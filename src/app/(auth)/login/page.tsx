@@ -4,22 +4,28 @@
 import LoginForm from '@/components/auth/LoginForm'
 import { useApiForLogin } from '@/features/auth/hooks/useApiForLogin'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 interface LoginFormData {
-  email: string
+  user_name: string
   password: string
 }
 
 export default function LoginPage() {
-  const router = useRouter()
-  const { mutate: login, isPending } = useApiForLogin({
+  const router = useRouter();
+  const [isPending, setIsPending] = useState(false);
+  const { mutate: login } = useApiForLogin({
     onSuccess: () => {
+      setIsPending(false);
       router.push('/main') // 로그인 성공 시 리다이렉트
+    },onError: () => {
+      setIsPending(false);
     }
   })
 
   const handleLogin = (formData: LoginFormData) => {
-    login(formData)
+    setIsPending(true);
+    login(formData);
   }
 
   return (

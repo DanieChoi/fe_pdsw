@@ -6,7 +6,7 @@ export const loginApi = {
     const loginData: LoginRequest = {
       grant_type: "password",
       device_id: "api_test",
-      user_name: credentials.email,
+      user_name: credentials.user_name,
       password: credentials.password,
     };
 

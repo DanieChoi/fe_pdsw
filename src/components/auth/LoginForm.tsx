@@ -9,13 +9,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { User, Lock } from 'lucide-react'
 
 interface LoginFormProps {
-  onSubmit: (data: { email: string; password: string }) => void
+  onSubmit: (data: { user_name: string; password: string }) => void
   isLoading: boolean
 }
 
 export default function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
   const [formData, setFormData] = useState({
-    email: '',
+    user_name: '',
     password: ''
   })
 
@@ -48,8 +48,8 @@ export default function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
               <Input
                 type="text"
                 placeholder="아이디를 입력하세요"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                value={formData.user_name}
+                onChange={(e) => setFormData({ ...formData, user_name: e.target.value })}
                 className="h-12 pl-10 hover:border-[#5BC2C1] focus:border-[#5BC2C1] focus:ring-0"
                 disabled={isLoading}
               />

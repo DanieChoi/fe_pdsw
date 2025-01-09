@@ -12,7 +12,7 @@ export function useApiForLogin(
     mutationKey: ['login'],
     mutationFn: loginApi.login,
     onSuccess: (data, variables, context) => {
-      toast.success('로그인 성공!');
+      // toast.success('로그인 성공!');
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: AuthApiError, variables: LoginCredentials, context: unknown) => {
