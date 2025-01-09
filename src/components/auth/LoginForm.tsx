@@ -1,3 +1,4 @@
+// src/components/auth/LoginForm.tsx
 'use client'
 
 import { useState } from 'react'
@@ -7,16 +8,20 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { User, Lock } from 'lucide-react'
 
-export default function LoginForm() {
+interface LoginFormProps {
+  onSubmit: (data: { email: string; password: string }) => void
+  isLoading: boolean
+}
+
+export default function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Add login logic here
-    console.log('Form submitted:', formData)
+    onSubmit(formData)
   }
 
   return (
@@ -41,11 +46,12 @@ export default function LoginForm() {
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <Input
-                type="email"
+                type="text"
                 placeholder="아이디를 입력하세요"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="h-12 pl-10 hover:border-[#5BC2C1] focus:border-[#5BC2C1] focus:ring-0"
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -58,14 +64,16 @@ export default function LoginForm() {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className="h-12 pl-10 hover:border-[#5BC2C1] focus:border-[#5BC2C1] focus:ring-0"
+                disabled={isLoading}
               />
             </div>
           </div>
           <Button 
             type="submit" 
             className="w-full h-12 bg-[#5BC2C1] hover:bg-[#4BA3A2] text-white font-medium"
+            disabled={isLoading}
           >
-            로그인
+            {isLoading ? '로그인 중...' : '로그인'}
           </Button>
         </form>
       </CardContent>
