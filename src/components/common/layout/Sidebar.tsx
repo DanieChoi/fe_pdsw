@@ -1,8 +1,7 @@
-// Sidebar.tsx
 "use client"
 
 import { Button } from '@/components/ui/button'
-import { Plus, Minus, Phone, Folder } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
 type TreeItem = {
@@ -26,6 +25,11 @@ const treeData: TreeItem[] = [
     type: 'folder',
     children: [
       {
+        id: 'default',
+        label: '[1] DEFAULT',
+        type: 'folder',
+      },
+      {
         id: 'skt',
         label: '[2] SKT',
         type: 'folder',
@@ -38,13 +42,13 @@ const treeData: TreeItem[] = [
           },
           {
             id: 'test1',
-            label: 'testtest_00124',
+            label: 'test_00124',
             type: 'campaign',
             status: 'pending'
           },
           {
             id: 'test2',
-            label: 'testtest_00124',
+            label: 'test_00124',
             type: 'campaign',
             status: 'pending'
           },
@@ -73,7 +77,7 @@ const treeData: TreeItem[] = [
               },
               {
                 id: 'campaign4',
-                label: 'asldkfjlkasdfkds',
+                label: 'test_00124',
                 type: 'campaign',
                 status: 'pending'
               }
@@ -102,25 +106,14 @@ const TreeNode = ({ item, level = 0, defaultOpen = false }: TreeNodeProps) => {
     setIsOpen(!isOpen);
   };
 
-  const getStatusColor = (status?: string) => {
-    switch (status) {
-      case 'active':
-        return 'text-green-500';
-      case 'pending':
-        return 'text-blue-500';
-      case 'stopped':
-        return 'text-red-500';
-      default:
-        return 'text-gray-400';
-    }
-  }
-
   const getStatusIcon = (status?: string) => {
     switch (status) {
       case 'active':
+        return '/sidebar-menu/tree_play.svg';
       case 'pending':
+        return '/sidebar-menu/tree_pausse.svg';
       case 'stopped':
-        return '●';
+        return '/sidebar-menu/tree_stop.svg';
       default:
         return null;
     }
@@ -143,19 +136,20 @@ const TreeNode = ({ item, level = 0, defaultOpen = false }: TreeNodeProps) => {
                 <img src="/sidebar-menu/arrow_plus.svg" alt="plus" className="h-3 w-3" />
               )}
             </span>
-            {hasChildren && <Folder className="h-4 w-4 mr-1 text-gray-400" />}
+            <img src="/sidebar-menu/tree_folder.svg" alt="folder" className="h-4 w-4 mr-1" />
           </>
         ) : (
-          <span className="w-4 h-4 mr-1 flex items-center justify-center">
-            <Phone className="h-4 w-4 text-gray-400" />
-          </span>
+          <>
+            <span className="w-4 h-4 mr-1" />
+            {getStatusIcon(item.status) && (
+              <img 
+                src={getStatusIcon(item.status)} 
+                alt={item.status} 
+                className="h-4 w-4 mr-1"
+              />
+            )}
+          </>
         )}
-
-        <span className={getStatusColor(item.status)}>
-          {item.status && (
-            <span className="mr-1">{getStatusIcon(item.status)}</span>
-          )}
-        </span>
 
         <span className="text-sm text-[#212529] font-normal">
           {item.label}
@@ -213,7 +207,7 @@ export default function Sidebar({ isMenuOpen = false }: SidebarProps) {
         <div>
           <div className="flex items-center justify-between p-2 bg-lightgray-100 px-3 border-b">
             <div className="flex items-center">
-              <Phone className="h-4 w-4 mr-2" />
+              <img src="/sidebar-menu/tree_folder.svg" alt="folder" className="h-4 w-4 mr-2" />
               <span className="text-sm text-[#212529] font-normal">캠페인</span>
             </div>
             <div className="flex items-center space-x-2">
