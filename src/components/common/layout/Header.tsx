@@ -1,0 +1,121 @@
+"use client"
+
+import { Button } from '@/components/ui/button'
+import Image from 'next/image'
+
+export default function Header() {
+  const menuItems = [
+    { 
+      id: 1, 
+      title: '캠페인 그룹관리', 
+      icon: '/header-menu/캠페인그룹관리.svg', 
+      href: '/main' 
+    },
+    { 
+      id: 2, 
+      title: '캠페인관리', 
+      icon: '/header-menu/캠페인관리.svg', 
+      href: '/campaign' 
+    },
+    { 
+      id: 3, 
+      title: '통합모니터', 
+      icon: '/header-menu/통합모니터.svg', 
+      href: '/monitor' 
+    },
+    { 
+      id: 4, 
+      title: '총건행상황', 
+      icon: '/header-menu/총진행상황.svg', 
+      href: '/status' 
+    },
+    { 
+      id: 5, 
+      title: '발신전화상태', 
+      icon: '/header-menu/발신진행상태.svg', 
+      href: '/call' 
+    },
+    { 
+      id: 6, 
+      title: '채널모니터', 
+      icon: '/header-menu/채널모니터.svg', 
+      href: '/channel' 
+    },
+    { 
+      id: 7, 
+      title: '리스트 매니저', 
+      icon: '/header-menu/리스트매니저.svg', 
+      href: '/list' 
+    },
+    { 
+      id: 8, 
+      title: '예약램 채번설정', 
+      icon: '/header-menu/예약콜제한설정.svg', 
+      href: '/reserve' 
+    },
+    { 
+      id: 9, 
+      title: '분배우수 채번설정', 
+      icon: '/header-menu/분배호수제한설정.svg', 
+      href: '/distribute' 
+    },
+    { 
+      id: 10, 
+      title: '시스템설정', 
+      icon: '/header-menu/시스템설정.svg', 
+      href: '/system' 
+    },
+    { 
+      id: 11, 
+      title: '운영설정', 
+      icon: '/header-menu/운영설정.svg', 
+      href: '/operation' 
+    },
+    { 
+      id: 12, 
+      title: '환경설정', 
+      icon: '/header-menu/환경설정.svg', 
+      href: '/settings' 
+    },
+  ]
+
+  return (
+    <div className="flex flex-col">
+      <div className="py-1">
+        <div style={{ backgroundColor: '#55bec8' }}>
+          <div className="container px-2">
+            <h1 className="text-sm text-white">NEXPDS</h1>
+          </div>
+        </div>
+      </div>
+      <header className="bg-white px-4 pb-4 border-b">
+        <div className="container mx-auto">
+          <div className="flex items-center justify-between">
+            <nav className="flex space-x-1 overflow-x-auto">
+              {menuItems.map((item) => (
+                <div key={item.id}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="hover:bg-white/20 flex flex-col items-center justify-center min-w-[80px] h-auto py-2 space-y-1"
+                    onClick={() => console.log('Clicked:', item.title)}
+                  >
+                    <div className="w-6 h-6 relative">
+                      <Image
+                        src={item.icon}
+                        alt={item.title}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                    <span className="text-xs whitespace-nowrap">{item.title}</span>
+                  </Button>
+                </div>
+              ))}
+            </nav>
+          </div>
+        </div>
+      </header>
+    </div>
+  )
+}
