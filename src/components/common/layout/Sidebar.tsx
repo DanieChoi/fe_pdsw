@@ -1,7 +1,8 @@
+// Sidebar.tsx
 "use client"
 
 import { Button } from '@/components/ui/button'
-import { ChevronDown, ChevronRight, Phone, Folder } from 'lucide-react'
+import { Plus, Minus, Phone, Folder } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
 type TreeItem = {
@@ -10,6 +11,12 @@ type TreeItem = {
   type: 'folder' | 'campaign';
   status?: 'active' | 'pending' | 'stopped';
   children?: TreeItem[];
+}
+
+interface TreeNodeProps {
+  item: TreeItem;
+  level?: number;
+  defaultOpen?: boolean;
 }
 
 const treeData: TreeItem[] = [
@@ -88,8 +95,8 @@ const treeData: TreeItem[] = [
   }
 ]
 
-const TreeNode = ({ item, level = 0 }: { item: TreeItem; level?: number }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const TreeNode = ({ item, level = 0, defaultOpen = false }: TreeNodeProps) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const toggleOpen = () => {
     setIsOpen(!isOpen);
@@ -131,9 +138,9 @@ const TreeNode = ({ item, level = 0 }: { item: TreeItem; level?: number }) => {
           <>
             <span className="w-4 h-4 mr-1 flex items-center justify-center">
               {isOpen ? (
-                <ChevronDown className="h-4 w-4 text-gray-400" />
+                <img src="/sidebar-menu/arrow_minus.svg" alt="minus" className="h-3 w-3" />
               ) : (
-                <ChevronRight className="h-4 w-4 text-gray-400" />
+                <img src="/sidebar-menu/arrow_plus.svg" alt="plus" className="h-3 w-3" />
               )}
             </span>
             {hasChildren && <Folder className="h-4 w-4 mr-1 text-gray-400" />}
@@ -158,7 +165,7 @@ const TreeNode = ({ item, level = 0 }: { item: TreeItem; level?: number }) => {
       {item.type === 'folder' && isOpen && (
         <div className="ml-4">
           {item.children?.map((child) => (
-            <TreeNode key={child.id} item={child} level={level + 1} />
+            <TreeNode key={child.id} item={child} level={level + 1} defaultOpen={defaultOpen} />
           ))}
         </div>
       )}
@@ -166,8 +173,12 @@ const TreeNode = ({ item, level = 0 }: { item: TreeItem; level?: number }) => {
   )
 }
 
-export default function Sidebar() {
-  const [width, setWidth] = useState(330); // Default width 256px
+interface SidebarProps {
+  isMenuOpen?: boolean;
+}
+
+export default function Sidebar({ isMenuOpen = false }: SidebarProps) {
+  const [width, setWidth] = useState(330); 
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isResizing, setIsResizing] = useState(false);
 
@@ -176,7 +187,7 @@ export default function Sidebar() {
       if (!isResizing) return;
       
       const newWidth = e.clientX;
-      if (newWidth >= 200 && newWidth <= 600) { // Min and max width constraints
+      if (newWidth >= 200 && newWidth <= 600) {
         setWidth(newWidth);
       }
     };
@@ -208,18 +219,18 @@ export default function Sidebar() {
             <div className="flex items-center space-x-2">
               <Button variant="ghost" size="sm" className="h-6 px-2 text-[#212529] font-normal">
                 필터
-                <ChevronDown className="h-4 w-4 ml-1" />
+                <Plus className="h-4 w-4 ml-1" />
               </Button>
               <Button variant="ghost" size="sm" className="h-6 px-2 text-[#212529] font-normal">
                 정렬
-                <ChevronDown className="h-4 w-4 ml-1" />
+                <Plus className="h-4 w-4 ml-1" />
               </Button>
             </div>
           </div>
 
           <div className="">
             {treeData.map((item) => (
-              <TreeNode key={item.id} item={item} />
+              <TreeNode key={item.id} item={item} defaultOpen={isMenuOpen} />
             ))}
           </div>
         </div>

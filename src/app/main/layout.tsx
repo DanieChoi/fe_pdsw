@@ -24,7 +24,7 @@ export default function MainLayout({
       <div className="min-h-screen flex flex-col">
         <Header />
         <div className="flex flex-1">
-          <Sidebar />
+          <Sidebar isMenuOpen />
           <main className="flex-1 p-6 bg-gray-50">
             {children}
           </main>
