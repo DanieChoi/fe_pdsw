@@ -1,14 +1,24 @@
 // src/features/auth/api/login.ts
-import { LoginCredentials, LoginRequest, LoginResponse } from '../types';
+import { LoginCredentials, LoginRequest, LoginResponse, LoginResponseFirst } from '../types';
 
 export const loginApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     const loginData: LoginRequest = {
       grant_type: "password",
       device_id: "api_test",
-      user_name: credentials.user_name,
-      password: credentials.password,
+      user_name: "NEX20000",
+      password: "1",
     };
+    
+    const responseFirst = await fetch(`https://jedai-qa-web.nexuscommunity.net:9443/agent/loginCubeC?id=${credentials.user_name}&passwd=${credentials.password}`, {
+      method: 'GET'
+    });
+    
+    const dataFirst: LoginResponseFirst = await responseFirst.json();
+    
+    if (!responseFirst.ok || typeof dataFirst.id === 'undefined') {      
+      throw new Error('서버 에러 입니다.');
+    }
 
     const response = await fetch('/api/login', {
       method: 'POST',
