@@ -1,5 +1,7 @@
 // src/features/auth/api/login.ts
+import { set } from 'react-hook-form';
 import { LoginCredentials, LoginRequest, LoginResponse, LoginResponseFirst } from '../types';
+import useStore,{UserInfoData} from '@/features/auth/hooks/store';
 
 export const loginApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
@@ -37,6 +39,11 @@ export const loginApi = {
     if (!response.ok || data.result_code !== 0) {
       throw new Error(data.result_msg || '로그인 실패');
     }
+    const userInfo:UserInfoData = {
+      id: dataFirst.id,
+      tenant_id: data.tenant_id
+    }
+    useStore.setState(userInfo);
 
     // 로그인 성공 시 세션 저장
     await fetch('/api/auth/set-session', {

@@ -19,6 +19,8 @@ export interface LoginResponse {
   result_msg: string;
   session_key: string;
   expired_in: number;
+  tenant_id: number;
+  role_id: number;
 }
 
 // API 에러 타입

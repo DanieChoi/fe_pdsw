@@ -21,7 +21,13 @@ export default function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit(formData)
+    if( formData.user_name === '' ){
+      alert('아이디를 입력해 주세요');
+    }else if(formData.user_name === '' ){
+      alert('비밀번호를 입력해 주세요');
+    }else{
+      onSubmit(formData)
+    }
   }
 
   return (
