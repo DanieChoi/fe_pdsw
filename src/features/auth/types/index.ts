@@ -26,3 +26,9 @@ export interface AuthApiError {
   message: string;
   status: number;
 }
+
+// 로그인First 응답 데이터 타입
+export interface LoginResponseFirst {
+  id: string;
+  passwd: string;
+}

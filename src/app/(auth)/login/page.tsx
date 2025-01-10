@@ -18,7 +18,8 @@ export default function LoginPage() {
     onSuccess: () => {
       setIsPending(false);
       router.push('/main') // 로그인 성공 시 리다이렉트
-    },onError: () => {
+    },onError: (e) => {
+      alert(e.message);
       setIsPending(false);
     }
   })
