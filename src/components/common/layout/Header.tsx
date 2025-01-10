@@ -13,7 +13,7 @@ export default function Header() {
     },
     { 
       id: 2, 
-      title: '캠페인관리', 
+      title: '캠페인 관리', 
       icon: '/header-menu/캠페인관리.svg', 
       href: '/campaign' 
     },
@@ -25,7 +25,7 @@ export default function Header() {
     },
     { 
       id: 4, 
-      title: '총건행상황', 
+      title: '총진행상황', 
       icon: '/header-menu/총진행상황.svg', 
       href: '/status' 
     },
@@ -37,7 +37,7 @@ export default function Header() {
     },
     { 
       id: 6, 
-      title: '채널모니터', 
+      title: '채널 모니터', 
       icon: '/header-menu/채널모니터.svg', 
       href: '/channel' 
     },
@@ -49,31 +49,31 @@ export default function Header() {
     },
     { 
       id: 8, 
-      title: '예약램 채번설정', 
+      title: '예약콜 제한 설정', 
       icon: '/header-menu/예약콜제한설정.svg', 
       href: '/reserve' 
     },
     { 
       id: 9, 
-      title: '분배우수 채번설정', 
+      title: '분배호수 제한 설정', 
       icon: '/header-menu/분배호수제한설정.svg', 
       href: '/distribute' 
     },
     { 
       id: 10, 
-      title: '시스템설정', 
+      title: '시스템 설정', 
       icon: '/header-menu/시스템설정.svg', 
       href: '/system' 
     },
     { 
       id: 11, 
-      title: '운영설정', 
+      title: '운영 설정', 
       icon: '/header-menu/운영설정.svg', 
       href: '/operation' 
     },
     { 
       id: 12, 
-      title: '환경설정', 
+      title: '환경 설정', 
       icon: '/header-menu/환경설정.svg', 
       href: '/settings' 
     },
