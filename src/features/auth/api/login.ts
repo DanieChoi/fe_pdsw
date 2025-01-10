@@ -3,11 +3,12 @@ import { LoginCredentials, LoginRequest, LoginResponse, LoginResponseFirst } fro
 
 export const loginApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
+    
     const loginData: LoginRequest = {
       grant_type: "password",
       device_id: "api_test",
-      user_name: "NEX20000",
-      password: "1",
+      user_name: credentials.user_name,
+      password: credentials.password,
     };
     
     const responseFirst = await fetch(`https://jedai-qa-web.nexuscommunity.net:9443/agent/loginCubeC?id=${credentials.user_name}&passwd=${credentials.password}`, {
@@ -18,6 +19,9 @@ export const loginApi = {
     
     if (!responseFirst.ok || typeof dataFirst.id === 'undefined') {      
       throw new Error('서버 에러 입니다.');
+    }else{
+      // to fix 전역 변수에 담고 그걸 메뉴에 출력
+      console.log(dataFirst.id);
     }
 
     const response = await fetch('/api/login', {
