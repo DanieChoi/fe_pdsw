@@ -17,15 +17,15 @@ export default function LoginPage() {
   const [isPending, setIsPending] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('success');
+  const [alertType, setAlertType] = useState('fail');
 
   const { mutate: login } = useApiForLogin({
     onSuccess: () => {
       setIsPending(false);
       router.push('/main') // 로그인 성공 시 리다이렉트
     },onError: (e) => {
-      showAlert(e.message,'success');
-      alert(e.message);
+      setAlertMessage(e.message);
+      setAlertVisible(true);
       setIsPending(false);
     }
   })
@@ -34,17 +34,6 @@ export default function LoginPage() {
     setIsPending(true);
     login(formData);
   }
-
-  const showAlert = (message:string, type:string) => {
-    setAlertMessage(message);
-    setAlertType(type);
-    setAlertVisible(true);
-
-    // 3초 후에 알림을 자동으로 닫음
-    setTimeout(() => {
-      setAlertVisible(false);
-    }, 3000);
-  };
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
