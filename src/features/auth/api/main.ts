@@ -24,7 +24,7 @@ export const MainApi = {
         }
     };
     
-    const campaignResponse = await fetch('http://10.10.40.145:8010/pds/collections/campaign', {
+    const campaignResponse = await fetch('/api/collections/campaign', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
