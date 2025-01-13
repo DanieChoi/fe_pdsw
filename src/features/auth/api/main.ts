@@ -1,9 +1,9 @@
 // src/features/auth/api/fetchCampaigns.ts
 import { axiosInstance } from '@/lib/axios';
-import { MainCredentials, LoginResponse } from '../types/mainIndex';
+import { MainCredentials, MainResponse } from '../types/mainIndex';
 
 // 캠페인 리스트 요청
-export const fetchCampaigns = async (credentials: MainCredentials): Promise<LoginResponse> => {
+export const fetchCampaigns = async (credentials: MainCredentials): Promise<MainResponse> => {
   const mainData = {
     filter: {
       
@@ -22,7 +22,7 @@ export const fetchCampaigns = async (credentials: MainCredentials): Promise<Logi
   };
 
   try {
-    const { data } = await axiosInstance.post<LoginResponse>(
+    const { data } = await axiosInstance.post<MainResponse>(
       '/collections/campaign', 
       mainData
     );
