@@ -1,4 +1,3 @@
-// src/app/(auth)/login/page.tsx
 'use client'
 
 import LoginForm from '@/components/auth/LoginForm'
@@ -15,25 +14,29 @@ interface LoginFormData {
 export default function LoginPage() {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('fail');
+  const [alertState, setAlertState] = useState({
+    isOpen: false,
+    message: ''
+  });
 
   const { mutate: login } = useApiForLogin({
     onSuccess: () => {
       setIsPending(false);
       router.push('/main') // 로그인 성공 시 리다이렉트
-    },onError: (e) => {
-      setAlertMessage(e.message);
-      setAlertVisible(true);
+    },
+    onError: (e) => {
+      setAlertState({
+        isOpen: true,
+        message: e.message
+      });
       setIsPending(false);
     }
-  })
+  });
 
   const handleLogin = (formData: LoginFormData) => {
     setIsPending(true);
     login(formData);
-  }
+  };
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
@@ -45,13 +48,11 @@ export default function LoginPage() {
         <footer className="text-center mt-8 text-sm text-gray-500">
           © 2025 NEXUS COMMUNITY All rights reserved.
         </footer>
-        {alertVisible && (
-          <CustomAlert 
-            message={alertMessage} 
-            type={alertType} 
-            onClose={() => setAlertVisible(false)} 
-          />
-        )}
+        <CustomAlert 
+          message={alertState.message}
+          isOpen={alertState.isOpen}
+          onClose={() => setAlertState(prev => ({ ...prev, isOpen: false }))}
+        />
       </div>
     </main>
   )
