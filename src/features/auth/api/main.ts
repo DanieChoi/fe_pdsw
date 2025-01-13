@@ -2,6 +2,7 @@
 import { axiosInstance } from '@/lib/axios';
 import { MainCredentials, LoginResponse } from '../types/mainIndex';
 
+// 캠페인 리스트 요청
 export const fetchCampaigns = async (credentials: MainCredentials): Promise<LoginResponse> => {
   const mainData = {
     filter: {
