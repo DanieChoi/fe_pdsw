@@ -7,7 +7,7 @@ export interface UserInfoData {
 }
 const useStore = create<UserInfoData>((set) => ({
     id : '',
-    tenant_id : 0,
+    tenant_id : -1,
     session_key : ''
 }));
 

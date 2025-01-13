@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { User, Lock } from 'lucide-react'
+import CustomAlert from '@/components/common/layout/CustomAlert'
 
 interface LoginFormProps {
   onSubmit: (data: { user_name: string; password: string }) => void
@@ -18,13 +19,29 @@ export default function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
     user_name: '',
     password: ''
   })
+  const [alertState, setAlertState] = useState({
+    isOpen: false,
+    message: '',
+    title: '로그인',
+    type: '0'
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if( formData.user_name === '' ){
-      alert('아이디를 입력해 주세요');
-    }else if(formData.user_name === '' ){
-      alert('비밀번호를 입력해 주세요');
+      setAlertState({
+        isOpen: true,
+        message: '아이디를 입력해 주세요',
+        title: '로그인',
+        type: '0'
+      });
+    }else if(formData.password === '' ){
+      setAlertState({
+        isOpen: true,
+        message: '비밀번호를 입력해 주세요',
+        title: '로그인',
+        type: '0'
+      });
     }else{
       onSubmit(formData)
     }
@@ -82,6 +99,13 @@ export default function LoginForm({ onSubmit, isLoading }: LoginFormProps) {
             {isLoading ? '로그인 중...' : '로그인'}
           </Button>
         </form>
+        <CustomAlert 
+          message={alertState.message}
+          title={alertState.title}
+          type={alertState.type}
+          isOpen={alertState.isOpen}
+          onClose={() => setAlertState(prev => ({ ...prev, isOpen: false }))}
+        />
       </CardContent>
     </Card>
   )

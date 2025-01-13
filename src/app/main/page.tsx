@@ -1,12 +1,13 @@
 // src/app/main/page.tsx
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useStore from '@/features/auth/hooks/store';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useMainStore } from '@/features/store';
 import CampaignList from "./comp/CampaignList";
 import CampaignDetail from "./comp/CampaignDetail";
+import Cookies from 'js-cookie';
 
 interface MainFormData {
   tenant_id: number;
@@ -16,6 +17,7 @@ interface MainFormData {
 export default function MainPage() {
   const { tenant_id, session_key } = useStore.getState();
   const { setCampaigns, setTotalCount } = useMainStore();
+  const [tenantId, setTenantId] = useState(-1);
 
   const mainData: MainFormData = {
     tenant_id,
@@ -41,7 +43,8 @@ export default function MainPage() {
     if (session_key !== '') {
       main(mainData);
     }
-  }, [tenant_id, session_key]);
+    setTenantId(Number(Cookies.get('tenant_id')));
+  }, []);
 
   return (
     <div className="space-y-6">
