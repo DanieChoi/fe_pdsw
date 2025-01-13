@@ -1,5 +1,5 @@
 // components/main/DetailView.tsx
-import { useMainStore } from '@/features/store';
+import { useMainStore } from '@/store';
 
 export default function DetailView() {
   const selectedCampaign = useMainStore((state) => state.selectedCampaign);

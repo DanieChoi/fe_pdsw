@@ -242,7 +242,7 @@
 
 // components/common/layout/Sidebar.tsx
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
-import { useMainStore } from '@/features/store';
+import { useMainStore } from '@/store';
 import { useEffect } from 'react';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 

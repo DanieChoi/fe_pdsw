@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import useStore from '@/features/auth/hooks/store';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
-import { useMainStore } from '@/features/store';
+import { useMainStore } from '@/store';
 import TabMenuForMainPage from "./comp/TabMenuForMainPage";
 import TabContent from "./comp/TabContent";
 import Cookies from 'js-cookie';
@@ -47,7 +47,7 @@ export default function MainPage() {
   }, []);
 
   return (
-    <div className="flex flex-col">
+    <div className="space-y-4 p-4">
       <TabMenuForMainPage />
       <TabContent />
     </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from '@/components/ui/button'
-import { useTabStore } from '@/features/store';
+import { useTabStore } from '@/store';
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
