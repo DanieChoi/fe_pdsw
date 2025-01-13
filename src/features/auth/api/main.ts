@@ -1,49 +1,34 @@
-// src/features/auth/api/login.ts
-import { set } from 'react-hook-form';
-import { MainCredentials, LoginRequest, LoginResponse, LoginResponseFirst } from '../types/mainIndex';
-import useStore from '@/features/auth/hooks/store';
+// src/features/auth/api/fetchCampaigns.ts
+import { axiosInstance } from '@/lib/axios';
+import { MainCredentials, LoginResponse } from '../types/mainIndex';
 
-export const MainApi = {
-  login: async (credentials: MainCredentials): Promise<LoginResponse> => {
-    
-    const { id, tenant_id, session_key } = useStore.getState();
-
-    const mainData = {
-        "filter": {
-            "campaign_id": {
-                "start": 1,
-                "end": 1000
-            }
-        },
-        "sort": {
-            "campaign_id": 1
-        },
-        "page": {
-            "index": 1,
-            "items": 10
-        }
-    };
-    
-    const campaignResponse = await fetch('/api/collections/campaign', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Session-Key': session_key
+export const fetchCampaigns = async (credentials: MainCredentials): Promise<LoginResponse> => {
+  const mainData = {
+    filter: {
+      campaign_id: {
+        start: 1,
+        end: 1000,
       },
-      body: JSON.stringify(mainData),
-    });
-    
-    const data: LoginResponse = await campaignResponse.json();
-    
-    if (!campaignResponse.ok || data.result_code !== 0) {
-      throw new Error(data.result_msg || '로그인 실패');
-    }
-    // const userInfo:UserInfoData = {
-    //   id: dataFirst.id,
-    //   tenant_id: data.tenant_id
-    // }
-    // useStore.setState(userInfo);
+    },
+    sort: {
+      campaign_id: 1,
+    },
+    page: {
+      index: 1,
+      items: 10,
+    },
+  };
 
+  try {
+    const { data } = await axiosInstance.post<LoginResponse>(
+      '/collections/campaign', 
+      mainData
+    );
     return data;
+  } catch (error: any) {
+    if (error.response?.status === 401) {
+      throw new Error('세션이 만료되었습니다. 다시 로그인해주세요.');
+    }
+    throw new Error(error.response?.data?.result_msg || '데이터 가져오기 실패');
   }
 };
