@@ -1,6 +1,6 @@
 // src/features/auth/api/login.ts
 import { set } from 'react-hook-form';
-import { LoginCredentials, LoginRequest, LoginResponse, LoginResponseFirst } from '../types';
+import { LoginCredentials, LoginRequest, LoginResponse, LoginResponseFirst } from '../types/loginIndex';
 import useStore,{UserInfoData} from '@/features/auth/hooks/store';
 
 export const loginApi = {
@@ -41,7 +41,8 @@ export const loginApi = {
     }
     const userInfo:UserInfoData = {
       id: dataFirst.id,
-      tenant_id: data.tenant_id
+      tenant_id: data.tenant_id,
+      session_key: data.session_key
     }
     useStore.setState(userInfo);
 

@@ -1,6 +1,40 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useEffect } from "react";
+import useStore from '@/features/auth/hooks/store';
+import { useApiForMain } from '@/features/auth/hooks/useApiForMain'
+
+interface MainFormData {
+  tenant_id: number
+  session_key: string
+}
 
 export default function MainPage() {
+  const { id, tenant_id, session_key } = useStore.getState();
+  const msinData:MainFormData = {
+    tenant_id: tenant_id,
+    session_key: session_key
+  }
+
+  const { mutate: main } = useApiForMain({
+    onSuccess: () => {
+      // setIsPending(false);
+      // router.push('/main') // 로그인 성공 시 리다이렉트
+    },onError: () => {
+      // setAlertMessage(e.message);
+      // setAlertVisible(true);
+      // setIsPending(false);
+    }
+  })
+
+  useEffect(() => {
+    console.log(id);
+    console.log(tenant_id);
+    console.log(session_key);
+    main(msinData);
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* 상단 필터/검색 영역 */}

@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { loginApi } from '../api/login';
 import { toast } from 'react-toastify';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { LoginCredentials, LoginResponse, AuthApiError } from '../types';
+import { LoginCredentials, LoginResponse, AuthApiError } from '../types/loginIndex';
 
 export function useApiForLogin(
   options?: UseMutationOptions<LoginResponse, AuthApiError, LoginCredentials>
