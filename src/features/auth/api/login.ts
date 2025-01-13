@@ -50,6 +50,11 @@ export const loginApi = {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'Lax'
       });
+      Cookies.set('tenant_id', data.tenant_id+'', {
+        expires: 1, // 1일
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Lax'
+      });
 
       return data;
     } catch (error: any) {
