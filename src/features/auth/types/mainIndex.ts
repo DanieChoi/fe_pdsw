@@ -1,4 +1,4 @@
-// src/features/auth/types/index.ts
+// src/features/auth/types/mainIndex.ts
 // 메인 요청 시 필요한 credentials 타입
 export interface MainCredentials {
   session_key: string;

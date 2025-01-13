@@ -1,4 +1,4 @@
-// src/features/auth/types/index.ts
+// src/features/auth/types/loginIndex.ts
 // 로그인 요청 시 필요한 credentials 타입
 export interface LoginCredentials {
   user_name: string;
