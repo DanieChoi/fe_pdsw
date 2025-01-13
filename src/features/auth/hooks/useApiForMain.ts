@@ -1,6 +1,6 @@
 // src/features/auth/hooks/useApiForLogin.ts
 import { useMutation } from '@tanstack/react-query';
-import { MainApi } from '../api/main';
+import { fetchCampaigns } from '../api/main';
 import { toast } from 'react-toastify';
 import { UseMutationOptions } from '@tanstack/react-query';
 import { MainCredentials, LoginResponse, AuthApiError } from '../types/mainIndex';
@@ -10,7 +10,7 @@ export function useApiForMain(
 ) {
   return useMutation({
     mutationKey: ['main'],
-    mutationFn: MainApi.login,
+    mutationFn: fetchCampaigns,
     onSuccess: (data, variables, context) => {
       // toast.success('로그인 성공!');
       options?.onSuccess?.(data, variables, context);

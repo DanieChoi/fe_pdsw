@@ -1,5 +1,6 @@
 // src/app/api/auth/set-session/route.ts
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   try {
@@ -12,16 +13,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const response = NextResponse.json({ success: true });
-    
-    response.cookies.set('session_key', session_key, {
+    (await cookies()).set('session_key', session_key, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 // 24시간
     });
 
-    return response;
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error setting session:', error);
     return NextResponse.json(
