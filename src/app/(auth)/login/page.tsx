@@ -16,7 +16,9 @@ export default function LoginPage() {
   const [isPending, setIsPending] = useState(false);
   const [alertState, setAlertState] = useState({
     isOpen: false,
-    message: ''
+    message: '',
+    title: '로그인',
+    type: '0'
   });
 
   const { mutate: login } = useApiForLogin({
@@ -27,7 +29,9 @@ export default function LoginPage() {
     onError: (e) => {
       setAlertState({
         isOpen: true,
-        message: e.message
+        message: e.message,
+        title: '로그인',
+        type: '0'
       });
       setIsPending(false);
     }
@@ -50,6 +54,8 @@ export default function LoginPage() {
         </footer>
         <CustomAlert 
           message={alertState.message}
+          title={alertState.title}
+          type={alertState.type}
           isOpen={alertState.isOpen}
           onClose={() => setAlertState(prev => ({ ...prev, isOpen: false }))}
         />
