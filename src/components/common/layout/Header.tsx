@@ -1,9 +1,14 @@
 "use client"
 
 import { Button } from '@/components/ui/button'
+import { useTabStore } from '@/features/store';
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 export default function Header() {
+  const router = useRouter();
+  const { addTab } = useTabStore();
+
   const menuItems = [
     { 
       id: 1, 
@@ -79,6 +84,11 @@ export default function Header() {
     },
   ]
 
+  const handleMenuClick = (item: typeof menuItems[0]) => {
+    addTab(item);
+    // router.push(item.href);
+  };
+
   return (
     <div className="flex flex-col">
       <div className="py-1">
@@ -98,7 +108,7 @@ export default function Header() {
                     type="button"
                     variant="ghost"
                     className="hover:bg-white/20 flex flex-col items-center justify-center min-w-[80px] h-auto py-2 space-y-1"
-                    onClick={() => console.log('Clicked:', item.title)}
+                    onClick={() => handleMenuClick(item)}
                   >
                     <div className="w-6 h-6 relative">
                       <Image

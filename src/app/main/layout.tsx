@@ -23,7 +23,7 @@ export default function MainLayout({
     <div className={inter.className}>
       <div className="min-h-screen flex flex-col">
         <Header />
-        <div className="flex flex-1">
+        <div className="flex flex-1 my-2 gap-2">
           <Sidebar isMenuOpen />
           <main className="flex-1 p-6 bg-gray-50">
             {children}

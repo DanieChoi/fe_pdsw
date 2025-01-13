@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import useStore from '@/features/auth/hooks/store';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useMainStore } from '@/features/store';
-import CampaignList from "./comp/CampaignList";
-import CampaignDetail from "./comp/CampaignDetail";
+import TabMenuForMainPage from "./comp/TabMenuForMainPage";
+import TabContent from "./comp/TabContent";
 import Cookies from 'js-cookie';
 
 interface MainFormData {
@@ -47,21 +47,9 @@ export default function MainPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
-      {/* 상단 필터/검색 영역 */}
-      <div className="flex space-x-4 items-center">
-        <select className="p-2 border rounded">
-          <option>전체</option>
-        </select>
-        <input 
-          type="text" 
-          placeholder="캠페인명" 
-          className="p-2 border rounded"
-        />
-      </div>
-
-      <CampaignList />
-      <CampaignDetail />
+    <div className="flex flex-col">
+      <TabMenuForMainPage />
+      <TabContent />
     </div>
   );
 }
