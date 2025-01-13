@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useStore from '@/features/auth/hooks/store';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain'
 
@@ -12,15 +12,17 @@ interface MainFormData {
 
 export default function MainPage() {
   const { id, tenant_id, session_key } = useStore.getState();
+  const [tenantId, setTenantId ] = useState(999);
   const msinData:MainFormData = {
     tenant_id: tenant_id,
     session_key: session_key
   }
 
   const { mutate: main } = useApiForMain({
-    onSuccess: () => {
+    onSuccess: (e) => {
       // setIsPending(false);
       // router.push('/main') // 로그인 성공 시 리다이렉트
+      console.log(e.result_msg);
     },onError: () => {
       // setAlertMessage(e.message);
       // setAlertVisible(true);
@@ -29,11 +31,11 @@ export default function MainPage() {
   })
 
   useEffect(() => {
-    console.log(id);
-    console.log(tenant_id);
-    console.log(session_key);
+    if( session_key !== ''){
+      setTenantId( tenant_id );
+    }
     main(msinData);
-  }, []);
+  }, [tenant_id,session_key]);
 
   return (
     <div className="space-y-6">

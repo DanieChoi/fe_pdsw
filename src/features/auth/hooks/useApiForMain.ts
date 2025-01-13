@@ -3,10 +3,10 @@ import { useMutation } from '@tanstack/react-query';
 import { fetchCampaigns } from '../api/main';
 import { toast } from 'react-toastify';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { MainCredentials, LoginResponse, AuthApiError } from '../types/mainIndex';
+import { MainCredentials, MainResponse, AuthApiError } from '../types/mainIndex';
 
 export function useApiForMain(
-  options?: UseMutationOptions<LoginResponse, AuthApiError, MainCredentials>
+  options?: UseMutationOptions<MainResponse, AuthApiError, MainCredentials>
 ) {
   return useMutation({
     mutationKey: ['main'],
