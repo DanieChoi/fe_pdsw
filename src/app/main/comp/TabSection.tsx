@@ -42,14 +42,12 @@ const TabSection: React.FC<TabSectionProps> = ({
 
   // Cleanup effect for scroll interval
   useEffect(() => {
-    if (!section) return;
-    
     return () => {
       if (scrollIntervalRef.current) {
         clearInterval(scrollIntervalRef.current);
       }
     };
-  }, [section]);
+  }, []);
 
   // Cleanup effect for scroll interval
   useEffect(() => {
@@ -58,7 +56,9 @@ const TabSection: React.FC<TabSectionProps> = ({
         clearInterval(scrollIntervalRef.current);
       }
     };
-  }, [section]);
+  }, []);
+
+  if (!section) return null;
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -104,8 +104,6 @@ const TabSection: React.FC<TabSectionProps> = ({
       }
     };
   }, []);
-
-  if (!section) return null;
 
   return (
     <div

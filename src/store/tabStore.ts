@@ -36,6 +36,8 @@ export interface TabLayoutStore {
   addTabGroup: (tabId: number) => void;
   removeTabGroup: (groupId: string) => void;
   moveTabToGroup: (tabId: number, groupId: string) => void;
+  duplicateTab: (tabId: number) => void;  // 새로 추가
+
 }
 
 const generateUniqueId = (prefix: string, existingIds: string[]) => {
@@ -298,5 +300,45 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
       sections: updatedSections,
       tabGroups: updatedGroups
     };
-  })
+  }),
+
+  duplicateTab: (tabId: number) => set((state) => {
+    const originalTab = state.openedTabs.find(t => t.id === tabId);
+    if (!originalTab) return state;
+
+    // 새로운 고유 ID 생성 (기존 ID에 timestamp를 추가하여 고유성 보장)
+    const newTabId = Date.now();
+    const duplicatedTab = {
+      ...originalTab,
+      id: newTabId
+    };
+
+    // 섹션에서 원본 탭의 위치 찾기
+    const targetSection = state.sections.find(section => 
+      section.tabs.some(tab => tab.id === tabId)
+    );
+
+    if (!targetSection) return state;
+
+    // 해당 섹션에 복제된 탭 추가
+    const updatedSections = state.sections.map(section => {
+      if (section.id === targetSection.id) {
+        const originalTabIndex = section.tabs.findIndex(tab => tab.id === tabId);
+        const newTabs = [...section.tabs];
+        newTabs.splice(originalTabIndex + 1, 0, duplicatedTab); // 원본 탭 바로 뒤에 삽입
+        return {
+          ...section,
+          tabs: newTabs
+        };
+      }
+      return section;
+    });
+
+    return {
+      openedTabs: [...state.openedTabs, duplicatedTab],
+      sections: updatedSections,
+      activeTabId: newTabId // 새로 생성된 탭을 활성화
+    };
+  }),
+
 }));

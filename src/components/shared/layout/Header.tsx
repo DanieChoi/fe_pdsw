@@ -2,21 +2,25 @@
 "use client"
 
 import { Button } from '@/components/ui/button'
-import { useTabStore } from '@/store';
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { menuItems, MenuItem } from '@/components/shared/constants/menuItems';
+import { useTabStore } from '@/store/tabStore';  // 수정된 부분
 
 export default function Header() {
   const router = useRouter();
-  const { addTab, openedTabs } = useTabStore();
+  const { addTab, openedTabs, duplicateTab } = useTabStore();
 
-  const handleMenuClick = (item: MenuItem) => {
-    addTab(item);
-    // router.push(item.href);
+  const handleMenuClick = (item: MenuItem, event: React.MouseEvent) => {
+    if (event.ctrlKey) {
+      // Control 키를 누른 상태에서 클릭하면 새로운 탭 복제
+      duplicateTab(item.id);
+    } else {
+      // 일반 클릭은 기존대로 처리
+      addTab(item);
+    }
   };
 
-  // 현재 열린 탭인지 확인하는 함수
   const isTabOpened = (itemId: number) => {
     return openedTabs.some(tab => tab.id === itemId);
   };
@@ -38,7 +42,7 @@ export default function Header() {
           {/* 오른쪽 사용자 정보 */}
           <div className="flex items-center space-x-4 text-white text-sm">
             <div className='flex items-center space-x-1'>
-            <Image
+              <Image
                 src="/header-menu/top_pic.svg"
                 alt="사용자"
                 width={18}
@@ -74,7 +78,7 @@ export default function Header() {
                       min-w-[80px] h-auto py-2 space-y-1 rounded-md
                       ${isTabOpened(item.id) ? 'bg-blue-50 text-blue-700' : ''}
                     `}
-                    onClick={() => handleMenuClick(item)}
+                    onClick={(e) => handleMenuClick(item, e)}
                   >
                     <div className="w-[32px] h-[32px] relative">
                       <Image
