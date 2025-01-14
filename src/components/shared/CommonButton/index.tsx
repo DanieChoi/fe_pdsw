@@ -28,6 +28,8 @@ export const CommonButton: React.FC<CommonButtonProps> = ({
     ghost: 'bg-transparent text-black',
     link: 'text-blue-500 underline',
     login: 'w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm rounded-none font-16',
+    tab:"rounded-none rounded-tl-[3px] rounded-tr-[3px]  bg-[#56CAD6] text-white text-[13px] py-[7px] px-[10px] shadow-none border-t border-l border-r border-[#56CAD6]",
+    tabghost:"rounded-none rounded-tl-[3px] rounded-tr-[3px]  bg-transparent text-black text-[13px] py-[7px] px-[10px] shadow-none border-t border-l border-r"
   }[variant];
 
   const sizeClass = {

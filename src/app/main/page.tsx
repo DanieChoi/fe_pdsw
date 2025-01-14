@@ -60,10 +60,10 @@ const handleDragEnd = (event: DragEndEvent) => {
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col h-screen  box-border px-9 py-5 bg-white">
         {/* 상단 탭 섹션 영역 */}
-        <div className="flex border-b bg-white">
-          <div className="flex-1 flex border-r border-gray-300">
+        <div className="tabs-container">
+          <div className="tabs">
             {sections.map((section) => (
               <React.Fragment key={section.id}>
                 <TabSection
@@ -78,7 +78,7 @@ const handleDragEnd = (event: DragEndEvent) => {
             ))}
           </div>
           {sections.length < 3 && (
-            <div className="flex items-center px-4">
+            <div className="flex items-center px-0">
               <Button
                 variant="outline"
                 size="sm"
@@ -93,7 +93,7 @@ const handleDragEnd = (event: DragEndEvent) => {
         </div>
 
         {/* 본문 영역 */}
-        <div className="flex-1 p-4 bg-gray-50">
+        <div className="flex-1 p-2 bg-white">
           {/* <TabDropZone> */}
             <TabContent />
           {/* </TabDropZone> */}
