@@ -67,8 +67,8 @@ const MainPage = () => {
       <div className="flex flex-col h-screen">
         {/* 상단 탭 섹션 영역 */}
         <div className="flex border-b bg-white">
-          <div className="flex-1 flex">
-            {sections.map((section) => (
+          <div className="flex-1 flex border-r border-gray-300">
+            {sections.map((section, index) => (
               <React.Fragment key={section.id}>
                 <TabSection
                   id={section.id}
@@ -76,18 +76,18 @@ const MainPage = () => {
                   canRemove={section.id !== 'default'}
                 />
                 {section.id !== sections[sections.length - 1].id && (
-                  <div className="w-px bg-gray-200" />
+                  <div className="w-px bg-gray-300 h-full" />
                 )}
               </React.Fragment>
             ))}
           </div>
           {sections.length < 3 && (
-            <div className="flex items-center px-0">
+            <div className="flex items-center px-4">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={addSection}
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 hover:bg-gray-100"
               >
                 <Plus className="h-4 w-4" />
                 Split
@@ -97,7 +97,7 @@ const MainPage = () => {
         </div>
 
         {/* 본문 영역 (드롭 영역) */}
-        <div className="flex-1 p-2 bg-gray-50">
+        <div className="flex-1 p-4 bg-gray-50">
           <TabDropZone>
             <div className="grid grid-cols-2 gap-4">
               {tabGroups.map((group) => (

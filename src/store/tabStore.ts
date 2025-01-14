@@ -1,20 +1,20 @@
 // src/store/tabStore.ts
 import { create } from 'zustand';
 
-export interface TabItem {
+interface TabItem {
   id: number;
   title: string;
   icon: string;
   href: string;
 }
 
-export interface TabSection {
+interface TabSection {
   id: string;
   tabs: TabItem[];
   width: number;
 }
 
-export interface TabGroup {
+interface TabGroup {
   id: string;
   tabs: TabItem[];
   position: { x: number; y: number };
@@ -45,24 +45,17 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
   tabGroups: [],
 
   addTab: (tab) => set((state) => {
-    // 이미 열린 탭이 있는지 확인
-    const existingTab = state.openedTabs.find(t => t.id === tab.id);
-    
-    if (existingTab) {
-      // 이미 열린 탭이면 활성화만 수행
-      return { ...state, activeTabId: tab.id };
+    if (state.openedTabs.some(t => t.id === tab.id)) {
+      return { activeTabId: tab.id };
     }
-
-    // 새 탭 추가
-    const updatedSections = state.sections.map(section => ({
-      ...section,
-      tabs: section.id === 'default' 
-        ? [...section.tabs, tab]
-        : section.tabs
-    }));
+    
+    const updatedSections = state.sections.map(section => 
+      section.id === 'default' 
+        ? { ...section, tabs: [...section.tabs, tab] }
+        : section
+    );
 
     return {
-      ...state,
       openedTabs: [...state.openedTabs, tab],
       activeTabId: tab.id,
       sections: updatedSections
@@ -90,7 +83,6 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     })).filter(group => group.tabs.length > 0);
 
     return {
-      ...state,
       openedTabs: newTabs,
       activeTabId: newActiveTabId,
       sections: updatedSections,
@@ -98,39 +90,31 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     };
   }),
 
-  setActiveTab: (tabId) => set(state => ({
-    ...state,
+  setActiveTab: (tabId) => set({
     activeTabId: tabId
-  })),
+  }),
 
   moveTabToSection: (tabId, targetSectionId) => set((state) => {
     const tab = state.openedTabs.find(t => t.id === tabId);
     if (!tab) return state;
 
-    // 현재 탭이 이미 해당 섹션에 있는지 확인
-    const isTabInTargetSection = state.sections.find(
-      section => section.id === targetSectionId
-    )?.tabs.some(t => t.id === tabId);
+    // 섹션 간 탭 이동
+    const updatedSections = state.sections.map(section => {
+      const filteredTabs = section.tabs.filter(t => t.id !== tabId);
+      
+      if (section.id === targetSectionId) {
+        return { ...section, tabs: [...filteredTabs, tab] };
+      }
+      return { ...section, tabs: filteredTabs };
+    });
 
-    // 이미 해당 섹션에 있다면 상태 변경하지 않음
-    if (isTabInTargetSection) {
-      return state;
-    }
-
-    const updatedSections = state.sections.map(section => ({
-      ...section,
-      tabs: section.id === targetSectionId
-        ? [...section.tabs, tab]
-        : section.tabs.filter(t => t.id !== tabId)
-    }));
-
+    // 탭 그룹에서도 탭 제거
     const updatedGroups = state.tabGroups.map(group => ({
       ...group,
       tabs: group.tabs.filter(t => t.id !== tabId)
     })).filter(group => group.tabs.length > 0);
 
     return {
-      ...state,
       sections: updatedSections,
       tabGroups: updatedGroups
     };
@@ -146,13 +130,11 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     }));
 
     return {
-      ...state,
       sections: [...updatedSections, { id: newSectionId, tabs: [], width: newWidth }]
     };
   }),
 
   updateSectionWidth: (sectionId, width) => set((state) => ({
-    ...state,
     sections: state.sections.map(section =>
       section.id === sectionId ? { ...section, width } : section
     )
@@ -175,10 +157,7 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     const newWidth = 100 / updatedSections.length;
     updatedSections.forEach(section => section.width = newWidth);
 
-    return { 
-      ...state,
-      sections: updatedSections 
-    };
+    return { sections: updatedSections };
   }),
 
   addTabGroup: (tabId) => set((state) => {
@@ -192,13 +171,13 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
       position: { x: 0, y: 0 }
     };
 
+    // 원래 섹션에서 탭 제거
     const updatedSections = state.sections.map(section => ({
       ...section,
       tabs: section.tabs.filter(t => t.id !== tabId)
     }));
 
     return {
-      ...state,
       sections: updatedSections,
       tabGroups: [...state.tabGroups, newGroup]
     };
@@ -208,6 +187,7 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     const group = state.tabGroups.find(g => g.id === groupId);
     if (!group) return state;
 
+    // 그룹의 탭들을 기본 섹션으로 이동
     const updatedSections = state.sections.map(section => 
       section.id === 'default'
         ? { ...section, tabs: [...section.tabs, ...group.tabs] }
@@ -215,7 +195,6 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     );
 
     return {
-      ...state,
       sections: updatedSections,
       tabGroups: state.tabGroups.filter(g => g.id !== groupId)
     };
@@ -225,30 +204,24 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     const tab = state.openedTabs.find(t => t.id === tabId);
     if (!tab) return state;
 
-    // 현재 탭이 이미 해당 그룹에 있는지 확인
-    const isTabInTargetGroup = state.tabGroups.find(
-      group => group.id === groupId
-    )?.tabs.some(t => t.id === tabId);
+    // 그룹 간 탭 이동
+    const updatedGroups = state.tabGroups.map(group => {
+      if (group.id === groupId) {
+        return { ...group, tabs: [...group.tabs, tab] };
+      }
+      return {
+        ...group,
+        tabs: group.tabs.filter(t => t.id !== tabId)
+      };
+    }).filter(group => group.tabs.length > 0);
 
-    // 이미 해당 그룹에 있다면 상태 변경하지 않음
-    if (isTabInTargetGroup) {
-      return state;
-    }
-
-    const updatedGroups = state.tabGroups.map(group => ({
-      ...group,
-      tabs: group.id === groupId
-        ? [...group.tabs, tab]
-        : group.tabs.filter(t => t.id !== tabId)
-    })).filter(group => group.tabs.length > 0);
-
+    // 섹션에서도 탭 제거
     const updatedSections = state.sections.map(section => ({
       ...section,
       tabs: section.tabs.filter(t => t.id !== tabId)
     }));
 
     return {
-      ...state,
       sections: updatedSections,
       tabGroups: updatedGroups
     };

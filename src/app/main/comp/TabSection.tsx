@@ -1,4 +1,3 @@
-// src/app/main/comp/TabSection.tsx
 "use client";
 
 import React from 'react';
@@ -42,12 +41,12 @@ const TabSection: React.FC<TabSectionProps> = ({
     <div
       ref={setNodeRef}
       className={`
-        flex-none h-full relative
+        flex-none h-full relative border-r border-gray-300
         ${isOver ? 'bg-gray-50' : 'bg-white'}
       `}
       style={{ width: `${width}%` }}
     >
-      <div className="flex items-center px-2 py-1">
+      <div className="flex items-center">
         <div className="flex-1 flex space-x-1 overflow-x-auto scrollbar-hide">
           {section.tabs.map((tab) => (
             <DraggableTab
