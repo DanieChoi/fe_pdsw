@@ -1,20 +1,20 @@
 // src/store/tabStore.ts
 import { create } from 'zustand';
 
-interface TabItem {
+export interface TabItem {
   id: number;
   title: string;
   icon: string;
   href: string;
 }
 
-interface TabSection {
+export interface TabSection {
   id: string;
   tabs: TabItem[];
   width: number;
 }
 
-interface TabGroup {
+export interface TabGroup {
   id: string;
   tabs: TabItem[];
   position: { x: number; y: number };
