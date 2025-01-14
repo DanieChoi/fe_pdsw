@@ -4,6 +4,7 @@ import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useMainStore } from '@/store';
 import { useEffect } from 'react';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 
 export default function Sidebar({ isMenuOpen }: { isMenuOpen: boolean }) {
   const { mutate: fetchMain } = useApiForMain({
@@ -12,6 +13,13 @@ export default function Sidebar({ isMenuOpen }: { isMenuOpen: boolean }) {
     },
   });
   
+  const { mutate: fetchTenants } = useApiForTenants({
+    onSuccess: (data) => {
+      // setCampaigns(data.result_data);
+      console.log(data.result_data);
+    },
+  });
+
   const { setCampaigns, setSelectedCampaign, campaigns } = useMainStore();
 
   useEffect(() => {
@@ -20,6 +28,13 @@ export default function Sidebar({ isMenuOpen }: { isMenuOpen: boolean }) {
       tenant_id: Number(localStorage.getItem('tenantId')) || 0,
     });
   }, [fetchMain]);
+
+  useEffect(() => {
+    fetchTenants({
+      session_key: localStorage.getItem('sessionKey') || '',
+      tenant_id: Number(localStorage.getItem('tenantId')) || 0,
+    });
+  }, [fetchTenants]);
 
   const handleCampaignClick = (campaign: MainDataResponse) => {
     setSelectedCampaign(campaign);
