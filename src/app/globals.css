@@ -166,6 +166,7 @@ input::placeholder {
   overflow-x: auto;
   white-space: nowrap;
   max-width: calc(100% - 70px); 
+  width: 100%;
 }
 .tabs::-webkit-scrollbar {
   height: 8px;
