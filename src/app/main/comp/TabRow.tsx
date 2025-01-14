@@ -4,7 +4,7 @@ import React from 'react';
 import { useTabStore } from '@/store/tabStore';
 import TabSection from './TabSection';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Minus, Plus } from 'lucide-react';
 
 interface TabRowProps {
   rowId: string;
@@ -15,6 +15,7 @@ const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
     rows,
     addRow,
     addSection,
+    removeRow,
   } = useTabStore();
 
   const row = rows.find(r => r.id === rowId);
@@ -30,6 +31,13 @@ const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
       addSection(rowId);
     }
   };
+
+  // 행 삭제 핸들러
+  const handleRemoveRow = () => {
+    removeRow(rowId);
+  };
+
+  const canRemove = rowId !== 'row-1'; // 첫 번째 행은 삭제 불가능
 
   return (
     <div className="flex items-center min-h-[44px] w-full">
@@ -47,8 +55,8 @@ const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
         ))}
       </div>
 
-      {/* 행 우측의 Split 버튼 */}
-      <div className="flex-none flex items-center px-2">
+      {/* 행 우측의 버튼들 */}
+      <div className="flex-none flex items-center gap-1 px-2">
         <Button
           variant="ghost"
           size="icon"
@@ -57,6 +65,17 @@ const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
         >
           <Plus className="h-4 w-4" />
         </Button>
+
+        {canRemove && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleRemoveRow}
+            className="h-6 w-6 hover:bg-red-100"
+          >
+            <Minus className="h-4 w-4 text-red-500" />
+          </Button>
+        )}
       </div>
     </div>
   );
