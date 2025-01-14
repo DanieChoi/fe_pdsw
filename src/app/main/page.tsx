@@ -7,7 +7,6 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragOverlay,
 } from '@dnd-kit/core';
 import { useTabStore } from '@/store/tabStore';
 import { Button } from '@/components/ui/button';
@@ -15,15 +14,15 @@ import { Plus } from 'lucide-react';
 import TabSection from './comp/TabSection';
 import TabDropZone from './comp/TabDropZone';
 import TabGroup from './comp/TabGroup';
+import TabContent from './comp/TabContent';
 
 const MainPage = () => {
   const { 
     sections, 
-    tabGroups, 
+    tabGroups,
     moveTabToSection,
     moveTabToGroup,
     addSection, 
-    addTabGroup 
   } = useTabStore();
   
   const sensors = useSensors(
@@ -36,7 +35,6 @@ const MainPage = () => {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    
     if (!over) return;
 
     const isTab = active.data.current?.type === 'tab';
@@ -44,21 +42,16 @@ const MainPage = () => {
     const isOverDropZone = over.data.current?.type === 'dropzone';
     const isOverGroup = over.data.current?.type === 'group';
 
-    if (isTab && isOverSection) {
+    if (isTab) {
       const tabId = active.data.current?.id;
-      const sectionId = over.data.current?.id;
-      moveTabToSection(tabId, sectionId);
-    }
 
-    if (isTab && isOverDropZone) {
-      const tabId = active.data.current?.id;
-      addTabGroup(tabId);
-    }
-
-    if (isTab && isOverGroup) {
-      const tabId = active.data.current?.id;
-      const groupId = over.data.current?.id;
-      moveTabToGroup(tabId, groupId);
+      if (isOverSection) {
+        moveTabToSection(tabId, over.data.current?.id);
+      } else if (isOverDropZone && sections.length < 3) {
+        addSection(tabId);
+      } else if (isOverGroup) {
+        moveTabToGroup(tabId, over.data.current?.id);
+      }
     }
   };
 
@@ -68,7 +61,7 @@ const MainPage = () => {
         {/* 상단 탭 섹션 영역 */}
         <div className="flex border-b bg-white">
           <div className="flex-1 flex border-r border-gray-300">
-            {sections.map((section, index) => (
+            {sections.map((section) => (
               <React.Fragment key={section.id}>
                 <TabSection
                   id={section.id}
@@ -86,7 +79,7 @@ const MainPage = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={addSection}
+                onClick={() => addSection()}
                 className="flex items-center gap-1 hover:bg-gray-100"
               >
                 <Plus className="h-4 w-4" />
@@ -96,19 +89,10 @@ const MainPage = () => {
           )}
         </div>
 
-        {/* 본문 영역 (드롭 영역) */}
+        {/* 본문 영역 */}
         <div className="flex-1 p-4 bg-gray-50">
           <TabDropZone>
-            <div className="grid grid-cols-2 gap-4">
-              {tabGroups.map((group) => (
-                <TabGroup 
-                  key={group.id} 
-                  id={group.id}
-                  tabs={group.tabs}
-                  position={group.position}
-                />
-              ))}
-            </div>
+            <TabContent />
           </TabDropZone>
         </div>
       </div>

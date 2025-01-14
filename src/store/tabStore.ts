@@ -1,26 +1,26 @@
-// src/store/tabStore.ts
 import { create } from 'zustand';
 
-interface TabItem {
+export interface TabItem {
   id: number;
   title: string;
   icon: string;
   href: string;
+  content: React.ReactNode;
 }
 
-interface TabSection {
+export interface TabSection {
   id: string;
   tabs: TabItem[];
   width: number;
 }
 
-interface TabGroup {
+export interface TabGroup {
   id: string;
   tabs: TabItem[];
   position: { x: number; y: number };
 }
 
-interface TabLayoutStore {
+export interface TabLayoutStore {
   openedTabs: TabItem[];
   activeTabId: number | null;
   sections: TabSection[];
@@ -29,7 +29,7 @@ interface TabLayoutStore {
   addTab: (tab: TabItem) => void;
   removeTab: (tabId: number) => void;
   setActiveTab: (tabId: number) => void;
-  addSection: () => void;
+  addSection: (tabId?: number) => void;
   moveTabToSection: (tabId: number, sectionId: string) => void;
   updateSectionWidth: (sectionId: string, width: number) => void;
   removeSection: (sectionId: string) => void;
@@ -94,21 +94,40 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     activeTabId: tabId
   }),
 
+  addSection: (tabId) => set((state) => {
+    const newSectionId = `section-${state.sections.length + 1}`;
+    const newWidth = 100 / (state.sections.length + 1);
+    
+    const updatedSections = state.sections.map(section => ({
+      ...section,
+      width: newWidth,
+      // If tabId is provided, remove it from other sections
+      tabs: tabId ? section.tabs.filter(t => t.id !== tabId) : section.tabs
+    }));
+
+    const tab = tabId ? state.openedTabs.find(t => t.id === tabId) : null;
+    const newSection = {
+      id: newSectionId,
+      tabs: tab ? [tab] : [],
+      width: newWidth
+    };
+
+    return {
+      sections: [...updatedSections, newSection]
+    };
+  }),
+
   moveTabToSection: (tabId, targetSectionId) => set((state) => {
     const tab = state.openedTabs.find(t => t.id === tabId);
     if (!tab) return state;
 
-    // 먼저 모든 섹션과 그룹에서 탭을 제거
-    const updatedSections = state.sections.map(section => {
-      if (section.id === targetSectionId) {
-        // 이미 대상 섹션에 있는 경우 중복 추가 방지
-        if (section.tabs.some(t => t.id === tabId)) {
-          return section;
-        }
-        return { ...section, tabs: [...section.tabs, tab] };
-      }
-      return { ...section, tabs: section.tabs.filter(t => t.id !== tabId) };
-    });
+    // Remove tab from all sections and groups
+    const updatedSections = state.sections.map(section => ({
+      ...section,
+      tabs: section.id === targetSectionId
+        ? [...section.tabs, tab]
+        : section.tabs.filter(t => t.id !== tabId)
+    }));
 
     const updatedGroups = state.tabGroups
       .map(group => ({
@@ -121,20 +140,6 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
       ...state,
       sections: updatedSections,
       tabGroups: updatedGroups
-    };
-  }),
-
-  addSection: () => set((state) => {
-    const newSectionId = `section-${state.sections.length + 1}`;
-    const newWidth = 100 / (state.sections.length + 1);
-    
-    const updatedSections = state.sections.map(section => ({
-      ...section,
-      width: newWidth
-    }));
-
-    return {
-      sections: [...updatedSections, { id: newSectionId, tabs: [], width: newWidth }]
     };
   }),
 
@@ -168,10 +173,16 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     const tab = state.openedTabs.find(t => t.id === tabId);
     if (!tab) return state;
 
-    // 먼저 모든 섹션과 그룹에서 탭을 제거
+    // Remove tab from all sections
     const updatedSections = state.sections.map(section => ({
       ...section,
       tabs: section.tabs.filter(t => t.id !== tabId)
+    }));
+
+    // Remove tab from all other groups
+    const updatedGroups = state.tabGroups.map(group => ({
+      ...group,
+      tabs: group.tabs.filter(t => t.id !== tabId)
     }));
 
     const newGroupId = `group-${state.tabGroups.length + 1}`;
@@ -184,7 +195,7 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     return {
       ...state,
       sections: updatedSections,
-      tabGroups: [...state.tabGroups, newGroup]
+      tabGroups: [...updatedGroups, newGroup]
     };
   }),
 
@@ -208,18 +219,15 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     const tab = state.openedTabs.find(t => t.id === tabId);
     if (!tab) return state;
 
-    // 먼저 모든 섹션과 그룹에서 탭을 제거
+    // Remove tab from all sections
     const updatedSections = state.sections.map(section => ({
       ...section,
       tabs: section.tabs.filter(t => t.id !== tabId)
     }));
 
+    // Update groups - remove from all groups except target group
     const updatedGroups = state.tabGroups.map(group => {
       if (group.id === groupId) {
-        // 이미 대상 그룹에 있는 경우 중복 추가 방지
-        if (group.tabs.some(t => t.id === tabId)) {
-          return group;
-        }
         return { ...group, tabs: [...group.tabs, tab] };
       }
       return {

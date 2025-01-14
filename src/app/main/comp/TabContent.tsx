@@ -1,8 +1,6 @@
-// 3. src/app/main/comp/TabContent.tsx
 "use client";
 
-import CampaignList from './CampaignList';
-import CampaignDetail from './CampaignDetail';
+import React from 'react';
 import { useTabStore } from '@/store/tabStore';
 
 const TabContent = () => {
@@ -13,8 +11,8 @@ const TabContent = () => {
       case 1:
         return (
           <div className="space-y-0">
-            <CampaignList />
-            <CampaignDetail />
+            <div>CampaignList 컴포넌트</div>
+            <div>CampaignDetail 컴포넌트</div>
           </div>
         );
       case 2:
@@ -40,11 +38,13 @@ const TabContent = () => {
       case 12:
         return <div className="p-2">환경 설정 컨텐츠</div>;
       default:
-        return <div className="flex items-center justify-center h-[calc(100vh-12rem)] text-gray-500">탭을 선택해주세요</div>;
+        return (
+          <div className="flex items-center justify-center h-[calc(100vh-12rem)] text-gray-500">
+            탭을 선택해주세요
+          </div>
+        );
     }
   };
-
-  if (!activeTabId) return null;
 
   return (
     <div className="bg-white rounded-lg shadow-sm min-h-[calc(100vh-8rem)]">

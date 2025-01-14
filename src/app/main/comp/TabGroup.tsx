@@ -1,4 +1,3 @@
-// src/app/main/comp/TabGroup.tsx
 "use client";
 
 import React from 'react';
@@ -8,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import DraggableTab from './DraggableTab';
 import { useTabStore } from '@/store/tabStore';
 import { TabItem } from '@/store/tabStore';
+import TabContent from './TabContent';
 
 interface TabGroupProps {
   id: string;
@@ -31,7 +31,7 @@ const TabGroup: React.FC<TabGroupProps> = ({ id, tabs, position }) => {
       ref={setNodeRef}
       className={`
         bg-white rounded-lg shadow-sm border border-gray-200
-        ${isOver ? 'ring-2 ring-green-500 ring-opacity-50' : ''}
+        ${isOver ? 'ring-2 ring-blue-500 ring-opacity-50' : ''}
       `}
       style={{
         transform: `translate(${position.x}px, ${position.y}px)`
@@ -64,15 +64,7 @@ const TabGroup: React.FC<TabGroupProps> = ({ id, tabs, position }) => {
 
       {/* 탭 그룹 컨텐츠 */}
       <div className="p-4">
-        {tabs.map(tab => (
-          <div
-            key={tab.id}
-            className={activeTabId === tab.id ? 'block' : 'hidden'}
-          >
-            {/* 여기에 탭 컨텐츠 렌더링 */}
-            {tab.title} 컨텐츠
-          </div>
-        ))}
+        <TabContent />
       </div>
     </div>
   );
