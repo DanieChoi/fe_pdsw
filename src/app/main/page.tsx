@@ -47,7 +47,7 @@ export default function MainPage() {
   }, []);
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-0 p-0">
       <TabMenuForMainPage />
       <TabContent />
     </div>
