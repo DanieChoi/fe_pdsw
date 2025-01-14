@@ -88,6 +88,23 @@ export interface TenantListResponse {
   result_data: TenantListDataResponse[];
 }
 
+// 스킬마스터정보조회 데이터 타입
+export interface SkillListDataResponse {
+  tenant_id: number;
+  skill_id: number;
+  skill_name: string;
+  skill_description: string;
+}
+
+// 스킬마스터정보조회 데이터 타입
+export interface SkillListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: SkillListDataResponse[];
+}
+
 // API 에러 타입
 export interface AuthApiError {
   message: string;
