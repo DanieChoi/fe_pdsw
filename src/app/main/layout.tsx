@@ -50,7 +50,7 @@ export default function MainLayout({
   };
 
   return (
-    <div className="{${inter.className} h-full}">
+    <div className={'${inter.className} h-full'}>
       <div className="h-full flex flex-col">
         <Header />
         <div className="flex flex-1 h-[calc(100%-125px)] ">
