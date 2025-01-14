@@ -38,6 +38,26 @@ export interface TabLayoutStore {
   moveTabToGroup: (tabId: number, groupId: string) => void;
 }
 
+const generateUniqueId = (prefix: string, existingIds: string[]) => {
+  let counter = 1;
+  let newId = `${prefix}-${counter}`;
+  
+  while (existingIds.includes(newId)) {
+    counter++;
+    newId = `${prefix}-${counter}`;
+  }
+  
+  return newId;
+};
+
+const adjustSectionWidths = (sections: TabSection[]) => {
+  const newWidth = 100 / sections.length;
+  return sections.map(section => ({
+    ...section,
+    width: newWidth
+  }));
+};
+
 export const useTabStore = create<TabLayoutStore>((set) => ({
   openedTabs: [],
   activeTabId: null,
@@ -72,15 +92,24 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
                       (newTabs[index - 1] ? newTabs[index - 1].id : null);
     }
 
-    const updatedSections = state.sections.map(section => ({
+    let updatedSections = state.sections.map(section => ({
       ...section,
       tabs: section.tabs.filter(tab => tab.id !== tabId)
-    }));
+    })).filter(section => 
+      section.id === 'default' || section.tabs.length > 0
+    );
 
-    const updatedGroups = state.tabGroups.map(group => ({
-      ...group,
-      tabs: group.tabs.filter(tab => tab.id !== tabId)
-    })).filter(group => group.tabs.length > 0);
+    // Readjust widths if sections changed
+    if (updatedSections.length !== state.sections.length) {
+      updatedSections = adjustSectionWidths(updatedSections);
+    }
+
+    const updatedGroups = state.tabGroups
+      .map(group => ({
+        ...group,
+        tabs: group.tabs.filter(tab => tab.id !== tabId)
+      }))
+      .filter(group => group.tabs.length > 0);
 
     return {
       openedTabs: newTabs,
@@ -95,25 +124,27 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
   }),
 
   addSection: (tabId) => set((state) => {
-    const newSectionId = `section-${state.sections.length + 1}`;
-    const newWidth = 100 / (state.sections.length + 1);
-    
-    const updatedSections = state.sections.map(section => ({
+    const existingIds = state.sections.map(s => s.id);
+    const newSectionId = generateUniqueId('section', existingIds);
+
+    let updatedSections = state.sections.map(section => ({
       ...section,
-      width: newWidth,
-      // If tabId is provided, remove it from other sections
       tabs: tabId ? section.tabs.filter(t => t.id !== tabId) : section.tabs
-    }));
+    })).filter(section => 
+      section.id === 'default' || section.tabs.length > 0
+    );
 
     const tab = tabId ? state.openedTabs.find(t => t.id === tabId) : null;
     const newSection = {
       id: newSectionId,
       tabs: tab ? [tab] : [],
-      width: newWidth
+      width: 0 // temporary width
     };
 
+    const finalSections = adjustSectionWidths([...updatedSections, newSection]);
+
     return {
-      sections: [...updatedSections, newSection]
+      sections: finalSections
     };
   }),
 
@@ -121,13 +152,33 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     const tab = state.openedTabs.find(t => t.id === tabId);
     if (!tab) return state;
 
-    // Remove tab from all sections and groups
-    const updatedSections = state.sections.map(section => ({
+    // 현재 탭이 있는 섹션 찾기
+    const currentSection = state.sections.find(section => 
+      section.tabs.some(t => t.id === tabId)
+    );
+
+    // 같은 섹션으로의 이동이면 무시
+    if (currentSection?.id === targetSectionId) {
+      return state;
+    }
+
+    // 탭이 1개이고 섹션이 하나뿐일 때는 이동하지 않음
+    if (state.sections.length === 1 && state.openedTabs.length === 1) {
+      return state;
+    }
+
+    let updatedSections = state.sections.map(section => ({
       ...section,
       tabs: section.id === targetSectionId
         ? [...section.tabs, tab]
         : section.tabs.filter(t => t.id !== tabId)
-    }));
+    })).filter(section => 
+      section.id === 'default' || section.tabs.length > 0
+    );
+
+    if (updatedSections.length !== state.sections.length) {
+      updatedSections = adjustSectionWidths(updatedSections);
+    }
 
     const updatedGroups = state.tabGroups
       .map(group => ({
@@ -155,7 +206,7 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     const removedSection = state.sections.find(s => s.id === sectionId);
     if (!removedSection) return state;
 
-    const updatedSections = state.sections
+    let updatedSections = state.sections
       .filter(s => s.id !== sectionId)
       .map(section => 
         section.id === 'default'
@@ -163,8 +214,7 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
           : section
       );
 
-    const newWidth = 100 / updatedSections.length;
-    updatedSections.forEach(section => section.width = newWidth);
+    updatedSections = adjustSectionWidths(updatedSections);
 
     return { sections: updatedSections };
   }),
@@ -173,19 +223,19 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     const tab = state.openedTabs.find(t => t.id === tabId);
     if (!tab) return state;
 
-    // Remove tab from all sections
-    const updatedSections = state.sections.map(section => ({
+    let updatedSections = state.sections.map(section => ({
       ...section,
       tabs: section.tabs.filter(t => t.id !== tabId)
-    }));
+    })).filter(section => 
+      section.id === 'default' || section.tabs.length > 0
+    );
 
-    // Remove tab from all other groups
-    const updatedGroups = state.tabGroups.map(group => ({
-      ...group,
-      tabs: group.tabs.filter(t => t.id !== tabId)
-    }));
+    if (updatedSections.length !== state.sections.length) {
+      updatedSections = adjustSectionWidths(updatedSections);
+    }
 
-    const newGroupId = `group-${state.tabGroups.length + 1}`;
+    const existingIds = state.tabGroups.map(g => g.id);
+    const newGroupId = generateUniqueId('group', existingIds);
     const newGroup = {
       id: newGroupId,
       tabs: [tab],
@@ -193,9 +243,8 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     };
 
     return {
-      ...state,
       sections: updatedSections,
-      tabGroups: [...updatedGroups, newGroup]
+      tabGroups: [...state.tabGroups, newGroup]
     };
   }),
 
@@ -203,11 +252,15 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     const group = state.tabGroups.find(g => g.id === groupId);
     if (!group) return state;
 
-    const updatedSections = state.sections.map(section => 
+    let updatedSections = state.sections.map(section => 
       section.id === 'default'
         ? { ...section, tabs: [...section.tabs, ...group.tabs] }
         : section
     );
+
+    if (updatedSections.length !== state.sections.length) {
+      updatedSections = adjustSectionWidths(updatedSections);
+    }
 
     return {
       sections: updatedSections,
@@ -219,13 +272,17 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     const tab = state.openedTabs.find(t => t.id === tabId);
     if (!tab) return state;
 
-    // Remove tab from all sections
-    const updatedSections = state.sections.map(section => ({
+    let updatedSections = state.sections.map(section => ({
       ...section,
       tabs: section.tabs.filter(t => t.id !== tabId)
-    }));
+    })).filter(section => 
+      section.id === 'default' || section.tabs.length > 0
+    );
 
-    // Update groups - remove from all groups except target group
+    if (updatedSections.length !== state.sections.length) {
+      updatedSections = adjustSectionWidths(updatedSections);
+    }
+
     const updatedGroups = state.tabGroups.map(group => {
       if (group.id === groupId) {
         return { ...group, tabs: [...group.tabs, tab] };

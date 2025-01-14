@@ -33,7 +33,7 @@ const MainPage = () => {
     })
   );
 
-  const handleDragEnd = (event: DragEndEvent) => {
+const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
 
@@ -48,7 +48,10 @@ const MainPage = () => {
       if (isOverSection) {
         moveTabToSection(tabId, over.data.current?.id);
       } else if (isOverDropZone && sections.length < 3) {
-        addSection(tabId);
+        // 섹션이 하나일 때는 드롭존으로 이동하지 않음
+        if (sections.length > 1) {
+          addSection(tabId);
+        }
       } else if (isOverGroup) {
         moveTabToGroup(tabId, over.data.current?.id);
       }
