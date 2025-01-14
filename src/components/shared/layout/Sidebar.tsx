@@ -1,7 +1,5 @@
-
 "use client";
 
-// components/common/layout/Sidebar.tsx
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useMainStore } from '@/store';
 import { useEffect } from 'react';
@@ -27,6 +25,34 @@ export default function Sidebar({ isMenuOpen }: { isMenuOpen: boolean }) {
     setSelectedCampaign(campaign);
   };
 
+  const renderContent = () => {
+    if (!campaigns || campaigns.length === 0) {
+      return (
+        <div className="px-4 py-8 text-center text-gray-500">
+          <p>등록된 캠페인이 없습니다.</p>
+          <p className="text-sm mt-2">캠페인을 추가해주세요.</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-1">
+        {campaigns.map((campaign) => (
+          <button
+            key={campaign.campaign_id}
+            onClick={() => handleCampaignClick(campaign)}
+            className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 transition-colors"
+          >
+            <div className="font-medium">{campaign.campaign_name}</div>
+            <div className="text-sm text-gray-500 truncate">
+              {campaign.campaign_desc}
+            </div>
+          </button>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <aside 
       className={`${
@@ -36,20 +62,7 @@ export default function Sidebar({ isMenuOpen }: { isMenuOpen: boolean }) {
       <nav className="h-full bg-white border-r shadow-sm">
         <div className="py-4">
           <h2 className="px-4 text-lg font-semibold mb-4">캠페인 목록</h2>
-          <div className="space-y-1">
-            {campaigns.map((campaign) => (
-              <button
-                key={campaign.campaign_id}
-                onClick={() => handleCampaignClick(campaign)}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 transition-colors"
-              >
-                <div className="font-medium">{campaign.campaign_name}</div>
-                <div className="text-sm text-gray-500 truncate">
-                  {campaign.campaign_desc}
-                </div>
-              </button>
-            ))}
-          </div>
+          {renderContent()}
         </div>
       </nav>
     </aside>
