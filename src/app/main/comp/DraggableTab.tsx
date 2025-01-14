@@ -66,8 +66,8 @@ const DraggableTab = ({
           onRemove();
         }}
         className={`
-          absolute right-1 p-1 rounded-full hover:bg-gray-200
-          ${isActive ? 'text-white hover:bg-green-600' : 'text-gray-500'}
+          absolute right-1 p-1 rounded-full 
+          ${isActive ? 'text-white hover:bg-[#56CAD6]' : 'text-gray-500'}
         `}
       >
         <X className="h-3 w-3" />

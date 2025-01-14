@@ -60,7 +60,7 @@ const handleDragEnd = (event: DragEndEvent) => {
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className="flex flex-col h-screen  box-border px-9 py-5 bg-white">
+      <div className="flex flex-col box-border px-9 py-5 bg-white">
         {/* 상단 탭 섹션 영역 */}
         <div className="tabs-container">
           <div className="tabs">

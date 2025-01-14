@@ -101,6 +101,10 @@
   }
 }
 
+.body-top{
+  height: 100vh;
+}
+
 input::placeholder {
   color: #AAA;
 }

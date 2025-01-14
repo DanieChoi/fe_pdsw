@@ -39,7 +39,7 @@ const TabContent = () => {
         return <div className="p-2">환경 설정 컨텐츠</div>;
       default:
         return (
-          <div className="flex items-center justify-center h-[calc(100vh-12rem)] text-gray-500">
+          <div className="flex items-center justify-center min-h-[calc(100vh-23rem)] text-gray-500">
             탭을 선택해주세요
           </div>
         );
@@ -47,7 +47,7 @@ const TabContent = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm min-h-[calc(100vh-8rem)]">
+    <div className="bg-white min-h-[calc(100vh-22.5rem)]">
       {renderContent()}
     </div>
   );
