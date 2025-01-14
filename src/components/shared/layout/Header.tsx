@@ -5,87 +5,13 @@ import { Button } from '@/components/ui/button'
 import { useTabStore } from '@/store';
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { menuItems, MenuItem } from '@/components/shared/constants/menuItems';
 
 export default function Header() {
   const router = useRouter();
   const { addTab, openedTabs } = useTabStore();
 
-  const menuItems = [
-    { 
-      id: 1, 
-      title: '캠페인 그룹관리', 
-      icon: '/header-menu/캠페인그룹관리.svg', 
-      href: '/main' 
-    },
-    { 
-      id: 2, 
-      title: '캠페인 관리', 
-      icon: '/header-menu/캠페인관리.svg', 
-      href: '/campaign' 
-    },
-    { 
-      id: 3, 
-      title: '통합모니터', 
-      icon: '/header-menu/통합모니터.svg', 
-      href: '/monitor' 
-    },
-    { 
-      id: 4, 
-      title: '총진행상황', 
-      icon: '/header-menu/총진행상황.svg', 
-      href: '/status' 
-    },
-    { 
-      id: 5, 
-      title: '발신전화상태', 
-      icon: '/header-menu/발신진행상태.svg', 
-      href: '/call' 
-    },
-    { 
-      id: 6, 
-      title: '채널 모니터', 
-      icon: '/header-menu/채널모니터.svg', 
-      href: '/channel' 
-    },
-    { 
-      id: 7, 
-      title: '리스트 매니저', 
-      icon: '/header-menu/리스트매니저.svg', 
-      href: '/list' 
-    },
-    { 
-      id: 8, 
-      title: '예약콜 제한 설정', 
-      icon: '/header-menu/예약콜제한설정.svg', 
-      href: '/reserve' 
-    },
-    { 
-      id: 9, 
-      title: '분배호수 제한 설정', 
-      icon: '/header-menu/분배호수제한설정.svg', 
-      href: '/distribute' 
-    },
-    { 
-      id: 10, 
-      title: '시스템 설정', 
-      icon: '/header-menu/시스템설정.svg', 
-      href: '/system' 
-    },
-    { 
-      id: 11, 
-      title: '운영 설정', 
-      icon: '/header-menu/운영설정.svg', 
-      href: '/operation' 
-    },
-    { 
-      id: 12, 
-      title: '환경 설정', 
-      icon: '/header-menu/환경설정.svg', 
-      href: '/settings' 
-    },
-  ]
-
-  const handleMenuClick = (item: typeof menuItems[0]) => {
+  const handleMenuClick = (item: MenuItem) => {
     addTab(item);
     // router.push(item.href);
   };
