@@ -94,9 +94,9 @@ const handleDragEnd = (event: DragEndEvent) => {
 
         {/* 본문 영역 */}
         <div className="flex-1 p-4 bg-gray-50">
-          <TabDropZone>
+          {/* <TabDropZone> */}
             <TabContent />
-          </TabDropZone>
+          {/* </TabDropZone> */}
         </div>
       </div>
     </DndContext>
