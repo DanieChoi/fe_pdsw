@@ -41,13 +41,13 @@ const TabSection: React.FC<TabSectionProps> = ({
     <div
       ref={setNodeRef}
       className={`
-        flex-none h-full relative border-r border-gray-300
+        flex-none h-full relative
         ${isOver ? 'bg-gray-50' : 'bg-white'}
       `}
       style={{ width: `${width}%` }}
     >
       <div className="flex items-center">
-        <div className="flex-1 flex space-x-1 overflow-x-auto scrollbar-hide">
+        <div className="flex-1 flex overflow-x-auto scrollbar-hide">
           {section.tabs.map((tab) => (
             <DraggableTab
               key={tab.id}

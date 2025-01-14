@@ -3,14 +3,21 @@
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useMainStore } from '@/store';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 import Cookies from 'js-cookie';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useRouter } from 'next/navigation';
 
-export default function Sidebar({ isMenuOpen }: { isMenuOpen: boolean }) {
-  // const [tenantId, setTenantId] = useState(Cookies.get('tenant_id'));
+
+export default function Sidebar({
+    isMenuOpen,
+    toggleSidebar,
+  }: {
+    isMenuOpen: boolean;
+    toggleSidebar: () => void;
+  }) {
   const tenantId = Number(Cookies.get('tenant_id'));
   const router = useRouter();
   const [alertState, setAlertState] = useState({
@@ -152,15 +159,26 @@ export default function Sidebar({ isMenuOpen }: { isMenuOpen: boolean }) {
   };
 
   return (
-    <aside 
+    <aside
       className={`${
-        isMenuOpen ? 'w-64' : 'w-0'
-      } transition-all duration-300 ease-in-out overflow-hidden`}
+        isMenuOpen ? 'w-64 min-w-64' : 'w-0'}
+      } transition-all duration-300 ease-in-out bg-white border-r shadow-sm flex flex-col`}
     >
-      <nav className="h-full bg-white border-r shadow-sm">
+      <nav className="h-full relative">
+        <button
+          onClick={toggleSidebar}
+          className={`toggle-btn transition-transform flex items-center justify-center`}
+        >
+          <Image
+            src="/sidebar-menu/sidebar-icon.svg"
+            alt="Sidebar Toggle"
+            fill
+            className="object-contain"
+          />
+        </button>
         <div className="py-4">
-          <h2 className="px-4 text-lg font-semibold mb-4">캠페인 목록</h2>
-          {renderContent()}
+          {isMenuOpen && <h2 className="px-4 text-lg font-semibold mb-4">캠페인 목록</h2>}
+          {isMenuOpen && renderContent()}
         </div>
       </nav>
     </aside>

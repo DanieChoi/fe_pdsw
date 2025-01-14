@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { X } from 'lucide-react';
+import CommonButton from '@/components/shared/CommonButton';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
@@ -38,11 +39,11 @@ const DraggableTab = ({
       {...attributes}
       {...listeners}
     >
-      <Button
-        variant={isActive ? "default" : "ghost"}
+      <CommonButton
+        variant={isActive ? "tab" : "tabghost"}
         className={`
           group flex items-center space-x-2 rounded-md pr-8 pl-3 py-2 
-          ${isActive ? 'bg-green-500 text-white' : 'hover:bg-gray-100'}
+          ${isActive ? 'bg-[#56CAD6] text-white' : 'hover:bg-gray-100'}
           cursor-move
         `}
         onClick={onSelect}
@@ -56,7 +57,7 @@ const DraggableTab = ({
           />
         </div>
         <span className="text-sm">{title}</span>
-      </Button>
+      </CommonButton>
       <Button
         variant="ghost"
         size="sm"
