@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { X } from 'lucide-react';
@@ -40,11 +42,13 @@ const DraggableTab = ({
       {...listeners}
     >
       <CommonButton
-        variant={isActive ? "tab" : "tabghost"}
+        variant={isActive ? "default" : "ghost"}
         className={`
           group flex items-center space-x-2 rounded-md pr-8 pl-3 py-2 
-          ${isActive ? 'bg-[#56CAD6] text-white' : 'hover:bg-gray-100'}
-          cursor-move
+          ${isActive 
+            ? 'bg-[#56CAD6] text-white shadow-sm' 
+            : 'bg-[#E8F7F9] text-[#56CAD6] hover:bg-[#CCE9ED] border border-[#56CAD6]/20'}
+          cursor-move transition-all duration-200
         `}
         onClick={onSelect}
       >
@@ -56,7 +60,7 @@ const DraggableTab = ({
             className="object-contain"
           />
         </div>
-        <span className="text-sm">{title}</span>
+        <span className="text-sm font-medium">{title}</span>
       </CommonButton>
       <Button
         variant="ghost"
@@ -67,7 +71,10 @@ const DraggableTab = ({
         }}
         className={`
           absolute right-1 p-1 rounded-full 
-          ${isActive ? 'text-white hover:bg-[#56CAD6]' : 'text-gray-500'}
+          ${isActive 
+            ? 'text-white hover:bg-[#56CAD6]/80' 
+            : 'text-[#56CAD6]/70 hover:text-[#56CAD6] hover:bg-[#CCE9ED]'}
+          transition-colors duration-200
         `}
       >
         <X className="h-3 w-3" />

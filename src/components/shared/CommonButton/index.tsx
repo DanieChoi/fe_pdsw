@@ -8,6 +8,7 @@ interface CommonButtonProps {
   size?: 'default' | 'sm' | 'lg' | 'icon';
   fullWidth?: boolean;
   disabled?: boolean;
+  className?: string;
 }
 
 export const CommonButton: React.FC<CommonButtonProps> = ({

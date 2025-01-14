@@ -33,7 +33,7 @@ const MainPage = () => {
     })
   );
 
-const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
 
@@ -48,7 +48,6 @@ const handleDragEnd = (event: DragEndEvent) => {
       if (isOverSection) {
         moveTabToSection(tabId, over.data.current?.id);
       } else if (isOverDropZone && sections.length < 3) {
-        // 섹션이 하나일 때는 드롭존으로 이동하지 않음
         if (sections.length > 1) {
           addSection(tabId);
         }
@@ -61,9 +60,8 @@ const handleDragEnd = (event: DragEndEvent) => {
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="flex flex-col box-border px-9 py-5 bg-white">
-        {/* 상단 탭 섹션 영역 */}
-        <div className="tabs-container">
-          <div className="tabs">
+        <div className="tabs-container border-b border-gray-200">
+          <div className="tabs flex">
             {sections.map((section) => (
               <React.Fragment key={section.id}>
                 <TabSection
@@ -72,13 +70,13 @@ const handleDragEnd = (event: DragEndEvent) => {
                   canRemove={section.id !== 'default'}
                 />
                 {section.id !== sections[sections.length - 1].id && (
-                  <div className="w-px bg-gray-300 h-full" />
+                  <div className="w-0.5 bg-gray-300 h-full shadow-md" />
                 )}
               </React.Fragment>
             ))}
           </div>
           {sections.length < 3 && (
-            <div className="flex items-center px-0">
+            <div className="flex items-center px-2 py-1">
               <Button
                 variant="outline"
                 size="sm"
@@ -92,11 +90,8 @@ const handleDragEnd = (event: DragEndEvent) => {
           )}
         </div>
 
-        {/* 본문 영역 */}
         <div className="flex-1 p-2 bg-white">
-          {/* <TabDropZone> */}
-            <TabContent />
-          {/* </TabDropZone> */}
+          <TabContent />
         </div>
       </div>
     </DndContext>
