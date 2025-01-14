@@ -45,19 +45,7 @@ export default function MainPage() {
 
   return (
     <div className="space-y-6">
-      {/* 상단 필터/검색 영역 */}
-      <div className="flex space-x-4 items-center">
-        <select className="p-2 border rounded">
-          <option>전체</option>
-        </select>
-        <input 
-          type="text" 
-          placeholder="캠페인명" 
-          className="p-2 border rounded"
-        />
-      </div>
-
-      <CampaignList />
+      {/* 컴퍼넌트 만든뒤에 여기에 추가 */}
       <CampaignDetail />
     </div>
   );
