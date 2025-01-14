@@ -129,7 +129,7 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     const existingIds = state.sections.map(s => s.id);
     const newSectionId = generateUniqueId('section', existingIds);
 
-    let updatedSections = state.sections.map(section => ({
+    const updatedSections = state.sections.map(section => ({
       ...section,
       tabs: tabId ? section.tabs.filter(t => t.id !== tabId) : section.tabs
     })).filter(section => 
