@@ -1,4 +1,3 @@
-// src/app/main/page.tsx
 "use client";
 
 import React from 'react';
@@ -84,14 +83,16 @@ const MainPage = () => {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex flex-col box-border px-9 py-5 bg-white">
-        <div className="space-y-4">
-          {rows.map((row) => (
-            <TabRow key={row.id} rowId={row.id} />
-          ))}
+      <div className="flex flex-col h-screen bg-white">
+        <div className="flex-none border-b border-gray-200">
+          <div className="px-9 py-1">
+            {rows.map((row) => (
+              <TabRow key={row.id} rowId={row.id} />
+            ))}
+          </div>
         </div>
 
-        <div className="flex-1 p-2 bg-white">
+        <div className="flex-1 overflow-auto p-2">
           <TabContent />
         </div>
       </div>

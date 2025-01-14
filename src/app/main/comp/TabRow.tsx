@@ -1,4 +1,3 @@
-// C:\Users\terec\fe_pdsw\src\app\main\comp\TabRow.tsx
 "use client";
 
 import React from 'react';
@@ -33,29 +32,30 @@ const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
   };
 
   return (
-    <div className="border-b border-gray-200 w-full flex flex-row items-stretch">
-      {/* 섹션들 */}
-      {row.sections.map((section, idx) => (
-        <TabSection
-          key={section.id}
-          rowId={rowId}
-          sectionId={section.id}
-          width={section.width}
-          canRemove={section.id !== 'default'}
-          showDivider={idx < row.sections.length - 1}
-        />
-      ))}
+    <div className="flex items-center min-h-[44px] w-full">
+      <div className="flex-1 flex">
+        {/* 섹션들 */}
+        {row.sections.map((section, idx) => (
+          <TabSection
+            key={section.id}
+            rowId={rowId}
+            sectionId={section.id}
+            width={section.width}
+            canRemove={section.id !== 'default'}
+            showDivider={idx < row.sections.length - 1}
+          />
+        ))}
+      </div>
 
       {/* 행 우측의 Split 버튼 */}
-      <div className="flex items-center px-2">
+      <div className="flex-none flex items-center px-2">
         <Button
-          variant="outline"
-          size="sm"
+          variant="ghost"
+          size="icon"
           onClick={handleSplitClick}
-          className="flex items-center gap-1 hover:bg-gray-100"
+          className="h-6 w-6 hover:bg-gray-100"
         >
           <Plus className="h-4 w-4" />
-          Split
         </Button>
       </div>
     </div>
