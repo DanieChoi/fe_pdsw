@@ -91,26 +91,56 @@ export default function Header() {
 
   return (
     <div className="flex flex-col">
-      <div className="py-1">
-        <div style={{ backgroundColor: '#55bec8' }}>
-          <div className="container px-2">
-            <h1 className="text-sm text-white">NEXPDS</h1>
+      <div className="header-top bg-[#5BC2C1] h-[28px] flex items-center">
+        <div className=" px-4 flex justify-between items-center w-full">
+          {/* NEXPDS Logo */}
+          <div className="flex items-center">
+            <Image
+              src="/header-menu/nexpds-logo.svg"
+              alt="NEXPDS"
+              width={66}
+              height={11}
+              priority
+            />
+          </div>
+          {/* 오른쪽 사용자 정보 */}
+          <div className="flex items-center space-x-4 text-white text-sm">
+            <div className='flex items-center space-x-1'>
+            <Image
+                src="/header-menu/top_pic.svg"
+                alt="사용자"
+                width={18}
+                height={18}
+                priority
+              />
+              <span>홍길동(관리자)</span>
+            </div>
+            {/* 로그아웃 버튼*/}
+            <button className="flex items-center space-x-1 text-sm">
+              <Image
+                src="/header-menu/log-out.svg"
+                alt="로그아웃"
+                width={14}
+                height={10}
+                priority
+              />
+            </button>
           </div>
         </div>
       </div>
-      <header className="bg-white px-4 pb-4 border-b">
-        <div className="container mx-auto">
+      <header className="bg-white py-[10px] pl-[30px] border-b">
+        <div className="">
           <div className="flex items-center justify-between">
             <nav className="flex space-x-1 overflow-x-auto">
               {menuItems.map((item) => (
-                <div key={item.id}>
+                <div key={item.id} className="menu-item">
                   <Button
                     type="button"
                     variant="ghost"
                     className="hover:bg-white/20 flex flex-col items-center justify-center min-w-[80px] h-auto py-2 space-y-1"
                     onClick={() => handleMenuClick(item)}
                   >
-                    <div className="w-6 h-6 relative">
+                    <div className="w-[32px] h-[32px] relative">
                       <Image
                         src={item.icon}
                         alt={item.title}

@@ -27,7 +27,7 @@ export const CommonButton: React.FC<CommonButtonProps> = ({
     secondary: 'bg-gray-200 hover:bg-gray-300 text-black',
     ghost: 'bg-transparent text-black',
     link: 'text-blue-500 underline',
-    login: 'w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm font-semibold rounded-none',
+    login: 'w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm rounded-none font-16',
   }[variant];
 
   const sizeClass = {
