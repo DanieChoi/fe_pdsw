@@ -2,11 +2,14 @@
 
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useMainStore } from '@/store';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
+import Cookies from 'js-cookie';
 
 export default function Sidebar({ isMenuOpen }: { isMenuOpen: boolean }) {
+  // const [tenantId, setTenantId] = useState(Cookies.get('tenant_id'));
+  const tenantId = Number(Cookies.get('tenant_id'));
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
@@ -15,12 +18,11 @@ export default function Sidebar({ isMenuOpen }: { isMenuOpen: boolean }) {
   
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
-      // setCampaigns(data.result_data);
-      console.log(data.result_data);
+      setTenants(data.result_data);
     },
   });
 
-  const { setCampaigns, setSelectedCampaign, campaigns } = useMainStore();
+  const { setCampaigns, setTenants, setSelectedCampaign, campaigns, tenants } = useMainStore();
 
   useEffect(() => {
     fetchMain({
@@ -52,18 +54,59 @@ export default function Sidebar({ isMenuOpen }: { isMenuOpen: boolean }) {
 
     return (
       <div className="space-y-1">
-        {campaigns.map((campaign) => (
-          <button
-            key={campaign.campaign_id}
-            onClick={() => handleCampaignClick(campaign)}
-            className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 transition-colors"
-          >
-            <div className="font-medium">{campaign.campaign_name}</div>
-            <div className="text-sm text-gray-500 truncate">
-              {campaign.campaign_desc}
-            </div>
-          </button>
-        ))}
+        { tenantId === 0 ? 
+        tenants.map((tenant) => (
+          <div key={tenant.tenant_id}>
+            <button
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 transition-colors"
+            >
+              <div className="font-medium">[{tenant.tenant_id}] {tenant.tenant_name}</div>
+            </button>
+            
+            {campaigns
+              .filter((campaign) => campaign.tenant_id === tenant.tenant_id) 
+              .map((campaign) => (
+                <button
+                  key={campaign.campaign_id}
+                  onClick={() => handleCampaignClick(campaign)}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 transition-colors"
+                >
+                  <div className="font-medium">{campaign.campaign_name}</div>
+                  <div className="text-sm text-gray-500 truncate">
+                    {campaign.campaign_desc}
+                  </div>
+                </button>
+              ))}
+          </div>
+        ))
+        :
+        tenants
+        .filter((tenant) => tenant.tenant_id === tenantId) 
+        .map((tenant) => (
+          <div key={tenant.tenant_id}>
+            <button
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 transition-colors"
+            >
+              <div className="font-medium">[{tenant.tenant_id}] {tenant.tenant_name}</div>
+            </button>
+            
+            {campaigns
+              .filter((campaign) => campaign.tenant_id === tenant.tenant_id) 
+              .map((campaign) => (
+                <button
+                  key={campaign.campaign_id}
+                  onClick={() => handleCampaignClick(campaign)}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 transition-colors"
+                >
+                  <div className="font-medium">{campaign.campaign_name}</div>
+                  <div className="text-sm text-gray-500 truncate">
+                    {campaign.campaign_desc}
+                  </div>
+                </button>
+              ))}
+          </div>
+        ))
+        }
       </div>
     );
   };
