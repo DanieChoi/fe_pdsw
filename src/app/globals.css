@@ -2,8 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
+
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-Regular.woff2') format('woff2'),
+       url('/fonts/Pretendard-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Pretendard Bold */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-Bold.woff2') format('woff2'),
+       url('/fonts/Pretendard-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Pretendard Black */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-Black.woff2') format('woff2'),
+       url('/fonts/Pretendard-Black.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+* {
+  font-family: 'Pretendard', Arial, Helvetica, sans-serif;
 }
 
 @layer base {
@@ -69,4 +99,39 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+input::placeholder {
+  color: #AAA;
+}
+.mb-70{
+  margin-bottom: 4.5rem;
+}
+.mt-100{
+  margin-top: 6.25rem;
+}
+.footer-text {
+  color: #B0B0B0;
+  font-size: 12px;
+  margin-top: 110px;
+}
+.font-16{
+  font-size: 16px;
+}
+
+.menu-item{
+  position: relative;
+}
+.menu-item:nth-child(2)::after, 
+.menu-item:nth-child(7)::after, 
+.menu-item:nth-child(8)::after, 
+.menu-item:nth-child(10)::after  {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -8px;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 30px;
+  background-color: #E9E9E9; 
 }

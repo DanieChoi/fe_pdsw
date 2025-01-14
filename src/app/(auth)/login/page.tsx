@@ -3,10 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { User, Lock, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { useApiForLogin } from '@/features/auth/hooks/useApiForLogin';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import CommonButton from '@/components/shared/CommonButton';
@@ -54,40 +53,52 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-slate-100">
-      <Card className="w-[400px] shadow-lg">
-        <CardContent className="pt-8">
-          <div className="flex justify-center mb-8">
-            <Image
-              src="/logo/NEXPDS_LOGO.svg"
-              alt="NEXPDS"
-              width={150}
-              height={40}
+    <div className="min-h-screen flex flex-col justify-center items-center ">
+      <Card className="w-[500px] shadow-none border-0 py-7 px-10">
+          <div className="flex mb-8 mb-70">
+              <Image 
+              src="/logo/pds-logo.svg" 
+              alt="NEXPDS" 
+              width={230}
+              height={51}
+              className=""
               priority
             />
           </div>
-          
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <CardContent className="p-0">
+          <form onSubmit={handleSubmit}>
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <User className="h-5 w-5 text-gray-400 flex-shrink-0" />
+              <div className="relative">
+                <Image 
+                  src="/logo/icon_id.svg" 
+                  alt="id" 
+                  width={14}
+                  height={16}
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                />
                 <Input
                   type="text"
                   placeholder="아이디를 입력하세요"
-                  className="h-12 bg-gray-50 border border-gray-200"
+                  className="h-12 pl-10 border-b-1 border-black shadow-none border-t-0 border-l-0 border-r-0 focus:border-black focus:border-b-[0px] focus:outline-none focus:ring-0 rounded-none focus:bg-[#F0F0F0] placeholder-[#aaa] font-16"
                   value={formData.user_name}
                   onChange={(e) => setFormData(prev => ({ ...prev, user_name: e.target.value }))}
                   disabled={isPending}
                 />
               </div>
               
-              <div className="flex items-center gap-3">
-                <Lock className="h-5 w-5 text-gray-400 flex-shrink-0" />
+              <div className="relative">
+                <Image 
+                  src="/logo/icon_pw.svg" 
+                  alt="id" 
+                  width={14}
+                  height={19}
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10"
+                />
                 <div className="relative flex-grow">
                   <Input
                     type={showPassword ? "text" : "password"}
                     placeholder="비밀번호를 입력하세요"
-                    className="h-12 pr-10 bg-gray-50 border border-gray-200"
+                    className="h-12 pl-10 border-b-1 border-black shadow-none border-t-0 border-l-0 border-r-0 focus:border-black focus:border-b-[0px] focus:outline-none focus:ring-0 rounded-none focus:bg-[#F0F0F0] placeholder-[#aaa] font-16"
                     value={formData.password}
                     onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                     disabled={isPending}
@@ -120,7 +131,7 @@ export default function LoginPage() {
         </CardContent>
       </Card>
       
-      <p className="mt-6 text-sm text-gray-500">
+      <p className="footer-text">
         © {new Date().getFullYear()} NEXUS COMMUNITY All rights reserved.
       </p>
 
