@@ -13,7 +13,7 @@ const TabMenuForMainPage = () => {
 
   return (
     <div className="bg-white border-b">
-      <div className="container px-4">
+      <div className="container px-2">
         <div className="flex space-x-1 overflow-x-auto py-2">
           {openedTabs.map((tab) => (
             <div 

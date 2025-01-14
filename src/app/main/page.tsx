@@ -82,7 +82,7 @@ const MainPage = () => {
             ))}
           </div>
           {sections.length < 3 && (
-            <div className="flex items-center px-4">
+            <div className="flex items-center px-0">
               <Button
                 variant="outline"
                 size="sm"
@@ -97,7 +97,7 @@ const MainPage = () => {
         </div>
 
         {/* 본문 영역 (드롭 영역) */}
-        <div className="flex-1 p-4 bg-gray-50">
+        <div className="flex-1 p-2 bg-gray-50">
           <TabDropZone>
             <div className="grid grid-cols-2 gap-4">
               {tabGroups.map((group) => (
