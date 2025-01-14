@@ -73,6 +73,21 @@ export interface MainResponse {
   result_data: MainDataResponse[];
 }
 
+// 테넌트 조회 응답 데이터 리스트 타입
+export interface TenantListDataResponse {
+  tenant_id: number;
+  tenant_name: string;
+}
+
+// 테넌트 조회 데이터 타입
+export interface TenantListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: TenantListDataResponse[];
+}
+
 // API 에러 타입
 export interface AuthApiError {
   message: string;
