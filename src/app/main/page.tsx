@@ -1,55 +1,119 @@
-// src/app/main/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import useStore from '@/features/auth/hooks/store';
-import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
-import { useMainStore } from '@/store';
-import TabMenuForMainPage from "./comp/TabMenuForMainPage";
-import TabContent from "./comp/TabContent";
-import Cookies from 'js-cookie';
+import React from 'react';
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+} from '@dnd-kit/core';
+import { useTabStore } from '@/store/tabStore';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import TabSection from './comp/TabSection';
+import TabDropZone from './comp/TabDropZone';
+import TabGroup from './comp/TabGroup';
 
-interface MainFormData {
-  tenant_id: number;
-  session_key: string;
-}
+const MainPage = () => {
+  const { 
+    sections, 
+    tabGroups, 
+    moveTabToSection,
+    moveTabToGroup,
+    addSection, 
+    addTabGroup 
+  } = useTabStore();
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
-export default function MainPage() {
-  const { tenant_id, session_key } = useStore.getState();
-  const { setCampaigns, setTotalCount } = useMainStore();
-  const [tenantId, setTenantId] = useState(-1);
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (!over) return;
 
-  const mainData: MainFormData = {
-    tenant_id,
-    session_key
+    const isTab = active.data.current?.type === 'tab';
+    const isOverSection = over.data.current?.type === 'section';
+    const isOverDropZone = over.data.current?.type === 'dropzone';
+    const isOverGroup = over.data.current?.type === 'group';
+
+    if (isTab && isOverSection) {
+      const tabId = active.data.current?.id;
+      const sectionId = over.data.current?.id;
+      moveTabToSection(tabId, sectionId);
+    }
+
+    if (isTab && isOverDropZone) {
+      const tabId = active.data.current?.id;
+      addTabGroup(tabId);
+    }
+
+    if (isTab && isOverGroup) {
+      const tabId = active.data.current?.id;
+      const groupId = over.data.current?.id;
+      moveTabToGroup(tabId, groupId);
+    }
   };
 
-  const { mutate: main } = useApiForMain({
-    onSuccess: (response) => {
-      console.log('API Response:', {
-        code: response.result_code,
-        message: response.result_msg,
-        data: response.result_data
-      });
-      setCampaigns(response.result_data);
-      setTotalCount(response.total_count);
-    },
-    onError: (error) => {
-      console.error('에러 발생:', error);
-    }
-  });
-
-  useEffect(() => {
-    if (session_key !== '') {
-      main(mainData);
-    }
-    setTenantId(Number(Cookies.get('tenant_id')));
-  }, []);
-
   return (
-    <div className="space-y-0 p-0">
-      <TabMenuForMainPage />
-      <TabContent />
-    </div>
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <div className="flex flex-col h-screen">
+        {/* 상단 탭 섹션 영역 */}
+        <div className="flex border-b bg-white">
+          <div className="flex-1 flex">
+            {sections.map((section) => (
+              <React.Fragment key={section.id}>
+                <TabSection
+                  id={section.id}
+                  width={section.width}
+                  canRemove={section.id !== 'default'}
+                />
+                {section.id !== sections[sections.length - 1].id && (
+                  <div className="w-px bg-gray-200" />
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+          {sections.length < 3 && (
+            <div className="flex items-center px-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={addSection}
+                className="flex items-center gap-1"
+              >
+                <Plus className="h-4 w-4" />
+                Split
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* 본문 영역 (드롭 영역) */}
+        <div className="flex-1 p-4 bg-gray-50">
+          <TabDropZone>
+            <div className="grid grid-cols-2 gap-4">
+              {tabGroups.map((group) => (
+                <TabGroup 
+                  key={group.id} 
+                  id={group.id}
+                  tabs={group.tabs}
+                  position={group.position}
+                />
+              ))}
+            </div>
+          </TabDropZone>
+        </div>
+      </div>
+    </DndContext>
   );
-}
+};
+
+export default MainPage;
