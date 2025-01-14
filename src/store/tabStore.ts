@@ -1,4 +1,7 @@
+"use client";
+
 import { create } from 'zustand';
+import React from 'react';
 
 export interface TabItem {
   id: number;
@@ -14,6 +17,11 @@ export interface TabSection {
   width: number;
 }
 
+export interface TabRow {
+  id: string;
+  sections: TabSection[];
+}
+
 export interface TabGroup {
   id: string;
   tabs: TabItem[];
@@ -23,21 +31,21 @@ export interface TabGroup {
 export interface TabLayoutStore {
   openedTabs: TabItem[];
   activeTabId: number | null;
-  sections: TabSection[];
+  rows: TabRow[];
   tabGroups: TabGroup[];
-  
   addTab: (tab: TabItem) => void;
   removeTab: (tabId: number) => void;
   setActiveTab: (tabId: number) => void;
-  addSection: (tabId?: number) => void;
-  moveTabToSection: (tabId: number, sectionId: string) => void;
-  updateSectionWidth: (sectionId: string, width: number) => void;
-  removeSection: (sectionId: string) => void;
+  duplicateTab: (tabId: number) => void;
+  addRow: () => void;
+  removeRow: (rowId: string) => void;
+  addSection: (rowId: string, tabId?: number) => void;
+  removeSection: (rowId: string, sectionId: string) => void;
+  moveTabToSection: (tabId: number, targetRowId: string, targetSectionId: string) => void;
+  updateSectionWidth: (rowId: string, sectionId: string, width: number) => void;
   addTabGroup: (tabId: number) => void;
   removeTabGroup: (groupId: string) => void;
   moveTabToGroup: (tabId: number, groupId: string) => void;
-  duplicateTab: (tabId: number) => void;  // 새로 추가
-
 }
 
 const generateUniqueId = (prefix: string, existingIds: string[]) => {
@@ -60,193 +68,366 @@ const adjustSectionWidths = (sections: TabSection[]) => {
   }));
 };
 
-export const useTabStore = create<TabLayoutStore>((set) => ({
+export const useTabStore = create<TabLayoutStore>((set, get) => ({
   openedTabs: [],
   activeTabId: null,
-  sections: [{ id: 'default', tabs: [], width: 100 }],
+  rows: [
+    {
+      id: 'row-1',
+      sections: [
+        {
+          id: 'default',
+          tabs: [],
+          width: 100
+        }
+      ]
+    }
+  ],
   tabGroups: [],
 
   addTab: (tab) => set((state) => {
     if (state.openedTabs.some(t => t.id === tab.id)) {
       return { activeTabId: tab.id };
     }
-    
-    const updatedSections = state.sections.map(section => 
-      section.id === 'default' 
-        ? { ...section, tabs: [...section.tabs, tab] }
-        : section
+
+    const newOpenedTabs = [...state.openedTabs, tab];
+    const [firstRow] = state.rows;
+    if (!firstRow) return {};
+
+    const [firstSection] = firstRow.sections;
+    if (!firstSection) return {};
+
+    const updatedFirstSection = {
+      ...firstSection,
+      tabs: [...firstSection.tabs, tab],
+    };
+
+    const updatedSections = adjustSectionWidths(
+      firstRow.sections.map((sec) =>
+        sec.id === firstSection.id ? updatedFirstSection : sec
+      )
+    );
+
+    const updatedRow = { ...firstRow, sections: updatedSections };
+    const newRows = state.rows.map((row) =>
+      row.id === firstRow.id ? updatedRow : row
     );
 
     return {
-      openedTabs: [...state.openedTabs, tab],
+      openedTabs: newOpenedTabs,
       activeTabId: tab.id,
-      sections: updatedSections
+      rows: newRows,
     };
   }),
 
   removeTab: (tabId) => set((state) => {
-    const newTabs = state.openedTabs.filter(tab => tab.id !== tabId);
+    const newTabs = state.openedTabs.filter((tab) => tab.id !== tabId);
     let newActiveTabId = state.activeTabId;
-
     if (state.activeTabId === tabId) {
-      const index = state.openedTabs.findIndex(tab => tab.id === tabId);
-      newActiveTabId = newTabs[index] ? newTabs[index].id : 
-                      (newTabs[index - 1] ? newTabs[index - 1].id : null);
+      const index = state.openedTabs.findIndex((t) => t.id === tabId);
+      newActiveTabId = newTabs[index]?.id || newTabs[index - 1]?.id || null;
     }
 
-    let updatedSections = state.sections.map(section => ({
-      ...section,
-      tabs: section.tabs.filter(tab => tab.id !== tabId)
-    })).filter(section => 
-      section.id === 'default' || section.tabs.length > 0
-    );
+    const updatedRows = state.rows.map((row) => {
+      const updatedSections = row.sections
+        .map((sec) => ({
+          ...sec,
+          tabs: sec.tabs.filter((t) => t.id !== tabId),
+        }))
+        .filter((sec) => sec.id === 'default' || sec.tabs.length > 0);
 
-    // Readjust widths if sections changed
-    if (updatedSections.length !== state.sections.length) {
-      updatedSections = adjustSectionWidths(updatedSections);
-    }
+      return {
+        ...row,
+        sections: adjustSectionWidths(updatedSections),
+      };
+    });
 
     const updatedGroups = state.tabGroups
-      .map(group => ({
+      .map((group) => ({
         ...group,
-        tabs: group.tabs.filter(tab => tab.id !== tabId)
+        tabs: group.tabs.filter((t) => t.id !== tabId),
       }))
-      .filter(group => group.tabs.length > 0);
+      .filter((g) => g.tabs.length > 0);
 
     return {
       openedTabs: newTabs,
       activeTabId: newActiveTabId,
-      sections: updatedSections,
-      tabGroups: updatedGroups
+      rows: updatedRows,
+      tabGroups: updatedGroups,
     };
   }),
 
-  setActiveTab: (tabId) => set({
-    activeTabId: tabId
-  }),
+  setActiveTab: (tabId) => set({ activeTabId: tabId }),
 
-  addSection: (tabId) => set((state) => {
-    const existingIds = state.sections.map(s => s.id);
-    const newSectionId = generateUniqueId('section', existingIds);
+  duplicateTab: (tabId) => set((state) => {
+    const originalTab = state.openedTabs.find(t => t.id === tabId);
+    if (!originalTab) return state;
 
-    const updatedSections = state.sections.map(section => ({
-      ...section,
-      tabs: tabId ? section.tabs.filter(t => t.id !== tabId) : section.tabs
-    })).filter(section => 
-      section.id === 'default' || section.tabs.length > 0
+    const newTabId = Math.floor(Date.now() + Math.random() * 1000);
+    const duplicatedTab = { ...originalTab, id: newTabId };
+
+    let targetRowIndex = -1;
+    let targetSectionIndex = -1;
+    let originalIndexInSection = -1;
+
+    outerLoop: for (let r = 0; r < state.rows.length; r++) {
+      for (let s = 0; s < state.rows[r].sections.length; s++) {
+        const section = state.rows[r].sections[s];
+        const idx = section.tabs.findIndex(t => t.id === tabId);
+        if (idx !== -1) {
+          targetRowIndex = r;
+          targetSectionIndex = s;
+          originalIndexInSection = idx;
+          break outerLoop;
+        }
+      }
+    }
+
+    if (targetRowIndex === -1 || targetSectionIndex === -1) {
+      return state;
+    }
+
+    const newOpenedTabs = [...state.openedTabs, duplicatedTab];
+    const rowToUpdate = state.rows[targetRowIndex];
+    const sectionToUpdate = rowToUpdate.sections[targetSectionIndex];
+
+    const newTabsInSection = [...sectionToUpdate.tabs];
+    newTabsInSection.splice(originalIndexInSection + 1, 0, duplicatedTab);
+
+    const updatedSection = { ...sectionToUpdate, tabs: newTabsInSection };
+    const updatedSections = rowToUpdate.sections.map((sec, i) =>
+      i === targetSectionIndex ? updatedSection : sec
     );
 
-    const tab = tabId ? state.openedTabs.find(t => t.id === tabId) : null;
-    const newSection = {
-      id: newSectionId,
-      tabs: tab ? [tab] : [],
-      width: 0 // temporary width
+    const updatedRow = {
+      ...rowToUpdate,
+      sections: adjustSectionWidths(updatedSections),
     };
-
-    const finalSections = adjustSectionWidths([...updatedSections, newSection]);
+    const updatedRows = [...state.rows];
+    updatedRows[targetRowIndex] = updatedRow;
 
     return {
-      sections: finalSections
+      openedTabs: newOpenedTabs,
+      rows: updatedRows,
+      activeTabId: newTabId,
     };
   }),
 
-  moveTabToSection: (tabId, targetSectionId) => set((state) => {
+  addRow: () => set((state) => {
+    const existingIds = state.rows.map(r => r.id);
+    const newRowId = generateUniqueId('row', existingIds);
+
+    const newRow: TabRow = {
+      id: newRowId,
+      sections: [
+        {
+          id: 'section-1',
+          tabs: [],
+          width: 100,
+        }
+      ]
+    };
+
+    return { rows: [...state.rows, newRow] };
+  }),
+
+  removeRow: (rowId) => set((state) => {
+    if (state.rows.length <= 1) return state;
+
+    const rowToRemove = state.rows.find(r => r.id === rowId);
+    if (!rowToRemove) return state;
+
+    const baseRowIndex = state.rows.findIndex(r => r.id === 'row-1');
+    if (baseRowIndex === -1) return state;
+
+    const baseDefaultSecIndex = state.rows[baseRowIndex].sections.findIndex(
+      (sec) => sec.id === 'default'
+    );
+    if (baseDefaultSecIndex === -1) return state;
+
+    const allTabs = rowToRemove.sections.flatMap(s => s.tabs);
+    const updatedBaseSections = [...state.rows[baseRowIndex].sections];
+    const baseDefaultSec = updatedBaseSections[baseDefaultSecIndex];
+    const mergedSection = {
+      ...baseDefaultSec,
+      tabs: [...baseDefaultSec.tabs, ...allTabs],
+    };
+    updatedBaseSections[baseDefaultSecIndex] = mergedSection;
+
+    const newRows = state.rows.filter(r => r.id !== rowId);
+    const updatedBaseRow = {
+      ...newRows[baseRowIndex],
+      sections: adjustSectionWidths(updatedBaseSections),
+    };
+    newRows[baseRowIndex] = updatedBaseRow;
+
+    return { rows: newRows };
+  }),
+
+  addSection: (rowId, tabId) => set((state) => {
+    const rowIndex = state.rows.findIndex(r => r.id === rowId);
+    if (rowIndex === -1) return state;
+
+    const row = state.rows[rowIndex];
+    const existingIds = row.sections.map(s => s.id);
+    const newSectionId = generateUniqueId('section', existingIds);
+
+    let maybeTab: TabItem | null = null;
+    if (tabId) {
+      maybeTab = state.openedTabs.find(t => t.id === tabId) || null;
+    }
+
+    const newSection: TabSection = {
+      id: newSectionId,
+      tabs: maybeTab ? [maybeTab] : [],
+      width: 0,
+    };
+
+    let updatedSections = row.sections.map((sec) => ({
+      ...sec,
+      tabs: maybeTab ? sec.tabs.filter(t => t.id !== tabId) : sec.tabs,
+    }));
+    updatedSections = updatedSections.filter(
+      (sec) => sec.id === 'default' || sec.tabs.length > 0
+    );
+
+    updatedSections.push(newSection);
+    updatedSections = adjustSectionWidths(updatedSections);
+
+    const updatedRow = { ...row, sections: updatedSections };
+    const newRows = [...state.rows];
+    newRows[rowIndex] = updatedRow;
+
+    return { rows: newRows };
+  }),
+
+  removeSection: (rowId, sectionId) => set((state) => {
+    const rowIndex = state.rows.findIndex((r) => r.id === rowId);
+    if (rowIndex === -1) return state;
+
+    const row = state.rows[rowIndex];
+    if (row.sections.length <= 1) return state;
+
+    const removedSection = row.sections.find(s => s.id === sectionId);
+    if (!removedSection) return state;
+
+    let newSections = row.sections
+      .filter(s => s.id !== sectionId)
+      .map((sec) =>
+        sec.id === 'default'
+          ? { ...sec, tabs: [...sec.tabs, ...removedSection.tabs] }
+          : sec
+      );
+
+    newSections = adjustSectionWidths(newSections);
+    const updatedRow = { ...row, sections: newSections };
+    const newRows = [...state.rows];
+    newRows[rowIndex] = updatedRow;
+
+    return { rows: newRows };
+  }),
+
+  moveTabToSection: (tabId, targetRowId, targetSectionId) => set((state) => {
     const tab = state.openedTabs.find(t => t.id === tabId);
     if (!tab) return state;
 
-    // 현재 탭이 있는 섹션 찾기
-    const currentSection = state.sections.find(section => 
-      section.tabs.some(t => t.id === tabId)
-    );
+    // Extract numeric ID from the tab-{id} format
+    const numericTabId = typeof tabId === 'string' && String(tabId).startsWith('tab-') ? 
+      parseInt(String(tabId).replace('tab-', '')) : (typeof tabId === 'number' ? tabId : 0);
 
-    // 같은 섹션으로의 이동이면 무시
-    if (currentSection?.id === targetSectionId) {
-      return state;
-    }
-
-    // 탭이 1개이고 섹션이 하나뿐일 때는 이동하지 않음
-    if (state.sections.length === 1 && state.openedTabs.length === 1) {
-      return state;
-    }
-
-    let updatedSections = state.sections.map(section => ({
-      ...section,
-      tabs: section.id === targetSectionId
-        ? [...section.tabs, tab]
-        : section.tabs.filter(t => t.id !== tabId)
-    })).filter(section => 
-      section.id === 'default' || section.tabs.length > 0
-    );
-
-    if (updatedSections.length !== state.sections.length) {
-      updatedSections = adjustSectionWidths(updatedSections);
-    }
-
-    const updatedGroups = state.tabGroups
-      .map(group => ({
-        ...group,
-        tabs: group.tabs.filter(t => t.id !== tabId)
+    // Update all rows to remove the tab from its current location
+    const updatedRows = state.rows.map(row => ({
+      ...row,
+      sections: row.sections.map(sec => ({
+        ...sec,
+        tabs: sec.tabs.filter(t => t.id !== numericTabId)
       }))
-      .filter(group => group.tabs.length > 0);
+    }));
+
+    // Find target row and section
+    const targetRowIndex = updatedRows.findIndex(r => r.id === targetRowId);
+    if (targetRowIndex === -1) return state;
+
+    const targetRow = updatedRows[targetRowIndex];
+    const targetSectionIndex = targetRow.sections.findIndex(s => s.id === targetSectionId);
+    if (targetSectionIndex === -1) return state;
+
+    // Add tab to target section
+    const updatedSections = [...targetRow.sections];
+    updatedSections[targetSectionIndex] = {
+      ...updatedSections[targetSectionIndex],
+      tabs: [...updatedSections[targetSectionIndex].tabs, tab]
+    };
+
+    // Update the target row
+    updatedRows[targetRowIndex] = {
+      ...targetRow,
+      sections: adjustSectionWidths(updatedSections)
+    };
+
+    // Remove tab from all groups
+    const updatedGroups = state.tabGroups
+      .map(g => ({
+        ...g,
+        tabs: g.tabs.filter(t => t.id !== numericTabId)
+      }))
+      .filter(g => g.tabs.length > 0);
 
     return {
       ...state,
-      sections: updatedSections,
+      rows: updatedRows,
       tabGroups: updatedGroups
     };
   }),
 
-  updateSectionWidth: (sectionId, width) => set((state) => ({
-    sections: state.sections.map(section =>
-      section.id === sectionId ? { ...section, width } : section
-    )
-  })),
+  updateSectionWidth: (rowId, sectionId, width) => set((state) => {
+    const rowIndex = state.rows.findIndex((r) => r.id === rowId);
+    if (rowIndex === -1) return state;
 
-  removeSection: (sectionId) => set((state) => {
-    if (state.sections.length <= 1) return state;
-    
-    const removedSection = state.sections.find(s => s.id === sectionId);
-    if (!removedSection) return state;
+    const row = state.rows[rowIndex];
+    const updatedSections = row.sections.map((sec) =>
+      sec.id === sectionId ? { ...sec, width } : sec
+    );
 
-    let updatedSections = state.sections
-      .filter(s => s.id !== sectionId)
-      .map(section => 
-        section.id === 'default'
-          ? { ...section, tabs: [...section.tabs, ...removedSection.tabs] }
-          : section
-      );
+    const updatedRow = { ...row, sections: updatedSections };
+    const newRows = [...state.rows];
+    newRows[rowIndex] = updatedRow;
 
-    updatedSections = adjustSectionWidths(updatedSections);
-
-    return { sections: updatedSections };
+    return { rows: newRows };
   }),
 
-  addTabGroup: (tabId) => set((state) => {
+addTabGroup: (tabId) => set((state) => {
     const tab = state.openedTabs.find(t => t.id === tabId);
     if (!tab) return state;
 
-    let updatedSections = state.sections.map(section => ({
-      ...section,
-      tabs: section.tabs.filter(t => t.id !== tabId)
-    })).filter(section => 
-      section.id === 'default' || section.tabs.length > 0
-    );
+    // Extract numeric ID if necessary
+    const numericTabId = (typeof tabId === 'string' && String(tabId).startsWith('tab-')) ? 
+      parseInt(String(tabId).replace('tab-', '')) : (typeof tabId === 'number' ? tabId : 0);
 
-    if (updatedSections.length !== state.sections.length) {
-      updatedSections = adjustSectionWidths(updatedSections);
-    }
+    // 모든 섹션에서 제거
+    const updatedRows = state.rows.map(row => {
+      let newSecs = row.sections.map(sec => ({
+        ...sec,
+        tabs: sec.tabs.filter(t => t.id !== numericTabId),
+      }));
+      newSecs = newSecs.filter(
+        (sec) => sec.id === 'default' || sec.tabs.length > 0
+      );
+      return { ...row, sections: adjustSectionWidths(newSecs) };
+    });
 
     const existingIds = state.tabGroups.map(g => g.id);
     const newGroupId = generateUniqueId('group', existingIds);
-    const newGroup = {
+
+    const newGroup: TabGroup = {
       id: newGroupId,
       tabs: [tab],
-      position: { x: 0, y: 0 }
+      position: { x: 0, y: 0 },
     };
 
     return {
-      sections: updatedSections,
-      tabGroups: [...state.tabGroups, newGroup]
+      rows: updatedRows,
+      tabGroups: [...state.tabGroups, newGroup],
     };
   }),
 
@@ -254,19 +435,34 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     const group = state.tabGroups.find(g => g.id === groupId);
     if (!group) return state;
 
-    let updatedSections = state.sections.map(section => 
-      section.id === 'default'
-        ? { ...section, tabs: [...section.tabs, ...group.tabs] }
-        : section
-    );
+    const rowIndex = state.rows.findIndex(r => r.id === 'row-1');
+    if (rowIndex === -1) return state;
 
-    if (updatedSections.length !== state.sections.length) {
-      updatedSections = adjustSectionWidths(updatedSections);
-    }
+    const defaultSecIndex = state.rows[rowIndex].sections.findIndex(
+      sec => sec.id === 'default'
+    );
+    if (defaultSecIndex === -1) return state;
+
+    const baseSection = state.rows[rowIndex].sections[defaultSecIndex];
+    const mergedSection = {
+      ...baseSection,
+      tabs: [...baseSection.tabs, ...group.tabs],
+    };
+
+    let updatedSections = [...state.rows[rowIndex].sections];
+    updatedSections[defaultSecIndex] = mergedSection;
+    updatedSections = adjustSectionWidths(updatedSections);
+
+    const updatedRow = {
+      ...state.rows[rowIndex],
+      sections: updatedSections,
+    };
+    const newRows = [...state.rows];
+    newRows[rowIndex] = updatedRow;
 
     return {
-      sections: updatedSections,
-      tabGroups: state.tabGroups.filter(g => g.id !== groupId)
+      rows: newRows,
+      tabGroups: state.tabGroups.filter(g => g.id !== groupId),
     };
   }),
 
@@ -274,71 +470,33 @@ export const useTabStore = create<TabLayoutStore>((set) => ({
     const tab = state.openedTabs.find(t => t.id === tabId);
     if (!tab) return state;
 
-    let updatedSections = state.sections.map(section => ({
-      ...section,
-      tabs: section.tabs.filter(t => t.id !== tabId)
-    })).filter(section => 
-      section.id === 'default' || section.tabs.length > 0
-    );
+    // Extract numeric ID if necessary
+    const numericTabId = typeof tabId === 'string' ? 
+      parseInt(String(tabId).replace('tab-', '')) : (typeof tabId === 'number' ? tabId : 0);
 
-    if (updatedSections.length !== state.sections.length) {
-      updatedSections = adjustSectionWidths(updatedSections);
-    }
+    // 모든 섹션에서 제거
+    const updatedRows = state.rows.map(row => {
+      let newSecs = row.sections.map(sec => ({
+        ...sec,
+        tabs: sec.tabs.filter(t => t.id !== numericTabId),
+      }));
+      newSecs = newSecs.filter(
+        (sec) => sec.id === 'default' || sec.tabs.length > 0
+      );
+      return { ...row, sections: adjustSectionWidths(newSecs) };
+    });
 
-    const updatedGroups = state.tabGroups.map(group => {
-      if (group.id === groupId) {
-        return { ...group, tabs: [...group.tabs, tab] };
+    // 그룹에 탭 추가
+    const updatedGroups = state.tabGroups.map(g => {
+      if (g.id === groupId) {
+        return { ...g, tabs: [...g.tabs, tab] };
       }
-      return {
-        ...group,
-        tabs: group.tabs.filter(t => t.id !== tabId)
-      };
+      return { ...g, tabs: g.tabs.filter(t => t.id !== numericTabId) };
     });
 
     return {
-      ...state,
-      sections: updatedSections,
-      tabGroups: updatedGroups
+      rows: updatedRows,
+      tabGroups: updatedGroups,
     };
   }),
-
-  duplicateTab: (tabId: number) => set((state) => {
-    const originalTab = state.openedTabs.find(t => t.id === tabId);
-    if (!originalTab) return state;
-
-    // 새로운 고유 ID 생성 (기존 ID에 timestamp를 추가하여 고유성 보장)
-    const newTabId = Date.now();
-    const duplicatedTab = {
-      ...originalTab,
-      id: newTabId
-    };
-
-    // 섹션에서 원본 탭의 위치 찾기
-    const targetSection = state.sections.find(section => 
-      section.tabs.some(tab => tab.id === tabId)
-    );
-
-    if (!targetSection) return state;
-
-    // 해당 섹션에 복제된 탭 추가
-    const updatedSections = state.sections.map(section => {
-      if (section.id === targetSection.id) {
-        const originalTabIndex = section.tabs.findIndex(tab => tab.id === tabId);
-        const newTabs = [...section.tabs];
-        newTabs.splice(originalTabIndex + 1, 0, duplicatedTab); // 원본 탭 바로 뒤에 삽입
-        return {
-          ...section,
-          tabs: newTabs
-        };
-      }
-      return section;
-    });
-
-    return {
-      openedTabs: [...state.openedTabs, duplicatedTab],
-      sections: updatedSections,
-      activeTabId: newTabId // 새로 생성된 탭을 활성화
-    };
-  }),
-
 }));

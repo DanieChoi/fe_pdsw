@@ -1,3 +1,4 @@
+// src/app/main/comp/DraggableTab.tsx
 "use client";
 
 import React from 'react';
@@ -16,39 +17,49 @@ interface DraggableTabProps {
   onSelect: () => void;
 }
 
-const DraggableTab = ({
+const DraggableTab: React.FC<DraggableTabProps> = ({
   id,
   title,
   icon,
   isActive,
   onRemove,
-  onSelect
-}: DraggableTabProps) => {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+  onSelect,
+}) => {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: `tab-${id}`,
-    data: { type: 'tab', id }
+    data: {
+      type: 'tab',
+      id: id,
+    },
   });
 
   const style = transform ? {
     transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    zIndex: isDragging ? 999 : undefined,
   } : undefined;
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="relative flex items-center"
+      className={`
+        relative flex items-center
+        ${isDragging ? 'opacity-50 cursor-grabbing' : ''}
+      `}
       {...attributes}
       {...listeners}
     >
       <CommonButton
         variant={isActive ? "default" : "ghost"}
         className={`
-          group flex items-center space-x-2 rounded-md pr-8 pl-3 py-2 
-          ${isActive 
-            ? 'bg-[#56CAD6] text-white shadow-sm' 
-            : 'bg-[#E8F7F9] text-[#56CAD6] hover:bg-[#CCE9ED] border border-[#56CAD6]/20'}
-          cursor-move transition-all duration-200
+          group flex items-center space-x-2 rounded-md pr-8 pl-3 py-2
+          ${isActive
+            ? 'bg-[#56CAD6] text-white shadow-sm'
+            : 'bg-[#E8F7F9] text-[#56CAD6] hover:bg-[#CCE9ED] border border-[#56CAD6]/20'
+          }
+          cursor-grab active:cursor-grabbing
+          transition-all duration-200
+          ${isDragging ? 'cursor-grabbing' : ''}
         `}
         onClick={onSelect}
       >
@@ -70,10 +81,11 @@ const DraggableTab = ({
           onRemove();
         }}
         className={`
-          absolute right-1 p-1 rounded-full 
-          ${isActive 
-            ? 'text-white hover:bg-[#56CAD6]/80' 
-            : 'text-[#56CAD6]/70 hover:text-[#56CAD6] hover:bg-[#CCE9ED]'}
+          absolute right-1 p-1 rounded-full
+          ${isActive
+            ? 'text-white hover:bg-[#56CAD6]/80'
+            : 'text-[#56CAD6]/70 hover:text-[#56CAD6] hover:bg-[#CCE9ED]'
+          }
           transition-colors duration-200
         `}
       >
