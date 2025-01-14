@@ -1,6 +1,6 @@
 // src/features/store/mainStore.ts
 import { create } from 'zustand';
-import { MainDataResponse } from '../auth/types/mainIndex';
+import { MainDataResponse } from '../features/auth/types/mainIndex';
 
 interface MainState {
   campaigns: MainDataResponse[];

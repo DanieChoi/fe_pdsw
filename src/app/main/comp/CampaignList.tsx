@@ -1,6 +1,6 @@
 // components/main/CampaignList.tsx
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
-import { useMainStore } from '@/features/store';
+import { useMainStore } from '@/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function CampaignList() {
