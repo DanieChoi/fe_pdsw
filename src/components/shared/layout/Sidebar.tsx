@@ -34,11 +34,22 @@ export default function Sidebar({
   
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
-      setTenants(data.result_data);
-      fetchMain({
-        session_key: localStorage.getItem('sessionKey') || '',
-        tenant_id: Number(localStorage.getItem('tenantId')) || 0,
-      });
+      if( data.result_code === 5){
+        setAlertState({
+          isOpen: true,
+          message: '로그인 정보가 없습니다.',
+          title: '로그인',
+          type: '0',
+        });
+        Cookies.remove('session_key');
+        router.push('/login');
+      }else{
+        setTenants(data.result_data);
+        fetchMain({
+          session_key: localStorage.getItem('sessionKey') || '',
+          tenant_id: Number(localStorage.getItem('tenantId')) || 0,
+        });
+      }
     },
     onError: (error) => {
       if( error.message.split('||')[0] === '5' ){
@@ -48,6 +59,7 @@ export default function Sidebar({
           title: '로그인',
           type: '0',
         });
+        Cookies.remove('session_key');
         router.push('/login');
       }
     }

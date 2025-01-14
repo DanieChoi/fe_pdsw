@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { menuItems, MenuItem } from '@/components/shared/constants/menuItems';
 import { useTabStore } from '@/store/tabStore';  // 수정된 부분
+import Cookies from 'js-cookie';
 
 export default function Header() {
   const router = useRouter();
@@ -24,6 +25,11 @@ export default function Header() {
   const isTabOpened = (itemId: number) => {
     return openedTabs.some(tab => tab.id === itemId);
   };
+
+  const handleLoginOut = () => {
+    Cookies.remove('session_key');
+    router.push('/login');
+  }
 
   return (
     <div className="flex flex-col">
@@ -52,7 +58,9 @@ export default function Header() {
               <span>홍길동(관리자)</span>
             </div>
             {/* 로그아웃 버튼*/}
-            <button className="flex items-center space-x-1 text-sm">
+            <button className="flex items-center space-x-1 text-sm"
+              onClick={handleLoginOut}
+            >
               <Image
                 src="/header-menu/log-out.svg"
                 alt="로그아웃"
