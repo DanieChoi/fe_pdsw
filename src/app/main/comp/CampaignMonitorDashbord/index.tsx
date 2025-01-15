@@ -1,259 +1,336 @@
-import React from 'react'
-import {
-  useReactTable,
-  getCoreRowModel,
-  getExpandedRowModel,
-  ColumnDef,
-  flexRender,
-  ExpandedState,
-} from '@tanstack/react-table'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { ChevronRight, ChevronDown } from 'lucide-react'
+"use client";
+
+import React, { useState } from 'react';
+import DataGrid, { Column } from 'react-data-grid';
+import { ChevronRight, ChevronDown } from 'lucide-react';
+import 'react-data-grid/lib/styles.css';
 
 interface CampaignData {
-  id: string
-  name: string
-  requestStatus: string
-  executeStatus: string
-  processStatus: string
-  errorRate: number
-  riskTestRate: number
-  timeTestRate: number
-  riskTestCount: number
-  processCount: number
-  completeCount: number
-  subRows?: CampaignData[]
+  id: string;
+  발신구분: string;
+  시작구분: string;
+  완료구분: string;
+  진행률: number;
+  리스트대비성공률: number;
+  발신대비성공률: number;
+  총리스트건수: number;
+  순수발신건수: number;
 }
 
-const defaultData: CampaignData[] = [
-  {
-    id: '1',
-    name: 'NEXUS(1번대)',
-    requestStatus: '',
-    executeStatus: '',
-    processStatus: '',
-    errorRate: 0,
-    riskTestRate: 0,
-    timeTestRate: 0,
-    riskTestCount: 0,
-    processCount: 0,
-    completeCount: 0,
-    subRows: [
-      {
-        id: '1-1',
-        name: '124752',
-        requestStatus: '',
-        executeStatus: '',
-        processStatus: '',
-        errorRate: 0,
-        riskTestRate: 0,
-        timeTestRate: 0,
-        riskTestCount: 0,
-        processCount: 0,
-        completeCount: 0,
-        subRows: [
-          {
-            id: '1-1-1',
-            name: '캠페인 아이디: 7',
-            requestStatus: '',
-            executeStatus: '',
-            processStatus: '',
-            errorRate: 0,
-            riskTestRate: 0,
-            timeTestRate: 0,
-            riskTestCount: 0,
-            processCount: 0,
-            completeCount: 0,
-            subRows: [
-              {
-                id: 'O00147-00234',
-                name: 'O00147-00234',
-                requestStatus: '처리완료',
-                executeStatus: '입중',
-                processStatus: '진행중',
-                errorRate: 25,
-                riskTestRate: 0,
-                timeTestRate: 0,
-                riskTestCount: 4,
-                processCount: 1,
-                completeCount: 3,
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-]
+interface TreeRow extends CampaignData {
+  parentId?: string;
+  isExpanded?: boolean;
+  level: number;
+  hasChildren?: boolean;
+  children?: TreeRow[];
+}
 
-const CampaignMonitorDashbord = () => {
-  const [expanded, setExpanded] = React.useState<ExpandedState>({})
-
-  // 초기에 모든 행을 펼친 상태로 설정
-  React.useEffect(() => {
-    const allExpanded: ExpandedState = {}
-    const expandRows = (rows: CampaignData[]) => {
-      rows.forEach(row => {
-        allExpanded[row.id] = true
-        if (row.subRows) {
-          expandRows(row.subRows)
+export default function CampaignMonitorDashboard() {
+  const initialData: TreeRow[] = [
+    {
+      id: 'center-1',
+      level: 0,
+      hasChildren: true,
+      발신구분: '',
+      시작구분: '',
+      완료구분: '',
+      진행률: 0,
+      리스트대비성공률: 0,
+      발신대비성공률: 0,
+      총리스트건수: 0,
+      순수발신건수: 0,
+      children: [
+        {
+          id: 'task-124752',
+          parentId: 'center-1',
+          level: 1,
+          hasChildren: true,
+          발신구분: '',
+          시작구분: '',
+          완료구분: '',
+          진행률: 0,
+          리스트대비성공률: 0,
+          발신대비성공률: 0,
+          총리스트건수: 0,
+          순수발신건수: 0,
+          children: [
+            {
+              id: 'campaign-7',
+              parentId: 'task-124752',
+              level: 2,
+              hasChildren: true,
+              발신구분: '',
+              시작구분: '',
+              완료구분: '',
+              진행률: 0,
+              리스트대비성공률: 0,
+              발신대비성공률: 0,
+              총리스트건수: 0,
+              순수발신건수: 0,
+              children: [
+                {
+                  id: 'OG0147-00234-1',
+                  parentId: 'campaign-7',
+                  level: 3,
+                  발신구분: '최초발신',
+                  시작구분: '업종',
+                  완료구분: '진행중',
+                  진행률: 25,
+                  리스트대비성공률: 0,
+                  발신대비성공률: 0,
+                  총리스트건수: 4,
+                  순수발신건수: 4
+                },
+                {
+                  id: 'OG0147-00234-2',
+                  parentId: 'campaign-7',
+                  level: 3,
+                  발신구분: '최초발신',
+                  시작구분: '업종',
+                  완료구분: '진행중',
+                  진행률: 25,
+                  리스트대비성공률: 0,
+                  발신대비성공률: 0,
+                  총리스트건수: 4,
+                  순수발신건수: 4
+                },
+                {
+                  id: 'OG0147-00234-3',
+                  parentId: 'campaign-7',
+                  level: 3,
+                  발신구분: '최초발신',
+                  시작구분: '업종',
+                  완료구분: '진행중',
+                  진행률: 25,
+                  리스트대비성공률: 0,
+                  발신대비성공률: 0,
+                  총리스트건수: 4,
+                  순수발신건수: 4
+                }
+              ]
+            },
+            {
+              id: 'campaign-8',
+              parentId: 'task-124752',
+              level: 2,
+              hasChildren: false,
+              발신구분: '',
+              시작구분: '',
+              완료구분: '',
+              진행률: 0,
+              리스트대비성공률: 0,
+              발신대비성공률: 0,
+              총리스트건수: 0,
+              순수발신건수: 0
+            },
+            {
+              id: 'campaign-9',
+              parentId: 'task-124752',
+              level: 2,
+              hasChildren: false,
+              발신구분: '',
+              시작구분: '',
+              완료구분: '',
+              진행률: 0,
+              리스트대비성공률: 0,
+              발신대비성공률: 0,
+              총리스트건수: 0,
+              순수발신건수: 0
+            },
+            {
+              id: 'campaign-10',
+              parentId: 'task-124752',
+              level: 2,
+              hasChildren: false,
+              발신구분: '',
+              시작구분: '',
+              완료구분: '',
+              진행률: 0,
+              리스트대비성공률: 0,
+              발신대비성공률: 0,
+              총리스트건수: 0,
+              순수발신건수: 0
+            },
+            {
+              id: 'campaign-11',
+              parentId: 'task-124752',
+              level: 2,
+              hasChildren: true,
+              발신구분: '',
+              시작구분: '',
+              완료구분: '',
+              진행률: 0,
+              리스트대비성공률: 0,
+              발신대비성공률: 0,
+              총리스트건수: 0,
+              순수발신건수: 0,
+              children: [
+                {
+                  id: 'OG0147-00234-4',
+                  parentId: 'campaign-11',
+                  level: 3,
+                  발신구분: '4번째발신',
+                  시작구분: '중지',
+                  완료구분: '완료',
+                  진행률: 25,
+                  리스트대비성공률: 0,
+                  발신대비성공률: 0,
+                  총리스트건수: 4,
+                  순수발신건수: 4
+                },
+                {
+                  id: 'OG0147-00234-5',
+                  parentId: 'campaign-11',
+                  level: 3,
+                  발신구분: '2번째발신',
+                  시작구분: '중지',
+                  완료구분: '완료',
+                  진행률: 12.5,
+                  리스트대비성공률: 0,
+                  발신대비성공률: 0,
+                  총리스트건수: 4,
+                  순수발신건수: 4
+                },
+                {
+                  id: 'OG0147-00234-6',
+                  parentId: 'campaign-11',
+                  level: 3,
+                  발신구분: '최초발신',
+                  시작구분: '업종',
+                  완료구분: '진행중',
+                  진행률: 25,
+                  리스트대비성공률: 0,
+                  발신대비성공률: 0,
+                  총리스트건수: 4,
+                  순수발신건수: 4
+                }
+              ]
+            }
+          ]
         }
-      })
+      ]
     }
-    expandRows(defaultData)
-    setExpanded(allExpanded)
-  }, [])
+  ];
 
-  const columns: ColumnDef<CampaignData>[] = [
+  // 초기에는 센터, 태스크만 열림
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set(['center-1', 'task-124752']));
+
+  const toggleRowExpand = (rowId: string) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (expandedRows.has(rowId)) {
+      newExpandedRows.delete(rowId);
+    } else {
+      newExpandedRows.add(rowId);
+    }
+    setExpandedRows(newExpandedRows);
+  };
+
+  function flattenRows(rows: TreeRow[]): TreeRow[] {
+    let flat: TreeRow[] = [];
+    rows.forEach((row) => {
+      const isExpanded = expandedRows.has(row.id);
+      flat.push({ ...row, isExpanded });
+      if (row.children && isExpanded) {
+        flat = flat.concat(flattenRows(row.children));
+      }
+    });
+    return flat;
+  }
+
+  // 행 구분용 키 설정 (최신 react-data-grid에서 필수)
+  const rowKeyGetter = (row: TreeRow) => row.id;
+
+  const columns: Column<TreeRow>[] = [
     {
-      accessorKey: 'name',
-      header: '캠페인 이름',
-      cell: ({ row }) => {
+      key: 'campaignName',
+      name: '캠페인 이름',
+      width: 300,
+      renderCell: ({ row }) => {
+        const indent = row.level * 20;
+        const showToggle = row.hasChildren;
+        let displayName = '';
+
+        if (row.level === 0) {
+          displayName = '센터: NEXUS(1센터)';
+        } else if (row.level === 1) {
+          displayName = '태스크: 124752';
+        } else if (row.level === 2) {
+          // 예) campaign-7 → '7' 부분만 추출
+          displayName = `캠페인 아이디: ${row.id.split('-')[1]}`;
+        } else {
+          // 레벨 3 이상: 실제 id 그대로
+          displayName = row.id;
+        }
+
         return (
-          <div className="flex items-center" style={{ paddingLeft: `${row.depth * 2}rem` }}>
-            {row.getCanExpand() ? (
-              <button
-                className="mr-2 hover:bg-gray-100 rounded"
-                onClick={row.getToggleExpandedHandler()}
+          <div style={{ marginLeft: `${indent}px` }} className="flex items-center">
+            {showToggle && (
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleRowExpand(row.id);
+                }}
+                className="cursor-pointer mr-1"
               >
-                {row.getIsExpanded() ? (
-                  <div className="w-4 h-4 flex items-center justify-center text-gray-500">
-                    ∨
-                  </div>
+                {row.isExpanded ? (
+                  <ChevronDown className="w-4 h-4" />
                 ) : (
-                  <div className="w-4 h-4 flex items-center justify-center text-gray-500">
-                    ＞
-                  </div>
+                  <ChevronRight className="w-4 h-4" />
                 )}
-              </button>
-            ) : (
-              <span className="w-6"></span>
+              </span>
             )}
-            <span className="text-[13px] text-gray-700">{row.getValue('name')}</span>
+            <span>{displayName}</span>
           </div>
-        )
-      },
+        );
+      }
+    },
+    { key: '발신구분', name: '발신구분', width: 100 },
+    { key: '시작구분', name: '시작구분', width: 100 },
+    { key: '완료구분', name: '완료구분', width: 100 },
+    {
+      key: '진행률',
+      name: '진행률(%)',
+      width: 100,
+      renderCell: ({ row }) => (row.진행률 ? `${row.진행률}%` : '')
     },
     {
-      accessorKey: 'requestStatus',
-      header: '발신구분',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as string}</div>
-      )
+      key: '리스트대비성공률',
+      name: '리스트 대비 성공률(%)',
+      width: 150,
+      renderCell: ({ row }) => (row.리스트대비성공률 ? `${row.리스트대비성공률}%` : '')
     },
     {
-      accessorKey: 'executeStatus',
-      header: '시작구분',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as string}</div>
-      )
+      key: '발신대비성공률',
+      name: '발신 대비 성공률(%)',
+      width: 150,
+      renderCell: ({ row }) => (row.발신대비성공률 ? `${row.발신대비성공률}%` : '')
     },
     {
-      accessorKey: 'processStatus',
-      header: '완료구분',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as string}</div>
-      )
+      key: '총리스트건수',
+      name: '총 리스트 건수',
+      width: 120,
+      renderCell: ({ row }) => row.총리스트건수 || ''
     },
     {
-      accessorKey: 'errorRate',
-      header: '진행률(%)',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as number}</div>
-      )
-    },
-    {
-      accessorKey: 'riskTestRate',
-      header: '리스크 대비 성공률(%)',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as number}</div>
-      )
-    },
-    {
-      accessorKey: 'timeTestRate',
-      header: '발신 대비 성공률(%)',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as number}</div>
-      )
-    },
-    {
-      accessorKey: 'riskTestCount',
-      header: '총 리스크 건수',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as number}</div>
-      )
-    },
-    {
-      accessorKey: 'processCount',
-      header: '순수발신 건수',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as number}</div>
-      )
-    },
-    {
-      accessorKey: 'completeCount',
-      header: '총발신 건수',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as number}</div>
-      )
-    },
-  ]
-
-  const table = useReactTable({
-    data: defaultData,
-    columns,
-    state: {
-      expanded,
-    },
-    onExpandedChange: setExpanded,
-    getSubRows: row => row.subRows,
-    getCoreRowModel: getCoreRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
-  })
+      key: '순수발신건수',
+      name: '순수발신 건수',
+      width: 120,
+      renderCell: ({ row }) => row.순수발신건수 || ''
+    }
+  ];
 
   return (
-    <div className="p-4 bg-white">
-      <div className="border border-gray-200">
-        <Table>
-          <TableHeader className="bg-[#FBFBFB]">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-[13px] font-medium text-gray-700 py-2">
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} className="hover:bg-gray-50">
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-1.5">
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+    <div className="p-4">
+      <div className="h-[600px] w-full">
+        <DataGrid
+          columns={columns}
+          rows={flattenRows(initialData)}
+          rowKeyGetter={rowKeyGetter}
+          className="w-full h-full"
+          rowHeight={35}
+          headerRowHeight={45}
+        />
       </div>
     </div>
-  )
+  );
 }
-
-export default CampaignMonitorDashbord
