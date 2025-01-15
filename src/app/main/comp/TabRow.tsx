@@ -41,7 +41,7 @@ const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
 
   return (
     <div className="flex items-center min-h-[44px] w-full">
-      <div className="flex-1 flex">
+      <div className="flex-1 flex w-[calc(100%-46px)]">
         {/* 섹션들 */}
         {row.sections.map((section, idx) => (
           <TabSection
