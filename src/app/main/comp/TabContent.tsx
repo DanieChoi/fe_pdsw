@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { useTabStore } from '@/store/tabStore';
-import CampaignManager from './canpaignManager/CampaignManager';
+import CampaignManager from './campaignManager/CampaignManager';
 
 const TabContent = () => {
   const { activeTabId } = useTabStore();
