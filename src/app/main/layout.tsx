@@ -60,7 +60,14 @@ export default function MainLayout({
              isMenuOpen ? 'w-[calc(100%-16rem)]' : 'w-full'
            }`}
          >
-           <div className="flex-1 overflow-auto">
+           <div 
+             className="flex-1 overflow-y-auto"
+             style={{ 
+               height: 'calc(100vh - 50px)', // Header 높이(50px) 뺀 전체 높이
+               maxHeight: 'calc(100vh - 50px)', // 최대 높이도 동일하게 설정
+               paddingBottom: `${footerHeight}px` // Footer 높이만큼 패딩 추가
+             }}
+           >
              {children}
            </div>
            <div className="absolute bottom-0 left-0 right-0" style={{ height: `${footerHeight}px` }}>
