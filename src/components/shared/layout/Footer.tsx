@@ -6,12 +6,19 @@ export default function Footer({
   startResizing: () => void;
 }) {
   return (
+    // <footer
+    //   className="border-t text-sm text-gray-600 flex-shrink-0 relative bg-[#FBFBFB]"
+    //   style={{
+    //     height: `${footerHeight}px`, // 동적 높이 설정
+    //   }}
+    // >
+    // footer의 position을 relative에서 일반으로 변경
     <footer
-      className="border-t text-sm text-gray-600 flex-shrink-0 relative bg-[#FBFBFB]"
+      className="border-t text-sm text-gray-600 flex-shrink-0 bg-[#FBFBFB]"
       style={{
-        height: `${footerHeight}px`, // 동적 높이 설정
+        height: `${footerHeight}px`,
       }}
-    >
+    >    
       {/* 드래그 핸들러 */}
       <div
       className="resize-handle bg-gray-300 h-[1px] cursor-ns-resize absolute top-0 left-0 w-full hover:h-[4px] hover:bg-[#5BC2C1] before:content-[''] before:absolute before:top-[-4px] before:bottom-[-4px] before:left-0 before:right-0 before:bg-transparent"

@@ -1,4 +1,4 @@
-// C:\Users\terec\fe_pdsw\src\app\main\layout.tsx
+// C:\Users\nexus\Documents\GitHub\fe_pdsw\src\app\main\layout.tsx
 'use client';
 //import { Metadata } from 'next'
 import { Inter } from 'next/font/google'
@@ -55,7 +55,7 @@ export default function MainLayout({
         <Header />
         <div className="flex flex-1 h-[calc(100%-125px)] ">
           <Sidebar isMenuOpen={isMenuOpen} toggleSidebar={toggleSidebar} />
-          <main
+          {/* <main
             className={`transition-all duration-300 h-full ${
               isMenuOpen ? 'w-[calc(100%-16rem)]' : 'w-full'
             }`}
@@ -70,7 +70,31 @@ export default function MainLayout({
             {children}
             </div>
             <Footer footerHeight={footerHeight} startResizing={startResizing}/>
+          </main> */}
+
+          <main
+            className={`transition-all duration-300 h-full relative ${
+              isMenuOpen ? 'w-[calc(100%-16rem)]' : 'w-full'
+            }`}
+          >
+            <div
+              className="absolute top-0 left-0 right-0 overflow-auto"
+              style={{
+                bottom: `${footerHeight}px`, // 푸터 높이만큼 아래 여백 확보
+              }}
+            >
+              {children}
+            </div>
+            <div
+              className="absolute left-0 right-0 bottom-0"
+              style={{
+                height: `${footerHeight}px`,
+              }}
+            >
+              <Footer footerHeight={footerHeight} startResizing={startResizing}/>
+            </div>
           </main>
+
         </div>
       </div>
     </div>
