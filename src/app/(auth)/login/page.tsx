@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useApiForLogin } from '@/features/auth/hooks/useApiForLogin';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
-import CommonButton from '@/components/shared/CommonButton';
+import { Button } from "@/components/ui/button";
 
 interface LoginFormData {
   user_name: string;
@@ -119,14 +119,14 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <CommonButton 
+            <Button 
               variant="login"
               type="submit" 
               className="mt-100"
               // disabled={isLoading}
             >
               {isPending ? '로그인 중...' : '로그인'}
-            </CommonButton>          
+            </Button>          
           </form>
         </CardContent>
       </Card>

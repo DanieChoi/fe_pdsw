@@ -178,3 +178,43 @@ input::placeholder {
 
 
 /*레이아웃 공통*/
+
+.table-custom{
+  width: 100%;
+  table-layout: auto;
+  border:1px solid hsl(var(--border));
+  border-radius: 3px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.table-custom tr{
+  border-bottom: 1px solid hsl(var(--border));
+}
+.table-custom th{
+  background: #F8F8F8;
+  text-align: left;
+  padding: 3px 15px;
+  border-bottom: 1px solid hsl(var(--border));
+}
+.table-custom td{
+  border-bottom: 1px solid hsl(var(--border));
+}
+.table-custom tr:first-child th:first-child {
+  border-top-left-radius: 3px; /* 왼쪽 위 둥글게 */
+}
+
+.table-custom tr:first-child td:last-child {
+  border-top-right-radius: 3px; /* 오른쪽 위 둥글게 */
+}
+.table-custom tr:last-child th {
+  border-bottom:none;
+}
+.table-custom tr:last-child th:first-child {
+  border-bottom-left-radius: 3px; /* 왼쪽 아래 둥글게 */
+}
+.table-custom tr:last-child td {
+  border-bottom:none;
+}
+.table-custom tr:last-child td:last-child {
+  border-bottom-right-radius: 3px; /* 오른쪽 아래 둥글게 */
+}
