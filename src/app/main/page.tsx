@@ -86,14 +86,14 @@ const MainPage = () => {
     >
       <div className="flex flex-col h-full bg-white">
         <div className="flex-none border-b border-gray-200">
-          <div className="px-9 py-1">
+          <div className="">
             {rows.map((row) => (
               <TabRow key={row.id} rowId={row.id} />
             ))}
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto p-2">
+        <div className="flex-1 overflow-auto py-[15px] px-[35px]">
           <TabContent />
         </div>
       </div>

@@ -4,6 +4,7 @@
 import React from 'react';
 import { useTabStore } from '@/store/tabStore';
 import PreferencesBoard from './preferences';
+import SystemPreferences from './SystemPreferences';
 import CampaignMonitorDashbord from './CampaignMonitorDashbord';
 import CampaignManager from './campaignManager/CampaignManagerHeader';
 
@@ -38,7 +39,7 @@ const TabContent = () => {
       case 9:
         return <div className="p-2">분배호수 제한 설정 컨텐츠</div>;
       case 10:
-        return <div className="p-2">시스템 설정 컨텐츠</div>;
+        return <div className="p-2"><SystemPreferences /></div>;
       case 11:
         return <div className="p-2">운영 설정 컨텐츠</div>;
       case 12:
