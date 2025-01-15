@@ -3,8 +3,9 @@
 
 import React from 'react';
 import { useTabStore } from '@/store/tabStore';
-import CampaignManager from './campaignManager/CampaignManager';
+import PreferencesBoard from './preferences';
 import CampaignMonitorDashbord from './CampaignMonitorDashbord';
+import CampaignManager from './campaignManager/CampaignManagerHeader';
 
 const TabContent = () => {
   const { activeTabId } = useTabStore();
@@ -41,7 +42,7 @@ const TabContent = () => {
       case 11:
         return <div className="p-2">운영 설정 컨텐츠</div>;
       case 12:
-        return <div className="p-2">환경 설정 컨텐츠</div>;
+        return <div className="p-2"><PreferencesBoard /></div>;
       default:
         return (
           <div className="flex items-center justify-center min-h-[calc(100vh-23rem)] text-gray-500">
