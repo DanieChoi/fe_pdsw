@@ -3,6 +3,7 @@
 
 import React from 'react';
 import { useTabStore } from '@/store/tabStore';
+import CampaignManager from './canpaignManager/CampaignManager';
 
 const TabContent = () => {
   const { activeTabId } = useTabStore();
@@ -17,7 +18,7 @@ const TabContent = () => {
           </div>
         );
       case 2:
-        return <div className="p-2">캠페인 관리 컨텐츠</div>;
+        return <div className="p-2"><CampaignManager /></div>;
       case 3:
         return <div className="p-2">통합모니터 컨텐츠</div>;
       case 4:
