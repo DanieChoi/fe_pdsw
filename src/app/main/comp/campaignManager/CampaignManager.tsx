@@ -3,6 +3,8 @@
 import { useMainStore } from '@/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import CampaignManagerHeader from './CampaignManagerHeader';
+import CampaignManagerDetail from './CampaignManagerDetail';
+import CampaignManagerList from './CampaignManagerList';
 
 // 테넌트 조회 응답 데이터 리스트 타입
 interface CampaignManagerProps {
@@ -19,6 +21,10 @@ export default function CampaignManager({ campaign_id }: CampaignManagerProps) {
         <CampaignManagerHeader />
       </CardHeader>
       <CardContent>
+        <div className="grid grid-cols-2 gap-4">
+          <CampaignManagerList />
+          <CampaignManagerDetail />
+        </div>
       </CardContent>
     </Card>
   );
