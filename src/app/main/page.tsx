@@ -84,8 +84,7 @@ const MainPage = () => {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      {/* h-screen 제거 하여 높이 제한 제거 */}
-      <div className="flex flex-col bg-white">
+      <div className="flex flex-col h-full bg-white">
         <div className="flex-none border-b border-gray-200">
           <div className="px-9 py-1">
             {rows.map((row) => (
