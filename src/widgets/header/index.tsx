@@ -4,9 +4,9 @@
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { menuItems, MenuItem } from '@/components/shared/constants/menuItems';
-import { useTabStore } from '@/store/tabStore';  // 수정된 부분
-import Cookies from 'js-cookie';
+import { useTabStore } from '@/store/tabStore'
+import Cookies from 'js-cookie'
+import { MenuItem, menuItems } from '@/widgets/header/model/menuItems'
 
 export default function Header() {
   const router = useRouter();
@@ -14,10 +14,8 @@ export default function Header() {
 
   const handleMenuClick = (item: MenuItem, event: React.MouseEvent) => {
     if (event.ctrlKey) {
-      // Control 키를 누른 상태에서 클릭하면 새로운 탭 복제
       duplicateTab(item.id);
     } else {
-      // 일반 클릭은 기존대로 처리
       addTab(item);
     }
   };
@@ -34,7 +32,7 @@ export default function Header() {
   return (
     <div className="flex flex-col">
       <div className="header-top bg-[#5BC2C1] h-[28px] flex items-center">
-        <div className=" px-4 flex justify-between items-center w-full">
+        <div className="px-4 flex justify-between items-center w-full">
           {/* NEXPDS Logo */}
           <div className="flex items-center">
             <Image
@@ -58,7 +56,8 @@ export default function Header() {
               <span>홍길동(관리자)</span>
             </div>
             {/* 로그아웃 버튼*/}
-            <button className="flex items-center space-x-1 text-sm"
+            <button 
+              className="flex items-center space-x-1 text-sm"
               onClick={handleLoginOut}
             >
               <Image
@@ -73,7 +72,8 @@ export default function Header() {
         </div>
       </div>
       <header className="bg-white py-[10px] pl-[30px] border-b">
-        <div className="">
+        <div className="flex flex-col gap-4">
+
           <div className="flex items-center justify-between">
             <nav className="flex space-x-1 overflow-x-auto">
               {menuItems.map((item) => (
@@ -88,11 +88,12 @@ export default function Header() {
                     `}
                     onClick={(e) => handleMenuClick(item, e)}
                   >
-                    <div className="w-[32px] h-[32px] relative">
+                    <div className="flex items-center justify-center">
                       <Image
                         src={item.icon}
                         alt={item.title}
-                        fill
+                        width={32}
+                        height={32}
                         className="object-contain"
                       />
                     </div>

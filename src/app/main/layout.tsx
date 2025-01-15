@@ -1,10 +1,10 @@
 'use client';
 import { Inter } from 'next/font/google'
 import { useState } from 'react';
-import Header from '@/components/shared/layout/Header'
 import Footer from '@/components/shared/layout/Footer'
 import Sidebar from '@/components/shared/layout/Sidebar'
 import '@/app/globals.css'
+import Header from '@/widgets/header';
 
 const inter = Inter({ subsets: ['latin'] })
 

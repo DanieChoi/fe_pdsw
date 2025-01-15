@@ -7,6 +7,7 @@ import PreferencesBoard from './preferences';
 import SystemPreferences from './SystemPreferences';
 import CampaignMonitorDashbord from './CampaignMonitorDashbord';
 import CampaignManager from './campaignManager/CampaignManagerHeader';
+import OutboundCallProgressPanel from './OutboundCallProgressPanel';
 
 const TabContent = () => {
   const { activeTabId } = useTabStore();
@@ -29,7 +30,9 @@ const TabContent = () => {
           <CampaignMonitorDashbord />
         </div>;
       case 5:
-        return <div className="p-2">발신전화상태 컨텐츠</div>;
+        return <div className="p-2">
+          <OutboundCallProgressPanel />
+        </div>;
       case 6:
         return <div className="p-2">채널 모니터 컨텐츠</div>;
       case 7:

@@ -1,5 +1,4 @@
-// src/components/shared/constants/menuItems.ts
-
+// src/widgets/header/model/menuItems.ts
 export interface MenuItem {
   id: number;
   title: string;
@@ -39,7 +38,7 @@ export const menuItems: MenuItem[] = [
   },
   { 
     id: 5, 
-    title: '발신전화상태', 
+    title: '발신진행상태', 
     icon: '/header-menu/발신진행상태.svg', 
     href: '/call',
     content: null
