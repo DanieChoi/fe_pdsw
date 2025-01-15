@@ -1,3 +1,4 @@
+// C:\Users\nexus\Documents\GitHub\fe_pdsw\src\app\main\page.tsx
 "use client";
 
 import React from 'react';
@@ -83,7 +84,7 @@ const MainPage = () => {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex flex-col h-screen bg-white">
+      <div className="flex flex-col h-full bg-white">
         <div className="flex-none border-b border-gray-200">
           <div className="px-9 py-1">
             {rows.map((row) => (
