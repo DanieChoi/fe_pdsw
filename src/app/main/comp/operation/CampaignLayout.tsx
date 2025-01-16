@@ -1,7 +1,9 @@
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import CampaignModal from './CampaignModal';
 
 interface GridItem {
   id: string;
@@ -11,19 +13,22 @@ interface GridItem {
 
 interface CampaignLayoutProps {
   data: GridItem[];
-  onCampaignSearchClick: () => void;
   onNewClick: () => void;
   onSaveClick: () => void;
-  selectedCampaign?: string;
 }
 
 export default function CampaignLayout({
   data,
-  onCampaignSearchClick,
   onNewClick,
   onSaveClick,
-  selectedCampaign
 }: CampaignLayoutProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState('');
+
+  const handleCampaignSelect = (campaign: string) => {
+    setSelectedCampaign(campaign);
+  };
+
   return (
     <div className="flex gap-8">
       {/* 왼쪽 그리드 */}
@@ -59,7 +64,7 @@ export default function CampaignLayout({
             <span className="text-sm text-gray-600 w-24">대상캠페인</span>
             <Select>
               <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Select" />
+                <SelectValue placeholder="" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="web_only">web_only</SelectItem>
@@ -68,7 +73,7 @@ export default function CampaignLayout({
             <Button 
               variant="outline" 
               size="sm"
-              onClick={onCampaignSearchClick}
+              onClick={() => setIsModalOpen(true)}
             >
               캠페인조회
             </Button>
@@ -115,9 +120,15 @@ export default function CampaignLayout({
             <p>• 발신번호를 설정하시면은 그리드에서 카피도 할 늘칠 주시면자 신규 비트를 클릭해 주세요.</p>
             <p>• 변경된 정보는 멤버십의 발신 여부이 저장이 시 반영됩니다.</p>
           </div>
-
         </div>
       </div>
+
+      {/* Campaign Modal */}
+      <CampaignModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelect={handleCampaignSelect}
+      />
     </div>
   );
 }
