@@ -8,6 +8,7 @@ import SystemPreferences from './SystemPreferences';
 import CampaignMonitorDashbord from './CampaignMonitorDashbord';
 import CampaignManager from './campaignManager/CampaignManager';
 import OutboundCallProgressPanel from './OutboundCallProgressPanel';
+import OperationSetting from './operation';
 
 const TabContent = () => {
   const { activeTabId } = useTabStore();
@@ -44,7 +45,7 @@ const TabContent = () => {
       case 10:
         return <div className="p-2"><SystemPreferences /></div>;
       case 11:
-        return <div className="p-2">운영 설정 컨텐츠</div>;
+        return <div className="p-2"><OperationSetting /></div>;
       case 12:
         return <div className="p-2"><PreferencesBoard /></div>;
       default:
