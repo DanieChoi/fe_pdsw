@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import CampaignModal from './CampaignModal';
+// import { useMainStore } from '@/store';
+// import { MainDataResponse } from '@/features/auth/types/mainIndex';
 
 interface GridItem {
   id: string;
@@ -24,6 +26,9 @@ export default function CampaignLayout({
 }: CampaignLayoutProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState('');
+
+  // const { campaigns, totalCount, setSelectedCampaign } = useMainStore();
+  // const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>(campaigns);
 
   const handleCampaignSelect = (campaign: string) => {
     setSelectedCampaign(campaign);
