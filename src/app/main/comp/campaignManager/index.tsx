@@ -9,7 +9,7 @@ type Props = {}
 
 const CampaignManager = (props: Props) => {
   return (
-    <Card>
+    <div>
       <CardHeader>
         <CampaignManagerHeader />
       </CardHeader>
@@ -19,7 +19,7 @@ const CampaignManager = (props: Props) => {
           <CampaignManagerDetail />
         </div>
       </CardContent>
-    </Card>
+    </div>
   )
 }
 
