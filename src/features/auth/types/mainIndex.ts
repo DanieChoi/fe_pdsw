@@ -125,6 +125,25 @@ export interface CallingNumberListResponse {
   result_data: CallingNumberListDataResponse[];
 }
 
+// 캠페인스케줄 데이터 타입
+export interface CampaignScheDuleListDataResponse {
+  campaign_id: number;
+  tenant_id: number;
+  start_date: string;
+  end_date: string;
+  start_time: [string];
+  end_time: [string];
+}
+
+// 캠페인스케줄 데이터 타입
+export interface CampaignScheDuleListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: CampaignScheDuleListDataResponse[];
+}
+
 // API 에러 타입
 export interface AuthApiError {
   message: string;

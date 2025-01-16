@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { SkillListDataResponse } from '@/features/auth/types/mainIndex';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
@@ -28,13 +29,14 @@ type Props = {
 }
 
 export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
-  const { tenants,selectedCampaign } = useMainStore();
+  const { tenants,selectedCampaign, skills } = useMainStore();
   const [tenantId, setTenantId] = useState('all'); // 테넌트
   const [campaignName, setCampaignName] = useState(''); // 캠페인이름
   const [dailMode, setDailMode] = useState('all'); // 다이얼모드
   const [skill, setSkill] = useState('all'); // 스킬
   const [callNumber, setCallNumber] = useState(''); // 발신번호
   const [readonly, setReadonly] = useState(false);
+  const [tempSkills, setTempSkills] = useState<SkillListDataResponse[]>([]);
 
   const onHeaderSearch = () => {
     const param:CampaignHeaderSearch = {
@@ -53,11 +55,18 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
     }
   }, [campaignId]);
 
+  useEffect(() => {
+    if( typeof tenantId != 'undefined' ){
+      setTempSkills(skills.filter((skill) => skill.tenant_id === Number(tenantId)));
+    }
+    setSkill('all');
+  }, [tenantId]);
+
   return (
     <div className="grid grid-cols-6 gap-4 title-background">
       <div className="flex items-center">
           <Label className="w-20 min-w-20">테넌트</Label>
-          <Select value={tenantId} onValueChange={setTenantId}>
+          <Select defaultValue='all' value={tenantId} onValueChange={setTenantId}>
               <SelectTrigger className="w-full">
               <SelectValue placeholder="테넌트" />
               </SelectTrigger>
@@ -80,7 +89,7 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
       </div>
       <div className="flex items-center">
           <Label className="w-20 min-w-20">다이얼 모드</Label>
-          <Select value={dailMode} onValueChange={setDailMode}>
+          <Select defaultValue='all' value={dailMode} onValueChange={setDailMode}>
               <SelectTrigger className="w-full">
               <SelectValue placeholder="다이얼 모드" />
               </SelectTrigger>
@@ -94,15 +103,15 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
       </div>
       <div className="flex items-center">
           <Label className="w-20 min-w-20">스킬</Label>
-          <Select value={dailMode} onValueChange={setDailMode}>
+          <Select  defaultValue='all' value={skill} onValueChange={setSkill}>
               <SelectTrigger className="w-full">
               <SelectValue placeholder="스킬" />
               </SelectTrigger>
               <SelectContent>
               <SelectItem value='all'>전체</SelectItem>
-              {/* { dialModeList.map(option => (
-                <SelectItem key={option.dial_id} value={option.dial_id+''}>{option.dial_name}</SelectItem>
-              )) } */}
+              {tempSkills.map(option => (
+                <SelectItem key={option.skill_id} value={option.skill_id+''}>{option.skill_name}</SelectItem>
+              ))}
               </SelectContent>
           </Select>
       </div>

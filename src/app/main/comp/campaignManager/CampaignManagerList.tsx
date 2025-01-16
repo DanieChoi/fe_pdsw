@@ -11,7 +11,7 @@ type Props = {
 }
 
 export default function CampaignManagerList({campaignId,campaignHeaderSearchParam}: Props) {
-  const { campaigns, totalCount, setSelectedCampaign } = useMainStore();
+  const { campaigns, callingNumbers, schedules , setSelectedCampaign } = useMainStore();
   const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>(campaigns);
   
   const handleRowClick = (campaign: MainDataResponse) => {
@@ -60,13 +60,12 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
             <thead>
               <tr className="bg-gray-50">
                 <th className="border p-2 text-left">No.</th>
-                <th className="border p-2 text-left">캠페인 ID</th>
-                <th className="border p-2 text-left">캠페인명</th>
-                <th className="border p-2 text-left">설명</th>
-                <th className="border p-2 text-left">테넌트 ID</th>
-                <th className="border p-2 text-left">생성일</th>
-                <th className="border p-2 text-left">수정일</th>
-                <th className="border p-2 text-left">상태</th>
+                <th className="border p-2 text-left">아이디+이름</th>
+                <th className="border p-2 text-left">시작일자</th>
+                <th className="border p-2 text-left">종료일자</th>
+                <th className="border p-2 text-left">스킬</th>
+                <th className="border p-2 text-left">다이얼모드</th>
+                <th className="border p-2 text-left">발신번호</th>
               </tr>
             </thead>
             <tbody>
@@ -77,13 +76,17 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
                   className="cursor-pointer hover:bg-gray-50"
                 >
                   <td className="border p-2">{index + 1}</td>
-                  <td className="border p-2">{campaign.campaign_id}</td>
-                  <td className="border p-2">{campaign.campaign_name}</td>
-                  <td className="border p-2">{campaign.campaign_desc}</td>
-                  <td className="border p-2">{campaign.tenant_id}</td>
+                  <td className="border p-2">[{campaign.campaign_id}]{campaign.campaign_name}</td>
+                  <td className="border p-2">{schedules.filter((schedule) => schedule.campaign_id === campaign.campaign_id)
+                  .map((data) => data.start_date)
+                  }</td>
+                  <td className="border p-2">{schedules.filter((schedule) => schedule.campaign_id === campaign.campaign_id)
+                  .map((data) => data.end_date)
+                  }</td>
                   <td className="border p-2">{new Date(campaign.creation_time).toLocaleString()}</td>
                   <td className="border p-2">{new Date(campaign.update_time).toLocaleString()}</td>
-                  <td className="border p-2">{campaign.start_flag ? '진행중' : '대기'}</td>
+                  <td className="border p-2"></td>
+                  <td className="border p-2"></td>
                 </tr>
               ))}
             </tbody>
