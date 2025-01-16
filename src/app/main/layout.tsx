@@ -1,81 +1,86 @@
 'use client';
+
 import { Inter } from 'next/font/google'
 import { useState } from 'react';
 import Footer from '@/components/shared/layout/Footer'
 import Sidebar from '@/components/shared/layout/Sidebar'
 import '@/app/globals.css'
 import Header from '@/widgets/header';
+import TitleHeader from './comp/TitleHeader';
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function MainLayout({
- children,
+  children,
 }: {
- children: React.ReactNode;
+  children: React.ReactNode;
 }) {
- const [isMenuOpen, setIsMenuOpen] = useState(true);
- const [footerHeight, setFooterHeight] = useState(140);
- const [isResizing, setIsResizing] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const [footerHeight, setFooterHeight] = useState(140);
+  const [isResizing, setIsResizing] = useState(false);
 
- const toggleSidebar = () => {
-   setIsMenuOpen((prev) => !prev);
- };
+  const toggleSidebar = () => {
+    setIsMenuOpen((prev) => !prev);
+  };
 
- const startResizing = () => {
-   setIsResizing(true);
-   document.body.style.cursor = 'ns-resize';
-   document.addEventListener('mousemove', resizeFooter);
-   document.addEventListener('mouseup', stopResizing);
- };
+  const startResizing = () => {
+    setIsResizing(true);
+    document.body.style.cursor = 'ns-resize';
+    document.addEventListener('mousemove', resizeFooter);
+    document.addEventListener('mouseup', stopResizing);
+  };
 
- const resizeFooter = (e: MouseEvent) => {
-   const windowHeight = window.innerHeight;
-   const mouseY = e.clientY;
-   const headerHeight = 50;
-   const minFooterHeight = 50;
-   const maxFooterHeight = windowHeight - headerHeight - 100;
-   
-   const newHeight = windowHeight - mouseY;
-   
-   if (newHeight >= minFooterHeight && newHeight <= maxFooterHeight) {
-     setFooterHeight(newHeight);
-   }
- };
+  const resizeFooter = (e: MouseEvent) => {
+    const windowHeight = window.innerHeight;
+    const mouseY = e.clientY;
+    const headerHeight = 28; // 헤더 높이를 28px로 수정
+    const minFooterHeight = 50;
+    const maxFooterHeight = windowHeight - headerHeight - 100;
+    
+    const newHeight = windowHeight - mouseY;
+    
+    if (newHeight >= minFooterHeight && newHeight <= maxFooterHeight) {
+      setFooterHeight(newHeight);
+    }
+  };
 
- const stopResizing = () => {
-   setIsResizing(false);
-   document.body.style.cursor = '';
-   document.removeEventListener('mousemove', resizeFooter);
-   document.removeEventListener('mouseup', stopResizing);
- };
+  const stopResizing = () => {
+    setIsResizing(false);
+    document.body.style.cursor = '';
+    document.removeEventListener('mousemove', resizeFooter);
+    document.removeEventListener('mouseup', stopResizing);
+  };
 
- return (
-   <div className={`${inter.className} h-screen`}>
-     <div className="flex flex-col h-full">
-       <Header />
-       <div className="flex flex-1 h-[calc(100%-125px)]">
-         <Sidebar isMenuOpen={isMenuOpen} toggleSidebar={toggleSidebar} />
-         <main
-           className={`transition-all duration-300 flex flex-col relative h-full ${
-             isMenuOpen ? 'w-[calc(100%-16rem)]' : 'w-full'
-           }`}
-         >
-           <div 
-             className="overflow-y-auto"
-             style={{ 
-                height: `calc(100% - ${footerHeight}px)`, // Header 높이(50px) 뺀 전체 높이
-               //maxHeight: 'calc(100vh - 50px)', // 최대 높이도 동일하게 설정
-               //paddingBottom: `${footerHeight}px` // Footer 높이만큼 패딩 추가
-             }}
-           >
-             {children}
-           </div>
-           <div className="absolute bottom-0 left-0 right-0" style={{ height: `${footerHeight}px` }}>
-             <Footer footerHeight={footerHeight} startResizing={startResizing}/>
-           </div>
-         </main>
-       </div>
-     </div>
-   </div>
- );
+  return (
+    <div className={`${inter.className} h-screen`}>
+      <div className="flex flex-col h-full relative">
+        {/* title info */}
+          {/* <TitleHeader /> */}
+        <Header />
+        <div className="flex flex-1 h-[calc(100%-28px)]">
+          <Sidebar isMenuOpen={isMenuOpen} toggleSidebar={toggleSidebar} />
+          <main
+            className={`transition-all duration-300 flex flex-col relative h-full ${
+              isMenuOpen ? 'w-[calc(100%-16rem)]' : 'w-full'
+            }`}
+          >
+            <div 
+              className="overflow-y-auto"
+              style={{ 
+                height: `calc(100% - ${footerHeight}px)`,
+              }}
+            >
+              {children}
+            </div>
+            <div 
+              className="absolute bottom-0 left-0 right-0" 
+              style={{ height: `${footerHeight}px` }}
+            >
+              <Footer footerHeight={footerHeight} startResizing={startResizing}/>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  );
 }
