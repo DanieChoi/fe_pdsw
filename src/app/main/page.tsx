@@ -1,4 +1,4 @@
-// C:\Users\nexus\Documents\GitHub\fe_pdsw\src\app\main\page.tsx
+// src/app/main/page.tsx
 "use client";
 
 import React from 'react';
@@ -16,17 +16,21 @@ import TabContent from './comp/TabContent';
 import TabRow from './comp/TabRow';
 import DraggableTab from './comp/DraggableTab';
 
+interface ActiveTabState {
+  id: number;
+  uniqueKey: string;
+  title: string;
+  icon: string;
+}
+
 const MainPage = () => {
-  const [activeTab, setActiveTab] = React.useState<{
-    id: number;
-    title: string;
-    icon: string;
-  } | null>(null);
+  const [activeTab, setActiveTab] = React.useState<ActiveTabState | null>(null);
 
   const {
     rows,
     openedTabs,
     activeTabId,
+    activeTabKey,
     moveTabToSection,
     moveTabToGroup,
   } = useTabStore();
@@ -45,10 +49,14 @@ const MainPage = () => {
     if (!isTab) return;
 
     const tabId = active.data.current?.id;
-    const tab = openedTabs.find(t => t.id === tabId);
+    const uniqueKey = active.data.current?.uniqueKey;
+    
+    // uniqueKey로 정확한 탭을 찾습니다
+    const tab = openedTabs.find(t => t.id === tabId && t.uniqueKey === uniqueKey);
     if (tab) {
       setActiveTab({
         id: tab.id,
+        uniqueKey: tab.uniqueKey,
         title: tab.title,
         icon: tab.icon,
       });
@@ -63,13 +71,14 @@ const MainPage = () => {
     if (!isTab) return;
 
     const tabId = active.data.current?.id;
+    const uniqueKey = active.data.current?.uniqueKey;
     const overType = over.data.current?.type;
 
     if (overType === 'section') {
       const targetRowId = over.data.current?.rowId;
       const targetSectionId = over.data.current?.sectionId;
       if (targetRowId && targetSectionId) {
-        moveTabToSection(tabId, targetRowId, targetSectionId);
+        moveTabToSection(tabId, targetRowId, targetSectionId, uniqueKey);
       }
     } else if (overType === 'group') {
       moveTabToGroup(tabId, over.data.current?.id);
@@ -102,9 +111,10 @@ const MainPage = () => {
         {activeTab ? (
           <DraggableTab
             id={activeTab.id}
+            uniqueKey={activeTab.uniqueKey}
             title={activeTab.title}
             icon={activeTab.icon}
-            isActive={activeTab.id === activeTabId}
+            isActive={activeTab.id === activeTabId && activeTab.uniqueKey === activeTabKey}
             onRemove={() => {}}
             onSelect={() => {}}
           />

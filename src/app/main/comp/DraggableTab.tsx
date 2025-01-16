@@ -1,15 +1,16 @@
+// src/app/main/comp/DraggableTab.tsx
 "use client";
 
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
+import { CSS } from '@dnd-kit/utilities';
 import { X } from 'lucide-react';
-import CommonButton from '@/components/shared/CommonButton';
-import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 
 interface DraggableTabProps {
   id: number;
-  uniqueKey?: string;  // uniqueKey prop 추가
+  uniqueKey: string;
   title: string;
   icon: string;
   isActive: boolean;
@@ -26,58 +27,42 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
   onRemove,
   onSelect,
 }) => {
-  // uniqueKey가 있으면 그것을 사용, 없으면 id만 사용
-  const dragId = uniqueKey ? `tab-${uniqueKey}` : `tab-${id}`;
-
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: dragId,
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: uniqueKey,
     data: {
       type: 'tab',
-      id: id,
-      uniqueKey: uniqueKey,  // DnD 데이터에도 uniqueKey 포함
-    },
+      id,
+      uniqueKey
+    }
   });
 
-  const style = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-    zIndex: isDragging ? 999 : undefined,
-  } : undefined;
+  const style = {
+    transform: CSS.Translate.toString(transform)
+  };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`
-        relative flex items-center
-        ${isDragging ? 'opacity-50 cursor-grabbing' : ''}
-      `}
       {...attributes}
       {...listeners}
+      className={`
+        flex items-center gap-2 px-3 py-1.5 h-8
+        border border-gray-200 rounded-lg cursor-pointer
+        ${isActive ? 'bg-[#49EDE3] bg-opacity-20' : 'bg-white hover:bg-gray-50'}
+      `}
+      onClick={onSelect}
     >
-      <CommonButton
-        variant={isActive ? "default" : "ghost"}
-        className={`
-          group flex items-center space-x-2 rounded-md pr-8 pl-3 py-2
-          ${isActive
-            ? 'bg-[#56CAD6] text-white shadow-sm'
-            : 'bg-[#E8F7F9] text-[#56CAD6] hover:bg-[#CCE9ED] border border-[#56CAD6]/20'
-          }
-          cursor-grab active:cursor-grabbing
-          transition-all duration-200
-          ${isDragging ? 'cursor-grabbing' : ''}
-        `}
-        onClick={onSelect}
-      >
-        <div className="w-4 h-4 relative">
-          <Image
-            src={icon}
-            alt={title}
-            fill
-            className="object-contain"
-          />
-        </div>
-        <span className="text-sm font-medium">{title}</span>
-      </CommonButton>
+      {icon && (
+        <Image
+          src={icon}
+          alt={title}
+          width={16}
+          height={16}
+          className="flex-none object-contain"
+        />
+      )}
+      <span className="text-sm whitespace-nowrap">{title}</span>
       <Button
         variant="ghost"
         size="sm"
@@ -85,14 +70,7 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
           e.stopPropagation();
           onRemove();
         }}
-        className={`
-          absolute right-1 p-1 rounded-full
-          ${isActive
-            ? 'text-white hover:bg-[#56CAD6]/80'
-            : 'text-[#56CAD6]/70 hover:text-[#56CAD6] hover:bg-[#CCE9ED]'
-          }
-          transition-colors duration-200
-        `}
+        className="ml-1 p-0.5 h-5 w-5 hover:bg-gray-200 rounded-full"
       >
         <X className="h-3 w-3" />
       </Button>

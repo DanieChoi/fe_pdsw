@@ -130,7 +130,8 @@ const TabSection: React.FC<TabSectionProps> = ({
           isActive={tab.id === activeTabId && tab.uniqueKey === activeTabKey}
 
           onRemove={() => removeTab(tab.id)}
-          onSelect={() => setActiveTab(tab.id)}  // 탭 선택 시 활성화
+          onSelect={() => setActiveTab(tab.id, tab.uniqueKey)}  // uniqueKey 추가
+
         />
       ))}
       </div>

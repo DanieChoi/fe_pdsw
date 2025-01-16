@@ -37,13 +37,13 @@ export interface TabLayoutStore {
   tabGroups: TabGroup[];
   addTab: (tab: TabItem) => void;
   removeTab: (tabId: number) => void;
-  setActiveTab: (tabId: number) => void;
+  setActiveTab: (tabId: number, uniqueKey: string) => void;
   duplicateTab: (tabId: number) => void;
   addRow: () => void;
   removeRow: (rowId: string) => void;
   addSection: (rowId: string, tabId?: number) => void;
   removeSection: (rowId: string, sectionId: string) => void;
-  moveTabToSection: (tabId: number, targetRowId: string, targetSectionId: string) => void;
+  moveTabToSection: (tabId: number, targetRowId: string, targetSectionId: string, draggedTabKey: string) => void;
   updateSectionWidth: (rowId: string, sectionId: string, width: number) => void;
   addTabGroup: (tabId: number) => void;
   removeTabGroup: (groupId: string) => void;
@@ -396,8 +396,9 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     return { rows: newRows };
   }),
 
-  moveTabToSection: (tabId: number, targetRowId: string, targetSectionId: string) => set((state) => {
-    const movedTab = state.openedTabs.find(t => t.id === tabId && t.uniqueKey === state.activeTabKey);
+  moveTabToSection: (tabId: number, targetRowId: string, targetSectionId: string, draggedTabKey: string) => set((state) => {
+    // draggedTabKey로 이동할 탭을 찾습니다
+    const movedTab = state.openedTabs.find(t => t.id === tabId && t.uniqueKey === draggedTabKey);
     if (!movedTab) return state;
 
     // 현재 탭의 uniqueKey를 기준으로 필터링하여 해당 탭만 이동
@@ -405,7 +406,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
       ...row,
       sections: row.sections.map(sec => ({
         ...sec,
-        tabs: sec.tabs.filter(t => !(t.id === tabId && t.uniqueKey === movedTab.uniqueKey))
+        tabs: sec.tabs.filter(t => !(t.id === tabId && t.uniqueKey === draggedTabKey))
       }))
     }));
 
@@ -432,14 +433,17 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     const updatedGroups = state.tabGroups
       .map(g => ({
         ...g,
-        tabs: g.tabs.filter(t => !(t.id === tabId && t.uniqueKey === movedTab.uniqueKey))
+        tabs: g.tabs.filter(t => !(t.id === tabId && t.uniqueKey === draggedTabKey))
       }))
       .filter(g => g.tabs.length > 0);
 
     return {
       ...state,
       rows: updatedRows,
-      tabGroups: updatedGroups
+      tabGroups: updatedGroups,
+      // 드래그한 탭을 활성화
+      activeTabId: movedTab.id,
+      activeTabKey: movedTab.uniqueKey
     };
   }),
 
