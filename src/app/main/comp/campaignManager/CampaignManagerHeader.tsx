@@ -30,7 +30,7 @@ export default function CampaignManager() {
   // }, [selectedCampaign]);
 
   return (
-    <div className="grid grid-cols-6 gap-4">
+    <div className="grid grid-cols-6 gap-4 title-background">
       <div className="flex items-center">
           <Label className="w-20 min-w-20">테넌트</Label>
           <Select value={tenantId} onValueChange={setTenantId}>
