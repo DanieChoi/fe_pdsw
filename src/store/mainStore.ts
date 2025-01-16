@@ -1,12 +1,13 @@
 // src/features/store/mainStore.ts
 import { create } from 'zustand';
-import { MainDataResponse, TenantListDataResponse, SkillListDataResponse, CallingNumberListDataResponse } from '../features/auth/types/mainIndex';
+import { MainDataResponse, TenantListDataResponse, SkillListDataResponse, CallingNumberListDataResponse, CampaignScheDuleListDataResponse } from '../features/auth/types/mainIndex';
 
 interface MainState {
   campaigns: MainDataResponse[];
   tenants: TenantListDataResponse[];
   skills: SkillListDataResponse[];
   callingNumbers: CallingNumberListDataResponse[];
+  schedules: CampaignScheDuleListDataResponse[];
   selectedCampaign: MainDataResponse | null;
   totalCount: number;
 }
@@ -16,6 +17,7 @@ interface MainActions {
   setTenants: (tenants: TenantListDataResponse[]) => void;
   setSkills: (skills: SkillListDataResponse[]) => void;
   setCallingNumbers: (callingNumbers: CallingNumberListDataResponse[]) => void;
+  setSchedules: (schedules: CampaignScheDuleListDataResponse[]) => void;
   setSelectedCampaign: (campaign: MainDataResponse | null) => void;
   setTotalCount: (count: number) => void;
 }
@@ -27,12 +29,14 @@ export const useMainStore = create<MainStore>((set) => ({
   tenants: [],
   skills: [],
   callingNumbers: [],
+  schedules: [],
   selectedCampaign: null,
   totalCount: 0,
   setCampaigns: (campaigns) => set({ campaigns }),
   setTenants: (tenants) => set({ tenants }),
   setSkills: (skills) => set({ skills }),
   setCallingNumbers: (callingNumbers) => set({ callingNumbers }),
+  setSchedules: (schedules) => set({ schedules }),
   setSelectedCampaign: (campaign) => set({ selectedCampaign: campaign }),
   setTotalCount: (totalCount) => set({ totalCount }),
 }));
