@@ -128,7 +128,6 @@ const TabSection: React.FC<TabSectionProps> = ({
               isActive={activeTabId === tab.id}
               onRemove={() => removeTab(tab.id)}
               onSelect={() => setActiveTab(tab.id)}
-              activeId={activeTabId ?? undefined}
             />
           ))}
         </div>

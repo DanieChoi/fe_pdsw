@@ -162,50 +162,51 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
   duplicateTab: (tabId) => set((state) => {
     const originalTab = state.openedTabs.find(t => t.id === tabId);
     if (!originalTab) return state;
-
+  
     const newTabId = Math.floor(Date.now() + Math.random() * 1000);
     const duplicatedTab = { ...originalTab, id: newTabId };
-
+  
+    // 현재 탭이 있는 row와 section 찾기
     let targetRowIndex = -1;
     let targetSectionIndex = -1;
-    let originalIndexInSection = -1;
-
+  
     outerLoop: for (let r = 0; r < state.rows.length; r++) {
       for (let s = 0; s < state.rows[r].sections.length; s++) {
         const section = state.rows[r].sections[s];
-        const idx = section.tabs.findIndex(t => t.id === tabId);
-        if (idx !== -1) {
+        if (section.tabs.some(t => t.id === tabId)) {
           targetRowIndex = r;
           targetSectionIndex = s;
-          originalIndexInSection = idx;
           break outerLoop;
         }
       }
     }
-
+  
     if (targetRowIndex === -1 || targetSectionIndex === -1) {
       return state;
     }
-
+  
     const newOpenedTabs = [...state.openedTabs, duplicatedTab];
     const rowToUpdate = state.rows[targetRowIndex];
     const sectionToUpdate = rowToUpdate.sections[targetSectionIndex];
-
-    const newTabsInSection = [...sectionToUpdate.tabs];
-    newTabsInSection.splice(originalIndexInSection + 1, 0, duplicatedTab);
-
-    const updatedSection = { ...sectionToUpdate, tabs: newTabsInSection };
+  
+    // 새 탭을 섹션의 마지막에 추가
+    const updatedSection = {
+      ...sectionToUpdate,
+      tabs: [...sectionToUpdate.tabs, duplicatedTab]  // 여기가 수정된 부분
+    };
+    
     const updatedSections = rowToUpdate.sections.map((sec, i) =>
       i === targetSectionIndex ? updatedSection : sec
     );
-
+  
     const updatedRow = {
       ...rowToUpdate,
       sections: adjustSectionWidths(updatedSections),
     };
+    
     const updatedRows = [...state.rows];
     updatedRows[targetRowIndex] = updatedRow;
-
+  
     return {
       openedTabs: newOpenedTabs,
       rows: updatedRows,

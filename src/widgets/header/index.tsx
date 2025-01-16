@@ -11,7 +11,7 @@ import React from 'react'
 
 export default function Header() {
   const router = useRouter();
-  const { addTab, openedTabs, duplicateTab } = useTabStore();
+  const { addTab, openedTabs, duplicateTab , activeTabId} = useTabStore();
 
   const handleMenuClick = (item: MenuItem, event: React.MouseEvent<HTMLButtonElement>) => {
     if (event.ctrlKey) {
@@ -100,6 +100,7 @@ export default function Header() {
             </nav>
           </div>
         </div>
+              {activeTabId}
       </header>
     </div>
   )

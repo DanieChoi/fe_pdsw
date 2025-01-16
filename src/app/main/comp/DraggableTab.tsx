@@ -13,7 +13,6 @@ interface DraggableTabProps {
   title: string;
   icon: string;
   isActive: boolean;
-  activeId: number;
   onRemove: () => void;
   onSelect: () => void;
 }
@@ -25,7 +24,6 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
   isActive,
   onRemove,
   onSelect,
-  activeId
 }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: `tab-${id}`,
