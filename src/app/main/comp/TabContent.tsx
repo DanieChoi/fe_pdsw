@@ -6,8 +6,8 @@ import { useTabStore } from '@/store/tabStore';
 import PreferencesBoard from './preferences';
 import SystemPreferences from './SystemPreferences';
 import CampaignMonitorDashbord from './CampaignMonitorDashbord';
-import CampaignManager from './CampaignManager';
 import OutboundCallProgressPanel from './OutboundCallProgressPanel';
+import CampaignManager from './campaignManager';
 
 const TabContent = () => {
   const { activeTabId } = useTabStore();
