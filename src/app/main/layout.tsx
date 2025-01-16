@@ -54,8 +54,6 @@ export default function MainLayout({
   return (
     <div className={`${inter.className} h-screen`}>
       <div className="flex flex-col h-full relative">
-        {/* title info */}
-          {/* <TitleHeader /> */}
         <Header />
         <div className="flex flex-1 h-[calc(100%-28px)]">
           <Sidebar isMenuOpen={isMenuOpen} toggleSidebar={toggleSidebar} />
