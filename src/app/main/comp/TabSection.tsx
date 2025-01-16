@@ -47,6 +47,7 @@ const TabSection: React.FC<TabSectionProps> = ({
   const {
     rows,
     activeTabId,
+    activeTabKey,
     removeTab,
     setActiveTab,
     removeSection,
@@ -115,22 +116,24 @@ const TabSection: React.FC<TabSectionProps> = ({
           <ChevronLeft className={`h-4 w-4 ${isScrolling === 'left' ? 'text-blue-600' : 'text-gray-600'}`} />
         </Button>
 
-        <div
-          ref={scrollContainerRef}
-          className="flex-1 flex gap-1 overflow-hidden scroll-smooth"
-        >
-          {section.tabs.map((tab) => (
-            <DraggableTab
-              key={tab.id}
-              id={tab.id}
-              title={tab.title}
-              icon={tab.icon}
-              isActive={activeTabId === tab.id}
-              onRemove={() => removeTab(tab.id)}
-              onSelect={() => setActiveTab(tab.id)}
-            />
-          ))}
-        </div>
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 flex gap-1 overflow-hidden scroll-smooth"
+      >
+      {section.tabs.map((tab) => (
+        <DraggableTab
+          key={tab.uniqueKey}
+          id={tab.id}
+          uniqueKey={tab.uniqueKey}
+          title={tab.title}
+          icon={tab.icon}
+          isActive={tab.id === activeTabId && tab.uniqueKey === activeTabKey}
+
+          onRemove={() => removeTab(tab.id)}
+          onSelect={() => setActiveTab(tab.id)}  // 탭 선택 시 활성화
+        />
+      ))}
+      </div>
 
         <Button
           variant="ghost"

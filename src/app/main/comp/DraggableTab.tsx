@@ -1,4 +1,3 @@
-// src/app/main/comp/DraggableTab.tsx
 "use client";
 
 import React from 'react';
@@ -10,6 +9,7 @@ import Image from 'next/image';
 
 interface DraggableTabProps {
   id: number;
+  uniqueKey?: string;  // uniqueKey prop 추가
   title: string;
   icon: string;
   isActive: boolean;
@@ -19,17 +19,22 @@ interface DraggableTabProps {
 
 const DraggableTab: React.FC<DraggableTabProps> = ({
   id,
+  uniqueKey,
   title,
   icon,
   isActive,
   onRemove,
   onSelect,
 }) => {
+  // uniqueKey가 있으면 그것을 사용, 없으면 id만 사용
+  const dragId = uniqueKey ? `tab-${uniqueKey}` : `tab-${id}`;
+
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: `tab-${id}`,
+    id: dragId,
     data: {
       type: 'tab',
       id: id,
+      uniqueKey: uniqueKey,  // DnD 데이터에도 uniqueKey 포함
     },
   });
 

@@ -5,6 +5,7 @@ import React from 'react';
 
 export interface TabItem {
   id: number;
+  uniqueKey: string;
   title: string;
   icon: string;
   href: string;
@@ -31,6 +32,7 @@ export interface TabGroup {
 export interface TabLayoutStore {
   openedTabs: TabItem[];
   activeTabId: number | null;
+  activeTabKey: string | null;     // uniqueKey를 위한 새로운 필드 추가
   rows: TabRow[];
   tabGroups: TabGroup[];
   addTab: (tab: TabItem) => void;
@@ -46,7 +48,28 @@ export interface TabLayoutStore {
   addTabGroup: (tabId: number) => void;
   removeTabGroup: (groupId: string) => void;
   moveTabToGroup: (tabId: number, groupId: string) => void;
+  getTabCountById: (tabId: number) => number;
 }
+
+// const generateUniqueId = (prefix: string, existingIds: string[]) => {
+//   let counter = 1;
+//   let newId = `${prefix}-${counter}`;
+  
+//   while (existingIds.includes(newId)) {
+//     counter++;
+//     newId = `${prefix}-${counter}`;
+//   }
+  
+//   return newId;
+// };
+
+// const adjustSectionWidths = (sections: TabSection[]) => {
+//   const newWidth = 100 / sections.length;
+//   return sections.map(section => ({
+//     ...section,
+//     width: newWidth
+//   }));
+// };
 
 const generateUniqueId = (prefix: string, existingIds: string[]) => {
   let counter = 1;
@@ -71,6 +94,8 @@ const adjustSectionWidths = (sections: TabSection[]) => {
 export const useTabStore = create<TabLayoutStore>((set, get) => ({
   openedTabs: [],
   activeTabId: null,
+  activeTabKey: null,
+
   rows: [
     {
       id: 'row-1',
@@ -85,9 +110,41 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
   ],
   tabGroups: [],
 
+  getTabCountById: (menuId: number) => {
+    const state = get();
+    let count = 0;
+
+    state.rows.forEach(row => {
+      row.sections.forEach(section => {
+        count += section.tabs.filter(tab => tab.id === menuId).length;
+      });
+    });
+
+    state.tabGroups.forEach(group => {
+      count += group.tabs.filter(tab => tab.id === menuId).length;
+    });
+
+    return count;
+  },
+
+    setActiveTab: (tabId: number, uniqueKey: string) => set(state => {
+    const tab = state.openedTabs.find(t => t.id === tabId && t.uniqueKey === uniqueKey);
+    if (!tab) return state;
+
+    return { 
+      ...state,
+      activeTabId: tabId,
+      activeTabKey: uniqueKey
+    };
+  }),
+
   addTab: (tab) => set((state) => {
-    if (state.openedTabs.some(t => t.id === tab.id)) {
-      return { activeTabId: tab.id };
+    // 이미 열려있는 탭인 경우
+    if (state.openedTabs.some(t => t.id === tab.id && t.uniqueKey === tab.uniqueKey)) {
+      return { 
+        activeTabId: tab.id,
+        activeTabKey: tab.uniqueKey
+      };
     }
 
     const newOpenedTabs = [...state.openedTabs, tab];
@@ -116,6 +173,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     return {
       openedTabs: newOpenedTabs,
       activeTabId: tab.id,
+      activeTabKey: tab.uniqueKey,
       rows: newRows,
     };
   }),
@@ -156,20 +214,24 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
       tabGroups: updatedGroups,
     };
   }),
-  
-  setActiveTab: (tabId) => set({ activeTabId: tabId }),
 
   duplicateTab: (tabId) => set((state) => {
     const originalTab = state.openedTabs.find(t => t.id === tabId);
     if (!originalTab) return state;
-  
-    const newTabId = Math.floor(Date.now() + Math.random() * 1000);
-    const duplicatedTab = { ...originalTab, id: newTabId };
-  
+
+    // 새로운 uniqueKey 생성
+    const uniqueKey = `tab-${tabId}-${Date.now()}`;
+    
+    // 복제된 탭에 uniqueKey 추가
+    const duplicatedTab = { 
+      ...originalTab,
+      uniqueKey,
+    };
+
     // 현재 탭이 있는 row와 section 찾기
     let targetRowIndex = -1;
     let targetSectionIndex = -1;
-  
+
     outerLoop: for (let r = 0; r < state.rows.length; r++) {
       for (let s = 0; s < state.rows[r].sections.length; s++) {
         const section = state.rows[r].sections[s];
@@ -180,39 +242,45 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
         }
       }
     }
-  
+
     if (targetRowIndex === -1 || targetSectionIndex === -1) {
       return state;
     }
-  
+
+    // openedTabs에 복제된 탭 추가
     const newOpenedTabs = [...state.openedTabs, duplicatedTab];
+    
     const rowToUpdate = state.rows[targetRowIndex];
     const sectionToUpdate = rowToUpdate.sections[targetSectionIndex];
-  
-    // 새 탭을 섹션의 마지막에 추가
+
+    // 섹션에 복제된 탭 추가
     const updatedSection = {
       ...sectionToUpdate,
-      tabs: [...sectionToUpdate.tabs, duplicatedTab]  // 여기가 수정된 부분
+      tabs: [...sectionToUpdate.tabs, duplicatedTab]
     };
-    
+
+    // 섹션 너비 조정을 포함한 섹션 업데이트
     const updatedSections = rowToUpdate.sections.map((sec, i) =>
       i === targetSectionIndex ? updatedSection : sec
     );
-  
+
     const updatedRow = {
       ...rowToUpdate,
       sections: adjustSectionWidths(updatedSections),
     };
-    
+
     const updatedRows = [...state.rows];
     updatedRows[targetRowIndex] = updatedRow;
-  
+
+    // 상태 업데이트 - 새로 복제된 탭을 활성화
     return {
+      ...state,
       openedTabs: newOpenedTabs,
       rows: updatedRows,
-      activeTabId: newTabId,
+      activeTabId: duplicatedTab.id,      // 복제된 탭의 id
+      activeTabKey: duplicatedTab.uniqueKey  // 복제된 탭의 uniqueKey
     };
-  }),
+}),
 
   addRow: () => set((state) => {
     const existingIds = state.rows.map(r => r.id);
@@ -328,24 +396,20 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     return { rows: newRows };
   }),
 
-  moveTabToSection: (tabId, targetRowId, targetSectionId) => set((state) => {
-    const tab = state.openedTabs.find(t => t.id === tabId);
-    if (!tab) return state;
+  moveTabToSection: (tabId: number, targetRowId: string, targetSectionId: string) => set((state) => {
+    const movedTab = state.openedTabs.find(t => t.id === tabId && t.uniqueKey === state.activeTabKey);
+    if (!movedTab) return state;
 
-    // Extract numeric ID from the tab-{id} format
-    const numericTabId = typeof tabId === 'string' && String(tabId).startsWith('tab-') ? 
-      parseInt(String(tabId).replace('tab-', '')) : (typeof tabId === 'number' ? tabId : 0);
-
-    // Update all rows to remove the tab from its current location
+    // 현재 탭의 uniqueKey를 기준으로 필터링하여 해당 탭만 이동
     const updatedRows = state.rows.map(row => ({
       ...row,
       sections: row.sections.map(sec => ({
         ...sec,
-        tabs: sec.tabs.filter(t => t.id !== numericTabId)
+        tabs: sec.tabs.filter(t => !(t.id === tabId && t.uniqueKey === movedTab.uniqueKey))
       }))
     }));
 
-    // Find target row and section
+    // 대상 섹션에 탭 추가
     const targetRowIndex = updatedRows.findIndex(r => r.id === targetRowId);
     if (targetRowIndex === -1) return state;
 
@@ -353,24 +417,22 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     const targetSectionIndex = targetRow.sections.findIndex(s => s.id === targetSectionId);
     if (targetSectionIndex === -1) return state;
 
-    // Add tab to target section
     const updatedSections = [...targetRow.sections];
     updatedSections[targetSectionIndex] = {
       ...updatedSections[targetSectionIndex],
-      tabs: [...updatedSections[targetSectionIndex].tabs, tab]
+      tabs: [...updatedSections[targetSectionIndex].tabs, movedTab]
     };
 
-    // Update the target row
     updatedRows[targetRowIndex] = {
       ...targetRow,
       sections: adjustSectionWidths(updatedSections)
     };
 
-    // Remove tab from all groups
+    // 탭 그룹에서도 해당 uniqueKey를 가진 탭만 제거
     const updatedGroups = state.tabGroups
       .map(g => ({
         ...g,
-        tabs: g.tabs.filter(t => t.id !== numericTabId)
+        tabs: g.tabs.filter(t => !(t.id === tabId && t.uniqueKey === movedTab.uniqueKey))
       }))
       .filter(g => g.tabs.length > 0);
 
@@ -397,7 +459,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     return { rows: newRows };
   }),
 
-addTabGroup: (tabId) => set((state) => {
+  addTabGroup: (tabId) => set((state) => {
     const tab = state.openedTabs.find(t => t.id === tabId);
     if (!tab) return state;
 
