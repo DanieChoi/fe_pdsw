@@ -174,7 +174,12 @@ input::placeholder {
 }
 
 
-
+.title-background{
+  border-top: 1px solid hsl(var(--border));
+  border-bottom: 1px solid hsl(var(--border));
+  background: #FBFBFB;
+  padding:10px 15px;
+}
 
 
 /*레이아웃 공통*/
