@@ -4,7 +4,7 @@ import { fetchCallingNumbers } from '../api/mainCallingNumberInfoSearch';
 import { UseMutationOptions } from '@tanstack/react-query';
 import { MainCredentials, CallingNumberListResponse, AuthApiError } from '../types/mainIndex';
 
-export function useApiForTenants(
+export function useApiForCallingNumber(
   options?: UseMutationOptions<CallingNumberListResponse, AuthApiError, MainCredentials>
 ) {
   return useMutation({

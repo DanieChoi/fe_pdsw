@@ -6,10 +6,18 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
+import { useApiForSkills } from '@/features/auth/hooks/useApiForSkills';
+import { useApiForCallingNumber } from '@/features/auth/hooks/useApiForCallingNumber';
 import Cookies from 'js-cookie';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useRouter } from 'next/navigation';
 
+const errorMessage = {
+  isOpen: false,
+  message: '',
+  title: '로그인',
+  type: '0',
+};
 
 export default function Sidebar({
     isMenuOpen,
@@ -21,48 +29,53 @@ export default function Sidebar({
   const tenantId = Number(Cookies.get('tenant_id'));
   const [tenantIdArray, setTenantIdArray] = useState<number[]>([]);
   const router = useRouter();
-  const [alertState, setAlertState] = useState({
-    isOpen: false,
-    message: '',
-    title: '로그인',
-    type: '0',
-  });
+  const [alertState, setAlertState] = useState(errorMessage);
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
+      fetchCallingNumbers({
+        session_key: localStorage.getItem('sessionKey') || '',
+        tenant_id: Number(localStorage.getItem('tenantId')) || 0,
+      });
+    }
+  });
+  const { mutate: fetchSkills } = useApiForSkills({
+    onSuccess: (data) => {
+      setSkills(data.result_data);
+      fetchMain({
+        session_key: localStorage.getItem('sessionKey') || '',
+        tenant_id: Number(localStorage.getItem('tenantId')) || 0,
+      });
+    }
+  });
+  const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
+    onSuccess: (data) => {
+      setCallingNumbers(data.result_data);
     }
   });
   
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
       if( data.result_code === 5){
-        setAlertState({
+        setAlertState({...errorMessage,
           isOpen: true,
           message: '로그인 정보가 없습니다.',
-          title: '로그인',
-          type: '0',
         });
         Cookies.remove('session_key');
         router.push('/login');
       }else{
         setTenants(data.result_data);
         let tempTenantIdArray = data.result_data.map(tenant => Number(tenant.tenant_id));
-        setTenantIdArray(prevState => [...prevState, ...tempTenantIdArray]);
-        console.log(55);
-
-        fetchMain({
-          session_key: localStorage.getItem('sessionKey') || '',
-          tenant_id: Number(localStorage.getItem('tenantId')) || 0,
+        fetchSkills({
+          tenant_id_array: tempTenantIdArray
         });
       }
     },
     onError: (error) => {
       if( error.message.split('||')[0] === '5' ){
-        setAlertState({
+        setAlertState({...errorMessage,
           isOpen: true,
           message: '로그인 정보가 없습니다.',
-          title: '로그인',
-          type: '0',
         });
         Cookies.remove('session_key');
         router.push('/login');
@@ -70,7 +83,7 @@ export default function Sidebar({
     }
   });
 
-  const { setCampaigns, setTenants, setSelectedCampaign, campaigns, tenants } = useMainStore();
+  const { setCampaigns, setTenants, setSkills, setCallingNumbers, setSelectedCampaign, campaigns, tenants } = useMainStore();
 
   // useEffect(() => {
   //   fetchMain({
