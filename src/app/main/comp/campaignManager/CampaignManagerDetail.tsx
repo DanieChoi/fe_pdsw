@@ -13,6 +13,10 @@ export default function CampaignDetail() {
   const selectedCampaign = useMainStore((state) => state.selectedCampaign);
   const { tenants } = useMainStore();
 
+  const handleSelectChange = (event:any) => {
+    
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -36,7 +40,7 @@ export default function CampaignDetail() {
             <select
               id="filter-select"
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              // onChange={handleFilterChange}
+              onChange={handleSelectChange}
               // defaultValue={initialFilter}
               value={selectedCampaign?.tenant_id || ''}
             >
@@ -65,7 +69,7 @@ export default function CampaignDetail() {
             <select
               id="filter-select"
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              // onChange={handleFilterChange}
+              onChange={handleSelectChange}
               // defaultValue={initialFilter}
               value={selectedCampaign?.dial_mode || ''}
             >
@@ -83,7 +87,7 @@ export default function CampaignDetail() {
             <select
               id="filter-select"
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              // onChange={handleFilterChange}
+              onChange={handleSelectChange}
               // defaultValue={initialFilter}
             >
               {/* {filterOptions.map(option => (
