@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useMainStore } from '@/store';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
@@ -14,20 +16,21 @@ const dialModeList = [
 
 export default function CampaignManager() {
   const { tenants,selectedCampaign } = useMainStore();
-  const [tenantId, setTenantId] = useState(''); // 테넌트
+  const [tenantId, setTenantId] = useState('all'); // 테넌트
+  const [campaignName, setCampaignName] = useState(''); // 캠페인이름
+  const [dailMode, setDailMode] = useState('all'); // 다이얼모드
+  const [callNumber, setCallNumber] = useState(''); // 발신번호
 
-  useEffect(() => {
-    if ( selectedCampaign ) {
-      setTenantId(selectedCampaign.tenant_id+'');
-    }
-  }, [selectedCampaign]);
-
-  const handleSelectChange = (event:any) => {
-    
-  }
+  // useEffect(() => {
+  //   if ( selectedCampaign ) {
+  //     setTenantId(selectedCampaign?.tenant_id+'');
+  //     setCampaignName(selectedCampaign.campaign_name);
+  //     setDailMode(selectedCampaign?.dial_mode+'');
+  //   }
+  // }, [selectedCampaign]);
 
   return (
-    <div className="grid grid-cols-5 gap-4">
+    <div className="grid grid-cols-6 gap-4">
       <div className="flex items-center">
           <Label className="w-20 min-w-20">테넌트</Label>
           <Select value={tenantId} onValueChange={setTenantId}>
@@ -35,65 +38,62 @@ export default function CampaignManager() {
               <SelectValue placeholder="테넌트" />
               </SelectTrigger>
               <SelectContent>
+              <SelectItem value='all'>전체</SelectItem>
               { tenants.map(option => (
                 <SelectItem key={option.tenant_id} value={option.tenant_id+''}>{option.tenant_name}</SelectItem>
               )) }
               </SelectContent>
           </Select>
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">캠페인이름</label>
-        <input 
+      <div className="flex items-center">
+        <Label className="w-20 min-w-20">캠페인이름</Label>
+        <Input 
+        type="text" 
+        value={campaignName}
+        onChange={(e) => setCampaignName(e.target.value)}
+        className="w-full"
+      />
+      </div>
+      <div className="flex items-center">
+          <Label className="w-20 min-w-20">다이얼 모드</Label>
+          <Select value={dailMode} onValueChange={setDailMode}>
+              <SelectTrigger className="w-full">
+              <SelectValue placeholder="다이얼 모드" />
+              </SelectTrigger>
+              <SelectContent>
+              <SelectItem value='all'>전체</SelectItem>
+              { dialModeList.map(option => (
+                <SelectItem key={option.dial_id} value={option.dial_id+''}>{option.dial_name}</SelectItem>
+              )) }
+              </SelectContent>
+          </Select>
+      </div>
+      <div className="flex items-center">
+          <Label className="w-20 min-w-20">스킬</Label>
+          <Select value={dailMode} onValueChange={setDailMode}>
+              <SelectTrigger className="w-full">
+              <SelectValue placeholder="스킬" />
+              </SelectTrigger>
+              <SelectContent>
+              <SelectItem value='all'>전체</SelectItem>
+              {/* { dialModeList.map(option => (
+                <SelectItem key={option.dial_id} value={option.dial_id+''}>{option.dial_name}</SelectItem>
+              )) } */}
+              </SelectContent>
+          </Select>
+      </div>
+      <div className="flex items-center">
+        <Label className="w-20 min-w-20">발신번호</Label>
+        <Input 
           type="text" 
-          value={selectedCampaign?.campaign_name || ''} 
-          className="mt-1 p-2 border rounded w-full" 
-          readOnly 
+          value={callNumber}
+          onChange={(e) => setCallNumber(e.target.value)}
+          className="w-full"
         />
       </div>
-      <div>
-        <label htmlFor="filter-select" className="block text-sm font-medium text-gray-700 mb-1">
-          다이얼 모드
-        </label>
-        <select
-          id="filter-select"
-          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          onChange={handleSelectChange}
-          // defaultValue={initialFilter}
-          value={selectedCampaign?.dial_mode || ''}
-        >
-          {dialModeList.map(option => (
-            <option key={option.dial_id} value={option.dial_id}>
-              {option.dial_name}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div>
-        <label htmlFor="filter-select" className="block text-sm font-medium text-gray-700 mb-1">
-          스킬
-        </label>
-        <select
-          id="filter-select"
-          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          onChange={handleSelectChange}
-          // defaultValue={initialFilter}
-        >
-          {/* {filterOptions.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))} */}
-        </select>
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">발신번호</label>
-        <input 
-          type="text" 
-          value={selectedCampaign?.campaign_name || ''} 
-          className="mt-1 p-2 border rounded w-full" 
-          readOnly 
-        />
-      </div>
+        <div className="flex justify-end gap-2">
+          <Button>조회</Button>
+        </div>
       {/* ... 나머지 필드들 ... */}
     </div>
   );
