@@ -7,12 +7,13 @@ import { useRouter } from 'next/navigation'
 import { useTabStore } from '@/store/tabStore'
 import Cookies from 'js-cookie'
 import { MenuItem, menuItems } from '@/widgets/header/model/menuItems'
+import React from 'react'
 
 export default function Header() {
   const router = useRouter();
   const { addTab, openedTabs, duplicateTab } = useTabStore();
 
-  const handleMenuClick = (item: MenuItem, event: React.MouseEvent) => {
+  const handleMenuClick = (item: MenuItem, event: React.MouseEvent<HTMLButtonElement>) => {
     if (event.ctrlKey) {
       duplicateTab(item.id);
     } else {
@@ -56,8 +57,9 @@ export default function Header() {
               <span>홍길동(관리자)</span>
             </div>
             {/* 로그아웃 버튼*/}
-            <button 
-              className="flex items-center space-x-1 text-sm"
+            <Button 
+              variant="ghost"
+              className="flex items-center space-x-1 text-sm text-white hover:bg-[#56CAD6]/20"
               onClick={handleLoginOut}
             >
               <Image
@@ -67,33 +69,27 @@ export default function Header() {
                 height={10}
                 priority
               />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
       <header className="bg-white py-[10px] pl-[30px] border-b">
         <div className="flex flex-col gap-4">
-
           <div className="flex items-center justify-between">
-            <nav className="flex space-x-1 overflow-x-auto">
+            <nav className="flex gap-0.5 overflow-x-auto">
               {menuItems.map((item) => (
-                <div key={item.id} className="menu-item">
+                <div key={item.id} className="menu-item px-0.5">
                   <Button
-                    type="button"
-                    variant="ghost"
-                    className={`
-                      hover:bg-gray-100 flex flex-col items-center justify-center 
-                      min-w-[80px] h-auto py-2 space-y-1 rounded-md
-                      ${isTabOpened(item.id) ? 'bg-blue-50 text-blue-700' : ''}
-                    `}
+                    variant={isTabOpened(item.id) ? 'menuActive' : 'menu'}
+                    size="none"
                     onClick={(e) => handleMenuClick(item, e)}
                   >
                     <div className="flex items-center justify-center">
                       <Image
                         src={item.icon}
                         alt={item.title}
-                        width={32}
-                        height={32}
+                        width={28}
+                        height={28}
                         className="object-contain"
                       />
                     </div>

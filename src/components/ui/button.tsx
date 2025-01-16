@@ -1,33 +1,38 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "rounded-[3px] bg-[#56CAD6] text-white text-[13px]",
+          "rounded-[3px] bg-[#56CAD6] text-white text-[13px] hover:bg-[#56CAD6]/90",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+          "rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+          "rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        login: 'w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm rounded-none font-16',
-        tab:"rounded-none rounded-tl-[3px] rounded-tr-[3px]  bg-[#56CAD6] text-white text-[13px] py-[7px] px-[10px] shadow-none border-t border-l border-r border-[#56CAD6]",
-        tabghost:"rounded-none rounded-tl-[3px] rounded-tr-[3px]  bg-transparent text-black text-[13px] py-[7px] px-[10px] shadow-none border-t border-l border-r"
+          "rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: 
+          "bg-transparent hover:bg-gray-100",
+        link: 
+          "text-primary underline-offset-4 hover:underline",
+        menu:
+          "bg-white hover:bg-gray-50 rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center space-y-1",
+        menuActive:
+          "bg-[#56CAD6]/10 text-[#56CAD6] hover:bg-[#56CAD6]/20 rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center space-y-1",
+        login: 
+          'w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm rounded-none',
       },
       size: {
-        default: "py-[3px] px-[6px]",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
+        default: "h-9 px-4",
+        sm: "h-8 px-3 text-xs",
+        lg: "h-10 px-8",
         icon: "h-9 w-9",
+        none: "",
       },
     },
     defaultVariants: {

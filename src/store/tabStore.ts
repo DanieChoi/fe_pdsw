@@ -156,7 +156,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
       tabGroups: updatedGroups,
     };
   }),
-
+  
   setActiveTab: (tabId) => set({ activeTabId: tabId }),
 
   duplicateTab: (tabId) => set((state) => {
