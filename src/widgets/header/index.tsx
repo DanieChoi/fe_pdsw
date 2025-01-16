@@ -127,7 +127,7 @@ export default function Header() {
           </div>
         </div>
         {/* 디버깅 정보 */}
-        <div className="text-xs text-gray-400 mt-2 border-t pt-2">
+        {/* <div className="text-xs text-gray-400 mt-2 border-t pt-2">
           <div>Active Tab: {activeTabId}</div>
           <div>Opened Tabs: {openedTabs.map(tab => 
             `${tab.title}(id:${tab.id}, uniqueKey:${tab.uniqueKey || 'none'})`
@@ -141,7 +141,7 @@ export default function Header() {
               `${t.id}(uniqueKey:${t.uniqueKey || 'none'})`
             ).join(',')}]`
           ).join(', ')}</div>
-        </div>
+        </div> */}
       </header>
     </div>
   );
