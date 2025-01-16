@@ -1,20 +1,18 @@
 // src/features/auth/api/fetchSkills.ts
 import { axiosInstance } from '@/lib/axios';
-import { SkillListCredentials, SkillListResponse } from '../types/mainIndex';
+import { MainCredentials, CallingNumberListResponse } from '../types/mainIndex';
 
-// 스킬마스터정보조회 리스트 요청
-export const fetchSkills = async (credentials: SkillListCredentials): Promise<SkillListResponse> => {
-  const skillMasterInfoSearchRequestData = {
+// 캠페인발신번호 리스트 요청
+export const fetchCallingNumbers = async (credentials: MainCredentials): Promise<CallingNumberListResponse> => {
+  const callingNumberListSearchRequestData = {
     filter: {      
-      skill_id: {
+      campaign_id: {
         start: 1,
         end: 9999999,
       },    
-      tenant_id: credentials.tenant_id_array
     },
     sort: {
-      skill_id: 0,
-      tenant_id: 0,
+      campaign_id: 0,
     },
     page: {
       index: 1,
@@ -23,9 +21,9 @@ export const fetchSkills = async (credentials: SkillListCredentials): Promise<Sk
   };
 
   try {
-    const { data } = await axiosInstance.post<SkillListResponse>(
-      '/collections/skill', 
-      skillMasterInfoSearchRequestData
+    const { data } = await axiosInstance.post<CallingNumberListResponse>(
+      '/collections/campaign-calling-number', 
+      callingNumberListSearchRequestData
     );
     return data;
   } catch (error: any) {

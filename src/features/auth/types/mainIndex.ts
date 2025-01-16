@@ -5,6 +5,11 @@ export interface MainCredentials {
   tenant_id: number;
 }
 
+// 스킬마스터정보조회 요청 시 필요한 credentials 타입
+export interface SkillListCredentials {
+  tenant_id_array: [];
+}
+
 // 백엔드로 전송되는 실제 메인 요청 데이터 타입
 export interface MainRequest {
   session_key: string;
@@ -103,6 +108,21 @@ export interface SkillListResponse {
   result_count: number;
   total_count: number;
   result_data: SkillListDataResponse[];
+}
+
+// 캠페인발신번호 데이터 타입
+export interface CallingNumberListDataResponse {
+  campaign_id: number;
+  calling_number: string;
+}
+
+// 캠페인발신번호 데이터 타입
+export interface CallingNumberListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: CallingNumberListDataResponse[];
 }
 
 // API 에러 타입
