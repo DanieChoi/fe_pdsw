@@ -2,20 +2,59 @@
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useMainStore } from '@/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {CampaignHeaderSearch} from './CampaignManagerHeader';
+import { useEffect, useState } from 'react';
+import TitleWrap from "@/components/shared/TitleWrap";
+type Props = {
+  campaignId?: string;
+  campaignHeaderSearchParam?: CampaignHeaderSearch;
+}
 
-export default function CampaignList() {
+export default function CampaignManagerList({campaignId,campaignHeaderSearchParam}: Props) {
   const { campaigns, totalCount, setSelectedCampaign } = useMainStore();
+  const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>(campaigns);
   
   const handleRowClick = (campaign: MainDataResponse) => {
     setSelectedCampaign(campaign);
   };
+  
+  useEffect(() => {
+    if( typeof campaignId != 'undefined' ){
+      setTempCampaigns(campaigns.filter((campaign) => campaign.campaign_id === Number(campaignId)));
+    }
+    if( tempCampaigns.length > 0 ){
+      setSelectedCampaign(tempCampaigns[0]);
+    }else{
+      setSelectedCampaign(null);
+    }
+  }, [campaignId]);
+
+  useEffect(() => {
+    if( typeof campaignHeaderSearchParam != 'undefined' && typeof campaignId === 'undefined' ){
+      let _tempCampaigns = campaigns;
+      if( campaignHeaderSearchParam.tenantId > 0 ){
+        _tempCampaigns = _tempCampaigns.filter((campaign) => campaign.tenant_id === Number(campaignHeaderSearchParam.tenantId));
+      }
+      if( campaignHeaderSearchParam.dailMode > 0 ){
+        _tempCampaigns = _tempCampaigns.filter((campaign) => campaign.dial_mode === Number(campaignHeaderSearchParam.dailMode));
+      }
+      if( campaignHeaderSearchParam.campaignName != '' ){
+        _tempCampaigns = _tempCampaigns.filter((campaign) => campaign.campaign_name.includes(campaignHeaderSearchParam.campaignName));
+      }
+      
+      setTempCampaigns(_tempCampaigns);
+      if( tempCampaigns.length > 0 ){
+        setSelectedCampaign(tempCampaigns[0]);
+      }else{
+        setSelectedCampaign(null);
+      }
+    }
+  }, [campaignHeaderSearchParam]);
+
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>캠페인 목록 (총 {totalCount}건)</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div>
+      <TitleWrap title="캠페인 목록" totalCount={8} />
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
@@ -31,7 +70,7 @@ export default function CampaignList() {
               </tr>
             </thead>
             <tbody>
-              {campaigns.map((campaign, index) => (
+              {tempCampaigns.map((campaign, index) => (
                 <tr 
                   key={campaign.campaign_id}
                   onClick={() => handleRowClick(campaign)}
@@ -50,7 +89,6 @@ export default function CampaignList() {
             </tbody>
           </table>
         </div>
-      </CardContent>
-    </Card>
+    </div>
   );
 }

@@ -15,6 +15,7 @@ const buttonVariants = cva(
         outline:
           "rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary:
+<<<<<<< HEAD
           "rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: 
           "bg-transparent hover:bg-gray-100",
@@ -26,6 +27,15 @@ const buttonVariants = cva(
           "bg-[#56CAD6]/10 text-[#56CAD6] hover:bg-[#56CAD6]/20 rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center space-y-1",
         login: 
           'w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm rounded-none',
+=======
+          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+        login: 'w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm rounded-none font-16',
+        tab:"rounded-none rounded-tl-[3px] rounded-tr-[3px]  bg-[#56CAD6] text-white text-[13px] py-[7px] px-[10px] shadow-none border-t border-l border-r border-[#56CAD6]",
+        tabghost:"rounded-none rounded-tl-[3px] rounded-tr-[3px]  bg-transparent text-black text-[13px] py-[7px] px-[10px] shadow-none border-t border-l border-r",
+        customblue:"rounded-[3px] bg-[#51ADD4] text-white text-[13px]"
+>>>>>>> 18bbfded830d4ab443929b4834bdd0f0d4c65a89
       },
       size: {
         default: "h-9 px-4",

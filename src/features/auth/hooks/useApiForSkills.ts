@@ -4,7 +4,7 @@ import { fetchSkills } from '../api/mainSkillMasterInfoSearch';
 import { UseMutationOptions } from '@tanstack/react-query';
 import { SkillListCredentials, SkillListResponse, AuthApiError } from '../types/mainIndex';
 
-export function useApiForTenants(
+export function useApiForSkills(
   options?: UseMutationOptions<SkillListResponse, AuthApiError, SkillListCredentials>
 ) {
   return useMutation({

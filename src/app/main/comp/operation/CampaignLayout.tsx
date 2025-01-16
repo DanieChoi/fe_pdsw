@@ -1,7 +1,9 @@
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import CampaignModal from './CampaignModal';
 
 interface GridItem {
   id: string;
@@ -11,15 +13,22 @@ interface GridItem {
 
 interface CampaignLayoutProps {
   data: GridItem[];
-  onCampaignSearchClick: () => void;
-  selectedCampaign?: string;
+  onNewClick: () => void;
+  onSaveClick: () => void;
 }
 
 export default function CampaignLayout({
   data,
-  onCampaignSearchClick,
-  selectedCampaign
+  onNewClick,
+  onSaveClick,
 }: CampaignLayoutProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState('');
+
+  const handleCampaignSelect = (campaign: string) => {
+    setSelectedCampaign(campaign);
+  };
+
   return (
     <div className="flex gap-8">
       {/* 왼쪽 그리드 */}
@@ -55,7 +64,7 @@ export default function CampaignLayout({
             <span className="text-sm text-gray-600 w-24">대상캠페인</span>
             <Select>
               <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Select" />
+                <SelectValue placeholder="" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="web_only">web_only</SelectItem>
@@ -64,7 +73,7 @@ export default function CampaignLayout({
             <Button 
               variant="outline" 
               size="sm"
-              onClick={onCampaignSearchClick}
+              onClick={() => setIsModalOpen(true)}
             >
               캠페인조회
             </Button>
@@ -81,10 +90,28 @@ export default function CampaignLayout({
             <span className="text-sm text-gray-600 w-24">발신번호</span>
             <Input 
               type="text" 
-              placeholder="01012345678"
-              readOnly
-              className="w-[150px]"
+              placeholder="그리드에서 선택"
+              disabled
+              className="w-[150px] bg-gray-50 cursor-not-allowed"
             />
+          </div>
+
+          {/* 버튼 영역 */}
+          <div className="flex justify-end gap-2 pt-4">
+            <Button 
+              variant="outline" 
+              onClick={onNewClick}
+              className="bg-cyan-500 text-white hover:bg-cyan-600 border-none"
+            >
+              신규
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={onSaveClick}
+              className="bg-cyan-500 text-white hover:bg-cyan-600 border-none"
+            >
+              저장
+            </Button>
           </div>
 
           {/* 안내 텍스트 */}
@@ -95,6 +122,13 @@ export default function CampaignLayout({
           </div>
         </div>
       </div>
+
+      {/* Campaign Modal */}
+      <CampaignModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelect={handleCampaignSelect}
+      />
     </div>
   );
 }
