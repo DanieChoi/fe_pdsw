@@ -6,7 +6,7 @@ import { useTabStore } from '@/store/tabStore';
 import PreferencesBoard from './preferences';
 import SystemPreferences from './SystemPreferences';
 import CampaignMonitorDashbord from './CampaignMonitorDashbord';
-import CampaignManager from './campaignManager/CampaignManagerHeader';
+import CampaignManager from './campaignManager/CampaignManager';
 import OutboundCallProgressPanel from './OutboundCallProgressPanel';
 
 const TabContent = () => {
