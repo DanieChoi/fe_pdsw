@@ -12,6 +12,10 @@ const dialModeList = [
 export default function CampaignManager() {
   const { tenants,selectedCampaign } = useMainStore();
 
+  const handleSelectChange = (event:any) => {
+    
+  }
+
   return (
     <div className="grid grid-cols-5 gap-4">
       <div>
@@ -21,7 +25,7 @@ export default function CampaignManager() {
         <select
           id="filter-select"
           className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          // onChange={handleFilterChange}
+          onChange={handleSelectChange}
           // defaultValue={initialFilter}
           value={selectedCampaign?.tenant_id || ''}
         >
@@ -50,7 +54,7 @@ export default function CampaignManager() {
         <select
           id="filter-select"
           className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          // onChange={handleFilterChange}
+          onChange={handleSelectChange}
           // defaultValue={initialFilter}
           value={selectedCampaign?.dial_mode || ''}
         >
@@ -68,7 +72,7 @@ export default function CampaignManager() {
         <select
           id="filter-select"
           className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          // onChange={handleFilterChange}
+          onChange={handleSelectChange}
           // defaultValue={initialFilter}
         >
           {/* {filterOptions.map(option => (
