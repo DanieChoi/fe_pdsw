@@ -4,7 +4,7 @@ import { useMainStore } from '@/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {CampaignHeaderSearch} from './CampaignManagerHeader';
 import { useEffect, useState } from 'react';
-
+import TitleWrap from "@/components/shared/TitleWrap";
 type Props = {
   campaignId?: string;
   campaignHeaderSearchParam?: CampaignHeaderSearch;
@@ -53,11 +53,8 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
 
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>캠페인 목록 (총 {totalCount}건)</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div>
+      <TitleWrap title="캠페인 목록" totalCount={8} />
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
@@ -92,7 +89,6 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
             </tbody>
           </table>
         </div>
-      </CardContent>
-    </Card>
+    </div>
   );
 }

@@ -21,7 +21,8 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         login: 'w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm rounded-none font-16',
         tab:"rounded-none rounded-tl-[3px] rounded-tr-[3px]  bg-[#56CAD6] text-white text-[13px] py-[7px] px-[10px] shadow-none border-t border-l border-r border-[#56CAD6]",
-        tabghost:"rounded-none rounded-tl-[3px] rounded-tr-[3px]  bg-transparent text-black text-[13px] py-[7px] px-[10px] shadow-none border-t border-l border-r"
+        tabghost:"rounded-none rounded-tl-[3px] rounded-tr-[3px]  bg-transparent text-black text-[13px] py-[7px] px-[10px] shadow-none border-t border-l border-r",
+        customblue:"rounded-[3px] bg-[#51ADD4] text-white text-[13px]"
       },
       size: {
         default: "py-[3px] px-[6px]",
