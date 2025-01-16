@@ -5,7 +5,7 @@ import CampaignLayout from './CampaignLayout';
 
 export default function OperationBoard() {
   const [openSection, setOpenSection] = useState<{ [key: string]: boolean }>({
-    section1: false,
+    section1: true,
     section2: false,
     section3: false,
     section4: false,
@@ -61,6 +61,10 @@ export default function OperationBoard() {
             >
                 <div className="p-5 border border-t-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
                     <CampaignLayout data={[]} onCampaignSearchClick={function (): void {
+                          throw new Error('Function not implemented.');
+                      } } onNewClick={function (): void {
+                          throw new Error('Function not implemented.');
+                      } } onSaveClick={function (): void {
                           throw new Error('Function not implemented.');
                       } } />
                 </div>

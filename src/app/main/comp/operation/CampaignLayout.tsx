@@ -12,12 +12,16 @@ interface GridItem {
 interface CampaignLayoutProps {
   data: GridItem[];
   onCampaignSearchClick: () => void;
+  onNewClick: () => void;
+  onSaveClick: () => void;
   selectedCampaign?: string;
 }
 
 export default function CampaignLayout({
   data,
   onCampaignSearchClick,
+  onNewClick,
+  onSaveClick,
   selectedCampaign
 }: CampaignLayoutProps) {
   return (
@@ -81,10 +85,28 @@ export default function CampaignLayout({
             <span className="text-sm text-gray-600 w-24">발신번호</span>
             <Input 
               type="text" 
-              placeholder="01012345678"
-              readOnly
-              className="w-[150px]"
+              placeholder="그리드에서 선택"
+              disabled
+              className="w-[150px] bg-gray-50 cursor-not-allowed"
             />
+          </div>
+
+          {/* 버튼 영역 */}
+          <div className="flex justify-end gap-2 pt-4">
+            <Button 
+              variant="outline" 
+              onClick={onNewClick}
+              className="bg-cyan-500 text-white hover:bg-cyan-600 border-none"
+            >
+              신규
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={onSaveClick}
+              className="bg-cyan-500 text-white hover:bg-cyan-600 border-none"
+            >
+              저장
+            </Button>
           </div>
 
           {/* 안내 텍스트 */}
@@ -93,6 +115,7 @@ export default function CampaignLayout({
             <p>• 발신번호를 설정하시면은 그리드에서 카피도 할 늘칠 주시면자 신규 비트를 클릭해 주세요.</p>
             <p>• 변경된 정보는 멤버십의 발신 여부이 저장이 시 반영됩니다.</p>
           </div>
+
         </div>
       </div>
     </div>
