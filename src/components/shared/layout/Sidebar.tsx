@@ -8,6 +8,7 @@ import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 import { useApiForSkills } from '@/features/auth/hooks/useApiForSkills';
 import { useApiForCallingNumber } from '@/features/auth/hooks/useApiForCallingNumber';
+import { useApiForSchedules } from '@/features/auth/hooks/useApiForSchedules';
 import Cookies from 'js-cookie';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useRouter } from 'next/navigation';
@@ -27,7 +28,6 @@ export default function Sidebar({
     toggleSidebar: () => void;
   }) {
   const tenantId = Number(Cookies.get('tenant_id'));
-  const [tenantIdArray, setTenantIdArray] = useState<number[]>([]);
   const router = useRouter();
   const [alertState, setAlertState] = useState(errorMessage);
   const { mutate: fetchMain } = useApiForMain({
@@ -46,6 +46,11 @@ export default function Sidebar({
         session_key: localStorage.getItem('sessionKey') || '',
         tenant_id: Number(localStorage.getItem('tenantId')) || 0,
       });
+    }
+  });
+  const { mutate: fetchSchedules } = useApiForSchedules({
+    onSuccess: (data) => {
+      setSchedules(data.result_data);
     }
   });
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
@@ -69,6 +74,9 @@ export default function Sidebar({
         fetchSkills({
           tenant_id_array: tempTenantIdArray
         });
+        fetchSchedules({
+          tenant_id_array: tempTenantIdArray
+        });
       }
     },
     onError: (error) => {
@@ -83,7 +91,7 @@ export default function Sidebar({
     }
   });
 
-  const { setCampaigns, setTenants, setSkills, setCallingNumbers, setSelectedCampaign, campaigns, tenants } = useMainStore();
+  const { setCampaigns, setTenants, setSkills, setCallingNumbers, setSchedules, setSelectedCampaign, campaigns, tenants } = useMainStore();
 
   // useEffect(() => {
   //   fetchMain({

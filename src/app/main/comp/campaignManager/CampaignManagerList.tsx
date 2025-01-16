@@ -1,10 +1,17 @@
 // components/main/CampaignList.tsx
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useMainStore } from '@/store';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {CampaignHeaderSearch} from './CampaignManagerHeader';
 import { useEffect, useState } from 'react';
 import TitleWrap from "@/components/shared/TitleWrap";
+
+const dialModeList = [
+  {dial_id:1, dial_name: 'Power'},
+  {dial_id:2, dial_name: 'Progressive'},
+  {dial_id:3, dial_name: 'Predictive'},
+  {dial_id:4, dial_name: 'System Preview'},
+];
+
 type Props = {
   campaignId?: string;
   campaignHeaderSearchParam?: CampaignHeaderSearch;
@@ -83,10 +90,13 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
                   <td className="border p-2">{schedules.filter((schedule) => schedule.campaign_id === campaign.campaign_id)
                   .map((data) => data.end_date)
                   }</td>
-                  <td className="border p-2">{new Date(campaign.creation_time).toLocaleString()}</td>
-                  <td className="border p-2">{new Date(campaign.update_time).toLocaleString()}</td>
                   <td className="border p-2"></td>
-                  <td className="border p-2"></td>
+                  <td className="border p-2">{dialModeList.filter((dialMode) => dialMode.dial_id === campaign.dial_mode)
+                  .map((data) => data.dial_name)
+                  }</td>
+                  <td className="border p-2">{callingNumbers.filter((callingNumber) => callingNumber.campaign_id === campaign.campaign_id)
+                  .map((data) => data.calling_number)
+                  }</td>
                 </tr>
               ))}
             </tbody>
