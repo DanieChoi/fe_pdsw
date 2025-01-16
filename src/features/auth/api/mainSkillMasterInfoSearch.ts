@@ -1,18 +1,16 @@
 // src/features/auth/api/fetchSkills.ts
 import { axiosInstance } from '@/lib/axios';
-import { MainCredentials, SkillListResponse } from '../types/mainIndex';
+import { SkillListCredentials, SkillListResponse } from '../types/mainIndex';
 
 // 스킬마스터정보조회 리스트 요청
-export const fetchSkills = async (credentials: MainCredentials): Promise<SkillListResponse> => {
+export const fetchSkills = async (credentials: SkillListCredentials): Promise<SkillListResponse> => {
   const skillMasterInfoSearchRequestData = {
     filter: {      
       skill_id: {
         start: 1,
         end: 9999999,
       },    
-      tenant_id: [
-        credentials.tenant_id
-      ]
+      tenant_id: credentials.tenant_id_array
     },
     sort: {
       skill_id: 0,
