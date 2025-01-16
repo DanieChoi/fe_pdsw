@@ -14,20 +14,44 @@ const dialModeList = [
   {dial_id:4, dial_name: 'System Preview'},
 ];
 
-export default function CampaignManager() {
+export interface CampaignHeaderSearch {
+  tenantId: number;
+  campaignName: string;
+  dailMode: number;
+  skill: number;
+  callNumber: string;
+}
+
+type Props = {
+  campaignId?: string;
+  onSearch: (param:CampaignHeaderSearch) => void;
+}
+
+export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
   const { tenants,selectedCampaign } = useMainStore();
   const [tenantId, setTenantId] = useState('all'); // 테넌트
   const [campaignName, setCampaignName] = useState(''); // 캠페인이름
   const [dailMode, setDailMode] = useState('all'); // 다이얼모드
+  const [skill, setSkill] = useState('all'); // 스킬
   const [callNumber, setCallNumber] = useState(''); // 발신번호
+  const [readonly, setReadonly] = useState(false);
 
-  // useEffect(() => {
-  //   if ( selectedCampaign ) {
-  //     setTenantId(selectedCampaign?.tenant_id+'');
-  //     setCampaignName(selectedCampaign.campaign_name);
-  //     setDailMode(selectedCampaign?.dial_mode+'');
-  //   }
-  // }, [selectedCampaign]);
+  const onHeaderSearch = () => {
+    const param:CampaignHeaderSearch = {
+      tenantId: tenantId === 'all'?-1:Number(tenantId),
+      campaignName: campaignName,
+      dailMode: dailMode === 'all'?-1:Number(dailMode),
+      skill: skill === 'all'?-1:Number(skill),
+      callNumber: callNumber,
+    }
+    onSearch(param);
+  }
+
+  useEffect(() => {
+    if( typeof campaignId != 'undefined' ){
+      setReadonly(true);
+    }
+  }, [campaignId]);
 
   return (
     <div className="grid grid-cols-6 gap-4 title-background">
@@ -92,7 +116,7 @@ export default function CampaignManager() {
         />
       </div>
         <div className="flex justify-end gap-2">
-          <Button>조회</Button>
+          <Button onClick={onHeaderSearch}>조회</Button>
         </div>
       {/* ... 나머지 필드들 ... */}
     </div>
