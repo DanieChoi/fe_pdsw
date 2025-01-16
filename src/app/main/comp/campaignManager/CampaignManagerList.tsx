@@ -85,10 +85,10 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
                   <td className="border p-2">{index + 1}</td>
                   <td className="border p-2">[{campaign.campaign_id}]{campaign.campaign_name}</td>
                   <td className="border p-2">{schedules.filter((schedule) => schedule.campaign_id === campaign.campaign_id)
-                  .map((data) => data.start_date)
+                  .map((data) => data.start_date.length == 8? data.start_date.substring(0,4)+'-'+data.start_date.substring(4,6)+'-'+data.start_date.substring(6,8):'')
                   }</td>
                   <td className="border p-2">{schedules.filter((schedule) => schedule.campaign_id === campaign.campaign_id)
-                  .map((data) => data.end_date)
+                  .map((data) => data.end_date.length == 8? data.end_date.substring(0,4)+'-'+data.end_date.substring(4,6)+'-'+data.end_date.substring(6,8):'')
                   }</td>
                   <td className="border p-2"></td>
                   <td className="border p-2">{dialModeList.filter((dialMode) => dialMode.dial_id === campaign.dial_mode)
