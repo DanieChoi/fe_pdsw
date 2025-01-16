@@ -2,8 +2,8 @@
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import CampaignManagerHeader from './CampaignManagerHeader';
-import CampaignManagerDetail from './CampaignManagerDetail';
 import CampaignManagerList from './CampaignManagerList';
+import CampaignManagerDetail from './CampaignManagerDetail';
 
 type Props = {}
 

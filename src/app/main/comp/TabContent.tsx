@@ -1,13 +1,13 @@
 // C:\Users\terec\fe_pdsw\src\app\main\comp\TabContent.tsx
 "use client";
 
-import React from 'react';
+import React, { FC } from 'react';
 import { useTabStore } from '@/store/tabStore';
 import PreferencesBoard from './preferences';
 import SystemPreferences from './SystemPreferences';
 import CampaignMonitorDashbord from './CampaignMonitorDashbord';
 import OutboundCallProgressPanel from './OutboundCallProgressPanel';
-import CampaignManager from './CampaignManager';
+import CampaignManager from './campaignManager';
 
 const TabContent = () => {
   const { activeTabId } = useTabStore();
