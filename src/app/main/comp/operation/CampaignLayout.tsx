@@ -36,8 +36,8 @@ export default function CampaignLayout({
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50">
-              <TableHead className="font-medium text-gray-700">멤버십 아이디</TableHead>
-              <TableHead className="font-medium text-gray-700">멤버십 마켓</TableHead>
+              <TableHead className="font-medium text-gray-700">캠페인 아이디</TableHead>
+              <TableHead className="font-medium text-gray-700">캠페인 이름</TableHead>
               <TableHead className="font-medium text-gray-700">발신번호</TableHead>
             </TableRow>
           </TableHeader>

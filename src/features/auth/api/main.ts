@@ -6,7 +6,6 @@ import { MainCredentials, MainResponse } from '../types/mainIndex';
 export const fetchCampaigns = async (credentials: MainCredentials): Promise<MainResponse> => {
   const mainData = {
     filter: {
-      
       campaign_id: {
         start: 1,
         end: 1000,
