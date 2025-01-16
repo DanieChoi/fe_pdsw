@@ -19,6 +19,7 @@ export default function Sidebar({
     toggleSidebar: () => void;
   }) {
   const tenantId = Number(Cookies.get('tenant_id'));
+  const [tenantIdArray, setTenantIdArray] = useState<number[]>([]);
   const router = useRouter();
   const [alertState, setAlertState] = useState({
     isOpen: false,
@@ -45,6 +46,10 @@ export default function Sidebar({
         router.push('/login');
       }else{
         setTenants(data.result_data);
+        let tempTenantIdArray = data.result_data.map(tenant => Number(tenant.tenant_id));
+        setTenantIdArray(prevState => [...prevState, ...tempTenantIdArray]);
+        console.log(55);
+
         fetchMain({
           session_key: localStorage.getItem('sessionKey') || '',
           tenant_id: Number(localStorage.getItem('tenantId')) || 0,
