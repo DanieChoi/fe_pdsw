@@ -88,7 +88,7 @@ export default function CampaignDetail() {
                   .join(',');
       setInputCallingNumber(tempCallNumber);
     }
-  }, [selectedCampaign]);
+  }, [selectedCampaign,campaignSkills,callingNumbers]);
 
   //input data change
   const handleInputData = (value:any, col:string) => {
@@ -199,7 +199,8 @@ export default function CampaignDetail() {
           </div>
           <div className='flex items-center gap-2'>
             <Label className="w-[5.6rem] min-w-[5.6rem]">발신번호</Label>
-            <Input value={inputCallingNumber} className="mt-1 w-full" readOnly />
+            <Input value={inputCallingNumber} className="mt-1 w-full" 
+              disabled={selectedCampaign !== null} />
             <Button variant="outline" className='h-7'>발신번호 변경</Button>
           </div>
           <div className="flex items-center gap-2 col-span-3">

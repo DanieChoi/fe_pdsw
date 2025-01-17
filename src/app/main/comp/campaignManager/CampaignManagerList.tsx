@@ -34,7 +34,7 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
     }else{
       setSelectedCampaign(null);
     }
-  }, [campaignId]);
+  }, [campaigns, setSelectedCampaign, tempCampaigns,campaignId]);
 
   useEffect(() => {
     if( typeof campaignHeaderSearchParam != 'undefined' && typeof campaignId === 'undefined' ){
@@ -68,7 +68,7 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
         setSelectedCampaign(null);
       }
     }
-  }, [campaignHeaderSearchParam]);
+  }, [campaignHeaderSearchParam, callingNumbers, campaignSkills, campaigns, setSelectedCampaign, tempCampaigns,campaignId]);
 
 
   return (
