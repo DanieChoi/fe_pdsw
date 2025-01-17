@@ -4,34 +4,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import CampaignModal from './CampaignModal';
-// import { useMainStore } from '@/store';
-// import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { useMainStore } from '@/store';
 
-interface GridItem {
-  id: string;
-  memberType: string;
-  phoneNumber: string;
-}
-
-interface CampaignLayoutProps {
-  data: GridItem[];
-  onNewClick: () => void;
-  onSaveClick: () => void;
-}
-
-export default function CampaignLayout({
-  data,
-  onNewClick,
-  onSaveClick,
-}: CampaignLayoutProps) {
+function CampaignLayout() {
+  const { 
+    campaigns, 
+    callingNumbers, 
+    setSelectedCampaign,
+  } = useMainStore();
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState('');
+  const [selectedCampaignValue, setSelectedCampaignValue] = useState('');
+  const [selectedCallingNumber, setSelectedCallingNumber] = useState('');
 
-  // const { campaigns, totalCount, setSelectedCampaign } = useMainStore();
-  // const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>(campaigns);
+  const handleRowClick = (campaign: MainDataResponse) => {
+
+    // campaign 정보를 로그로 출력 해야 되
+    console.log(campaign);
+
+    setSelectedCampaign(campaign);
+    const callingNumber = callingNumbers.find(
+      (number) => number.campaign_id === campaign.campaign_id
+    );
+    setSelectedCallingNumber(callingNumber?.calling_number || '');
+  };
 
   const handleCampaignSelect = (campaign: string) => {
-    setSelectedCampaign(campaign);
+    setSelectedCampaignValue(campaign);
   };
 
   return (
@@ -41,20 +41,25 @@ export default function CampaignLayout({
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50">
-              <TableHead className="font-medium text-gray-700">캠페인 아이디</TableHead>
-              <TableHead className="font-medium text-gray-700">캠페인 이름</TableHead>
-              <TableHead className="font-medium text-gray-700">발신번호</TableHead>
+              <TableHead className="font-medium text-gray-700 text-center">캠페인 아이디</TableHead>
+              <TableHead className="font-medium text-gray-700 text-center">캠페인 이름</TableHead>
+              <TableHead className="font-medium text-gray-700 text-center">발신번호</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((item, index) => (
+            {campaigns.map((campaign) => (
               <TableRow 
-                key={index}
-                className="border-b hover:bg-gray-50"
+                key={campaign.campaign_id}
+                onClick={() => handleRowClick(campaign)}
+                className="border-b hover:bg-gray-50 cursor-pointer"
               >
-                <TableCell className="font-normal">{item.id}</TableCell>
-                <TableCell className="font-normal">{item.memberType}</TableCell>
-                <TableCell className="font-normal">{item.phoneNumber}</TableCell>
+                <TableCell className="font-normal text-center">{campaign.campaign_id}</TableCell>
+                <TableCell className="font-normal text-center">{campaign.campaign_name}</TableCell>
+                <TableCell className="font-normal text-center">
+                  {callingNumbers
+                    .filter((callingNumber) => callingNumber.campaign_id === campaign.campaign_id)
+                    .map((data) => data.calling_number)}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -69,7 +74,7 @@ export default function CampaignLayout({
             <span className="text-sm text-gray-600 w-24">대상캠페인</span>
             <Select>
               <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="" />
+                <SelectValue placeholder="선택" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="web_only">web_only</SelectItem>
@@ -84,7 +89,7 @@ export default function CampaignLayout({
             </Button>
             <Input 
               type="text" 
-              value={selectedCampaign} 
+              value={selectedCampaignValue} 
               readOnly 
               className="w-[150px] bg-gray-50"
             />
@@ -95,6 +100,7 @@ export default function CampaignLayout({
             <span className="text-sm text-gray-600 w-24">발신번호</span>
             <Input 
               type="text" 
+              value={selectedCallingNumber}
               placeholder="그리드에서 선택"
               disabled
               className="w-[150px] bg-gray-50 cursor-not-allowed"
@@ -104,15 +110,13 @@ export default function CampaignLayout({
           {/* 버튼 영역 */}
           <div className="flex justify-end gap-2 pt-4">
             <Button 
-              variant="outline" 
-              onClick={onNewClick}
+              variant="outline"
               className="bg-cyan-500 text-white hover:bg-cyan-600 border-none"
             >
               신규
             </Button>
             <Button 
               variant="outline"
-              onClick={onSaveClick}
               className="bg-cyan-500 text-white hover:bg-cyan-600 border-none"
             >
               저장
@@ -136,4 +140,6 @@ export default function CampaignLayout({
       />
     </div>
   );
-}
+};
+
+export default CampaignLayout;
