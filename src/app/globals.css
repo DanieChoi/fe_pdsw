@@ -247,3 +247,40 @@ input::placeholder {
   position: relative;
   z-index: 2;
 }
+
+
+/*gird-custom*/
+.gird-custom{
+  border:1px solid  hsl(var(--border)); 
+  border-radius: 4px;
+  overflow: hidden;
+}
+.grid-custom .rdg-header-row .rdg-cell{
+  background: #F8F8F8;
+  border-bottom: 1px solid #ebebeb;
+  font-size: 13px;
+  color: #333;
+  font-weight: normal;
+  text-align: center;
+}
+
+.grid-custom .rdg-header-row .rdg-cell[aria-selected="true"]{
+  outline: 2px solid #ebebeb;
+  outline-offset: -1px;
+}
+.grid-custom .rdg-row .rdg-cell{
+  border-bottom: 1px solid #ebebeb;
+  text-align: center;
+}
+.grid-custom .rdg-row .rdg-cell[aria-selected="true"]{
+  border-bottom: 1px solid #ebebeb;
+  font-size: 13px;
+  color: #333;
+  font-weight: normal;
+  text-align: center;
+}
+
+.grid-custom .rdg-row .rdg-cell[aria-selected="true"]{
+  outline: 2px solid #ebebeb;
+  outline-offset: -1px
+}
