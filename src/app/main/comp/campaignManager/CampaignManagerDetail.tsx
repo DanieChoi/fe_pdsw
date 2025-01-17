@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import CampaignTab from './CampaignTab';
-import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { MainDataResponse, CampaignSkillUpdateRequest } from '@/features/auth/types/mainIndex';
 import { useEffect, useState } from 'react';
+import SkillListPopup from '@/components/shared/layout/SkillListPopup';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
@@ -17,6 +18,11 @@ const dialModeList = [
   {dial_id:3, dial_name: 'Predictive'},
   {dial_id:4, dial_name: 'System Preview'},
 ];
+
+const CampaignSkillInfo: CampaignSkillUpdateRequest = {
+  campaign_id: 0,
+  skill_id: [],
+}
 
 const CampaignInfo: MainDataResponse = {
   campaign_id: 0,
@@ -67,11 +73,18 @@ const CampaignInfo: MainDataResponse = {
 export default function CampaignDetail() {
   const selectedCampaign = useMainStore((state) => state.selectedCampaign);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
+  const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
   const [changeYn, setChangeYn] = useState<boolean>(false); // 변경여부
   const [campaignInfoChangeYn, setCampaignInfoChangeYn] = useState<boolean>(false); // 캠페인정보 변경여부
   const { tenants, campaignSkills, callingNumbers } = useMainStore();
   const [ inputSkills, setInputSkills ] = useState('');
   const [ inputCallingNumber, setInputCallingNumber ] = useState('');
+  const [alertState, setAlertState] = useState({
+    isOpen: false,
+    param: [],
+    tenantId: 0,
+    type: '0',
+  });
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
@@ -81,8 +94,11 @@ export default function CampaignDetail() {
       setTempCampaignsInfo(selectedCampaign);
       const tempSkill = campaignSkills.filter((skill) => skill.campaign_id === selectedCampaign.campaign_id)
                   .map((data) => data.skill_id)
-                  .join(',')
+                  .join(',');
       setInputSkills(tempSkill);
+      setTempCampaignSkills({...tempCampaignSkills
+        , skill_id: tempSkill.split(',').map((data) => Number(data))
+      });
       const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === selectedCampaign.campaign_id)
                   .map((data) => data.calling_number)
                   .join(',');
@@ -133,6 +149,7 @@ export default function CampaignDetail() {
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
               className="" 
               disabled={selectedCampaign !== null}
+              defaultValue={tempCampaignInfo.campaign_id}
             />
           </div>
 
@@ -193,7 +210,11 @@ export default function CampaignDetail() {
                     width={12}
                     height={12}
                     priority
-                    onClick={() => console.log('스킬팝업')}
+                    onClick={() => 
+                      setAlertState({...alertState,
+                        isOpen: true,
+                      })
+                    }
                   /> 
             </button>
           </div>
@@ -212,6 +233,14 @@ export default function CampaignDetail() {
       <div>
         <CampaignTab/>
       </div>
+      <SkillListPopup
+        param={tempCampaignSkills.skill_id||[]}
+        tenantId={tempCampaignInfo.tenant_id}
+        type={alertState.type}
+        isOpen={alertState.isOpen}
+        onConfirm={(param) => console.log('param', param)}
+        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }
