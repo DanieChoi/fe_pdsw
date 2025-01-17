@@ -28,11 +28,10 @@ export default function Sidebar({
     isMenuOpen: boolean;
     toggleSidebar: () => void;
   }) {
-  const tenantId = Number(Cookies.get('tenant_id'));
-  const router = useRouter();
-  const [alertState, setAlertState] = useState(errorMessage);
-  const _sessionKey = localStorage.getItem('sessionKey') || '';
-  const _tenantId = Number(localStorage.getItem('tenantId')) || 0;
+    const router = useRouter();
+    const [alertState, setAlertState] = useState(errorMessage);
+    const _sessionKey = Cookies.get('session_key') || '';
+    const _tenantId = Number(Cookies.get('tenant_id'));
 
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
@@ -147,7 +146,7 @@ export default function Sidebar({
 
     return (
       <div className="space-y-1">
-        { tenantId === 0 ? 
+        { _tenantId === 0 ? 
         tenants.map((tenant) => (
           <div key={tenant.tenant_id}>
             <button
@@ -174,7 +173,7 @@ export default function Sidebar({
         ))
         :
         tenants
-        .filter((tenant) => tenant.tenant_id === tenantId) 
+        .filter((tenant) => tenant.tenant_id === _tenantId) 
         .map((tenant) => (
           <div key={tenant.tenant_id}>
             <button

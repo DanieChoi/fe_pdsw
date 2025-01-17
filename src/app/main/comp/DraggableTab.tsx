@@ -49,7 +49,7 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
       className={`
         flex items-center gap-2 px-3 py-1.5 h-8
         border border-gray-200 rounded-lg cursor-pointer
-        ${isActive ? 'bg-[#49EDE3] bg-opacity-20' : 'bg-white hover:bg-gray-50'}
+        ${isActive ? 'bg-[#56CAD6] text-[#fff]' : 'bg-white hover:bg-gray-50'}
       `}
       onClick={onSelect}
     >

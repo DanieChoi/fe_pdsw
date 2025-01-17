@@ -128,12 +128,12 @@ input::placeholder {
 }
 .menu-item:nth-child(2)::after, 
 .menu-item:nth-child(7)::after, 
-.menu-item:nth-child(8)::after, 
-.menu-item:nth-child(10)::after  {
+.menu-item:nth-child(9)::after
+ {
   content: '';
   position: absolute;
   top: 50%;
-  right: -3px;
+  right: -8px;
   transform: translateY(-50%);
   width: 1px;
   height: 30px;
@@ -143,6 +143,11 @@ input::placeholder {
 
 .main-w{
   width: calc(100% - 16rem);
+}
+
+
+.header-padding{
+  padding: 10px 28px;
 }
 
 /*laylout*/
