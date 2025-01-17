@@ -144,6 +144,22 @@ export interface CampaignScheDuleListResponse {
   result_data: CampaignScheDuleListDataResponse[];
 }
 
+// 캠페인스킬 데이터 타입
+export interface CampaignSkillDataResponse {
+  campaign_id: number;
+  tenant_id: number;
+  skill_id: [number];
+}
+
+// 캠페인스킬 데이터 타입
+export interface CampaignSkillListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: CampaignSkillDataResponse[];
+}
+
 // API 에러 타입
 export interface AuthApiError {
   message: string;
