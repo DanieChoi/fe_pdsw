@@ -28,7 +28,8 @@ const SkillListPopup = ({
     const [selectedSkills, setSelectedSkills] = useState<number[]>(param);
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, skillId: number) => {
         if(e.target.checked){
-            setSelectedSkills([...selectedSkills, skillId]);
+            let temp = [...selectedSkills, skillId].sort();
+            setSelectedSkills(temp);
         }else{
             setSelectedSkills(selectedSkills.filter((data) => data !== skillId));
         }
@@ -41,10 +42,8 @@ const SkillListPopup = ({
     }, [param]);
     
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        // Don't return anything from this function
-        // onConfirm('66');
-        console.log('clicked');
-      };
+        onConfirm(selectedSkills.join(','));
+    };
 
     return (
         <AlertDialog open={isOpen} onOpenChange={onCancle}>
