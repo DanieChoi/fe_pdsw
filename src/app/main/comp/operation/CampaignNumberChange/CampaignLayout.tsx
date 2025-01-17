@@ -3,9 +3,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import CampaignModal from './CampaignModal';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useMainStore } from '@/store';
+import CampaignModal from './CampaignModal';
 
 function CampaignLayout() {
   const { 
@@ -17,21 +17,19 @@ function CampaignLayout() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCampaignValue, setSelectedCampaignValue] = useState('');
   const [selectedCallingNumber, setSelectedCallingNumber] = useState('');
+  const [selectedCampaign, setSelectedCampaignState] = useState<any>(null);
 
   const handleRowClick = (campaign: MainDataResponse) => {
-
-    // campaign 정보를 로그로 출력 해야 되
-    console.log(campaign);
-
     setSelectedCampaign(campaign);
+    setSelectedCampaignState(campaign);
     const callingNumber = callingNumbers.find(
       (number) => number.campaign_id === campaign.campaign_id
     );
     setSelectedCallingNumber(callingNumber?.calling_number || '');
   };
 
-  const handleCampaignSelect = (campaign: string) => {
-    setSelectedCampaignValue(campaign);
+  const handleCampaignSelect = (tenantName: string) => {
+    setSelectedCampaignValue(tenantName);
   };
 
   return (
@@ -51,9 +49,11 @@ function CampaignLayout() {
               <TableRow 
                 key={campaign.campaign_id}
                 onClick={() => handleRowClick(campaign)}
-                className="border-b hover:bg-gray-50 cursor-pointer"
+                className={`border-b hover:bg-gray-50 cursor-pointer ${
+                  selectedCampaign?.campaign_id === campaign.campaign_id ? 'bg-cyan-50' : ''
+                }`}
               >
-                <TableCell className="font-normal text-center">{campaign.campaign_id}</TableCell>
+                <TableCell className="font-normal text-center ">{campaign.campaign_id}</TableCell>
                 <TableCell className="font-normal text-center">{campaign.campaign_name}</TableCell>
                 <TableCell className="font-normal text-center">
                   {callingNumbers

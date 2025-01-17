@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import CampaignLayout from './CampaignLayout';
+import CampaignLayout from './CampaignNumberChange/CampaignLayout';
 
 export default function OperationBoard() {
   const [openSection, setOpenSection] = useState<{ [key: string]: boolean }>({
@@ -36,23 +36,6 @@ export default function OperationBoard() {
                     aria-expanded={openSection.section1}
                 >
                     <span>캠페인별 발신번호 변경</span>
-                {/* <svg
-                className={`w-3 h-3 shrink-0 transition-transform duration-200 ${
-                    openSection.section1 ? 'rotate-180' : ''
-                }`}
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 10 6"
-                >
-                <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M9 5 5 1 1 5"
-                />
-                </svg> */}
                 </button>
             </h2>
             <div
