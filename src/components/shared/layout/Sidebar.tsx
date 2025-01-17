@@ -70,7 +70,7 @@ export default function Sidebar({
         router.push('/login');
       }else{
         setTenants(data.result_data);
-        let tempTenantIdArray = data.result_data.map(tenant => Number(tenant.tenant_id));
+        const tempTenantIdArray = data.result_data.map(tenant => Number(tenant.tenant_id));
         fetchSkills({
           tenant_id_array: tempTenantIdArray
         });

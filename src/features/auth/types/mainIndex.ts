@@ -7,7 +7,7 @@ export interface MainCredentials {
 
 // 스킬마스터정보조회 요청 시 필요한 credentials 타입
 export interface SkillListCredentials {
-  tenant_id_array: Number[];
+  tenant_id_array: number[];
 }
 
 // 백엔드로 전송되는 실제 메인 요청 데이터 타입
