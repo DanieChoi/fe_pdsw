@@ -1,8 +1,6 @@
 import React from 'react'
 
-type Props = {}
-
-const LoginForm = (props: Props) => {
+const LoginForm = () => {
   return (
     <div>LoginForm</div>
   )

@@ -119,7 +119,7 @@ export default function Sidebar({
       session_key: _sessionKey,
       tenant_id: _tenantId,
     });
-  }, [fetchTenants]);
+  }, [fetchTenants, _sessionKey, _tenantId]);
 
   const handleCampaignClick = (campaign: MainDataResponse) => {
     setSelectedCampaign(campaign);

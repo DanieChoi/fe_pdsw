@@ -24,13 +24,22 @@ export function CampaignFilter({
 }: FilterProps) {
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
 
+  // // 디바운스된 검색 함수
+  // const debouncedSearch = useCallback(
+  //   debounce((term: string) => {
+  //     onSearch(term);
+  //   }, 300),
+  //   [onSearch]
+  // );
+
   // 디바운스된 검색 함수
-  const debouncedSearch = useCallback(
-    debounce((term: string) => {
+  const debouncedSearch = useCallback((term: string) => {
+    const handler = debounce(() => {
       onSearch(term);
-    }, 300),
-    [onSearch]
-  );
+    }, 300);
+    handler();
+    return () => handler.cancel();
+  }, [onSearch]);
 
   // 검색어 변경 핸들러
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {

@@ -18,7 +18,7 @@ export default function CampaignDetail() {
   const selectedCampaign = useMainStore((state) => state.selectedCampaign);
   const { tenants } = useMainStore();
 
-  const handleSelectChange = (event:any) => {
+  const handleSelectChange = (value: string, type: 'tenant' | 'dialMode') => {
     
   }
 
@@ -53,7 +53,7 @@ export default function CampaignDetail() {
             <Label className="w-[5.6rem] min-w-[5.6rem]">테넌트</Label>
             <Select
               onValueChange={(value) => handleSelectChange(value, 'tenant')}
-              value={selectedCampaign?.tenant_id || ''}
+              value={selectedCampaign?.tenant_id?.toString() || ''}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="테넌트를 선택하세요" />
@@ -81,7 +81,7 @@ export default function CampaignDetail() {
             <Label className="w-[5.6rem] min-w-[5.6rem]">다이얼 모드</Label>
             <Select
               onValueChange={(value) => handleSelectChange(value, 'dialMode')}
-              value={selectedCampaign?.dial_mode || ''}
+              value={selectedCampaign?.dial_mode?.toString() || ''}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="다이얼 모드를 선택하세요" />
