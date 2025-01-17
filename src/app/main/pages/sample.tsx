@@ -1,10 +1,6 @@
 import React from 'react'
 
-interface Props {
-    
-}
-
-const SmaplePageForMain = (props: Props) => {
+const SmaplePageForMain = (props: object) => {
     return (
         <div>
            SmaplePageForMain 

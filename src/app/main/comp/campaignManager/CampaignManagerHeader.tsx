@@ -60,7 +60,7 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
       setTempSkills(skills.filter((skill) => skill.tenant_id === Number(tenantId)));
     }
     setSkill('all');
-  }, [tenantId]);
+  }, [tenantId, skills]);
 
   return (
     <div className="grid grid-cols-6 gap-4 title-background">

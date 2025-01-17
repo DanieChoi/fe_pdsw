@@ -57,8 +57,9 @@ export const loginApi = {
       });
 
       return data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || error.message || '로그인 중 오류가 발생했습니다.');
+    } catch (error: Error | unknown) {
+      const err = error as Error;
+      throw new Error(err?.message || '로그인 중 오류가 발생했습니다.');
     }
   }
 };

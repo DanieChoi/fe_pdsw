@@ -7,8 +7,21 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import TitleWrap from "@/components/shared/TitleWrap";
+
+interface PreferencesData {
+  refreshCycle: string;
+  monitoringType: string;
+  retryCount: string;
+  timeout: string;
+  ip: string;
+  port: string;
+  startTime: string;
+  endTime: string;
+  messageType: string;
+}
+
 interface PreferencesBoardProps {
-  onSubmit?: (data: any) => void;
+  onSubmit?: (data: PreferencesData) => void;
 }
 
 export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
