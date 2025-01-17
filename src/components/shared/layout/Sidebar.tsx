@@ -9,6 +9,7 @@ import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 import { useApiForSkills } from '@/features/auth/hooks/useApiForSkills';
 import { useApiForCallingNumber } from '@/features/auth/hooks/useApiForCallingNumber';
 import { useApiForSchedules } from '@/features/auth/hooks/useApiForSchedules';
+import { useApiForCampaignSkill } from '@/features/auth/hooks/useApiForCampaignSkill';
 import Cookies from 'js-cookie';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useRouter } from 'next/navigation';
@@ -30,12 +31,15 @@ export default function Sidebar({
   const tenantId = Number(Cookies.get('tenant_id'));
   const router = useRouter();
   const [alertState, setAlertState] = useState(errorMessage);
+  const _sessionKey = localStorage.getItem('sessionKey') || '';
+  const _tenantId = Number(localStorage.getItem('tenantId')) || 0;
+
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
       fetchCallingNumbers({
-        session_key: localStorage.getItem('sessionKey') || '',
-        tenant_id: Number(localStorage.getItem('tenantId')) || 0,
+        session_key: _sessionKey,
+        tenant_id: _tenantId,
       });
     }
   });
@@ -43,8 +47,8 @@ export default function Sidebar({
     onSuccess: (data) => {
       setSkills(data.result_data);
       fetchMain({
-        session_key: localStorage.getItem('sessionKey') || '',
-        tenant_id: Number(localStorage.getItem('tenantId')) || 0,
+        session_key: _sessionKey,
+        tenant_id: _tenantId
       });
     }
   });
@@ -56,6 +60,15 @@ export default function Sidebar({
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
       setCallingNumbers(data.result_data);
+      fetchCampaignSkills({
+        session_key: _sessionKey,
+        tenant_id: _tenantId
+      });
+    }
+  });
+  const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
+    onSuccess: (data) => {
+      setCampaignSkills(data.result_data);
     }
   });
   
@@ -91,19 +104,21 @@ export default function Sidebar({
     }
   });
 
-  const { setCampaigns, setTenants, setSkills, setCallingNumbers, setSchedules, setSelectedCampaign, campaigns, tenants } = useMainStore();
-
-  // useEffect(() => {
-  //   fetchMain({
-  //     session_key: localStorage.getItem('sessionKey') || '',
-  //     tenant_id: Number(localStorage.getItem('tenantId')) || 0,
-  //   });
-  // }, [fetchMain]);
+  const { setCampaigns
+    , setTenants
+    , setSkills
+    , setCallingNumbers
+    , setSchedules
+    , setSelectedCampaign
+    , setCampaignSkills
+    , campaigns
+    , tenants 
+  } = useMainStore();
 
   useEffect(() => {
     fetchTenants({
-      session_key: localStorage.getItem('sessionKey') || '',
-      tenant_id: Number(localStorage.getItem('tenantId')) || 0,
+      session_key: _sessionKey,
+      tenant_id: _tenantId,
     });
   }, [fetchTenants]);
 
