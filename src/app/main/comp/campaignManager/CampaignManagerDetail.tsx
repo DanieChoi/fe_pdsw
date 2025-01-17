@@ -124,14 +124,14 @@ export default function CampaignDetail() {
               { label: "분배호수 제한설정", onClick: () => console.log(""),variant: "customblue" },
           ]}
           />
-          <div className="grid grid-cols-3 gap-x-4 gap-y-1">
+          <div className="grid grid-cols-3 gap-x-4 gap-y-2">
           <div className='flex items-center gap-2'>
             <Label className="w-[5.6rem] min-w-[5.6rem]">캠페인 아이디</Label>
             <Input 
               type="number" 
               value={tempCampaignInfo.campaign_id } 
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
-              className="mt-1" 
+              className="" 
               disabled={selectedCampaign !== null}
             />
           </div>
@@ -159,7 +159,7 @@ export default function CampaignDetail() {
             <Label className="w-[5.6rem] min-w-[5.6rem]">캠페인명</Label>
             <Input 
               value={tempCampaignInfo.campaign_name || ''} 
-              className="mt-1" 
+              className="" 
               readOnly 
             />
           </div>
@@ -184,7 +184,7 @@ export default function CampaignDetail() {
           </div>
           <div className='flex items-center gap-2 relative'>
             <Label className="w-[5.6rem] min-w-[5.6rem]">스킬</Label>
-            <Input value={inputSkills} className="mt-1 w-full" readOnly />
+            <Input value={inputSkills} className="w-full" readOnly />
             <button
                 className="absolute right-2 top-[52%] transform -translate-y-1/2">
                 <Image
@@ -199,13 +199,13 @@ export default function CampaignDetail() {
           </div>
           <div className='flex items-center gap-2'>
             <Label className="w-[5.6rem] min-w-[5.6rem]">발신번호</Label>
-            <Input value={inputCallingNumber} className="mt-1 w-full" 
+            <Input value={inputCallingNumber} className="w-full" 
               disabled={selectedCampaign !== null} />
             <Button variant="outline" className='h-7'>발신번호 변경</Button>
           </div>
           <div className="flex items-center gap-2 col-span-3">
             <Label className="w-[5.6rem] min-w-[5.6rem]">설명</Label>
-            <Input value={tempCampaignInfo.campaign_desc || ''} className="mt-1 w-full" readOnly />
+            <Input value={tempCampaignInfo.campaign_desc || ''} className="w-full" readOnly />
           </div>
         </div>
       </div>
