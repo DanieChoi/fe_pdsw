@@ -16,6 +16,12 @@ export interface MainRequest {
   tenant_id: number;
 }
 
+// 캠페인스킬 수정 요청 데이터 타입
+export interface CampaignSkillUpdateRequest {
+  campaign_id: number;
+  skill_id: number[];
+}
+
 // 메인 응답 데이터 리스트 타입
 export interface AuthApiError {
   message: string;
