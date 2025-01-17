@@ -22,11 +22,11 @@ const buttonVariants = cva(
        link: 
          "text-primary underline-offset-4 hover:underline",
        menu:
-         "bg-white hover:bg-gray-50 rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center space-y-1",
+         "bg-white hover:bg-gray-50 rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center",
        menuActive:
-         "relative bg-[#E5F3F3] text-[#56CAD6] hover:bg-[#E5F3F3] font-medium rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center space-y-1",
+         "relative bg-[#56CAD6] hover:bg-[#56CAD6] font-medium rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center text-[#fff]",
        menuOpened:
-         "bg-[#E5F3F3]/50 hover:bg-[#E5F3F3]/70 rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center space-y-1",
+         "bg-[#E5F3F3]/50 hover:bg-[#E5F3F3]/70 rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center text-[#333]",
        login: 
          'w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm rounded-none',
      },

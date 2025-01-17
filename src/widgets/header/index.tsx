@@ -115,7 +115,7 @@ export default function Header() {
                     >
                       {isActive && (
                         <div className="absolute top-1 right-1">
-                          <Check className="w-3 h-3 text-[#56CAD6]" />
+                          <Check className="w-3 h-3 text-[#fff]" />
                         </div>
                       )}
                       <div className="flex items-center justify-center p-1">
