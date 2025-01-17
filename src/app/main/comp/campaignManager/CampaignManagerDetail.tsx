@@ -76,6 +76,7 @@ export default function CampaignDetail() {
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
   const [changeYn, setChangeYn] = useState<boolean>(false); // 변경여부
   const [campaignInfoChangeYn, setCampaignInfoChangeYn] = useState<boolean>(false); // 캠페인정보 변경여부
+  const [campaignSkillChangeYn, setCampaignSkillChangeYn] = useState<boolean>(false); // 캠페인스킬 변경여부
   const { tenants, campaignSkills, callingNumbers } = useMainStore();
   const [ inputSkills, setInputSkills ] = useState('');
   const [ inputCallingNumber, setInputCallingNumber ] = useState('');
@@ -116,11 +117,49 @@ export default function CampaignDetail() {
         campaign_id: Number(value)
       });
     }    
+    if( col === 'campaign_name' ){
+      setTempCampaignsInfo({
+        ...tempCampaignInfo,
+        campaign_name: value
+      });
+    }
+    if( col === 'campaign_desc' ){
+      setTempCampaignsInfo({
+        ...tempCampaignInfo,
+        campaign_desc: value
+      });
+    }
   }
 
   //select data change
   const handleSelectChange = (value: string, type: 'tenant' | 'dialMode') => {
     
+  }
+
+  //스킬 선택 팝업
+  const handleSelectSkills = (param: string) => {
+    if( tempCampaignSkills.skill_id.join(',') !== param ){
+      setChangeYn(true);
+      setCampaignSkillChangeYn(true);
+      setInputSkills(param);
+      setTempCampaignSkills({...tempCampaignSkills
+        , campaign_id: tempCampaignInfo.campaign_id
+        , skill_id: param.split(',').map((data) => Number(data))
+      });
+    }
+    setAlertState((prev) => ({ ...prev, isOpen: false }))
+  }
+
+  //캠페인 저장
+  const handleCampaignSave = () => {
+    if( changeYn ){
+      if( campaignInfoChangeYn ){
+        console.log('캠페인 정보 저장');
+      }
+      if( campaignSkillChangeYn ){
+        console.log('캠페인 스킬 저장');
+      }
+    }
   }
 
   return (
@@ -131,7 +170,7 @@ export default function CampaignDetail() {
           title="상세내역"
           buttons={[
               { label: "새 캠페인", onClick: () => console.log("") },
-              { label: "캠페인 저장", onClick: () => console.log("") },
+              { label: "캠페인 저장", onClick: () => handleCampaignSave(), variant: "customblue" },
               { label: "캠페인 삭제", onClick: () => console.log("") },
               { label: "재발신", onClick: () => console.log(""), variant: "customblue"},
               { label: "리스트 적용", onClick: () => console.log(""), variant: "customblue"},
@@ -176,8 +215,8 @@ export default function CampaignDetail() {
             <Label className="w-[5.6rem] min-w-[5.6rem]">캠페인명</Label>
             <Input 
               value={tempCampaignInfo.campaign_name || ''} 
-              className="" 
-              readOnly 
+              onChange={(e) => handleInputData(e.target.value, 'campaign_name')}         
+              className="" defaultValue={tempCampaignInfo.campaign_name}
             />
           </div>
 
@@ -226,7 +265,8 @@ export default function CampaignDetail() {
           </div>
           <div className="flex items-center gap-2 col-span-3">
             <Label className="w-[5.6rem] min-w-[5.6rem]">설명</Label>
-            <Input value={tempCampaignInfo.campaign_desc || ''} className="w-full" readOnly />
+            <Input value={tempCampaignInfo.campaign_desc || ''} className="w-full" defaultValue={tempCampaignInfo.campaign_desc}          
+              onChange={(e) => handleInputData(e.target.value, 'campaign_desc')} /> 
           </div>
         </div>
       </div>
@@ -238,7 +278,7 @@ export default function CampaignDetail() {
         tenantId={tempCampaignInfo.tenant_id}
         type={alertState.type}
         isOpen={alertState.isOpen}
-        onConfirm={(param) => console.log('param', param)}
+        onConfirm={(param) => handleSelectSkills(param)}
         onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
       />
     </div>

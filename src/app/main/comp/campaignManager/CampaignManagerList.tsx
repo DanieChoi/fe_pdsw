@@ -68,12 +68,12 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
         setSelectedCampaign(null);
       }
     }
-  }, [campaignHeaderSearchParam, callingNumbers, campaignSkills, campaigns, setSelectedCampaign, tempCampaigns,campaignId]);
+  }, [campaignHeaderSearchParam]);
 
 
   return (
     <div>
-      <TitleWrap title="캠페인 목록" totalCount={8} />
+      <TitleWrap title="캠페인 목록" totalCount={tempCampaigns.length} />
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
