@@ -44,7 +44,7 @@ const TabMenuForMainPage = () => {
                     ? 'bg-green-500 text-white hover:bg-green-600' 
                     : 'hover:bg-gray-100'}
                 `}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => setActiveTab(tab.id, tab.uniqueKey)}
               >
                 <div className="w-4 h-4 relative">
                   <Image
@@ -61,7 +61,7 @@ const TabMenuForMainPage = () => {
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
-                  removeTab(tab.id);
+                  removeTab(tab.id, tab.uniqueKey);
                 }}
                 className={`
                   absolute right-1 p-1 rounded-full

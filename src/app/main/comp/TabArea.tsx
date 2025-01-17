@@ -25,7 +25,7 @@ const TabArea: React.FC<TabAreaProps> = ({
   title,
   canRemove = true
 }) => {
-  const { activeTabId, removeArea, setActiveTab } = useTabStore();
+  const { activeTabId, removeTab, setActiveTab } = useTabStore();
 
   const { setNodeRef, isOver } = useDroppable({
     id,
@@ -52,7 +52,7 @@ const TabArea: React.FC<TabAreaProps> = ({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => removeArea(id)}
+            onClick={() => tabs.forEach(tab => removeTab(tab.id, tab.uniqueKey))}
             className="p-1 hover:bg-gray-100 rounded-full"
           >
             <X className="h-4 w-4" />
@@ -61,19 +61,23 @@ const TabArea: React.FC<TabAreaProps> = ({
       </div>
 
       {/* 탭 목록 */}
-      <div className="p-2">
-        <div className="flex flex-wrap gap-1">
-          {tabs.map((tab) => (
-            <DraggableTab
-                  key={tab.id}
-                  id={tab.id}
-                  title={tab.title}
-                  icon={tab.icon}
-                  isActive={activeTabId === tab.id}
-                  onSelect={() => setActiveTab(tab.id)} />
-          ))}
-        </div>
+    {/* 탭 목록 */}
+    <div className="p-2">
+      <div className="flex flex-wrap gap-1">
+        {tabs.map((tab) => (
+          <DraggableTab
+            key={tab.uniqueKey} // key를 uniqueKey로 변경
+            id={tab.id}
+            uniqueKey={tab.uniqueKey} // 탭의 실제 uniqueKey 전달
+            title={tab.title}
+            icon={tab.icon}
+            isActive={activeTabId === tab.id}
+            onSelect={() => setActiveTab(tab.id, tab.uniqueKey)}
+            onRemove={() => removeTab(tab.id, tab.uniqueKey)} // removeTab 함수 구현
+          />
+        ))}
       </div>
+    </div>
 
       {/* 컨텐츠 영역 */}
       {tabs.length > 0 && (

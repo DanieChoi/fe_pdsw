@@ -9,9 +9,11 @@ interface TabDropZoneProps {
 }
 
 const TabDropZone: React.FC<TabDropZoneProps> = ({ children }) => {
-  const { sections, openedTabs } = useTabStore();
+  const { rows, openedTabs } = useTabStore();  // rows를 가져옴
   
-  const isDisabled = sections.length === 1 && openedTabs.length === 1;
+  // 첫 번째 row의 sections를 사용
+  const firstRowSections = rows[0]?.sections || [];
+  const isDisabled = firstRowSections.length === 1 && openedTabs.length === 1;
   
   const { setNodeRef, isOver } = useDroppable({
     id: 'main-drop-zone',

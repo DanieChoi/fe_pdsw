@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 interface ButtonProps {
   label: string; // 버튼 텍스트
   onClick?: () => void; // 버튼 클릭 이벤트 (선택)
-  variant?: string; // 버튼 스타일링 (선택)
+  variant?: "link" | "menu" | "default" | "destructive" | "outline" | "secondary" | "ghost" | "menuActive" | "menuOpened" | "login" | "customblue" | null; // 버튼 스타일링 (선택)
   type?: "button" | "submit" | "reset"; // 버튼 타입 (기본값: button)
 }
 

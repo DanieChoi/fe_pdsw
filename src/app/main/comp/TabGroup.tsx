@@ -16,7 +16,7 @@ interface TabGroupProps {
 }
 
 const TabGroup: React.FC<TabGroupProps> = ({ id, tabs, position }) => {
-  const { removeTabGroup, activeTabId, setActiveTab, removeTab } = useTabStore();
+  const { removeTabGroup, activeTabId, activeTabKey, setActiveTab, removeTab } = useTabStore();
 
   const { setNodeRef, isOver } = useDroppable({
     id: `group-${id}`,
@@ -42,13 +42,14 @@ const TabGroup: React.FC<TabGroupProps> = ({ id, tabs, position }) => {
         <div className="flex-1 flex space-x-1 overflow-x-auto">
           {tabs.map((tab) => (
             <DraggableTab
-              key={tab.id}
+              key={tab.uniqueKey}  // key를 uniqueKey로 변경
               id={tab.id}
+              uniqueKey={tab.uniqueKey} // uniqueKey 추가
               title={tab.title}
               icon={tab.icon}
-              isActive={activeTabId === tab.id}
-              onRemove={() => removeTab(tab.id)}
-              onSelect={() => setActiveTab(tab.id)}
+              isActive={activeTabId === tab.id && activeTabKey === tab.uniqueKey}
+              onRemove={() => removeTab(tab.id, tab.uniqueKey)} // uniqueKey 추가
+              onSelect={() => setActiveTab(tab.id, tab.uniqueKey)} // uniqueKey 추가
             />
           ))}
         </div>

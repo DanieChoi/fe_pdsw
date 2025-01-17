@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-const SystemPreferences = (props: Props) => {
+const SystemPreferences = () => {
     const [refreshCycle, setRefreshCycle] = useState("5"); // 채널 수 갱신 주기
     const [monitoringType, setMonitoringType] = useState("periodic"); // 사용 여부 (주기적 사용 여부)
     const [equipmentNumber, setEquipmentNumber] = useState(""); // 장비번호
