@@ -112,7 +112,7 @@ export default function CampaignDetail() {
           <div className='flex items-center gap-2'>
             <Label className="w-[5.6rem] min-w-[5.6rem]">발신번호</Label>
             <Input value={""} className="mt-1 w-full" readOnly />
-            <Button>발신번호 변경</Button>
+            <Button variant="outline" className='h-7'>발신번호 변경</Button>
           </div>
           <div className="flex items-center gap-2 col-span-3">
             <Label className="w-[5.6rem] min-w-[5.6rem]">설명</Label>
