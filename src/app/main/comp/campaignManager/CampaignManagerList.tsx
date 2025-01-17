@@ -18,7 +18,7 @@ type Props = {
 }
 
 export default function CampaignManagerList({campaignId,campaignHeaderSearchParam}: Props) {
-  const { campaigns, callingNumbers, schedules , setSelectedCampaign } = useMainStore();
+  const { campaigns, callingNumbers, schedules, campaignSkills , setSelectedCampaign } = useMainStore();
   const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>(campaigns);
   
   const handleRowClick = (campaign: MainDataResponse) => {
@@ -47,6 +47,18 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
       }
       if( campaignHeaderSearchParam.campaignName != '' ){
         _tempCampaigns = _tempCampaigns.filter((campaign) => campaign.campaign_name.includes(campaignHeaderSearchParam.campaignName));
+      }
+      if( campaignHeaderSearchParam.callNumber != '' ){
+        const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.calling_number.includes(campaignHeaderSearchParam.callNumber));
+        _tempCampaigns = _tempCampaigns.filter((campaign) => 
+          tempCallNumber.some(callingNumber => callingNumber.campaign_id === campaign.campaign_id)
+        );
+      }
+      if( campaignHeaderSearchParam.skill > 0 ){
+        const tempCampaignSkills = campaignSkills.filter((campaignSkill) => campaignSkill.skill_id.includes(campaignHeaderSearchParam.skill));
+        _tempCampaigns = _tempCampaigns.filter((campaign) => 
+          tempCampaignSkills.some(campaignSkill => campaignSkill.campaign_id === campaign.campaign_id)
+        );
       }
       
       setTempCampaigns(_tempCampaigns);
@@ -90,7 +102,10 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
                   <td className="border p-2">{schedules.filter((schedule) => schedule.campaign_id === campaign.campaign_id)
                   .map((data) => data.end_date.length == 8? data.end_date.substring(0,4)+'-'+data.end_date.substring(4,6)+'-'+data.end_date.substring(6,8):'')
                   }</td>
-                  <td className="border p-2"></td>
+                  <td className="border p-2">{campaignSkills.filter((skill) => skill.campaign_id === campaign.campaign_id)
+                  .map((data) => data.skill_id)
+                  .join(',')
+                  }</td>
                   <td className="border p-2">{dialModeList.filter((dialMode) => dialMode.dial_id === campaign.dial_mode)
                   .map((data) => data.dial_name)
                   }</td>
