@@ -27,11 +27,12 @@ const buttonVariants = cva(
          "relative bg-[#56CAD6] hover:bg-[#56CAD6] font-medium rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center text-[#fff]",
        menuOpened:
          "bg-[#E5F3F3]/50 hover:bg-[#E5F3F3]/70 rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center text-[#333]",
-       login: 
-         'w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm rounded-none',
+        login: 
+         'w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm rounded-none font-16',
+       customblue:"rounded-[3px] bg-[#51ADD4] text-white text-[13px]"
      },
      size: {
-       default: "h-9 px-4",
+        default: "py-0.5 px-1.5",
        sm: "h-8 px-3 text-xs",
        lg: "h-10 px-8",
        icon: "h-9 w-9",
