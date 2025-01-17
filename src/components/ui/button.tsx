@@ -21,14 +21,15 @@ const buttonVariants = cva(
         link: 
           "text-primary underline-offset-4 hover:underline",
         menu:
-          "bg-white hover:bg-gray-50 rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center space-y-1",
+          "bg-white hover:bg-gray-50 rounded-md min-w-[76px] py-1.5 px-2 h-auto flex flex-col items-center justify-center space-y-1",
         menuActive:
-          "bg-[#56CAD6]/10 text-[#56CAD6] hover:bg-[#56CAD6]/20 rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center space-y-1",
+          "bg-[#56CAD6]/10 text-[#333] hover:bg-[#56CAD6]/20 rounded-md min-w-[76px] py-1.5 px-2 h-auto flex flex-col items-center justify-center space-y-1",
         login: 
-          'w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm rounded-none',
+          'w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm rounded-none font-16',
+        customblue:"rounded-[3px] bg-[#51ADD4] text-white text-[13px]"
       },
       size: {
-        default: "h-9 px-4",
+        default: "py-0.5 px-1.5",
         sm: "h-8 px-3 text-xs",
         lg: "h-10 px-8",
         icon: "h-9 w-9",

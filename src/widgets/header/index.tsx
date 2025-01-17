@@ -88,14 +88,14 @@ export default function Header() {
           </div>
         </div>
       </div>
-      <header className="bg-white py-[10px] pl-[30px] border-b">
+      <header className="bg-white border-b">
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <nav className="flex gap-0.5 overflow-x-auto">
+          <div className="flex items-center justify-between header-padding">
+            <nav className="flex overflow-x-auto gap-4">
               {menuItems.map((item) => {
                 const count = getTabCountById(item.id);
                 return (
-                  <div key={`menu-${item.id}`} className="menu-item px-0.5">
+                  <div key={`menu-${item.id}`} className="menu-item">
                     <Button
                       variant={isTabOpened(item.id) ? 'menuActive' : 'menu'}
                       size="none"
