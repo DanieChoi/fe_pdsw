@@ -129,7 +129,7 @@ const TabSection: React.FC<TabSectionProps> = ({
           icon={tab.icon}
           isActive={tab.id === activeTabId && tab.uniqueKey === activeTabKey}
 
-          onRemove={() => removeTab(tab.id)}
+          onRemove={() => removeTab(tab.id, tab.uniqueKey)}  // uniqueKey 전달
           onSelect={() => setActiveTab(tab.id, tab.uniqueKey)}  // uniqueKey 추가
 
         />

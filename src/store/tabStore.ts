@@ -36,7 +36,8 @@ export interface TabLayoutStore {
   rows: TabRow[];
   tabGroups: TabGroup[];
   addTab: (tab: TabItem) => void;
-  removeTab: (tabId: number) => void;
+  // removeTab: (tabId: number) => void;
+  removeTab: (tabId: number, uniqueKey: string) => void;  // uniqueKey 매개변수 추가
   setActiveTab: (tabId: number, uniqueKey: string) => void;
   duplicateTab: (tabId: number) => void;
   addRow: () => void;
@@ -178,38 +179,65 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     };
   }),
 
-  removeTab: (tabId) => set((state) => {
-    const newTabs = state.openedTabs.filter((tab) => tab.id !== tabId);
+  removeTab: (tabId: number, uniqueKey: string) => set((state) => {
+    // uniqueKey를 기준으로 정확한 탭 찾기
+    const newTabs = state.openedTabs.filter((tab) => 
+      !(tab.id === tabId && tab.uniqueKey === uniqueKey)
+    );
+  
+    // 현재 활성화된 탭이 삭제되는 경우
     let newActiveTabId = state.activeTabId;
-    if (state.activeTabId === tabId) {
-      const index = state.openedTabs.findIndex((t) => t.id === tabId);
-      newActiveTabId = newTabs[index]?.id || newTabs[index - 1]?.id || null;
+    let newActiveTabKey = state.activeTabKey;
+    
+    if (state.activeTabId === tabId && state.activeTabKey === uniqueKey) {
+      // 삭제되는 탭의 인덱스 찾기
+      const index = state.openedTabs.findIndex(
+        (t) => t.id === tabId && t.uniqueKey === uniqueKey
+      );
+      
+      // 다음 탭이나 이전 탭을 활성화
+      const nextTab = newTabs[index] || newTabs[index - 1];
+      if (nextTab) {
+        newActiveTabId = nextTab.id;
+        newActiveTabKey = nextTab.uniqueKey;
+      } else {
+        newActiveTabId = null;
+        newActiveTabKey = null;
+      }
     }
-
+  
+    // rows의 sections에서도 해당 특정 탭만 제거
     const updatedRows = state.rows.map((row) => {
       const updatedSections = row.sections
         .map((sec) => ({
           ...sec,
-          tabs: sec.tabs.filter((t) => t.id !== tabId),
+          tabs: sec.tabs.filter(
+            (t) => !(t.id === tabId && t.uniqueKey === uniqueKey)
+          ),
         }))
         .filter((sec) => sec.id === 'default' || sec.tabs.length > 0);
-
+  
       return {
         ...row,
         sections: adjustSectionWidths(updatedSections),
       };
     });
-
+  
+    // tabGroups에서도 해당 특정 탭만 제거
     const updatedGroups = state.tabGroups
       .map((group) => ({
         ...group,
-        tabs: group.tabs.filter((t) => t.id !== tabId),
+        tabs: group.tabs.filter(
+          (t) => !(t.id === tabId && t.uniqueKey === uniqueKey)
+        ),
       }))
       .filter((g) => g.tabs.length > 0);
-
+  
     return {
+      ...state,
       openedTabs: newTabs,
       activeTabId: newActiveTabId,
+      activeTabKey: newActiveTabKey,
       rows: updatedRows,
       tabGroups: updatedGroups,
     };
