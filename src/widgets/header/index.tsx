@@ -17,7 +17,7 @@ export default function Header() {
       const existingTab = openedTabs.find(tab => tab.id === item.id);
       if (existingTab) {
         // 이미 열려있는 탭이면 활성화만
-        setActiveTab(item.id);
+        setActiveTab(item.id, item.uniqueKey || '');
       } else {
         // 새 탭 추가 (addTab 내부에서 활성화 처리)
         addTab({ ...item, uniqueKey: `${item.id}-${Date.now()}` });

@@ -5,6 +5,7 @@ export interface MenuItem {
   icon: string;
   href: string;
   content: null;
+  uniqueKey?: string;
 }
 
 export const menuItems: MenuItem[] = [
