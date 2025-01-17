@@ -16,7 +16,7 @@ const buttonVariants = cva(
        outline:
          "rounded-[3px] border border-input bg-background hover:bg-accent hover:text-accent-foreground text-[#777] border-[#777]",
        secondary:
-         "rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80",
+         " bg-[#B3B3B3] rounded-[3px] text-white",
        ghost: 
          "bg-transparent hover:bg-gray-100",
        link: 
@@ -46,6 +46,7 @@ const buttonVariants = cva(
  }
 )
 
+
 export interface ButtonProps
  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
    VariantProps<typeof buttonVariants> {
@@ -60,6 +61,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
        className={cn(buttonVariants({ variant, size, className }))}
        ref={ref}
        {...props}
+
+       
      />
    )
  }
