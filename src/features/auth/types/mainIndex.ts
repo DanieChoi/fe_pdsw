@@ -166,6 +166,12 @@ export interface CampaignSkillListResponse {
   result_data: CampaignSkillDataResponse[];
 }
 
+// 수정 응답 타입
+export interface UpdateResponse {
+  result_code: number;
+  result_msg: string;
+}
+
 // API 에러 타입
 export interface AuthApiError {
   message: string;
