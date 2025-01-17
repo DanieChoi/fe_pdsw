@@ -11,6 +11,7 @@ import CampaignTab from './CampaignTab';
 import { MainDataResponse, CampaignSkillUpdateRequest } from '@/features/auth/types/mainIndex';
 import { useEffect, useState } from 'react';
 import SkillListPopup from '@/components/shared/layout/SkillListPopup';
+import { useApiForCampaignSkillUpdate } from '@/features/auth/hooks/useApiForCampaignSkillUpdate';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
@@ -157,10 +158,18 @@ export default function CampaignDetail() {
         console.log('캠페인 정보 저장');
       }
       if( campaignSkillChangeYn ){
-        console.log('캠페인 스킬 저장');
+        fetchCampaignSkillUpdate(tempCampaignSkills);
       }
     }
   }
+  
+  //캠페인 스킬 수정 api 호출
+  const { mutate: fetchCampaignSkillUpdate } = useApiForCampaignSkillUpdate({
+    onSuccess: (data) => {
+      console.log(data.result_msg);
+    }
+  });
+  
 
   return (
     <div className='flex flex-col gap-5'>
