@@ -57,7 +57,11 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
 
   useEffect(() => {
     if( typeof tenantId != 'undefined' ){
-      setTempSkills(skills.filter((skill) => skill.tenant_id === Number(tenantId)));
+      if( tenantId === 'all' ){
+        setTempSkills(skills);
+      }else{
+        setTempSkills(skills.filter((skill) => skill.tenant_id === Number(tenantId)));
+      }
     }
     setSkill('all');
   }, [tenantId, skills]);
