@@ -12,6 +12,8 @@ import { MainDataResponse, CampaignSkillUpdateRequest } from '@/features/auth/ty
 import { useEffect, useState } from 'react';
 import SkillListPopup from '@/components/shared/layout/SkillListPopup';
 import { useApiForCampaignSkillUpdate } from '@/features/auth/hooks/useApiForCampaignSkillUpdate';
+import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
+import { useApiForCampaignSkill } from '@/features/auth/hooks/useApiForCampaignSkill';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
@@ -78,7 +80,13 @@ export default function CampaignDetail() {
   const [changeYn, setChangeYn] = useState<boolean>(false); // 변경여부
   const [campaignInfoChangeYn, setCampaignInfoChangeYn] = useState<boolean>(false); // 캠페인정보 변경여부
   const [campaignSkillChangeYn, setCampaignSkillChangeYn] = useState<boolean>(false); // 캠페인스킬 변경여부
-  const { tenants, campaignSkills, callingNumbers } = useMainStore();
+  const { tenants
+    , campaignSkills
+    , callingNumbers
+    , setCampaigns
+    , setSelectedCampaign
+    , setCampaignSkills 
+  } = useMainStore();
   const [ inputSkills, setInputSkills ] = useState('');
   const [ inputCallingNumber, setInputCallingNumber ] = useState('');
   const [alertState, setAlertState] = useState({
@@ -158,15 +166,44 @@ export default function CampaignDetail() {
         console.log('캠페인 정보 저장');
       }
       if( campaignSkillChangeYn ){
+        //캠페인 스킬 수정 api 호출
         fetchCampaignSkillUpdate(tempCampaignSkills);
       }
     }
   }
   
+  //변경여부 체크
+  useEffect(() => {  
+    if( !campaignInfoChangeYn && !campaignSkillChangeYn ){  
+      fetchMain({
+        session_key: '',
+        tenant_id: 0,
+      });
+    }
+  }, [campaignInfoChangeYn,campaignSkillChangeYn]);
+
+  const { mutate: fetchMain } = useApiForMain({
+    onSuccess: (data) => {
+      setSelectedCampaign( tempCampaignInfo );
+      setCampaigns(data.result_data);
+      setChangeYn(false);
+    }
+  });
+
+  const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
+    onSuccess: (data) => {
+      setCampaignSkills(data.result_data);
+      setCampaignSkillChangeYn(false);
+    }
+  });
+  
   //캠페인 스킬 수정 api 호출
   const { mutate: fetchCampaignSkillUpdate } = useApiForCampaignSkillUpdate({
     onSuccess: (data) => {
-      console.log(data.result_msg);
+      fetchCampaignSkills({
+        session_key: '',
+        tenant_id: 0,
+      });
     }
   });
   
