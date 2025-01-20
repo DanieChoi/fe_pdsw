@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DataGrid from "react-data-grid";
-import { Button } from "@/components/ui/button";
+import { CommonButton } from "@/components/shared/CommonButton";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react"
@@ -62,10 +62,10 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
               <Label className="w-[5rem] min-w-[5rem]">시작날짜</Label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="datapicker" className="w-full justify-start">
+                  <CommonButton variant="datapicker" className="w-full justify-start">
                     <CalendarIcon className="mr-2 h-4 w-4" color="#989898"/>
                     {startDate ? startDate.toLocaleDateString() : "날짜 선택"}
-                  </Button>
+                  </CommonButton>
                 </PopoverTrigger>
                 <PopoverContent align="start" className="w-auto p-0">
                   <Calendar
@@ -81,10 +81,10 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
               <Label className="w-[5rem] min-w-[5rem]">종료날짜</Label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="datapicker" className="w-full justify-start">
+                  <CommonButton variant="datapicker" className="w-full justify-start">
                     <CalendarIcon className="mr-2 h-4 w-4" color="#989898"/>
                     {endDate ? endDate.toLocaleDateString() : "날짜 선택"}
-                  </Button>
+                  </CommonButton>
                 </PopoverTrigger>
                 <PopoverContent align="start" className="w-auto p-0">
                   <Calendar
@@ -120,10 +120,10 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
                   />
                 </div>
                 <div className="flex justify-end">
-                  <Button variant="secondary">
+                  <CommonButton variant="secondary">
                     시간추가
                     <Image src="/addArrow.svg" alt="스킬팝업" width={10} height={10} />
-                  </Button>
+                  </CommonButton>
                 </div>
               </div>
             </div>
@@ -136,8 +136,8 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
         </div>
       </div>
       <div className="flex justify-end gap-2 mt-5">
-        <Button>확인</Button>
-        <Button>취소</Button>
+        <CommonButton>확인</CommonButton>
+        <CommonButton>취소</CommonButton>
       </div>
     </div>
   );

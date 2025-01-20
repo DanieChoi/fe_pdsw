@@ -54,7 +54,7 @@
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
+    --border: 0 0% 92.16%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
     --chart-1: 12 76% 61%;
@@ -275,6 +275,7 @@ input::placeholder {
 .grid-custom .rdg-row .rdg-cell{
   border-bottom: 1px solid #ebebeb;
   text-align: center;
+  font-size: 13px;
 }
 .grid-custom .rdg-row:hover{
   background: #FFFAEE;

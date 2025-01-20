@@ -1,51 +1,219 @@
-import React from "react";
+import React, { useState } from "react";
+import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import DataGrid from 'react-data-grid';
-import { Button } from "@/components/ui/button";
-import Image from 'next/image'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
+import DataGrid from "react-data-grid";
+import { CommonButton } from "@/components/shared/CommonButton";
 
 const columns = [
-  { key: "Tell1", name: "고객 전화번호(1)", }, // 열 정의
-  { key: "Tell2", name: "고객 전화번호(2)", }, // 열 정의
-  { key: "Tell3", name: "고객 전화번호(3)", }, // 열 정의
-  { key: "Tell4", name: "고객 전화번호(4)", }, // 열 정의
-  { key: "Tell5", name: "고객 전화번호(5)", }, // 열 정의
+  { key: "phone1", name: "고객전화번호(1)" },
+  { key: "phone2", name: "고객전화번호(2)" },
+  { key: "phone3", name: "고객전화번호(3)" },
+  { key: "phone4", name: "고객전화번호(4)" },
+  { key: "phone5", name: "고객전화번호(5)" },
+  { key: "phone6", name: "고객전화번호(6)" },
 ];
 
 const rows = [
-  { Tell1: "CP", Tell2: 2, Tell3: "00:00", Tell4: "00:00", Tell5: 2 }, // 행 데이터
+  {
+    phone1: "01012345678",
+    phone2: "01012345678",
+    phone3: "01012345678",
+    phone4: "01012345678",
+    phone5: "01012345678",
+    phone6: "01012345678",
+  },
 ];
 
 const OutgoingOrderTab: React.FC = () => {
+  const [leftList, setLeftList] = useState([
+    "고객 전화번호(3)",
+    "고객 전화번호(4)",
+    "고객 전화번호(5)",
+  ]);
+
+  const [rightList, setRightList] = useState([
+    { id: 1, label: "고객 전화번호(1)" },
+    { id: 2, label: "고객 전화번호(2)" },
+  ]);
+
+  const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
+  const [selectedRight, setSelectedRight] = useState<number | null>(null);
+
+  const moveToRight = () => {
+    if (selectedLeft) {
+      setRightList([...rightList, { id: rightList.length + 1, label: selectedLeft }]);
+      setLeftList(leftList.filter((item) => item !== selectedLeft));
+      setSelectedLeft(null);
+    }
+  };
+
+  const moveToLeft = () => {
+    if (selectedRight !== null) {
+      const removedItem = rightList.find((item) => item.id === selectedRight);
+      if (removedItem) {
+        setLeftList([...leftList, removedItem.label]);
+        setRightList(
+          rightList
+            .filter((item) => item.id !== selectedRight)
+            .map((item, index) => ({
+              id: index + 1, // 순서 재정렬
+              label: item.label,
+            }))
+        );
+        setSelectedRight(null);
+      }
+    }
+  };
+
+  const moveUp = () => {
+    if (selectedRight !== null) {
+      const index = rightList.findIndex((item) => item.id === selectedRight);
+      if (index > 0) {
+        const updatedList = [...rightList];
+        [updatedList[index - 1], updatedList[index]] = [updatedList[index], updatedList[index - 1]];
+        setRightList(
+          updatedList.map((item, index) => ({
+            id: index + 1, // 순서 재정렬
+            label: item.label,
+          }))
+        );
+        setSelectedRight(index); // 선택된 항목을 이동된 순서에 맞게 업데이트
+      }
+    }
+  };
+
+  const moveDown = () => {
+    if (selectedRight !== null) {
+      const index = rightList.findIndex((item) => item.id === selectedRight);
+      if (index < rightList.length - 1) {
+        const updatedList = [...rightList];
+        [updatedList[index], updatedList[index + 1]] = [updatedList[index + 1], updatedList[index]];
+        setRightList(
+          updatedList.map((item, index) => ({
+            id: index + 1, // 순서 재정렬
+            label: item.label,
+          }))
+        );
+        setSelectedRight(index + 2); // 선택된 항목을 이동된 순서에 맞게 업데이트
+      }
+    }
+  };
+
   return (
     <div className="py-5">
-      <div className="flex gap-5">
-        <div className="w-[30%]">
-            <div className="flex flex-col gap-y-2">              
-              <div className='flex items-center gap-2 justify-between'>
-                <Label className="w-[5rem] min-w-[5rem]">Phone ID</Label>
-                 <Select>
-                  <SelectTrigger className="">
-                    <SelectValue placeholder="시작" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">시작</SelectItem>
-                    <SelectItem value="2">멈춤</SelectItem>
-                    <SelectItem value="3">중지</SelectItem>
-                  </SelectContent>
-                  </Select>
+      <div className="flex flex-col gap-5">
+        <div className="flex gap-5 justify-between items-start">
+          <div className="flex items-center gap-2 justify-between w-[25%]">
+            <Label className="w-[5rem] min-w-[5rem]">Phone ID</Label>
+            <Select>
+              <SelectTrigger className="">
+                <SelectValue placeholder="1234" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">12345</SelectItem>
+                <SelectItem value="2">56478</SelectItem>
+                <SelectItem value="3">1011112</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="gird-custom-wrap w-[75%]">
+            <DataGrid
+              columns={columns}
+              rows={rows}
+              className="grid-custom h-auto" // React Data Grid의 기본 테마
+            />
+          </div>
+        </div>
+        <div>
+          <TitleWrap
+            className="border-b border-gray-300 pb-1"
+            title="전화번호별 발신순서 편집"
+          />
+           <div className="">
+            <div className="flex gap-5">
+              {/* 왼쪽 리스트 */}
+              <div className="flex gap-5 flex-1">
+                <div className="border p-2 rounded h-40 overflow-y-auto w-[calc(100%-22px)]">
+                  {leftList.map((item) => (
+                    <div
+                      key={item}
+                      onClick={() => setSelectedLeft(item)}
+                      className={`cursor-pointer p-1 rounded text-sm ${
+                        selectedLeft === item ? "bg-[#FFFAEE]" : ""
+                      }`}
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-col items-center gap-2 min-w-[22px] justify-center">
+                  <button
+                    onClick={moveToRight}
+                    className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
+                    disabled={!selectedLeft}
+                  >
+                    →
+                  </button>
+                  <button
+                    onClick={moveToLeft}
+                    className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
+                    disabled={!selectedRight}
+                  >
+                    ←
+                  </button>
+                </div>
+              </div>
+
+              {/* 오른쪽 테이블 */}
+              <div className="flex gap-5 flex-1">
+                <div className="border rounded h-40 overflow-y-auto  w-[calc(100%-22px)]">
+                  <table className="w-full text-sm border-collapse">
+                    <thead>
+                      <tr>
+                        <th className="border-r border-b p-1 font-normal text-sm bg-[#F8F8F8]">순서</th>
+                        <th className="border-b p-1 font-normal text-sm bg-[#F8F8F8]">전화번호 구분</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rightList.map((item) => (
+                        <tr
+                          key={item.id}
+                          onClick={() => setSelectedRight(item.id)}
+                          className={`cursor-pointer ${
+                            selectedRight === item.id ? "bg-[#FFFAEE]" : ""
+                          }`}
+                        >
+                          <td className="border-b border-r p-1 text-center">{item.id}</td>
+                          <td className="border-b p-1">{item.label}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="flex flex-col items-center gap-2 min-w-[22px] justify-center">
+                  <button
+                    onClick={moveUp}
+                    className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
+                    disabled={!selectedRight}
+                  >
+                    ↑
+                  </button>
+                  <button
+                    onClick={moveDown}
+                    className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
+                    disabled={!selectedRight}
+                  >
+                    ↓
+                  </button>
+                </div>
               </div>
             </div>
-        </div>
-        <div className="w-[70%]">
-            <div className="gird-custom h-[70px]">
-              <DataGrid
-                columns={columns}
-                rows={rows}
-                className="grid-custom" // React Data Grid의 기본 테마
-              />
-            </div>
+          </div>
+          <div className="flex justify-end gap-2 mt-5">
+            <CommonButton>확인</CommonButton>
+            <CommonButton>취소</CommonButton>
+          </div>
         </div>
       </div>
     </div>
