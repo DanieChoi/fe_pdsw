@@ -2,7 +2,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { fetchCampaignSkillUpdate } from '../api/mainCampaignSkillUpdate';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { CampaignSkillUpdateRequest, UpdateResponse, AuthApiError } from '../types/mainIndex';
+import { CampaignSkillUpdateRequest, UpdateResponse, AuthApiError } from '../types/campaignManagerIndex';
 
 export function useApiForCampaignSkillUpdate(
   options?: UseMutationOptions<UpdateResponse, AuthApiError, CampaignSkillUpdateRequest>

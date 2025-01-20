@@ -2,7 +2,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { fetchCampaignSkills } from '../api/mainCampaignSkillSearch';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { MainCredentials, CampaignSkillListResponse, AuthApiError } from '../types/mainIndex';
+import { MainCredentials, CampaignSkillListResponse, AuthApiError } from '../types/campaignManagerIndex';
 
 export function useApiForCampaignSkill(
   options?: UseMutationOptions<CampaignSkillListResponse, AuthApiError, MainCredentials>

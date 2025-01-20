@@ -1,6 +1,6 @@
 // src/features/auth/api/fetchSkills.ts
 import { axiosInstance } from '@/lib/axios';
-import { SkillListCredentials, CampaignScheDuleListResponse } from '../types/mainIndex';
+import { SkillListCredentials, CampaignScheDuleListResponse } from '../types/campaignManagerIndex';
 
 // 캠페인스케줄 리스트 요청
 export const fetchSchedules = async (credentials: SkillListCredentials): Promise<CampaignScheDuleListResponse> => {

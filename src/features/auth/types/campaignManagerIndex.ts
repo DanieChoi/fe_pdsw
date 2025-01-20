@@ -1,4 +1,22 @@
 // src/features/auth/types/mainIndex.ts
+
+// 스킬마스터정보조회 데이터 타입
+export interface SkillListDataResponse {
+  tenant_id: number;
+  skill_id: number;
+  skill_name: string;
+  skill_description: string;
+}
+
+// 스킬마스터정보조회 데이터 타입
+export interface SkillListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: SkillListDataResponse[];
+}
+
 // 메인 요청 시 필요한 credentials 타입
 export interface MainCredentials {
   session_key: string;
@@ -7,11 +25,6 @@ export interface MainCredentials {
 
 // 스킬마스터정보조회 요청 시 필요한 credentials 타입
 export interface SkillListCredentials {
-  tenant_id_array: number[];
-}
-
-// 장비목록 요청 시 필요한 credentials 타입
-export interface DialingDeviceListCredentials {
   tenant_id_array: number[];
 }
 
@@ -104,6 +117,71 @@ export interface TenantListResponse {
   result_data: TenantListDataResponse[];
 }
 
+// 캠페인발신번호 데이터 타입
+export interface CallingNumberListDataResponse {
+  campaign_id: number;
+  calling_number: string;
+}
+
+// 캠페인발신번호 데이터 타입
+export interface CallingNumberListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: CallingNumberListDataResponse[];
+}
+
+// 캠페인스케줄 데이터 타입
+export interface CampaignScheDuleListDataResponse {
+  campaign_id: number;
+  tenant_id: number;
+  start_date: string;
+  end_date: string;
+  start_time: [string];
+  end_time: [string];
+}
+
+// 캠페인스케줄 데이터 타입
+export interface CampaignScheDuleListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: CampaignScheDuleListDataResponse[];
+}
+
+// 캠페인스킬 데이터 타입
+export interface CampaignSkillDataResponse {
+  campaign_id: number;
+  tenant_id: number;
+  skill_id: [number];
+}
+
+// 캠페인스킬 데이터 타입
+export interface CampaignSkillListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: CampaignSkillDataResponse[];
+}
+
+// 전화번호설명 템플릿 조회 데이터 타입
+export interface PhoneDescriptionListDataResponse {
+  description_id: number;
+  description: [string];
+}
+
+// 전화번호설명 템플릿 조회 데이터 타입
+export interface PhoneDescriptionListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: PhoneDescriptionListDataResponse[];
+}
+
 // 수정 응답 타입
 export interface UpdateResponse {
   result_code: number;
@@ -179,21 +257,4 @@ export interface CampaignInfoUpdateRequest {
   redial_strategy5: string;  
   dial_mode_option: number;
   user_option: string;  
-}
-
-// 다이얼링 장비 데이터 타입
-export interface DialingDeviceListDataResponse {
-  tenant_id: number;
-  device_id: number;
-  device_name: string;
-  channel_count: number;
-}
-
-// 다이얼링 장비 데이터 타입
-export interface DialingDeviceListResponse {
-  result_code: number;
-  result_msg: string;
-  result_count: number;
-  total_count: number;
-  result_data: DialingDeviceListDataResponse[];
 }

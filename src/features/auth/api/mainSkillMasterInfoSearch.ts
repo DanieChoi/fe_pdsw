@@ -1,6 +1,6 @@
 // src/features/auth/api/fetchSkills.ts
 import { axiosInstance } from '@/lib/axios';
-import { SkillListCredentials, SkillListResponse } from '../types/mainIndex';
+import { SkillListCredentials, SkillListResponse } from '../types/campaignManagerIndex';
 
 // 스킬마스터정보조회 리스트 요청
 export const fetchSkills = async (credentials: SkillListCredentials): Promise<SkillListResponse> => {

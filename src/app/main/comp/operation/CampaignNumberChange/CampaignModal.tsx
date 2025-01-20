@@ -10,8 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X } from 'lucide-react';
-import { useMainStore } from '@/store';
-import { SkillListDataResponse } from '@/features/auth/types/mainIndex';
+import { useMainStore, useCampainManagerStore } from '@/store';
+import { SkillListDataResponse } from '@/features/auth/types/campaignManagerIndex';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
@@ -27,7 +27,8 @@ interface CampaignModalProps {
 }
 
 export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignModalProps) {
-  const { tenants, skills, campaigns } = useMainStore();
+  const { tenants, campaigns } = useMainStore();
+  const { skills } = useCampainManagerStore();
   const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
   const [tenantId, setTenantId] = useState('all');
   const [campaignName, setCampaignName] = useState('');

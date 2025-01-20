@@ -1,6 +1,6 @@
 // components/main/CampaignList.tsx
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
-import { useMainStore } from '@/store';
+import { useMainStore, useCampainManagerStore } from '@/store';
 import {CampaignHeaderSearch} from './CampaignManagerHeader';
 import { useEffect, useState } from 'react';
 import TitleWrap from "@/components/shared/TitleWrap";
@@ -18,7 +18,8 @@ type Props = {
 }
 
 export default function CampaignManagerList({campaignId,campaignHeaderSearchParam}: Props) {
-  const { campaigns, callingNumbers, schedules, campaignSkills , setSelectedCampaign } = useMainStore();
+  const { campaigns , setSelectedCampaign } = useMainStore();
+  const { schedules, callingNumbers, campaignSkills  } = useCampainManagerStore();
   const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>(campaigns);
   
   const handleRowClick = (campaign: MainDataResponse) => {

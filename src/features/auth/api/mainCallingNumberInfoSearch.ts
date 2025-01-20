@@ -1,6 +1,6 @@
 // src/features/auth/api/fetchSkills.ts
 import { axiosInstance } from '@/lib/axios';
-import { MainCredentials, CallingNumberListResponse } from '../types/mainIndex';
+import { MainCredentials, CallingNumberListResponse } from '../types/campaignManagerIndex';
 
 // 캠페인발신번호 리스트 요청
 export const fetchCallingNumbers = async (credentials: MainCredentials): Promise<CallingNumberListResponse> => {

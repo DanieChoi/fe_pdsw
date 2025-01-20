@@ -3,7 +3,7 @@
 import React from 'react';
 import { AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogHeader } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { useMainStore } from '@/store';
+import { useCampainManagerStore } from '@/store';
 import { useEffect, useState } from 'react';
 
 export interface CustomAlertRequest {
@@ -24,7 +24,7 @@ const SkillListPopup = ({
     onCancle
 }: CustomAlertRequest) => {
     
-    const { skills } = useMainStore();
+    const { skills } = useCampainManagerStore();
     const [selectedSkills, setSelectedSkills] = useState<number[]>(param);
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, skillId: number) => {
         if(e.target.checked){
