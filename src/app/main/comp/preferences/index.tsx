@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-custom";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { CommonRadio, CommonRadioItem } from "@/components/shared/CommonRadio";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CustomInput } from "@/components/shared/CustomInput";
+import { CommonButton } from "@/components/shared/CommonButton";
+import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import TitleWrap from "@/components/shared/TitleWrap";
 
@@ -48,7 +48,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             </TableHeader>
             <TableCell className="w-[17rem]">
                 <div className="flex items-center gap-3">
-                  <Input 
+                  <CustomInput 
                   type="number" 
                   value={refreshCycle}
                   onChange={(e) => setRefreshCycle(e.target.value)}
@@ -66,16 +66,16 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                 <Label className="w-32">일람설정</Label>
               </TableHeader>
               <TableCell className="w-[17rem]">
-                <RadioGroup defaultValue={monitoringType} onValueChange={setMonitoringType} className="flex gap-8">
+                <CommonRadio defaultValue={monitoringType} onValueChange={setMonitoringType} className="flex gap-8">
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="oneTime" id="oneTime" />
+                    <CommonRadioItem value="oneTime" id="oneTime" />
                     <Label htmlFor="oneTime">한번만</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="periodic" id="periodic" />
+                    <CommonRadioItem value="periodic" id="periodic" />
                     <Label htmlFor="periodic">주기적으로 계속</Label>
                   </div>
-                </RadioGroup>
+                </CommonRadio>
               </TableCell>
               <TableCell>
                 <span className="text-sm">캠페인 리스트 잔량 부족시의 알람모드를 설정합니다.</span>
@@ -86,16 +86,16 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                 <Label className="w-32">모니터 설정</Label>
               </TableHeader>
               <TableCell className="w-[17rem]">
-              <RadioGroup defaultValue="auto" className="flex gap-8">
+              <CommonRadio defaultValue="auto" className="flex gap-8">
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="grid" id="grid" />
+                  <CommonRadioItem value="grid" id="grid" />
                   <Label htmlFor="grid">그리드형</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="auto" id="auto" />
+                  <CommonRadioItem value="auto" id="auto" />
                   <Label htmlFor="auto">차트형</Label>
                 </div>
-              </RadioGroup>
+              </CommonRadio>
               </TableCell>
               <TableCell>
                 <span className="text-sm">캠페인 진행현황을 보여주는 형태를 선택할 수 있습니다.</span>
@@ -112,7 +112,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
               </TableHeader>
               <TableCell className="w-[17rem]">
                 <div className="flex items-center gap-3">
-                  <Input 
+                  <CustomInput 
                   type="number"
                   value={retryCount}
                   onChange={(e) => setRetryCount(e.target.value)}
@@ -131,7 +131,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
               </TableHeader>
               <TableCell className="w-[17rem]">
                 <div className="flex items-center gap-3">
-                  <Input
+                  <CustomInput
                   type="number"
                   value={timeout}
                   onChange={(e) => setTimeout(e.target.value)}
@@ -150,12 +150,12 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
               </TableHeader>
               <TableCell className="w-[17rem]">
                 <div className="flex items-center gap-3">
-                  <Input
+                  <CustomInput
                     value={ip}
                     onChange={(e) => setIp(e.target.value)}
                     className="w-32"
                   />
-                  <Input
+                  <CustomInput
                     value={port}
                     onChange={(e) => setPort(e.target.value)}
                     className="w-20"
@@ -173,7 +173,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             <div className="flex items-center gap-8">
                 <h2 className="text-sm">알림</h2>
                 <div className='flex items-center gap-1'>
-                  <Checkbox id="notification-enable" />
+                  <CustomCheckbox id="notification-enable" />
                   <Label htmlFor="notification-enable" className="text-sm">본인 캠페인만 업링크 알림</Label>
                 </div>
             </div>
@@ -212,7 +212,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
               </TableHeader>
               <TableCell className="w-[17rem]">
                 <div className="flex items-center gap-2">
-                  <Checkbox id="logging" />
+                  <CustomCheckbox id="logging" />
                   <Label htmlFor="logging">프로그램 로그와 동시 로그를 설정합니다.</Label>
                 </div>
               </TableCell>
@@ -227,7 +227,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             <div className="flex items-center gap-8">
                 <h2 className="text-sm">캠페인 가능 업무시간</h2>
                 <div className='flex items-center gap-1'>
-                  <Checkbox id="worktime-enable" />
+                  <CustomCheckbox id="worktime-enable" />
                   <Label htmlFor="worktime-enable" className="text-sm">업무시간 계산 미사용</Label>
                 </div>
             </div>
@@ -240,13 +240,13 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
               <TableCell className="w-[15rem]">
                 <div className="flex items-center gap-2">
                   <Label>시작시간</Label>
-                  <Input
+                  <CustomInput
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
                     className="w-16"
                   />
                   <Label>종료시간</Label>
-                    <Input
+                    <CustomInput
                       value={endTime}
                       onChange={(e) => setEndTime(e.target.value)}
                       className="w-16"
@@ -265,7 +265,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   <div className="flex gap-4">
                     {weekdays.map((day) => (
                       <div key={day} className="flex items-center gap-1">
-                        <Checkbox id={`day-${day}`} />
+                        <CustomCheckbox id={`day-${day}`} />
                         <Label htmlFor={`day-${day}`}>{day}</Label>
                       </div>
                     ))}
@@ -275,8 +275,8 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
         </Table>
         </div>
         <div className="flex justify-end gap-2">
-          <Button>저장</Button>
-          <Button>취소</Button>
+          <CommonButton>저장</CommonButton>
+          <CommonButton>취소</CommonButton>
         </div>
       </div>
     </div>

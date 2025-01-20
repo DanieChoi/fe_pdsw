@@ -4,9 +4,9 @@ import { useMainStore } from '@/store';
 import Image from 'next/image'
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { CustomInput } from "@/components/shared/CustomInput";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
+import { CommonButton } from "@/components/shared/CommonButton";
 import CampaignTab from './CampaignTab';
 import { MainDataResponse, CampaignSkillUpdateRequest } from '@/features/auth/types/mainIndex';
 import { useEffect, useState } from 'react';
@@ -217,7 +217,7 @@ export default function CampaignDetail() {
           title="상세내역"
           buttons={[
               { label: "새 캠페인", onClick: () => console.log("") },
-              { label: "캠페인 저장", onClick: () => handleCampaignSave(), variant: "customblue" },
+              { label: "캠페인 저장", onClick: () => handleCampaignSave(),},
               { label: "캠페인 삭제", onClick: () => console.log("") },
               { label: "재발신", onClick: () => console.log(""), variant: "customblue"},
               { label: "리스트 적용", onClick: () => console.log(""), variant: "customblue"},
@@ -229,7 +229,7 @@ export default function CampaignDetail() {
           <div className="grid grid-cols-3 gap-x-4 gap-y-2">
           <div className='flex items-center gap-2'>
             <Label className="w-[5.6rem] min-w-[5.6rem]">캠페인 아이디</Label>
-            <Input 
+            <CustomInput 
               type="number" 
               value={tempCampaignInfo.campaign_id } 
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
@@ -259,7 +259,7 @@ export default function CampaignDetail() {
 
           <div className='flex items-center gap-2'>
             <Label className="w-[5.6rem] min-w-[5.6rem]">캠페인명</Label>
-            <Input 
+            <CustomInput 
               value={tempCampaignInfo.campaign_name || ''} 
               onChange={(e) => handleInputData(e.target.value, 'campaign_name')}         
               className="" 
@@ -287,7 +287,7 @@ export default function CampaignDetail() {
           </div>
           <div className='flex items-center gap-2 relative'>
             <Label className="w-[5.6rem] min-w-[5.6rem]">스킬</Label>
-            <Input value={inputSkills} className="w-full" readOnly />
+            <CustomInput value={inputSkills} className="w-full" readOnly />
             <button
                 className="absolute right-2 top-[52%] transform -translate-y-1/2">
                 <Image
@@ -306,14 +306,14 @@ export default function CampaignDetail() {
           </div>
           <div className='flex items-center gap-2'>
             <Label className="w-[5.6rem] min-w-[5.6rem]">발신번호</Label>
-            <Input value={inputCallingNumber} className="w-full" 
+            <CustomInput value={inputCallingNumber} className="w-full" 
               disabled={selectedCampaign !== null} readOnly
             />
-            <Button variant="outline" className='h-7'>발신번호 변경</Button>
+            <CommonButton variant="outline" className='h-7'>발신번호 변경</CommonButton>
           </div>
           <div className="flex items-center gap-2 col-span-3">
             <Label className="w-[5.6rem] min-w-[5.6rem]">설명</Label>
-            <Input value={tempCampaignInfo.campaign_desc || ''} className="w-full"          
+            <CustomInput value={tempCampaignInfo.campaign_desc || ''} className="w-full"          
               onChange={(e) => handleInputData(e.target.value, 'campaign_desc')} 
             /> 
           </div>

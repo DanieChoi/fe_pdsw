@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { CustomInput } from "@/components/shared/CustomInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DataGrid from "react-data-grid";
 import { CommonButton } from "@/components/shared/CommonButton";
@@ -55,7 +55,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
 
             <div className="flex items-center gap-2 justify-between">
               <Label className="w-[5rem] min-w-[5rem]">종료구분</Label>
-              <Input disabled={true} />
+              <CustomInput disabled={true} />
             </div>
 
             <div className="flex items-center gap-2 justify-between">
@@ -105,7 +105,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
               <div className="flex flex-col gap-y-2">
                 <div className="flex items-center gap-2 justify-between">
                   <Label className="w-[5rem] min-w-[5rem]">시작시간</Label>
-                  <Input
+                  <CustomInput
                     type="text"
                     value={startTime} // 제어된 컴포넌트
                     onChange={(e) => setStartTime(e.target.value)} // 상태 업데이트
@@ -113,7 +113,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
                 </div>
                 <div className="flex items-center gap-2 justify-between">
                   <Label className="w-[5rem] min-w-[5rem]">종료시간</Label>
-                  <Input
+                  <CustomInput
                     type="text"
                     value={endTime} // 제어된 컴포넌트
                     onChange={(e) => setEndTime(e.target.value)} // 상태 업데이트

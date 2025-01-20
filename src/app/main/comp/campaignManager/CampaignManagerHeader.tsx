@@ -2,10 +2,10 @@
 // components/main/CampaignManager.tsx
 import React, { useEffect, useState } from 'react';
 import { useMainStore } from '@/store';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { CustomInput } from "@/components/shared/CustomInput";
+import { CommonButton } from "@/components/shared/CommonButton";
 import { SkillListDataResponse } from '@/features/auth/types/mainIndex';
 
 const dialModeList = [
@@ -84,7 +84,7 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
       </div>
       <div className="flex items-center">
         <Label className="w-20 min-w-20">캠페인이름</Label>
-        <Input 
+        <CustomInput 
         type="text" 
         value={campaignName}
         onChange={(e) => setCampaignName(e.target.value)}
@@ -121,7 +121,7 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
       </div>
       <div className="flex items-center">
         <Label className="w-20 min-w-20">발신번호</Label>
-        <Input 
+        <CustomInput 
           type="text" 
           value={callNumber}
           onChange={(e) => setCallNumber(e.target.value)}
@@ -129,7 +129,7 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
         />
       </div>
         <div className="flex justify-end gap-2">
-          <Button onClick={onHeaderSearch}>조회</Button>
+          <CommonButton onClick={onHeaderSearch}>조회</CommonButton>
         </div>
       {/* ... 나머지 필드들 ... */}
     </div>
