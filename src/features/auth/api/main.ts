@@ -8,7 +8,7 @@ export const fetchCampaigns = async (credentials: MainCredentials): Promise<Main
     filter: {
       campaign_id: {
         start: 1,
-        end: 1000,
+        end: 9999999,
       },
     },
     sort: {

@@ -74,7 +74,7 @@ const CampaignInfo: MainDataResponse = {
 }
 
 export default function CampaignDetail() {
-  const selectedCampaign = useMainStore((state) => state.selectedCampaign);
+  // const selectedCampaign = useMainStore((state) => state.selectedCampaign);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
   const [changeYn, setChangeYn] = useState<boolean>(false); // 변경여부
@@ -83,6 +83,7 @@ export default function CampaignDetail() {
   const { tenants
     , campaignSkills
     , callingNumbers
+    , selectedCampaign
     , setCampaigns
     , setSelectedCampaign
     , setCampaignSkills 
@@ -174,7 +175,7 @@ export default function CampaignDetail() {
   
   //변경여부 체크
   useEffect(() => {  
-    if( !campaignInfoChangeYn && !campaignSkillChangeYn ){  
+    if( changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn ){  
       fetchMain({
         session_key: '',
         tenant_id: 0,
@@ -184,8 +185,8 @@ export default function CampaignDetail() {
 
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
-      setSelectedCampaign( tempCampaignInfo );
       setCampaigns(data.result_data);
+      setSelectedCampaign( tempCampaignInfo );
       setChangeYn(false);
     }
   });
@@ -317,7 +318,7 @@ export default function CampaignDetail() {
         </div>
       </div>
       <div>
-        <CampaignTab/>
+        <CampaignTab campaignId={tempCampaignInfo.campaign_id + ''} />
       </div>
       <SkillListPopup
         param={tempCampaignSkills.skill_id||[]}
