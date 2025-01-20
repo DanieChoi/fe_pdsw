@@ -7,7 +7,8 @@ import { CustomInput } from "@/components/shared/CustomInput";
 import { CommonRadio, CommonRadioItem } from "@/components/shared/CommonRadio";
 import DataGrid from 'react-data-grid';
 import { useApiForDialingDevice } from '@/features/auth/hooks/useApiForDialingDevice';
-import Cookies from 'js-cookie';
+import { DialingDeviceListDataResponse } from '@/features/auth/types/mainIndex';
+import { useMainStore } from '@/store';
 
 
 const SystemPreferences = () => {
@@ -18,18 +19,22 @@ const SystemPreferences = () => {
     const [allocationMode, setAllocationMode] = useState(""); // 할당 모드
     const [allocationOutboundMode, setAllocationOutboundMode] = useState(""); // 할당 발신 모드
 
+    const { tenants } = useMainStore();
+    const [dialingDeviceList, setDialingDeviceList] = useState<DialingDeviceListDataResponse[]>([]);
+
     const { mutate: fetchDialingDeviceList } = useApiForDialingDevice({
-            onSuccess: (data) => {
-                console.log("시스템 설정 api 요청 확인 : ", data);
-            }
+        onSuccess: (data) => {
+            console.log("시스템 설정 api 요청 확인 : ", data);
+            setDialingDeviceList(data.result_data);
+        }
+    });
+
+    useEffect(() => {
+        const _tenantId = tenants.map((tenant) => tenant.tenant_id);
+        fetchDialingDeviceList({
+            tenant_id_array: _tenantId
         });
-    
-        useEffect(() => {
-            const _tenantId = Number(Cookies.get('tenant_id'));
-            fetchDialingDeviceList({
-                tenant_id_array: [_tenantId]
-            });
-        }, [fetchDialingDeviceList]);
+    }, []);
 
     const equipmentColumns = [
         { key: "id", name: "장비번호" },
