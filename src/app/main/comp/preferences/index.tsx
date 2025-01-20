@@ -42,6 +42,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
       <div>
         <TitleWrap title="화면표시" />
         <Table>
+          <tbody>
           <TableRow>
             <TableHeader className="w-[12.5rem]">
               <Label className="w-32">채널 할당 시 보여주는 캠페인</Label>
@@ -101,11 +102,13 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                 <span className="text-sm">캠페인 진행현황을 보여주는 형태를 선택할 수 있습니다.</span>
               </TableCell>
             </TableRow>
+            </tbody>
         </Table>
         </div> 
         <div>
         <TitleWrap title="통신" />
         <Table>
+          <tbody>
             <TableRow>
               <TableHeader className="w-[12.5rem]">
                 <Label className="w-32">통계 갱신주기</Label>
@@ -166,6 +169,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                 <span className="text-sm">작업대상 리스트 파일을 업로드 할 서버의 IP와 PORT를 설정합니다.</span>
               </TableCell>
             </TableRow>
+            </tbody>
         </Table>
         </div>
         <div>
@@ -179,6 +183,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             </div>
         </div>
         <Table>
+          <tbody>
             <TableRow>
               <TableHeader className="w-[12.5rem]">
                 <Label className="w-32">매시지 알림창</Label>
@@ -201,11 +206,13 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                 <span className="text-sm">주요 이벤트 알림창 알림을 설정합니다.</span>
               </TableCell>
             </TableRow>
+            </tbody>
         </Table>
         </div>
         <div>
         <TitleWrap title="로그" />
         <Table>
+           <tbody>
             <TableRow>
               <TableHeader className="w-[12.5rem]">
                 <Label className="w-32">프로그램 로그설정</Label>
@@ -220,6 +227,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                 <span className="text-sm">NEXUSCUBE-C 프로그램의 로그를 설정합니다.</span>
               </TableCell>
             </TableRow>
+            </tbody>
         </Table>
         </div>
         <div>
@@ -233,6 +241,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             </div>
         </div>
         <Table>
+          <tbody>
             <TableRow>
               <TableHeader className="w-[12.5rem]">
                 <Label className="w-32">발신업무시간</Label>
@@ -272,6 +281,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   </div>
               </TableCell>
             </TableRow>
+            </tbody>
         </Table>
         </div>
         <div className="flex justify-end gap-2">
