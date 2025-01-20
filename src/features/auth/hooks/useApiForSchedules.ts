@@ -2,7 +2,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { fetchSchedules } from '../api/mainCampaignSchedule';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { SkillListCredentials, CampaignScheDuleListResponse, AuthApiError } from '../types/mainIndex';
+import { SkillListCredentials, CampaignScheDuleListResponse, AuthApiError } from '../types/campaignManagerIndex';
 
 export function useApiForSchedules(
   options?: UseMutationOptions<CampaignScheDuleListResponse, AuthApiError, SkillListCredentials>

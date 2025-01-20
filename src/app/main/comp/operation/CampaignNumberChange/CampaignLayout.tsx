@@ -4,15 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
-import { useMainStore } from '@/store';
+import { useMainStore, useCampainManagerStore } from '@/store';
 import CampaignModal from './CampaignModal';
 
 function CampaignLayout() {
   const { 
     campaigns, 
-    callingNumbers, 
     setSelectedCampaign,
   } = useMainStore();
+  const { callingNumbers } = useCampainManagerStore();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCampaignValue, setSelectedCampaignValue] = useState('');

@@ -1,12 +1,12 @@
 "use client";
 // components/main/CampaignManager.tsx
 import React, { useEffect, useState } from 'react';
-import { useMainStore } from '@/store';
+import { useMainStore, useCampainManagerStore } from '@/store';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { CommonButton } from "@/components/shared/CommonButton";
-import { SkillListDataResponse } from '@/features/auth/types/mainIndex';
+import { SkillListDataResponse } from '@/features/auth/types/campaignManagerIndex';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
@@ -29,7 +29,8 @@ type Props = {
 }
 
 export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
-  const { tenants,selectedCampaign, skills } = useMainStore();
+  const { tenants,selectedCampaign } = useMainStore();
+  const { skills } = useCampainManagerStore();
   const [tenantId, setTenantId] = useState('all'); // 테넌트
   const [campaignName, setCampaignName] = useState(''); // 캠페인이름
   const [dailMode, setDailMode] = useState('all'); // 다이얼모드

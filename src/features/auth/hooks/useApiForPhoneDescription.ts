@@ -2,7 +2,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { fetchPhoneDescriptions } from '../api/mainPhoneDescriptionSearch';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { MainCredentials, PhoneDescriptionListResponse, AuthApiError } from '../types/mainIndex';
+import { MainCredentials, PhoneDescriptionListResponse, AuthApiError } from '../types/campaignManagerIndex';
 
 export function useApiForPhoneDescription(
   options?: UseMutationOptions<PhoneDescriptionListResponse, AuthApiError, MainCredentials>

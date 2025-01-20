@@ -1,6 +1,6 @@
 // src/features/auth/api/fetchCampaignSkillUpdate.ts
 import { axiosInstance } from '@/lib/axios';
-import { CampaignSkillUpdateRequest, UpdateResponse } from '../types/mainIndex';
+import { CampaignSkillUpdateRequest, UpdateResponse } from '../types/campaignManagerIndex';
 
 // 캠페인 스킬 수정 요청
 export const fetchCampaignSkillUpdate = async (credentials: CampaignSkillUpdateRequest): Promise<UpdateResponse> => {

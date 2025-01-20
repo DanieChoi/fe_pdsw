@@ -2,7 +2,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { fetchSkills } from '../api/mainSkillMasterInfoSearch';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { SkillListCredentials, SkillListResponse, AuthApiError } from '../types/mainIndex';
+import { SkillListCredentials, SkillListResponse, AuthApiError } from '../types/campaignManagerIndex';
 
 export function useApiForSkills(
   options?: UseMutationOptions<SkillListResponse, AuthApiError, SkillListCredentials>

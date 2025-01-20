@@ -1,6 +1,6 @@
 "use client";
 // components/CampaignManager/CampaignManagerDetail.tsx
-import { useMainStore } from '@/store';
+import { useMainStore, useCampainManagerStore } from '@/store';
 import Image from 'next/image'
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
@@ -81,13 +81,11 @@ export default function CampaignDetail() {
   const [campaignInfoChangeYn, setCampaignInfoChangeYn] = useState<boolean>(false); // 캠페인정보 변경여부
   const [campaignSkillChangeYn, setCampaignSkillChangeYn] = useState<boolean>(false); // 캠페인스킬 변경여부
   const { tenants
-    , campaignSkills
-    , callingNumbers
     , selectedCampaign
     , setCampaigns
     , setSelectedCampaign
-    , setCampaignSkills 
   } = useMainStore();
+  const { callingNumbers, campaignSkills, setCampaignSkills } = useCampainManagerStore();
   const [ inputSkills, setInputSkills ] = useState('');
   const [ inputCallingNumber, setInputCallingNumber ] = useState('');
   const [alertState, setAlertState] = useState({
