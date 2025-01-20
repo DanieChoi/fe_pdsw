@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { CustomInput } from "@/components/shared/CustomInput";
+import { CommonRadio, CommonRadioItem } from "@/components/shared/CommonRadio";
 import DataGrid from 'react-data-grid';
 import { useApiForDialingDevice } from '@/features/auth/hooks/useApiForDialingDevice';
 import Cookies from 'js-cookie';
@@ -104,7 +104,7 @@ const SystemPreferences = () => {
                                 </div>
                                 <div className="flex items-center">
                                   <Label className="w-20 min-w-20">채널수</Label>
-                                   <Input 
+                                   <CustomInput 
                                     type="number" 
                                     value={refreshCycle}
                                     onChange={(e) => setRefreshCycle(e.target.value)}
@@ -113,16 +113,16 @@ const SystemPreferences = () => {
                                 </div>
                                 <div className="flex items-center">
                                     <Label className="w-20 min-w-20">사용여부</Label>
-                                     <RadioGroup defaultValue={monitoringType} onValueChange={setMonitoringType} className="flex gap-8">
+                                     <CommonRadio defaultValue={monitoringType} onValueChange={setMonitoringType} className="flex gap-8">
                                         <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="oneTime" id="oneTime" />
+                                        <CommonRadioItem value="oneTime" id="oneTime" />
                                         <Label htmlFor="oneTime">사용</Label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="periodic" id="periodic" />
+                                        <CommonRadioItem value="periodic" id="periodic" />
                                         <Label htmlFor="periodic">미사용</Label>
                                         </div>
-                                    </RadioGroup>
+                                    </CommonRadio>
                                 </div>
                             </div>
                     </div>

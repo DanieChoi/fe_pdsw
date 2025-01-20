@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import TitleWrap from "@/components/shared/TitleWrap";
 
 interface PreferencesData {
