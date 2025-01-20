@@ -131,6 +131,21 @@ export interface CallingNumberListResponse {
   result_data: CallingNumberListDataResponse[];
 }
 
+// 전화번호설명 템플릿 조회 데이터 타입
+export interface PhoneDescriptionListDataResponse {
+  description_id: number;
+  description: [string];
+}
+
+// 전화번호설명 템플릿 조회 데이터 타입
+export interface PhoneDescriptionListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: PhoneDescriptionListDataResponse[];
+}
+
 // 캠페인스케줄 데이터 타입
 export interface CampaignScheDuleListDataResponse {
   campaign_id: number;

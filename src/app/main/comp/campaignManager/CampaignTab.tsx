@@ -10,7 +10,11 @@ import NotificationTab from "./NotificationTab";
 import AssignedAgentTab from "./AssignedAgentTab";
 import AdditionalInfoTab from "./AdditionalInfoTab";
 
-const CampaignTab = () => {
+type Props = {
+  campaignId: string;
+};
+
+const CampaignTab: React.FC<Props> = ({ campaignId }) => {
   return (
     <Tabs defaultValue="tab1" className="w-full">
       <div className="tab-custom-wrap">
