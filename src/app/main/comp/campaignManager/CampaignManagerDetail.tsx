@@ -235,7 +235,6 @@ export default function CampaignDetail() {
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
               className="" 
               disabled={selectedCampaign !== null}
-              defaultValue={tempCampaignInfo.campaign_id}
             />
           </div>
 
@@ -263,7 +262,8 @@ export default function CampaignDetail() {
             <Input 
               value={tempCampaignInfo.campaign_name || ''} 
               onChange={(e) => handleInputData(e.target.value, 'campaign_name')}         
-              className="" defaultValue={tempCampaignInfo.campaign_name}
+              className="" 
+              readOnly
             />
           </div>
 
@@ -307,13 +307,15 @@ export default function CampaignDetail() {
           <div className='flex items-center gap-2'>
             <Label className="w-[5.6rem] min-w-[5.6rem]">발신번호</Label>
             <Input value={inputCallingNumber} className="w-full" 
-              disabled={selectedCampaign !== null} />
+              disabled={selectedCampaign !== null} readOnly
+            />
             <Button variant="outline" className='h-7'>발신번호 변경</Button>
           </div>
           <div className="flex items-center gap-2 col-span-3">
             <Label className="w-[5.6rem] min-w-[5.6rem]">설명</Label>
-            <Input value={tempCampaignInfo.campaign_desc || ''} className="w-full" defaultValue={tempCampaignInfo.campaign_desc}          
-              onChange={(e) => handleInputData(e.target.value, 'campaign_desc')} /> 
+            <Input value={tempCampaignInfo.campaign_desc || ''} className="w-full"          
+              onChange={(e) => handleInputData(e.target.value, 'campaign_desc')} 
+            /> 
           </div>
         </div>
       </div>

@@ -23,7 +23,11 @@ const rows = [
   { no: 3, division: 3, startTime: "02:00", endTime: "03:00" },
 ];
 
-const OperationTimeTab: React.FC = () => {
+type Props = {
+  campaignId: string;
+};
+
+const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [startTime, setStartTime] = useState(""); // 시작시간

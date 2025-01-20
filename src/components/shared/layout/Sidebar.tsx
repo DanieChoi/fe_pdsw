@@ -10,6 +10,7 @@ import { useApiForSkills } from '@/features/auth/hooks/useApiForSkills';
 import { useApiForCallingNumber } from '@/features/auth/hooks/useApiForCallingNumber';
 import { useApiForSchedules } from '@/features/auth/hooks/useApiForSchedules';
 import { useApiForCampaignSkill } from '@/features/auth/hooks/useApiForCampaignSkill';
+import { useApiForPhoneDescription } from '@/features/auth/hooks/useApiForPhoneDescription';
 import Cookies from 'js-cookie';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useRouter } from 'next/navigation';
@@ -28,11 +29,11 @@ export default function Sidebar({
     isMenuOpen: boolean;
     toggleSidebar: () => void;
   }) {
-    const router = useRouter();
-    const [alertState, setAlertState] = useState(errorMessage);
-    const _sessionKey = Cookies.get('session_key') || '';
-    const _tenantId = Number(Cookies.get('tenant_id'));
-
+  const router = useRouter();
+  const [alertState, setAlertState] = useState(errorMessage);
+  const _sessionKey = Cookies.get('session_key') || '';
+  const _tenantId = Number(Cookies.get('tenant_id'));
+  // 캠페인 조회
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
@@ -42,6 +43,7 @@ export default function Sidebar({
       });
     }
   });
+  // 스킬 조회
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data);
@@ -51,11 +53,13 @@ export default function Sidebar({
       });
     }
   });
+  // 스케줄 조회
   const { mutate: fetchSchedules } = useApiForSchedules({
     onSuccess: (data) => {
       setSchedules(data.result_data);
     }
   });
+  // 전화번호 조회
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
       setCallingNumbers(data.result_data);
@@ -65,12 +69,23 @@ export default function Sidebar({
       });
     }
   });
+  // 캠페인스킬 조회
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
       setCampaignSkills(data.result_data);
+      fetchPhoneDescriptions({
+        session_key: _sessionKey,
+        tenant_id: _tenantId
+      });
     }
   });
-  
+  // 전화번호설명 템플릿 조회
+  const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
+    onSuccess: (data) => {
+      setPhoneDescriptions(data.result_data);
+    }
+  });
+  // 테넌트 조회
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
       if( data.result_code === 5){
@@ -110,6 +125,7 @@ export default function Sidebar({
     , setSchedules
     , setSelectedCampaign
     , setCampaignSkills
+    , setPhoneDescriptions
     , campaigns
     , tenants 
   } = useMainStore();
