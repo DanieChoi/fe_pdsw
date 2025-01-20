@@ -1,11 +1,11 @@
-// src/features/auth/hooks/useApiForLogin.tsx
+// src/features/campaignManager/hooks/useApiForCampaignSkill.ts
 import { useMutation } from '@tanstack/react-query';
 import { fetchCampaignSkills } from '../api/mainCampaignSkillSearch';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { MainCredentials, CampaignSkillListResponse, AuthApiError } from '../types/campaignManagerIndex';
+import { CampaignCredentials, CampaignSkillListResponse, AuthApiError } from '../types/campaignManagerIndex';
 
 export function useApiForCampaignSkill(
-  options?: UseMutationOptions<CampaignSkillListResponse, AuthApiError, MainCredentials>
+  options?: UseMutationOptions<CampaignSkillListResponse, AuthApiError, CampaignCredentials>
 ) {
   return useMutation({
     mutationKey: ['mainCampaignSkills'],
@@ -20,7 +20,7 @@ export function useApiForCampaignSkill(
       });
       options?.onSuccess?.(data, variables, context);
     },
-    onError: (error: AuthApiError, variables: MainCredentials, context: unknown) => {
+    onError: (error: AuthApiError, variables: CampaignCredentials, context: unknown) => {
       // console.error('API Error:', error);
       // toast.error(error.message || '데이터 로드에 실패했습니다.');
       options?.onError?.(error, variables, context);

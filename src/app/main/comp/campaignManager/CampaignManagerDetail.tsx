@@ -73,6 +73,15 @@ const CampaignInfo: MainDataResponse = {
   user_option: '',  
 }
 
+export interface OperationTimeParam {
+  campaign_id: number;
+  start_date: string;
+  end_date: string;
+  start_time: string;
+  end_time: string;
+  start_flag: string;
+}
+
 export default function CampaignDetail() {
   // const selectedCampaign = useMainStore((state) => state.selectedCampaign);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
