@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useApiForDialingDevice } from '@/features/auth/hooks/useApiForDialingDevice';
+import Cookies from 'js-cookie';
 
 const SystemPreferences = () => {
     const [refreshCycle, setRefreshCycle] = useState("5"); // 채널 수 갱신 주기
@@ -13,6 +15,19 @@ const SystemPreferences = () => {
     const [equipmentName, setEquipmentName] = useState(""); // 장비 이름
     const [allocationMode, setAllocationMode] = useState(""); // 할당 모드
     const [allocationOutboundMode, setAllocationOutboundMode] = useState(""); // 할당 발신 모드
+
+    const { mutate: fetchDialingDeviceList } = useApiForDialingDevice({
+        onSuccess: (data) => {
+            console.log("시스템 설정 api 요청 확인 : ", data);
+        }
+    });
+
+    useEffect(() => {
+        const _tenantId = Number(Cookies.get('tenant_id'));
+        fetchDialingDeviceList({
+            tenant_id_array: [_tenantId]
+        });
+    }, [fetchDialingDeviceList]);
 
     return (
         <div className=''>
