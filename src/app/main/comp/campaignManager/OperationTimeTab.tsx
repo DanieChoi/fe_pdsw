@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DataGrid from 'react-data-grid';
 import { Button } from "@/components/ui/button";
-
+import Image from 'next/image'
 
 const columns = [
   { key: "no", name: "NO", }, // 열 정의
@@ -101,6 +101,12 @@ const OperationTimeTab: React.FC = () => {
                      variant="secondary"
                      >
                       시간추가
+                      <Image
+                          src="/addArrow.svg"
+                          alt="스킬팝업"
+                          width={10}
+                          height={10}
+                        /> 
                      </Button>
                   </div>
                 </div>
