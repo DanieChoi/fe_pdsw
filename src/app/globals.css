@@ -228,3 +228,58 @@ input::placeholder {
 .table-custom tr:last-child td:last-child {
   border-bottom-right-radius: 3px; /* 오른쪽 아래 둥글게 */
 }
+
+/*tab 커스텀*/
+.tab-custom-wrap {
+  position: relative;
+}
+
+.tab-custom-wrap::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px; 
+  background-color: hsl(var(--border)); 
+}
+.tab-custom-wrap button{
+  position: relative;
+  z-index: 2;
+}
+
+
+/*gird-custom*/
+.gird-custom{
+  border:1px solid #ebebeb; 
+  border-radius: 4px;
+  overflow: hidden;
+}
+.gird-custom .rdg{}
+
+
+.grid-custom .rdg-header-row .rdg-cell{
+  background: #F8F8F8;
+  border-bottom: 1px solid #ebebeb;
+  font-size: 13px;
+  color: #333;
+  font-weight: normal;
+  text-align: center;
+  border-right: 1px solid #ebebeb;
+}
+
+.grid-custom .rdg-header-row .rdg-cell[aria-selected="true"]{
+  outline: 2px solid #ebebeb;
+  outline-offset: -1px;
+}
+.grid-custom .rdg-row .rdg-cell{
+  border-bottom: 1px solid #ebebeb;
+  text-align: center;
+}
+.grid-custom .rdg-row:hover{
+  background: #FFFAEE;
+}
+.grid-custom .rdg-row .rdg-cell[aria-selected="true"]{
+  outline: 2px solid #ebebeb;
+  outline-offset: -1px
+}

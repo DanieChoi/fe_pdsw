@@ -34,7 +34,7 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
     }else{
       setSelectedCampaign(null);
     }
-  }, [campaignId]);
+  }, [campaigns, setSelectedCampaign, tempCampaigns,campaignId]);
 
   useEffect(() => {
     if( typeof campaignHeaderSearchParam != 'undefined' && typeof campaignId === 'undefined' ){
@@ -73,7 +73,7 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
 
   return (
     <div>
-      <TitleWrap title="캠페인 목록" totalCount={8} />
+      <TitleWrap title="캠페인 목록" totalCount={tempCampaigns.length} />
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>

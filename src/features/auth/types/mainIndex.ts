@@ -16,6 +16,12 @@ export interface MainRequest {
   tenant_id: number;
 }
 
+// 캠페인스킬 수정 요청 데이터 타입
+export interface CampaignSkillUpdateRequest {
+  campaign_id: number;
+  skill_id: number[];
+}
+
 // 메인 응답 데이터 리스트 타입
 export interface AuthApiError {
   message: string;
@@ -125,6 +131,21 @@ export interface CallingNumberListResponse {
   result_data: CallingNumberListDataResponse[];
 }
 
+// 전화번호설명 템플릿 조회 데이터 타입
+export interface PhoneDescriptionListDataResponse {
+  description_id: number;
+  description: [string];
+}
+
+// 전화번호설명 템플릿 조회 데이터 타입
+export interface PhoneDescriptionListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: PhoneDescriptionListDataResponse[];
+}
+
 // 캠페인스케줄 데이터 타입
 export interface CampaignScheDuleListDataResponse {
   campaign_id: number;
@@ -160,6 +181,12 @@ export interface CampaignSkillListResponse {
   result_data: CampaignSkillDataResponse[];
 }
 
+// 수정 응답 타입
+export interface UpdateResponse {
+  result_code: number;
+  result_msg: string;
+}
+
 // API 에러 타입
 export interface AuthApiError {
   message: string;
@@ -170,4 +197,63 @@ export interface AuthApiError {
 export interface LoginResponseFirst {
   id: string;
   passwd: string;
+}
+
+// 캠페인정보 수정 요청 데이터 타입
+export interface CampaignInfoUpdateRequest {
+  campaign_name: string;
+  campaign_desc: string;
+  site_code: number;
+  service_code: number;
+  start_flag: number;
+  end_flag: number;
+  dial_mode: number;
+  callback_kind: number;
+  delete_flag: number;
+  list_count: number;
+  list_redial_query: string;
+  next_campaign: number;
+  token_id: number;
+  phone_order: string;
+  phone_dial_try1: number;
+  phone_dial_try2: number;
+  phone_dial_try3: number;
+  phone_dial_try4: number;
+  phone_dial_try5: number;
+  dial_try_interval: number;  
+  trunk_access_code: string;
+  DDD_code: string;
+  power_divert_queue: number;
+  max_ring: number;
+  detect_mode: number;
+  auto_dial_interval: number;
+  creation_user: string;
+  creation_time: string;
+  creation_ip: string;
+  update_user: string;
+  update_time: string;
+  update_ip: string;
+  customer_char_id: number;
+  dial_phone_id: number;
+  counsel_script_id: number;
+  announcement_id: number;
+  tenant_id: number;
+  alarm_answer_count: number;
+  dial_speed: number;
+  parent_campaign: number;
+  campaign_level: number;
+  overdial_abandon_time: number;
+  list_alarm_count: number;
+  supervisor_phone: string;
+  reuse_count: number;
+  outbound_sequence: string;
+  use_counsel_result: number;
+  use_list_alarm: number;
+  redial_strategy1: string;
+  redial_strategy2: string;
+  redial_strategy3: string;
+  redial_strategy4: string;
+  redial_strategy5: string;  
+  dial_mode_option: number;
+  user_option: string;  
 }
