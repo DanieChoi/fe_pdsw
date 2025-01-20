@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import DataGrid from 'react-data-grid';
+import { useApiForDialingDevice } from '@/features/auth/hooks/useApiForDialingDevice';
+import Cookies from 'js-cookie';
 
 
 const SystemPreferences = () => {
@@ -15,6 +17,19 @@ const SystemPreferences = () => {
     const [equipmentName, setEquipmentName] = useState(""); // 장비 이름
     const [allocationMode, setAllocationMode] = useState(""); // 할당 모드
     const [allocationOutboundMode, setAllocationOutboundMode] = useState(""); // 할당 발신 모드
+
+    const { mutate: fetchDialingDeviceList } = useApiForDialingDevice({
+            onSuccess: (data) => {
+                console.log("시스템 설정 api 요청 확인 : ", data);
+            }
+        });
+    
+        useEffect(() => {
+            const _tenantId = Number(Cookies.get('tenant_id'));
+            fetchDialingDeviceList({
+                tenant_id_array: [_tenantId]
+            });
+        }, [fetchDialingDeviceList]);
 
     const equipmentColumns = [
         { key: "id", name: "장비번호" },
