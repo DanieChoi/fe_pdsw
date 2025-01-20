@@ -1,4 +1,23 @@
-// src/features/auth/types/mainIndex.ts
+// src/features/campaignManager/types/campaignManagerIndex.ts
+
+// 캠페인스케줄 데이터 타입
+export interface CampaignScheDuleListDataResponse {
+  campaign_id: number;
+  tenant_id: number;
+  start_date: string;
+  end_date: string;
+  start_time: [string];
+  end_time: [string];
+}
+
+// 캠페인스케줄 데이터 타입
+export interface CampaignScheDuleListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: CampaignScheDuleListDataResponse[];
+}
 
 // 스킬마스터정보조회 데이터 타입
 export interface SkillListDataResponse {
@@ -17,8 +36,8 @@ export interface SkillListResponse {
   result_data: SkillListDataResponse[];
 }
 
-// 메인 요청 시 필요한 credentials 타입
-export interface MainCredentials {
+// 캠페인 요청 시 필요한 credentials 타입
+export interface CampaignCredentials {
   session_key: string;
   tenant_id: number;
 }
@@ -59,25 +78,6 @@ export interface CallingNumberListResponse {
   result_count: number;
   total_count: number;
   result_data: CallingNumberListDataResponse[];
-}
-
-// 캠페인스케줄 데이터 타입
-export interface CampaignScheDuleListDataResponse {
-  campaign_id: number;
-  tenant_id: number;
-  start_date: string;
-  end_date: string;
-  start_time: [string];
-  end_time: [string];
-}
-
-// 캠페인스케줄 데이터 타입
-export interface CampaignScheDuleListResponse {
-  result_code: number;
-  result_msg: string;
-  result_count: number;
-  total_count: number;
-  result_data: CampaignScheDuleListDataResponse[];
 }
 
 // 캠페인스킬 데이터 타입
@@ -121,12 +121,6 @@ export interface UpdateResponse {
 export interface AuthApiError {
   message: string;
   status: number;
-}
-
-// 로그인First 응답 데이터 타입
-export interface LoginResponseFirst {
-  id: string;
-  passwd: string;
 }
 
 // 캠페인정보 수정 요청 데이터 타입

@@ -1,9 +1,9 @@
 // src/features/auth/api/fetchSkills.ts
 import { axiosInstance } from '@/lib/axios';
-import { MainCredentials, CampaignSkillListResponse } from '../types/campaignManagerIndex';
+import { CampaignCredentials, CampaignSkillListResponse } from '../types/campaignManagerIndex';
 
 // 캠페인발스킬 리스트 요청
-export const fetchCampaignSkills = async (credentials: MainCredentials): Promise<CampaignSkillListResponse> => {
+export const fetchCampaignSkills = async (credentials: CampaignCredentials): Promise<CampaignSkillListResponse> => {
   const campaignSkillListSearchRequestData = {
     filter: {      
       campaign_id: {

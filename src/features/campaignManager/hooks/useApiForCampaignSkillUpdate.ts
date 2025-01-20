@@ -1,4 +1,4 @@
-// src/features/auth/hooks/useApiForLogin.tsx
+// src/features/campaignManager/hooks/useApiForCampaignSkillUpdate.ts
 import { useMutation } from '@tanstack/react-query';
 import { fetchCampaignSkillUpdate } from '../api/mainCampaignSkillUpdate';
 import { UseMutationOptions } from '@tanstack/react-query';

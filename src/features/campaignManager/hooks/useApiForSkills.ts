@@ -1,4 +1,4 @@
-// src/features/auth/hooks/useApiForLogin.tsx
+// src/features/campaignManager/hooks/useApiForSkills.ts
 import { useMutation } from '@tanstack/react-query';
 import { fetchSkills } from '../api/mainSkillMasterInfoSearch';
 import { UseMutationOptions } from '@tanstack/react-query';
