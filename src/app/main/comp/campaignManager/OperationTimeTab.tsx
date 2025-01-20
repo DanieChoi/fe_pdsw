@@ -46,6 +46,13 @@ type Props = {
   campaignId: string;
 };
 
+interface DataProps {
+  no: number;
+  division: number;
+  startTime: string;
+  endTime: string;
+}
+
 const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
   const { selectedCampaign } = useMainStore();
   const { schedules } = useCampainManagerStore();

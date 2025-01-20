@@ -1,4 +1,4 @@
-// src/features/auth/hooks/useApiForLogin.tsx
+// src/features/campaignManager/hooks/useApiForSchedules.ts
 import { useMutation } from '@tanstack/react-query';
 import { fetchSchedules } from '../api/mainCampaignSchedule';
 import { UseMutationOptions } from '@tanstack/react-query';

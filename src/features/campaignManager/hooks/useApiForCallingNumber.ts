@@ -1,11 +1,11 @@
-// src/features/auth/hooks/useApiForLogin.tsx
+// src/features/campaignManager/hooks/useApiForCallingNumber.ts
 import { useMutation } from '@tanstack/react-query';
 import { fetchCallingNumbers } from '../api/mainCallingNumberInfoSearch';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { MainCredentials, CallingNumberListResponse, AuthApiError } from '../types/campaignManagerIndex';
+import { CampaignCredentials, CallingNumberListResponse, AuthApiError } from '../types/campaignManagerIndex';
 
 export function useApiForCallingNumber(
-  options?: UseMutationOptions<CallingNumberListResponse, AuthApiError, MainCredentials>
+  options?: UseMutationOptions<CallingNumberListResponse, AuthApiError, CampaignCredentials>
 ) {
   return useMutation({
     mutationKey: ['mainCallingNumbers'],
@@ -20,7 +20,7 @@ export function useApiForCallingNumber(
       });
       options?.onSuccess?.(data, variables, context);
     },
-    onError: (error: AuthApiError, variables: MainCredentials, context: unknown) => {
+    onError: (error: AuthApiError, variables: CampaignCredentials, context: unknown) => {
       // console.error('API Error:', error);
       // toast.error(error.message || '데이터 로드에 실패했습니다.');
       options?.onError?.(error, variables, context);
