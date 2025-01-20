@@ -5,19 +5,30 @@ import { CustomInput } from "@/components/shared/CustomInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DataGrid from "react-data-grid";
 import { CommonButton } from "@/components/shared/CommonButton";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { Calendar as CalendarIcon } from "lucide-react"
+import DatePicker from "react-date-picker";
+import { Calendar as CalendarIcon } from "lucide-react";
 import Image from "next/image";
 
-const columns = [
+type Column = {
+  key: string;
+  name: string;
+};
+
+type Row = {
+  no: number;
+  division: number;
+  startTime: string;
+  endTime: string;
+};
+
+const columns: Column[] = [
   { key: "no", name: "NO" },
   { key: "division", name: "구분" },
   { key: "startTime", name: "시작시간" },
   { key: "endTime", name: "종료시간" },
 ];
 
-const rows = [
+const rows: Row[] = [
   { no: 1, division: 1, startTime: "00:00", endTime: "00:00" },
   { no: 2, division: 2, startTime: "01:00", endTime: "02:00" },
   { no: 3, division: 3, startTime: "02:00", endTime: "03:00" },
@@ -28,8 +39,8 @@ type Props = {
 };
 
 const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
-  const [startDate, setStartDate] = useState<Date | undefined>();
-  const [endDate, setEndDate] = useState<Date | undefined>();
+  const [startDate, setStartDate] = useState<Date | null>(new Date());
+  const [endDate, setEndDate] = useState<Date | null>(new Date());
   const [startTime, setStartTime] = useState(""); // 시작시간
   const [endTime, setEndTime] = useState(""); // 종료시간
 
@@ -60,40 +71,34 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
 
             <div className="flex items-center gap-2 justify-between">
               <Label className="w-[5rem] min-w-[5rem]">시작날짜</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <CommonButton variant="datapicker" className="w-full justify-start">
-                    <CalendarIcon className="mr-2 h-4 w-4" color="#989898"/>
-                    {startDate ? startDate.toLocaleDateString() : "날짜 선택"}
-                  </CommonButton>
-                </PopoverTrigger>
-                <PopoverContent align="start" className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={setStartDate}
-                  />
-                </PopoverContent>
-              </Popover>
+              <DatePicker
+                onChange={(value) => {
+                  if (value instanceof Date || value === null) {
+                    setStartDate(value);
+                  }
+                }}
+                value={startDate}
+                format="yyyy-MM-dd"
+                className="w-full custom-calendar"
+                calendarIcon={<CalendarIcon className="mr-2 h-4 w-4" color="#989898" />}
+                clearIcon={null}
+              />
             </div>
 
             <div className="flex items-center gap-2 justify-between">
               <Label className="w-[5rem] min-w-[5rem]">종료날짜</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <CommonButton variant="datapicker" className="w-full justify-start">
-                    <CalendarIcon className="mr-2 h-4 w-4" color="#989898"/>
-                    {endDate ? endDate.toLocaleDateString() : "날짜 선택"}
-                  </CommonButton>
-                </PopoverTrigger>
-                <PopoverContent align="start" className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={endDate}
-                    onSelect={setEndDate}
-                  />
-                </PopoverContent>
-              </Popover>
+              <DatePicker
+               onChange={(value) => {
+                if (value instanceof Date || value === null) {
+                  setEndDate(value);
+                }
+              }}
+                value={endDate}
+                format="yyyy-MM-dd"
+                className="w-full custom-calendar"
+                calendarIcon={<CalendarIcon className="mr-2 h-4 w-4" color="#989898" />}
+                clearIcon={null}
+              />
             </div>
           </div>
         </div>
@@ -107,16 +112,16 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
                   <Label className="w-[5rem] min-w-[5rem]">시작시간</Label>
                   <CustomInput
                     type="text"
-                    value={startTime} // 제어된 컴포넌트
-                    onChange={(e) => setStartTime(e.target.value)} // 상태 업데이트
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
                   />
                 </div>
                 <div className="flex items-center gap-2 justify-between">
                   <Label className="w-[5rem] min-w-[5rem]">종료시간</Label>
                   <CustomInput
                     type="text"
-                    value={endTime} // 제어된 컴포넌트
-                    onChange={(e) => setEndTime(e.target.value)} // 상태 업데이트
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
                   />
                 </div>
                 <div className="flex justify-end">
@@ -128,7 +133,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
               </div>
             </div>
             <div className="w-[60%]">
-              <div className="gird-custom-wrap h-[270px]">
+              <div className="grid-custom-wrap h-[270px]">
                 <DataGrid columns={columns} rows={rows} className="grid-custom" />
               </div>
             </div>
