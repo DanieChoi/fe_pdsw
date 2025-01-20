@@ -171,6 +171,21 @@ export interface CampaignSkillListResponse {
   result_data: CampaignSkillDataResponse[];
 }
 
+// 전화번호설명 템플릿 조회 데이터 타입
+export interface PhoneDescriptionListDataResponse {
+  description_id: number;
+  description: [string];
+}
+
+// 전화번호설명 템플릿 조회 데이터 타입
+export interface PhoneDescriptionListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: PhoneDescriptionListDataResponse[];
+}
+
 // 수정 응답 타입
 export interface UpdateResponse {
   result_code: number;

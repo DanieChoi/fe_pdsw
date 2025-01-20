@@ -74,7 +74,7 @@ const CampaignInfo: MainDataResponse = {
 }
 
 export default function CampaignDetail() {
-  const selectedCampaign = useMainStore((state) => state.selectedCampaign);
+  // const selectedCampaign = useMainStore((state) => state.selectedCampaign);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
   const [changeYn, setChangeYn] = useState<boolean>(false); // 변경여부
@@ -83,6 +83,7 @@ export default function CampaignDetail() {
   const { tenants
     , campaignSkills
     , callingNumbers
+    , selectedCampaign
     , setCampaigns
     , setSelectedCampaign
     , setCampaignSkills 
@@ -174,7 +175,7 @@ export default function CampaignDetail() {
   
   //변경여부 체크
   useEffect(() => {  
-    if( !campaignInfoChangeYn && !campaignSkillChangeYn ){  
+    if( changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn ){  
       fetchMain({
         session_key: '',
         tenant_id: 0,
@@ -184,8 +185,8 @@ export default function CampaignDetail() {
 
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
-      setSelectedCampaign( tempCampaignInfo );
       setCampaigns(data.result_data);
+      setSelectedCampaign( tempCampaignInfo );
       setChangeYn(false);
     }
   });
@@ -234,7 +235,6 @@ export default function CampaignDetail() {
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
               className="" 
               disabled={selectedCampaign !== null}
-              defaultValue={tempCampaignInfo.campaign_id}
             />
           </div>
 
@@ -262,7 +262,8 @@ export default function CampaignDetail() {
             <Input 
               value={tempCampaignInfo.campaign_name || ''} 
               onChange={(e) => handleInputData(e.target.value, 'campaign_name')}         
-              className="" defaultValue={tempCampaignInfo.campaign_name}
+              className="" 
+              readOnly
             />
           </div>
 
@@ -306,18 +307,20 @@ export default function CampaignDetail() {
           <div className='flex items-center gap-2'>
             <Label className="w-[5.6rem] min-w-[5.6rem]">발신번호</Label>
             <Input value={inputCallingNumber} className="w-full" 
-              disabled={selectedCampaign !== null} />
+              disabled={selectedCampaign !== null} readOnly
+            />
             <Button variant="outline" className='h-7'>발신번호 변경</Button>
           </div>
           <div className="flex items-center gap-2 col-span-3">
             <Label className="w-[5.6rem] min-w-[5.6rem]">설명</Label>
-            <Input value={tempCampaignInfo.campaign_desc || ''} className="w-full" defaultValue={tempCampaignInfo.campaign_desc}          
-              onChange={(e) => handleInputData(e.target.value, 'campaign_desc')} /> 
+            <Input value={tempCampaignInfo.campaign_desc || ''} className="w-full"          
+              onChange={(e) => handleInputData(e.target.value, 'campaign_desc')} 
+            /> 
           </div>
         </div>
       </div>
       <div>
-        <CampaignTab/>
+        <CampaignTab campaignId={tempCampaignInfo.campaign_id + ''} />
       </div>
       <SkillListPopup
         param={tempCampaignSkills.skill_id||[]}

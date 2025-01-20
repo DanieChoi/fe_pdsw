@@ -5,8 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useApiForDialingDevice } from '@/features/auth/hooks/useApiForDialingDevice';
-import Cookies from 'js-cookie';
+import DataGrid from 'react-data-grid';
+
 
 const SystemPreferences = () => {
     const [refreshCycle, setRefreshCycle] = useState("5"); // 채널 수 갱신 주기
@@ -16,18 +16,29 @@ const SystemPreferences = () => {
     const [allocationMode, setAllocationMode] = useState(""); // 할당 모드
     const [allocationOutboundMode, setAllocationOutboundMode] = useState(""); // 할당 발신 모드
 
-    const { mutate: fetchDialingDeviceList } = useApiForDialingDevice({
-        onSuccess: (data) => {
-            console.log("시스템 설정 api 요청 확인 : ", data);
-        }
-    });
-
-    useEffect(() => {
-        const _tenantId = Number(Cookies.get('tenant_id'));
-        fetchDialingDeviceList({
-            tenant_id_array: [_tenantId]
-        });
-    }, [fetchDialingDeviceList]);
+    const equipmentColumns = [
+        { key: "id", name: "장비번호" },
+        { key: "channels", name: "채널수" },
+        { key: "name", name: "장비이름" },
+        { key: "usage", name: "사용여부" },
+      ];
+    
+      const equipmentRows = [
+        { id: 1, channels: 30, name: "IPPDS1", usage: "사용" },
+        { id: 3, channels: 60, name: "IPPDS3", usage: "미사용" },
+      ];
+    
+      const channelColumns = [
+        { key: "channelNumber", name: "채널번호" },
+        { key: "channelName", name: "채널이름" },
+        { key: "mode", name: "할당 발신모드" },
+      ];
+    
+      const channelRows = Array.from({ length: 20 }, (_, index) => ({
+        channelNumber: index + 1,
+        channelName: `Channel No ${index + 1}`,
+        mode: "발신방법 모두 사용",
+      }));
 
     return (
         <div className=''>
@@ -35,7 +46,13 @@ const SystemPreferences = () => {
                 <div className="w-1/2 flex-1 flex flex-col gap-5">
                     <div className="flex flex-col gap-2">
                         <TitleWrap title="장비 목록" totalCount={2} />
-                        <div className="min-h-[400px] bg-[#777]">테이블</div>
+                        <div className="gird-custom-wrap h-[300px]">
+                            <DataGrid
+                            columns={equipmentColumns}
+                            rows={equipmentRows}
+                            className="grid-custom"
+                            />
+                        </div>
                     </div>
                     <div className="flex flex-col gap-2">
                          <TitleWrap
@@ -98,7 +115,13 @@ const SystemPreferences = () => {
                 <div className="w-1/2 flex-1 flex flex-col gap-5">
                     <div className="flex flex-col gap-2">
                         <TitleWrap title="채널목록" totalCount={30} />
-                        <div className="min-h-[400px] bg-[#777]">테이블</div>
+                        <div className="gird-custom-wrap h-[300px]">
+                            <DataGrid
+                            columns={channelColumns}
+                            rows={channelRows}
+                            className="grid-custom"
+                            />
+                        </div>
                     </div>
                     <div className="flex flex-col gap-2">
                          <TitleWrap

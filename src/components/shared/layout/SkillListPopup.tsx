@@ -28,7 +28,7 @@ const SkillListPopup = ({
     const [selectedSkills, setSelectedSkills] = useState<number[]>(param);
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, skillId: number) => {
         if(e.target.checked){
-            let temp = [...selectedSkills, skillId].sort();
+            const temp = [...selectedSkills, skillId].sort();
             setSelectedSkills(temp);
         }else{
             setSelectedSkills(selectedSkills.filter((data) => data !== skillId));

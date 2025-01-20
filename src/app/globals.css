@@ -250,11 +250,14 @@ input::placeholder {
 
 
 /*gird-custom*/
-.gird-custom{
-  border:1px solid  hsl(var(--border)); 
+.gird-custom-wrap{
+  border:1px solid #ebebeb; 
   border-radius: 4px;
-  overflow: hidden;
 }
+.grid-custom{
+  height: 100%;
+}
+
 .grid-custom .rdg-header-row .rdg-cell{
   background: #F8F8F8;
   border-bottom: 1px solid #ebebeb;
@@ -262,6 +265,7 @@ input::placeholder {
   color: #333;
   font-weight: normal;
   text-align: center;
+  border-right: 1px solid #ebebeb;
 }
 
 .grid-custom .rdg-header-row .rdg-cell[aria-selected="true"]{
@@ -272,14 +276,9 @@ input::placeholder {
   border-bottom: 1px solid #ebebeb;
   text-align: center;
 }
-.grid-custom .rdg-row .rdg-cell[aria-selected="true"]{
-  border-bottom: 1px solid #ebebeb;
-  font-size: 13px;
-  color: #333;
-  font-weight: normal;
-  text-align: center;
+.grid-custom .rdg-row:hover{
+  background: #FFFAEE;
 }
-
 .grid-custom .rdg-row .rdg-cell[aria-selected="true"]{
   outline: 2px solid #ebebeb;
   outline-offset: -1px
