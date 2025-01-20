@@ -31,7 +31,7 @@ const CampaignTab: React.FC<Props> = ({ campaignId }) => {
         </TabsList>
       </div>
       <TabsContent value="tab1">
-        <OperationTimeTab />
+        <OperationTimeTab campaignId={campaignId} />
       </TabsContent>
       <TabsContent value="tab2">
         <OutgoingOrderTab />
