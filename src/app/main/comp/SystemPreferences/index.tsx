@@ -34,7 +34,7 @@ const SystemPreferences = () => {
         { key: "mode", name: "할당 발신모드" },
       ];
     
-      const channelRows = Array.from({ length: 30 }, (_, index) => ({
+      const channelRows = Array.from({ length: 20 }, (_, index) => ({
         channelNumber: index + 1,
         channelName: `Channel No ${index + 1}`,
         mode: "발신방법 모두 사용",
@@ -46,7 +46,7 @@ const SystemPreferences = () => {
                 <div className="w-1/2 flex-1 flex flex-col gap-5">
                     <div className="flex flex-col gap-2">
                         <TitleWrap title="장비 목록" totalCount={2} />
-                        <div className="min-h-[400px] gird-custom">
+                        <div className="gird-custom">
                             <DataGrid
                             columns={equipmentColumns}
                             rows={equipmentRows}
@@ -115,7 +115,7 @@ const SystemPreferences = () => {
                 <div className="w-1/2 flex-1 flex flex-col gap-5">
                     <div className="flex flex-col gap-2">
                         <TitleWrap title="채널목록" totalCount={30} />
-                        <div className="min-h-[400px] gird-custom ">
+                        <div className="gird-custom ">
                             <DataGrid
                             columns={channelColumns}
                             rows={channelRows}
