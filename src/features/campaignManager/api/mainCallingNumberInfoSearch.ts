@@ -1,4 +1,4 @@
-// src/features/auth/api/fetchSkills.ts
+// src/features/campaignManager/api/mainCallingNumberInfoSearch.ts
 import { axiosInstance } from '@/lib/axios';
 import { MainCredentials, CallingNumberListResponse } from '../types/campaignManagerIndex';
 

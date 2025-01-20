@@ -11,9 +11,9 @@ import CampaignTab from './CampaignTab';
 import { MainDataResponse, CampaignSkillUpdateRequest } from '@/features/auth/types/mainIndex';
 import { useEffect, useState } from 'react';
 import SkillListPopup from '@/components/shared/layout/SkillListPopup';
-import { useApiForCampaignSkillUpdate } from '@/features/auth/hooks/useApiForCampaignSkillUpdate';
+import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
-import { useApiForCampaignSkill } from '@/features/auth/hooks/useApiForCampaignSkill';
+import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},

@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react'
 import CampaignManagerHeader, {CampaignHeaderSearch} from './CampaignManagerHeader';
 import CampaignManagerDetail from './CampaignManagerDetail';
 import CampaignManagerList from './CampaignManagerList';
-import { useApiForSchedules } from '@/features/auth/hooks/useApiForSchedules';
-import { useApiForSkills } from '@/features/auth/hooks/useApiForSkills';
-import { useApiForCallingNumber } from '@/features/auth/hooks/useApiForCallingNumber';
-import { useApiForCampaignSkill } from '@/features/auth/hooks/useApiForCampaignSkill';
-import { useApiForPhoneDescription } from '@/features/auth/hooks/useApiForPhoneDescription';
+import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
+import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
+import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
+import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
+import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useMainStore, useCampainManagerStore } from '@/store';
 
 type Props = {

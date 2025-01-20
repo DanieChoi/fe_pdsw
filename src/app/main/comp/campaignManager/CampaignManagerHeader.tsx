@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { CommonButton } from "@/components/shared/CommonButton";
-import { SkillListDataResponse } from '@/features/auth/types/campaignManagerIndex';
+import { SkillListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},

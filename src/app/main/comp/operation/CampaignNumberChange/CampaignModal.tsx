@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X } from 'lucide-react';
 import { useMainStore, useCampainManagerStore } from '@/store';
-import { SkillListDataResponse } from '@/features/auth/types/campaignManagerIndex';
+import { SkillListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
