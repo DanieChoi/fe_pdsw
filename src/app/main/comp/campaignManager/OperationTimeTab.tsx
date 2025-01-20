@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
@@ -8,6 +8,7 @@ import { CommonButton } from "@/components/shared/CommonButton";
 import DatePicker from "react-date-picker";
 import { Calendar as CalendarIcon } from "lucide-react";
 import Image from "next/image";
+import { useMainStore, useCampainManagerStore } from '@/store';
 
 type Column = {
   key: string;
@@ -34,15 +35,52 @@ const rows: Row[] = [
   { no: 3, division: 3, startTime: "02:00", endTime: "03:00" },
 ];
 
+interface DataProps {
+  no: number;
+  division: number;
+  startTime: string;
+  endTime: string;
+}
+
 type Props = {
   campaignId: string;
 };
 
 const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
+  const { selectedCampaign } = useMainStore();
+  const { schedules } = useCampainManagerStore();
+  const [tempData, setTempData] = useState<DataProps[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
   const [startTime, setStartTime] = useState(""); // 시작시간
   const [endTime, setEndTime] = useState(""); // 종료시간
+  const [startFlag, setStartFlag] = useState(""); // 시작구분
+
+  useEffect(() => {
+    if( schedules.length > 0 && selectedCampaign ) {      
+      const tempCampaignScheduleList = schedules.filter((schedule) => schedule.campaign_id === selectedCampaign?.campaign_id);
+      const tempCampaignSchedule = tempCampaignScheduleList[0];
+      const CampaignScheduleStartTime = tempCampaignSchedule.start_time;
+      const CampaignScheduleEndTime = tempCampaignSchedule.end_time;
+      setStartDate(new Date(tempCampaignSchedule.start_date.substring(0,4)+'-'+ tempCampaignSchedule.start_date.substring(4,6)+'-'+ tempCampaignSchedule.start_date.substring(6,8)));
+      setEndDate(new Date(tempCampaignSchedule.end_date.substring(0,4)+'-'+ tempCampaignSchedule.end_date.substring(4,6)+'-'+ tempCampaignSchedule.end_date.substring(6,8)));
+      setStartFlag(selectedCampaign.start_flag.toString());
+      if( CampaignScheduleStartTime.length > 0 && CampaignScheduleEndTime.length > 0 ) {
+        setTempData([]);
+        CampaignScheduleStartTime.map((item, index) => {
+          setTempData((prev) => [
+            ...prev,
+            {
+              no: index + 1,
+              division: 1,
+              startTime: item.substring(0,2)+":"+item.substring(2,4),
+              endTime: CampaignScheduleEndTime[index].substring(0,2)+":"+CampaignScheduleEndTime[index].substring(2,4),
+            },
+          ]);
+        });
+      }
+    }
+  }, [schedules, selectedCampaign]);
 
   return (
     <div className="py-5">
@@ -52,7 +90,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
           <div className="flex flex-col gap-y-2">
             <div className="flex items-center gap-2 justify-between">
               <Label className="w-[5rem] min-w-[5rem]">시작</Label>
-              <Select>
+              <Select value={startFlag} onValueChange={setStartFlag}>
                 <SelectTrigger>
                   <SelectValue placeholder="시작" />
                 </SelectTrigger>
@@ -66,7 +104,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
 
             <div className="flex items-center gap-2 justify-between">
               <Label className="w-[5rem] min-w-[5rem]">종료구분</Label>
-              <CustomInput disabled={true} />
+              <CustomInput disabled={true} value={selectedCampaign?.end_flag === 1?'진행 중':'완료'}/>
             </div>
 
             <div className="flex items-center gap-2 justify-between">
@@ -114,6 +152,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
                     type="text"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
+                    maxLength={4}
                   />
                 </div>
                 <div className="flex items-center gap-2 justify-between">
@@ -122,10 +161,39 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
                     type="text"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
+                    maxLength={4}
                   />
                 </div>
                 <div className="flex justify-end">
-                  <CommonButton variant="secondary">
+                  <CommonButton variant="secondary" onClick={()=>{
+                      if( startTime.length === 4 && endTime.length === 4 ) {
+                        let check = false;
+                        tempData.map((item, index) => {
+                          if( item.startTime.substring(0,2)+item.startTime.substring(3,5) === startTime 
+                          && item.endTime.substring(0,2)+item.endTime.substring(3,5) === endTime ) {
+                            alert("동일한 시간이 이미 설정되어 있습니다.");
+                            check = true;
+                          }
+                        });
+                        if( startTime > endTime ) {
+                          alert("종료시간 설정이 잘못 되었습니다.");
+                          check = true;
+                        }
+                        if( !check ) {                          
+                          setTempData((prev) => [
+                            ...prev,
+                            {
+                              no: prev.length + 1,
+                              division: prev.length + 1,
+                              startTime: startTime.substring(0,2)+":"+startTime.substring(2,4),
+                              endTime: endTime.substring(0,2)+":"+endTime.substring(2,4),
+                            },
+                          ]);
+                          setStartTime("");
+                          setEndTime("");
+                        }
+                      }
+                    }}>
                     시간추가
                     <Image src="/addArrow.svg" alt="스킬팝업" width={10} height={10} />
                   </CommonButton>
@@ -134,7 +202,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
             </div>
             <div className="w-[60%]">
               <div className="grid-custom-wrap h-[270px]">
-                <DataGrid columns={columns} rows={rows} className="grid-custom" />
+                <DataGrid columns={columns} rows={tempData} className="grid-custom" />
               </div>
             </div>
           </div>
