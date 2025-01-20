@@ -21,6 +21,8 @@ const buttonVariants = cva(
          "bg-transparent hover:bg-gray-100",
        link: 
          "text-primary underline-offset-4 hover:underline",
+       datapicker: 
+         "flex h-7 w-full items-center justify-between whitespace-nowrap rounded-[3px] border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:text-[#aaa] disabled:bg-[#F4F4F4] [&>span]:line-clamp-1 border-[#ebebeb]",
        menu:
          "bg-white hover:bg-gray-50 rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center",
        menuActive:

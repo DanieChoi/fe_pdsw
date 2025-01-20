@@ -250,13 +250,13 @@ input::placeholder {
 
 
 /*gird-custom*/
-.gird-custom{
+.gird-custom-wrap{
   border:1px solid #ebebeb; 
   border-radius: 4px;
-  overflow: hidden;
 }
-.gird-custom .rdg{}
-
+.grid-custom{
+  height: 100%;
+}
 
 .grid-custom .rdg-header-row .rdg-cell{
   background: #F8F8F8;
