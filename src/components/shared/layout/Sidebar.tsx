@@ -30,7 +30,7 @@ interface SidebarProps {
 
 export default function Sidebar({ isMenuOpen, toggleSidebar }: SidebarProps) {
   const router = useRouter();
-  const [width, setWidth] = useState(330);
+  const [width, setWidth] = useState(260);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [alertState, setAlertState] = useState(errorMessage);
@@ -343,21 +343,21 @@ export default function Sidebar({ isMenuOpen, toggleSidebar }: SidebarProps) {
       <aside
         ref={sidebarRef}
         style={{ width: isMenuOpen ? `${width}px` : '0' }}
-        className="transition-all duration-300 ease-in-out bg-white border-r shadow-sm flex flex-col min-h-screen relative"
+        className="transition-all duration-300 ease-in-out bg-white border-r shadow-sm flex flex-col relative"
       >
-        <nav className="h-full relative">
-          <button
-            onClick={toggleSidebar}
-            className="toggle-btn transition-transform flex items-center justify-center"
-          >
-            <Image
-              src="/sidebar-menu/sidebar-icon.svg"
-              alt="Sidebar Toggle"
-              width={24}
-              height={24}
-              className="object-contain"
-            />
-          </button>
+        <button
+          onClick={toggleSidebar}
+          className="toggle-btn transition-transform flex items-center justify-center"
+        >
+          <Image
+            src="/sidebar-menu/sidebar-icon.svg"
+            alt="Sidebar Toggle"
+            width={24}
+            height={24}
+            className="object-contain"
+          />
+        </button>
+        <nav className="h-full relative overflow-auto">
           <div className="py-4">
             {isMenuOpen && <h2 className="px-4 text-lg font-semibold mb-4">캠페인 목록</h2>}
             {isMenuOpen && renderContent()}
