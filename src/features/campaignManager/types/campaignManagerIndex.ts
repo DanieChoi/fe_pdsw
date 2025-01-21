@@ -47,22 +47,10 @@ export interface SkillListCredentials {
   tenant_id_array: number[];
 }
 
-// 백엔드로 전송되는 실제 메인 요청 데이터 타입
-export interface MainRequest {
-  session_key: string;
-  tenant_id: number;
-}
-
 // 캠페인스킬 수정 요청 데이터 타입
 export interface CampaignSkillUpdateRequest {
   campaign_id: number;
   skill_id: number[];
-}
-
-// 메인 응답 데이터 리스트 타입
-export interface AuthApiError {
-  message: string;
-  status: number;
 }
 
 // 캠페인발신번호 데이터 타입
@@ -117,14 +105,15 @@ export interface UpdateResponse {
   result_msg: string;
 }
 
-// API 에러 타입
-export interface AuthApiError {
+// 캠페인 API 에러 타입
+export interface CampaignApiError {
   message: string;
   status: number;
 }
 
 // 캠페인정보 수정 요청 데이터 타입
 export interface CampaignInfoUpdateRequest {
+  campaign_id: number;
   campaign_name: string;
   campaign_desc: string;
   site_code: number;
@@ -147,7 +136,7 @@ export interface CampaignInfoUpdateRequest {
   dial_try_interval: number;  
   trunk_access_code: string;
   DDD_code: string;
-  power_divert_queue: number;
+  power_divert_queue: string;
   max_ring: number;
   detect_mode: number;
   auto_dial_interval: number;
@@ -157,20 +146,15 @@ export interface CampaignInfoUpdateRequest {
   update_user: string;
   update_time: string;
   update_ip: string;
-  customer_char_id: number;
   dial_phone_id: number;
-  counsel_script_id: number;
-  announcement_id: number;
   tenant_id: number;
   alarm_answer_count: number;
   dial_speed: number;
   parent_campaign: number;
-  campaign_level: number;
   overdial_abandon_time: number;
   list_alarm_count: number;
   supervisor_phone: string;
   reuse_count: number;
-  outbound_sequence: string;
   use_counsel_result: number;
   use_list_alarm: number;
   redial_strategy1: string;
@@ -180,4 +164,9 @@ export interface CampaignInfoUpdateRequest {
   redial_strategy5: string;  
   dial_mode_option: number;
   user_option: string;  
+  customer_char_id: number;
+  counsel_script_id: number;
+  announcement_id: number;
+  campaign_level: number;
+  outbound_sequence: string;
 }
