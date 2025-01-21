@@ -359,7 +359,7 @@ export default function CampaignDetail() {
   
 
   return (
-    <div className='flex flex-col gap-5 w-[65%] overflow-auto'>
+    <div className='flex flex-col gap-5 w-[60%] overflow-auto'>
       <div>
         <TitleWrap
           className='border-b border-gray-300 pb-1'

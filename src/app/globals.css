@@ -253,6 +253,7 @@ input::placeholder {
 .grid-custom-wrap{
   border:1px solid #ebebeb; 
   border-radius: 4px;
+
 }
 .grid-custom{
   height: 100%;
@@ -285,6 +286,9 @@ input::placeholder {
   outline-offset: -1px
 }
 
+.grid-custom.row-none .rdg-row:hover{
+  background: transparent;
+}
 
 
 /*데이터피커*/
