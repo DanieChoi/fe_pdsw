@@ -1,6 +1,7 @@
 // src/features/auth/types/mainIndex.ts
 // 메인 요청 시 필요한 credentials 타입
 export interface MainCredentials {
+  roleId?: any;
   session_key: string;
   tenant_id: number;
 }

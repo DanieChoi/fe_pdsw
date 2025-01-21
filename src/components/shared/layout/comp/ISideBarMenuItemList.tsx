@@ -1,11 +1,12 @@
 "use client";
 
 import { MainDataResponse } from "@/features/auth/types/mainIndex";
+import { ITenant } from "@/features/campaignManager/types/typeForMainSideBar";
 import Image from "next/image";
 
 interface ISideBarMenuItemListProps {
   _tenantId: number;
-  tenants: any[];
+  tenants: ITenant[];  // any[] 대신 ITenant[] 사용
   campaigns: MainDataResponse[];
   expandedTenants: number[];
   toggleTenant: (tenantId: number) => void;

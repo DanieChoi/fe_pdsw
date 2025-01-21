@@ -33,3 +33,17 @@ export const fetchCampaigns = async (credentials: MainCredentials): Promise<Main
     throw new Error(error.response?.data?.result_code + '||' + error.response?.data?.result_msg || '데이터 가져오기 실패');
   }
 };
+
+export const fetchCounselorList = async (credentials: MainCredentials): Promise<any> => {
+  try {
+    const { data } = await axiosInstance.get<any>(
+      `http://localhost:4000/api/v1/counselor/list?tenantId=${credentials.tenant_id}&roleId=${credentials.roleId}`
+    );
+    return data;
+  } catch (error: any) {
+    if (error.response?.status === 401) {
+      throw new Error('세션이 만료되었습니다. 다시 로그인해주세요.');
+    }
+    throw new Error(error.response?.data?.result_code + '||' + error.response?.data?.result_msg || '데이터 가져오기 실패');
+  }
+}
