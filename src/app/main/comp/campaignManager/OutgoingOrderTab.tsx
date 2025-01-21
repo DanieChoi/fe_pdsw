@@ -211,8 +211,8 @@ const OutgoingOrderTab: React.FC = () => {
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-5">
-            <CommonButton>확인</CommonButton>
-            <CommonButton>취소</CommonButton>
+            <CommonButton variant="secondary">확인</CommonButton>
+            <CommonButton variant="secondary">취소</CommonButton>
           </div>
         </div>
       </div>
