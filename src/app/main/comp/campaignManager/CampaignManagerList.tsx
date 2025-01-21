@@ -73,7 +73,7 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
 
 
   return (
-    <div>
+    <div className="w-[45%] shrink-0">
       <TitleWrap title="캠페인 목록" totalCount={tempCampaigns.length} />
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
