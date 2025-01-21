@@ -1,12 +1,13 @@
 import { axiosInstance } from "@/lib/axios";
-import { DialingDeviceListCredentials, DialingDeviceListResponse } from "../types/mainIndex";
+import { DialingDeviceListCredentials, DialingDeviceListResponse } from "../types/SystemPreferences";
 
+// 시스템 설정 장비 리스트 요청
 export const fetchDialingDeviceList = async (credentials: DialingDeviceListCredentials): Promise<DialingDeviceListResponse> => {
     const dialingDeviceListRequestData = {
         filter: {
             device_id: {
                 "start": 1,
-                "end": 100,
+                "end": 99,
             },
             tenant_id: credentials.tenant_id_array
         },

@@ -6,9 +6,9 @@ import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { CommonRadio, CommonRadioItem } from "@/components/shared/CommonRadio";
 import DataGrid from 'react-data-grid';
-import { useApiForDialingDevice } from '@/features/auth/hooks/useApiForDialingDevice';
-import { DialingDeviceListDataResponse } from '@/features/auth/types/mainIndex';
 import { useMainStore } from '@/store';
+import { DialingDeviceListDataResponse } from '@/features/systemPreferences/types/SystemPreferences';
+import { useApiForDialingDevice } from '@/features/systemPreferences/hooks/useApiForDialingDevice';
 
 
 const SystemPreferences = () => {

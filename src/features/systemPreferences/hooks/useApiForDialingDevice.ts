@@ -1,10 +1,9 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { DialingDeviceListCredentials, DialingDeviceListResponse } from "../types/mainIndex";
-import { AuthApiError } from "../types/loginIndex";
 import { fetchDialingDeviceList } from "../api/dialingdevicelist";
+import { ApiError, DialingDeviceListCredentials, DialingDeviceListResponse } from "../types/SystemPreferences";
 
 export function useApiForDialingDevice(
-    options?: UseMutationOptions<DialingDeviceListResponse, AuthApiError, DialingDeviceListCredentials>
+    options?: UseMutationOptions<DialingDeviceListResponse, ApiError, DialingDeviceListCredentials>
 ) {
     return useMutation({
         mutationKey: ['dialingDeviceList'],
@@ -19,7 +18,7 @@ export function useApiForDialingDevice(
             });
             options?.onSuccess?.(data, variables, context);
         },
-        onError: (error: AuthApiError, variables: DialingDeviceListCredentials, context: unknown) => {
+        onError: (error: ApiError, variables: DialingDeviceListCredentials, context: unknown) => {
             options?.onError?.(error, variables, context);
         },
     });
