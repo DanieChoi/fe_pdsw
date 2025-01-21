@@ -117,7 +117,7 @@ const OutgoingOrderTab: React.FC = () => {
               </SelectContent>
             </Select>
           </div>
-          <div className="gird-custom-wrap w-[75%]">
+          <div className="grid-custom-wrap w-[75%]">
             <DataGrid
               columns={columns}
               rows={rows}
