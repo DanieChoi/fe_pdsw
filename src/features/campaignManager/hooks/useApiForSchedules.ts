@@ -2,10 +2,10 @@
 import { useMutation } from '@tanstack/react-query';
 import { fetchSchedules } from '../api/mainCampaignSchedule';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { SkillListCredentials, CampaignScheDuleListResponse, AuthApiError } from '../types/campaignManagerIndex';
+import { SkillListCredentials, CampaignScheDuleListResponse, CampaignApiError } from '../types/campaignManagerIndex';
 
 export function useApiForSchedules(
-  options?: UseMutationOptions<CampaignScheDuleListResponse, AuthApiError, SkillListCredentials>
+  options?: UseMutationOptions<CampaignScheDuleListResponse, CampaignApiError, SkillListCredentials>
 ) {
   return useMutation({
     mutationKey: ['mainSchedules'],
@@ -20,7 +20,7 @@ export function useApiForSchedules(
       });
       options?.onSuccess?.(data, variables, context);
     },
-    onError: (error: AuthApiError, variables: SkillListCredentials, context: unknown) => {
+    onError: (error: CampaignApiError, variables: SkillListCredentials, context: unknown) => {
       // console.error('API Error:', error);
       // toast.error(error.message || '데이터 로드에 실패했습니다.');
       options?.onError?.(error, variables, context);
