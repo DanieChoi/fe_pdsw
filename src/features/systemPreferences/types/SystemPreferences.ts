@@ -25,3 +25,20 @@ result_count: number;
 total_count: number;
 result_data: DialingDeviceListDataResponse[];
 }
+
+// 채널 리스트 데이터 타입
+export interface ChannelListDataResponse {
+  device_id: number;
+  assign_kind: number;
+  channel_count: number;
+  channel_assign: number[];
+}
+
+// 채널 리스트 타입
+export interface ChannelListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: ChannelListDataResponse[];
+}
