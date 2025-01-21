@@ -81,7 +81,7 @@ const CampaignManager = ({campaignId}: Props) => {
     <div>
       <div className='flex flex-col gap-4'>
           <CampaignManagerHeader campaignId={campaignId} onSearch={handleCampaignHeaderSearch}/>
-          <div className="grid grid-cols-[4fr_6fr] gap-5">
+          <div className="flex gap-5">
             <CampaignManagerList campaignId={campaignId} campaignHeaderSearchParam={campaignHeaderSearchParam}/>
             <CampaignManagerDetail />
           </div>

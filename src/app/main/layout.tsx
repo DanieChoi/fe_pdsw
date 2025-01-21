@@ -55,11 +55,11 @@ export default function MainLayout({
     <div className={`${inter.className} h-screen`}>
       <div className="flex flex-col h-full relative">
         <Header />
-        <div className="flex flex-1 h-[calc(100%-28px)]">
+        <div className="flex flex-1 h-[calc(100%-129px)]">
           <Sidebar isMenuOpen={isMenuOpen} toggleSidebar={toggleSidebar} />
           <main
             className={`transition-all duration-300 flex flex-col relative h-full ${
-              isMenuOpen ? 'w-[calc(100%-16rem)]' : 'w-full'
+              isMenuOpen ? 'w-[calc(100%-260px)]' : 'w-full'
             }`}
           >
             <div 

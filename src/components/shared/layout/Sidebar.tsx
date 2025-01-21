@@ -34,7 +34,7 @@ interface SidebarProps {
 
 export default function Sidebar({ isMenuOpen, toggleSidebar }: SidebarProps) {
   const router = useRouter();
-  const [width, setWidth] = useState(330);
+  const [width, setWidth] = useState(260);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [alertState, setAlertState] = useState(errorMessage);
@@ -200,19 +200,19 @@ export default function Sidebar({ isMenuOpen, toggleSidebar }: SidebarProps) {
         style={{ width: isMenuOpen ? `${width}px` : "0" }}
         className="transition-all duration-300 ease-in-out bg-white border-r shadow-sm flex flex-col min-h-screen relative"
       >
-        <nav className="h-full relative">
-          <button
-            onClick={toggleSidebar}
-            className="toggle-btn transition-transform flex items-center justify-center"
-          >
-            <Image
-              src="/sidebar-menu/sidebar-icon.svg"
-              alt="Sidebar Toggle"
-              width={24}
-              height={24}
-              className="object-contain"
-            />
-          </button>
+        <button
+          onClick={toggleSidebar}
+          className="toggle-btn transition-transform flex items-center justify-center"
+        >
+          <Image
+            src="/sidebar-menu/sidebar-icon.svg"
+            alt="Sidebar Toggle"
+            width={24}
+            height={24}
+            className="object-contain"
+          />
+        </button>
+        <nav className="h-full relative overflow-auto">
           <div className="py-4">
             {isMenuOpen && (
               <>

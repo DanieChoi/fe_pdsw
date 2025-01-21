@@ -8,10 +8,12 @@ import { CustomInput } from "@/components/shared/CustomInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { CommonButton } from "@/components/shared/CommonButton";
 import CampaignTab from './CampaignTab';
-import { MainDataResponse, CampaignSkillUpdateRequest } from '@/features/auth/types/mainIndex';
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { CampaignSkillUpdateRequest, CampaignInfoUpdateRequest } from '@/features/campaignManager/types/campaignManagerIndex';
 import { useEffect, useState } from 'react';
 import SkillListPopup from '@/components/shared/layout/SkillListPopup';
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
+import { useApiForCampaignManagerUpdate } from '@/features/campaignManager/hooks/useApiForCampaignManagerUpdate';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 
@@ -25,6 +27,65 @@ const dialModeList = [
 const CampaignSkillInfo: CampaignSkillUpdateRequest = {
   campaign_id: 0,
   skill_id: [],
+}
+
+const CampaignManagerInfo: CampaignInfoUpdateRequest = {
+  campaign_id: 0,
+  campaign_name: '',
+  campaign_desc: '',
+  site_code: 0,
+  service_code: 0,
+  start_flag: 0,
+  end_flag: 0,
+  dial_mode: 0,
+  callback_kind: 0,
+  delete_flag: 0,
+  list_count: 0,
+  list_redial_query: '',
+  next_campaign: 0,
+  token_id: 0,
+  phone_order: '',
+  phone_dial_try1: 0,
+  phone_dial_try2: 0,
+  phone_dial_try3: 0,
+  phone_dial_try4: 0,
+  phone_dial_try5: 0,
+  dial_try_interval: 0,
+  trunk_access_code: '',
+  DDD_code: '',
+  power_divert_queue: '',
+  max_ring: 0,
+  detect_mode: 0,
+  auto_dial_interval: 0,
+  creation_user: '',
+  creation_time: '',
+  creation_ip: '',
+  update_user: '',
+  update_time: '',
+  update_ip: '',
+  dial_phone_id: 0,
+  tenant_id: 0,
+  alarm_answer_count: 0,
+  dial_speed: 0,
+  parent_campaign: 0,
+  overdial_abandon_time: 0,
+  list_alarm_count: 0,
+  supervisor_phone: '',
+  reuse_count: 0,
+  use_counsel_result: 0,
+  use_list_alarm: 0,
+  redial_strategy1: '',
+  redial_strategy2: '',
+  redial_strategy3: '',
+  redial_strategy4: '',
+  redial_strategy5: '',
+  dial_mode_option: 0,
+  user_option: '',
+  customer_char_id: 1,
+  counsel_script_id: 1,
+  announcement_id: 1,
+  campaign_level: 0,
+  outbound_sequence: '',
 }
 
 const CampaignInfo: MainDataResponse = {
@@ -84,6 +145,7 @@ export interface OperationTimeParam {
 
 export default function CampaignDetail() {
   // const selectedCampaign = useMainStore((state) => state.selectedCampaign);
+  const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
   const [changeYn, setChangeYn] = useState<boolean>(false); // 변경여부
@@ -121,6 +183,66 @@ export default function CampaignDetail() {
                   .map((data) => data.calling_number)
                   .join(',');
       setInputCallingNumber(tempCallNumber);
+      setTempCampaignManagerInfo({...CampaignManagerInfo,
+        campaign_id: selectedCampaign.campaign_id,
+        campaign_name: selectedCampaign.campaign_name,
+        campaign_desc: selectedCampaign.campaign_desc,
+        site_code: selectedCampaign.site_code,
+        service_code: selectedCampaign.service_code,
+        start_flag: selectedCampaign.start_flag,
+        end_flag: selectedCampaign.end_flag,
+        dial_mode: selectedCampaign.dial_mode,
+        callback_kind: selectedCampaign.callback_kind,
+        delete_flag: selectedCampaign.delete_flag,
+        list_count: selectedCampaign.list_count,
+        list_redial_query: selectedCampaign.list_redial_query,
+        next_campaign: selectedCampaign.next_campaign,
+        token_id: selectedCampaign.token_id,
+        phone_order: selectedCampaign.phone_order,
+        phone_dial_try1: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(0,1)[0]) : 0,
+        phone_dial_try2: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(1,2)[0]) : 0,
+        phone_dial_try3: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(2,3)[0]) : 0,
+        phone_dial_try4: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(3,4)[0]) : 0,
+        phone_dial_try5: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(4,5)[0]) : 0,
+        dial_try_interval: selectedCampaign.dial_try_interval,
+        trunk_access_code: selectedCampaign.trunk_access_code,
+        DDD_code: selectedCampaign.DDD_code,
+        power_divert_queue: selectedCampaign.power_divert_queue+'',
+        max_ring: selectedCampaign.max_ring,
+        detect_mode: selectedCampaign.detect_mode,
+        auto_dial_interval: selectedCampaign.auto_dial_interval,
+        creation_user: selectedCampaign.creation_user+'',
+        creation_time: selectedCampaign.creation_time,
+        creation_ip: selectedCampaign.creation_ip,
+        update_user: selectedCampaign.update_user+'',
+        update_time: selectedCampaign.update_time,
+        update_ip: selectedCampaign.update_ip,
+        dial_phone_id: selectedCampaign.dial_phone_id,
+        tenant_id: selectedCampaign.tenant_id,
+        alarm_answer_count: selectedCampaign.alarm_answer_count,
+        dial_speed: selectedCampaign.dial_speed,
+        parent_campaign: selectedCampaign.parent_campaign,
+        overdial_abandon_time: selectedCampaign.overdial_abandon_time,
+        list_alarm_count: selectedCampaign.list_alarm_count,
+        supervisor_phone: selectedCampaign.supervisor_phone,
+        reuse_count: selectedCampaign.reuse_count,
+        use_counsel_result: selectedCampaign.use_counsel_result,
+        use_list_alarm: selectedCampaign.use_list_alarm,
+        redial_strategy1: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(0,1)[0]+'' : '',
+        redial_strategy2: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(1,2)[0]+'' : '',
+        redial_strategy3: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(2,3)[0]+'' : '',
+        redial_strategy4: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(3,4)[0]+'' : '',
+        redial_strategy5: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(4,5)[0]+'' : '',
+        dial_mode_option: selectedCampaign.dial_mode_option,
+        user_option: selectedCampaign.user_option,
+        customer_char_id: 1,
+        counsel_script_id: 1,
+        announcement_id: 1,
+        campaign_level: 0,
+        outbound_sequence: ''
+
+      });
+      console.log('캠페인 정보 최초 세팅',tempCampaignManagerInfo);
     }
   }, [selectedCampaign,campaignSkills,callingNumbers]);
 
@@ -133,16 +255,28 @@ export default function CampaignDetail() {
         ...tempCampaignInfo,
         campaign_id: Number(value)
       });
+      setTempCampaignManagerInfo({
+        ...tempCampaignManagerInfo,
+        campaign_id: Number(value)
+      });
     }    
     if( col === 'campaign_name' ){
       setTempCampaignsInfo({
         ...tempCampaignInfo,
         campaign_name: value
       });
+      setTempCampaignManagerInfo({
+        ...tempCampaignManagerInfo,
+        campaign_name: value
+      });
     }
     if( col === 'campaign_desc' ){
       setTempCampaignsInfo({
         ...tempCampaignInfo,
+        campaign_desc: value
+      });
+      setTempCampaignManagerInfo({
+        ...tempCampaignManagerInfo,
         campaign_desc: value
       });
     }
@@ -171,7 +305,9 @@ export default function CampaignDetail() {
   const handleCampaignSave = () => {
     if( changeYn ){
       if( campaignInfoChangeYn ){
-        console.log('캠페인 정보 저장');
+        console.log('캠페인 정보 수정 api 호출');
+        console.log(tempCampaignManagerInfo);
+        fetchCampaignManagerUpdate(tempCampaignManagerInfo);
       }
       if( campaignSkillChangeYn ){
         //캠페인 스킬 수정 api 호출
@@ -205,6 +341,12 @@ export default function CampaignDetail() {
     }
   });
   
+  //캠페인 정보 수정 api 호출
+  const { mutate: fetchCampaignManagerUpdate } = useApiForCampaignManagerUpdate({
+    onSuccess: (data) => {
+    }
+  });
+
   //캠페인 스킬 수정 api 호출
   const { mutate: fetchCampaignSkillUpdate } = useApiForCampaignSkillUpdate({
     onSuccess: (data) => {
@@ -217,7 +359,7 @@ export default function CampaignDetail() {
   
 
   return (
-    <div className='flex flex-col gap-5'>
+    <div className='flex flex-col gap-5 w-[60%] overflow-auto'>
       <div>
         <TitleWrap
           className='border-b border-gray-300 pb-1'

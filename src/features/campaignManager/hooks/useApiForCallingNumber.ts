@@ -2,10 +2,10 @@
 import { useMutation } from '@tanstack/react-query';
 import { fetchCallingNumbers } from '../api/mainCallingNumberInfoSearch';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { CampaignCredentials, CallingNumberListResponse, AuthApiError } from '../types/campaignManagerIndex';
+import { CampaignCredentials, CallingNumberListResponse, CampaignApiError } from '../types/campaignManagerIndex';
 
 export function useApiForCallingNumber(
-  options?: UseMutationOptions<CallingNumberListResponse, AuthApiError, CampaignCredentials>
+  options?: UseMutationOptions<CallingNumberListResponse, CampaignApiError, CampaignCredentials>
 ) {
   return useMutation({
     mutationKey: ['mainCallingNumbers'],
@@ -20,7 +20,7 @@ export function useApiForCallingNumber(
       });
       options?.onSuccess?.(data, variables, context);
     },
-    onError: (error: AuthApiError, variables: CampaignCredentials, context: unknown) => {
+    onError: (error: CampaignApiError, variables: CampaignCredentials, context: unknown) => {
       // console.error('API Error:', error);
       // toast.error(error.message || '데이터 로드에 실패했습니다.');
       options?.onError?.(error, variables, context);

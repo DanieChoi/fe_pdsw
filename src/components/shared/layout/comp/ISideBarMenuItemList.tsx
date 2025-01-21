@@ -5,7 +5,7 @@ import Image from "next/image";
 
 interface ISideBarMenuItemListProps {
   _tenantId: number;
-  tenants: TenantData[];
+  tenants: any[];
   campaigns: MainDataResponse[];
   expandedTenants: number[];
   toggleTenant: (tenantId: number) => void;
