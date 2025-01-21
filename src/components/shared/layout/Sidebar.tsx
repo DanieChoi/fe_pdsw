@@ -1,26 +1,30 @@
 "use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import Cookies from 'js-cookie';
-import { useMainStore } from '@/store';
-import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
-import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Cookies from "js-cookie";
+import { useMainStore } from "@/store";
 
-import CustomAlert from '@/components/shared/layout/CustomAlert';
-import { MainDataResponse } from '@/features/auth/types/mainIndex';
-import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
-import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
-import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
-import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
-import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
+import { useApiForMain } from "@/features/auth/hooks/useApiForMain";
+import { useApiForTenants } from "@/features/auth/hooks/useApiForTenants";
+import CustomAlert from "@/components/shared/layout/CustomAlert";
+import { MainDataResponse } from "@/features/auth/types/mainIndex";
+import { useApiForSkills } from "@/features/campaignManager/hooks/useApiForSkills";
+import { useApiForSchedules } from "@/features/campaignManager/hooks/useApiForSchedules";
+import { useApiForCallingNumber } from "@/features/campaignManager/hooks/useApiForCallingNumber";
+import { useApiForCampaignSkill } from "@/features/campaignManager/hooks/useApiForCampaignSkill";
+import { useApiForPhoneDescription } from "@/features/campaignManager/hooks/useApiForPhoneDescription";
+import ISideBarMenuItemList from "./comp/ISideBarMenuItemList";
+
+// 새로 만든 컴포넌트 import
+// ↑ 자신의 경로에 맞게 import 경로를 수정하세요.
 
 const errorMessage = {
   isOpen: false,
-  message: '',
-  title: '로그인',
-  type: '0',
+  message: "",
+  title: "로그인",
+  type: "0",
 };
 
 interface SidebarProps {
@@ -36,117 +40,114 @@ export default function Sidebar({ isMenuOpen, toggleSidebar }: SidebarProps) {
   const [alertState, setAlertState] = useState(errorMessage);
   const [expandedTenants, setExpandedTenants] = useState<number[]>([]);
 
-  const _sessionKey = Cookies.get('session_key') || '';
-  const _tenantId = Number(Cookies.get('tenant_id'));
+  const _sessionKey = Cookies.get("session_key") || "";
+  const _tenantId = Number(Cookies.get("tenant_id"));
 
-  console.log('Current session key:', _sessionKey);
-  console.log('Current tenant ID:', _tenantId);
+  console.log("Current session key:", _sessionKey);
+  console.log("Current tenant ID:", _tenantId);
 
   const {
     setCampaigns,
     setTenants,
     setSelectedCampaign,
     campaigns,
-    tenants
+    tenants,
   } = useMainStore();
 
   // API hooks
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
-      console.log('Main API response:', data);
+      console.log("Main API response:", data);
       setCampaigns(data.result_data);
       fetchCallingNumbers({
         session_key: _sessionKey,
         tenant_id: _tenantId,
       });
-    }
+    },
   });
 
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
-      console.log('Skills API response:', data);
-      // setSkills(data.result_data);
+      console.log("Skills API response:", data);
       fetchMain({
         session_key: _sessionKey,
-        tenant_id: _tenantId
+        tenant_id: _tenantId,
       });
-    }
+    },
   });
 
   const { mutate: fetchSchedules } = useApiForSchedules({
     onSuccess: (data) => {
-      console.log('Schedules API response:', data);
-      // setSchedules(data.result_data);
-    }
+      console.log("Schedules API response:", data);
+    },
   });
 
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
-      console.log('Calling Numbers API response:', data);
-      // setCallingNumbers(data.result_data);
+      console.log("Calling Numbers API response:", data);
       fetchCampaignSkills({
         session_key: _sessionKey,
-        tenant_id: _tenantId
+        tenant_id: _tenantId,
       });
-    }
+    },
   });
 
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
-      console.log('Campaign Skills API response:', data);
-      // setCampaignSkills(data.result_data);
+      console.log("Campaign Skills API response:", data);
       fetchPhoneDescriptions({
         session_key: _sessionKey,
-        tenant_id: _tenantId
+        tenant_id: _tenantId,
       });
-    }
+    },
   });
 
   const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
     onSuccess: (data) => {
-      console.log('Phone Descriptions API response:', data);
-      // setPhoneDescriptions(data.result_data);
-    }
+      console.log("Phone Descriptions API response:", data);
+    },
   });
 
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
-      console.log('Tenants API response:', data);
+      console.log("Tenants API response:", data);
       if (data.result_code === 5) {
         setAlertState({
           ...errorMessage,
           isOpen: true,
-          message: '로그인 정보가 없습니다.',
+          message: "로그인 정보가 없습니다.",
         });
-        Cookies.remove('session_key');
-        router.push('/login');
+        Cookies.remove("session_key");
+        router.push("/login");
       } else {
         setTenants(data.result_data);
-        const tempTenantIdArray = data.result_data.map(tenant => Number(tenant.tenant_id));
+        const tempTenantIdArray = data.result_data.map((tenant) =>
+          Number(tenant.tenant_id)
+        );
         fetchSkills({
-          tenant_id_array: tempTenantIdArray
+          tenant_id_array: tempTenantIdArray,
         });
         fetchSchedules({
-          tenant_id_array: tempTenantIdArray
+          tenant_id_array: tempTenantIdArray,
         });
       }
     },
     onError: (error) => {
-      console.error('Tenants API error:', error);
-      if (error.message.split('||')[0] === '5') {
+      console.error("Tenants API error:", error);
+      if (error.message.split("||")[0] === "5") {
         setAlertState({
           ...errorMessage,
           isOpen: true,
-          message: '로그인 정보가 없습니다.',
+          message: "로그인 정보가 없습니다.",
         });
-        Cookies.remove('session_key');
-        router.push('/login');
+        Cookies.remove("session_key");
+        router.push("/login");
       }
-    }
+    },
   });
 
   useEffect(() => {
-    console.log('Fetching tenants with:', { _sessionKey, _tenantId });
+    console.log("Fetching tenants with:", { _sessionKey, _tenantId });
     fetchTenants({
       session_key: _sessionKey,
       tenant_id: _tenantId,
@@ -167,21 +168,23 @@ export default function Sidebar({ isMenuOpen, toggleSidebar }: SidebarProps) {
     };
 
     if (isResizing) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isResizing]);
 
+  // 캠페인을 클릭했을 때의 로직
   const handleCampaignClick = (campaign: MainDataResponse) => {
-    console.log('Campaign clicked:', campaign);
+    console.log("Campaign clicked:", campaign);
     setSelectedCampaign(campaign);
   };
 
+  // 테넌트를 열고 닫는 로직
   const toggleTenant = (tenantId: number) => {
     setExpandedTenants((prev) =>
       prev.includes(tenantId)
@@ -190,159 +193,11 @@ export default function Sidebar({ isMenuOpen, toggleSidebar }: SidebarProps) {
     );
   };
 
-  const renderContent = () => {
-    console.log('campaigns check ! :', campaigns );
-    
-    if (!campaigns || campaigns.length === 0) {
-      return (
-        <div className="px-4 py-8 text-center text-gray-500">
-          <p>등록된 캠페인이 없습니다.</p>
-          <p className="text-sm mt-2">캠페인을 추가해주세요.</p>
-        </div>
-      );
-    }
-
-    const handleRightClick = (e: React.MouseEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      if (e.target instanceof HTMLElement) {
-        const campaignId = e.target.id.split('||')[0];
-        const tenantId = e.target.id.split('||')[1];
-        console.log('Right click on campaign:', { campaignId, tenantId });
-      }
-    };
-
-    // campaigns, tenants 둘다 각각 로그로 확인
-    console.log('campaigns:', campaigns);
-    console.log('tenants:', tenants);
-
-    return (
-      <div className="w-full">
-
-      <div className="p-2 cursor-pointer flex items-center">
-        <Image
-          src="/sidebar-menu/company_icon.svg"
-          alt="Company"
-          width={16}
-          height={16}
-          className="object-contain mr-2"
-        />
-        <span className="text-sm font-semibold text-gray-700">NEXUS</span>
-      </div>
-
-        {_tenantId === 0 ? (
-          tenants.map((tenant) => (
-            <div key={tenant.tenant_id} className="mb-1 ml-2">
-              <div
-                className="p-2  cursor-pointer flex items-center justify-between"
-                onClick={() => toggleTenant(tenant.tenant_id)}
-              >
-                <div className="flex items-center">
-
-                <Image
-                  src={`/sidebar-menu/${expandedTenants.includes(tenant.tenant_id) ? 'arrow_minus' : 'arrow_plus'}.svg`}
-                  alt="Toggle"
-                  width={12}
-                  height={12}
-                  className="object-contain mx-1"
-                />
-
-                  <Image
-                    src="/sidebar-menu/tree_folder.svg"
-                    alt="Folder"
-                    width={16}
-                    height={16}
-                    className="object-contain mr-2"
-                  />
-                  <span className="text-sm font-semibold text-gray-700">[ {tenant.tenant_id} ] {tenant.tenant_name}</span>
-                </div>
-                
-              </div>
-              {expandedTenants.includes(tenant.tenant_id) && (
-                <div className="pl-7">
-                  {campaigns
-                    .filter((campaign) => campaign.tenant_id === tenant.tenant_id)
-                    .map((campaign) => (
-                      <div
-                        key={campaign.campaign_id}
-                        onClick={() => handleCampaignClick(campaign)}
-                        className="p-1 hover:bg-gray-100 cursor-pointer flex items-center"
-                      >
-                       <Image
-                          src="/sidebar-menu/tree_folder.svg"
-                          alt="Campaign"
-                          width={14}
-                          height={14}
-                          className="object-contain mr-2"
-                        />
-                        <span className="text-sm text-gray-600">{campaign.campaign_name}</span>
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-          ))
-        ) : (
-          tenants
-            .filter((tenant) => tenant.tenant_id === _tenantId)
-            .map((tenant) => (
-              <div key={tenant.tenant_id} className="mb-1">
-                <div
-                  className="p-2 cursor-pointer flex items-center justify-between"
-                  onClick={() => toggleTenant(tenant.tenant_id)}
-                >
-                  <div className="flex items-center">
-                  <Image
-                      src="/sidebar-menu/folder.svg"
-                      alt="Folder"
-                      width={16}
-                      height={16}
-                      className="object-contain mr-2"
-                  />
-                   <span className="text-sm font-semibold text-gray-700">[ {tenant.tenant_id} ] {tenant.tenant_name}</span>
-                  </div>
-                    
-                  <Image
-                    src={`/sidebar-menu/${expandedTenants.includes(tenant.tenant_id) ? 'opened' : 'closed'}.svg`}
-                    alt="Toggle"
-                    width={12}
-                    height={12}
-                    className="object-contain"
-                  />
-                </div>
-                {expandedTenants.includes(tenant.tenant_id) && (
-                  <div className="pl-7">
-                    {campaigns
-                      .filter((campaign) => campaign.tenant_id === tenant.tenant_id)
-                      .map((campaign) => (
-                        <div
-                          key={campaign.campaign_id}
-                          onClick={() => handleCampaignClick(campaign)}
-                          className="p-1 hover:bg-gray-100 cursor-pointer flex items-center"
-                        >
-                          <Image
-                            src="/sidebar-menu/tree_folder.svg"
-                            alt="Campaign"
-                            width={14}
-                            height={14}
-                            className="object-contain mr-2"
-                          />
-                          <span className="text-sm text-gray-600">{campaign.campaign_name}</span>
-                        </div>
-                      ))}
-                  </div>
-                )}
-              </div>
-            ))
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="flex">
       <aside
         ref={sidebarRef}
-        style={{ width: isMenuOpen ? `${width}px` : '0' }}
+        style={{ width: isMenuOpen ? `${width}px` : "0" }}
         className="transition-all duration-300 ease-in-out bg-white border-r shadow-sm flex flex-col min-h-screen relative"
       >
         <nav className="h-full relative">
@@ -359,10 +214,22 @@ export default function Sidebar({ isMenuOpen, toggleSidebar }: SidebarProps) {
             />
           </button>
           <div className="py-4">
-            {isMenuOpen && <h2 className="px-4 text-lg font-semibold mb-4">캠페인 목록</h2>}
-            {isMenuOpen && renderContent()}
+            {isMenuOpen && (
+              <>
+                <h2 className="px-4 text-lg font-semibold mb-4">캠페인 목록</h2>
+                <ISideBarMenuItemList
+                  _tenantId={_tenantId}
+                  tenants={tenants}
+                  campaigns={campaigns}
+                  expandedTenants={expandedTenants}
+                  toggleTenant={toggleTenant}
+                  handleCampaignClick={handleCampaignClick}
+                />
+              </>
+            )}
           </div>
         </nav>
+
         <CustomAlert
           message={alertState.message}
           title={alertState.title}
