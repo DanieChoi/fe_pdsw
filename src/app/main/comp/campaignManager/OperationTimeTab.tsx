@@ -206,14 +206,20 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
                       }
                     }}>
                     시간추가
-                    <Image src="/addArrow.svg" alt="스킬팝업" width={10} height={10} />
+                    <Image src="/addArrow.svg" alt="화살표" width={10} height={10} />
                   </CommonButton>
                 </div>
               </div>
             </div>
             <div className="w-[60%]">
               <div className="grid-custom-wrap h-[270px]">
-                <DataGrid columns={columns} rows={tempData} className="grid-custom" />
+                <DataGrid 
+                  columns={columns} 
+                  rows={tempData} 
+                  className="grid-custom" 
+                  rowHeight={26}
+                  headerRowHeight={26}
+                  />
               </div>
             </div>
           </div>

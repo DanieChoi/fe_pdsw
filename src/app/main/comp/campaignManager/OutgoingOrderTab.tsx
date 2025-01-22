@@ -121,7 +121,9 @@ const OutgoingOrderTab: React.FC = () => {
             <DataGrid
               columns={columns}
               rows={rows}
-              className="grid-custom h-auto" // React Data Grid의 기본 테마
+              className="grid-custom h-auto"
+              rowHeight={26}
+              headerRowHeight={26}
             />
           </div>
         </div>
