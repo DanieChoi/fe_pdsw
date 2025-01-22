@@ -11,10 +11,6 @@ import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
-import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
-import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
-import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
-import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import useApiForFetchCounselorList from '@/features/campaignManager/hooks/useApiForFetchCounselorList';
 
 const errorMessage = {

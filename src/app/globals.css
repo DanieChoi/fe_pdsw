@@ -393,3 +393,8 @@ input::placeholder {
   color: #aaa; 
   background-color: #f9f9f9; 
 }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
