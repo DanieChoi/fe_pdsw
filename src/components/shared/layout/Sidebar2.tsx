@@ -1,168 +1,120 @@
-// SidebarContainer.tsx
+// src/features/campaignManager/components/SidebarContainer.tsx
 import { useState, useEffect } from 'react';
-import SidebarPresenter from './SidebarPresenter';
-
-type TreeItem = {
-  id: string;
-  label: string;
-  type?: 'folder' | 'campaign';
-  status?: 'active' | 'pending' | 'stopped';
-  children?: TreeItem[];
-};
-
-type TreeData = {
-  label: string;
-  items: TreeItem[];
-};
-
-const treeDataByAccordion: Record<string, TreeData> = {
-  accordion1: {
-    label: 'NEXUS',
-    items: [
-      {
-        id: 'nexus',
-        label: 'NEXUS',
-        type: 'folder',
-        children: [
-          { 
-            id: 'default', 
-            label: '[1] DEFAULT',
-            type: 'folder'
-          },
-          {
-            id: 'skt',
-            label: '[2] SKT',
-            type: 'folder',
-            children: [
-              { id: 'profile', label: '로밍홍보', type: 'campaign', status: 'stopped' },
-              { id: 'test1', label: 'testtest_00124', type: 'campaign', status: 'pending' },
-              { id: 'test2', label: 'testtest_00124', type: 'campaign', status: 'pending' },
-              {
-                id: '1247',
-                label: '1247 그룹',
-                type: 'folder',
-                children: [
-                  { id: 'kakao1', label: '카카오톡회원', type: 'campaign', status: 'active' },
-                  { id: 'kakao2', label: '카카오톡회원', type: 'campaign', status: 'stopped' },
-                  { id: 'kakao3', label: '카카오톡회원', type: 'campaign', status: 'pending' },
-                ]
-              },
-              { id: 'pds', label: 'PDS_Web_Only', type: 'campaign', status: 'active' },
-              { id: 'asdf', label: 'asldkjflkasdfkds', type: 'campaign', status: 'stopped' },
-            ],
-          },
-          { 
-            id: 'kakao', 
-            label: '[3] KAKAO ENTER',
-            type: 'folder'
-          },
-          { 
-            id: 'sktenter', 
-            label: '[4] SKT엔터키',
-            type: 'folder'
-          }
-        ],
-      },
-    ],
-  },
-  accordion2: {
-    label: '프로젝트 2',
-    items: [
-      {
-        id: 'project2',
-        label: 'Project 2',
-        type: 'folder',
-        children: [],
-      },
-    ],
-  },
-  accordion3: {
-    label: '프로젝트 3',
-    items: [
-      {
-        id: 'project3',
-        label: 'Project 3',
-        type: 'folder',
-        children: [],
-      },
-    ],
-  },
-};
-
-const getStatusIcon = (status?: string) => {
-  switch (status) {
-    case 'active':
-      return '/sidebar-menu/tree_play.svg';
-    case 'pending':
-      return '/sidebar-menu/tree_pause.svg';
-    case 'stopped':
-      return '/sidebar-menu/tree_stop.svg';
-    default:
-      return null;
-  }
-};
+import { getStatusIcon } from '@/components/shared/layout/utils/utils';
+import { FilterType, SortType } from '@/features/campaignManager/types/typeForSidebar2';
+import { baseTabs, TabId } from '@/features/campaignManager/components/data/baseTabs';
+import { TreeMenusForCampaigns } from '@/features/campaignManager/components/treeMenus/TreeMenusForCampaigns';
+import { TreeMenusForAgentTab } from '@/features/campaignManager/components/treeMenus/TreeMenusForAgentTab';
+import { TreeMenusForAgentGroupTab } from '@/features/campaignManager/components/treeMenus/TreeMenusForAgentGroupTab';
 
 export default function SidebarContainer() {
   const [width, setWidth] = useState(330);
-  const [activeAccordion, setActiveAccordion] = useState<string | null>('accordion1');
+  const [selectedTabId, setSelectedTabId] = useState<TabId>('campaign');
+  const [selectedNodeId, setSelectedNodeId] = useState<string>();
   const [isResizing, setIsResizing] = useState(false);
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  const [sortType, setSortType] = useState<SortType>('name');
+  const [filterType, setFilterType] = useState<FilterType>('all');
+
+  // 리사이징 관련 핸들러
+  const handleResizeStart = () => {
+    setIsResizing(true);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isResizing) return;
+    const newWidth = e.clientX;
+    setWidth(Math.max(200, Math.min(600, newWidth))); // 최소 200px, 최대 600px
+  };
+
+  const handleMouseUp = () => {
+    setIsResizing(false);
+  };
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing) return;
-      const newWidth = e.clientX;
-      if (newWidth >= 200 && newWidth <= 600) {
-        setWidth(newWidth);
-      }
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-    };
-
     if (isResizing) {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
     }
-
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isResizing]);
 
-  const handleAccordionClick = (key: string) => {
-    setActiveAccordion(activeAccordion === key ? null : key);
-  };
-
   const handleNodeToggle = (nodeId: string) => {
     setExpandedNodes(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(nodeId)) {
-        newSet.delete(nodeId);
+      const next = new Set(prev);
+      if (next.has(nodeId)) {
+        next.delete(nodeId);
       } else {
-        newSet.add(nodeId);
+        next.add(nodeId);
       }
-      return newSet;
+      return next;
     });
   };
 
-  const handleResizeStart = () => {
-    setIsResizing(true);
+  const handleNodeSelect = (nodeId: string) => {
+    setSelectedNodeId(nodeId);
+  };
+
+  const renderTreeMenu = () => {
+    const commonProps = {
+      expandedNodes,
+      selectedNodeId,
+      getStatusIcon,
+      onNodeToggle: handleNodeToggle,
+      onNodeSelect: handleNodeSelect,
+    };
+
+    switch (selectedTabId) {
+      case 'campaign':
+        return <TreeMenusForCampaigns {...commonProps} />;
+      case 'agent':
+        return <TreeMenusForAgentTab />;
+      case 'agent-group':
+        return <TreeMenusForAgentGroupTab />;
+      default:
+        return null;
+    }
   };
 
   return (
-    <SidebarPresenter
-      width={width}
-      activeAccordion={activeAccordion}
-      isResizing={isResizing}
-      expandedNodes={expandedNodes}
-      treeDataByAccordion={treeDataByAccordion}
-      getStatusIcon={getStatusIcon}
-      onAccordionClick={handleAccordionClick}
-      onNodeToggle={handleNodeToggle}
-      onResizeStart={handleResizeStart}
-    />
+    <div className="flex h-full bg-white border-r">
+      <div className="flex flex-col w-full" style={{ width: `${width}px` }}>
+        {/* 헤더 */}
+        <div className="flex-none flex items-center justify-between p-3 bg-gray-50 border-b">
+          <span className="text-sm font-medium text-gray-800">
+            {baseTabs.find(tab => tab.id === selectedTabId)?.label}
+          </span>
+        </div>
+
+        {/* 트리 메뉴 영역 */}
+        {renderTreeMenu()}
+
+        {/* 하단 탭 메뉴 */}
+        <div className="flex-none border-t">
+          {baseTabs.map(tab => (
+            <button
+              key={tab.id}
+              className={`w-full text-left px-4 py-2 text-sm font-medium 
+                ${selectedTabId === tab.id 
+                  ? 'bg-blue-50 text-blue-600' 
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                }`}
+              onClick={() => setSelectedTabId(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 리사이즈 핸들 */}
+      <div
+        className="w-1 cursor-col-resize hover:bg-gray-300 active:bg-gray-400"
+        onMouseDown={handleResizeStart}
+      />
+    </div>
   );
 }

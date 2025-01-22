@@ -3,7 +3,7 @@ import { axiosInstance } from '@/lib/axios';
 import { MainCredentials, TenantListResponse } from '../types/mainIndex';
 
 // 테넌트 리스트 요청
-export const fetchTenants = async (credentials: MainCredentials): Promise<TenantListResponse> => {
+export const fetchTenants = async (): Promise<TenantListResponse> => {
   const tenantRequestData = {
     filter: {      
       tenant_id: {

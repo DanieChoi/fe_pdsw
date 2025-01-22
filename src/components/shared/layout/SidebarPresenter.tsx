@@ -1,45 +1,41 @@
-// SidebarPresenter.tsx
-import { Disclosure } from '@headlessui/react';
-import { Button } from '@/components/ui/button';
-import { Filter, SortAsc } from 'lucide-react';
-
-type TreeItem = {
-  id: string;
-  label: string;
-  type?: 'folder' | 'campaign';
-  status?: 'active' | 'pending' | 'stopped';
-  children?: TreeItem[];
-};
-
-type TreeData = {
-  label: string;
-  items: TreeItem[];
-};
+import { TabData, TreeItem, FilterType, SortType } from '@/features/campaignManager/types/typeForSidebar2';
+import { TabActions } from './comp/TabActions';
 
 interface TreeNodeProps {
   item: TreeItem;
   level: number;
   expandedNodes: Set<string>;
+  selectedNodeId?: string;
   getStatusIcon: (status?: string) => string | null;
   onNodeToggle: (nodeId: string) => void;
+  onNodeSelect: (nodeId: string) => void;
 }
 
 const TreeNode: React.FC<TreeNodeProps> = ({
   item,
   level,
   expandedNodes,
+  selectedNodeId,
   getStatusIcon,
-  onNodeToggle
+  onNodeToggle,
+  onNodeSelect
 }) => {
   const hasChildren = item.children && item.children.length > 0;
   const isExpanded = expandedNodes.has(item.id);
+  const isSelected = selectedNodeId === item.id;
   const statusIcon = getStatusIcon(item.status);
 
   return (
     <div className="select-none">
       <div 
-        className="flex items-center hover:bg-gray-100 rounded px-2 py-1 cursor-pointer"
-        onClick={() => hasChildren && onNodeToggle(item.id)}
+        className={`flex items-center hover:bg-gray-100 rounded px-2 py-1 cursor-pointer
+          ${isSelected ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' : ''}`}
+        onClick={() => {
+          onNodeSelect(item.id);
+          if (hasChildren) {
+            onNodeToggle(item.id);
+          }
+        }}
         style={{ paddingLeft: `${level * 12 + 8}px` }}
       >
         <div className="flex items-center w-full">
@@ -54,19 +50,18 @@ const TreeNode: React.FC<TreeNodeProps> = ({
           )}
           
           {item.type === 'folder' ? (
-            <>
-              {level === 0 && (
-                <img src="/sidebar-menu/company_icon.svg" alt="company" className="w-4 h-4 mr-2" />
-              )}
-              {level > 0 && (
-                <img src="/sidebar-menu/tree_folder.svg" alt="folder" className="w-4 h-4 mr-2" />
-              )}
-            </>
+            <img 
+              src="/sidebar-menu/tree_folder.svg" 
+              alt="folder" 
+              className="w-4 h-4 mr-2"
+            />
           ) : (
             statusIcon && <img src={statusIcon} alt="status" className="w-4 h-4 mr-2" />
           )}
           
-          <span className="text-sm text-gray-800">{item.label}</span>
+          <span className={`text-sm ${isSelected ? 'font-medium' : ''}`}>
+            {item.label}
+          </span>
         </div>
       </div>
       {hasChildren && isExpanded && (
@@ -77,8 +72,10 @@ const TreeNode: React.FC<TreeNodeProps> = ({
               item={child} 
               level={level + 1}
               expandedNodes={expandedNodes}
+              selectedNodeId={selectedNodeId}
               getStatusIcon={getStatusIcon}
               onNodeToggle={onNodeToggle}
+              onNodeSelect={onNodeSelect}
             />
           ))}
         </div>
@@ -88,105 +85,129 @@ const TreeNode: React.FC<TreeNodeProps> = ({
 };
 
 interface SidebarPresenterProps {
+  // 기본 정보
   width: number;
-  activeAccordion: string | null;
+  selectedTabId: string;
+  selectedNodeId?: string;
+  
+  // 리사이징 관련
   isResizing: boolean;
-  expandedNodes: Set<string>;
-  treeDataByAccordion: Record<string, TreeData>;
-  getStatusIcon: (status?: string) => string | null;
-  onAccordionClick: (key: string) => void;
-  onNodeToggle: (nodeId: string) => void;
   onResizeStart: () => void;
+  
+  // 트리 노드 관련
+  expandedNodes: Set<string>;
+  tabs: TabData[];
+  getStatusIcon: (status?: string) => string | null;
+  onNodeToggle: (nodeId: string) => void;
+  onNodeSelect: (nodeId: string) => void;
+  
+  // 탭 관련
+  onTabChange: (tabId: string) => void;
+  
+  // 필터 관련
+  onFilter?: (type: FilterType) => void;
+  selectedFilter: FilterType;
+  
+  // 정렬 관련
+  onSort?: (type: SortType) => void;
+  selectedSort: SortType;
+  
+  // 상태 관련
+  isLoading?: boolean;
+  error?: string | null;
 }
 
 export default function SidebarPresenter({
   width,
-  activeAccordion,
+  selectedTabId,
+  selectedNodeId,
   isResizing,
   expandedNodes,
-  treeDataByAccordion,
+  tabs,
   getStatusIcon,
-  onAccordionClick,
+  onTabChange,
   onNodeToggle,
-  onResizeStart
+  onNodeSelect,
+  onResizeStart,
+  onSort,
+  onFilter,
+  selectedSort,
+  selectedFilter,
+  isLoading,
+  error
 }: SidebarPresenterProps) {
+  const currentTab = tabs.find(tab => tab.id === selectedTabId);
+
   return (
-    <div className="flex h-full">
+    <div className="flex h-full relative">
       <div className="bg-white border-r flex flex-col flex-none" style={{ width: `${width}px` }}>
-        {/* 헤더 */}
-        <div className="flex-none flex items-center justify-between p-2 bg-gray-50 px-3 border-b">
-          <div className="flex items-center gap-2 py-1.5">
-            <img src="/sidebar-menu/phone_icon.svg" alt="navigation" className="w-4 h-4" />
-            <span className="text-sm text-gray-800 font-medium">캠페인</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" className="h-6 px-2 text-xs font-normal">
-              필터
-              <Filter className="h-3 w-3 ml-1" />
-            </Button>
-            <Button variant="ghost" size="sm" className="h-6 px-2 text-xs font-normal">
-              정렬
-              <SortAsc className="h-3 w-3 ml-1" />
-            </Button>
-          </div>
-        </div>
-
-        {/* 메인 컨텐츠 영역 */}
-        <div className="flex-1 min-h-0 overflow-auto">
-          <div className="h-full flex flex-col">
-            {/* 트리 메뉴 영역 */}
-            <div className="flex-1 min-h-0 overflow-auto">
-              {activeAccordion &&
-                treeDataByAccordion[activeAccordion]?.items.map((item) => (
-                  <TreeNode 
-                    key={item.id} 
-                    item={item} 
-                    level={0}
-                    expandedNodes={expandedNodes}
-                    getStatusIcon={getStatusIcon}
-                    onNodeToggle={onNodeToggle}
-                  />
-                ))}
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-none flex items-center justify-between p-2 bg-gray-50 px-3 border-b">
+            <div className="flex items-center gap-2 py-1.5">
+              <img src="/sidebar-menu/phone_icon.svg" alt="navigation" className="w-4 h-4" />
+              <span className="text-sm text-gray-800 font-medium">{currentTab?.label}</span>
             </div>
-
-            {/* 하단 아코디언 */}
-            <div className="flex-none border-t">
-              {Object.entries(treeDataByAccordion).map(([key, data]) => (
-                <Disclosure key={key} defaultOpen={key === 'accordion1'}>
-                  {({ open }) => (
-                    <div className="border-b last:border-b-0">
-                      <Disclosure.Button
-                        onClick={() => onAccordionClick(key)}
-                        className={`w-full text-left py-2 px-4 hover:bg-gray-50 flex items-center justify-between ${
-                          activeAccordion === key ? 'bg-gray-100' : ''
-                        }`}
-                      >
-                        <div className="flex items-center">
-                          <img 
-                            src="/sidebar-menu/company_icon.svg" 
-                            alt="company" 
-                            className="w-4 h-4 mr-2" 
-                          />
-                          <span className={`text-sm ${activeAccordion === key ? 'text-blue-600' : 'text-gray-800'}`}>
-                            {data.label}
-                          </span>
-                        </div>
-                        <img 
-                          src={`/sidebar-menu/arrow_${activeAccordion === key ? 'minus' : 'plus'}.svg`}
-                          alt={activeAccordion === key ? 'collapse' : 'expand'}
-                          className="w-4 h-4"
-                        />
-                      </Disclosure.Button>
-                    </div>
-                  )}
-                </Disclosure>
-              ))}
+            <div className="flex items-center gap-1">
+              {/* <FilterButtonForCampa
+                onFilter={onFilter || (() => {})} 
+                selectedFilter={selectedFilter}
+              />ign
+              <SortButtonForCampaign
+                onSort={onSort || (() => {})} 
+                selectedSort={selectedSort}
+              /> */}
+                <TabActions
+                  tabId={selectedTabId}
+                  onFilter={onFilter || (() => {})}
+                  onSort={onSort || (() => {})}
+                  selectedFilter={selectedFilter}
+                  selectedSort={selectedSort}
+                />
             </div>
+          </div>
+
+          <div className="flex-1 overflow-auto relative">
+            {isLoading && (
+              <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+              </div>
+            )}
+            {error ? (
+              <div className="p-4 text-red-600 text-sm">{error}</div>
+            ) : (
+              currentTab?.items.map(item => (
+                <TreeNode
+                  key={item.id}
+                  item={item}
+                  level={0}
+                  expandedNodes={expandedNodes}
+                  selectedNodeId={selectedNodeId}
+                  getStatusIcon={getStatusIcon}
+                  onNodeToggle={onNodeToggle}
+                  onNodeSelect={onNodeSelect}
+                />
+              ))
+            )}
+          </div>
+
+          <div className="flex-none border-t">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                className={`w-full text-left px-4 py-2 text-sm font-medium 
+                  ${selectedTabId === tab.id 
+                    ? 'bg-blue-50 text-blue-600' 
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                  }`}
+                onClick={() => onTabChange(tab.id)}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* 리사이즈 핸들 */}
       <div
         className="w-1 cursor-col-resize hover:bg-gray-300 active:bg-gray-400"
         onMouseDown={onResizeStart}
@@ -194,3 +215,5 @@ export default function SidebarPresenter({
     </div>
   );
 }
+
+export type { SidebarPresenterProps, TreeNodeProps };

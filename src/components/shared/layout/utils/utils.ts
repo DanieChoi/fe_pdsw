@@ -1,0 +1,121 @@
+// src\components\shared\layout\utils\utils.ts
+
+import { FilterType, SortType, TreeItem } from "@/features/campaignManager/types/typeForSidebar2";
+
+/**
+ * Sidebar에서 MouseMove 이벤트 핸들러
+ * @param e - MouseEvent
+ * @param isResizing - 리사이징 중인지 여부
+ * @param setWidth - width를 업데이트하는 함수
+ */
+export const handleMouseMoveForSidebar = (e: MouseEvent, isResizing: boolean, setWidth: (width: number) => void) => {
+    if (!isResizing) return;
+    const newWidth = e.clientX;
+    if (newWidth >= 200 && newWidth <= 600) {
+      setWidth(newWidth);
+    }
+  };
+  
+  /**
+   * Sidebar에서 MouseUp 이벤트 핸들러
+   * @param setIsResizing - 리사이징 상태를 업데이트하는 함수
+   */
+  export const handleMouseUpForSidebar = (setIsResizing: (isResizing: boolean) => void) => {
+    setIsResizing(false);
+  };
+
+// src/components/shared/layout/utils/utils.ts
+
+/**
+ * Sidebar 노드 토글 핸들러
+ * @param nodeId - 토글할 노드 ID
+ * @param expandedNodes - 현재 확장된 노드들의 집합
+ * @param setExpandedNodes - 확장된 노드를 업데이트하는 함수
+ */
+export const handleNodeToggleForSidebar = (
+  nodeId: string,
+  expandedNodes: Set<string>,
+  setExpandedNodes: (nodes: Set<string>) => void
+) => {
+  const newSet = new Set(expandedNodes);
+  if (newSet.has(nodeId)) {
+    newSet.delete(nodeId);
+  } else {
+    newSet.add(nodeId);
+  }
+  setExpandedNodes(newSet);
+};
+
+/**
+ * Sidebar 노드 선택 핸들러
+ * @param nodeId - 선택한 노드 ID
+ * @param setSelectedNodeId - 선택된 노드를 업데이트하는 함수
+ */
+export const handleNodeSelectForSidebar = (
+  nodeId: string,
+  setSelectedNodeId: (id: string) => void
+) => {
+  setSelectedNodeId(nodeId);
+};
+
+/**
+ * Sidebar 트리 아이템 필터링
+ * @param items - 트리 아이템 목록
+ * @param type - 필터 타입
+ * @returns 필터링된 트리 아이템 목록
+ */
+export const processTreeItemsForSidebar = (items: TreeItem[], type: FilterType): TreeItem[] => {
+  return items
+    .map((item) => {
+      const processed = { ...item };
+      if (item.children) {
+        processed.children = processTreeItemsForSidebar(item.children, type);
+      }
+      return processed;
+    })
+    .filter((item) => {
+      if (type === 'all') return true;
+      if (item.type === 'folder' && item.children && item.children.length > 0) return true;
+      return item.direction === type;
+    });
+};
+
+/**
+ * Sidebar 정렬 처리
+ * @param items - 트리 아이템 목록
+ * @param type - 정렬 타입
+ * @returns 정렬된 트리 아이템 목록
+ */
+export const sortTreeItemsForSidebar = (items: TreeItem[], type: SortType): TreeItem[] => {
+  return items
+    .map((item) => {
+      const sorted = { ...item };
+      if (item.children) {
+        sorted.children = sortTreeItemsForSidebar(item.children, type);
+      }
+      return sorted;
+    })
+    .sort((a, b) => {
+      if (type === 'name') {
+        return a.label.localeCompare(b.label);
+      }
+      return a.id.localeCompare(b.id);
+    });
+};
+
+
+  
+export const getStatusIcon = (status?: string) => {
+    switch (status) {
+      case 'active':
+        return '/sidebar-menu/tree_play.svg';
+      case 'pending':
+        return '/sidebar-menu/tree_pause.svg';
+      case 'stopped':
+        return '/sidebar-menu/tree_stop.svg';
+      default:
+        return null;
+    }
+  };
+
+  
