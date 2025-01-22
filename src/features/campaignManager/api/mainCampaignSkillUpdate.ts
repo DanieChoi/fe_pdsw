@@ -1,4 +1,4 @@
-// src/features/auth/api/fetchCampaignSkillUpdate.ts
+// src/features/campaignManager/api/mainCampaignSkillUpdate.ts
 import { axiosInstance } from '@/lib/axios';
 import { CampaignSkillUpdateRequest, UpdateResponse } from '../types/campaignManagerIndex';
 
