@@ -19,6 +19,7 @@ import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
+import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
@@ -198,6 +199,12 @@ export default function CampaignDetail() {
     isOpen: false,
     message: '',
     title: '로그인',
+    type: '0',
+  });
+  const [ callingNumberPopupState, setCallingNumberPopupState] = useState({
+    isOpen: false,
+    param: [],
+    tenantId: 0,
     type: '0',
   });
 
@@ -409,6 +416,20 @@ export default function CampaignDetail() {
       });
     }
     setSkillPopupState((prev) => ({ ...prev, isOpen: false }))
+  }
+  
+  //발신번호 팝업
+  const handleCallingNumlber = (param: string) => {
+    if( tempCampaignSkills.skill_id.join(',') !== param ){
+      setChangeYn(true);
+      setCampaignSkillChangeYn(true);
+      setInputSkills(param);
+      setTempCampaignSkills({...tempCampaignSkills
+        , campaign_id: tempCampaignInfo.campaign_id
+        , skill_id: param.split(',').map((data) => Number(data))
+      });
+    }
+    setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))
   }
 
   //캠페인 동작시간 탭 변경
@@ -631,7 +652,11 @@ export default function CampaignDetail() {
             <CustomInput value={inputCallingNumber} className="w-full" 
               disabled={selectedCampaign !== null} readOnly
             />
-            <CommonButton variant="outline" className='h-7'>발신번호 변경</CommonButton>
+            <CommonButton variant="outline" className='h-7' onClick={() => 
+              setCallingNumberPopupState({...callingNumberPopupState,
+                isOpen: true,
+              })
+            }>발신번호 변경</CommonButton>
           </div>
           <div className="flex items-center gap-2 col-span-3">
             <Label className="w-[5.6rem] min-w-[5.6rem]">설명</Label>
@@ -664,6 +689,14 @@ export default function CampaignDetail() {
         onClose={() => {
           setAlertState((prev) => ({ ...prev, isOpen: false }));
         }}/>
+      <CallingNumberPopup
+        param={tempCampaignSkills.skill_id||[]}
+        tenantId={tempCampaignInfo.tenant_id}
+        type={callingNumberPopupState.type}
+        isOpen={callingNumberPopupState.isOpen}
+        onConfirm={(param) => handleCallingNumlber(param)}
+        onCancle={() => setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }
