@@ -49,13 +49,6 @@ type Props = {
   onCampaignScheduleChange: (param:OperationTimeParam) => void;
 };
 
-interface DataProps {
-  no: number;
-  division: number;
-  startTime: string;
-  endTime: string;
-}
-
 const tempCampaignInfo:OperationTimeParam = {
   changeYn: false,
   campaignInfoChangeYn: false,
