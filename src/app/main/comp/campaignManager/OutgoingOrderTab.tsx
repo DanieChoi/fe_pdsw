@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
@@ -6,6 +6,8 @@ import DataGrid from "react-data-grid";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { useCampainManagerStore } from "@/store";
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { CampaignInfo } from './CampaignManagerDetail';
+import { OutgoingOrderTabParam } from './CampaignManagerDetail';
 
 const columns = [
   { key: "phone1", name: "고객전화번호(1)" },
@@ -13,8 +15,15 @@ const columns = [
   { key: "phone3", name: "고객전화번호(3)" },
   { key: "phone4", name: "고객전화번호(4)" },
   { key: "phone5", name: "고객전화번호(5)" },
-  { key: "phone6", name: "고객전화번호(6)" },
 ];
+
+interface DataProps {
+  phone1: string;
+  phone2: string;
+  phone3: string;
+  phone4: string;
+  phone5: string;
+}
 
 const rows = [
   {
@@ -23,16 +32,36 @@ const rows = [
     phone3: "01012345678",
     phone4: "01012345678",
     phone5: "01012345678",
-    phone6: "01012345678",
   },
 ];
 
-type Props = {
-  campaignInfo: MainDataResponse;
+interface RightDataProps {
+  id: number;
+  label: string;
+}
+
+const CampaignOutgoingOrderTab:OutgoingOrderTabParam = {
+  changeYn: false,
+  campaignInfoChangeYn: false,
+  onSave: false,
+  onClosed: false,
+  dial_phone_id: 0,
+  phone_order: '',
+  phone_dial_try: []
 };
 
-const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo }) => {
+type Props = {
+  campaignInfo: MainDataResponse;
+  onCampaignOutgoingOrderChange: (param:OutgoingOrderTabParam) => void;
+};
+
+const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrderChange }) => {
   const { phoneDescriptions } = useCampainManagerStore();
+  const [tempData, setTempData] = useState<DataProps[]>([]);
+  const [tempRightData, setTempRightData] = useState<RightDataProps[]>([]);
+  const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
+  const [tempCampaignOutgoingOrderTab, setTempCampaignOutgoingOrderTab] = useState<OutgoingOrderTabParam>(CampaignOutgoingOrderTab);
+
   const [leftList, setLeftList] = useState([
     "고객 전화번호(3)",
     "고객 전화번호(4)",
@@ -43,6 +72,48 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo }) => {
     { id: 1, label: "고객 전화번호(1)" },
     { id: 2, label: "고객 전화번호(2)" },
   ]);
+
+  useEffect(() => {
+    if( phoneDescriptions.length > 0 && campaignInfo.dial_phone_id > 0 ) {    
+      setTempCampaignOutgoingOrderTab({...tempCampaignOutgoingOrderTab
+        , dial_phone_id: campaignInfo.dial_phone_id
+        , phone_order: campaignInfo.phone_order
+        , phone_dial_try: campaignInfo.phone_dial_try
+      });
+
+      setLeftList([]);
+      const tempLeftData:string[] = [];
+      campaignInfo.phone_dial_try.map((data,index) => data === 0 && tempLeftData.push('고객 전화번호('+(index+1)+')'));
+      setLeftList(tempLeftData);
+
+      setRightList([]);
+      const tempRigntData:RightDataProps[] = [];
+      const cnt = Number(campaignInfo.phone_order.substring(0,1));
+      for(let i=0;i<cnt;i++){
+        tempRigntData.push({
+          id: i + 1,
+          label: '고객 전화번호('+campaignInfo.phone_order[i+1]+')'
+        });
+      }
+      setRightList(tempRigntData);
+
+      setTempCampaignsInfo(campaignInfo);
+      setTempData([]);  
+      const tempDialPhoneId = phoneDescriptions.filter((dialPhoneId) => dialPhoneId.description_id === campaignInfo.dial_phone_id);
+      if( tempDialPhoneId.length > 0 ){
+        setTempData((prev) => [
+          ...prev,
+          {
+            phone1: tempDialPhoneId[0].description[0]+'',
+            phone2: tempDialPhoneId[0].description[1]+'',
+            phone3: tempDialPhoneId[0].description[2]+'',
+            phone4: tempDialPhoneId[0].description[3]+'',
+            phone5: tempDialPhoneId[0].description[4]+''
+          },
+        ]);
+      }
+    }
+  }, [campaignInfo,phoneDescriptions]);
 
   const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
   const [selectedRight, setSelectedRight] = useState<number | null>(null);
@@ -107,10 +178,14 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo }) => {
     }
   };
 
-  //select data change
-  const handleSelectChange = (value: string, type: 'tenant' | 'dialMode') => {
-    
-  }
+  const handleSelectChange = (value:any, col:string) => {
+    setTempCampaignOutgoingOrderTab({...tempCampaignOutgoingOrderTab
+      , changeYn: true
+      , campaignInfoChangeYn: true
+      , dial_phone_id: Number(value)
+    });
+  };
+
 
   return (
     <div className="py-5">
@@ -120,14 +195,15 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo }) => {
             <Label className="w-[5rem] min-w-[5rem]">Phone ID</Label>
             <Select 
               onValueChange={(value) => handleSelectChange(value, 'dialMode')}
-              value={campaignInfo?.dial_phone_id+'' || ''}
+              value={tempCampaignOutgoingOrderTab.dial_phone_id+'' || ''}
             >
               <SelectTrigger className="">
                 <SelectValue placeholder=" " />
               </SelectTrigger>
               <SelectContent>
                 {
-                  phoneDescriptions.map((item) => (
+                  phoneDescriptions.filter((dialPhoneId) => dialPhoneId.description_id === tempCampaignOutgoingOrderTab.dial_phone_id)
+                  .map((item) => (
                     <SelectItem key={item.description_id} value={item.description_id+''}>{item.description_id}</SelectItem>
                   ))
                 }
@@ -137,7 +213,7 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo }) => {
           <div className="grid-custom-wrap w-[75%]">
             <DataGrid
               columns={columns}
-              rows={rows}
+              rows={tempData}
               className="grid-custom h-auto"
               rowHeight={26}
               headerRowHeight={26}

@@ -87,7 +87,7 @@ export interface CampaignSkillListResponse {
 // 전화번호설명 템플릿 조회 데이터 타입
 export interface PhoneDescriptionListDataResponse {
   description_id: number;
-  description: [string];
+  description: string[];
 }
 
 // 전화번호설명 템플릿 조회 데이터 타입

@@ -91,7 +91,7 @@ const CampaignManagerInfo: CampaignInfoUpdateRequest = {
   outbound_sequence: '',
 }
 
-const CampaignInfo: MainDataResponse = {
+export const CampaignInfo: MainDataResponse = {
   campaign_id: 0,
   campaign_name: '',
   campaign_desc: '',
@@ -149,6 +149,16 @@ export interface OperationTimeParam {
   start_time: string[];
   end_time: string[];
   start_flag: string;
+}
+
+export interface OutgoingOrderTabParam {
+  changeYn: boolean;
+  campaignInfoChangeYn: boolean;
+  onSave: boolean;
+  onClosed: boolean;
+  dial_phone_id: number;
+  phone_order: string;
+  phone_dial_try: [];
 }
 
 const CampaignScheduleInfo: CampaignScheDuleListDataResponse = {
@@ -401,7 +411,7 @@ export default function CampaignDetail() {
     setSkillPopupState((prev) => ({ ...prev, isOpen: false }))
   }
 
-  //캠페인 스케줄 변경
+  //캠페인 동작시간 탭 변경
   const handleCampaignScheduleChange = (value: OperationTimeParam) => {
     if( value.campaignInfoChangeYn ){
       setChangeYn(true);
@@ -428,6 +438,11 @@ export default function CampaignDetail() {
     if( value.onClosed ){
       // setCampaignSaveYn(false);
     }
+  }
+  
+  //캠페인 발신순서 탭 변경
+  const handleCampaignOutgoingOrderChange = (value: OutgoingOrderTabParam) => {
+    
   }
 
   //캠페인 저장
@@ -629,6 +644,7 @@ export default function CampaignDetail() {
       <div>
         <CampaignTab campaignSchedule={tempCampaignSchedule}
           campaignInfo={tempCampaignInfo}
+          onCampaignOutgoingOrderChange={(value) => handleCampaignOutgoingOrderChange(value)}
           onCampaignScheduleChange={(value) => handleCampaignScheduleChange(value)}
         />
       </div>
