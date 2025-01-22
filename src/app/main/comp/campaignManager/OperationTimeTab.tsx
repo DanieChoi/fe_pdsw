@@ -53,6 +53,10 @@ interface DataProps {
   endTime: string;
 }
 
+export interface OperationTimeTabProps {
+  campaignId: string;
+}
+
 const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
   const { selectedCampaign } = useMainStore();
   const { schedules } = useCampainManagerStore();

@@ -27,8 +27,10 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
   };
   
   useEffect(() => {
-    if( typeof campaignId != 'undefined' ){
+    if( campaigns && typeof campaignId != 'undefined' ){
       setTempCampaigns(campaigns.filter((campaign) => campaign.campaign_id === Number(campaignId)));
+    }else{
+      setTempCampaigns(campaigns);
     }
     if( tempCampaigns.length > 0 ){
       setSelectedCampaign(tempCampaigns[0]);

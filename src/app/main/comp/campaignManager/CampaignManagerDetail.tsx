@@ -138,8 +138,8 @@ export interface OperationTimeParam {
   campaign_id: number;
   start_date: string;
   end_date: string;
-  start_time: string;
-  end_time: string;
+  start_time: [string];
+  end_time: [string];
   start_flag: string;
 }
 
@@ -152,8 +152,8 @@ export default function CampaignDetail() {
   const [campaignInfoChangeYn, setCampaignInfoChangeYn] = useState<boolean>(false); // 캠페인정보 변경여부
   const [campaignSkillChangeYn, setCampaignSkillChangeYn] = useState<boolean>(false); // 캠페인스킬 변경여부
   const { tenants
-    , selectedCampaign
     , setCampaigns
+    , selectedCampaign
     , setSelectedCampaign
   } = useMainStore();
   const { callingNumbers, campaignSkills, setCampaignSkills } = useCampainManagerStore();
@@ -171,7 +171,52 @@ export default function CampaignDetail() {
     if( selectedCampaign !== null ){
       setChangeYn(false);
       setCampaignInfoChangeYn(false);
-      setTempCampaignsInfo(selectedCampaign);
+      setTempCampaignsInfo({...tempCampaignInfo,
+        campaign_id: selectedCampaign.campaign_id,
+        campaign_name: selectedCampaign.campaign_name,
+        campaign_desc: selectedCampaign.campaign_desc,
+        site_code: selectedCampaign.site_code,
+        service_code: selectedCampaign.service_code,
+        start_flag: selectedCampaign.start_flag,
+        end_flag: selectedCampaign.end_flag,
+        dial_mode: selectedCampaign.dial_mode,
+        callback_kind: selectedCampaign.callback_kind,
+        delete_flag: selectedCampaign.delete_flag,
+        list_count: selectedCampaign.list_count,
+        list_redial_query: selectedCampaign.list_redial_query,
+        next_campaign: selectedCampaign.next_campaign,
+        token_id: selectedCampaign.token_id,
+        phone_order: selectedCampaign.phone_order,
+        phone_dial_try: selectedCampaign.phone_dial_try,
+        dial_try_interval: selectedCampaign.dial_try_interval,
+        trunk_access_code: selectedCampaign.trunk_access_code,
+        DDD_code: selectedCampaign.DDD_code,
+        power_divert_queue: selectedCampaign.power_divert_queue,
+        max_ring: selectedCampaign.max_ring,
+        detect_mode: selectedCampaign.detect_mode,
+        auto_dial_interval: selectedCampaign.auto_dial_interval,
+        creation_user: selectedCampaign.creation_user,
+        creation_time: selectedCampaign.creation_time,
+        creation_ip: selectedCampaign.creation_ip,
+        update_user: selectedCampaign.update_user,
+        update_time: selectedCampaign.update_time,
+        update_ip: selectedCampaign.update_ip,
+        dial_phone_id: selectedCampaign.dial_phone_id,
+        tenant_id: selectedCampaign.tenant_id,
+        alarm_answer_count: selectedCampaign.alarm_answer_count,
+        dial_speed: selectedCampaign.dial_speed,
+        parent_campaign: selectedCampaign.parent_campaign,
+        overdial_abandon_time: selectedCampaign.overdial_abandon_time,
+        list_alarm_count: selectedCampaign.list_alarm_count,
+        supervisor_phone: selectedCampaign.supervisor_phone,
+        reuse_count: selectedCampaign.reuse_count,
+        use_counsel_result: selectedCampaign.use_counsel_result,
+        use_list_alarm: selectedCampaign.use_list_alarm,
+        redial_strategy: selectedCampaign.redial_strategy,
+        dial_mode_option: selectedCampaign.dial_mode_option,
+        user_option: selectedCampaign.user_option
+      });
+
       const tempSkill = campaignSkills.filter((skill) => skill.campaign_id === selectedCampaign.campaign_id)
                   .map((data) => data.skill_id)
                   .join(',');
@@ -240,9 +285,9 @@ export default function CampaignDetail() {
         announcement_id: 1,
         campaign_level: 0,
         outbound_sequence: ''
-
       });
-      console.log('캠페인 정보 최초 세팅',tempCampaignManagerInfo);
+      console.log('캠페인 정보 최초 세팅 selectedCampaign ',selectedCampaign);
+      console.log('캠페인 정보 최초 세팅 tempCampaignInfo ',tempCampaignInfo);
     }
   }, [selectedCampaign,campaignSkills,callingNumbers]);
 
@@ -305,8 +350,6 @@ export default function CampaignDetail() {
   const handleCampaignSave = () => {
     if( changeYn ){
       if( campaignInfoChangeYn ){
-        console.log('캠페인 정보 수정 api 호출');
-        console.log(tempCampaignManagerInfo);
         fetchCampaignManagerUpdate(tempCampaignManagerInfo);
       }
       if( campaignSkillChangeYn ){
@@ -329,7 +372,8 @@ export default function CampaignDetail() {
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
-      setSelectedCampaign( tempCampaignInfo );
+      setSelectedCampaign( data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0] );
+      setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
       setChangeYn(false);
     }
   });
@@ -344,6 +388,7 @@ export default function CampaignDetail() {
   //캠페인 정보 수정 api 호출
   const { mutate: fetchCampaignManagerUpdate } = useApiForCampaignManagerUpdate({
     onSuccess: (data) => {
+      setCampaignInfoChangeYn(false);
     }
   });
 
