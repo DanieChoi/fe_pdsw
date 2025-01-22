@@ -6,8 +6,8 @@ export interface CampaignScheDuleListDataResponse {
   tenant_id: number;
   start_date: string;
   end_date: string;
-  start_time: [string];
-  end_time: [string];
+  start_time: string[];
+  end_time: string[];
 }
 
 // 캠페인스케줄 데이터 타입

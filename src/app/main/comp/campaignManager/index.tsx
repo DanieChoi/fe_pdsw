@@ -27,7 +27,11 @@ const CampaignManager = ({campaignId}: Props) => {
   // 스케줄 조회
   const { mutate: fetchSchedules } = useApiForSchedules({
     onSuccess: (data) => {
-      setSchedules(data.result_data);      
+      setSchedules(data.result_data);  
+      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id); 
+      fetchSkills({
+        tenant_id_array: tempTenantIdArray
+      });   
     }
   });
   // 스킬 조회
@@ -68,14 +72,13 @@ const CampaignManager = ({campaignId}: Props) => {
   });
   
   useEffect(() => {
-    const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
-    fetchSchedules({
-      tenant_id_array: tempTenantIdArray
-    });
-    fetchSkills({
-      tenant_id_array: tempTenantIdArray
-    });
-  }, []);
+    if( tenants ){
+      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
+      fetchSchedules({
+        tenant_id_array: tempTenantIdArray
+      });
+    }
+  }, [tenants]);
 
   return (
     <div>

@@ -4,6 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import DataGrid from "react-data-grid";
 import { CommonButton } from "@/components/shared/CommonButton";
+import { useCampainManagerStore } from "@/store";
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
 
 const columns = [
   { key: "phone1", name: "고객전화번호(1)" },
@@ -25,7 +27,12 @@ const rows = [
   },
 ];
 
-const OutgoingOrderTab: React.FC = () => {
+type Props = {
+  campaignInfo: MainDataResponse;
+};
+
+const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo }) => {
+  const { phoneDescriptions } = useCampainManagerStore();
   const [leftList, setLeftList] = useState([
     "고객 전화번호(3)",
     "고객 전화번호(4)",
@@ -100,20 +107,30 @@ const OutgoingOrderTab: React.FC = () => {
     }
   };
 
+  //select data change
+  const handleSelectChange = (value: string, type: 'tenant' | 'dialMode') => {
+    
+  }
+
   return (
     <div className="py-5">
       <div className="flex flex-col gap-5">
         <div className="flex gap-5 justify-between items-start">
           <div className="flex items-center gap-2 justify-between w-[25%]">
             <Label className="w-[5rem] min-w-[5rem]">Phone ID</Label>
-            <Select>
+            <Select 
+              onValueChange={(value) => handleSelectChange(value, 'dialMode')}
+              value={campaignInfo?.dial_phone_id+'' || ''}
+            >
               <SelectTrigger className="">
-                <SelectValue placeholder="1234" />
+                <SelectValue placeholder=" " />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">12345</SelectItem>
-                <SelectItem value="2">56478</SelectItem>
-                <SelectItem value="3">1011112</SelectItem>
+                {
+                  phoneDescriptions.map((item) => (
+                    <SelectItem key={item.description_id} value={item.description_id+''}>{item.description_id}</SelectItem>
+                  ))
+                }
               </SelectContent>
             </Select>
           </div>
@@ -121,7 +138,9 @@ const OutgoingOrderTab: React.FC = () => {
             <DataGrid
               columns={columns}
               rows={rows}
-              className="grid-custom h-auto" // React Data Grid의 기본 테마
+              className="grid-custom h-auto"
+              rowHeight={26}
+              headerRowHeight={26}
             />
           </div>
         </div>

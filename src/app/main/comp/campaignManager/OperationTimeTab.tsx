@@ -8,7 +8,9 @@ import { CommonButton } from "@/components/shared/CommonButton";
 import DatePicker from "react-date-picker";
 import { Calendar as CalendarIcon } from "lucide-react";
 import Image from "next/image";
-import { useMainStore, useCampainManagerStore } from '@/store';
+import { useMainStore } from '@/store';
+import { OperationTimeParam } from './CampaignManagerDetail';
+import { CampaignScheDuleListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 
 type Column = {
   key: string;
@@ -43,7 +45,8 @@ interface DataProps {
 }
 
 type Props = {
-  campaignId: string;
+  campaignSchedule: CampaignScheDuleListDataResponse;
+  onCampaignScheduleChange: (param:OperationTimeParam) => void;
 };
 
 interface DataProps {
@@ -53,45 +56,69 @@ interface DataProps {
   endTime: string;
 }
 
-export interface OperationTimeTabProps {
-  campaignId: string;
-}
+const tempCampaignInfo:OperationTimeParam = {
+  changeYn: false,
+  campaignInfoChangeYn: false,
+  campaignScheduleChangeYn: false,
+  onSave: false,
+  onClosed: false,
+  campaign_id: 0,
+  start_date: '',
+  end_date: '',
+  start_time: [],
+  end_time: [],
+  start_flag: ''
+};
 
-const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
+const OperationTimeTab: React.FC<Props> = ({ campaignSchedule, onCampaignScheduleChange }) => {
   const { selectedCampaign } = useMainStore();
-  const { schedules } = useCampainManagerStore();
   const [tempData, setTempData] = useState<DataProps[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
   const [startTime, setStartTime] = useState(""); // 시작시간
   const [endTime, setEndTime] = useState(""); // 종료시간
-  const [startFlag, setStartFlag] = useState(""); // 시작구분
+  const [tempCampaignSchedule, setTempCampaignSchedule] = useState<OperationTimeParam>(tempCampaignInfo);
+
+  const handleSelectChange = (value:any, col:string) => {
+    onCampaignScheduleChange({...tempCampaignSchedule
+      , changeYn: true
+      , campaignInfoChangeYn: true
+      , start_flag: value
+    });
+  };
 
   useEffect(() => {
-    if( schedules.length > 0 && selectedCampaign ) {      
-      const tempCampaignScheduleList = schedules.filter((schedule) => schedule.campaign_id === selectedCampaign?.campaign_id);
-      const tempCampaignSchedule = tempCampaignScheduleList[0];
+    if( selectedCampaign && campaignSchedule.start_date !== '' ) {      
+      const tempCampaignSchedule = campaignSchedule;
       const CampaignScheduleStartTime = tempCampaignSchedule.start_time;
       const CampaignScheduleEndTime = tempCampaignSchedule.end_time;
       setStartDate(new Date(tempCampaignSchedule.start_date.substring(0,4)+'-'+ tempCampaignSchedule.start_date.substring(4,6)+'-'+ tempCampaignSchedule.start_date.substring(6,8)));
       setEndDate(new Date(tempCampaignSchedule.end_date.substring(0,4)+'-'+ tempCampaignSchedule.end_date.substring(4,6)+'-'+ tempCampaignSchedule.end_date.substring(6,8)));
-      setStartFlag(selectedCampaign.start_flag.toString());
       if( CampaignScheduleStartTime.length > 0 && CampaignScheduleEndTime.length > 0 ) {
         setTempData([]);
-        CampaignScheduleStartTime.map((item, index) => {
+        CampaignScheduleStartTime.map((item:string, index) => {
           setTempData((prev) => [
             ...prev,
             {
               no: index + 1,
-              division: 1,
+              division: index + 1,
               startTime: item.substring(0,2)+":"+item.substring(2,4),
-              endTime: CampaignScheduleEndTime[index].substring(0,2)+":"+CampaignScheduleEndTime[index].substring(2,4),
+              endTime: (CampaignScheduleEndTime[index]+'').substring(0,2)+":"+(CampaignScheduleEndTime[index]+'').substring(2,4),
             },
           ]);
         });
       }
+      setTempCampaignSchedule({...tempCampaignInfo,
+        campaign_id: selectedCampaign.campaign_id,
+        start_date: tempCampaignSchedule.start_date,
+        end_date: tempCampaignSchedule.end_date,
+        start_time: CampaignScheduleStartTime,
+        end_time: CampaignScheduleEndTime,
+        start_flag: selectedCampaign.start_flag+'',
+        onSave: false,
+      });
     }
-  }, [schedules, selectedCampaign]);
+  }, [selectedCampaign, campaignSchedule]);
 
   return (
     <div className="py-5">
@@ -101,7 +128,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
           <div className="flex flex-col gap-y-2">
             <div className="flex items-center gap-2 justify-between">
               <Label className="w-[5rem] min-w-[5rem]">시작</Label>
-              <Select value={startFlag} onValueChange={setStartFlag}>
+              <Select value={tempCampaignSchedule.start_flag} onValueChange={(value) => handleSelectChange(value, 'startFlag')}>
                 <SelectTrigger>
                   <SelectValue placeholder="시작" />
                 </SelectTrigger>
@@ -124,9 +151,14 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
                 onChange={(value) => {
                   if (value instanceof Date || value === null) {
                     setStartDate(value);
+                    onCampaignScheduleChange({...tempCampaignSchedule
+                      , changeYn: true
+                      , campaignScheduleChangeYn: true
+                      , start_date: value ? value.getFullYear() + ('0' + (value.getMonth() + 1)).slice(-2) + ('0' + value.getDate()).slice(-2) : ''
+                    });
                   }
                 }}
-                value={startDate}
+                value={tempCampaignSchedule.start_date ? new Date(tempCampaignSchedule.start_date.substring(0,4)+'-'+ tempCampaignSchedule.start_date.substring(4,6)+'-'+ tempCampaignSchedule.start_date.substring(6,8)) : startDate}
                 format="yyyy-MM-dd"
                 className="w-full custom-calendar"
                 calendarIcon={<CalendarIcon className="mr-2 h-4 w-4" color="#989898" />}
@@ -137,12 +169,17 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
             <div className="flex items-center gap-2 justify-between">
               <Label className="w-[5rem] min-w-[5rem]">종료날짜</Label>
               <DatePicker
-               onChange={(value) => {
-                if (value instanceof Date || value === null) {
-                  setEndDate(value);
-                }
-              }}
-                value={endDate}
+                onChange={(value) => {
+                  if (value instanceof Date || value === null) {
+                    setEndDate(value);
+                    onCampaignScheduleChange({...tempCampaignSchedule
+                      , changeYn: true
+                      , campaignScheduleChangeYn: true
+                      , end_date: value ? value.getFullYear() + ('0' + (value.getMonth() + 1)).slice(-2) + ('0' + value.getDate()).slice(-2) : ''
+                    });
+                  }
+                }}
+                value={tempCampaignSchedule.end_date ? new Date(tempCampaignSchedule.end_date.substring(0,4)+'-'+ tempCampaignSchedule.end_date.substring(4,6)+'-'+ tempCampaignSchedule.end_date.substring(6,8)) : endDate}
                 format="yyyy-MM-dd"
                 className="w-full custom-calendar"
                 calendarIcon={<CalendarIcon className="mr-2 h-4 w-4" color="#989898" />}
@@ -179,12 +216,16 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
                   <CommonButton variant="secondary" onClick={()=>{
                       if( startTime.length === 4 && endTime.length === 4 ) {
                         let check = false;
+                        const tempStartTime:string[] = [];
+                        const tempEndTime:string[] = [];
                         tempData.map((item, index) => {
                           if( item.startTime.substring(0,2)+item.startTime.substring(3,5) === startTime 
                           && item.endTime.substring(0,2)+item.endTime.substring(3,5) === endTime ) {
                             alert("동일한 시간이 이미 설정되어 있습니다.");
                             check = true;
                           }
+                          tempStartTime.push(item.startTime.substring(0,2)+item.startTime.substring(3,5));
+                          tempEndTime.push(item.endTime.substring(0,2)+item.endTime.substring(3,5));
                         });
                         if( startTime > endTime ) {
                           alert("종료시간 설정이 잘못 되었습니다.");
@@ -200,28 +241,51 @@ const OperationTimeTab: React.FC<Props> = ({ campaignId }) => {
                               endTime: endTime.substring(0,2)+":"+endTime.substring(2,4),
                             },
                           ]);
+                          tempStartTime.push(startTime);
+                          tempEndTime.push(endTime);
+
+                          onCampaignScheduleChange({...tempCampaignSchedule
+                            , changeYn: true
+                            , campaignScheduleChangeYn: true
+                            , start_time: tempStartTime
+                            , end_time: tempEndTime
+                          });
                           setStartTime("");
                           setEndTime("");
                         }
                       }
                     }}>
                     시간추가
-                    <Image src="/addArrow.svg" alt="스킬팝업" width={10} height={10} />
+                    <Image src="/addArrow.svg" alt="화살표" width={10} height={10} />
                   </CommonButton>
                 </div>
               </div>
             </div>
             <div className="w-[60%]">
               <div className="grid-custom-wrap h-[270px]">
-                <DataGrid columns={columns} rows={tempData} className="grid-custom" />
+                <DataGrid 
+                  columns={columns} 
+                  rows={tempData} 
+                  className="grid-custom" 
+                  rowHeight={26}
+                  headerRowHeight={26}
+                  />
               </div>
             </div>
           </div>
         </div>
       </div>
       <div className="flex justify-end gap-2 mt-5">
-        <CommonButton variant="secondary">확인</CommonButton>
-        <CommonButton variant="secondary">취소</CommonButton>
+        <CommonButton variant="secondary" onClick={()=> 
+          onCampaignScheduleChange({...tempCampaignSchedule
+            , onSave: true
+          })
+        }>확인</CommonButton>
+        <CommonButton variant="secondary" onClick={()=> 
+          onCampaignScheduleChange({...tempCampaignSchedule
+            , onClosed: true
+          })
+        }>취소</CommonButton>
       </div>
     </div>
   );
