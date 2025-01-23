@@ -1,14 +1,10 @@
 "use client";
 
-import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useMainStore } from '@/store';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
-import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 import Cookies from 'js-cookie';
-import CustomAlert from '@/components/shared/layout/CustomAlert';
-import { useRouter } from 'next/navigation';
 
 
 export default function Sidebar({
@@ -19,67 +15,8 @@ export default function Sidebar({
     toggleSidebar: () => void;
   }) {
   const tenantId = Number(Cookies.get('tenant_id'));
-  const router = useRouter();
-  const [alertState, setAlertState] = useState({
-    isOpen: false,
-    message: '',
-    title: '로그인',
-    type: '0',
-  });
-  const { mutate: fetchMain } = useApiForMain({
-    onSuccess: (data) => {
-      setCampaigns(data.result_data);
-    }
-  });
-  
-  const { mutate: fetchTenants } = useApiForTenants({
-    onSuccess: (data) => {
-      if( data.result_code === 5){
-        setAlertState({
-          isOpen: true,
-          message: '로그인 정보가 없습니다.',
-          title: '로그인',
-          type: '0',
-        });
-        Cookies.remove('session_key');
-        router.push('/login');
-      }else{
-        setTenants(data.result_data);
-        fetchMain({
-          session_key: localStorage.getItem('sessionKey') || '',
-          tenant_id: Number(localStorage.getItem('tenantId')) || 0,
-        });
-      }
-    },
-    onError: (error) => {
-      if( error.message.split('||')[0] === '5' ){
-        setAlertState({
-          isOpen: true,
-          message: '로그인 정보가 없습니다.',
-          title: '로그인',
-          type: '0',
-        });
-        Cookies.remove('session_key');
-        router.push('/login');
-      }
-    }
-  });
 
-  const { setCampaigns, setTenants, setSelectedCampaign, campaigns, tenants } = useMainStore();
-
-  // useEffect(() => {
-  //   fetchMain({
-  //     session_key: localStorage.getItem('sessionKey') || '',
-  //     tenant_id: Number(localStorage.getItem('tenantId')) || 0,
-  //   });
-  // }, [fetchMain]);
-
-  useEffect(() => {
-    fetchTenants({
-      session_key: localStorage.getItem('sessionKey') || '',
-      tenant_id: Number(localStorage.getItem('tenantId')) || 0,
-    });
-  }, [fetchTenants]);
+  const {setSelectedCampaign, campaigns, tenants } = useMainStore();
 
   const handleCampaignClick = (campaign: MainDataResponse) => {
     setSelectedCampaign(campaign);
@@ -159,13 +96,6 @@ export default function Sidebar({
           </div>
         ))
         }
-        <CustomAlert
-          message={alertState.message}
-          title={alertState.title}
-          type={alertState.type}
-          isOpen={alertState.isOpen}
-          onClose={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
-        />
       </div>
     );
   };

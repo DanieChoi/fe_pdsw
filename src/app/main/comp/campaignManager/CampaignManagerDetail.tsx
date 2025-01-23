@@ -463,7 +463,13 @@ export default function CampaignDetail() {
   
   //캠페인 발신순서 탭 변경
   const handleCampaignOutgoingOrderChange = (value: OutgoingOrderTabParam) => {
-    
+    if( value.campaignInfoChangeYn ){
+      setChangeYn(true);
+      setCampaignInfoChangeYn(true);
+      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+        , dial_phone_id: Number(value.dial_phone_id)
+      });
+    }    
   }
 
   //캠페인 저장
@@ -690,8 +696,7 @@ export default function CampaignDetail() {
           setAlertState((prev) => ({ ...prev, isOpen: false }));
         }}/>
       <CallingNumberPopup
-        param={tempCampaignSkills.skill_id||[]}
-        tenantId={tempCampaignInfo.tenant_id}
+        param={tempCampaignSkills.campaign_id+''}
         type={callingNumberPopupState.type}
         isOpen={callingNumberPopupState.isOpen}
         onConfirm={(param) => handleCallingNumlber(param)}
