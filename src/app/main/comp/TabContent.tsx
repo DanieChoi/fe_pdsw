@@ -28,6 +28,7 @@ const TabContent = () => {
         return <div className="p-2">통합모니터 컨텐츠</div>;
       case 4:
         return <div className="p-2">
+          {/* 캠페인 총진행상황 */}
           <CampaignMonitorDashbord />
         </div>;
       case 5:

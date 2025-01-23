@@ -12,18 +12,23 @@ import { TreeMenusForAgentGroupTab } from '@/features/campaignManager/components
 // ★ 추가: 기존에 TreeMenusForCampaigns 내부에서 사용하던 API 훅을 여기서 가져옵니다.
 import { useApiForGetTreeMenuDataForCampaignTab } from "@/features/auth/hooks/useApiForGetTreeMenuDataForCampaignTab";
 import { TabActions } from './comp/TabActions';
+import { useSideMenuStore } from '@/store/sideMenuStore';
 
 export default function SidebarContainer() {
   const [width, setWidth] = useState(330);
   const [selectedTabId, setSelectedTabId] = useState<TabId>('campaign');
-  const [selectedNodeId, setSelectedNodeId] = useState<string>();
   const [isResizing, setIsResizing] = useState(false);
-
+  
   // ⭐ expandedNodes: Set<string> (어떤 노드가 펼쳐져 있는지)
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
-
+  
   const [sortType, setSortType] = useState<SortType>('name');
   const [filterType, setFilterType] = useState<FilterType>('all');
+  
+  // const [selectedNodeId, setSelectedNodeId] = useState<string>();
+  const selectedNodeId = useSideMenuStore(state => state.selectedNodeId);
+  const setSelectedNodeId = useSideMenuStore(state => state.setSelectedNodeId); // Changed to useSideMenuStore
+
 
   // ★ 추가: 트리 데이터 가져오기
   const { treeData, isLoading, error } = useApiForGetTreeMenuDataForCampaignTab();
@@ -59,7 +64,10 @@ export default function SidebarContainer() {
   // ----------------------------
   // 트리 노드 토글/선택 핸들러
   // ----------------------------
+  // tofix: 노드 클릭하면 클릭한 노드의 id를 로그로 출력
   const handleNodeToggle = (nodeId: string) => {
+    console.log("clicked nodeId: ", nodeId);
+
     setExpandedNodes(prev => {
       const next = new Set(prev);
       if (next.has(nodeId)) {
@@ -138,9 +146,7 @@ export default function SidebarContainer() {
         return null;
     }
   };
-  console.log("treeData check : ", treeData);
-  
-
+  console.log("treeData check 1: ", treeData);
 
   // ----------------------------
   // 최종 렌더

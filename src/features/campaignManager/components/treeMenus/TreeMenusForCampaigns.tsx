@@ -38,6 +38,9 @@ export function TreeMenusForCampaigns({
   // ★ treeData에서 items 가져오기
   const items = treeData?.[0]?.items || [];
 
+  console.log("treeData check 3: ", treeData);
+  
+
   return (
     <div className="flex-1 overflow-auto">
       {items.map((item: TreeItem) => (
