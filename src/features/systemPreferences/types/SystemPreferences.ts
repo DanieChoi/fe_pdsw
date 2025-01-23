@@ -56,3 +56,15 @@ export interface ChannelEditResponse {
   result_code: number;
   result_msg: string;
 }
+
+export interface DialingDeviceCreateRequest {
+  channel_count: number;
+  device_id: number;
+  device_name: string;
+  tenant_id: number;
+}
+
+export interface DialingDeviceCreateResponse {
+  result_code: number;
+  result_msg: string;
+}

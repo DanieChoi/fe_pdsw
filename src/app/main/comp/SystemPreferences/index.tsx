@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -6,9 +6,9 @@ import { CustomInput } from "@/components/shared/CustomInput";
 import DataGrid, { CellClickArgs } from 'react-data-grid';
 import { useMainStore } from '@/store';
 import { ChannelListDataResponse, DialingDeviceListDataResponse } from '@/features/systemPreferences/types/SystemPreferences';
-import { useApiForDialingDevice } from '@/features/systemPreferences/hooks/useApiForDialingDevice';
 import { useApiForChannelList } from '@/features/systemPreferences/hooks/useApiForChannelList';
 import { useApiForChannelEdit } from '@/features/systemPreferences/hooks/useApiForChannelEdit';
+import { useApiForDialingDevice, useApiForDialingDeviceCreate, useApiForDialingDeviceUpdate } from '@/features/systemPreferences/hooks/useApiForDialingDevice';
 
 interface EquipmentRow {
     device_id: string;
@@ -57,12 +57,42 @@ const SystemPreferences = () => {
     // 채널 정보 수정 api 호출
     const { mutate: fetchChannelEdit } = useApiForChannelEdit({
         onSuccess: (data) => {
+            // 채널 목록 새로고침
             fetchChannelList();
+            // 장비 목록도 함께 새로고침
+            fetchDialingDeviceList({
+                tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+            });
             alert('채널 정보가 성공적으로 수정되었습니다.');
         },
         onError: (error) => {
-            // 에러 메시지 표시
             alert('채널 정보 수정 중 오류가 발생했습니다: ' + error.message);
+        }
+    });
+    
+    // 신규 등록 API
+    const { mutate: createDevice } = useApiForDialingDeviceCreate({
+        onSuccess: (data) => {
+            fetchDialingDeviceList({
+                tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+            });
+            alert('새로운 장비가 성공적으로 저장되었습니다.');
+        },
+        onError: (error) => {
+            alert('장비 정보 저장 중 오류가 발생했습니다: ' + error.message);
+        }
+    });
+
+    // 수정 API
+    const { mutate: updateDevice } = useApiForDialingDeviceUpdate({
+        onSuccess: (data) => {
+            fetchDialingDeviceList({
+                tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+            });
+            alert('장비 정보가 성공적으로 수정되었습니다.');
+        },
+        onError: (error) => {
+            alert('장비 정보 수정 중 오류가 발생했습니다: ' + error.message);
         }
     });
 
@@ -123,6 +153,19 @@ const SystemPreferences = () => {
         }
     }, [selectedChannel]);
 
+    // 장비의 사용여부를 확인하는 함수
+    const getDeviceUsage = (deviceId: number): string => {
+        const deviceChannels = channelList.find(
+            channel => channel.device_id === deviceId
+        );
+
+        if (!deviceChannels) return "사용안함";
+
+        // channel_assign 배열의 모든 값이 0인지 확인
+        const isAllZero = deviceChannels.channel_assign.every(value => value === 0);
+        return isAllZero ? "사용안함" : "사용";
+    };
+
     const getChannelMode = (assignValue: number): string => {
         switch(assignValue) {
             case 2147483647:
@@ -139,19 +182,22 @@ const SystemPreferences = () => {
         }
     };
 
+    // 장비 목록 데이터 구성
+    const equipmentRows = useMemo(() => {
+        return dialingDeviceList.map(device => ({
+            device_id: device.device_id.toString(),
+            channel_count: device.channel_count,
+            device_name: device.device_name,
+            usage: getDeviceUsage(device.device_id)
+        }));
+    }, [dialingDeviceList, channelList]); // channelList 의존성 추가
+
     const equipmentColumns = [
         { key: "device_id", name: "장비번호" },
         { key: "channel_count", name: "채널수" },
         { key: "device_name", name: "장비이름" },
         { key: "usage", name: "사용여부" }
     ];
-    
-    const equipmentRows = dialingDeviceList.map(device => ({
-        device_id: device.device_id.toString(),
-        channel_count: device.channel_count,
-        device_name: device.device_name,
-        usage: "사용" 
-    }));
 
     const channelColumns = [
         { key: "channelNumber", name: "채널번호" },
@@ -166,6 +212,71 @@ const SystemPreferences = () => {
 
     const handleChannelCellClick = ({ row }: CellClickArgs<ChannelRow>) => {
         setSelectedChannel(row);
+    };
+
+    // 장비 상세내역의 신규 버튼 클릭 핸들러
+    const handleNewEquipment = () => {
+        // 마지막 장비번호 찾기
+        const lastDeviceId = dialingDeviceList
+            .map(device => device.device_id)
+            .sort((a, b) => a - b)  // 숫자 오름차순 정렬
+            .pop() || 0;  // 비어있을 경우 0
+        
+        // 새로운 장비번호 설정 (마지막 번호 + 1)
+        const newDeviceId = (lastDeviceId + 1).toString();
+
+        // 장비 관련 상태 초기화
+        setSelectedDevice(null);
+        setEquipmentNumber(newDeviceId);
+        setEquipmentName("");
+        setRefreshCycle("");
+        setMonitoringType("periodic");
+        
+        // 채널 관련 상태 초기화
+        setFilteredChannels([]);
+        setSelectedChannel(null);
+        setAllocationMode("");
+        setAllocationOutboundMode("");
+    };
+
+    // 장비 저장 핸들러 (신규/수정 공통 검증)
+    const validateEquipmentData = () => {
+        if (!equipmentNumber || !equipmentName || !refreshCycle) {
+            alert('모든 필드를 입력해주세요.');
+            return false;
+        }
+
+        const channelCount = parseInt(refreshCycle);
+        if (isNaN(channelCount) || channelCount <= 0) {
+            alert('유효한 채널 수를 입력해주세요.');
+            return false;
+        }
+
+        return true;
+    };
+
+    // 장비 저장 핸들러
+    const handleSaveEquipment = () => {
+        if (!validateEquipmentData()) return;
+
+        const saveRequest = {
+            tenant_id: tenants[0].tenant_id,
+            device_id: parseInt(equipmentNumber),
+            device_name: equipmentName,
+            channel_count: parseInt(refreshCycle)
+        };
+
+        if (selectedDevice) {
+            // 수정
+            if (window.confirm('장비 정보를 수정하시겠습니까?')) {
+                updateDevice(saveRequest);
+            }
+        } else {
+            // 신규 등록
+            if (window.confirm('새로운 장비 정보를 저장하시겠습니까?')) {
+                createDevice(saveRequest);
+            }
+        }
     };
 
     const handleChannelEdit = () => {
@@ -237,49 +348,34 @@ const SystemPreferences = () => {
                             buttons={[
                                 { 
                                     label: "신규", 
-                                    onClick: () => {
-                                        setSelectedDevice(null);
-                                        setSelectedChannel(null);
-                                        setEquipmentNumber("");
-                                        setEquipmentName("");
-                                        setRefreshCycle("5");
-                                        setMonitoringType("periodic");
-                                        setFilteredChannels([]);
-                                    }
+                                    onClick: handleNewEquipment
                                 },
-                                { label: "저장", onClick: () => console.log("저장 클릭") },
+                                { 
+                                    label: "저장", 
+                                    onClick: handleSaveEquipment
+                                },
                             ]}
                         />
                         <div className="flex flex-col gap-2 p-4 border rounded-lg bg-white">
                             <div className="flex items-center">
                                 <Label className="w-20 min-w-20">장비번호</Label>
-                                <Select value={equipmentNumber} onValueChange={setEquipmentNumber}>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="장비번호" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {dialingDeviceList.map(device => (
-                                            <SelectItem key={device.device_id} value={device.device_id.toString()}>
-                                                {device.device_id}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <CustomInput 
+                                    type="text"
+                                    value={equipmentNumber}
+                                    onChange={(e) => setEquipmentNumber(e.target.value)}
+                                    // disabled={selectedDevice !== null}
+                                    disabled={true}
+                                    className="w-full"
+                                />
                             </div>
                             <div className="flex items-center">
                                 <Label className="w-20 min-w-20">장비이름</Label>
-                                <Select value={equipmentName} onValueChange={setEquipmentName}>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="장비이름" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {dialingDeviceList.map(device => (
-                                            <SelectItem key={device.device_id} value={device.device_name}>
-                                                {device.device_name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <CustomInput 
+                                    type="text"
+                                    value={equipmentName}
+                                    onChange={(e) => setEquipmentName(e.target.value)}
+                                    className="w-full"
+                                />
                             </div>
                             <div className="flex items-center">
                                 <Label className="w-20 min-w-20">채널수</Label>
