@@ -98,7 +98,7 @@ export default function SidebarContainer() {
       };
 
       // 예: 2 레벨까지 자동으로 펼친다
-      expandUpToLevel(items, 0, 2);
+      expandUpToLevel(items, 0, 3);
 
       setExpandedNodes(newExpanded);
       setInitialized(true); // 다시 안 불리도록
