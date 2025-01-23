@@ -8,8 +8,8 @@ import { SortAsc } from "lucide-react"
 import { SortType } from '@/features/campaignManager/types/typeForSidebar2';
 
 interface SortButtonForCampaignProps {
-  onSort: (type: SortType) => void;
-  selectedSort: SortType;
+  onSort?: (type: SortType) => void;
+  selectedSort?: SortType;
 }
 
 const campaignSortOptions: Array<{ id: SortType; label: string }> = [

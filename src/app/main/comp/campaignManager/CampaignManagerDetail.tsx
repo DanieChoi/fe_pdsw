@@ -9,14 +9,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CommonButton } from "@/components/shared/CommonButton";
 import CampaignTab from './CampaignTab';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
-import { CampaignSkillUpdateRequest, CampaignInfoUpdateRequest, CampaignScheDuleListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
+import { CampaignSkillUpdateRequest, CampaignInfoUpdateRequest, CampaignScheDuleListDataResponse, CallingNumberListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 import { useEffect, useState } from 'react';
 import SkillListPopup from '@/components/shared/layout/SkillListPopup';
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
 import { useApiForCampaignManagerUpdate } from '@/features/campaignManager/hooks/useApiForCampaignManagerUpdate';
 import { useApiForCampaignScheduleUpdate } from '@/features/campaignManager/hooks/useApiForCampaignScheduleUpdate';
+import { useApiForCallingNumberUpdate } from '@/features/campaignManager/hooks/useApiForCallingNumberUpdate';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
+import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
@@ -28,9 +30,31 @@ const dialModeList = [
   {dial_id:4, dial_name: 'System Preview'},
 ];
 
+interface errorMessageParam {
+  isOpen: boolean;
+  message: string;
+  title: string;
+  type: string;
+  onClose?: () => void;
+  onCancle?: () => void;
+}
+
+
+const errorMessage: errorMessageParam = {
+  isOpen: false,
+  message: '',
+  title: '캠페인',
+  type: '1',
+};
+
 const CampaignSkillInfo: CampaignSkillUpdateRequest = {
   campaign_id: 0,
   skill_id: [],
+}
+
+const CallingNumberInfo: CallingNumberListDataResponse = {
+  campaign_id: 0,
+  calling_number: ''
 }
 
 const CampaignManagerInfo: CampaignInfoUpdateRequest = {
@@ -159,7 +183,7 @@ export interface OutgoingOrderTabParam {
   onClosed: boolean;
   dial_phone_id: number;
   phone_order: string;
-  phone_dial_try: [];
+  phone_dial_try: number[];
 }
 
 const CampaignScheduleInfo: CampaignScheDuleListDataResponse = {
@@ -175,10 +199,12 @@ export default function CampaignDetail() {
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
+  const [tempCallingNumberInfo, setTempCallingNumberInfo] = useState<CallingNumberListDataResponse>(CallingNumberInfo);
   const [tempCampaignSchedule, setTempCampaignSchedule] = useState<CampaignScheDuleListDataResponse>(CampaignScheduleInfo);
   const [changeYn, setChangeYn] = useState<boolean>(false); // 변경여부
   const [campaignInfoChangeYn, setCampaignInfoChangeYn] = useState<boolean>(false); // 캠페인정보 변경여부
   const [campaignSkillChangeYn, setCampaignSkillChangeYn] = useState<boolean>(false); // 캠페인스킬 변경여부
+  const [callingNumberChangeYn, setCallingNumberChangeYn] = useState<boolean>(false); // 캠페인 발신번호 변경여부
   const [campaignScheduleChangeYn, setCampaignScheduleChangeYn] = useState<boolean>(false); // 캠페인 스케줄 변경여부
   const [campaignSaveYn, setCampaignSaveYn] = useState<boolean>(false); // 캠페인 저장여부
   const { tenants
@@ -186,26 +212,21 @@ export default function CampaignDetail() {
     , selectedCampaign
     , setSelectedCampaign
   } = useMainStore();
-  const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules } = useCampainManagerStore();
+  const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
   const [ inputSkills, setInputSkills ] = useState('');
   const [ inputCallingNumber, setInputCallingNumber ] = useState('');
   const [ skillPopupState, setSkillPopupState] = useState({
     isOpen: false,
     param: [],
     tenantId: 0,
-    type: '0',
+    type: '1',
   });
-  const [alertState, setAlertState] = useState({
-    isOpen: false,
-    message: '',
-    title: '로그인',
-    type: '0',
-  });
+  const [alertState, setAlertState] = useState<errorMessageParam>(errorMessage);
   const [ callingNumberPopupState, setCallingNumberPopupState] = useState({
     isOpen: false,
     param: [],
     tenantId: 0,
-    type: '0',
+    type: '1',
   });
 
   //캠페인 정보 최초 세팅 
@@ -270,6 +291,9 @@ export default function CampaignDetail() {
                   .map((data) => data.calling_number)
                   .join(',');
       setInputCallingNumber(tempCallNumber);
+      setTempCallingNumberInfo({...tempCallingNumberInfo
+        , calling_number: tempCallNumber
+      });
       setTempCampaignManagerInfo({...CampaignManagerInfo,
         campaign_id: selectedCampaign.campaign_id,
         campaign_name: selectedCampaign.campaign_name,
@@ -420,13 +444,13 @@ export default function CampaignDetail() {
   
   //발신번호 팝업
   const handleCallingNumlber = (param: string) => {
-    if( tempCampaignSkills.skill_id.join(',') !== param ){
+    if( inputCallingNumber !== param ){
       setChangeYn(true);
-      setCampaignSkillChangeYn(true);
-      setInputSkills(param);
-      setTempCampaignSkills({...tempCampaignSkills
+      setCallingNumberChangeYn(true);
+      setInputCallingNumber(param);
+      setTempCallingNumberInfo({...tempCallingNumberInfo
         , campaign_id: tempCampaignInfo.campaign_id
-        , skill_id: param.split(',').map((data) => Number(data))
+        , calling_number: param
       });
     }
     setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))
@@ -463,11 +487,49 @@ export default function CampaignDetail() {
   
   //캠페인 발신순서 탭 변경
   const handleCampaignOutgoingOrderChange = (value: OutgoingOrderTabParam) => {
-    
+    if( value.campaignInfoChangeYn ){
+      setChangeYn(true);
+      setCampaignInfoChangeYn(true);
+      setTempCampaignsInfo({...tempCampaignInfo
+        , dial_phone_id: Number(value.dial_phone_id)
+        , phone_dial_try: value.phone_dial_try
+        , phone_order: value.phone_order
+      });
+      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+        , dial_phone_id: Number(value.dial_phone_id)
+        , phone_dial_try1: value.phone_dial_try[0]
+        , phone_dial_try2: value.phone_dial_try[1]
+        , phone_dial_try3: value.phone_dial_try[2]
+        , phone_dial_try4: value.phone_dial_try[3]
+        , phone_dial_try5: value.phone_dial_try[4]
+        , phone_order: value.phone_order
+      });
+    }  
+    if( value.onSave ){
+      setCampaignSaveYn(false);
+      handleCampaignSave();
+    }
+    if( value.onClosed ){
+      // setCampaignSaveYn(false);
+    }  
   }
 
   //캠페인 저장
   const handleCampaignSave = () => {
+    setAlertState({
+      ...errorMessage,
+      isOpen: true,
+      message: '캠페인 아이디 : ' + tempCampaignManagerInfo.campaign_id
+      + '\n 캠페인 이름 : ' + tempCampaignManagerInfo.campaign_name
+      + '\n 캠페인을 수정하시겠습니까?',
+      onClose: handleCampaignSaveExecute,
+      onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+    });
+  }
+  
+  //캠페인 저장 실행.
+  const handleCampaignSaveExecute = () => {
+    setAlertState((prev) => ({ ...prev, isOpen: false }));
     if( changeYn ){
       if( campaignInfoChangeYn ){
         fetchCampaignManagerUpdate(tempCampaignManagerInfo);
@@ -480,6 +542,10 @@ export default function CampaignDetail() {
         //캠페인 스케줄 수정 api 호출
         fetchCampaignScheduleUpdate(tempCampaignSchedule);
       }
+      if( callingNumberChangeYn ){
+        //캠페인 발신번호 수정 api 호출
+        fetchCallingNumberUpdate(tempCallingNumberInfo);
+      }
     }
   }
 
@@ -490,13 +556,13 @@ export default function CampaignDetail() {
   
   //변경여부 체크
   useEffect(() => {  
-    if( changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn ){  
+    if( changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !callingNumberChangeYn ){  
       fetchMain({
         session_key: '',
         tenant_id: 0,
       });
     }
-  }, [campaignInfoChangeYn,campaignSkillChangeYn]);
+  }, [campaignInfoChangeYn,campaignSkillChangeYn,callingNumberChangeYn]);
 
   //캠페인 정보 조회 api 호출
   const { mutate: fetchMain } = useApiForMain({
@@ -551,6 +617,23 @@ export default function CampaignDetail() {
     }
   });
   
+  //캠페인 발신번호 수정 api 호출
+  const { mutate: fetchCallingNumberUpdate } = useApiForCallingNumberUpdate({
+    onSuccess: (data) => {
+      fetchCallingNumbers({
+        session_key: '',
+        tenant_id: 0,
+      });      
+    }
+  });
+  
+    // 전화번호 조회
+    const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
+      onSuccess: (data) => {
+        setCallingNumbers(data.result_data);
+        setCallingNumberChangeYn(false);
+      }
+    });
 
   return (
     <div className='flex flex-col gap-5 w-[60%] overflow-auto'>
@@ -687,11 +770,13 @@ export default function CampaignDetail() {
         type={alertState.type}
         isOpen={alertState.isOpen}
         onClose={() => {
+          handleCampaignSaveExecute();
+        }}
+        onCancle={() => {
           setAlertState((prev) => ({ ...prev, isOpen: false }));
         }}/>
       <CallingNumberPopup
-        param={tempCampaignSkills.skill_id||[]}
-        tenantId={tempCampaignInfo.tenant_id}
+        param={inputCallingNumber}
         type={callingNumberPopupState.type}
         isOpen={callingNumberPopupState.isOpen}
         onConfirm={(param) => handleCallingNumlber(param)}

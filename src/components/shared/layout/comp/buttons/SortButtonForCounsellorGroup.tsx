@@ -8,8 +8,8 @@ import {
   import { SortType } from '@/features/campaignManager/types/typeForSidebar2';
   
   interface Props {
-    onSort: (type: SortType) => void;
-    selectedSort: SortType;
+    onSort?: (type: SortType) => void;
+    selectedSort?: SortType;
   }
   
   const counsellorGroupSortOptions: Array<{ id: SortType; label: string }> = [

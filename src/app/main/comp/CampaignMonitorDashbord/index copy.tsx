@@ -1,259 +1,538 @@
-import React from 'react'
-import {
-  useReactTable,
-  getCoreRowModel,
-  getExpandedRowModel,
-  ColumnDef,
-  flexRender,
-  ExpandedState,
-} from '@tanstack/react-table'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { ChevronRight, ChevronDown } from 'lucide-react'
+"use client";
+
+import React, { useState, useMemo } from 'react';
+import DataGrid, { Column } from 'react-data-grid';
+import { ChevronRight, ChevronDown } from 'lucide-react';
+import 'react-data-grid/lib/styles.css';
+import TitleWrap from "@/components/shared/TitleWrap";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
+import { Label } from "@/components/ui/label";
+import { CommonButton } from "@/components/shared/CommonButton";
+import Image from "next/image";
 
 interface CampaignData {
-  id: string
-  name: string
-  requestStatus: string
-  executeStatus: string
-  processStatus: string
-  errorRate: number
-  riskTestRate: number
-  timeTestRate: number
-  riskTestCount: number
-  processCount: number
-  completeCount: number
-  subRows?: CampaignData[]
+  id: string;
+  발신구분: string;
+  시작구분: string;
+  완료구분: string;
+  진행률: number;
+  리스트대비성공률: number;
+  발신대비성공률: number;
+  총리스트건수: number;
+  순수발신건수: number;
+  미발신건수: number;
+  총발신건수: number;
 }
 
-const defaultData: CampaignData[] = [
-  {
-    id: '1',
-    name: 'NEXUS(1번대)',
-    requestStatus: '',
-    executeStatus: '',
-    processStatus: '',
-    errorRate: 0,
-    riskTestRate: 0,
-    timeTestRate: 0,
-    riskTestCount: 0,
-    processCount: 0,
-    completeCount: 0,
-    subRows: [
-      {
-        id: '1-1',
-        name: '124752',
-        requestStatus: '',
-        executeStatus: '',
-        processStatus: '',
-        errorRate: 0,
-        riskTestRate: 0,
-        timeTestRate: 0,
-        riskTestCount: 0,
-        processCount: 0,
-        completeCount: 0,
-        subRows: [
-          {
-            id: '1-1-1',
-            name: '캠페인 아이디: 7',
-            requestStatus: '',
-            executeStatus: '',
-            processStatus: '',
-            errorRate: 0,
-            riskTestRate: 0,
-            timeTestRate: 0,
-            riskTestCount: 0,
-            processCount: 0,
-            completeCount: 0,
-            subRows: [
-              {
-                id: 'O00147-00234',
-                name: 'O00147-00234',
-                requestStatus: '처리완료',
-                executeStatus: '입중',
-                processStatus: '진행중',
-                errorRate: 25,
-                riskTestRate: 0,
-                timeTestRate: 0,
-                riskTestCount: 4,
-                processCount: 1,
-                completeCount: 3,
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-]
+interface TreeRow extends CampaignData {
+  parentId?: string;
+  isExpanded?: boolean;
+  level: number;
+  hasChildren?: boolean;
+  children?: TreeRow[];
+}
 
-const CampaignMonitorDashbord = () => {
-  const [expanded, setExpanded] = React.useState<ExpandedState>({})
-
-  // 초기에 모든 행을 펼친 상태로 설정
-  React.useEffect(() => {
-    const allExpanded: ExpandedState = {}
-    const expandRows = (rows: CampaignData[]) => {
-      rows.forEach(row => {
-        allExpanded[row.id] = true
-        if (row.subRows) {
-          expandRows(row.subRows)
+export default function CampaignMonitorDashboard() {
+  const initialData: TreeRow[] = [
+    {
+      id: 'center-1',
+      level: 0,
+      hasChildren: true,
+      발신구분: '',
+      시작구분: '',
+      완료구분: '',
+      진행률: 0,
+      리스트대비성공률: 0,
+      발신대비성공률: 0,
+      총리스트건수: 0,
+      순수발신건수: 0,
+      미발신건수: 4,
+      총발신건수: 0,
+      children: [
+        {
+          id: 'task-124752',
+          parentId: 'center-1',
+          level: 1,
+          hasChildren: true,
+          발신구분: '',
+          시작구분: '',
+          완료구분: '',
+          진행률: 0,
+          리스트대비성공률: 0,
+          발신대비성공률: 0,
+          총리스트건수: 0,
+          순수발신건수: 0,
+          미발신건수: 4,
+          총발신건수: 0,
+          children: [
+            {
+              id: 'campaign-7',
+              parentId: 'task-124752',
+              level: 2,
+              hasChildren: true,
+              발신구분: '',
+              시작구분: '',
+              완료구분: '',
+              진행률: 0,
+              리스트대비성공률: 0,
+              발신대비성공률: 0,
+              총리스트건수: 0,
+              순수발신건수: 0,
+              미발신건수: 4,
+              총발신건수: 0,
+              children: [
+                {
+                  id: 'OG0147-00234-1',
+                  parentId: 'campaign-7',
+                  level: 3,
+                  발신구분: '최초발신',
+                  시작구분: '멈춤',
+                  완료구분: '진행중',
+                  진행률: 25,
+                  리스트대비성공률: 0,
+                  발신대비성공률: 0,
+                  총리스트건수: 4,
+                  순수발신건수: 4,
+                  미발신건수: 4,
+                  총발신건수: 12,
+                },
+                {
+                  id: 'OG0147-00234-2',
+                  parentId: 'campaign-7',
+                  level: 3,
+                  발신구분: '최초발신',
+                  시작구분: '중지',
+                  완료구분: '진행중',
+                  진행률: 25,
+                  리스트대비성공률: 0,
+                  발신대비성공률: 0,
+                  총리스트건수: 4,
+                  순수발신건수: 4,
+                  미발신건수: 4,
+                  총발신건수: 0,
+                },
+                {
+                  id: 'OG0147-00234-3',
+                  parentId: 'campaign-7',
+                  level: 3,
+                  발신구분: '최초발신',
+                  시작구분: '시작',
+                  완료구분: '진행중',
+                  진행률: 25,
+                  리스트대비성공률: 0,
+                  발신대비성공률: 0,
+                  총리스트건수: 4,
+                  순수발신건수: 4,
+                  미발신건수: 4,
+                  총발신건수: 0,
+                }
+              ]
+            },
+            {
+              id: 'campaign-8',
+              parentId: 'task-124752',
+              level: 2,
+              hasChildren: false,
+              발신구분: '',
+              시작구분: '시작',
+              완료구분: '',
+              진행률: 0,
+              리스트대비성공률: 0,
+              발신대비성공률: 0,
+              총리스트건수: 0,
+              순수발신건수: 0,
+              미발신건수: 4,
+              총발신건수: 0,
+            },
+            {
+              id: 'campaign-9',
+              parentId: 'task-124752',
+              level: 2,
+              hasChildren: false,
+              발신구분: '',
+              시작구분: '시작',
+              완료구분: '',
+              진행률: 0,
+              리스트대비성공률: 0,
+              발신대비성공률: 0,
+              총리스트건수: 0,
+              순수발신건수: 0,
+              미발신건수: 4,
+              총발신건수: 0,
+            },
+            {
+              id: 'campaign-10',
+              parentId: 'task-124752',
+              level: 2,
+              hasChildren: false,
+              발신구분: '',
+              시작구분: '멈춤',
+              완료구분: '',
+              진행률: 0,
+              리스트대비성공률: 0,
+              발신대비성공률: 0,
+              총리스트건수: 0,
+              순수발신건수: 0,
+              미발신건수: 4,
+              총발신건수: 0,
+            },
+            {
+              id: 'campaign-11',
+              parentId: 'task-124752',
+              level: 2,
+              hasChildren: true,
+              발신구분: '',
+              시작구분: '멈춤',
+              완료구분: '',
+              진행률: 0,
+              리스트대비성공률: 0,
+              발신대비성공률: 0,
+              총리스트건수: 0,
+              순수발신건수: 0,
+              미발신건수: 4,
+              총발신건수: 0,
+              children: [
+                {
+                  id: 'OG0147-00234-4',
+                  parentId: 'campaign-11',
+                  level: 3,
+                  발신구분: '4번째발신',
+                  시작구분: '멈춤',
+                  완료구분: '완료',
+                  진행률: 25,
+                  리스트대비성공률: 0,
+                  발신대비성공률: 0,
+                  총리스트건수: 4,
+                  순수발신건수: 4,
+                  미발신건수: 4,
+                  총발신건수: 0,
+                },
+                {
+                  id: 'OG0147-00234-5',
+                  parentId: 'campaign-11',
+                  level: 3,
+                  발신구분: '2번째발신',
+                  시작구분: '중지',
+                  완료구분: '완료',
+                  진행률: 12.5,
+                  리스트대비성공률: 0,
+                  발신대비성공률: 0,
+                  총리스트건수: 4,
+                  순수발신건수: 4,
+                  미발신건수: 4,
+                  총발신건수: 0,
+                },
+                {
+                  id: 'OG0147-00234-6',
+                  parentId: 'campaign-11',
+                  level: 3,
+                  발신구분: '최초발신',
+                  시작구분: '멈춤',
+                  완료구분: '진행중',
+                  진행률: 25,
+                  리스트대비성공률: 0,
+                  발신대비성공률: 0,
+                  총리스트건수: 4,
+                  순수발신건수: 4,
+                  미발신건수: 4,
+                  총발신건수: 0,
+                }
+              ]
+            }
+          ]
         }
-      })
+      ]
     }
-    expandRows(defaultData)
-    setExpanded(allExpanded)
-  }, [])
+  ];
 
-  const columns: ColumnDef<CampaignData>[] = [
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set(['center-1', 'task-124752']));
+  const [selectedCampaign, setSelectedCampaign] = useState<string>('전체보기');
+  const [selectedSkill, setSelectedSkill] = useState<string>('스킬전체보기');
+  const [selectedStatus, setSelectedStatus] = useState<string>('전체');
+  const [isSortAscending, setIsSortAscending] = useState<boolean>(true);
+
+  // 캠페인 ID 목록 생성
+  const campaignOptions = useMemo(() => {
+    const campaigns = new Set(['전체보기']);
+    const getCampaignIds = (rows: TreeRow[]) => {
+      rows.forEach(row => {
+        if (row.level === 2) {
+          campaigns.add(row.id.split('-')[1]);
+        }
+        if (row.children) {
+          getCampaignIds(row.children);
+        }
+      });
+    };
+    getCampaignIds(initialData);
+    return Array.from(campaigns).sort((a, b) => {
+      if (a === '전체보기') return -1;
+      if (b === '전체보기') return 1;
+      return parseInt(a) - parseInt(b);
+    });
+  }, []);
+
+  const getFilteredData = (data: TreeRow[]): TreeRow[] => {
+    const filterRow = (row: TreeRow): TreeRow | null => {
+      let filteredChildren: TreeRow[] = [];
+      
+      if (row.children) {
+        filteredChildren = row.children
+          .map(child => filterRow(child))
+          .filter((child): child is TreeRow => child !== null);
+      }
+
+      // 캠페인 필터
+      const matchesCampaign = selectedCampaign === '전체보기' || 
+        (row.level === 2 && row.id.split('-')[1] === selectedCampaign);
+
+      // 스킬 필터 (level 3에만 적용)
+      const matchesSkill = selectedSkill === '스킬전체보기' || 
+        (row.level !== 3) || 
+        (row.level === 3 && selectedSkill.includes(row.id.split('-')[1][0]));
+
+      // 상태 필터
+      const matchesStatus = selectedStatus === '전체' || 
+        row.시작구분 === selectedStatus;
+
+      // 부모 노드는 항상 표시, 필터는 최하위 노드에만 적용
+      if (row.level < 2 || filteredChildren.length > 0) {
+        return {
+          ...row,
+          children: filteredChildren.length > 0 ? filteredChildren : undefined,
+          hasChildren: filteredChildren.length > 0
+        };
+      }
+
+      if (matchesCampaign && matchesSkill && matchesStatus) {
+        return row;
+      }
+
+      return null;
+    };
+
+    return data.map(row => filterRow(row)).filter((row): row is TreeRow => row !== null);
+  };
+
+  // 정렬 함수
+  const getSortedData = (data: TreeRow[]): TreeRow[] => {
+    const sortChildren = (rows: TreeRow[]): TreeRow[] => {
+      const campaignRows = rows.filter(row => row.level === 2);
+      const nonCampaignRows = rows.filter(row => row.level !== 2);
+
+      const sortedCampaignRows = [...campaignRows].sort((a, b) => {
+        const idA = parseInt(a.id.split('-')[1]);
+        const idB = parseInt(b.id.split('-')[1]);
+        return isSortAscending ? idA - idB : idB - idA;
+      });
+
+      const sortedRows = [...nonCampaignRows, ...sortedCampaignRows].map(row => ({
+        ...row,
+        children: row.children ? sortChildren(row.children) : undefined
+      }));
+
+      return sortedRows;
+    };
+
+    return sortChildren(data);
+  };
+
+  const filteredAndSortedData = useMemo(() => {
+    const filteredData = getFilteredData(initialData);
+    return getSortedData(filteredData);
+  }, [selectedCampaign, selectedSkill, selectedStatus, isSortAscending]);
+
+  const toggleRowExpand = (rowId: string) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (expandedRows.has(rowId)) {
+      newExpandedRows.delete(rowId);
+    } else {
+      newExpandedRows.add(rowId);
+    }
+    setExpandedRows(newExpandedRows);
+  };
+
+  function flattenRows(rows: TreeRow[]): TreeRow[] {
+    let flat: TreeRow[] = [];
+    rows.forEach((row) => {
+      const isExpanded = expandedRows.has(row.id);
+      flat.push({ ...row, isExpanded });
+      if (row.children && isExpanded) {
+        flat = flat.concat(flattenRows(row.children));
+      }
+    });
+    return flat;
+  }
+
+  const rowKeyGetter = (row: TreeRow) => row.id;
+
+  const columns: Column<TreeRow>[] = [
     {
-      accessorKey: 'name',
-      header: '캠페인 이름',
-      cell: ({ row }) => {
+      key: 'campaignName',
+      name: '캠페인 이름',
+      width: 300,
+      renderCell: ({ row }) => {
+        const indent = row.level * 20;
+        const showToggle = row.hasChildren;
+        let displayName = '';
+
+        if (row.level === 0) {
+          displayName = '센터: NEXUS(1센터)';
+        } else if (row.level === 1) {
+          displayName = '태스크: 124752';
+        } else if (row.level === 2) {
+          displayName = `캠페인 아이디: ${row.id.split('-')[1]}`;
+        } else {
+          displayName = row.id;
+        }
+
         return (
-          <div className="flex items-center" style={{ paddingLeft: `${row.depth * 2}rem` }}>
-            {row.getCanExpand() ? (
-              <button
-                className="mr-2 hover:bg-gray-100 rounded"
-                onClick={row.getToggleExpandedHandler()}
+          <div style={{ marginLeft: `${indent}px` }} className="flex items-center">
+            {showToggle && (
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleRowExpand(row.id);
+                }}
+                className="cursor-pointer mr-1"
               >
-                {row.getIsExpanded() ? (
-                  <div className="w-4 h-4 flex items-center justify-center text-gray-500">
-                    ∨
-                  </div>
+                {row.isExpanded ? (
+                  <ChevronDown className="w-4 h-4" />
                 ) : (
-                  <div className="w-4 h-4 flex items-center justify-center text-gray-500">
-                    ＞
-                  </div>
+                  <ChevronRight className="w-4 h-4" />
                 )}
-              </button>
-            ) : (
-              <span className="w-6"></span>
+              </span>
             )}
-            <span className="text-[13px] text-gray-700">{row.getValue('name')}</span>
+            <span>{displayName}</span>
           </div>
-        )
-      },
+        );
+      }
+    },
+    { key: '발신구분', name: '발신구분', width: 100 },
+    { key: '시작구분', name: '시작구분', width: 100 },
+    { key: '완료구분', name: '완료구분', width: 100 },
+    {
+      key: '진행률',
+      name: '진행률(%)',
+      renderCell: ({ row }) => (row.진행률 ? `${row.진행률}%` : '')
     },
     {
-      accessorKey: 'requestStatus',
-      header: '발신구분',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as string}</div>
-      )
+      key: '리스트대비성공률',
+      name: '리스트 대비 성공률(%)',
+      renderCell: ({ row }) => (row.리스트대비성공률 ? `${row.리스트대비성공률}%` : '')
     },
     {
-      accessorKey: 'executeStatus',
-      header: '시작구분',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as string}</div>
-      )
+      key: '발신대비성공률',
+      name: '발신 대비 성공률(%)',
+      renderCell: ({ row }) => (row.발신대비성공률 ? `${row.발신대비성공률}%` : '')
     },
     {
-      accessorKey: 'processStatus',
-      header: '완료구분',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as string}</div>
-      )
+      key: '총리스트건수',
+      name: '총 리스트 건수',
+      renderCell: ({ row }) => row.총리스트건수 || ''
     },
     {
-      accessorKey: 'errorRate',
-      header: '진행률(%)',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as number}</div>
-      )
+      key: '순수발신건수',
+      name: '순수발신 건수',
+      renderCell: ({ row }) => row.순수발신건수 || ''
     },
     {
-      accessorKey: 'riskTestRate',
-      header: '리스크 대비 성공률(%)',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as number}</div>
-      )
+      key: '미발신건수',
+      name: '미발신건수',
+      renderCell: ({ row }) => row.미발신건수 || ''
     },
     {
-      accessorKey: 'timeTestRate',
-      header: '발신 대비 성공률(%)',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as number}</div>
-      )
-    },
-    {
-      accessorKey: 'riskTestCount',
-      header: '총 리스크 건수',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as number}</div>
-      )
-    },
-    {
-      accessorKey: 'processCount',
-      header: '순수발신 건수',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as number}</div>
-      )
-    },
-    {
-      accessorKey: 'completeCount',
-      header: '총발신 건수',
-      cell: ({ getValue }) => (
-        <div className="text-[13px] text-gray-700">{getValue() as number}</div>
-      )
-    },
-  ]
-
-  const table = useReactTable({
-    data: defaultData,
-    columns,
-    state: {
-      expanded,
-    },
-    onExpandedChange: setExpanded,
-    getSubRows: row => row.subRows,
-    getCoreRowModel: getCoreRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
-  })
+      key: '총발신건수',
+      name: '총발신건수',
+      renderCell: ({ row }) => row.총발신건수 || ''
+    }
+  ];
 
   return (
-    <div className="p-4 bg-white">
-      <div className="border border-gray-200">
-        <Table>
-          <TableHeader className="bg-[#FBFBFB]">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-[13px] font-medium text-gray-700 py-2">
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} className="hover:bg-gray-50">
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-1.5">
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+    <div className="">
+      <TitleWrap
+        className="border-b border-gray-300 pb-3"
+        title="상담원 상태"
+      />
+      <div className="flex items-center justify-between pb-3">
+        <div className="flex gap-5">
+          <div className='flex items-center gap-2'>
+            <Label className="pr-2">캠페인</Label>
+            <div className="w-[120px]">
+              <Select value={selectedCampaign} onValueChange={setSelectedCampaign}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="전체보기" />
+                </SelectTrigger>
+                <SelectContent>
+                  {campaignOptions.map((campaign) => (
+                    <SelectItem key={campaign} value={campaign}>
+                      {campaign}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className='flex items-center gap-2'>
+            <Label className="pr-2">스킬 별로 보기</Label>
+            <div className="w-[120px]">
+              <Select value={selectedSkill} onValueChange={setSelectedSkill}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="스킬전체보기" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="스킬전체보기">스킬전체보기</SelectItem>
+                  <SelectItem value="1번스킬">1번스킬</SelectItem>
+                  <SelectItem value="2번스킬">2번스킬</SelectItem>
+                  <SelectItem value="3번스킬">3번스킬</SelectItem>
+                  <SelectItem value="4번스킬">4번스킬</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className='flex items-center gap-2'>
+            <Label className="pr-2">상태 별로 보기</Label>
+            <div className="w-[120px]">
+              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="전체" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="전체">전체</SelectItem>
+                  <SelectItem value="시작">시작</SelectItem>
+                  <SelectItem value="멈춤">멈춤</SelectItem>
+                  <SelectItem value="중지">중지</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <button onClick={() => setIsSortAscending(!isSortAscending)}>
+            <Image src="/sort_button.svg" alt="오름,내림차순 버튼" width={12} height={12} />
+          </button>
+        </div>
+        <div className="flex justify-end gap-2">
+          <CommonButton variant="secondary">엑셀로 저장</CommonButton>
+          <CommonButton variant="secondary">칼럼 설정</CommonButton>
+        </div>
+      </div>
+      <div className="h-[500px] w-full grid-custom-wrap">
+        <DataGrid
+          columns={columns}
+          rows={flattenRows(filteredAndSortedData)}
+          rowKeyGetter={rowKeyGetter}
+          className="w-full h-auto grid-custom"
+          rowHeight={26}
+          headerRowHeight={26}
+          rowClass={(row) => {
+            if (row.level === 0 || row.level === 1) {
+              return 'bg-[#fafafa]';
+            } else if (row.level === 2) {
+              return 'bg-[#f5faff]';
+            }
+            return '';
+          }}
+        />
       </div>
     </div>
-  )
+  );
 }
-
-export default CampaignMonitorDashbord

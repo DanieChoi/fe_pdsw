@@ -8,8 +8,8 @@ import { Filter } from "lucide-react"
 import { FilterType } from '@/features/campaignManager/types/typeForSidebar2';
 
 interface FilterButtonForCampaignProps {
-  onFilter: (type: FilterType) => void;
-  selectedFilter: FilterType;
+  onFilter?: (type: FilterType) => void;
+  selectedFilter?: FilterType;
 }
 
 const campaignFilterOptions: Array<{ id: FilterType; label: string }> = [
@@ -35,7 +35,7 @@ export function FilterButtonForCampaign({
           {campaignFilterOptions.map((option) => (
             <button
               key={option.id}
-              onClick={() => onFilter(option.id)}
+              // onClick={() => onFilter(option.id)}
               className={`flex items-center justify-between text-left px-2 py-1.5 text-xs hover:bg-gray-100 rounded
                 ${selectedFilter === option.id ? 'bg-blue-50 text-blue-600' : ''}`}
             >

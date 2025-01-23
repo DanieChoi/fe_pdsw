@@ -88,12 +88,14 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrd
 
       setRightList([]);
       const tempRigntData:RightDataProps[] = [];
-      const cnt = Number(campaignInfo.phone_order.substring(0,1));
-      for(let i=0;i<cnt;i++){
-        tempRigntData.push({
-          id: i + 1,
-          label: '고객 전화번호('+campaignInfo.phone_order[i+1]+')'
-        });
+      if( tempLeftData.length < 5 ){
+        const cnt = Number(campaignInfo.phone_order.substring(0,1));
+        for(let i=0;i<cnt;i++){
+          tempRigntData.push({
+            id: i + 1,
+            label: '고객 전화번호('+campaignInfo.phone_order[i+1]+')'
+          });
+        }
       }
       setRightList(tempRigntData);
 
@@ -123,6 +125,13 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrd
       setRightList([...rightList, { id: rightList.length + 1, label: selectedLeft }]);
       setLeftList(leftList.filter((item) => item !== selectedLeft));
       setSelectedLeft(null);
+      const index = Number(selectedLeft.substring(8,9));
+      onCampaignOutgoingOrderChange({...tempCampaignOutgoingOrderTab
+        , changeYn: true
+        , campaignInfoChangeYn: true
+        , phone_dial_try: tempCampaignOutgoingOrderTab.phone_dial_try.map((val, idx) => idx === index - 1 ? 1 : val)
+        , phone_order: rightList.length == 0?'1'+index:(rightList.length+1) + tempCampaignOutgoingOrderTab.phone_order.substring(1) + index
+      });
     }
   };
 
@@ -140,6 +149,14 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrd
             }))
         );
         setSelectedRight(null);
+        const index = Number(removedItem.label.substring(8,9));
+        const idx = tempCampaignOutgoingOrderTab.phone_order.lastIndexOf(index+'');
+        onCampaignOutgoingOrderChange({...tempCampaignOutgoingOrderTab
+          , changeYn: true
+          , campaignInfoChangeYn: true
+          , phone_dial_try: tempCampaignOutgoingOrderTab.phone_dial_try.map((val, idx) => idx === index - 1 ? 0 : val)
+          , phone_order: rightList.length == 1?'':(rightList.length-1) + tempCampaignOutgoingOrderTab.phone_order.substring(1,idx) + tempCampaignOutgoingOrderTab.phone_order.substring(idx+1)
+        });
       }
     }
   };
@@ -156,7 +173,17 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrd
             label: item.label,
           }))
         );
-        setSelectedRight(index); // 선택된 항목을 이동된 순서에 맞게 업데이트
+        if( rightList.length > 2){
+          setSelectedRight(index); // 선택된 항목을 이동된 순서에 맞게 업데이트
+          const upItem = rightList.find((item) => item.id === selectedRight);
+          const cnt = Number(upItem?.label.substring(8,9));
+          const idx = tempCampaignOutgoingOrderTab.phone_order.lastIndexOf(cnt+'');
+          onCampaignOutgoingOrderChange({...tempCampaignOutgoingOrderTab
+            , changeYn: true
+            , campaignInfoChangeYn: true
+            , phone_order: tempCampaignOutgoingOrderTab.phone_order.substring(0,idx-1) + tempCampaignOutgoingOrderTab.phone_order.substring(idx,idx+1) + tempCampaignOutgoingOrderTab.phone_order.substring(idx-1,idx) + tempCampaignOutgoingOrderTab.phone_order.substring(idx+1)
+          });
+        }
       }
     }
   };
@@ -174,12 +201,23 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrd
           }))
         );
         setSelectedRight(index + 2); // 선택된 항목을 이동된 순서에 맞게 업데이트
+        if( rightList.length > 2){
+          setSelectedRight(index); // 선택된 항목을 이동된 순서에 맞게 업데이트
+          const upItem = rightList.find((item) => item.id === selectedRight);
+          const cnt = Number(upItem?.label.substring(8,9));
+          const idx = tempCampaignOutgoingOrderTab.phone_order.lastIndexOf(cnt+'');
+          onCampaignOutgoingOrderChange({...tempCampaignOutgoingOrderTab
+            , changeYn: true
+            , campaignInfoChangeYn: true
+            , phone_order: tempCampaignOutgoingOrderTab.phone_order.substring(0,idx) + tempCampaignOutgoingOrderTab.phone_order.substring(idx+1,idx+2) + tempCampaignOutgoingOrderTab.phone_order.substring(idx,idx+1) + tempCampaignOutgoingOrderTab.phone_order.substring(idx+2)
+          });
+        }
       }
     }
   };
 
   const handleSelectChange = (value:any, col:string) => {
-    setTempCampaignOutgoingOrderTab({...tempCampaignOutgoingOrderTab
+    onCampaignOutgoingOrderChange({...tempCampaignOutgoingOrderTab
       , changeYn: true
       , campaignInfoChangeYn: true
       , dial_phone_id: Number(value)
@@ -306,8 +344,16 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrd
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-5">
-            <CommonButton variant="secondary">확인</CommonButton>
-            <CommonButton variant="secondary">취소</CommonButton>
+            <CommonButton variant="secondary" onClick={()=> 
+              onCampaignOutgoingOrderChange({...tempCampaignOutgoingOrderTab
+                , onSave: true
+              })
+            }>확인</CommonButton>
+            <CommonButton variant="secondary" onClick={()=> 
+              onCampaignOutgoingOrderChange({...tempCampaignOutgoingOrderTab
+                , onClosed: true
+              })
+            }>취소</CommonButton>
           </div>
         </div>
       </div>

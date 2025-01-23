@@ -11,18 +11,24 @@ import { TreeMenusForAgentGroupTab } from '@/features/campaignManager/components
 
 // ★ 추가: 기존에 TreeMenusForCampaigns 내부에서 사용하던 API 훅을 여기서 가져옵니다.
 import { useApiForGetTreeMenuDataForCampaignTab } from "@/features/auth/hooks/useApiForGetTreeMenuDataForCampaignTab";
+import { TabActions } from './comp/TabActions';
+import { useSideMenuStore } from '@/store/sideMenuStore';
 
 export default function SidebarContainer() {
   const [width, setWidth] = useState(330);
   const [selectedTabId, setSelectedTabId] = useState<TabId>('campaign');
-  const [selectedNodeId, setSelectedNodeId] = useState<string>();
   const [isResizing, setIsResizing] = useState(false);
-
+  
   // ⭐ expandedNodes: Set<string> (어떤 노드가 펼쳐져 있는지)
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
-
+  
   const [sortType, setSortType] = useState<SortType>('name');
   const [filterType, setFilterType] = useState<FilterType>('all');
+  
+  // const [selectedNodeId, setSelectedNodeId] = useState<string>();
+  const selectedNodeId = useSideMenuStore(state => state.selectedNodeId);
+  const setSelectedNodeId = useSideMenuStore(state => state.setSelectedNodeId); // Changed to useSideMenuStore
+
 
   // ★ 추가: 트리 데이터 가져오기
   const { treeData, isLoading, error } = useApiForGetTreeMenuDataForCampaignTab();
@@ -58,7 +64,10 @@ export default function SidebarContainer() {
   // ----------------------------
   // 트리 노드 토글/선택 핸들러
   // ----------------------------
+  // tofix: 노드 클릭하면 클릭한 노드의 id를 로그로 출력
   const handleNodeToggle = (nodeId: string) => {
+    console.log("clicked nodeId: ", nodeId);
+
     setExpandedNodes(prev => {
       const next = new Set(prev);
       if (next.has(nodeId)) {
@@ -98,7 +107,7 @@ export default function SidebarContainer() {
       };
 
       // 예: 2 레벨까지 자동으로 펼친다
-      expandUpToLevel(items, 0, 2);
+      expandUpToLevel(items, 0, 3);
 
       setExpandedNodes(newExpanded);
       setInitialized(true); // 다시 안 불리도록
@@ -137,6 +146,7 @@ export default function SidebarContainer() {
         return null;
     }
   };
+  console.log("treeData check 1: ", treeData);
 
   // ----------------------------
   // 최종 렌더
@@ -145,11 +155,31 @@ export default function SidebarContainer() {
     <div className="flex h-full bg-white border-r">
       <div className="flex flex-col w-full" style={{ width: `${width}px` }}>
         {/* 헤더 */}
-        <div className="flex-none flex items-center justify-between p-3 bg-gray-50 border-b">
+
+          <div className="flex-none flex items-center justify-between p-2 bg-gray-50 px-3 border-b">
+            <div className="flex items-center gap-2 py-1.5">
+              <img src="/sidebar-menu/phone_icon.svg" alt="navigation" className="w-4 h-4" />
+              <span className="text-sm text-gray-800 font-medium">
+                {baseTabs.find(tab => tab.id === selectedTabId)?.label} 
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+                <TabActions
+                  tabId={selectedTabId}
+                  // onFilter={onFilter || (() => {})}
+                  // onSort={onSort || (() => {})}
+                  // selectedFilter={selectedFilter}
+                  // selectedSort={selectedSort}
+                />
+            </div>
+          </div>
+
+        
+        {/* <div className="flex-none flex items-center justify-between p-3 bg-gray-50 border-b">
           <span className="text-sm font-medium text-gray-800">
             {baseTabs.find(tab => tab.id === selectedTabId)?.label}
           </span>
-        </div>
+        </div> */}
 
         {/* 트리 메뉴 영역 */}
         {renderTreeMenu()}

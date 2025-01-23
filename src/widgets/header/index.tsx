@@ -5,10 +5,32 @@ import { useRouter } from 'next/navigation'
 import { useTabStore } from '@/store/tabStore'
 import Cookies from 'js-cookie'
 import { MenuItem, menuItems } from '@/widgets/header/model/menuItems'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { useMainStore } from '@/store';
+import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
+import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
+import useApiForFetchCounselorList from '@/features/campaignManager/hooks/useApiForFetchCounselorList';
+import CustomAlert from '@/components/shared/layout/CustomAlert';
+
+const errorMessage = {
+  isOpen: false,
+  message: '',
+  title: '로그인',
+  type: '0',
+};
 
 export default function Header() {
   const router = useRouter();
+  const _sessionKey = Cookies.get('session_key') || '';
+  const _tenantId = Number(Cookies.get('tenant_id'));
+  const [alertState, setAlertState] = useState(errorMessage);
+  
+  const {
+    setCampaigns,
+    setTenants,
+    setCounselers,
+  } = useMainStore();
+
   const { 
     addTab, 
     openedTabs, 
@@ -55,6 +77,72 @@ export default function Header() {
     Cookies.remove('session_key');
     router.push('/login');
   }
+
+  const { mutate: fetchTenants } = useApiForTenants({
+    onSuccess: (data) => {
+      console.log('Tenants API response:', data);
+      if (data.result_code === 5) {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: '로그인 정보가 없습니다.',
+        });
+        Cookies.remove('session_key');
+        router.push('/login');
+      } else {
+        setTenants(data.result_data);
+        // const tempTenantIdArray = data.result_data.map(tenant => Number(tenant.tenant_id));
+        // fetchSkills({
+        //   tenant_id_array: tempTenantIdArray
+        // });
+        fetchMain({
+          session_key: _sessionKey,
+          tenant_id: _tenantId
+        });
+      }
+    },
+    onError: (error) => {
+      console.error('Tenants API error:', error);
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: '로그인 정보가 없습니다.',
+        });
+        Cookies.remove('session_key');
+        router.push('/login');
+      }
+    }
+  });
+
+  useEffect(() => {
+    console.log('Fetching tenants with:', { _sessionKey, _tenantId });
+    fetchTenants({
+      session_key: _sessionKey,
+      tenant_id: _tenantId,
+    });
+  }, [fetchTenants, _sessionKey, _tenantId]);
+
+  const { mutate: fetchMain } = useApiForMain({
+    onSuccess: (data) => {
+      console.log('Main API response:', data);
+      setCampaigns(data.result_data);
+
+      fetchCounselorList({
+        session_key: _sessionKey,
+        tenant_id: 1,
+        roleId:6
+      });
+
+    }
+  });
+
+  const { mutate: fetchCounselorList } = useApiForFetchCounselorList({
+    onSuccess: (data) => {
+      // console.log('Counselors API response:', data);
+      setCounselers(data.counselorList);
+    }
+  });
 
   return (
     <div className="flex flex-col">
@@ -143,6 +231,13 @@ export default function Header() {
           </div>
         </div>
       </header>
+      <CustomAlert
+        message={alertState.message}
+        title={alertState.title}
+        type={alertState.type}
+        isOpen={alertState.isOpen}
+        onClose={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }

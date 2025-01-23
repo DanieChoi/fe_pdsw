@@ -148,14 +148,6 @@ export default function SidebarPresenter({
               <span className="text-sm text-gray-800 font-medium">{currentTab?.label}</span>
             </div>
             <div className="flex items-center gap-1">
-              {/* <FilterButtonForCampa
-                onFilter={onFilter || (() => {})} 
-                selectedFilter={selectedFilter}
-              />ign
-              <SortButtonForCampaign
-                onSort={onSort || (() => {})} 
-                selectedSort={selectedSort}
-              /> */}
                 <TabActions
                   tabId={selectedTabId}
                   onFilter={onFilter || (() => {})}

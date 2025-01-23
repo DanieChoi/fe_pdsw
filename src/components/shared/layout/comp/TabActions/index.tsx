@@ -7,10 +7,10 @@ import SortButtonForCounsellorGroup from '../buttons/SortButtonForCounsellorGrou
 
 interface TabActionsProps {
   tabId: string;
-  onFilter: (type: FilterType) => void;
-  onSort: (type: SortType) => void;
-  selectedFilter: FilterType;
-  selectedSort: SortType;
+  onFilter?: (type: FilterType) => void;
+  onSort?: (type: SortType) => void;
+  selectedFilter?: FilterType;
+  selectedSort?: SortType;
 }
 
 export function TabActions({
@@ -47,12 +47,12 @@ export function TabActions({
       return (
         <div className="flex items-center gap-1">
           <FilterButtonForCounsellorGroup
-            onFilter={onFilter}
-            selectedFilter={selectedFilter}
+            // onFilter={onFilter}
+            // selectedFilter={selectedFilter}
           />
           <SortButtonForCounsellorGroup
-            onSort={onSort}
-            selectedSort={selectedSort}
+            // onSort={onSort}
+            // selectedSort={selectedSort}
           />
         </div>
       );

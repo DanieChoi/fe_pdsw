@@ -8,8 +8,8 @@ import {
   import { FilterType } from '@/features/campaignManager/types/typeForSidebar2';
   
   interface Props {
-    onFilter: (type: FilterType) => void;
-    selectedFilter: FilterType;
+    onFilter?: (type: FilterType) => void;
+    selectedFilter?: FilterType;
   }
   
   const counsellorGroupFilterOptions: Array<{ id: FilterType; label: string }> = [

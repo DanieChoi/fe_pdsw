@@ -67,7 +67,8 @@ export function useApiForGetTreeMenuDataForCampaignTab() {
 
     return tabData;
   }, [tenantsData, campaignData]);
-
+  console.log("treeData check 1 : ", treeData);
+  
   return {
     treeData,
     isLoading: isLoadingTenants || isLoadingCampaigns,
