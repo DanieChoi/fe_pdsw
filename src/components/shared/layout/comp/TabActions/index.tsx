@@ -7,10 +7,10 @@ import SortButtonForCounsellorGroup from '../buttons/SortButtonForCounsellorGrou
 
 interface TabActionsProps {
   tabId: string;
-  onFilter: (type: FilterType) => void;
-  onSort: (type: SortType) => void;
-  selectedFilter: FilterType;
-  selectedSort: SortType;
+  onFilter?: (type: FilterType) => void;
+  onSort?: (type: SortType) => void;
+  selectedFilter?: FilterType;
+  selectedSort?: SortType;
 }
 
 export function TabActions({

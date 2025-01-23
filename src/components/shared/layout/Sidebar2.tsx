@@ -11,6 +11,7 @@ import { TreeMenusForAgentGroupTab } from '@/features/campaignManager/components
 
 // ★ 추가: 기존에 TreeMenusForCampaigns 내부에서 사용하던 API 훅을 여기서 가져옵니다.
 import { useApiForGetTreeMenuDataForCampaignTab } from "@/features/auth/hooks/useApiForGetTreeMenuDataForCampaignTab";
+import { TabActions } from './comp/TabActions';
 
 export default function SidebarContainer() {
   const [width, setWidth] = useState(330);
@@ -145,11 +146,31 @@ export default function SidebarContainer() {
     <div className="flex h-full bg-white border-r">
       <div className="flex flex-col w-full" style={{ width: `${width}px` }}>
         {/* 헤더 */}
-        <div className="flex-none flex items-center justify-between p-3 bg-gray-50 border-b">
+
+          <div className="flex-none flex items-center justify-between p-2 bg-gray-50 px-3 border-b">
+            <div className="flex items-center gap-2 py-1.5">
+              <img src="/sidebar-menu/phone_icon.svg" alt="navigation" className="w-4 h-4" />
+              <span className="text-sm text-gray-800 font-medium">
+                {baseTabs.find(tab => tab.id === selectedTabId)?.label} 
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+                <TabActions
+                  tabId={selectedTabId}
+                  // onFilter={onFilter || (() => {})}
+                  // onSort={onSort || (() => {})}
+                  // selectedFilter={selectedFilter}
+                  // selectedSort={selectedSort}
+                />
+            </div>
+          </div>
+
+        
+        {/* <div className="flex-none flex items-center justify-between p-3 bg-gray-50 border-b">
           <span className="text-sm font-medium text-gray-800">
             {baseTabs.find(tab => tab.id === selectedTabId)?.label}
           </span>
-        </div>
+        </div> */}
 
         {/* 트리 메뉴 영역 */}
         {renderTreeMenu()}

@@ -8,8 +8,8 @@ import {
   import { SortType } from '@/features/campaignManager/types/typeForSidebar2';
   
   interface SortButtonForAgentProps {
-    onSort: (type: SortType) => void;
-    selectedSort: SortType;
+    onSort?: (type: SortType) => void;
+    selectedSort?: SortType;
   }
   
   const agentSortOptions: Array<{ id: SortType; label: string }> = [
@@ -35,7 +35,7 @@ import {
             {agentSortOptions.map((option) => (
               <button
                 key={option.id}
-                onClick={() => onSort(option.id)}
+                // onClick={() => onSort(option.id)}
                 className={`flex items-center justify-between text-left px-2 py-1.5 text-xs hover:bg-gray-100 rounded
                   ${selectedSort === option.id ? 'bg-blue-50 text-blue-600' : ''}`}
               >
