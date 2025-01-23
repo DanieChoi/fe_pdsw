@@ -20,7 +20,7 @@ import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
-import CustomAlert from '@/components/shared/layout/CustomAlert';
+import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 
 const dialModeList = [
@@ -30,21 +30,13 @@ const dialModeList = [
   {dial_id:4, dial_name: 'System Preview'},
 ];
 
-interface errorMessageParam {
-  isOpen: boolean;
-  message: string;
-  title: string;
-  type: string;
-  onClose?: () => void;
-  onCancle?: () => void;
-}
-
-
-const errorMessage: errorMessageParam = {
+const errorMessage: CustomAlertRequest = {
   isOpen: false,
   message: '',
   title: '캠페인',
   type: '1',
+  onClose: () => {},
+  onCancle: () => {},
 };
 
 const CampaignSkillInfo: CampaignSkillUpdateRequest = {
@@ -186,6 +178,15 @@ export interface OutgoingOrderTabParam {
   phone_dial_try: number[];
 }
 
+export interface OutgoingStrategyTabParam {
+  changeYn: boolean;
+  campaignInfoChangeYn: boolean;
+  onSave: boolean;
+  onClosed: boolean;
+  onInit: boolean;
+  redial_strategy: string[];
+}
+
 const CampaignScheduleInfo: CampaignScheDuleListDataResponse = {
   campaign_id: 0,
   tenant_id: 0,
@@ -221,7 +222,7 @@ export default function CampaignDetail() {
     tenantId: 0,
     type: '1',
   });
-  const [alertState, setAlertState] = useState<errorMessageParam>(errorMessage);
+  const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
   const [ callingNumberPopupState, setCallingNumberPopupState] = useState({
     isOpen: false,
     param: [],
@@ -513,6 +514,11 @@ export default function CampaignDetail() {
       // setCampaignSaveYn(false);
     }  
   }
+  
+  //캠페인 발신순서 탭 변경
+  const handleOutgoingStrategyTabChange = (value: OutgoingStrategyTabParam) => {
+
+  }
 
   //캠페인 저장
   const handleCampaignSave = () => {
@@ -754,6 +760,7 @@ export default function CampaignDetail() {
           campaignInfo={tempCampaignInfo}
           onCampaignOutgoingOrderChange={(value) => handleCampaignOutgoingOrderChange(value)}
           onCampaignScheduleChange={(value) => handleCampaignScheduleChange(value)}
+          onCampaignOutgoingStrategyChange={(value) => handleOutgoingStrategyTabChange(value)}
         />
       </div>
       <SkillListPopup

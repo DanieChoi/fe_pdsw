@@ -9,7 +9,10 @@ import CallbackTab from "./CallbackTab";
 import NotificationTab from "./NotificationTab";
 import AssignedAgentTab from "./AssignedAgentTab";
 import AdditionalInfoTab from "./AdditionalInfoTab";
-import { OperationTimeParam, OutgoingOrderTabParam } from './CampaignManagerDetail';
+import { OperationTimeParam
+  , OutgoingOrderTabParam
+  , OutgoingStrategyTabParam 
+} from './CampaignManagerDetail';
 import { CampaignScheDuleListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 
@@ -18,9 +21,15 @@ type Props = {
   campaignInfo: MainDataResponse;
   onCampaignScheduleChange: (param:OperationTimeParam) => void;
   onCampaignOutgoingOrderChange: (param:OutgoingOrderTabParam) => void;
+  onCampaignOutgoingStrategyChange: (param:OutgoingStrategyTabParam) => void;
 };
 
-const CampaignTab: React.FC<Props> = ({ campaignSchedule, campaignInfo, onCampaignScheduleChange, onCampaignOutgoingOrderChange }) => {
+const CampaignTab: React.FC<Props> = ({ campaignSchedule
+  , campaignInfo
+  , onCampaignScheduleChange
+  , onCampaignOutgoingOrderChange 
+  , onCampaignOutgoingStrategyChange
+}) => {
   return (
     <Tabs defaultValue="tab1" className="w-full">
       <div className="tab-custom-wrap">
@@ -43,7 +52,7 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule, campaignInfo, onCampai
         <OutgoingOrderTab campaignInfo={campaignInfo} onCampaignOutgoingOrderChange={onCampaignOutgoingOrderChange} />
       </TabsContent>
       <TabsContent value="tab3">
-        <OutgoingStrategyTab />
+        <OutgoingStrategyTab campaignInfo={campaignInfo} onCampaignOutgoingStrategyChange={onCampaignOutgoingStrategyChange} />
       </TabsContent>
       <TabsContent value="tab4">
         <OutgoingMethodTab />

@@ -76,7 +76,7 @@ export interface MainDataResponse {
   reuse_count: number;
   use_counsel_result: number;
   use_list_alarm: number;
-  redial_strategy: [];
+  redial_strategy: string[];
   dial_mode_option: number;
   user_option: string;
 }

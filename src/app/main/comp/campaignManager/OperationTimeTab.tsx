@@ -11,6 +11,7 @@ import Image from "next/image";
 import { useMainStore } from '@/store';
 import { OperationTimeParam } from './CampaignManagerDetail';
 import { CampaignScheDuleListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
+import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 
 type Column = {
   key: string;
@@ -44,6 +45,15 @@ interface DataProps {
   endTime: string;
 }
 
+const errorMessage: CustomAlertRequest = {
+  isOpen: false,
+  message: '',
+  title: '캠페인 동작시간',
+  type: '0',
+  onClose: () => {},
+  onCancle: () => {},
+};
+
 type Props = {
   campaignSchedule: CampaignScheDuleListDataResponse;
   onCampaignScheduleChange: (param:OperationTimeParam) => void;
@@ -71,6 +81,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignSchedule, onCampaignSchedul
   const [startTime, setStartTime] = useState(""); // 시작시간
   const [endTime, setEndTime] = useState(""); // 종료시간
   const [tempCampaignSchedule, setTempCampaignSchedule] = useState<OperationTimeParam>(tempCampaignInfo);
+  const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
 
   const handleSelectChange = (value:any, col:string) => {
     onCampaignScheduleChange({...tempCampaignSchedule
@@ -214,14 +225,20 @@ const OperationTimeTab: React.FC<Props> = ({ campaignSchedule, onCampaignSchedul
                         tempData.map((item, index) => {
                           if( item.startTime.substring(0,2)+item.startTime.substring(3,5) === startTime 
                           && item.endTime.substring(0,2)+item.endTime.substring(3,5) === endTime ) {
-                            alert("동일한 시간이 이미 설정되어 있습니다.");
+                            setAlertState({...alertState,
+                              isOpen: true,
+                              message: "동일한 시간이 이미 설정되어 있습니다.",
+                            });
                             check = true;
                           }
                           tempStartTime.push(item.startTime.substring(0,2)+item.startTime.substring(3,5));
                           tempEndTime.push(item.endTime.substring(0,2)+item.endTime.substring(3,5));
                         });
                         if( startTime > endTime ) {
-                          alert("종료시간 설정이 잘못 되었습니다.");
+                          setAlertState({...alertState,
+                            isOpen: true,
+                            message: "종료시간 설정이 잘못 되었습니다.",
+                          });
                           check = true;
                         }
                         if( !check ) {                          
@@ -280,6 +297,17 @@ const OperationTimeTab: React.FC<Props> = ({ campaignSchedule, onCampaignSchedul
           })
         }>취소</CommonButton>
       </div>
+      <CustomAlert
+        message={alertState.message}
+        title={alertState.title}
+        type={alertState.type}
+        isOpen={alertState.isOpen}
+        onClose={() => {
+          setAlertState((prev) => ({ ...prev, isOpen: false }));
+        }}
+        onCancle={() => {
+          setAlertState((prev) => ({ ...prev, isOpen: false }));
+        }}/>
     </div>
   );
 };
