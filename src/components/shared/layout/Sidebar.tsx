@@ -1,24 +1,11 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Cookies from 'js-cookie';
 import { useMainStore } from '@/store';
-import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
-import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
-
-import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
-import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 import useApiForFetchCounselorList from '@/features/campaignManager/hooks/useApiForFetchCounselorList';
-
-const errorMessage = {
-  isOpen: false,
-  message: '',
-  title: '로그인',
-  type: '0',
-};
 
 interface SidebarProps {
   isMenuOpen: boolean;
@@ -26,19 +13,15 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isMenuOpen, toggleSidebar }: SidebarProps) {
-  const router = useRouter();
   const [width, setWidth] = useState(330);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isResizing, setIsResizing] = useState(false);
-  const [alertState, setAlertState] = useState(errorMessage);
   const [expandedTenants, setExpandedTenants] = useState<number[]>([]);
 
   const _sessionKey = Cookies.get('session_key') || '';
   const _tenantId = Number(Cookies.get('tenant_id'));
 
   const {
-    setCampaigns,
-    setTenants,
     setSelectedCampaign,
     setCounselers,
     campaigns,
@@ -53,73 +36,16 @@ export default function Sidebar({ isMenuOpen, toggleSidebar }: SidebarProps) {
     }
   });
 
-  // API hooks
-  const { mutate: fetchMain } = useApiForMain({
-    onSuccess: (data) => {
-      console.log('Main API response:', data);
-      setCampaigns(data.result_data);
-
-      fetchCounselorList({
-        session_key: _sessionKey,
-        tenant_id: 1,
-        roleId:6
-      });
-
-    }
-  });
-
-  const { mutate: fetchSkills } = useApiForSkills({
-    onSuccess: (data) => {
-      console.log('Skills API response:', data);
-      // setSkills(data.result_data);
-      fetchMain({
-        session_key: _sessionKey,
-        tenant_id: _tenantId
-      });
-    }
-  });
-
-
-  const { mutate: fetchTenants } = useApiForTenants({
-    onSuccess: (data) => {
-      console.log('Tenants API response:', data);
-      if (data.result_code === 5) {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: '로그인 정보가 없습니다.',
-        });
-        Cookies.remove('session_key');
-        router.push('/login');
-      } else {
-        setTenants(data.result_data);
-        const tempTenantIdArray = data.result_data.map(tenant => Number(tenant.tenant_id));
-        fetchSkills({
-          tenant_id_array: tempTenantIdArray
-        });
-      }
-    },
-    onError: (error) => {
-      console.error('Tenants API error:', error);
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: '로그인 정보가 없습니다.',
-        });
-        Cookies.remove('session_key');
-        router.push('/login');
-      }
-    }
-  });
-
-  useEffect(() => {
-    console.log('Fetching tenants with:', { _sessionKey, _tenantId });
-    fetchTenants({
-      session_key: _sessionKey,
-      tenant_id: _tenantId,
-    });
-  }, [fetchTenants, _sessionKey, _tenantId]);
+  // const { mutate: fetchSkills } = useApiForSkills({
+  //   onSuccess: (data) => {
+  //     console.log('Skills API response:', data);
+  //     // setSkills(data.result_data);
+  //     fetchMain({
+  //       session_key: _sessionKey,
+  //       tenant_id: _tenantId
+  //     });
+  //   }
+  // });
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -329,13 +255,6 @@ export default function Sidebar({ isMenuOpen, toggleSidebar }: SidebarProps) {
             {isMenuOpen && renderContent()}
           </div>
         </nav>
-        <CustomAlert
-          message={alertState.message}
-          title={alertState.title}
-          type={alertState.type}
-          isOpen={alertState.isOpen}
-          onClose={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
-        />
       </aside>
       <div
         className="w-1 cursor-col-resize hover:bg-gray-300 active:bg-gray-400"

@@ -123,6 +123,12 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrd
       setRightList([...rightList, { id: rightList.length + 1, label: selectedLeft }]);
       setLeftList(leftList.filter((item) => item !== selectedLeft));
       setSelectedLeft(null);
+      const index = Number(selectedLeft.substring(8,9));
+      // onCampaignOutgoingOrderChange({...tempCampaignOutgoingOrderTab
+      //   , changeYn: true
+      //   , campaignInfoChangeYn: true
+      //   , phone_dial_try: tempCampaignOutgoingOrderTab.phone_dial_try.map((val, idx) => idx === index - 1 ? 1 : val)
+      // });
     }
   };
 
@@ -179,7 +185,7 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrd
   };
 
   const handleSelectChange = (value:any, col:string) => {
-    setTempCampaignOutgoingOrderTab({...tempCampaignOutgoingOrderTab
+    onCampaignOutgoingOrderChange({...tempCampaignOutgoingOrderTab
       , changeYn: true
       , campaignInfoChangeYn: true
       , dial_phone_id: Number(value)
