@@ -6,8 +6,8 @@ export interface CampaignScheDuleListDataResponse {
   tenant_id: number;
   start_date: string;
   end_date: string;
-  start_time: [string];
-  end_time: [string];
+  start_time: string[];
+  end_time: string[];
 }
 
 // 캠페인스케줄 데이터 타입
@@ -87,7 +87,7 @@ export interface CampaignSkillListResponse {
 // 전화번호설명 템플릿 조회 데이터 타입
 export interface PhoneDescriptionListDataResponse {
   description_id: number;
-  description: [string];
+  description: string[];
 }
 
 // 전화번호설명 템플릿 조회 데이터 타입

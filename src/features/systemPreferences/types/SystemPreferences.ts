@@ -42,3 +42,17 @@ export interface ChannelListResponse {
   total_count: number;
   result_data: ChannelListDataResponse[];
 }
+
+// 채널 수정 요청 타입
+export interface ChannelEditRequest {
+  device_id: number;
+  assign_kind: number;
+  channel_count: number;
+  channel_assign: number[];
+}
+
+// 채널 수정 응답 타입
+export interface ChannelEditResponse {
+  result_code: number;
+  result_msg: string;
+}

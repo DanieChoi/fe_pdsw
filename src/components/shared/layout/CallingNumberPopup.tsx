@@ -10,7 +10,7 @@ interface Skill {
     tenant_id: number;
 }
 
-export interface SkillListPopupProps {
+export interface CallingNumberPopupProps {
     param: number[];
     tenantId: number;
     isOpen?: boolean;
@@ -19,14 +19,14 @@ export interface SkillListPopupProps {
     onCancle?: () => void;
 }
 
-const SkillListPopup = ({ 
+const CallingNumberPopup = ({ 
     param, 
     tenantId,
     type, 
     isOpen = true,
     onConfirm,
     onCancle
-}: SkillListPopupProps) => {
+}: CallingNumberPopupProps) => {
     const { skills } = useCampainManagerStore();
     const [selectedSkills, setSelectedSkills] = useState<Set<number>>(new Set(param));
     
@@ -102,4 +102,4 @@ const SkillListPopup = ({
     );
 };
 
-export default SkillListPopup;
+export default CallingNumberPopup;
