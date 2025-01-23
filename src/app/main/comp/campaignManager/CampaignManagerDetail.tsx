@@ -30,6 +30,23 @@ const dialModeList = [
   {dial_id:4, dial_name: 'System Preview'},
 ];
 
+interface errorMessageParam {
+  isOpen: boolean;
+  message: string;
+  title: string;
+  type: string;
+  onClose?: () => void;
+  onCancle?: () => void;
+}
+
+
+const errorMessage: errorMessageParam = {
+  isOpen: false,
+  message: '',
+  title: '캠페인',
+  type: '1',
+};
+
 const CampaignSkillInfo: CampaignSkillUpdateRequest = {
   campaign_id: 0,
   skill_id: [],
@@ -204,12 +221,7 @@ export default function CampaignDetail() {
     tenantId: 0,
     type: '1',
   });
-  const [alertState, setAlertState] = useState({
-    isOpen: false,
-    message: '',
-    title: '로그인',
-    type: '0',
-  });
+  const [alertState, setAlertState] = useState<errorMessageParam>(errorMessage);
   const [ callingNumberPopupState, setCallingNumberPopupState] = useState({
     isOpen: false,
     param: [],
@@ -504,6 +516,20 @@ export default function CampaignDetail() {
 
   //캠페인 저장
   const handleCampaignSave = () => {
+    setAlertState({
+      ...errorMessage,
+      isOpen: true,
+      message: '캠페인 아이디 : ' + tempCampaignManagerInfo.campaign_id
+      + '\n 캠페인 이름 : ' + tempCampaignManagerInfo.campaign_name
+      + '\n 캠페인을 수정하시겠습니까?',
+      onClose: handleCampaignSaveExecute,
+      onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+    });
+  }
+  
+  //캠페인 저장 실행.
+  const handleCampaignSaveExecute = () => {
+    setAlertState((prev) => ({ ...prev, isOpen: false }));
     if( changeYn ){
       if( campaignInfoChangeYn ){
         fetchCampaignManagerUpdate(tempCampaignManagerInfo);
@@ -744,6 +770,9 @@ export default function CampaignDetail() {
         type={alertState.type}
         isOpen={alertState.isOpen}
         onClose={() => {
+          handleCampaignSaveExecute();
+        }}
+        onCancle={() => {
           setAlertState((prev) => ({ ...prev, isOpen: false }));
         }}/>
       <CallingNumberPopup

@@ -29,7 +29,12 @@ const CustomAlert = ({
                 </AlertDialogHeader>
                 <div className="p-4 bg-white rounded-bl-[.5rem] rounded-br-[.5rem]">
                     <div className="text-sm text-gray-700 mb-4">
-                        {message}
+                        {typeof message === 'string' ? message.split('\n').map((line, index) => (
+                            <React.Fragment key={index}>
+                                {line}
+                                <br />
+                            </React.Fragment>
+                        )) : message}
                     </div>
                     <div className="flex justify-end gap-1.5">
                         {type === '1' ? (
