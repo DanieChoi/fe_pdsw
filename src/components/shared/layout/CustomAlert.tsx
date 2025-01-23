@@ -9,6 +9,7 @@ export interface CustomAlertRequest {
     isOpen?: boolean;
     onClose: () => void;
     onCancle?: () => void;
+    width?: string; // width prop 추가
 }
 
 const CustomAlert = ({ 
@@ -17,11 +18,12 @@ const CustomAlert = ({
     type,
     isOpen = true,
     onClose,
-    onCancle
+    onCancle,
+    width = 'max-w-sm' // 기본값 설정
 }: CustomAlertRequest) => {
     return (
         <AlertDialog open={isOpen} onOpenChange={onClose}>
-            <AlertDialogContent className="p-0 max-w-sm rounded-none border shadow-sm">
+            <AlertDialogContent className={`p-0 ${width} rounded-none border shadow-sm`}>
                 <AlertDialogHeader className="bg-[#AAA] px-4 py-2 border-b rounded-tl-[.5rem] rounded-tr-[.5rem]">
                     <AlertDialogTitle className="text-sm text-[#fff] font-normal">
                         {title}
@@ -29,7 +31,12 @@ const CustomAlert = ({
                 </AlertDialogHeader>
                 <div className="p-4 bg-white rounded-bl-[.5rem] rounded-br-[.5rem]">
                     <div className="text-sm text-gray-700 mb-4">
-                        {message}
+                        {typeof message === 'string' ? message.split('\n').map((line, index) => (
+                            <React.Fragment key={index}>
+                                {line}
+                                <br />
+                            </React.Fragment>
+                        )) : message}
                     </div>
                     <div className="flex justify-end gap-1.5">
                         {type === '1' ? (

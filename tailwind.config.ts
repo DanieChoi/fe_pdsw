@@ -49,13 +49,23 @@ export default {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
-  			}
+  			},
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
+  		},
+		  width: {
+			'modal': '780px',  // 이렇게 하면 w-modal로 사용 가능
+			'modal-lg': '1024px',
+			'modal-sm': '480px',
+		  },
+		  maxWidth: {
+			'modal': '780px',  // 이렇게 하면 max-w-modal로 사용 가능
+			'modal-lg': '1024px',
+			'modal-sm': '480px',
+		  }
   	}
   },
   plugins: [require("tailwindcss-animate")],

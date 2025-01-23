@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import CampaignLayout from './CampaignNumberChange/CampaignLayout';
+import CampaignLayout from './CampaignNumberChange/CampaignLayout'
+import Image from 'next/image'
 
 export default function OperationBoard() {
   const [openSection, setOpenSection] = useState<{ [key: string]: boolean }>({
@@ -12,186 +13,59 @@ export default function OperationBoard() {
     section5: false,
     section6: false,
     section7: false,
-  });
+  })
 
   const toggleSection = (section: string) => {
     setOpenSection((prev) => ({
       ...prev,
       [section]: !prev[section],
-    }));
-  };
+    }))
+  }
+
+  const sections = [
+    { id: 'section1', title: '캠페인별 발신번호 변경', content: <CampaignLayout /> },
+    { id: 'section2', title: '전화번호별 설명 편집', content: '화면2' },
+    { id: 'section3', title: '예약콜 제한 설정', content: '화면3' },
+    { id: 'section4', title: '분배호수 제한 설정', content: '화면4' },
+    { id: 'section5', title: '스킬편집', content: '화면5' },
+    { id: 'section6', title: '상담 결과코드 설정', content: '화면6' },
+    { id: 'section7', title: '서스팬드', content: '화면7' },
+  ]
 
   return (
-    <div className="divide-y divide-gray-200 dark:divide-gray-700">
-
-        <div className="border border-gray-200 dark:border-gray-700">
-            <h2>
-                <button
-                    type="button"
-                    className={`flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 
-                    ${!openSection.section1 ? 'border-b-0' : ''} 
-                    focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 
-                    dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3`}
-                    onClick={() => toggleSection('section1')}
-                    aria-expanded={openSection.section1}
-                >
-                    <span>캠페인별 발신번호 변경</span>
-                </button>
-            </h2>
-            <div
-            className={`transition-[max-height,opacity] duration-200 ease-in-out overflow-hidden
-                ${openSection.section1 ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+    <div className="divide-y accordion-wrap">
+      {sections.map((section) => (
+        <div key={section.id} className="accordion">
+          <h2>
+            <button
+              type="button"
+              className={`accordion-btn
+                ${!openSection[section.id] ? 'border-b-0' : ''} 
+                gap-[15px]`}
+              onClick={() => toggleSection(section.id)}
+              aria-expanded={openSection[section.id]}
             >
-                <div className="p-5 border border-t-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
-                    <CampaignLayout />
-                </div>
-            </div>
-        </div>
-
-        <div className="border border-gray-200 dark:border-gray-700">
-            <h2>
-                <button
-                    type="button"
-                    className={`flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 
-                    ${!openSection.section2 ? 'border-b-0' : ''} 
-                    focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 
-                    dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3`}
-                    onClick={() => toggleSection('section2')}
-                    aria-expanded={openSection.section2}
-                >
-                    <span>전화번호별 설명 편집</span>
-                </button>
-            </h2>
-            <div
+              <div className={`transform transition-transform duration-200 ${openSection[section.id] ? 'rotate-180' : ''}`}>
+                <Image 
+                  src="/chevron-down.svg"  // public 폴더 내의 SVG 경로
+                  alt="chevron"
+                  width={10}
+                  height={10}
+                />
+              </div>
+              <span className='text-sm'>{section.title}</span>
+            </button>
+          </h2>
+          <div
             className={`transition-[max-height,opacity] duration-200 ease-in-out overflow-hidden
-                ${openSection.section2 ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
-            >
-                <div className="p-5 border border-t-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
-                    화면2
-                </div>
+              ${openSection[section.id] ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+          >
+            <div className="py-[35px] px-[40px] border-t border-gray-200">
+              {section.content}
             </div>
+          </div>
         </div>
-
-        <div className="border border-gray-200 dark:border-gray-700">
-            <h2>
-                <button
-                    type="button"
-                    className={`flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 
-                    ${!openSection.section3 ? 'border-b-0' : ''} 
-                    focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 
-                    dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3`}
-                    onClick={() => toggleSection('section3')}
-                    aria-expanded={openSection.section3}
-                >
-                    <span>예약콜 제한 설정</span>
-                </button>
-            </h2>
-            <div
-            className={`transition-[max-height,opacity] duration-200 ease-in-out overflow-hidden
-                ${openSection.section3 ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
-            >
-                <div className="p-5 border border-t-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
-                    화면3
-                </div>
-            </div>
-        </div>
-
-        <div className="border border-gray-200 dark:border-gray-700">
-            <h2>
-                <button
-                    type="button"
-                    className={`flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 
-                    ${!openSection.section4 ? 'border-b-0' : ''} 
-                    focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 
-                    dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3`}
-                    onClick={() => toggleSection('section4')}
-                    aria-expanded={openSection.section4}
-                >
-                    <span>분배호수 제한 설정</span>
-                </button>
-            </h2>
-            <div
-            className={`transition-[max-height,opacity] duration-200 ease-in-out overflow-hidden
-                ${openSection.section4 ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
-            >
-                <div className="p-5 border border-t-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
-                    화면4
-                </div>
-            </div>
-        </div>
-
-        <div className="border border-gray-200 dark:border-gray-700">
-            <h2>
-                <button
-                    type="button"
-                    className={`flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 
-                    ${!openSection.section5 ? 'border-b-0' : ''} 
-                    focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 
-                    dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3`}
-                    onClick={() => toggleSection('section5')}
-                    aria-expanded={openSection.section5}
-                >
-                    <span>스킬편집</span>
-                </button>
-            </h2>
-            <div
-            className={`transition-[max-height,opacity] duration-200 ease-in-out overflow-hidden
-                ${openSection.section5 ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
-            >
-                <div className="p-5 border border-t-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
-                    화면5
-                </div>
-            </div>
-        </div>
-
-        <div className="border border-gray-200 dark:border-gray-700">
-            <h2>
-                <button
-                    type="button"
-                    className={`flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 
-                    ${!openSection.section6 ? 'border-b-0' : ''} 
-                    focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 
-                    dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3`}
-                    onClick={() => toggleSection('section6')}
-                    aria-expanded={openSection.section6}
-                >
-                    <span>상담 결과코드 설정</span>
-                </button>
-            </h2>
-            <div
-            className={`transition-[max-height,opacity] duration-200 ease-in-out overflow-hidden
-                ${openSection.section6 ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
-            >
-                <div className="p-5 border border-t-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
-                    화면6
-                </div>
-            </div>
-        </div>
-
-        <div className="border border-gray-200 dark:border-gray-700">
-            <h2>
-                <button
-                    type="button"
-                    className={`flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 
-                    ${!openSection.section7 ? 'border-b-0' : ''} 
-                    focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 
-                    dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3`}
-                    onClick={() => toggleSection('section7')}
-                    aria-expanded={openSection.section7}
-                >
-                    <span>서스팬드</span>
-                </button>
-            </h2>
-            <div
-            className={`transition-[max-height,opacity] duration-200 ease-in-out overflow-hidden
-                ${openSection.section7 ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
-            >
-                <div className="p-5 border border-t-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
-                    화면7
-                </div>
-            </div>
-        </div>
-
+      ))}
     </div>
-  );
+  )
 }
