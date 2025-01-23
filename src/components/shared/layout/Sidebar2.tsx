@@ -173,7 +173,6 @@ export default function SidebarContainer() {
                 />
             </div>
           </div>
-
         
         {/* <div className="flex-none flex items-center justify-between p-3 bg-gray-50 border-b">
           <span className="text-sm font-medium text-gray-800">
