@@ -434,7 +434,44 @@ input::placeholder {
   background-color: #f9f9f9; 
 }
 
+
 html, body {
   height: 100%;
-  overflow: hidden;
+  min-width: 1300px;
+
+}
+/*아코디언*/
+
+.accordion-wrap{
+  border:1px solid #ebebeb;
+  border-radius: 3px;
+  border-radius: 5px;
+}
+
+.accordion-btn{
+  display: flex;
+  align-items: center;
+  padding: 6px 33px;
+  background: #F5FAFF;
+  width: 100%;
+}
+
+.accordion-wrap .accordion:first-child .accordion-btn{
+  border-radius: 5px 5px 0 0;
+}
+.accordion-wrap .accordion:last-child .accordion-btn{
+  border-radius: 0 0 5px 5px;
+}
+
+
+.search-wrap{
+  background: #FBFBFB;
+  border-top:1px solid #EBEBEB;
+  border-bottom: 1px solid #ebebeb;
+  padding:10px 20px;
+}
+
+
+.max-w-custom-780{
+  width: 780px;
 }

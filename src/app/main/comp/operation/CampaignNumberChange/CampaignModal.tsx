@@ -1,17 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React, { useState, useEffect, useMemo } from 'react';
+import { CustomInput } from "@/components/shared/CustomInput";
 import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X } from 'lucide-react';
+import DataGrid, { CellClickArgs } from 'react-data-grid';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { useMainStore, useCampainManagerStore } from '@/store';
 import { SkillListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
+import CustomAlert from '@/components/shared/layout/CustomAlert';
+import TitleWrap from "@/components/shared/TitleWrap";
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
@@ -26,6 +21,13 @@ interface CampaignModalProps {
   onSelect: (campaign: string) => void;
 }
 
+interface Row {
+  campaign_id: number;
+  campaign_name: string;
+  tenant_name: string;
+  skills: string;
+}
+
 export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignModalProps) {
   const { tenants, campaigns } = useMainStore();
   const { skills } = useCampainManagerStore();
@@ -37,9 +39,54 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
   const [callNumber, setCallNumber] = useState('');
   const [tempSkills, setTempSkills] = useState<SkillListDataResponse[]>([]);
 
-  // 그리드 행 클릭 핸들러
-  const handleRowClick = (campaign: any) => {
-    setSelectedCampaign(campaign);
+  
+  const columns = useMemo(() => [
+    { 
+      key: 'campaign_id', 
+      name: '캠페인 아이디',
+      width: 150,
+    },
+    { 
+      key: 'campaign_name', 
+      name: '캠페인 이름',
+      width: 244,
+    },
+    { 
+      key: 'tenant_name', 
+      name: '테넌트',
+      width: 150,
+    },
+    { 
+      key: 'skills', 
+      name: '스킬',
+      width: 200,
+    }
+  ], []);
+
+  const rows = useMemo(() => 
+    campaigns.map((campaign) => {
+      const tenant = tenants.find(t => t.tenant_id === campaign.tenant_id);
+      const campaignSkills = skills
+        .filter(skill => skill.tenant_id === campaign.tenant_id)
+        .map(skill => skill.skill_name)
+        .join(', ');
+
+      return {
+        campaign_id: campaign.campaign_id,
+          campaign_name: campaign.campaign_name,
+          tenant_name: tenant?.tenant_name || '',
+          skills: campaignSkills,
+      };
+    }), 
+    [campaigns, tenants, skills]
+  );
+  
+   // 그리드 행 클릭 핸들러
+   const handleCellClick = ({ row }: CellClickArgs<Row>) => {
+    const campaign = campaigns.find(c => c.campaign_id === row.campaign_id);
+    if (campaign) {
+      setSelectedCampaign(campaign);
+    }
   };
 
   // 확인 버튼 클릭 시
@@ -54,7 +101,7 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
   // 닫기 버튼 클릭 시
   const handleClose = () => {
     setSelectedCampaign(null);
-    onSelect('');  // 빈 문자열 전달
+    onSelect('');
     onClose();
   };
 
@@ -79,38 +126,27 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
     setSkill('all');
   }, [tenantId, skills]);
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[480px] bg-white p-0 rounded-none">
-        <DialogTitle className="sr-only">캠페인 조회</DialogTitle>
-        {/* Header */}
-        <div className="px-4 py-3 flex justify-between items-center border-b">
-          <h2 className="text-base">캠페인 조회</h2>
-          <button onClick={onClose} className="hover:text-gray-600">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Search Section */}
-        <div className="p-4">
-          {/* Search Label & Button */}
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-sm">조회조건</span>
-            <Button 
-              onClick={onHeaderSearch}
-              className="bg-[#00c2b3] hover:bg-[#00c2b3]/90 text-white h-8 px-4 rounded"
-            >
-              조회
-            </Button>
-          </div>
-
-          {/* Search Fields */}
-          <div className="space-y-2">
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label className="text-sm block mb-1">테넌트</Label>
-                <Select defaultValue='all' value={tenantId} onValueChange={setTenantId}>
-                  <SelectTrigger className="h-9 border-gray-200">
+  const modalContent = (
+    <div className="w-full">
+      {/* Search Section */}
+        <TitleWrap
+            title="조회조건"
+            buttons={[
+                { 
+                    label: "적용", 
+                    onClick: onHeaderSearch,
+                },
+            ]}
+        />
+      
+        {/* Search Fields */}
+        <div className="search-wrap flex flex-col gap-2">
+          <div className="flex gap-2">
+            <div className="flex items-center gap-1">
+              <Label className="w-20 min-w-20">테넌트</Label>
+              <div className='w-[140px]'>
+                <Select value={tenantId} onValueChange={setTenantId}>
+                  <SelectTrigger className="w-[140px]">
                     <SelectValue placeholder="테넌트" />
                   </SelectTrigger>
                   <SelectContent>
@@ -121,19 +157,21 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label className="text-sm block mb-1">캠페인이름</Label>
-                <Input 
-                  type="text" 
-                  value={campaignName}
-                  onChange={(e) => setCampaignName(e.target.value)}
-                  className="h-9 border-gray-200"
-                />
-              </div>
-              <div>
-                <Label className="text-sm block mb-1">다이얼모드</Label>
-                <Select defaultValue='all' value={dailMode} onValueChange={setDailMode}>
-                  <SelectTrigger className="h-9 border-gray-200">
+            </div>
+            <div className="flex items-center gap-1">
+              <Label className="w-20 min-w-20">캠페인이름</Label>
+              <CustomInput 
+                type="text" 
+                value={campaignName}
+                onChange={(e) => setCampaignName(e.target.value)}
+                className="w-[140px]"
+              />
+            </div>
+            <div className="flex items-center gap-1">
+              <Label className="w-20 min-w-20">다이얼모드</Label>
+              <div className='w-[140px]'>
+                <Select value={dailMode} onValueChange={setDailMode}>
+                  <SelectTrigger className="">
                     <SelectValue placeholder="다이얼모드" />
                   </SelectTrigger>
                   <SelectContent>
@@ -143,14 +181,16 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+                </div>
             </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm block mb-1">스킬</Label>
-                <Select defaultValue='all' value={skill} onValueChange={setSkill}>
-                  <SelectTrigger className="h-9 border-gray-200">
+          <div className="flex gap-2">
+            <div className="flex items-center gap-1">
+              <Label className="w-20 min-w-20">스킬</Label>
+              <div className='w-[140px]'>
+                <Select value={skill} onValueChange={setSkill}>
+                  <SelectTrigger className="w-[140px]">
                     <SelectValue placeholder="스킬" />
                   </SelectTrigger>
                   <SelectContent>
@@ -161,82 +201,53 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label className="text-sm block mb-1">발신번호</Label>
-                <Input 
-                  type="text" 
-                  value={callNumber}
-                  onChange={(e) => setCallNumber(e.target.value)}
-                  className="h-9 border-gray-200"
-                  placeholder="발신번호 입력"
-                />
-              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              <Label className="w-20 min-w-20">발신번호</Label>
+              <CustomInput 
+                type="text" 
+                value={callNumber}
+                onChange={(e) => setCallNumber(e.target.value)}
+                className="w-[140px]"
+                placeholder="발신번호 입력"
+              />
             </div>
           </div>
         </div>
 
-        {/* List Header */}
-        <div className="px-4 py-2 bg-gray-50 border-t border-b">
-          <div className="flex items-center gap-1">
-            <span className="text-sm">캠페인 검색목록</span>
-            <span className="text-sm text-[#00c2b3]">(총 6 건)</span>
-          </div>
-        </div>
+      {/* List Header */}
 
-        {/* Grid */}
-        <div className="p-4">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50">
-                <TableHead className="text-sm font-normal text-center">캠페인 아이디</TableHead>
-                <TableHead className="text-sm font-normal text-center">캠페인 이름</TableHead>
-                <TableHead className="text-sm font-normal text-center">테넌트</TableHead>
-                <TableHead className="text-sm font-normal text-center">스킬</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {campaigns.map((campaign) => {
-                const tenant = tenants.find(tenant => tenant.tenant_id === campaign.tenant_id);
-                const campaignSkills = skills.filter(skill => skill.tenant_id === campaign.tenant_id)
-                  .map(skill => skill.skill_name)
-                  .join(', ');
 
-                return (
-                  <TableRow 
-                    key={campaign.campaign_id} 
-                    className={`hover:bg-gray-50 cursor-pointer ${
-                      selectedCampaign?.campaign_id === campaign.campaign_id ? 'bg-cyan-50' : ''
-                    }`}
-                    onClick={() => handleRowClick(campaign)}
-                  >
-                    <TableCell className="text-sm text-center">{campaign.campaign_id}</TableCell>
-                    <TableCell className="text-sm text-center">{campaign.campaign_name}</TableCell>
-                    <TableCell className="text-sm text-center">{tenant?.tenant_name}</TableCell>
-                    <TableCell className="text-sm text-center">{campaignSkills}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+      <TitleWrap title="캠페인 검색목록" totalCount={campaigns.length} className='mt-[14px]'/>
 
-          {/* Buttons */}
-          <div className="flex justify-end gap-1 mt-4">
-            <Button 
-              className="bg-[#00c2b3] hover:bg-[#00c2b3]/90 text-white h-8 px-4 rounded"
-              onClick={handleConfirm}
-            >
-              확인
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={handleClose}
-              className="h-8 px-4 rounded"
-            >
-              닫기
-            </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+      {/* Grid */}
+      <div className="grid-custom-wrap h-[400px]">
+        <DataGrid
+          columns={columns}
+          rows={rows}
+          className="grid-custom"
+          rowKeyGetter={(row) => row.campaign_id}
+          onCellClick={handleCellClick}
+          selectedRows={selectedCampaign ? new Set<number>([selectedCampaign.campaign_id]) : new Set<number>()}
+          rowClass={(row) => 
+            selectedCampaign?.campaign_id === row.campaign_id ? 'bg-[#FFFAEE]' : ''
+          }
+          rowHeight={26}
+          headerRowHeight={26}
+        />
+      </div>
+    </div>
+  );
+
+  return (
+    <CustomAlert
+      isOpen={isOpen}
+      title="캠페인 조회"
+      message={modalContent}
+      type="1"
+      onClose={handleConfirm}
+      onCancle={handleClose}
+      width="max-w-modal" 
+    />
   );
 }
