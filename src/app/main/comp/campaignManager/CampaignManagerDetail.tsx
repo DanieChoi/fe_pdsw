@@ -193,7 +193,7 @@ export default function CampaignDetail() {
     isOpen: false,
     param: [],
     tenantId: 0,
-    type: '0',
+    type: '1',
   });
   const [alertState, setAlertState] = useState({
     isOpen: false,
@@ -205,7 +205,7 @@ export default function CampaignDetail() {
     isOpen: false,
     param: [],
     tenantId: 0,
-    type: '0',
+    type: '1',
   });
 
   //캠페인 정보 최초 세팅 
