@@ -51,7 +51,7 @@ export interface MainDataResponse {
   next_campaign: number;
   token_id: number;
   phone_order: string;
-  phone_dial_try: [];
+  phone_dial_try: number[];
   dial_try_interval: number;
   trunk_access_code: string;
   DDD_code: string;
