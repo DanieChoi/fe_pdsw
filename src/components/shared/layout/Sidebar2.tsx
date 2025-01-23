@@ -138,6 +138,9 @@ export default function SidebarContainer() {
         return null;
     }
   };
+  console.log("treeData check : ", treeData);
+  
+
 
   // ----------------------------
   // 최종 렌더

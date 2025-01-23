@@ -47,12 +47,12 @@ export function TabActions({
       return (
         <div className="flex items-center gap-1">
           <FilterButtonForCounsellorGroup
-            onFilter={onFilter}
-            selectedFilter={selectedFilter}
+            // onFilter={onFilter}
+            // selectedFilter={selectedFilter}
           />
           <SortButtonForCounsellorGroup
-            onSort={onSort}
-            selectedSort={selectedSort}
+            // onSort={onSort}
+            // selectedSort={selectedSort}
           />
         </div>
       );
