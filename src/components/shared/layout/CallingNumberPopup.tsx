@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
@@ -19,6 +19,12 @@ const CallingNumberPopup = ({
     onCancle
 }: CallingNumberPopupProps) => {
     const [inputValue, setInputValue] = useState(param);
+
+    useEffect(() => {
+        if(param !== null){
+            setInputValue(param);
+        }
+    }, [param]);
 
     const inputField = (
         <div className="flex items-center gap-2 justify-between">
