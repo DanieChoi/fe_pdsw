@@ -84,8 +84,8 @@ function CampaignLayout() {
       </div>
 
       {/* 오른쪽 섹션 */}
-      <div className="">
-        <div className="space-y-4">
+      <div className="w-[513px]">
+        <div className="flex flex-col gap-2">
           {/* 대상캠페인 영역 */}
           <div className="flex items-center gap-2">
             <Label className="w-[5rem] min-w-[5rem]">대상캠페인</Label>
