@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { create } from 'zustand'; 
 import { getStatusIcon } from '@/components/shared/layout/utils/utils';
 import { FilterType, SortType, TreeItem } from '@/features/campaignManager/types/typeForSidebar2';
 import { baseTabs, TabId } from '@/features/campaignManager/components/data/baseTabs';
@@ -13,6 +14,15 @@ import { TreeMenusForAgentGroupTab } from '@/features/campaignManager/components
 import { useApiForGetTreeMenuDataForCampaignTab } from "@/features/auth/hooks/useApiForGetTreeMenuDataForCampaignTab";
 import { TabActions } from './comp/TabActions';
 import { useSideMenuStore } from '@/store/sideMenuStore';
+interface SidebarWidthState {
+  width: number;
+  setWidth: (width: number) => void;
+}
+
+export const useSidebarWidthStore = create<SidebarWidthState>((set) => ({
+  width: 330, // 초기값
+  setWidth: (width: number) => set({ width }),
+}));
 
 export default function SidebarContainer() {
   const [width, setWidth] = useState(330);
@@ -43,7 +53,8 @@ export default function SidebarContainer() {
   const handleMouseMove = (e: MouseEvent) => {
     if (!isResizing) return;
     const newWidth = e.clientX;
-    setWidth(Math.max(200, Math.min(600, newWidth))); // 최소 200px, 최대 600px
+    setWidth(Math.max(200, Math.min(600, newWidth)));
+    useSidebarWidthStore.getState().setWidth(Math.max(200, Math.min(600, newWidth)));
   };
 
   const handleMouseUp = () => {

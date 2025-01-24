@@ -93,6 +93,7 @@ import Sidebar from '@/components/shared/layout/Sidebar';
 import '@/app/globals.css';
 import Header from '@/widgets/header';
 import Sidebar2 from '@/components/shared/layout/Sidebar2';
+import { useSidebarWidthStore } from '@/components/shared/layout/Sidebar2';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -101,6 +102,7 @@ export default function MainLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const width = useSidebarWidthStore(state => state.width); 
   const [footerHeight, setFooterHeight] = useState(140);
   const [isResizing, setIsResizing] = useState(false);
 
@@ -139,7 +141,10 @@ export default function MainLayout({
           <div className="flex flex-1 min-h-0"> {/* min-h-0이 중요합니다 */}
 
           <Sidebar2 />
-          <main className={`transition-all duration-300 flex flex-col relative h-full w-full`}>
+          <main 
+              className="transition-all duration-300 flex flex-col relative h-full"
+              style={{ width: `calc(100% - ${width}px)` }}
+            >
             <div
               style={{
                 height: `calc(100% - ${footerHeight}px)`,
