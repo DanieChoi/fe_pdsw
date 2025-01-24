@@ -12,6 +12,8 @@ import { useMainStore } from '@/store';
 import { OperationTimeParam } from './CampaignManagerDetail';
 import { CampaignScheDuleListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
+import { CampaignInfo } from './CampaignManagerDetail';
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
 
 type Column = {
   key: string;
@@ -55,11 +57,12 @@ const errorMessage: CustomAlertRequest = {
 };
 
 type Props = {
+  campaignInfo: MainDataResponse;
   campaignSchedule: CampaignScheDuleListDataResponse;
   onCampaignScheduleChange: (param:OperationTimeParam) => void;
 };
 
-const tempCampaignInfo:OperationTimeParam = {
+const tempOperationTimeTab:OperationTimeParam = {
   changeYn: false,
   campaignInfoChangeYn: false,
   campaignScheduleChangeYn: false,
@@ -73,15 +76,15 @@ const tempCampaignInfo:OperationTimeParam = {
   start_flag: ''
 };
 
-const OperationTimeTab: React.FC<Props> = ({ campaignSchedule, onCampaignScheduleChange }) => {
-  const { selectedCampaign } = useMainStore();
+const OperationTimeTab: React.FC<Props> = ({ campaignInfo, campaignSchedule, onCampaignScheduleChange }) => {
   const [tempData, setTempData] = useState<DataProps[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(new Date());
   const [startTime, setStartTime] = useState(""); // 시작시간
   const [endTime, setEndTime] = useState(""); // 종료시간
-  const [tempCampaignSchedule, setTempCampaignSchedule] = useState<OperationTimeParam>(tempCampaignInfo);
+  const [tempCampaignSchedule, setTempCampaignSchedule] = useState<OperationTimeParam>(tempOperationTimeTab);
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
+  const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
 
   const handleSelectChange = (value:any, col:string) => {
     onCampaignScheduleChange({...tempCampaignSchedule
@@ -92,7 +95,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignSchedule, onCampaignSchedul
   };
 
   useEffect(() => {
-    if( selectedCampaign && campaignSchedule.start_date !== '' ) {      
+    if( campaignInfo && campaignSchedule.start_date !== '' ) {      
       const tempCampaignSchedule = campaignSchedule;
       const CampaignScheduleStartTime = tempCampaignSchedule.start_time;
       const CampaignScheduleEndTime = tempCampaignSchedule.end_time;
@@ -112,17 +115,17 @@ const OperationTimeTab: React.FC<Props> = ({ campaignSchedule, onCampaignSchedul
           ]);
         });
       }
-      setTempCampaignSchedule({...tempCampaignInfo,
-        campaign_id: selectedCampaign.campaign_id,
+      setTempCampaignSchedule({...tempOperationTimeTab,
+        campaign_id: campaignInfo.campaign_id,
         start_date: tempCampaignSchedule.start_date,
         end_date: tempCampaignSchedule.end_date,
         start_time: CampaignScheduleStartTime,
         end_time: CampaignScheduleEndTime,
-        start_flag: selectedCampaign.start_flag+'',
+        start_flag: campaignInfo.start_flag+'',
         onSave: false,
       });
     }
-  }, [selectedCampaign, campaignSchedule]);
+  }, [campaignSchedule,campaignInfo]);
 
   return (
     <div className="py-5">
@@ -132,7 +135,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignSchedule, onCampaignSchedul
           <div className="flex flex-col gap-y-2">
             <div className="flex items-center gap-2 justify-between">
               <Label className="w-[5rem] min-w-[5rem]">시작</Label>
-              <Select value={tempCampaignSchedule.start_flag} onValueChange={(value) => handleSelectChange(value, 'startFlag')}>
+              <Select value={campaignInfo?.start_flag+''} onValueChange={(value) => handleSelectChange(value, 'startFlag')}>
                 <SelectTrigger>
                   <SelectValue placeholder="시작" />
                 </SelectTrigger>
@@ -146,7 +149,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignSchedule, onCampaignSchedul
 
             <div className="flex items-center gap-2 justify-between">
               <Label className="w-[5rem] min-w-[5rem]">종료구분</Label>
-              <CustomInput disabled={true} value={selectedCampaign?.end_flag === 1?'진행 중':'완료'}/>
+              <CustomInput disabled={true} value={campaignInfo?.end_flag === 1?'진행 중':'완료'}/>
             </div>
 
             <div className="flex items-center gap-2 justify-between">

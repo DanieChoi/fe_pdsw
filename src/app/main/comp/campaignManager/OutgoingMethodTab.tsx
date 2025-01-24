@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { CommonButton } from "@/components/shared/CommonButton";
@@ -10,19 +10,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/shared/CustomSelect";
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { OutgoingMethodTabParam } from './CampaignManagerDetail';
 
-// 숫자만 입력되도록 제어하는 함수
-const handleNumericInput = (
-  e: React.ChangeEvent<HTMLInputElement>,
-  setValue: React.Dispatch<React.SetStateAction<string>>
-) => {
-  const value = e.target.value;
-  if (/^\d*$/.test(value)) {
-    setValue(value); // 숫자인 경우만 상태 업데이트
-  }
+const CampaignOutgoingOrderTab:OutgoingMethodTabParam = {
+  changeYn: false,
+  campaignInfoChangeYn: false,
+  onSave: false,
+  onClosed: false,
+  trunk_access_code: '',          //Trunk Access Code
+  dial_try_interval: 0,           //재시도 간격(초)
+  alarm_answer_count: 0,          //콜 목표량
+  overdial_abandon_time: 0,       //포기호 처리시간(초)
+  detect_mode: 0,                 //기계음 처리 - 자동응답기 처리 1 : 컬러링 판별 후 사람만 연결, 2 : 컬러링 판별 후 사람/기계음 연결, 3 : 기계음/사람 무조건 연결
+  auto_dial_interval: 0,          //자동 다이얼 시
+  power_divert_queue: 0,          //연결 IVR NO 및 다이얼 모드
+  next_campaign: 0,               //연결 캠페인
+  DDD_code: '',                   //DDD Number - 지역 번호
+  callback_kind: 0,               //연결구분 - 콜백구분 0 : 일반 캠페인(Default), 1 : 무한 콜백, 2 : 일반 콜백
+  max_ring: 0,                    //최대 링 횟수
+  token_id: 0,                    //토큰 ID
+  use_counsel_result: 0,          //상담결과 등록 여부 - 0 : 미사용, 1 : 사용
+  dial_mode_option: 0,            //다이얼 모드 옵션 - 발신 모드별 옵션 설정(system preview 에서만 사용)
+  user_option: '',                //제한 호수 비율
 };
 
-const OutgoingMethodTab: React.FC = () => {
+type Props = {
+  campaignInfo: MainDataResponse;
+  onCampaignOutgoingMethodChange: (param:OutgoingMethodTabParam) => void;
+};
+
+const OutgoingMethodTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingMethodChange }) => {
   const [trunkAccessCode, setTrunkAccessCode] = useState("");
   const [retryInterval] = useState("20");
   const [callGoal, setCallGoal] = useState("");
@@ -40,7 +58,94 @@ const OutgoingMethodTab: React.FC = () => {
   const [dialModeOption, setDialModeOption] = useState("default");
   const [ivrNo, setIvrNo] = useState("");
   const [limitRateEnabled, setLimitRateEnabled] = useState(false);
-  const [limitRate, setLimitRate] = useState("");
+  const [limitRate, setLimitRate] = useState("");  
+  const [tempOutgoingOrderTab, setTempOutgoingOrderTab] = useState<OutgoingMethodTabParam>(CampaignOutgoingOrderTab);
+
+  // 숫자만 입력되도록 제어하는 함수
+  const handleNumericInput = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setValue: React.Dispatch<React.SetStateAction<string>>,
+    type: string
+  ) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setValue(value); // 숫자인 경우만 상태 업데이트
+      if( type === 'setTrunkAccessCode'){
+        onCampaignOutgoingMethodChange({...tempOutgoingOrderTab
+          , changeYn: true
+          , campaignInfoChangeYn: true
+          , trunk_access_code: value
+        });
+      }else if( type === 'setCallGoal'){
+        onCampaignOutgoingMethodChange({...tempOutgoingOrderTab
+          , changeYn: true
+          , campaignInfoChangeYn: true
+          , alarm_answer_count: Number(value)
+        });
+      }else if( type === 'setAutoDial'){
+        onCampaignOutgoingMethodChange({...tempOutgoingOrderTab
+          , changeYn: true
+          , campaignInfoChangeYn: true
+          , auto_dial_interval: Number(value)
+        });
+      }else if( type === 'setDddNumber'){
+        onCampaignOutgoingMethodChange({...tempOutgoingOrderTab
+          , changeYn: true
+          , campaignInfoChangeYn: true
+          , DDD_code: value
+        });
+      }else if( type === 'setTokenId'){
+        onCampaignOutgoingMethodChange({...tempOutgoingOrderTab
+          , changeYn: true
+          , campaignInfoChangeYn: true
+          , token_id: Number(value)
+        });
+      }else if( type === 'setIvrNo'){
+        onCampaignOutgoingMethodChange({...tempOutgoingOrderTab
+          , changeYn: true
+          , campaignInfoChangeYn: true
+          , power_divert_queue: Number(value)
+        });
+      }else if( type === 'setLimitRate'){
+        onCampaignOutgoingMethodChange({...tempOutgoingOrderTab
+          , changeYn: true
+          , campaignInfoChangeYn: true
+          , user_option: value === ''?'': 'limit='+value+',afiniti=off'
+        });
+        setLimitRate(value);
+      }
+    }
+  };
+  const handleAbandonmentTime = (value:string) => {
+    onCampaignOutgoingMethodChange({...tempOutgoingOrderTab
+      , changeYn: true
+      , campaignInfoChangeYn: true
+      , overdial_abandon_time: Number(value) 
+    });
+  };
+
+  useEffect(() => {
+    if (campaignInfo.campaign_id !== 0) {  
+      setTempOutgoingOrderTab({...tempOutgoingOrderTab
+        ,trunk_access_code : campaignInfo.trunk_access_code
+        ,dial_try_interval : campaignInfo.dial_try_interval
+        ,alarm_answer_count : campaignInfo.alarm_answer_count
+        ,overdial_abandon_time : campaignInfo.overdial_abandon_time
+        ,detect_mode : campaignInfo.detect_mode
+        ,auto_dial_interval : campaignInfo.auto_dial_interval
+        ,power_divert_queue : campaignInfo.power_divert_queue
+        ,next_campaign : campaignInfo.next_campaign
+        ,DDD_code : campaignInfo.DDD_code
+        ,callback_kind : campaignInfo.callback_kind
+        ,max_ring : campaignInfo.max_ring
+        ,token_id : campaignInfo.token_id
+        ,use_counsel_result : campaignInfo.use_counsel_result
+        ,dial_mode_option : campaignInfo.dial_mode_option
+        ,user_option : campaignInfo.user_option
+      }); 
+      setLimitRate(campaignInfo.user_option === ''?'':campaignInfo.user_option.split(',')[0].indexOf('limit') > -1?campaignInfo.user_option.split(',')[0].split('=')[1]:'');
+    }
+  }, [campaignInfo]);
 
   return (
     <div className="py-5">
@@ -53,17 +158,17 @@ const OutgoingMethodTab: React.FC = () => {
             </Label>
             <CustomInput
               type="text"
-              value={trunkAccessCode}
-              onChange={(e) => handleNumericInput(e, setTrunkAccessCode)}
+              value={tempOutgoingOrderTab.trunk_access_code}
+              onChange={(e) => handleNumericInput(e, setTrunkAccessCode,'setTrunkAccessCode')}
             />
           </div>
 
           {/* 재시도 간격(초) */}
           <div className="flex items-center gap-2 justify-between">
             <Label className="w-[8.3rem] min-w-[8.3rem]">재시도 간격(초)</Label>
-            <Select value={retryInterval} disabled>
+            <Select value={tempOutgoingOrderTab.dial_try_interval+''} disabled>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder={retryInterval} />
+                <SelectValue placeholder={tempOutgoingOrderTab.dial_try_interval} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="20">20</SelectItem>
@@ -76,8 +181,8 @@ const OutgoingMethodTab: React.FC = () => {
             <Label className="w-[8.3rem] min-w-[8.3rem]">콜 목표량</Label>
             <CustomInput
               type="text"
-              value={callGoal}
-              onChange={(e) => handleNumericInput(e, setCallGoal)}
+              value={tempOutgoingOrderTab.alarm_answer_count}
+              onChange={(e) => handleNumericInput(e, setCallGoal,'setCallGoal')}
             />
           </div>
 
@@ -86,12 +191,12 @@ const OutgoingMethodTab: React.FC = () => {
             <Label className="w-[8.3rem] min-w-[8.3rem]">
               포기호 처리시간(초)
             </Label>
-            <Select value={abandonmentTime} onValueChange={setAbandonmentTime}>
+            <Select value={tempOutgoingOrderTab.overdial_abandon_time+''} onValueChange={handleAbandonmentTime}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder={abandonmentTime} />
+                <SelectValue placeholder={tempOutgoingOrderTab.overdial_abandon_time} />
               </SelectTrigger>
               <SelectContent>
-                {["2", "3", "4", "5", "6", "7", "10", "15", "20", "30", "60"].map(
+                {["0","2", "3", "4", "5", "6", "7", "10", "15", "20", "30", "60"].map(
                   (time) => (
                     <SelectItem key={time} value={time}>
                       {time}
@@ -131,8 +236,8 @@ const OutgoingMethodTab: React.FC = () => {
             <Label className="w-[8.3rem] min-w-[8.3rem]">자동 다이얼 시</Label>
             <CustomInput
               type="text"
-              value={autoDial}
-              onChange={(e) => handleNumericInput(e, setAutoDial)}
+              value={tempOutgoingOrderTab.auto_dial_interval}
+              onChange={(e) => handleNumericInput(e, setAutoDial,'setAutoDial')}
             />
           </div>
         </div>
@@ -160,8 +265,8 @@ const OutgoingMethodTab: React.FC = () => {
             <Label className="w-[8.3rem] min-w-[8.3rem]">DDD Number</Label>
             <CustomInput
               type="text"
-              value={dddNumber}
-              onChange={(e) => handleNumericInput(e, setDddNumber)}
+              value={tempOutgoingOrderTab.DDD_code}
+              onChange={(e) => handleNumericInput(e, setDddNumber,'setDddNumber')}
             />
           </div>
 
@@ -183,8 +288,8 @@ const OutgoingMethodTab: React.FC = () => {
             <Label className="w-[8.3rem] min-w-[8.3rem]">Token ID</Label>
             <CustomInput
               type="text"
-              value={tokenId}
-              onChange={(e) => handleNumericInput(e, setTokenId)}
+              value={tempOutgoingOrderTab.token_id}
+              onChange={(e) => handleNumericInput(e, setTokenId,'setTokenId')}
             />
           </div>
 
@@ -216,8 +321,8 @@ const OutgoingMethodTab: React.FC = () => {
           <Label className="w-[8.3rem] min-w-[8.3rem]">연결 IVR NO</Label>
           <CustomInput
             type="text"
-            value={ivrNo}
-            onChange={(e) => handleNumericInput(e, setIvrNo)}
+            value={tempOutgoingOrderTab.power_divert_queue}
+            onChange={(e) => handleNumericInput(e, setIvrNo,'setIvrNo')}
           />
         </div>
         <div className="flex items-center gap-2 justify-between">
@@ -248,7 +353,7 @@ const OutgoingMethodTab: React.FC = () => {
           <CustomInput
             type="text"
             value={limitRate}
-            onChange={(e) => handleNumericInput(e, setLimitRate)}
+            onChange={(e) => handleNumericInput(e, setLimitRate,'setLimitRate')}
             disabled={!limitRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
           />
           %

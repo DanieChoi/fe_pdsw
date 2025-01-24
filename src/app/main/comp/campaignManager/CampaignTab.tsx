@@ -12,6 +12,7 @@ import AdditionalInfoTab from "./AdditionalInfoTab";
 import { OperationTimeParam
   , OutgoingOrderTabParam
   , OutgoingStrategyTabParam 
+  , OutgoingMethodTabParam
 } from './CampaignManagerDetail';
 import { CampaignScheDuleListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
@@ -22,6 +23,7 @@ type Props = {
   onCampaignScheduleChange: (param:OperationTimeParam) => void;
   onCampaignOutgoingOrderChange: (param:OutgoingOrderTabParam) => void;
   onCampaignOutgoingStrategyChange: (param:OutgoingStrategyTabParam) => void;
+  onCampaignOutgoingMethodChange: (param:OutgoingMethodTabParam) => void;
 };
 
 const CampaignTab: React.FC<Props> = ({ campaignSchedule
@@ -29,6 +31,7 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
   , onCampaignScheduleChange
   , onCampaignOutgoingOrderChange 
   , onCampaignOutgoingStrategyChange
+  , onCampaignOutgoingMethodChange
 }) => {
   return (
     <Tabs defaultValue="tab1" className="w-full">
@@ -46,7 +49,7 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
         </TabsList>
       </div>
       <TabsContent value="tab1">
-        <OperationTimeTab campaignSchedule={campaignSchedule} onCampaignScheduleChange={onCampaignScheduleChange} />
+        <OperationTimeTab campaignInfo={campaignInfo} campaignSchedule={campaignSchedule} onCampaignScheduleChange={onCampaignScheduleChange} />
       </TabsContent>
       <TabsContent value="tab2">
         <OutgoingOrderTab campaignInfo={campaignInfo} onCampaignOutgoingOrderChange={onCampaignOutgoingOrderChange} />
@@ -55,7 +58,7 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
         <OutgoingStrategyTab campaignInfo={campaignInfo} onCampaignOutgoingStrategyChange={onCampaignOutgoingStrategyChange} />
       </TabsContent>
       <TabsContent value="tab4">
-        <OutgoingMethodTab />
+        <OutgoingMethodTab campaignInfo={campaignInfo} onCampaignOutgoingMethodChange={onCampaignOutgoingMethodChange} />
       </TabsContent>
       <TabsContent value="tab5">
         <CallPacingTab />
