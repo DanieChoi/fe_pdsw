@@ -189,6 +189,28 @@ export interface OutgoingStrategyTabParam {
   redial_strategy: string[];
 }
 
+export interface OutgoingMethodTabParam {
+  changeYn: boolean;
+  campaignInfoChangeYn: boolean;
+  onSave: boolean;
+  onClosed: boolean;
+  trunk_access_code: string;      //Trunk Access Code
+  dial_try_interval: number;      //재시도 간격(초)
+  alarm_answer_count: number;     //콜 목표량
+  overdial_abandon_time: number;  //포기호 처리시간(초)
+  detect_mode: number;            //기계음 처리 - 자동응답기 처리 1 : 컬러링 판별 후 사람만 연결, 2 : 컬러링 판별 후 사람/기계음 연결, 3 : 기계음/사람 무조건 연결
+  auto_dial_interval: number;     //자동 다이얼 시
+  power_divert_queue: number;     //연결 IVR NO 및 다이얼 모드
+  next_campaign: number;          //연결 캠페인
+  DDD_code: string;               //DDD Number - 지역 번호
+  callback_kind: number;          //연결구분 - 콜백구분 0 : 일반 캠페인(Default), 1 : 무한 콜백, 2 : 일반 콜백
+  max_ring: number;               //최대 링 횟수
+  token_id: number;               //토큰 ID
+  use_counsel_result: number;     //상담결과 등록 여부 - 0 : 미사용, 1 : 사용
+  dial_mode_option: number;       //다이얼 모드 옵션 - 발신 모드별 옵션 설정(system preview 에서만 사용)
+  user_option: string;            //제한 호수 비율
+}
+
 const CampaignScheduleInfo: CampaignScheDuleListDataResponse = {
   campaign_id: 0,
   tenant_id: 0,
@@ -467,6 +489,9 @@ export default function CampaignDetail() {
       setTempCampaignManagerInfo({...tempCampaignManagerInfo
         , start_flag: Number(value.start_flag)
       });
+      setTempCampaignsInfo({...tempCampaignInfo
+        , start_flag: Number(value.start_flag)
+      });
     }
     if( value.campaignScheduleChangeYn ){
       setChangeYn(true);
@@ -517,9 +542,78 @@ export default function CampaignDetail() {
     }  
   }
   
-  //캠페인 발신순서 탭 변경
+  //캠페인 발신전략 탭 변경
   const handleOutgoingStrategyTabChange = (value: OutgoingStrategyTabParam) => {
-
+    if( value.campaignInfoChangeYn ){
+      setChangeYn(true);
+      setCampaignInfoChangeYn(true);
+      setTempCampaignsInfo({...tempCampaignInfo
+        , redial_strategy: value.redial_strategy
+      });
+      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+        , redial_strategy1: value.redial_strategy[0]
+        , redial_strategy2: value.redial_strategy[1]
+        , redial_strategy3: value.redial_strategy[2]
+        , redial_strategy4: value.redial_strategy[3]
+        , redial_strategy5: value.redial_strategy[4]
+      });
+    }  
+    if( value.onSave ){
+      setCampaignSaveYn(false);
+      handleCampaignSave();
+    }
+    if( value.onClosed ){
+      // setCampaignSaveYn(false);
+    }  
+  }
+  
+  //캠페인 발신방법 탭 변경
+  const handleOutgoingMethodTabChange = (value: OutgoingMethodTabParam) => {
+    if( value.campaignInfoChangeYn ){
+      setChangeYn(true);
+      setCampaignInfoChangeYn(true);
+      setTempCampaignsInfo({...tempCampaignInfo
+        ,trunk_access_code : value.trunk_access_code
+        ,dial_try_interval : value.dial_try_interval
+        ,alarm_answer_count : value.alarm_answer_count
+        ,overdial_abandon_time : value.overdial_abandon_time
+        ,detect_mode : value.detect_mode
+        ,auto_dial_interval : value.auto_dial_interval
+        ,power_divert_queue : value.power_divert_queue
+        ,next_campaign : value.next_campaign
+        ,DDD_code : value.DDD_code
+        ,callback_kind : value.callback_kind
+        ,max_ring : value.max_ring
+        ,token_id : value.token_id
+        ,use_counsel_result : value.use_counsel_result
+        ,dial_mode_option : value.dial_mode_option
+        ,user_option : value.user_option
+      });
+      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+        ,trunk_access_code : value.trunk_access_code
+        ,dial_try_interval : value.dial_try_interval
+        ,alarm_answer_count : value.alarm_answer_count
+        ,overdial_abandon_time : value.overdial_abandon_time
+        ,detect_mode : value.detect_mode
+        ,auto_dial_interval : value.auto_dial_interval
+        ,power_divert_queue : value.power_divert_queue+''
+        ,next_campaign : value.next_campaign
+        ,DDD_code : value.DDD_code
+        ,callback_kind : value.callback_kind
+        ,max_ring : value.max_ring
+        ,token_id : value.token_id
+        ,use_counsel_result : value.use_counsel_result
+        ,dial_mode_option : value.dial_mode_option
+        ,user_option : value.user_option
+      });
+    }  
+    if( value.onSave ){
+      setCampaignSaveYn(false);
+      handleCampaignSave();
+    }
+    if( value.onClosed ){
+      // setCampaignSaveYn(false);
+    }  
   }
 
   //캠페인 저장
@@ -792,6 +886,7 @@ export default function CampaignDetail() {
           onCampaignOutgoingOrderChange={(value) => handleCampaignOutgoingOrderChange(value)}
           onCampaignScheduleChange={(value) => handleCampaignScheduleChange(value)}
           onCampaignOutgoingStrategyChange={(value) => handleOutgoingStrategyTabChange(value)}
+          onCampaignOutgoingMethodChange={(value) => handleOutgoingMethodTabChange(value)}
         />
       </div>
       <SkillListPopup
