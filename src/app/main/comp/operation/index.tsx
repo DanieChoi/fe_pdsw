@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import CampaignLayout from './CampaignNumberChange/CampaignLayout'
 import EditDescription from './NumberEditDescription/EditDescription'
+import CallLimitSetting from './CallLimitSetting/'
 import Image from 'next/image'
 
 export default function OperationBoard() {
@@ -26,7 +27,7 @@ export default function OperationBoard() {
   const sections = [
     { id: 'section1', title: '캠페인별 발신번호 변경', content: <CampaignLayout /> },
     { id: 'section2', title: '전화번호별 설명 편집', content: <EditDescription/> },
-    { id: 'section3', title: '예약콜 제한 설정', content: '화면3' },
+    { id: 'section3', title: '예약콜 제한 설정', content: <CallLimitSetting/> },
     { id: 'section4', title: '분배호수 제한 설정', content: '화면4' },
     { id: 'section5', title: '스킬편집', content: '화면5' },
     { id: 'section6', title: '상담 결과코드 설정', content: '화면6' },
