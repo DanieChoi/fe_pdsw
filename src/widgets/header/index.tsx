@@ -53,6 +53,7 @@ export default function Header() {
         setActiveTab(lastTab.id, lastTab.uniqueKey);
       } else {
         const newTabKey = `${item.id}-${Date.now()}`;
+        // alert(item.id);
         addTab({ 
           ...item, 
           uniqueKey: newTabKey,

@@ -9,12 +9,15 @@ import CampaignMonitorDashbord from './CampaignMonitorDashbord';
 import OutboundCallProgressPanel from './OutboundCallProgressPanel';
 import OperationBoard from './operation';
 import CampaignManager from './CampaignManager';
+import CampaignUpdatePanel from './CampaignUpdatePanel';
 
 const TabContent = () => {
   const { activeTabId } = useTabStore();
 
   const renderContent = () => {
+    console.log("activeTabId: ", activeTabId);
     switch (activeTabId) {
+      
       case 1:
         return (
           <div className="space-y-0">
@@ -49,6 +52,12 @@ const TabContent = () => {
         return <div className="p-2"><OperationBoard /></div>;
       case 12:
         return <div className="p-2"><PreferencesBoard /></div>;
+      // case 100:
+      //   return <div className="p-2">
+      //     {/* 캠페인 수정용 패널 */}
+      //     <CampaignUpdatePanel />
+      //   </div>;
+
       default:
         return (
           <div className="flex items-center justify-center min-h-[calc(100vh-23rem)] text-gray-500">

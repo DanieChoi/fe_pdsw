@@ -10,6 +10,7 @@ export interface TabItem {
   icon: string;
   href: string;
   content: React.ReactNode;
+  campaignId?: string;
 }
 
 export interface TabSection {

@@ -1,19 +1,24 @@
 // src/features/campaignManager/components/SidebarContainer.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
-import { create } from 'zustand'; 
-import { getStatusIcon } from '@/components/shared/layout/utils/utils';
-import { FilterType, SortType, TreeItem } from '@/features/campaignManager/types/typeForSidebar2';
-import { baseTabs, TabId } from '@/features/campaignManager/components/data/baseTabs';
-import { TreeMenusForCampaigns } from '@/features/campaignManager/components/treeMenus/TreeMenusForCampaigns';
-import { TreeMenusForAgentTab } from '@/features/campaignManager/components/treeMenus/TreeMenusForAgentTab';
-import { TreeMenusForAgentGroupTab } from '@/features/campaignManager/components/treeMenus/TreeMenusForAgentGroupTab';
+import { useState, useEffect } from "react";
+import { create } from "zustand";
+import { getStatusIcon } from "@/components/shared/layout/utils/utils";
+import { FilterType, SortType, TreeItem } from "@/features/campaignManager/types/typeForSidebar2";
+import { baseTabs, TabId } from "@/features/campaignManager/components/data/baseTabs";
+import { TreeMenusForCampaigns } from "@/features/campaignManager/components/treeMenus/TreeMenusForCampaigns";
+import { TreeMenusForAgentTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentTab";
+import { TreeMenusForAgentGroupTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentGroupTab";
 
-// ★ 추가: 기존에 TreeMenusForCampaigns 내부에서 사용하던 API 훅을 여기서 가져옵니다.
-import { useApiForGetTreeMenuDataForCampaignTab } from "@/features/auth/hooks/useApiForGetTreeMenuDataForCampaignTab";
-import { TabActions } from './comp/TabActions';
-import { useSideMenuStore } from '@/store/sideMenuStore';
+// ★ 변경: 새로운 훅 임포트
+
+import { TabActions } from "./comp/TabActions";
+import { useSideMenuStore } from "@/store/sideMenuStore";
+import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
+
+// --------------------------
+// 사이드바 너비 상태 (Zustand)
+// --------------------------
 interface SidebarWidthState {
   width: number;
   setWidth: (width: number) => void;
@@ -24,28 +29,31 @@ export const useSidebarWidthStore = create<SidebarWidthState>((set) => ({
   setWidth: (width: number) => set({ width }),
 }));
 
+// --------------------------
+// 메인 사이드바 컴포넌트
+// --------------------------
 export default function SidebarContainer() {
   const [width, setWidth] = useState(330);
-  const [selectedTabId, setSelectedTabId] = useState<TabId>('campaign');
+  const [selectedTabId, setSelectedTabId] = useState<TabId>("campaign");
   const [isResizing, setIsResizing] = useState(false);
-  
-  // ⭐ expandedNodes: Set<string> (어떤 노드가 펼쳐져 있는지)
+
+  // 트리 확장/필터/정렬 관련 상태
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
-  
-  const [sortType, setSortType] = useState<SortType>('name');
-  const [filterType, setFilterType] = useState<FilterType>('all');
-  
-  // const [selectedNodeId, setSelectedNodeId] = useState<string>();
-  const selectedNodeId = useSideMenuStore(state => state.selectedNodeId);
-  const setSelectedNodeId = useSideMenuStore(state => state.setSelectedNodeId); // Changed to useSideMenuStore
+  const [sortType, setSortType] = useState<SortType>("name");
+  const [filterType, setFilterType] = useState<FilterType>("all");
 
+  // 선택된 노드
+  const selectedNodeId = useSideMenuStore((state) => state.selectedNodeId);
+  const setSelectedNodeId = useSideMenuStore((state) => state.setSelectedNodeId);
 
-  // ★ 추가: 트리 데이터 가져오기
-  const { treeData, isLoading, error } = useApiForGetTreeMenuDataForCampaignTab();
+  // --------------------------
+  // ★ 새로운 API 훅 사용
+  // --------------------------
+  const { data: treeData, isLoading, error } = useApiForGetTreeMenuDataForSideMenu();
 
-  // ----------------------------
-  // 리사이징 관련 핸들러
-  // ----------------------------
+  // --------------------------
+  // 리사이징 관련 로직
+  // --------------------------
   const handleResizeStart = () => {
     setIsResizing(true);
   };
@@ -53,8 +61,10 @@ export default function SidebarContainer() {
   const handleMouseMove = (e: MouseEvent) => {
     if (!isResizing) return;
     const newWidth = e.clientX;
-    setWidth(Math.max(200, Math.min(600, newWidth)));
-    useSidebarWidthStore.getState().setWidth(Math.max(200, Math.min(600, newWidth)));
+    const clampedWidth = Math.max(200, Math.min(600, newWidth));
+
+    setWidth(clampedWidth);
+    useSidebarWidthStore.getState().setWidth(clampedWidth);
   };
 
   const handleMouseUp = () => {
@@ -63,23 +73,21 @@ export default function SidebarContainer() {
 
   useEffect(() => {
     if (isResizing) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
     }
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isResizing]);
 
-  // ----------------------------
-  // 트리 노드 토글/선택 핸들러
-  // ----------------------------
-  // tofix: 노드 클릭하면 클릭한 노드의 id를 로그로 출력
+  // --------------------------
+  // 트리 노드 토글/선택
+  // --------------------------
   const handleNodeToggle = (nodeId: string) => {
     console.log("clicked nodeId: ", nodeId);
-
-    setExpandedNodes(prev => {
+    setExpandedNodes((prev) => {
       const next = new Set(prev);
       if (next.has(nodeId)) {
         next.delete(nodeId);
@@ -94,10 +102,9 @@ export default function SidebarContainer() {
     setSelectedNodeId(nodeId);
   };
 
-  // ----------------------------
-  // 특정 레벨까지 자동으로 펼치기 (예: 2 레벨)
-  // ----------------------------
-  // 이미 한번 펼친 적 있으면 또 펼치지 않도록 하는 플래그
+  // --------------------------
+  // 초기에 특정 레벨까지 자동 확장
+  // --------------------------
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
@@ -107,7 +114,6 @@ export default function SidebarContainer() {
 
       const expandUpToLevel = (nodes: TreeItem[], currentLevel: number, maxLevel: number) => {
         for (const node of nodes) {
-          // currentLevel < maxLevel 이면 펼치기
           if (currentLevel < maxLevel) {
             newExpanded.add(node.id);
           }
@@ -117,19 +123,18 @@ export default function SidebarContainer() {
         }
       };
 
-      // 예: 2 레벨까지 자동으로 펼친다
+      // 예: 3레벨까지 자동으로 펼치기
       expandUpToLevel(items, 0, 3);
 
       setExpandedNodes(newExpanded);
-      setInitialized(true); // 다시 안 불리도록
+      setInitialized(true);
     }
   }, [initialized, isLoading, error, treeData]);
 
-  // ----------------------------
-  // 탭에 따라 다른 트리 컴포넌트 렌더
-  // ----------------------------
+  // --------------------------
+  // 탭에 따른 트리메뉴 렌더
+  // --------------------------
   const renderTreeMenu = () => {
-    // 공통 props
     const commonProps = {
       expandedNodes,
       selectedNodeId,
@@ -139,71 +144,59 @@ export default function SidebarContainer() {
     };
 
     switch (selectedTabId) {
-      case 'campaign':
-        // 여기서 treeData, isLoading, error를 넘겨주도록 수정
+      case "campaign":
         return (
           <TreeMenusForCampaigns
             {...commonProps}
-            treeData={treeData}
+            treeData={treeData || []} // isLoading 시 빈배열
             isLoading={isLoading}
-            error={error ? new Error(error.message) : null}
+            error={error || null}
           />
         );
-      case 'agent':
+      case "agent":
         return <TreeMenusForAgentTab />;
-      case 'agent-group':
+      case "agent-group":
         return <TreeMenusForAgentGroupTab />;
       default:
         return null;
     }
   };
-  console.log("treeData check 1: ", treeData);
 
-  // ----------------------------
+  // --------------------------
   // 최종 렌더
-  // ----------------------------
+  // --------------------------
   return (
     <div className="flex h-full bg-white border-r">
       <div className="flex flex-col w-full" style={{ width: `${width}px` }}>
-        {/* 헤더 */}
-
-          <div className="flex-none flex items-center justify-between p-2 bg-gray-50 px-3 border-b">
-            <div className="flex items-center gap-2 py-1.5">
-              <img src="/sidebar-menu/phone_icon.svg" alt="navigation" className="w-4 h-4" />
-              <span className="text-sm text-gray-800 font-medium">
-                {baseTabs.find(tab => tab.id === selectedTabId)?.label} 
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
-                <TabActions
-                  tabId={selectedTabId}
-                  // onFilter={onFilter || (() => {})}
-                  // onSort={onSort || (() => {})}
-                  // selectedFilter={selectedFilter}
-                  // selectedSort={selectedSort}
-                />
-            </div>
+        {/* 상단 헤더 */}
+        <div className="flex-none flex items-center justify-between p-2 bg-gray-50 px-3 border-b">
+          <div className="flex items-center gap-2 py-1.5">
+            <img src="/sidebar-menu/phone_icon.svg" alt="navigation" className="w-4 h-4" />
+            <span className="text-sm text-gray-800 font-medium">
+              {baseTabs.find((tab) => tab.id === selectedTabId)?.label}
+            </span>
           </div>
-        
-        {/* <div className="flex-none flex items-center justify-between p-3 bg-gray-50 border-b">
-          <span className="text-sm font-medium text-gray-800">
-            {baseTabs.find(tab => tab.id === selectedTabId)?.label}
-          </span>
-        </div> */}
+          <div className="flex items-center gap-1">
+            <TabActions
+              tabId={selectedTabId}
+              // 추가적인 필터/정렬 콜백을 넘길 수 있습니다
+            />
+          </div>
+        </div>
 
-        {/* 트리 메뉴 영역 */}
+        {/* 트리메뉴 영역 */}
         {renderTreeMenu()}
 
-        {/* 하단 탭 메뉴 */}
+        {/* 하단 탭 목록 */}
         <div className="flex-none border-t">
-          {baseTabs.map(tab => (
+          {baseTabs.map((tab) => (
             <button
               key={tab.id}
-              className={`w-full text-left px-4 py-2 text-sm font-medium 
+              className={`w-full text-left px-4 py-2 text-sm font-medium
                 ${
                   selectedTabId === tab.id
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                    ? "bg-blue-50 text-blue-600"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
                 }`}
               onClick={() => setSelectedTabId(tab.id)}
             >

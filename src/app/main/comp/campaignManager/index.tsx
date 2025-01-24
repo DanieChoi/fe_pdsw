@@ -80,6 +80,9 @@ const CampaignManager = ({campaignId}: Props) => {
     }
   }, [tenants]);
 
+  console.log('CampaignManager render : ', campaignId);
+  
+
   return (
     <div>
       <div className='flex flex-col gap-4'>
