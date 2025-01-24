@@ -6,6 +6,7 @@ import EditDescription from './NumberEditDescription/EditDescription'
 import CallLimitSetting from './CallLimitSetting'
 import DistributionLimit from './DistributionLimit'
 import ConsultResultSetting from './ConsultResultSetting'
+import SuspendView from './SuspendView'
 import Image from 'next/image'
 
 export default function OperationBoard() {
@@ -33,7 +34,7 @@ export default function OperationBoard() {
     { id: 'section4', title: '분배호수 제한 설정', content: '화면4'},
     { id: 'section5', title: '스킬편집', content: '화면5' },
     { id: 'section6', title: '상담 결과코드 설정', content: <ConsultResultSetting/> },
-    { id: 'section7', title: '서스팬드', content: '화면7' },
+    { id: 'section7', title: '서스팬드', content: <SuspendView/> },
   ]
 
   return (
