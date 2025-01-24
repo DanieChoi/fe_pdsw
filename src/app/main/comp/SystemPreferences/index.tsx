@@ -9,6 +9,7 @@ import { ChannelListDataResponse, DialingDeviceListDataResponse } from '@/featur
 import { useApiForChannelList } from '@/features/systemPreferences/hooks/useApiForChannelList';
 import { useApiForChannelEdit } from '@/features/systemPreferences/hooks/useApiForChannelEdit';
 import { useApiForDialingDevice, useApiForDialingDeviceCreate, useApiForDialingDeviceUpdate } from '@/features/systemPreferences/hooks/useApiForDialingDevice';
+import CustomAlert from '@/components/shared/layout/CustomAlert';
 
 interface EquipmentRow {
     device_id: string;
@@ -40,6 +41,44 @@ const SystemPreferences = () => {
     const [dialingDeviceList, setDialingDeviceList] = useState<DialingDeviceListDataResponse[]>([]);
     const [channelList, setChannelList] = useState<ChannelListDataResponse[]>([]);
 
+    const [alertState, setAlertState] = useState({
+        isOpen: false,
+        message: '',
+        title: '알림',
+        type: '1',
+        onConfirm: () => {},
+        onCancel: () => {}
+    });
+
+    const showAlert = (message: string) => {
+        setAlertState({
+            isOpen: true,
+            message,
+            title: '알림',
+            type: '1',
+            onConfirm: closeAlert,
+            onCancel: () => {}
+        });
+    };
+
+    const showConfirm = (message: string, onConfirm: () => void) => {
+        setAlertState({
+            isOpen: true,
+            message,
+            title: '확인',
+            type: '2',
+            onConfirm: () => {
+                onConfirm();
+                closeAlert();
+            },
+            onCancel: closeAlert
+        });
+    };
+
+    const closeAlert = () => {
+        setAlertState(prev => ({ ...prev, isOpen: false }));
+    };
+
     // 장비 목록 조회
     const { mutate: fetchDialingDeviceList } = useApiForDialingDevice({
         onSuccess: (data) => {
@@ -63,10 +102,10 @@ const SystemPreferences = () => {
             fetchDialingDeviceList({
                 tenant_id_array: tenants.map(tenant => tenant.tenant_id)
             });
-            alert('채널 정보가 성공적으로 수정되었습니다.');
+            // showAlert('채널 정보가 성공적으로 수정되었습니다.');
         },
         onError: (error) => {
-            alert('채널 정보 수정 중 오류가 발생했습니다: ' + error.message);
+            showAlert('채널 정보 수정 중 오류가 발생했습니다: ' + error.message);
         }
     });
     
@@ -76,10 +115,10 @@ const SystemPreferences = () => {
             fetchDialingDeviceList({
                 tenant_id_array: tenants.map(tenant => tenant.tenant_id)
             });
-            alert('새로운 장비가 성공적으로 저장되었습니다.');
+            // showAlert('새로운 장비가 성공적으로 저장되었습니다.');
         },
         onError: (error) => {
-            alert('장비 정보 저장 중 오류가 발생했습니다: ' + error.message);
+            showAlert('장비 정보 저장 중 오류가 발생했습니다: ' + error.message);
         }
     });
 
@@ -89,10 +128,10 @@ const SystemPreferences = () => {
             fetchDialingDeviceList({
                 tenant_id_array: tenants.map(tenant => tenant.tenant_id)
             });
-            alert('장비 정보가 성공적으로 수정되었습니다.');
+            // showAlert('장비 정보가 성공적으로 수정되었습니다.');
         },
         onError: (error) => {
-            alert('장비 정보 수정 중 오류가 발생했습니다: ' + error.message);
+            showAlert('장비 정보 수정 중 오류가 발생했습니다: ' + error.message);
         }
     });
 
@@ -242,13 +281,13 @@ const SystemPreferences = () => {
     // 장비 저장 핸들러 (신규/수정 공통 검증)
     const validateEquipmentData = () => {
         if (!equipmentNumber || !equipmentName || !refreshCycle) {
-            alert('모든 필드를 입력해주세요.');
+            showAlert('모든 필드를 입력해주세요.');
             return false;
         }
 
         const channelCount = parseInt(refreshCycle);
         if (isNaN(channelCount) || channelCount <= 0) {
-            alert('유효한 채널 수를 입력해주세요.');
+            showAlert('유효한 채널 수를 입력해주세요.');
             return false;
         }
 
@@ -268,22 +307,21 @@ const SystemPreferences = () => {
 
         if (selectedDevice) {
             // 수정
-            if (window.confirm('장비 정보를 수정하시겠습니까?')) {
+            showConfirm('장비 정보를 수정하시겠습니까?', () => {
                 updateDevice(saveRequest);
-            }
+            });
         } else {
             // 신규 등록
-            if (window.confirm('새로운 장비 정보를 저장하시겠습니까?')) {
+            showConfirm('새로운 장비 정보를 저장하시겠습니까?', () => {
                 createDevice(saveRequest);
-            }
+            });
         }
     };
 
     const handleChannelEdit = () => {
         if (!selectedDevice || !selectedChannel) return;
 
-        // 확인 알럿 표시
-        if (window.confirm('채널 정보를 수정하시겠습니까?')) {
+        showConfirm('채널 정보를 수정하시겠습니까?', () => {
             // 현재 선택된 장비의 채널 할당 정보 찾기
             const deviceChannels = channelList.find(
                 channel => channel.device_id.toString() === selectedDevice.device_id
@@ -303,7 +341,7 @@ const SystemPreferences = () => {
             };
 
             fetchChannelEdit(channelEditRequest);
-        }
+        });
     };
 
     const getAllocationOutboundModeOptions = () => {
@@ -459,6 +497,14 @@ const SystemPreferences = () => {
                     </div>
                 </div>
             </div>
+            <CustomAlert
+                isOpen={alertState.isOpen}
+                message={alertState.message}
+                title={alertState.title}
+                type={alertState.type}
+                onClose={alertState.onConfirm}
+                onCancle={alertState.onCancel}
+            />
         </div>
     );
 }
