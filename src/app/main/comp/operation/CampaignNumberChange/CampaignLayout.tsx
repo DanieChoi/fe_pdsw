@@ -7,7 +7,7 @@ import CampaignModal from './CampaignModal';
 import { CommonButton } from "@/components/shared/CommonButton";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 
 interface Row extends MainDataResponse {
   calling_number?: string;

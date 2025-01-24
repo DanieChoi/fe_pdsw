@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import TitleWrap from "@/components/shared/TitleWrap";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import DataGrid, { CellClickArgs } from 'react-data-grid';
@@ -337,6 +337,8 @@ const SystemPreferences = () => {
                                 rowKeyGetter={(row) => row.device_id}
                                 onCellClick={handleEquipmentCellClick}
                                 selectedRows={selectedDevice ? new Set([selectedDevice.device_id]) : new Set()}
+                                rowHeight={26}
+                                headerRowHeight={26}
                             />
                         </div>
                     </div>
@@ -356,9 +358,9 @@ const SystemPreferences = () => {
                                 },
                             ]}
                         />
-                        <div className="flex flex-col gap-2 p-4 border rounded-lg bg-white">
-                            <div className="flex items-center">
-                                <Label className="w-20 min-w-20">장비번호</Label>
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-1">
+                                <Label className="w-[5.6rem] min-w-[5.6rem]">장비번호</Label>
                                 <CustomInput 
                                     type="text"
                                     value={equipmentNumber}
@@ -368,8 +370,8 @@ const SystemPreferences = () => {
                                     className="w-full"
                                 />
                             </div>
-                            <div className="flex items-center">
-                                <Label className="w-20 min-w-20">장비이름</Label>
+                            <div className="flex items-center gap-1">
+                                <Label className="w-[5.6rem] min-w-[5.6rem]">장비이름</Label>
                                 <CustomInput 
                                     type="text"
                                     value={equipmentName}
@@ -377,8 +379,8 @@ const SystemPreferences = () => {
                                     className="w-full"
                                 />
                             </div>
-                            <div className="flex items-center">
-                                <Label className="w-20 min-w-20">채널수</Label>
+                            <div className="flex items-center gap-1">
+                                <Label className="w-[5.6rem] min-w-[5.6rem]">채널수</Label>
                                 <CustomInput 
                                     type="number" 
                                     value={refreshCycle}
@@ -402,6 +404,8 @@ const SystemPreferences = () => {
                                 onCellClick={handleChannelCellClick}
                                 selectedRows={selectedChannel ? new Set([selectedChannel.channelNumber.toString()]) : new Set()}
                                 rowKeyGetter={(row) => row.channelNumber.toString()}
+                                rowHeight={26}
+                                headerRowHeight={26}
                             />
                         </div>
                     </div>
@@ -418,9 +422,9 @@ const SystemPreferences = () => {
                                 },
                             ]}
                         />
-                        <div className="flex flex-col gap-2 p-4 border rounded-lg bg-white">
-                            <div className="flex items-center">
-                                <Label className="w-20 min-w-20">할당모드</Label>
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-1">
+                                <Label className="w-[5.6rem] min-w-[5.6rem]">할당모드</Label>
                                 <Select 
                                     value={allocationMode} 
                                     onValueChange={setAllocationMode}
@@ -436,8 +440,8 @@ const SystemPreferences = () => {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div className="flex items-center">
-                                <Label className="w-20 min-w-20">할당발신모드</Label>
+                            <div className="flex items-center gap-1">
+                                <Label className="w-[5.6rem] min-w-[5.6rem]">할당발신모드</Label>
                                 <Select 
                                     value={allocationOutboundMode} 
                                     onValueChange={setAllocationOutboundMode}
