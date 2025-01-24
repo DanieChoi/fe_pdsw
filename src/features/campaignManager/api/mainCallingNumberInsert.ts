@@ -1,19 +1,19 @@
-// src/features/campaignManager/hooks/fetchCallingNumberUpdate.ts
+// src/features/campaignManager/hooks/fetchCallingNumberInsert.ts
 import { axiosInstance } from '@/lib/axios';
 import { CallingNumberListDataResponse, UpdateResponse } from '../types/campaignManagerIndex';
 
-// 캠페인 발신번호 수정 요청
-export const fetchCallingNumberUpdate = async (credentials: CallingNumberListDataResponse): Promise<UpdateResponse> => {
-  const campaignCallingNumberUpdateRequestData = {
+// 캠페인 발신번호 추가 요청
+export const fetchCallingNumberInsert = async (credentials: CallingNumberListDataResponse): Promise<UpdateResponse> => {
+  const campaignScheduleUpdateRequestData = {
     request_data: {      
       calling_number: credentials.calling_number
     }
   };
 
   try {
-    const { data } = await axiosInstance.put<UpdateResponse>(
+    const { data } = await axiosInstance.post<UpdateResponse>(
       'campaigns/'+credentials.campaign_id+'/calling-number', 
-      campaignCallingNumberUpdateRequestData
+      campaignScheduleUpdateRequestData
     );
     return data;
   } catch (error: any) {

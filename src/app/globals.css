@@ -438,7 +438,7 @@ input::placeholder {
 html, body {
   height: 100%;
   min-width: 1300px;
-
+  overflow: hidden;
 }
 /*아코디언*/
 
