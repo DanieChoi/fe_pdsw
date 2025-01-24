@@ -16,6 +16,8 @@ import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/u
 import { useApiForCampaignManagerUpdate } from '@/features/campaignManager/hooks/useApiForCampaignManagerUpdate';
 import { useApiForCampaignScheduleUpdate } from '@/features/campaignManager/hooks/useApiForCampaignScheduleUpdate';
 import { useApiForCallingNumberUpdate } from '@/features/campaignManager/hooks/useApiForCallingNumberUpdate';
+import { useApiForCallingNumberInsert } from '@/features/campaignManager/hooks/useApiForCallingNumberInsert';
+import { useApiForCallingNumberDelete } from '@/features/campaignManager/hooks/useApiForCallingNumberDelete';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
@@ -548,9 +550,18 @@ export default function CampaignDetail() {
         //캠페인 스케줄 수정 api 호출
         fetchCampaignScheduleUpdate(tempCampaignSchedule);
       }
-      if( callingNumberChangeYn ){
-        //캠페인 발신번호 수정 api 호출
-        fetchCallingNumberUpdate(tempCallingNumberInfo);
+      if( callingNumberChangeYn ){        
+        const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignInfo.campaign_id)
+          .map((data) => data.calling_number)
+          .join(',');
+        //캠페인 발신번호 추가,수정,삭제 api 호출
+        if( tempCallingNumberInfo.calling_number !== '' &&  tempCallNumber === '' ){
+          fetchCallingNumberInsert(tempCallingNumberInfo);
+        }else if( tempCallingNumberInfo.calling_number === '' &&  tempCallNumber !== '' ){
+          fetchCallingNumberDelete(tempCallingNumberInfo);
+        }else{
+          fetchCallingNumberUpdate(tempCallingNumberInfo);
+        }
       }
     }
   }
@@ -623,6 +634,26 @@ export default function CampaignDetail() {
     }
   });
   
+  //캠페인 발신번호 삭제 api 호출
+  const { mutate: fetchCallingNumberDelete } = useApiForCallingNumberDelete({
+    onSuccess: (data) => {
+      fetchCallingNumbers({
+        session_key: '',
+        tenant_id: 0,
+      });      
+    }
+  });
+  
+  //캠페인 발신번호 추가 api 호출
+  const { mutate: fetchCallingNumberInsert } = useApiForCallingNumberInsert({
+    onSuccess: (data) => {
+      fetchCallingNumbers({
+        session_key: '',
+        tenant_id: 0,
+      });      
+    }
+  });
+  
   //캠페인 발신번호 수정 api 호출
   const { mutate: fetchCallingNumberUpdate } = useApiForCallingNumberUpdate({
     onSuccess: (data) => {
@@ -633,13 +664,13 @@ export default function CampaignDetail() {
     }
   });
   
-    // 전화번호 조회
-    const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
-      onSuccess: (data) => {
-        setCallingNumbers(data.result_data);
-        setCallingNumberChangeYn(false);
-      }
-    });
+  // 전화번호 조회
+  const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
+    onSuccess: (data) => {
+      setCallingNumbers(data.result_data);
+      setCallingNumberChangeYn(false);
+    }
+  });
 
   return (
     <div className='flex flex-col gap-5 w-[60%] overflow-auto'>
