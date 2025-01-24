@@ -20,66 +20,13 @@ export function TreeNode({
   const isSelected = selectedNodeId === item.id;
   const statusIcon = getStatusIcon(item.status);
 
-  const { addTab, openedTabs, setActiveTab } = useTabStore();
-
-  // 1) 더블클릭하면 캠페인 탭 열기
-  // const handleDoubleClick = useCallback(() => {
-  //   // 캠페인 타입이 아니면 무시
-  //   if (item.type !== "campaign") return;
-
-  //   // 이미 열려있는 탭인지 찾아보기
-  //   const existingTab = openedTabs.find(
-  //     (tab) => tab.id === 3 && tab.campaignId === item.id
-  //   );
-  //   if (existingTab) {
-  //     // 이미 열려 있다면 탭만 활성화
-  //     setActiveTab(existingTab.id, existingTab.uniqueKey);
-  //     return;
-  //   }
-
-  //   // 2) 없는 경우 새로운 uniqueKey
-  //   const newTabKey = `3-${item.id}-${Date.now()}`;
-
-  //   // 3) addTab에 campaignId를 담아서 전달
-  //   const newTab = {
-  //     id: 2,
-  //     uniqueKey: newTabKey,
-  //     title: `캠페인 관리 - ${item.label}`,
-  //     icon: "header-menu/캠페인관리.svg",
-  //     href: "/campaign",
-  //     campaignId: item.id, // ★ 여기서 campaignId를 넣어줌
-  //     content: null
-  //   };
-
-  //   addTab(newTab);
-  //   // addTab 내부에서 활성화까지 처리하므로 별도 setActiveTab 필요 없음
-  // }, [item, openedTabs, addTab, setActiveTab]);
+  const { openCampaignManagerForUpdate, setCampaignIdForUpdateFromSideMenu } = useTabStore();
 
   const handleDoubleClick = useCallback(() => {
     if (item.type !== "campaign") return;
-  
-    const existingTab = openedTabs.find(tab => 
-      tab.id === 2 && tab.campaignId === item.id
-    );
-  
-    if (existingTab) {
-      setActiveTab(existingTab.id, existingTab.uniqueKey);
-      return;
-    }
-  
-    const newTabKey = `2-${item.id}-${Date.now()}`;
-    const newTab = {
-      id: 2,
-      uniqueKey: newTabKey,
-      title: `캠페인 관리 - ${item.label}`,
-      icon: "header-menu/캠페인관리.svg",
-      href: "/campaign",
-      campaignId: item.id,
-      content: null
-    };
-  
-    addTab(newTab);
-  }, [item, addTab, openedTabs, setActiveTab]);
+    openCampaignManagerForUpdate(item.id, item.label);
+    setCampaignIdForUpdateFromSideMenu(item.id);
+  }, [item, openCampaignManagerForUpdate, setCampaignIdForUpdateFromSideMenu]);
 
   // 일반 클릭
   const handleClick = useCallback(() => {

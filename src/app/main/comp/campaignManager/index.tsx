@@ -8,7 +8,7 @@ import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkill
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
-import { useMainStore, useCampainManagerStore } from '@/store';
+import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 
 type Props = {
   campaignId?: string;
@@ -17,6 +17,8 @@ type Props = {
 const CampaignManager = ({campaignId}: Props) => {
   
   const { tenants } = useMainStore();
+  const { campaignIdForUpdateFromSideMenu } = useTabStore();
+
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
   
   const [campaignHeaderSearchParam,setCampaignHeaderSearchParam] = useState<CampaignHeaderSearch>();
@@ -85,6 +87,12 @@ const CampaignManager = ({campaignId}: Props) => {
 
   return (
     <div>
+
+<div className="p-2 mb-4 bg-gray-100 rounded">
+  선택된 캠페인 ID: {campaignIdForUpdateFromSideMenu || '없음'}
+
+  </div>
+
       <div className='flex flex-col gap-4'>
           <CampaignManagerHeader campaignId={campaignId} onSearch={handleCampaignHeaderSearch}/>
           <div className="flex gap-5">
