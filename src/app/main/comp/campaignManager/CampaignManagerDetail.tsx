@@ -1,6 +1,6 @@
 "use client";
 // components/CampaignManager/CampaignManagerDetail.tsx
-import { useMainStore, useCampainManagerStore } from '@/store';
+import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 import Image from 'next/image'
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
@@ -237,6 +237,7 @@ export default function CampaignDetail() {
     , selectedCampaign
     , setSelectedCampaign
   } = useMainStore();
+  const { removeTab, activeTabId, activeTabKey } = useTabStore();
   const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
   const [ inputSkills, setInputSkills ] = useState('');
   const [ inputCallingNumber, setInputCallingNumber ] = useState('');
@@ -509,7 +510,7 @@ export default function CampaignDetail() {
       handleCampaignSave();
     }
     if( value.onClosed ){
-      // setCampaignSaveYn(false);
+      removeTab(Number(activeTabId),activeTabKey+'');
     }
   }
   
@@ -538,7 +539,7 @@ export default function CampaignDetail() {
       handleCampaignSave();
     }
     if( value.onClosed ){
-      // setCampaignSaveYn(false);
+      removeTab(Number(activeTabId),activeTabKey+'');
     }  
   }
   
@@ -563,7 +564,7 @@ export default function CampaignDetail() {
       handleCampaignSave();
     }
     if( value.onClosed ){
-      // setCampaignSaveYn(false);
+      removeTab(Number(activeTabId),activeTabKey+'');
     }  
   }
   
@@ -612,7 +613,7 @@ export default function CampaignDetail() {
       handleCampaignSave();
     }
     if( value.onClosed ){
-      // setCampaignSaveYn(false);
+      removeTab(Number(activeTabId),activeTabKey+'');
     }  
   }
 

@@ -20,24 +20,26 @@ type Props = {
 export default function CampaignManagerList({campaignId,campaignHeaderSearchParam}: Props) {
   const { campaigns , setSelectedCampaign } = useMainStore();
   const { schedules, callingNumbers, campaignSkills  } = useCampainManagerStore();
-  const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>(campaigns);
+  const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>([]);
   
   const handleRowClick = (campaign: MainDataResponse) => {
     setSelectedCampaign(campaign);
   };
   
   useEffect(() => {
-    if( campaigns && typeof campaignId != 'undefined' ){
+    if( campaigns && typeof campaignId != 'undefined' && campaignId != '' ){
       setTempCampaigns(campaigns.filter((campaign) => campaign.campaign_id === Number(campaignId)));
     }else{
       setTempCampaigns(campaigns);
     }
+    // setSelectedCampaign(tempCampaigns[0]);
+  }, [campaigns, campaignId]);
+
+  useEffect(() => {
     if( tempCampaigns.length > 0 ){
       setSelectedCampaign(tempCampaigns[0]);
-    }else{
-      setSelectedCampaign(null);
     }
-  }, [campaigns, setSelectedCampaign, tempCampaigns,campaignId]);
+  }, [tempCampaigns]);
 
   useEffect(() => {
     if( typeof campaignHeaderSearchParam != 'undefined' && typeof campaignId === 'undefined' ){
@@ -71,7 +73,7 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
         setSelectedCampaign(null);
       }
     }
-  }, [campaignHeaderSearchParam]);
+  }, [campaignHeaderSearchParam,campaignId]);
 
 
   return (
