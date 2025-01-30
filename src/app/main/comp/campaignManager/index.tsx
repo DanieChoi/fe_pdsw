@@ -82,21 +82,15 @@ const CampaignManager = ({campaignId}: Props) => {
     }
   }, [tenants]);
 
-  console.log('CampaignManager render : ', campaignId);
+  console.log('campaignIdForUpdateFromSideMenu render : ', campaignIdForUpdateFromSideMenu);
   
 
   return (
     <div>
-
-<div className="p-2 mb-4 bg-gray-100 rounded">
-  선택된 캠페인 ID: {campaignIdForUpdateFromSideMenu || '없음'}
-
-  </div>
-
       <div className='flex flex-col gap-4'>
-          <CampaignManagerHeader campaignId={campaignId} onSearch={handleCampaignHeaderSearch}/>
+          <CampaignManagerHeader campaignId={campaignIdForUpdateFromSideMenu||''} onSearch={handleCampaignHeaderSearch}/>
           <div className="flex gap-5">
-            <CampaignManagerList campaignId={campaignId} campaignHeaderSearchParam={campaignHeaderSearchParam}/>
+            <CampaignManagerList campaignId={campaignIdForUpdateFromSideMenu||''} campaignHeaderSearchParam={campaignHeaderSearchParam}/>
             <CampaignManagerDetail />
           </div>
         </div>
