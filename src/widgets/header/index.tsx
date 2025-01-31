@@ -24,23 +24,25 @@ export default function Header() {
   const _sessionKey = Cookies.get('session_key') || '';
   const _tenantId = Number(Cookies.get('tenant_id'));
   const [alertState, setAlertState] = useState(errorMessage);
-  
+
   const {
     setCampaigns,
     setTenants,
     setCounselers,
   } = useMainStore();
 
-  const { 
-    addTab, 
-    openedTabs, 
-    duplicateTab, 
-    activeTabId, 
+  const {
+    addTab,
+    openedTabs,
+    duplicateTab,
+    activeTabId,
     activeTabKey,
-    getTabCountById, 
-    rows, 
-    tabGroups, 
-    setActiveTab 
+    getTabCountById,
+    rows,
+    tabGroups,
+    setActiveTab,
+    openCampaignManagerForUpdate,
+    setCampaignIdForUpdateFromSideMenu
   } = useTabStore();
 
   const handleMenuClick = (item: MenuItem, event: React.MouseEvent<HTMLButtonElement>) => {
@@ -54,12 +56,15 @@ export default function Header() {
       } else {
         const newTabKey = `${item.id}-${Date.now()}`;
         // alert(item.id);
-        addTab({ 
-          ...item, 
+        addTab({
+          ...item,
           uniqueKey: newTabKey,
-          content: item.content || null 
+          content: item.content || null
         });
       }
+
+      openCampaignManagerForUpdate(item.id.toString(), "");
+      setCampaignIdForUpdateFromSideMenu(null)
     }
   };
 
@@ -132,7 +137,7 @@ export default function Header() {
       fetchCounselorList({
         session_key: _sessionKey,
         tenant_id: 1,
-        roleId:6
+        roleId: 6
       });
 
     }
@@ -169,7 +174,7 @@ export default function Header() {
               />
               <span>홍길동(관리자)</span>
             </div>
-            <Button 
+            <Button
               variant="ghost"
               className="flex items-center space-x-1 text-sm text-white hover:bg-[#56CAD6]/20"
               onClick={handleLoginOut}

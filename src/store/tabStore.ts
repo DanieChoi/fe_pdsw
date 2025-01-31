@@ -608,7 +608,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
       const updatedTab = {
         ...existingTab,
         campaignId: campaignId,
-        title: `캠페인 관리 - ${label}`
+        title: label !== "" ? `캠페인 관리 - ${label}` : `캠페인 관리`
       };
 
       const updatedTabs = state.openedTabs.map(tab =>
@@ -638,7 +638,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     const newTab = {
       id: 2,
       uniqueKey: newTabKey,
-      title: `캠페인 관리 - ${label}`,
+      title: label !== "" ? `캠페인 관리 - ${label}` : `캠페인 관리`,
       icon: "header-menu/캠페인관리.svg",
       href: "/campaign",
       campaignId: campaignId,
