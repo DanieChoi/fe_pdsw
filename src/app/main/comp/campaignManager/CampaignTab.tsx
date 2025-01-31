@@ -13,8 +13,10 @@ import { OperationTimeParam
   , OutgoingOrderTabParam
   , OutgoingStrategyTabParam 
   , OutgoingMethodTabParam
-  , AdditionalInfoTabParam
   , CallPacingTabParam
+  , CallbackTabParam
+  , NotificationTabParam
+  , AdditionalInfoTabParam
 } from './CampaignManagerDetail';
 import { CampaignScheDuleListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
@@ -22,21 +24,27 @@ import { MainDataResponse } from '@/features/auth/types/mainIndex';
 type Props = {
   campaignSchedule: CampaignScheDuleListDataResponse;
   campaignInfo: MainDataResponse;
+  campaignDialSpeedInfo: CallPacingTabParam;
   onCampaignScheduleChange: (param:OperationTimeParam) => void;
   onCampaignOutgoingOrderChange: (param:OutgoingOrderTabParam) => void;
   onCampaignOutgoingStrategyChange: (param:OutgoingStrategyTabParam) => void;
   onCampaignOutgoingMethodChange: (param:OutgoingMethodTabParam) => void;
   onHandleCallPacingTabChange: (param:CallPacingTabParam) => void;
+  onHandleCallbackTabChange: (param:CallbackTabParam) => void;
+  onHandleNotificationTabChange: (param:NotificationTabParam) => void;
   onHandleAdditionalInfoTabChange: (param:AdditionalInfoTabParam) => void;
 };
 
 const CampaignTab: React.FC<Props> = ({ campaignSchedule
   , campaignInfo
+  , campaignDialSpeedInfo
   , onCampaignScheduleChange
   , onCampaignOutgoingOrderChange 
   , onCampaignOutgoingStrategyChange
   , onCampaignOutgoingMethodChange
   , onHandleCallPacingTabChange
+  , onHandleCallbackTabChange
+  , onHandleNotificationTabChange
   , onHandleAdditionalInfoTabChange
 }) => {
   return (
@@ -67,13 +75,13 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
         <OutgoingMethodTab campaignInfo={campaignInfo} onCampaignOutgoingMethodChange={onCampaignOutgoingMethodChange} />
       </TabsContent>
       <TabsContent value="tab5">
-        <CallPacingTab campaignInfo={campaignInfo} onHandleCallPacingTabChange={onHandleCallPacingTabChange} />
+        <CallPacingTab campaignDialSpeedInfo={campaignDialSpeedInfo} onHandleCallPacingTabChange={onHandleCallPacingTabChange} />
       </TabsContent>
       <TabsContent value="tab6">
-        <CallbackTab />
+        <CallbackTab campaignInfo={campaignInfo} onHandleCallbackTabChange={onHandleCallbackTabChange} />
       </TabsContent>
       <TabsContent value="tab7">
-        <NotificationTab />
+        <NotificationTab campaignInfo={campaignInfo} onHandleNotificationTabChange={onHandleNotificationTabChange} />
       </TabsContent>
       <TabsContent value="tab8">
         <AssignedAgentTab />

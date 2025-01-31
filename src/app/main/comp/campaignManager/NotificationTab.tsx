@@ -3,6 +3,8 @@ import { Label } from "@/components/ui/label";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { NotificationTabParam } from './CampaignManagerDetail';
 
 // 숫자 입력만 허용하는 핸들러
 const handleNumericInput = (
@@ -15,7 +17,12 @@ const handleNumericInput = (
   }
 };
 
-const NotificationTab: React.FC = () => {
+type Props = {
+  campaignInfo: MainDataResponse;
+  onHandleNotificationTabChange: (param:NotificationTabParam) => void;
+};
+
+const NotificationTab: React.FC<Props> = ({ campaignInfo, onHandleNotificationTabChange }) => {
   const [isChecked, setIsChecked] = useState(false); // 잔량 부족 알림 사용 상태
   const [notificationCount, setNotificationCount] = useState(""); // 잔량 부족 알림 개수
   const [adminPhone, setAdminPhone] = useState(""); // 관리자 전화번호
