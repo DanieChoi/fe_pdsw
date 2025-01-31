@@ -597,13 +597,8 @@ export default function CampaignDetail() {
       setCampaignSaveYn(false);
       handleCampaignSave();
     }
-<<<<<<< HEAD
-    if (value.onClosed) {
-      removeTab(Number(activeTabId), activeTabKey + '');
-=======
     if( value.onClosed ){
       handleCampaignClosed();
->>>>>>> 3ee154cf6e7e02786d3a16d855fb09af6158d073
     }
   }
 
@@ -633,15 +628,9 @@ export default function CampaignDetail() {
       setCampaignSaveYn(false);
       handleCampaignSave();
     }
-<<<<<<< HEAD
-    if (value.onClosed) {
-      removeTab(Number(activeTabId), activeTabKey + '');
-    }
-=======
     if( value.onClosed ){
       handleCampaignClosed();
     }  
->>>>>>> 3ee154cf6e7e02786d3a16d855fb09af6158d073
   }
 
   //캠페인 발신전략 탭 변경
@@ -666,15 +655,9 @@ export default function CampaignDetail() {
       setCampaignSaveYn(false);
       handleCampaignSave();
     }
-<<<<<<< HEAD
-    if (value.onClosed) {
-      removeTab(Number(activeTabId), activeTabKey + '');
-    }
-=======
     if( value.onClosed ){
       handleCampaignClosed();
     }  
->>>>>>> 3ee154cf6e7e02786d3a16d855fb09af6158d073
   }
 
   //캠페인 발신방법 탭 변경
@@ -723,15 +706,9 @@ export default function CampaignDetail() {
       setCampaignSaveYn(false);
       handleCampaignSave();
     }
-<<<<<<< HEAD
-    if (value.onClosed) {
-      removeTab(Number(activeTabId), activeTabKey + '');
-    }
-=======
     if( value.onClosed ){
       handleCampaignClosed();
     }  
->>>>>>> 3ee154cf6e7e02786d3a16d855fb09af6158d073
   }
 
   //캠페인 콜페이싱 탭 변경
