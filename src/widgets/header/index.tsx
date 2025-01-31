@@ -33,6 +33,7 @@ export default function Header() {
 
   const {
     addTab,
+    removeTab,
     openedTabs,
     duplicateTab,
     activeTabId,
@@ -46,29 +47,25 @@ export default function Header() {
   } = useTabStore();
 
   const handleMenuClick = (item: MenuItem, event: React.MouseEvent<HTMLButtonElement>) => {
-
-    // alert("hi here !")
-
     if (event.ctrlKey) {
       duplicateTab(item.id);
     } else {
+      // 해당 아이템의 이전 탭들을 모두 찾아서 제거
       const existingTabs = openedTabs.filter(tab => tab.id === item.id);
-      if (existingTabs.length > 0) {
-        const lastTab = existingTabs[existingTabs.length - 1];
-        setActiveTab(lastTab.id, lastTab.uniqueKey);
-      } else {
-        const newTabKey = `${item.id}-${Date.now()}`;
-        // alert(item.id);
-        addTab({
-          ...item,
-          uniqueKey: newTabKey,
-          content: item.content || null
-        });
-      }
-
-      // openCampaignManagerForUpdate(item.id.toString(), "");
-      setCampaignIdForUpdateFromSideMenu(null)
+      existingTabs.forEach(tab => {
+        removeTab(tab.id, tab.uniqueKey);
+      });
+  
+      // 새로운 탭 추가
+      const newTabKey = `${item.id}-${Date.now()}`;
+      addTab({
+        ...item,
+        uniqueKey: newTabKey,
+        content: item.content || null
+      });
     }
+    
+    setCampaignIdForUpdateFromSideMenu(null);
   };
 
   const isTabOpened = (itemId: number) => {
