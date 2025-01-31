@@ -46,6 +46,9 @@ export default function Header() {
   } = useTabStore();
 
   const handleMenuClick = (item: MenuItem, event: React.MouseEvent<HTMLButtonElement>) => {
+
+    // alert("hi here !")
+
     if (event.ctrlKey) {
       duplicateTab(item.id);
     } else {
@@ -63,7 +66,7 @@ export default function Header() {
         });
       }
 
-      openCampaignManagerForUpdate(item.id.toString(), "");
+      // openCampaignManagerForUpdate(item.id.toString(), "");
       setCampaignIdForUpdateFromSideMenu(null)
     }
   };
