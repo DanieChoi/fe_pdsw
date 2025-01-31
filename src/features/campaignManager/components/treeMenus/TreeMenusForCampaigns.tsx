@@ -1,18 +1,15 @@
-// src/features/campaignManager/components/treeMenus/TreeMenusForCampaigns.tsx
 "use client";
 
+import { useState, useEffect } from 'react';
 import { TreeItem } from '@/features/campaignManager/types/typeForSidebar2';
 import { TreeNode } from './TreeNode';
 
-// ★ SidebarContainer에서 내려주는 props
 interface TreeMenuProps {
-  treeData: any[]; // 실제 타입에 맞게 지정
+  treeData: any[];
   isLoading: boolean;
   error: Error | null;
-  expandedNodes: Set<string>;
   selectedNodeId?: string;
   getStatusIcon: (status?: string) => string | null;
-  onNodeToggle: (nodeId: string) => void;
   onNodeSelect: (nodeId: string) => void;
 }
 
@@ -20,12 +17,51 @@ export function TreeMenusForCampaigns({
   treeData,
   isLoading,
   error,
-  expandedNodes,
   selectedNodeId,
   getStatusIcon,
-  onNodeToggle,
   onNodeSelect,
 }: TreeMenuProps) {
+  // 확장 상태를 컴포넌트 내부로 이동
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  const [initialized, setInitialized] = useState(false);
+
+  // 노드 토글 핸들러를 컴포넌트 내부로 이동
+  const handleNodeToggle = (nodeId: string) => {
+    setExpandedNodes((prev) => {
+      const next = new Set(prev);
+      if (next.has(nodeId)) {
+        next.delete(nodeId);
+      } else {
+        next.add(nodeId);
+      }
+      return next;
+    });
+  };
+
+  // 초기 확장 로직을 컴포넌트 내부로 이동
+  useEffect(() => {
+    if (!initialized && !isLoading && !error && treeData && treeData.length > 0) {
+      const items = treeData[0].items || [];
+      const newExpanded = new Set<string>();
+
+      const expandUpToLevel = (nodes: TreeItem[], currentLevel: number, maxLevel: number) => {
+        for (const node of nodes) {
+          if (currentLevel < maxLevel) {
+            newExpanded.add(node.id);
+          }
+          if (node.children) {
+            expandUpToLevel(node.children, currentLevel + 1, maxLevel);
+          }
+        }
+      };
+
+      // 캠페인 트리메뉴의 경우 3레벨까지 자동으로 펼치기
+      expandUpToLevel(items, 0, 3);
+
+      setExpandedNodes(newExpanded);
+      setInitialized(true);
+    }
+  }, [initialized, isLoading, error, treeData]);
 
   if (isLoading) {
     return <div className="p-4">Loading...</div>;
@@ -35,11 +71,7 @@ export function TreeMenusForCampaigns({
     return <div className="p-4 text-red-600">{error.message}</div>;
   }
 
-  // ★ treeData에서 items 가져오기
   const items = treeData?.[0]?.items || [];
-
-  console.log("treeData check 3: ", treeData);
-  
 
   return (
     <div className="flex-1 overflow-auto">
@@ -51,7 +83,7 @@ export function TreeMenusForCampaigns({
           expandedNodes={expandedNodes}
           selectedNodeId={selectedNodeId}
           getStatusIcon={getStatusIcon}
-          onNodeToggle={onNodeToggle}
+          onNodeToggle={handleNodeToggle}
           onNodeSelect={onNodeSelect}
         />
       ))}
