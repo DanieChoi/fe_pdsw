@@ -55,6 +55,7 @@ export interface TabLayoutStore {
   moveTabToGroup: (tabId: number, groupId: string) => void;
   getTabCountById: (tabId: number) => number;
   openCampaignManagerForUpdate: (campaignId: string, label: string) => void;
+  openCampaignProgressInfo: (campaignId: string, label: string) => void;
 }
 
 // const generateUniqueId = (prefix: string, existingIds: string[]) => {
@@ -648,6 +649,44 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     return {
       openedTabs: [...state.openedTabs, newTab],
       activeTabId: 2,
+      activeTabKey: newTabKey,
+      rows: state.rows.map(row =>
+        row.id === 'row-1' ? {
+          ...row,
+          sections: row.sections.map(section =>
+            section.id === 'default' ? {
+              ...section,
+              tabs: [...section.tabs, newTab]
+            } : section
+          )
+        } : row
+      )
+    };
+  }),
+
+  openCampaignProgressInfo: (campaignId: string, label: string) => set((state) => {
+    const newTabKey = `4-${campaignId}-${Date.now()}`;
+    const newTab = {
+      id: 4,
+      uniqueKey: newTabKey,
+      title: label !== "" ? `총진행상황 - ${label}` : "총진행상황",
+      icon: "/header-menu/총진행상황.svg",
+      href: "/status",
+      content: null,
+      campaignId: campaignId  // 캠페인 ID 저장
+    };
+
+    // 이전 총진행상황 탭 찾기
+    const existingTabs = state.openedTabs.filter(tab => tab.id === 4);
+    
+    // 이전 탭들 제거
+    existingTabs.forEach(tab => {
+      state.removeTab(tab.id, tab.uniqueKey);
+    });
+
+    return {
+      openedTabs: [...state.openedTabs, newTab],
+      activeTabId: 4,
       activeTabKey: newTabKey,
       rows: state.rows.map(row =>
         row.id === 'row-1' ? {

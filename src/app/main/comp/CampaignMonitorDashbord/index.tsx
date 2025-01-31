@@ -1,35 +1,15 @@
-// "use client";
-// import React from 'react'
-// import { useSideMenuStore } from '@/store/sideMenuStore'
-// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
-// const CampaignMonitorDashbord = () => {
-//  const selectedNodeId = useSideMenuStore((state) => state.selectedNodeId)
-
-//  return (
-//    <Card className="w-96">
-//      <CardHeader>
-//        <CardTitle className="text-lg font-medium">캠페인 정보</CardTitle>
-//      </CardHeader>
-//      <CardContent>
-//        <div className="flex items-center gap-2">
-//          <div className="text-sm text-gray-500">캠페인 아이디</div>
-//          <div className="font-medium">{selectedNodeId || '-'}</div>
-//        </div>
-//      </CardContent>
-//    </Card>
-//  )
-// }
-
-// export default CampaignMonitorDashbord
-
 import React from 'react';
-import { useSideMenuStore } from '@/store/sideMenuStore';
+import { useTabStore } from '@/store/tabStore';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell } from 'recharts';
 
 const CampaignMonitorDashboard = () => {
-  const selectedNodeId = useSideMenuStore((state) => state.selectedNodeId);
+  // 현재 활성화된 탭 정보 가져오기
+  const activeTabKey = useTabStore((state) => state.activeTabKey);
+  const openedTabs = useTabStore((state) => state.openedTabs);
+  
+  // 현재 활성화된 탭에서 campaignId와 title 찾기
+  const activeTab = openedTabs.find(tab => tab.uniqueKey === activeTabKey);
   
   const data = [
     { name: '동의중', value: 25 },
@@ -44,14 +24,17 @@ const CampaignMonitorDashboard = () => {
 
   const COLORS = ['#40E0D0', '#40E0D0', '#4169E1', '#4169E1', '#4169E1', '#9370DB', '#9370DB', '#9370DB'];
 
+  // 탭의 title에서 캠페인 이름 추출 ("총진행상황 - " 이후의 텍스트)
+  const campaignName = activeTab?.title.replace('총진행상황 - ', '') || '';
+
   return (
     <div className="grid grid-cols-12 gap-4">
       {/* 왼쪽 설정 영역 */}
       <div className="col-span-3 bg-red-50 p-4">
         <h2 className="font-bold mb-4">캠페인 정보</h2>
         <div className="space-y-2">
-          <div>캠페인 아이디: {selectedNodeId || 7}</div>
-          <div>캠페인 이름: web_only</div>
+          <div>캠페인 아이디: {activeTab?.campaignId || ''}</div>
+          <div>캠페인 이름: {campaignName}</div>
         </div>
       </div>
 
