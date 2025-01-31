@@ -30,6 +30,7 @@ import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiF
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
+import { fetchDialSpeedUpdate } from '@/features/campaignManager/api/mainDialSpeedUpdate';
 
 const dialModeList = [
   { dial_id: 1, dial_name: 'Power' },
@@ -897,23 +898,14 @@ export default function CampaignDetail() {
   }
 
   //변경여부 체크
-<<<<<<< HEAD
-  useEffect(() => {
-    if (changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !callingNumberChangeYn) {
-=======
   useEffect(() => {  
     if( changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !callingNumberChangeYn && !campaignDialSpeedChangeYn ){  
->>>>>>> 3ee154cf6e7e02786d3a16d855fb09af6158d073
       fetchMain({
         session_key: '',
         tenant_id: 0,
       });
     }
-<<<<<<< HEAD
-  }, [campaignInfoChangeYn, campaignSkillChangeYn, callingNumberChangeYn]);
-=======
   }, [campaignInfoChangeYn,campaignSkillChangeYn,callingNumberChangeYn,campaignDialSpeedChangeYn]);
->>>>>>> 3ee154cf6e7e02786d3a16d855fb09af6158d073
 
   //캠페인 정보 조회 api 호출
   const { mutate: fetchMain } = useApiForMain({
@@ -1000,9 +992,6 @@ export default function CampaignDetail() {
       });
     }
   });
-<<<<<<< HEAD
-
-=======
   
   //캠페인 발신 속도 수정 api 호출
   const { mutate: fetchDialSpeedUpdate } = useApiForDialSpeedUpdate({
@@ -1011,7 +1000,6 @@ export default function CampaignDetail() {
     }
   });
   
->>>>>>> 3ee154cf6e7e02786d3a16d855fb09af6158d073
   // 전화번호 조회
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
@@ -1167,13 +1155,8 @@ export default function CampaignDetail() {
           alertState.onClose()
         }}
         onCancle={() => {
-<<<<<<< HEAD
-          setAlertState((prev) => ({ ...prev, isOpen: false }));
-        }} />
-=======
-          alertState.onCancle && alertState.onCancle()
+          if (alertState.onCancle) alertState.onCancle();
         }}/>
->>>>>>> 3ee154cf6e7e02786d3a16d855fb09af6158d073
       <CallingNumberPopup
         param={inputCallingNumber}
         type={callingNumberPopupState.type}
