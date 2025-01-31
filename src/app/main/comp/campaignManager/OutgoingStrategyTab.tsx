@@ -171,7 +171,7 @@ const OutgoingStrategyTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoing
   };
 
   const changeRedialStrategyData = (row: MainRow,value:string) => {
-    const tempRedialStrategy = value.substring(0,value.indexOf(':')+1) + row.count1+'.'+row.duration1+'\/3.' 
+    const tempRedialStrategy = value.substring(0,value.indexOf(':')+1)+'2.' + row.count1+'.'+row.duration1+'\/3.' 
     + row.count2+'.'+row.duration2 + '\/4.'
     + row.count3+'.'+row.duration3 + '\/5.'
     + row.count4+'.'+row.duration4 + '\/6.'
@@ -248,7 +248,9 @@ const OutgoingStrategyTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoing
             className="pb-1"
             title="재시도 전략 설정"
             buttons={[
-              { label: "초기화", onClick: () => console.log(""), variant: "secondary" },
+              { label: "초기화", onClick: () => onCampaignOutgoingStrategyChange({...tempOutgoingStrategyTab
+                , onInit: true
+              }), variant: "secondary" },
           ]}
           />
           <div className="grid-custom-wrap overflow-auto w-full h-[184px]">
