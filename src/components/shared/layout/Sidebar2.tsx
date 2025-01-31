@@ -1,4 +1,4 @@
-// src/features/campaignManager/components/SidebarContainer.tsx
+// C:\nproject\fe_pdsw\src\components\shared\layout\Sidebar2.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -161,6 +161,10 @@ export default function SidebarContainer() {
         return null;
     }
   };
+
+
+  console.log("treeData check at SidebarContainer: ", treeData);
+  
 
   // --------------------------
   // 최종 렌더

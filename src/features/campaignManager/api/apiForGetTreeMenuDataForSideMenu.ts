@@ -4,10 +4,19 @@ import { apiForGetTenantList } from "./apiForTennants";
 import { apiForGetCampaignList } from "./apiForCampaign";
 
 // start_flag, end_flag 에 따라 상태 텍스트 변환
+// function getStatusFromFlags(start_flag: number, end_flag: number): string {
+//   if (start_flag === 3) return 'active';
+//   if (start_flag === 2) return 'pending';
+//   return 'stopped';
+// }
+
 function getStatusFromFlags(start_flag: number, end_flag: number): string {
-  if (start_flag === 3) return 'active';
-  if (start_flag === 2) return 'pending';
-  return 'stopped';
+  console.log('Checking status with:', { start_flag, end_flag });
+  
+  if (end_flag === 1) return 'stopped';      // 종료된 상태
+  if (start_flag === 2) return 'pending';    // 대기 상태
+  if (start_flag === 3) return 'active';     // 진행중 
+  return 'stopped';                          // 기타 케이스는 stopped
 }
 
 /**
@@ -28,6 +37,10 @@ export async function apiForGetTreeMenuDataForSideMenu(): Promise<TabData[]> {
   // tenant_id별로 캠페인을 묶기
   const campaignsByTenant: { [key: number]: typeof campaignData.result_data } = {};
   campaignData.result_data.forEach(campaign => {
+
+    console.log("campaign check : ", campaign);
+    
+
     if (!campaignsByTenant[campaign.tenant_id]) {
       campaignsByTenant[campaign.tenant_id] = [];
     }
