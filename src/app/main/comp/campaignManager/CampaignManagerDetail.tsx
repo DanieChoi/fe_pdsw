@@ -384,10 +384,6 @@ export default function CampaignDetail() {
         ...tempCallingNumberInfo
         , calling_number: tempCallNumber
       });
-<<<<<<< HEAD
-      setTempCampaignManagerInfo({
-        ...CampaignManagerInfo,
-=======
       setTempCampaignDialSpeedInfo({...tempCampaignDialSpeedInfo
         , campaign_id: selectedCampaign.campaign_id
         , tenant_id: selectedCampaign.tenant_id
@@ -399,7 +395,6 @@ export default function CampaignDetail() {
         , progressive_dial_speed: selectedCampaign.dial_mode === 3?0:selectedCampaign.dial_speed
       })
       setTempCampaignManagerInfo({...CampaignManagerInfo,
->>>>>>> 3ee154cf6e7e02786d3a16d855fb09af6158d073
         campaign_id: selectedCampaign.campaign_id,
         campaign_name: selectedCampaign.campaign_name,
         campaign_desc: selectedCampaign.campaign_desc,
