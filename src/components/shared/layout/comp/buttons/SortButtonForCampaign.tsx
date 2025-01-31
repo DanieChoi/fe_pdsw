@@ -14,7 +14,7 @@ interface SortButtonForCampaignProps {
 
 const campaignSortOptions: Array<{ id: SortType; label: string }> = [
   { id: 'name', label: '이름으로 정렬' },
-  { id: 'id', label: '아이디로 정렬' },
+  { id: 'status', label: '상태로 정렬' }, // 예시로 'status'로 변경
 ];
 
 export function SortButtonForCampaign({ 
@@ -34,7 +34,7 @@ export function SortButtonForCampaign({
           {campaignSortOptions.map((option) => (
             <button
               key={option.id}
-              onClick={() => onSort(option.id)}
+              onClick={() => onSort?.(option.id)}
               className={`flex items-center justify-between text-left px-2 py-1.5 text-xs hover:bg-gray-100 rounded
                 ${selectedSort === option.id ? 'bg-blue-50 text-blue-600' : ''}`}
             >

@@ -36,7 +36,7 @@ import {
             {counsellorGroupSortOptions.map((option) => (
               <button
                 key={option.id}
-                onClick={() => onSort(option.id)}
+                onClick={() => onSort?.(option.id)}
                 className={`flex items-center justify-between text-left px-2 py-1.5 text-xs hover:bg-gray-100 rounded
                   ${selectedSort === option.id ? 'bg-blue-50 text-blue-600' : ''}`}
               >
