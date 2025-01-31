@@ -1,19 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { CommonButton } from "@/components/shared/CommonButton";
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { AdditionalInfoTabParam } from './CampaignManagerDetail';
 
-const AdditionalInfoTab: React.FC = () => {
+const tempAdditionalInfoTab:AdditionalInfoTabParam = {
+  changeYn: false,
+  campaignInfoChangeYn: false,
+  onSave: false,
+  onClosed: false
+};
+
+type Props = {
+  campaignInfo: MainDataResponse;
+  onHandleAdditionalInfoTabChange: (param:AdditionalInfoTabParam) => void;
+};
+
+const AdditionalInfoTab: React.FC<Props> = ({ campaignInfo, onHandleAdditionalInfoTabChange }) => {
   // 캠페인 생성 정보 상태
-  const [creator, setCreator] = useState(""); // 생성 인
+  const [creator, setCreator] = useState(''); // 생성 인
   const [creationDate, setCreationDate] = useState(""); // 생성 날짜
   const [creationPlace, setCreationPlace] = useState(""); // 생성 장소
 
   // 캠페인 수정 정보 상태
-  const [editor, setEditor] = useState(""); // 수정 인
+  const [editor, setEditor] = useState(''); // 수정 인
   const [editDate, setEditDate] = useState(""); // 수정 날짜
   const [editPlace, setEditPlace] = useState(""); // 수정 장소
+
+  useEffect(() => {
+    if (campaignInfo && campaignInfo.campaign_id !== 0) {  
+      setCreator(campaignInfo.creation_user+'');
+      setCreationDate(campaignInfo.creation_time);
+      setCreationPlace(campaignInfo.creation_ip);
+      setEditor(campaignInfo.update_user+'');
+      setEditDate(campaignInfo.update_time);
+      setEditPlace(campaignInfo.update_ip);
+    }
+  }, [campaignInfo]);
 
   return (
     <div className="py-5">
@@ -101,8 +126,16 @@ const AdditionalInfoTab: React.FC = () => {
 
       {/* 확인/취소 버튼 */}
       <div className="flex justify-end gap-2 mt-5">
-        <CommonButton variant="secondary">확인</CommonButton>
-        <CommonButton variant="secondary">취소</CommonButton>
+        <CommonButton variant="secondary" onClick={()=> 
+          onHandleAdditionalInfoTabChange({...tempAdditionalInfoTab
+            , onSave: true
+          })
+        }>확인</CommonButton>
+        <CommonButton variant="secondary" onClick={()=> 
+          onHandleAdditionalInfoTabChange({...tempAdditionalInfoTab
+            , onClosed: true
+          })
+        }>취소</CommonButton>
       </div>
     </div>
   );

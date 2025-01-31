@@ -13,6 +13,8 @@ import { OperationTimeParam
   , OutgoingOrderTabParam
   , OutgoingStrategyTabParam 
   , OutgoingMethodTabParam
+  , AdditionalInfoTabParam
+  , CallPacingTabParam
 } from './CampaignManagerDetail';
 import { CampaignScheDuleListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
@@ -24,6 +26,8 @@ type Props = {
   onCampaignOutgoingOrderChange: (param:OutgoingOrderTabParam) => void;
   onCampaignOutgoingStrategyChange: (param:OutgoingStrategyTabParam) => void;
   onCampaignOutgoingMethodChange: (param:OutgoingMethodTabParam) => void;
+  onHandleCallPacingTabChange: (param:CallPacingTabParam) => void;
+  onHandleAdditionalInfoTabChange: (param:AdditionalInfoTabParam) => void;
 };
 
 const CampaignTab: React.FC<Props> = ({ campaignSchedule
@@ -32,6 +36,8 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
   , onCampaignOutgoingOrderChange 
   , onCampaignOutgoingStrategyChange
   , onCampaignOutgoingMethodChange
+  , onHandleCallPacingTabChange
+  , onHandleAdditionalInfoTabChange
 }) => {
   return (
     <Tabs defaultValue="tab1" className="w-full">
@@ -61,7 +67,7 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
         <OutgoingMethodTab campaignInfo={campaignInfo} onCampaignOutgoingMethodChange={onCampaignOutgoingMethodChange} />
       </TabsContent>
       <TabsContent value="tab5">
-        <CallPacingTab />
+        <CallPacingTab campaignInfo={campaignInfo} onHandleCallPacingTabChange={onHandleCallPacingTabChange} />
       </TabsContent>
       <TabsContent value="tab6">
         <CallbackTab />
@@ -73,7 +79,7 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
         <AssignedAgentTab />
       </TabsContent>
       <TabsContent value="tab9">
-        <AdditionalInfoTab />
+        <AdditionalInfoTab campaignInfo={campaignInfo} onHandleAdditionalInfoTabChange={onHandleAdditionalInfoTabChange} />
       </TabsContent>
     </Tabs>
   );

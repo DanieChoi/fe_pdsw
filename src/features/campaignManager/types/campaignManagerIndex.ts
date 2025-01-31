@@ -47,6 +47,13 @@ export interface SkillListCredentials {
   tenant_id_array: number[];
 }
 
+// 캠페인 발신 속도 수정 요청 데이터 타입
+export interface CampaignDialSpeedUpdateRequest {
+  campaign_id: number;
+  tenant_id: number;
+  dial_speed: number;
+}
+
 // 캠페인스킬 수정 요청 데이터 타입
 export interface CampaignSkillUpdateRequest {
   campaign_id: number;

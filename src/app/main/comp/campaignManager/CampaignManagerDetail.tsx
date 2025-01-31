@@ -211,6 +211,21 @@ export interface OutgoingMethodTabParam {
   user_option: string;            //제한 호수 비율
 }
 
+export interface CallPacingTabParam {
+  changeYn: boolean;
+  campaignInfoChangeYn: boolean;
+  onSave: boolean;
+  onClosed: boolean;
+  dial_speed: number;             //PDS 발신 속도(1~100)
+}
+
+export interface AdditionalInfoTabParam {
+  changeYn: boolean;
+  campaignInfoChangeYn: boolean;
+  onSave: boolean;
+  onClosed: boolean;
+}
+
 const CampaignScheduleInfo: CampaignScheDuleListDataResponse = {
   campaign_id: 0,
   tenant_id: 0,
@@ -617,6 +632,38 @@ export default function CampaignDetail() {
     }  
   }
 
+  //캠페인 콜페이싱 탭 변경
+  const handleCallPacingTabChange = (value: CallPacingTabParam) => {
+    if( value.campaignInfoChangeYn ){
+      setChangeYn(true);
+      setCampaignInfoChangeYn(true);
+      setTempCampaignsInfo({...tempCampaignInfo
+        ,dial_speed : value.dial_speed
+      });
+      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+        ,dial_speed : value.dial_speed
+      });
+    }  
+    if( value.onSave ){
+      setCampaignSaveYn(false);
+      handleCampaignSave();
+    }
+    if( value.onClosed ){
+      removeTab(Number(activeTabId),activeTabKey+'');
+    }  
+  }
+
+  //캠페인 기타정보 탭 변경
+  const handleAdditionalInfoTabChange = (value: AdditionalInfoTabParam) => {    
+    if( value.onSave ){
+      // setCampaignSaveYn(false);
+      handleCampaignSave();
+    }
+    if( value.onClosed ){
+      removeTab(Number(activeTabId),activeTabKey+'');
+    }  
+  }
+
   //캠페인 저장
   const handleCampaignSave = () => {
     setAlertState({
@@ -888,6 +935,8 @@ export default function CampaignDetail() {
           onCampaignScheduleChange={(value) => handleCampaignScheduleChange(value)}
           onCampaignOutgoingStrategyChange={(value) => handleOutgoingStrategyTabChange(value)}
           onCampaignOutgoingMethodChange={(value) => handleOutgoingMethodTabChange(value)}
+          onHandleCallPacingTabChange={(value) => handleCallPacingTabChange(value)}
+          onHandleAdditionalInfoTabChange={(value) => handleAdditionalInfoTabChange(value)}
         />
       </div>
       <SkillListPopup
