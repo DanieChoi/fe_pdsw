@@ -1,21 +1,77 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { CallbackTabParam } from './CampaignManagerDetail';
 
-const CallbackTab: React.FC = () => {
+type Props = {
+  campaignInfo: MainDataResponse;
+  onHandleCallbackTabChange: (param:CallbackTabParam) => void;
+};
+
+const tempCallbackTab:CallbackTabParam = {
+  changeYn: false,
+  campaignInfoChangeYn: false,
+  onSave: false,
+  onClosed: false,
+  callback_kind: 0,
+  service_code: 0
+};
+
+const CallbackTab: React.FC<Props> = ({ campaignInfo, onHandleCallbackTabChange }) => {
   const [isChecked, setIsChecked] = useState(false); // 체크박스 상태 관리
-  const [serviceCode, setServiceCode] = useState(""); // Service Code 값 관리
+  const [tempCallbackTabParam, setTempCallbackTabParam] = useState<CallbackTabParam>(tempCallbackTab);
 
   // 숫자 입력만 허용하는 핸들러
   const handleServiceCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (/^\d*$/.test(value)) {
-      setServiceCode(value); // 숫자인 경우만 상태 업데이트
+      onHandleCallbackTabChange({...tempCallbackTabParam
+        , campaignInfoChangeYn: true
+        , service_code: Number(value)
+      });
     }
   };
+  const handleChecked = (checked:boolean) => {
+    setIsChecked( checked );
+    if( checked ){
+      onHandleCallbackTabChange({...tempCallbackTabParam
+        , campaignInfoChangeYn: true
+        , callback_kind: 1
+        , service_code: 0
+      });
+    }else{
+      onHandleCallbackTabChange({...tempCallbackTabParam
+        , campaignInfoChangeYn: true
+        , callback_kind: 0
+        , service_code: 0
+      });
+    }
+  };
+
+  const handleSelectChange = (value:any, col:string) => {
+    onHandleCallbackTabChange({...tempCallbackTabParam
+      , campaignInfoChangeYn: true
+      , callback_kind: Number(value)
+    });
+  };
+
+  useEffect(() => {
+    if (campaignInfo && campaignInfo.campaign_id !== 0) {  
+      if( campaignInfo.callback_kind === 0 ){
+        setIsChecked(false);
+      }else{
+        setIsChecked(true);
+      }
+      setTempCallbackTabParam({...tempCallbackTabParam
+        , callback_kind: campaignInfo.callback_kind
+        , service_code: campaignInfo.service_code
+      });
+    }
+  }, [campaignInfo]);
 
   return (
     <div className="pt-[50px]">
@@ -25,7 +81,7 @@ const CallbackTab: React.FC = () => {
           <CustomCheckbox
             id="callbackCampaign"
             checked={isChecked}
-            onCheckedChange={(checked) => setIsChecked(checked === true)}
+            onCheckedChange={(checked) => handleChecked(checked === true)}
           />
           <Label htmlFor="callbackCampaign">Call back Campaign</Label>
         </div>
@@ -33,13 +89,13 @@ const CallbackTab: React.FC = () => {
         {/* Call back 구분 */}
         <div className="flex items-center gap-2">
           <Label className="w-[8.3rem] min-w-[8.3rem]">Call back 구분</Label>
-          <Select disabled={!isChecked}> {/* 체크 여부로 활성화/비활성화 */}
+          <Select disabled={!isChecked} value={campaignInfo?.callback_kind+''} onValueChange={(value) => handleSelectChange(value, 'callback_kind')}> {/* 체크 여부로 활성화/비활성화 */}
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select an option" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="normal">일반 callback</SelectItem>
-              <SelectItem value="infinite">무한 callback</SelectItem>
+              <SelectItem value="1">일반 callback</SelectItem>
+              <SelectItem value="2">무한 callback</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -49,15 +105,23 @@ const CallbackTab: React.FC = () => {
           <Label className="w-[8.3rem] min-w-[8.3rem]">Service Code</Label>
           <CustomInput
             type="text"
-            value={serviceCode}
+            value={campaignInfo?.service_code+''}
             onChange={handleServiceCodeChange}
             disabled={!isChecked} // 체크 여부에 따라 활성화/비활성화
           />
         </div>
         {/* 확인 / 취소 버튼 */}
         <div className="flex justify-end gap-2 mt-5">
-          <CommonButton variant="secondary">확인</CommonButton>
-          <CommonButton variant="secondary">취소</CommonButton>
+          <CommonButton variant="secondary" onClick={()=> 
+            onHandleCallbackTabChange({...tempCallbackTabParam
+              , onSave: true
+            })
+          }>확인</CommonButton>
+          <CommonButton variant="secondary" onClick={()=> 
+            onHandleCallbackTabChange({...tempCallbackTabParam
+              , onClosed: true
+            })
+          }>취소</CommonButton>
         </div>
       </div>
 
