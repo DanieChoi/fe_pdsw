@@ -125,12 +125,14 @@ const SystemPreferences = () => {
     // 수정 API
     const { mutate: updateDevice } = useApiForDialingDeviceUpdate({
         onSuccess: (data) => {
+            console.log('장비 수정 성공: ', data);
             fetchDialingDeviceList({
                 tenant_id_array: tenants.map(tenant => tenant.tenant_id)
             });
             // showAlert('장비 정보가 성공적으로 수정되었습니다.');
         },
         onError: (error) => {
+            console.log('장비 수정 실패: ', error);
             showAlert('장비 정보 수정 중 오류가 발생했습니다: ' + error.message);
         }
     });
@@ -308,6 +310,7 @@ const SystemPreferences = () => {
         if (selectedDevice) {
             // 수정
             showConfirm('장비 정보를 수정하시겠습니까?', () => {
+                console.log('장비 수정 요청 시작', saveRequest);
                 updateDevice(saveRequest);
             });
         } else {
