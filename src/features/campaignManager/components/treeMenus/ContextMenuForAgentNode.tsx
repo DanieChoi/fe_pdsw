@@ -1,4 +1,6 @@
 // src/features/campaignManager/components/treeMenus/ContextMenuForAgentNode.tsx
+import React from "react";
+import { useTabStore } from '@/store/tabStore';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -6,13 +8,11 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { 
-  User, 
-  UserCog, 
-  UserMinus, 
-  PhoneCall, 
+import {
+  UserCog,
+  PhoneCall,
   History,
-  Settings 
+  Settings
 } from "lucide-react";
 
 interface ContextMenuForAgentNodeProps {
@@ -34,58 +34,76 @@ export function ContextMenuForAgentNode({
   onDelete,
   onManage,
 }: ContextMenuForAgentNodeProps) {
+  const addTab = useTabStore(state => state.addTab);
+  const [menuKey, setMenuKey] = React.useState(0);
   const isCounselor = item.type === "counselor";
   const isTeam = item.type === "team";
   const isGroup = item.type === "group";
 
+  const handleSkillAssignment = () => {
+    // 새로운 탭 생성
+    const uniqueKey = `skill-assignment-${item.id}-${Date.now()}`;
+    const newTab = {
+      id: 100, // 스킬 추가 탭의 ID
+      uniqueKey,
+      title: `상담원 스킬 할당 - ${item.label}`,
+      icon: "header-menu/스킬할당.svg",
+      href: "/skill-assignment",
+      content: null,
+      counselorId: item.id
+    };
+
+    addTab(newTab);
+  };
+
   return (
-    <ContextMenu>
-      <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-      <ContextMenuContent className="w-56">
-        {isCounselor && (
-          <>
-            <ContextMenuItem onClick={onEdit}>
-              <UserCog className="mr-2 h-4 w-4" />
-              상담원 스킬 할당당
-            </ContextMenuItem>
-            <ContextMenuSeparator />
+    <>
+      <ContextMenu key={menuKey}>
+        <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+        <ContextMenuContent className="w-56">
+          {isCounselor && (
+            <>
+              <ContextMenuItem onClick={handleSkillAssignment}>
+                <UserCog className="mr-2 h-4 w-4" />
+                상담원 스킬 할당
+              </ContextMenuItem>
+              <ContextMenuSeparator />
+              <ContextMenuItem>
+                <PhoneCall className="mr-2 h-4 w-4" />
+                상담원 스킬 해제
+              </ContextMenuItem>
+            </>
+          )}
 
-            <ContextMenuItem>
-              <PhoneCall className="mr-2 h-4 w-4" />
-              상담원 스킬 해제
-            </ContextMenuItem>
+          {isTeam && (
+            <>
+              <ContextMenuItem onClick={onManage}>
+                <Settings className="mr-2 h-4 w-4" />
+                팀 관리
+              </ContextMenuItem>
+              
+              <ContextMenuItem>
+                <History className="mr-2 h-4 w-4" />
+                팀 이력
+              </ContextMenuItem>
+            </>
+          )}
 
-          </>
-        )}
+          {isGroup && (
+            <>
+              <ContextMenuItem onClick={onManage}>
+                <Settings className="mr-2 h-4 w-4" />
+                그룹 관리
+              </ContextMenuItem>
 
-        {isTeam && (
-          <>
-            <ContextMenuItem onClick={onManage}>
-              <Settings className="mr-2 h-4 w-4" />
-              팀 관리
-            </ContextMenuItem>
-            
-            <ContextMenuItem>
-              <History className="mr-2 h-4 w-4" />
-              팀 이력
-            </ContextMenuItem>
-          </>
-        )}
-
-        {isGroup && (
-          <>
-            <ContextMenuItem onClick={onManage}>
-              <Settings className="mr-2 h-4 w-4" />
-              그룹 관리
-            </ContextMenuItem>
-
-            <ContextMenuItem>
-              <History className="mr-2 h-4 w-4" />
-              그룹 이력
-            </ContextMenuItem>
-          </>
-        )}
-      </ContextMenuContent>
-    </ContextMenu>
+              <ContextMenuItem>
+                <History className="mr-2 h-4 w-4" />
+                그룹 이력
+              </ContextMenuItem>
+            </>
+          )}
+        </ContextMenuContent>
+      </ContextMenu>
+    </>
   );
 }

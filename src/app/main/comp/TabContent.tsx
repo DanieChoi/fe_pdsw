@@ -1,7 +1,6 @@
-// C:\Users\terec\fe_pdsw\src\app\main\comp\TabContent.tsx
 "use client";
 
-import React, { FC } from 'react';
+import React from 'react';
 import { useTabStore } from '@/store/tabStore';
 import PreferencesBoard from './preferences';
 import SystemPreferences from './SystemPreferences';
@@ -11,14 +10,14 @@ import OperationBoard from './operation';
 import CampaignManager from './CampaignManager';
 import CampaignUpdatePanel from './CampaignUpdatePanel';
 import CampaignGroupManager from './CampaignGroupManager';
+import { SkillAssignmentTab } from '@/features/campaignManager/components/treeMenus/SkillAssignmentTab';
 
 const TabContent = () => {
-  const { activeTabId } = useTabStore();
+  const { activeTabId, openedTabs, activeTabKey } = useTabStore();
 
   const renderContent = () => {
     console.log("activeTabId: ", activeTabId);
     switch (activeTabId) {
-      
       case 1:
         return <div className="p-2"><CampaignGroupManager /></div>;
       case 2:
@@ -26,14 +25,9 @@ const TabContent = () => {
       case 3:
         return <div className="p-2">통합모니터 컨텐츠</div>;
       case 4:
-        return <div className="p-2">
-          {/* 캠페인 총진행상황 */}
-          <CampaignMonitorDashbord />
-        </div>;
+        return <div className="p-2"><CampaignMonitorDashbord /></div>;
       case 5:
-        return <div className="p-2">
-          <OutboundCallProgressPanel />
-        </div>;
+        return <div className="p-2"><OutboundCallProgressPanel /></div>;
       case 6:
         return <div className="p-2">채널 모니터 컨텐츠</div>;
       case 7:
@@ -48,11 +42,18 @@ const TabContent = () => {
         return <div className="p-2"><OperationBoard /></div>;
       case 12:
         return <div className="p-2"><PreferencesBoard /></div>;
-      // case 100:
-      //   return <div className="p-2">
-      //     {/* 캠페인 수정용 패널 */}
-      //     <CampaignUpdatePanel />
-      //   </div>;
+      case 100:  // 스킬 할당 탭
+        const activeTab = openedTabs.find(tab => 
+          tab.id === activeTabId && tab.uniqueKey === activeTabKey
+        );
+        if (activeTab && 'counselorId' in activeTab && typeof activeTab.counselorId === 'string') {
+          return (
+            <div className="p-2">
+              <SkillAssignmentTab counselorId={activeTab.counselorId} />
+            </div>
+          );
+        }
+        return <div className="p-2">잘못된 스킬 할당 탭입니다.</div>;
 
       default:
         return (

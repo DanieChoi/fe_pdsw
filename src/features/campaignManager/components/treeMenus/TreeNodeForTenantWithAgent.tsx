@@ -1,4 +1,5 @@
 // src/features/campaignManager/components/treeMenus/TreeNodeForTenantWithAgent.tsx
+
 "use client";
 
 import { ChevronRight, ChevronDown, Building2, User, Users } from "lucide-react";
@@ -16,101 +17,101 @@ interface TreeNodeProps {
 }
 
 export function TreeNodeForTenantWithAgent({
- item,
- level,
- expandedNodes,
- selectedNodeId,
- onNodeToggle,
- onNodeSelect,
+  item,
+  level,
+  expandedNodes,
+  selectedNodeId,
+  onNodeToggle,
+  onNodeSelect,
 }: TreeNodeProps) {
- const hasChildren = item.children && item.children.length > 0;
- const isExpanded = expandedNodes.has(item.id);
- const isSelected = selectedNodeId === item.id;
+  const hasChildren = item.children && item.children.length > 0;
+  const isExpanded = expandedNodes.has(item.id);
+  const isSelected = selectedNodeId === item.id;
 
- // type에 따른 아이콘 렌더링
- const renderIcon = () => {
-   switch(item.type) {
-     case 'counselor':
-       return <User className="h-4 w-4 text-gray-500" />;
-     case 'team':
-       return <Users className="h-4 w-4 text-gray-500" />;
-     case 'group':
-       return <Building2 className="h-4 w-4 text-gray-500" />;
-     default:
-       return <Building2 className="h-4 w-4 text-gray-500" />;
-   }
- };
+  // type에 따른 아이콘 렌더링
+  const renderIcon = () => {
+    switch(item.type) {
+      case 'counselor':
+        return <User className="h-4 w-4 text-gray-500" />;
+      case 'team':
+        return <Users className="h-4 w-4 text-gray-500" />;
+      case 'group':
+        return <Building2 className="h-4 w-4 text-gray-500" />;
+      default:
+        return <Building2 className="h-4 w-4 text-gray-500" />;
+    }
+  };
 
- // 일반 클릭
- const handleClick = useCallback(() => {
-   onNodeSelect(item.id);
-   if (hasChildren) {
-     onNodeToggle(item.id);
-   }
- }, [item.id, hasChildren, onNodeSelect, onNodeToggle]);
+  // 일반 클릭
+  const handleClick = useCallback(() => {
+    onNodeSelect(item.id);
+    if (hasChildren) {
+      onNodeToggle(item.id);
+    }
+  }, [item.id, hasChildren, onNodeSelect, onNodeToggle]);
 
- // 우클릭 메뉴 기능
- const handleEdit = () => {
-   console.log('Edit agent:', { id: item.id, label: item.label, type: item.type });
- };
+  // 우클릭 메뉴 기능
+  const handleEdit = () => {
+    console.log('Edit agent:', { id: item.id, label: item.label, type: item.type });
+  };
 
- const handleDelete = () => {
-   console.log('Delete agent:', { id: item.id, label: item.label, type: item.type });
- };
+  const handleDelete = () => {
+    console.log('Delete agent:', { id: item.id, label: item.label, type: item.type });
+  };
 
- const handleManage = () => {
-   console.log('Manage agent:', { id: item.id, label: item.label, type: item.type });
- };
- 
- return (
-   <div className="select-none">
-     <ContextMenuForAgentNode
-       item={item}
-       onEdit={handleEdit}
-       onDelete={handleDelete}
-       onManage={handleManage}
-     >
-       <div
-         className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150
-           ${isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""}`}
-         onClick={handleClick}
-         style={{ paddingLeft: `${level * 16 + 8}px` }}
-       >
-         <div className="flex items-center w-full gap-2">
-           {hasChildren ? (
-             isExpanded ? (
-               <ChevronDown className="h-4 w-4 text-gray-500" />
-             ) : (
-               <ChevronRight className="h-4 w-4 text-gray-500" />
-             )
-           ) : (
-             <span className="w-4" />
-           )}
+  const handleManage = () => {
+    console.log('Manage agent:', { id: item.id, label: item.label, type: item.type });
+  };
+  
+  return (
+    <div className="select-none">
+      <ContextMenuForAgentNode
+        item={item}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onManage={handleManage}
+      >
+        <div
+          className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150
+            ${isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""}`}
+          onClick={handleClick}
+          style={{ paddingLeft: `${level * 16 + 8}px` }}
+        >
+          <div className="flex items-center w-full gap-2">
+            {hasChildren ? (
+              isExpanded ? (
+                <ChevronDown className="h-4 w-4 text-gray-500" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-gray-500" />
+              )
+            ) : (
+              <span className="w-4" />
+            )}
 
-           {renderIcon()}
+            {renderIcon()}
 
-           <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
-             {item.label}
-           </span>
-         </div>
-       </div>
-     </ContextMenuForAgentNode>
+            <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
+              {item.label}
+            </span>
+          </div>
+        </div>
+      </ContextMenuForAgentNode>
 
-     {hasChildren && isExpanded && (
-       <div>
-         {item.children?.map((child) => (
-           <TreeNodeForTenantWithAgent
-                 key={child.id}
-                 item={child}
-                 level={level + 1}
-                 expandedNodes={expandedNodes}
-                 selectedNodeId={selectedNodeId}
-                 onNodeToggle={onNodeToggle}
-                 onNodeSelect={onNodeSelect} 
-                 />
-         ))}
-       </div>
-     )}
-   </div>
- );
+      {hasChildren && isExpanded && (
+        <div>
+          {item.children?.map((child) => (
+            <TreeNodeForTenantWithAgent
+                key={child.id}
+                item={child}
+                level={level + 1}
+                expandedNodes={expandedNodes}
+                selectedNodeId={selectedNodeId}
+                onNodeToggle={onNodeToggle}
+                onNodeSelect={onNodeSelect} 
+                />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
