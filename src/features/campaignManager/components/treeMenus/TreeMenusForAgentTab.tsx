@@ -6,6 +6,8 @@ import { TreeItem } from '@/features/campaignManager/types/typeForSidebar2';
 import { useApiToFetchCounselorTreeData } from "@/features/campaignManager/hooks/useApiToFetchCounselorTreeData";
 import { TreeNode } from './TreeNode';
 import { useSideMenuStore } from "@/store/sideMenuStore";
+import { Building2, User, Users } from 'lucide-react';
+import { TreeNodeForTenantWithAgent } from './TreeNodeForTenantWithAgent';
 
 export function TreeMenusForAgentTab() {
   const { data: treeData, isLoading, error } = useApiToFetchCounselorTreeData();
@@ -58,8 +60,20 @@ export function TreeMenusForAgentTab() {
   }, [initialized, isLoading, error, treeData]);
 
   // 상태에 따른 아이콘 반환 함수
-  const getStatusIcon = () => null;  // 상담원은 기본적으로 별도 상태 아이콘 없음
-
+  const getStatusIcon = (type?: string) => {
+    // console.log("type : ", type);
+    
+    switch(type) {
+      case 'counselor':
+        return <User className="h-4 w-4 text-gray-500" />;
+      case 'team':
+        return <Users className="h-4 w-4 text-gray-500" />;
+      case 'group':
+        return <Building2 className="h-4 w-4 text-gray-500" />;
+      default:
+        return null;
+    }
+  };
   if (isLoading) {
     return <div className="p-4">Loading...</div>;
   }
@@ -73,13 +87,12 @@ export function TreeMenusForAgentTab() {
   return (
     <div className="flex-1 overflow-auto">
       {items.map((item: TreeItem) => (
-        <TreeNode
+        <TreeNodeForTenantWithAgent
           key={item.id}
           item={item}
           level={0}
           expandedNodes={expandedNodes}
           selectedNodeId={selectedNodeId}
-          getStatusIcon={getStatusIcon}
           onNodeToggle={handleNodeToggle}
           onNodeSelect={setSelectedNodeId}
         />
