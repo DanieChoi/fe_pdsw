@@ -155,6 +155,10 @@ const DistributionLimit = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const getRowClass = (row: Row) => {
+    return selectedRow?.agent_id === row.agent_id ? 'bg-[#FFFAEE]' : '';
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex title-background justify-between">
@@ -228,6 +232,7 @@ const DistributionLimit = () => {
               selectedRows={selectedRow ? new Set<string>([selectedRow.agent_id]) : new Set<string>()}
               rowHeight={26}
               headerRowHeight={26}
+              rowClass={getRowClass}
             />
           </div>
         </div>
