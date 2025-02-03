@@ -46,27 +46,16 @@ export function ContextMenuForAgentNode({
           <>
             <ContextMenuItem onClick={onEdit}>
               <UserCog className="mr-2 h-4 w-4" />
-              상담원 정보
+              상담원 스킬 할당당
             </ContextMenuItem>
+            <ContextMenuSeparator />
 
             <ContextMenuItem>
               <PhoneCall className="mr-2 h-4 w-4" />
-              통화 현황
+              상담원 스킬 해제
             </ContextMenuItem>
 
-            <ContextMenuSeparator />
 
-            <ContextMenuItem>
-              <History className="mr-2 h-4 w-4" />
-              이력 조회
-            </ContextMenuItem>
-
-            <ContextMenuSeparator />
-
-            <ContextMenuItem onClick={onDelete} className="text-red-500">
-              <UserMinus className="mr-2 h-4 w-4" />
-              상담원 제거
-            </ContextMenuItem>
           </>
         )}
 
