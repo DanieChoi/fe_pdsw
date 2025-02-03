@@ -129,7 +129,7 @@ export default function SidebarContainer() {
 
       {/* 리사이즈 핸들 */}
       <div
-        className="w-1 cursor-col-resize hover:bg-gray-300 active:bg-gray-400"
+        className="w-[1px] cursor-col-resize bg-[#FBFBFB] hover:bg-[#5BC2C1] active:bg-[#5BC2C1] group_col"
         onMouseDown={handleResizeStart}
       />
     </div>

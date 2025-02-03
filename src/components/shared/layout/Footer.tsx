@@ -13,7 +13,7 @@ export default function Footer({
       }}
     >
      <div
-      className="group relative bg-gray-300 h-[1px] cursor-ns-resize hover:h-[4px] hover:bg-[#5BC2C1] before:content-[''] before:absolute before:-top-2 before:-bottom-2 before:left-0 before:right-0 before:bg-transparent"
+      className="group relative bg-[#FBFBFB] h-[1px] cursor-ns-resize hover:h-[1px] hover:bg-[#5BC2C1] before:content-[''] before:absolute before:bg-transparent"
       onMouseDown={startResizing}
     ></div>
 

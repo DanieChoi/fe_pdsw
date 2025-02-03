@@ -480,3 +480,30 @@ html, body {
   text-indent: -10px;
   padding-left: 10px;
 }
+
+.group:before{
+  width: 100%;
+  height: 4px;
+}
+
+.group:hover::before {
+  background-color: #5BC2C1;
+}
+
+.group_col{
+  position: relative;
+}
+
+.group_col:before{
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background-color: transparent;
+}
+
+.group_col:hover::before {
+  background-color: #5BC2C1;
+}
