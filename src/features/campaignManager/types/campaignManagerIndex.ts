@@ -75,6 +75,26 @@ export interface CallingNumberListResponse {
   result_data: CallingNumberListDataResponse[];
 }
 
+// 캠페인 소속 상담사 리스트 요청
+export interface CampaignAgentListDataRequest {
+  campaign_id: number;
+}
+
+// 캠페인 소속 상담사 데이터 타입
+export interface CampaignAgentListDataResponse {
+  campaign_id: number;
+  agent_id: string[];
+}
+
+// 캠페인 소속 상담사 데이터 타입
+export interface CampaignAgentListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: CampaignAgentListDataResponse[];
+}
+
 // 캠페인스킬 데이터 타입
 export interface CampaignSkillDataResponse {
   campaign_id: number;
