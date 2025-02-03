@@ -156,6 +156,7 @@ const SystemPreferences = () => {
             tenant_id_array: _tenantId
         });
         fetchChannelList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // 장비 선택 시 장비 상세내역 업데이트
@@ -211,6 +212,7 @@ const SystemPreferences = () => {
                 setAllocationOutboundMode("");
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedDevice, channelList]);
 
     // 채널 선택 시 상세 정보 업데이트
@@ -256,6 +258,7 @@ const SystemPreferences = () => {
             device_name: device.device_name,
             usage: getDeviceUsage(device.device_id)
         }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dialingDeviceList, channelList]);
 
     const equipmentColumns = [
