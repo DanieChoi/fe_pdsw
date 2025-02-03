@@ -4,6 +4,7 @@ import { useMainStore, useCampainManagerStore } from '@/store';
 import {CampaignHeaderSearch} from './CampaignManagerHeader';
 import { useEffect, useState } from 'react';
 import TitleWrap from "@/components/shared/TitleWrap";
+import { useApiForCampaignAgent } from '@/features/campaignManager/hooks/useApiForCampaignAgent';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
@@ -18,13 +19,25 @@ type Props = {
 }
 
 export default function CampaignManagerList({campaignId,campaignHeaderSearchParam}: Props) {
-  const { campaigns , setSelectedCampaign } = useMainStore();
+  const { campaigns, selectedCampaign , setSelectedCampaign } = useMainStore();
   const { schedules, callingNumbers, campaignSkills  } = useCampainManagerStore();
   const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>([]);
   
   const handleRowClick = (campaign: MainDataResponse) => {
     setSelectedCampaign(campaign);
   };
+  
+  // 캠페인 소속 상담사 리스트 요청
+  const { mutate: fetchCampaignAgents } = useApiForCampaignAgent({
+    onSuccess: (data) => {
+      // TODO..
+      // setSchedules(data.result_data);  
+      // const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id); 
+      // fetchSkills({
+      //   tenant_id_array: tempTenantIdArray
+      // });   
+    }
+  });
   
   useEffect(() => {
     if( campaigns && typeof campaignId != 'undefined' && campaignId != '' ){
@@ -40,6 +53,12 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
       setSelectedCampaign(tempCampaigns[0]);
     }
   }, [tempCampaigns]);
+
+  useEffect(() => {
+    if( selectedCampaign ){
+      fetchCampaignAgents({ campaign_id: selectedCampaign.campaign_id });
+    }
+  }, [selectedCampaign]);
 
   useEffect(() => {
     if( typeof campaignHeaderSearchParam != 'undefined' && typeof campaignId === 'undefined' ){
