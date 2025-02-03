@@ -6,7 +6,7 @@ import { useTabStore } from '@/store/tabStore'
 import Cookies from 'js-cookie'
 import { MenuItem, menuItems } from '@/widgets/header/model/menuItems'
 import React, { useState, useEffect } from 'react'
-import { useMainStore } from '@/store';
+import { useAuthStore, useMainStore } from '@/store';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 import useApiForFetchCounselorList from '@/features/campaignManager/hooks/useApiForFetchCounselorList';
@@ -123,7 +123,7 @@ export default function Header() {
   });
 
   useEffect(() => {
-    console.log('Fetching tenants with:', { _sessionKey, _tenantId });
+    // console.log('Fetching tenants with:', { _sessionKey, _tenantId });
     fetchTenants({
       session_key: _sessionKey,
       tenant_id: _tenantId,
@@ -132,29 +132,28 @@ export default function Header() {
 
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
-      console.log('Main API response:', data);
+      // console.log('Main API response:', data);
       setCampaigns(data.result_data);
       setShouldFetchCounselors(true);  // 이 시점에 상담사 목록 조회 활성화
 
     }
   });
 
-  // const { mutate: fetchCounselorList } = useApiForFetchCounselorList({
-  //   onSuccess: (data) => {
-  //     // console.log('Counselors API response:', data);
-  //     setCounselers(data.counselorList);
-  //   }
-  // });
+  // authStore 에서 tenant_id, role_id 가져오기
+  const tenant_id = useAuthStore((state) => state.tenant_id);
+  const role_id = useAuthStore((state) => state.role_id);
 
   const { data: counselorListData } = useApiForFetchCounselorList({
     credentials: {
       // 필요한 credentials 정보
       session_key: _sessionKey,
-      tenant_id: 1,
-      roleId: 6
+      tenant_id: tenant_id,
+      roleId: role_id
     },
-    enabled: shouldFetchCounselors,  // fetchMain 완료 후에만 실행
+    // enabled: shouldFetchCounselors,  // fetchMain 완료 후에만 실행
   });
+
+  console.log('counselorListData at header :', counselorListData);
 
   useEffect(() => {
     if (counselorListData) {

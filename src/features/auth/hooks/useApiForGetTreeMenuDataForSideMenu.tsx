@@ -19,13 +19,8 @@ export function useApiForGetTreeMenuDataForSideMenu() {
     refetchOnWindowFocus: false,
   });
 
-  // 2) invalidate를 원하는 경우를 대비해 준비
-//   const invalidateQuery = () => {
-//     queryClient.invalidateQueries(["treeMenuDataForSideMenu"]);
-//   };
 
   return {
     ...query,
-    // invalidateQuery,
   };
 }
