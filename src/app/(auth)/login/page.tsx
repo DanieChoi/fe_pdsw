@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { useApiForLogin } from '@/features/auth/hooks/useApiForLogin';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from '@/store/authStore';
 
 interface LoginFormData {
   user_name: string;
@@ -30,9 +31,35 @@ export default function LoginPage() {
     type: '0',
   });
 
+  
+
+  // const { mutate: login } = useApiForLogin({
+  //   onSuccess: () => {
+  //     setIsPending(false);
+  //     router.push('/main');
+  //   },
+  //   onError: (e) => {
+  //     setAlertState({
+  //       isOpen: true,
+  //       message: e.message,
+  //       title: '로그인',
+  //       type: '0',
+  //     });
+  //     setIsPending(false);
+  //   },
+  // });
+
+  const { setAuth } = useAuthStore();
+
   const { mutate: login } = useApiForLogin({
-    onSuccess: () => {
+    onSuccess: (data) => {
       setIsPending(false);
+      setAuth(
+        '',              // id
+        data.tenant_id,  // tenant_id
+        data.session_key, // session_key
+        data.role_id     // role_id 추가
+      );
       router.push('/main');
     },
     onError: (e) => {

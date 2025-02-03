@@ -376,6 +376,16 @@ const SystemPreferences = () => {
         return [...defaultOptions, ...campaignOptions];
     };
 
+    // 장비 목록용 rowClass 함수
+    const getEquipmentRowClass = (row: EquipmentRow) => {
+        return selectedDevice?.device_id === row.device_id ? 'bg-[#FFFAEE]' : '';
+    };
+    
+    // 채널 목록용 rowClass 함수
+    const getChannelRowClass = (row: ChannelRow) => {
+        return selectedChannel?.channelNumber === row.channelNumber ? 'bg-[#FFFAEE]' : '';
+    };
+
     return (
         <div className="space-y-5">
             <div className="flex gap-5">
@@ -393,6 +403,7 @@ const SystemPreferences = () => {
                                 selectedRows={selectedDevice ? new Set([selectedDevice.device_id]) : new Set()}
                                 rowHeight={26}
                                 headerRowHeight={26}
+                                rowClass={getEquipmentRowClass}
                             />
                         </div>
                     </div>
@@ -461,6 +472,7 @@ const SystemPreferences = () => {
                                 rowKeyGetter={(row) => row.channelNumber.toString()}
                                 rowHeight={26}
                                 headerRowHeight={26}
+                                rowClass={getChannelRowClass}
                             />
                         </div>
                     </div>

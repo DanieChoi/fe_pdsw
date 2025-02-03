@@ -118,6 +118,10 @@ const ConsultResultSetting = () => {
     setResultDesc('');
   };
 
+  const getRowClass = (row: Row) => {
+    return selectedRow?.id === row.id ? 'bg-[#FFFAEE]' : '';
+  };
+
   return (
     <div className="flex gap-8">
       <div className="w-[580px]">
@@ -131,6 +135,7 @@ const ConsultResultSetting = () => {
             selectedRows={selectedRow ? new Set<string>([selectedRow.id.toString()]) : new Set<string>()}
             rowHeight={26}
             headerRowHeight={26}
+            rowClass={getRowClass} 
           />
         </div>
       </div>
