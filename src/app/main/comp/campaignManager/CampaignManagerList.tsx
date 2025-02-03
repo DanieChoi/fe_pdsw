@@ -5,12 +5,54 @@ import {CampaignHeaderSearch} from './CampaignManagerHeader';
 import { useEffect, useState } from 'react';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { useApiForCampaignAgent } from '@/features/campaignManager/hooks/useApiForCampaignAgent';
+import DataGrid, { CellClickArgs } from "react-data-grid";
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
   {dial_id:2, dial_name: 'Progressive'},
   {dial_id:3, dial_name: 'Predictive'},
   {dial_id:4, dial_name: 'System Preview'},
+];
+
+type Column = {
+  key: string;
+  name: string;
+};
+
+type Row = {
+  no: number;
+  campaignId: number;
+  idName: string;
+  startDate: string;
+  endDate: string;
+  skill: string;
+  dialMode: string;
+  callingNumber: string;
+};
+
+const columns: Column[] = [
+  { key: "no", name: "NO." },
+  { key: "idName", name: "아이디+이름" },
+  { key: "startDate", name: "시작일자" },
+  { key: "endDate", name: "종료일자" },
+  { key: "skill", name: "스킬" },
+  { key: "dialMode", name: "다이얼모드" },
+  { key: "callingNumber", name: "발신번호" },
+];
+
+interface DataProps {
+  no: number;
+  campaignId: number;
+  idName: string;
+  startDate: string;
+  endDate: string;
+  skill: string;
+  dialMode: string;
+  callingNumber: string;
+}
+
+const rows: Row[] = [
+  { no: 1,campaignId:1, idName: '1', startDate: "00:00", endDate: "00:00", skill: "00:00", dialMode: "00:00", callingNumber: "00:00" },
 ];
 
 type Props = {
@@ -22,6 +64,7 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
   const { campaigns, selectedCampaign , setSelectedCampaign } = useMainStore();
   const { schedules, callingNumbers, campaignSkills  } = useCampainManagerStore();
   const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>([]);
+  const [tempData, setTempData] = useState<DataProps[]>([]);
   
   const handleRowClick = (campaign: MainDataResponse) => {
     setSelectedCampaign(campaign);
@@ -50,9 +93,32 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
 
   useEffect(() => {
     if( tempCampaigns.length > 0 ){
+      setTempData([]);
+      tempCampaigns.map((data, index) => {
+        setTempData((prev) => [
+          ...prev,
+          {
+            no: index + 1,
+            campaignId: data.campaign_id,
+            idName: '['+data.campaign_id+']'+data.campaign_name,
+            startDate: schedules.filter((schedule) => schedule.campaign_id === data.campaign_id)
+            .map((data) => data.start_date.length == 8? data.start_date.substring(0,4)+'-'+data.start_date.substring(4,6)+'-'+data.start_date.substring(6,8):'').join(','),
+            endDate: schedules.filter((schedule) => schedule.campaign_id === data.campaign_id)
+            .map((data) => data.end_date.length == 8? data.end_date.substring(0,4)+'-'+data.end_date.substring(4,6)+'-'+data.end_date.substring(6,8):'').join(','),
+            skill: campaignSkills.filter((skill) => skill.campaign_id === data.campaign_id)
+            .map((data) => data.skill_id)
+            .join(','),
+            dialMode: dialModeList.filter((dialMode) => dialMode.dial_id === data.dial_mode)
+                  .map((data) => data.dial_name).join(','),
+            callingNumber: callingNumbers.filter((callingNumber) => callingNumber.campaign_id === data.campaign_id)
+            .map((data) => data.calling_number).join(',')
+          }
+        ]);
+      });
+      
       setSelectedCampaign(tempCampaigns[0]);
     }
-  }, [tempCampaigns]);
+  }, [tempCampaigns,schedules,campaignSkills,dialModeList,callingNumbers]);
 
   useEffect(() => {
     if( selectedCampaign ){
@@ -94,53 +160,25 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
     }
   }, [campaignHeaderSearchParam,campaignId]);
 
+  const handleCellClick = ({ row }: CellClickArgs<Row>) => {
+    setSelectedCampaign(campaigns.filter((campaign) => campaign.campaign_id === Number(row.campaignId))[0]);
+  };
 
   return (
     <div className="w-[40%] shrink-0">
       <TitleWrap title="캠페인 목록" totalCount={tempCampaigns.length} />
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="border p-2 text-left">No.</th>
-                <th className="border p-2 text-left">아이디+이름</th>
-                <th className="border p-2 text-left">시작일자</th>
-                <th className="border p-2 text-left">종료일자</th>
-                <th className="border p-2 text-left">스킬</th>
-                <th className="border p-2 text-left">다이얼모드</th>
-                <th className="border p-2 text-left">발신번호</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tempCampaigns.map((campaign, index) => (
-                <tr 
-                  key={campaign.campaign_id}
-                  onClick={() => handleRowClick(campaign)}
-                  className="cursor-pointer hover:bg-gray-50"
-                >
-                  <td className="border p-2">{index + 1}</td>
-                  <td className="border p-2">[{campaign.campaign_id}]{campaign.campaign_name}</td>
-                  <td className="border p-2">{schedules.filter((schedule) => schedule.campaign_id === campaign.campaign_id)
-                  .map((data) => data.start_date.length == 8? data.start_date.substring(0,4)+'-'+data.start_date.substring(4,6)+'-'+data.start_date.substring(6,8):'')
-                  }</td>
-                  <td className="border p-2">{schedules.filter((schedule) => schedule.campaign_id === campaign.campaign_id)
-                  .map((data) => data.end_date.length == 8? data.end_date.substring(0,4)+'-'+data.end_date.substring(4,6)+'-'+data.end_date.substring(6,8):'')
-                  }</td>
-                  <td className="border p-2">{campaignSkills.filter((skill) => skill.campaign_id === campaign.campaign_id)
-                  .map((data) => data.skill_id)
-                  .join(',')
-                  }</td>
-                  <td className="border p-2">{dialModeList.filter((dialMode) => dialMode.dial_id === campaign.dial_mode)
-                  .map((data) => data.dial_name)
-                  }</td>
-                  <td className="border p-2">{callingNumbers.filter((callingNumber) => callingNumber.campaign_id === campaign.campaign_id)
-                  .map((data) => data.calling_number)
-                  }</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="overflow-x-auto">
+        <div className="grid-custom-wrap h-[500px]">
+          <DataGrid 
+            columns={columns} 
+            rows={tempData} 
+            className="grid-custom" 
+            rowHeight={26}
+            headerRowHeight={26}
+            onCellClick={handleCellClick}
+            />
         </div>
+      </div>
     </div>
   );
 }
