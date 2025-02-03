@@ -475,3 +475,8 @@ html, body {
 .max-w-custom-780{
   width: 780px;
 }
+
+.notice-li>li{
+  text-indent: -10px;
+  padding-left: 10px;
+}
