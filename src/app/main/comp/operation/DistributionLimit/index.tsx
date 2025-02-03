@@ -104,6 +104,29 @@ const DistributionLimit = () => {
     });
   };
 
+
+  // 초기화 시간 설정 관련 state들 추가
+  const [isTimeSettingOpen, setIsTimeSettingOpen] = useState(false);
+  const [isTimeRemoveOpen, setIsTimeRemoveOpen] = useState(false);
+  const [timeValue, setTimeValue] = useState('');
+
+
+  // 초기화 시간 설정 핸들러
+  const handleTimeSettingSave = () => {
+    if (!timeValue) {
+      showAlert('시간을 입력해주세요.');
+      return;
+    }
+    console.log('Save time setting:', timeValue);
+    setIsTimeSettingOpen(false);
+  };
+
+  // 초기화 시간 설정 해제 핸들러
+  const handleTimeRemove = () => {
+    console.log('Remove time setting');
+    setIsTimeRemoveOpen(false);
+  };
+
   const closeAlert = () => {
     setAlertState(prev => ({ ...prev, isOpen: false }));
   };
@@ -196,8 +219,8 @@ const DistributionLimit = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <CommonButton>초기화시간 변경</CommonButton>
-          <CommonButton>초기화시간 설정해제</CommonButton>
+          <CommonButton onClick={() => setIsTimeSettingOpen(true)}>초기화시간 변경</CommonButton>
+          <CommonButton  onClick={() => setIsTimeRemoveOpen(true)}>초기화시간 설정해제</CommonButton>
           <CommonButton>적용</CommonButton>
         </div>
       </div>
@@ -209,7 +232,7 @@ const DistributionLimit = () => {
             <div className="flex items-center gap-2">
               <Label className="w-20 min-w-20">보기설정</Label>
               <Select defaultValue='all'>
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-[250px]">
                   <SelectValue placeholder="해당 상담원 전체" />
                 </SelectTrigger>
                 <SelectContent>
@@ -343,6 +366,36 @@ const DistributionLimit = () => {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSelect={handleCampaignSelect}
+        />
+
+        <CustomAlert
+          isOpen={isTimeSettingOpen}
+          message={
+            <div className="flex flex-col gap-4">
+              <div>현재 설정 값이 없습니다. 시간을 입력하세요</div>
+              <CustomInput 
+                type="text" 
+                value={timeValue}
+                onChange={(e) => setTimeValue(e.target.value)}
+                placeholder="예) 23시00분은 2300"
+                className="w-full"
+              />
+            </div>
+          }
+          title="초기화 시간 설정"
+          type="2"
+          onClose={handleTimeSettingSave}
+          onCancle={() => setIsTimeSettingOpen(false)}
+        />
+
+
+        <CustomAlert
+          isOpen={isTimeRemoveOpen}
+          message="초기화 시간 설정값을 해제 하시겠습니까?"
+          title="초기화 시간 설정해제"
+          type="2"
+          onClose={handleTimeRemove}
+          onCancle={() => setIsTimeRemoveOpen(false)}
         />
 
         <CustomAlert
