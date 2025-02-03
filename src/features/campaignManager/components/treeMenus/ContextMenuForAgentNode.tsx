@@ -55,7 +55,6 @@ export function ContextMenuForAgentNode({
               상담원 스킬 해제
             </ContextMenuItem>
 
-
           </>
         )}
 

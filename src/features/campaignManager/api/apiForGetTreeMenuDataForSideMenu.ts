@@ -90,7 +90,6 @@ interface Counselor {
 }
 
 export async function apiToFetchCounselorTreeData(credentials: MainCredentials): Promise<TabData[]> {
-  console.log("hi 상담원 리스트 가져오려면 이 함수가 실행되야 한단 말이야 !");
 
   // Promise.all로 두 API를 병렬 호출
   const [tenantsData, counselorData] = await Promise.all([
