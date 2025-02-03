@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import DataGrid, { CellClickArgs } from "react-data-grid";
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useMainStore, useCampainManagerStore } from '@/store';
 import CampaignModal from '../CampaignModal';
+import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
 
 import { CommonButton } from "@/components/shared/CommonButton";
 import { Label } from "@/components/ui/label";
@@ -18,12 +19,27 @@ function CampaignLayout() {
     campaigns, 
     setSelectedCampaign,
   } = useMainStore();
-  const { callingNumbers } = useCampainManagerStore();
+  const { callingNumbers, setCallingNumbers } = useCampainManagerStore();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCampaignValue, setSelectedCampaignValue] = useState('');
   const [selectedCallingNumber, setSelectedCallingNumber] = useState('');
   const [selectedRow, setSelectedRow] = useState<Row | null>(null);
+
+  // 발신번호 조회
+  const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
+    onSuccess: (data) => {
+      setCallingNumbers(data.result_data);
+    }
+  });
+
+  useEffect(() => {
+    // 컴포넌트가 마운트될 때 발신번호 조회
+    fetchCallingNumbers({
+      session_key: '',
+      tenant_id: 0,
+    });
+  }, [fetchCallingNumbers]);
 
   const columns = useMemo(() => [
     {
