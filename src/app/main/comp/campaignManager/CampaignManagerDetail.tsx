@@ -1,6 +1,6 @@
 "use client";
 // components/CampaignManager/CampaignManagerDetail.tsx
-import { useMainStore, useCampainManagerStore } from '@/store';
+import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 import Image from 'next/image'
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CommonButton } from "@/components/shared/CommonButton";
 import CampaignTab from './CampaignTab';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
-import { CampaignSkillUpdateRequest, CampaignInfoUpdateRequest, CampaignScheDuleListDataResponse, CallingNumberListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
+import { CampaignSkillUpdateRequest
+  , CampaignInfoUpdateRequest
+  , CampaignScheDuleListDataResponse
+  , CallingNumberListDataResponse 
+  , CampaignDialSpeedUpdateRequest
+} from '@/features/campaignManager/types/campaignManagerIndex';
 import { useEffect, useState } from 'react';
 import SkillListPopup from '@/components/shared/layout/SkillListPopup';
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
@@ -18,6 +23,7 @@ import { useApiForCampaignScheduleUpdate } from '@/features/campaignManager/hook
 import { useApiForCallingNumberUpdate } from '@/features/campaignManager/hooks/useApiForCallingNumberUpdate';
 import { useApiForCallingNumberInsert } from '@/features/campaignManager/hooks/useApiForCallingNumberInsert';
 import { useApiForCallingNumberDelete } from '@/features/campaignManager/hooks/useApiForCallingNumberDelete';
+import { useApiForDialSpeedUpdate } from '@/features/campaignManager/hooks/useApiForDialSpeedUpdate';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
@@ -49,6 +55,12 @@ const CampaignSkillInfo: CampaignSkillUpdateRequest = {
 const CallingNumberInfo: CallingNumberListDataResponse = {
   campaign_id: 0,
   calling_number: ''
+}
+
+const CampaignDialSpeedInfo: CampaignDialSpeedUpdateRequest = {
+  campaign_id: 0,
+  tenant_id: 0,
+  dial_speed: 0
 }
 
 const CampaignManagerInfo: CampaignInfoUpdateRequest = {
@@ -189,6 +201,35 @@ export interface OutgoingStrategyTabParam {
   redial_strategy: string[];
 }
 
+export interface OutgoingMethodTabParam {
+  changeYn: boolean;
+  campaignInfoChangeYn: boolean;
+  onSave: boolean;
+  onClosed: boolean;
+  trunk_access_code: string;      //Trunk Access Code
+  dial_try_interval: number;      //재시도 간격(초)
+  alarm_answer_count: number;     //콜 목표량
+  overdial_abandon_time: number;  //포기호 처리시간(초)
+  detect_mode: number;            //기계음 처리 - 자동응답기 처리 1 : 컬러링 판별 후 사람만 연결, 2 : 컬러링 판별 후 사람/기계음 연결, 3 : 기계음/사람 무조건 연결
+  auto_dial_interval: number;     //자동 다이얼 시
+  power_divert_queue: number;     //연결 IVR NO 및 다이얼 모드
+  next_campaign: number;          //연결 캠페인
+  DDD_code: string;               //DDD Number - 지역 번호
+  callback_kind: number;          //연결구분 - 콜백구분 0 : 일반 캠페인(Default), 1 : 무한 콜백, 2 : 일반 콜백
+  max_ring: number;               //최대 링 횟수
+  token_id: number;               //토큰 ID
+  use_counsel_result: number;     //상담결과 등록 여부 - 0 : 미사용, 1 : 사용
+  dial_mode_option: number;       //다이얼 모드 옵션 - 발신 모드별 옵션 설정(system preview 에서만 사용)
+  user_option: string;            //제한 호수 비율
+}
+
+export interface AdditionalInfoTabParam {
+  changeYn: boolean;
+  campaignInfoChangeYn: boolean;
+  onSave: boolean;
+  onClosed: boolean;
+}
+
 const CampaignScheduleInfo: CampaignScheDuleListDataResponse = {
   campaign_id: 0,
   tenant_id: 0,
@@ -198,23 +239,66 @@ const CampaignScheduleInfo: CampaignScheDuleListDataResponse = {
   end_time: []
 }
 
+export interface CallPacingTabParam {
+  changeYn: boolean;
+  campaignDialSpeedChangeYn: boolean;
+  onSave: boolean;
+  onClosed: boolean;
+  dial_mode: number;
+  progressive_dial_speed: number; //PDS 발신 속도(1~100)
+  predictive_dial_speed: number;  //PDS 발신 속도(1~100)
+}
+
+const CampaignCallPacingTabInfo: CallPacingTabParam = {
+  changeYn: false,
+  campaignDialSpeedChangeYn: false,
+  onSave: false,
+  onClosed: false,
+  dial_mode: 0,
+  progressive_dial_speed: 0,
+  predictive_dial_speed: 0,
+}
+
+export interface CallbackTabParam {
+  changeYn: boolean;
+  campaignInfoChangeYn: boolean;
+  onSave: boolean;
+  onClosed: boolean;
+  callback_kind: number;
+  service_code: number;
+}
+
+export interface NotificationTabParam {
+  changeYn: boolean;
+  campaignInfoChangeYn: boolean;
+  onSave: boolean;
+  onClosed: boolean;
+  use_list_alarm: number;
+  list_alarm_count: number;
+  supervisor_phone: string;
+}
+
 export default function CampaignDetail() {
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
   const [tempCallingNumberInfo, setTempCallingNumberInfo] = useState<CallingNumberListDataResponse>(CallingNumberInfo);
   const [tempCampaignSchedule, setTempCampaignSchedule] = useState<CampaignScheDuleListDataResponse>(CampaignScheduleInfo);
+  const [tempCampaignDialSpeedInfo, setTempCampaignDialSpeedInfo] = useState<CampaignDialSpeedUpdateRequest>(CampaignDialSpeedInfo);
+  const [tempCampaignDialSpeedInfoParam, setTempCampaignDialSpeedInfoParam] = useState<CallPacingTabParam>(CampaignCallPacingTabInfo);
   const [changeYn, setChangeYn] = useState<boolean>(false); // 변경여부
   const [campaignInfoChangeYn, setCampaignInfoChangeYn] = useState<boolean>(false); // 캠페인정보 변경여부
   const [campaignSkillChangeYn, setCampaignSkillChangeYn] = useState<boolean>(false); // 캠페인스킬 변경여부
   const [callingNumberChangeYn, setCallingNumberChangeYn] = useState<boolean>(false); // 캠페인 발신번호 변경여부
   const [campaignScheduleChangeYn, setCampaignScheduleChangeYn] = useState<boolean>(false); // 캠페인 스케줄 변경여부
+  const [campaignDialSpeedChangeYn, setCampaignDialSpeedChangeYn] = useState<boolean>(false); // 캠페인 발신속도 변경여부
   const [campaignSaveYn, setCampaignSaveYn] = useState<boolean>(false); // 캠페인 저장여부
   const { tenants
     , setCampaigns
     , selectedCampaign
     , setSelectedCampaign
   } = useMainStore();
+  const { removeTab, activeTabId, activeTabKey } = useTabStore();
   const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
   const [ inputSkills, setInputSkills ] = useState('');
   const [ inputCallingNumber, setInputCallingNumber ] = useState('');
@@ -297,6 +381,16 @@ export default function CampaignDetail() {
       setTempCallingNumberInfo({...tempCallingNumberInfo
         , calling_number: tempCallNumber
       });
+      setTempCampaignDialSpeedInfo({...tempCampaignDialSpeedInfo
+        , campaign_id: selectedCampaign.campaign_id
+        , tenant_id: selectedCampaign.tenant_id
+        , dial_speed: selectedCampaign.dial_speed
+      });
+      setTempCampaignDialSpeedInfoParam({...tempCampaignDialSpeedInfoParam
+        , dial_mode: selectedCampaign.dial_mode
+        , predictive_dial_speed: selectedCampaign.dial_mode === 2?0:selectedCampaign.dial_speed
+        , progressive_dial_speed: selectedCampaign.dial_mode === 3?0:selectedCampaign.dial_speed
+      })
       setTempCampaignManagerInfo({...CampaignManagerInfo,
         campaign_id: selectedCampaign.campaign_id,
         campaign_name: selectedCampaign.campaign_name,
@@ -428,6 +522,9 @@ export default function CampaignDetail() {
         ...tempCampaignManagerInfo,
         dial_mode: Number(value)
       });
+      setTempCampaignDialSpeedInfoParam({...tempCampaignDialSpeedInfoParam,
+        dial_mode: Number(value)
+      });
     }  
   }
 
@@ -467,6 +564,9 @@ export default function CampaignDetail() {
       setTempCampaignManagerInfo({...tempCampaignManagerInfo
         , start_flag: Number(value.start_flag)
       });
+      setTempCampaignsInfo({...tempCampaignInfo
+        , start_flag: Number(value.start_flag)
+      });
     }
     if( value.campaignScheduleChangeYn ){
       setChangeYn(true);
@@ -484,7 +584,7 @@ export default function CampaignDetail() {
       handleCampaignSave();
     }
     if( value.onClosed ){
-      // setCampaignSaveYn(false);
+      handleCampaignClosed();
     }
   }
   
@@ -513,13 +613,209 @@ export default function CampaignDetail() {
       handleCampaignSave();
     }
     if( value.onClosed ){
-      // setCampaignSaveYn(false);
+      handleCampaignClosed();
     }  
   }
   
-  //캠페인 발신순서 탭 변경
+  //캠페인 발신전략 탭 변경
   const handleOutgoingStrategyTabChange = (value: OutgoingStrategyTabParam) => {
+    if( value.campaignInfoChangeYn ){
+      setChangeYn(true);
+      setCampaignInfoChangeYn(true);
+      setTempCampaignsInfo({...tempCampaignInfo
+        , redial_strategy: value.redial_strategy
+      });
+      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+        , redial_strategy1: value.redial_strategy[0]
+        , redial_strategy2: value.redial_strategy[1]
+        , redial_strategy3: value.redial_strategy[2]
+        , redial_strategy4: value.redial_strategy[3]
+        , redial_strategy5: value.redial_strategy[4]
+      });
+    }  
+    if( value.onSave ){
+      setCampaignSaveYn(false);
+      handleCampaignSave();
+    }
+    if( value.onClosed ){
+      handleCampaignClosed();
+    }  
+  }
+  
+  //캠페인 발신방법 탭 변경
+  const handleOutgoingMethodTabChange = (value: OutgoingMethodTabParam) => {
+    if( value.campaignInfoChangeYn ){
+      setChangeYn(true);
+      setCampaignInfoChangeYn(true);
+      setTempCampaignsInfo({...tempCampaignInfo
+        ,trunk_access_code : value.trunk_access_code
+        ,dial_try_interval : value.dial_try_interval
+        ,alarm_answer_count : value.alarm_answer_count
+        ,overdial_abandon_time : value.overdial_abandon_time
+        ,detect_mode : value.detect_mode
+        ,auto_dial_interval : value.auto_dial_interval
+        ,power_divert_queue : value.power_divert_queue
+        ,next_campaign : value.next_campaign
+        ,DDD_code : value.DDD_code
+        ,callback_kind : value.callback_kind
+        ,max_ring : value.max_ring
+        ,token_id : value.token_id
+        ,use_counsel_result : value.use_counsel_result
+        ,dial_mode_option : value.dial_mode_option
+        ,user_option : value.user_option
+      });
+      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+        ,trunk_access_code : value.trunk_access_code
+        ,dial_try_interval : value.dial_try_interval
+        ,alarm_answer_count : value.alarm_answer_count
+        ,overdial_abandon_time : value.overdial_abandon_time
+        ,detect_mode : value.detect_mode
+        ,auto_dial_interval : value.auto_dial_interval
+        ,power_divert_queue : value.power_divert_queue+''
+        ,next_campaign : value.next_campaign
+        ,DDD_code : value.DDD_code
+        ,callback_kind : value.callback_kind
+        ,max_ring : value.max_ring
+        ,token_id : value.token_id
+        ,use_counsel_result : value.use_counsel_result
+        ,dial_mode_option : value.dial_mode_option
+        ,user_option : value.user_option
+      });
+    }  
+    if( value.onSave ){
+      setCampaignSaveYn(false);
+      handleCampaignSave();
+    }
+    if( value.onClosed ){
+      handleCampaignClosed();
+    }  
+  }
 
+  //캠페인 콜페이싱 탭 변경
+  const handleCallPacingTabChange = (value: CallPacingTabParam) => {
+    if( value.campaignDialSpeedChangeYn ){
+      setChangeYn(true);
+      setCampaignDialSpeedChangeYn(value.campaignDialSpeedChangeYn);
+      setTempCampaignDialSpeedInfoParam({...tempCampaignDialSpeedInfoParam
+        , predictive_dial_speed : value.predictive_dial_speed
+        , progressive_dial_speed: value.progressive_dial_speed
+      });
+      setTempCampaignDialSpeedInfo({...tempCampaignDialSpeedInfo
+        , dial_speed : value.dial_mode === 2? Math.floor(value.progressive_dial_speed): value.predictive_dial_speed
+      });
+    }  
+    if( value.onSave ){
+      setCampaignSaveYn(false);
+      handleCampaignSave();
+    }
+    if( value.onClosed ){
+      handleCampaignClosed();
+    }  
+  }
+
+  //캠페인 콜백 탭 변경
+  const handleCampaignCallbackTabChange = (value: OutgoingOrderTabParam) => {
+    if( value.campaignInfoChangeYn ){
+      setChangeYn(true);
+      setCampaignInfoChangeYn(true);
+      setTempCampaignsInfo({...tempCampaignInfo
+        , dial_phone_id: Number(value.dial_phone_id)
+        , phone_dial_try: value.phone_dial_try
+        , phone_order: value.phone_order
+      });
+      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+        , dial_phone_id: Number(value.dial_phone_id)
+        , phone_dial_try1: value.phone_dial_try[0]
+        , phone_dial_try2: value.phone_dial_try[1]
+        , phone_dial_try3: value.phone_dial_try[2]
+        , phone_dial_try4: value.phone_dial_try[3]
+        , phone_dial_try5: value.phone_dial_try[4]
+        , phone_order: value.phone_order
+      });
+    }  
+    if( value.onSave ){
+      setCampaignSaveYn(false);
+      handleCampaignSave();
+    }
+    if( value.onClosed ){
+      handleCampaignClosed();
+    }  
+  }
+  
+  //캠페인 콜백 탭 변경
+  const handleCallbackTabChange = (value: CallbackTabParam) => {    
+    if( value.campaignInfoChangeYn ){
+      setChangeYn(true);
+      setCampaignInfoChangeYn(true);
+      setTempCampaignsInfo({...tempCampaignInfo
+        , callback_kind: Number(value.callback_kind)
+        , service_code: value.service_code
+      });
+      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+        , callback_kind: Number(value.callback_kind)
+        , service_code: value.service_code
+      });
+    }  
+    if( value.onSave ){
+      // setCampaignSaveYn(false);
+      handleCampaignSave();
+    }
+    if( value.onClosed ){
+      handleCampaignClosed();
+    }  
+  }
+
+  //캠페인 알림 탭 변경
+  const handleNotificationTabChange = (value: NotificationTabParam) => {    
+    if( value.campaignInfoChangeYn ){
+      setChangeYn(true);
+      setCampaignInfoChangeYn(value.campaignInfoChangeYn);
+      setTempCampaignsInfo({...tempCampaignInfo
+        , list_alarm_count: Number(value.list_alarm_count)
+        , supervisor_phone: value.supervisor_phone
+        , use_list_alarm: value.use_list_alarm
+      });
+      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+        , list_alarm_count: Number(value.list_alarm_count)
+        , supervisor_phone: value.supervisor_phone
+        , use_list_alarm: value.use_list_alarm
+      });
+    }  
+    if( value.onSave ){
+      // setCampaignSaveYn(false);
+      handleCampaignSave();
+    }
+    if( value.onClosed ){
+      handleCampaignClosed();
+    }  
+  }
+
+  //캠페인 기타정보 탭 변경
+  const handleAdditionalInfoTabChange = (value: AdditionalInfoTabParam) => {    
+    if( value.onSave ){
+      // setCampaignSaveYn(false);
+      handleCampaignSave();
+    }
+    if( value.onClosed ){
+      handleCampaignClosed();
+    }  
+  }
+
+  //캠페인 취소
+  const handleCampaignClosed = () => {
+    setAlertState({
+      ...errorMessage,
+      isOpen: true,
+      message: '캠페인 편집창을 종료하시겠습니까?',
+      onClose: handleCampaignClosedExecute,
+      onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+    });
+  }
+  
+  //캠페인 취소 실행.
+  const handleCampaignClosedExecute = () => {
+    setAlertState((prev) => ({ ...prev, isOpen: false }));
+    removeTab(Number(activeTabId),activeTabKey+'');
   }
 
   //캠페인 저장
@@ -563,6 +859,10 @@ export default function CampaignDetail() {
           fetchCallingNumberUpdate(tempCallingNumberInfo);
         }
       }
+      if( campaignDialSpeedChangeYn ){
+        //캠페인 발신 속도 수정 api 호출
+        fetchDialSpeedUpdate( tempCampaignDialSpeedInfo );
+      }
     }
   }
 
@@ -573,13 +873,13 @@ export default function CampaignDetail() {
   
   //변경여부 체크
   useEffect(() => {  
-    if( changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !callingNumberChangeYn ){  
+    if( changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !callingNumberChangeYn && !campaignDialSpeedChangeYn ){  
       fetchMain({
         session_key: '',
         tenant_id: 0,
       });
     }
-  }, [campaignInfoChangeYn,campaignSkillChangeYn,callingNumberChangeYn]);
+  }, [campaignInfoChangeYn,campaignSkillChangeYn,callingNumberChangeYn,campaignDialSpeedChangeYn]);
 
   //캠페인 정보 조회 api 호출
   const { mutate: fetchMain } = useApiForMain({
@@ -588,6 +888,7 @@ export default function CampaignDetail() {
       setSelectedCampaign( data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0] );
       setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
       setChangeYn(false);
+      removeTab(Number(activeTabId),activeTabKey+'');
     }
   });
 
@@ -661,6 +962,13 @@ export default function CampaignDetail() {
         session_key: '',
         tenant_id: 0,
       });      
+    }
+  });
+  
+  //캠페인 발신 속도 수정 api 호출
+  const { mutate: fetchDialSpeedUpdate } = useApiForDialSpeedUpdate({
+    onSuccess: (data) => {
+      setCampaignDialSpeedChangeYn(false);
     }
   });
   
@@ -789,9 +1097,15 @@ export default function CampaignDetail() {
       <div>
         <CampaignTab campaignSchedule={tempCampaignSchedule}
           campaignInfo={tempCampaignInfo}
+          campaignDialSpeedInfo={tempCampaignDialSpeedInfoParam}
           onCampaignOutgoingOrderChange={(value) => handleCampaignOutgoingOrderChange(value)}
           onCampaignScheduleChange={(value) => handleCampaignScheduleChange(value)}
           onCampaignOutgoingStrategyChange={(value) => handleOutgoingStrategyTabChange(value)}
+          onCampaignOutgoingMethodChange={(value) => handleOutgoingMethodTabChange(value)}
+          onHandleCallPacingTabChange={(value) => handleCallPacingTabChange(value)}
+          onHandleAdditionalInfoTabChange={(value) => handleAdditionalInfoTabChange(value)}
+          onHandleCallbackTabChange={(value) => handleCallbackTabChange(value)}
+          onHandleNotificationTabChange={(value) => handleNotificationTabChange(value)}
         />
       </div>
       <SkillListPopup
@@ -808,10 +1122,10 @@ export default function CampaignDetail() {
         type={alertState.type}
         isOpen={alertState.isOpen}
         onClose={() => {
-          handleCampaignSaveExecute();
+          alertState.onClose()
         }}
         onCancle={() => {
-          setAlertState((prev) => ({ ...prev, isOpen: false }));
+          alertState.onCancle && alertState.onCancle()
         }}/>
       <CallingNumberPopup
         param={inputCallingNumber}

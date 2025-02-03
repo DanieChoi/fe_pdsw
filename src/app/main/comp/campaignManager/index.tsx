@@ -8,7 +8,7 @@ import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkill
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
-import { useMainStore, useCampainManagerStore } from '@/store';
+import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 
 type Props = {
   campaignId?: string;
@@ -17,6 +17,8 @@ type Props = {
 const CampaignManager = ({campaignId}: Props) => {
   
   const { tenants } = useMainStore();
+  const { campaignIdForUpdateFromSideMenu } = useTabStore();
+
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
   
   const [campaignHeaderSearchParam,setCampaignHeaderSearchParam] = useState<CampaignHeaderSearch>();
@@ -80,12 +82,15 @@ const CampaignManager = ({campaignId}: Props) => {
     }
   }, [tenants]);
 
+  console.log('campaignIdForUpdateFromSideMenu render : ', campaignIdForUpdateFromSideMenu);
+  
+
   return (
     <div>
       <div className='flex flex-col gap-4'>
-          <CampaignManagerHeader campaignId={campaignId} onSearch={handleCampaignHeaderSearch}/>
+          <CampaignManagerHeader campaignId={campaignIdForUpdateFromSideMenu||''} onSearch={handleCampaignHeaderSearch}/>
           <div className="flex gap-5">
-            <CampaignManagerList campaignId={campaignId} campaignHeaderSearchParam={campaignHeaderSearchParam}/>
+            <CampaignManagerList campaignId={campaignIdForUpdateFromSideMenu||''} campaignHeaderSearchParam={campaignHeaderSearchParam}/>
             <CampaignManagerDetail />
           </div>
         </div>

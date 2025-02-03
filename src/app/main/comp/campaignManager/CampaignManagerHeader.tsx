@@ -51,7 +51,7 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
   }
 
   useEffect(() => {
-    if( typeof campaignId != 'undefined' ){
+    if( typeof campaignId != 'undefined' && campaignId != '' ){
       setReadonly(true);
     }
   }, [campaignId]);
@@ -130,7 +130,9 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
         />
       </div>
         <div className="flex justify-end gap-2">
+          {!readonly &&
           <CommonButton onClick={onHeaderSearch}>조회</CommonButton>
+          }
         </div>
       {/* ... 나머지 필드들 ... */}
     </div>

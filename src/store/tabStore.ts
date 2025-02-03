@@ -10,6 +10,7 @@ export interface TabItem {
   icon: string;
   href: string;
   content: React.ReactNode;
+  campaignId?: string;
 }
 
 export interface TabSection {
@@ -35,6 +36,9 @@ export interface TabLayoutStore {
   activeTabKey: string | null;     // uniqueKey를 위한 새로운 필드 추가
   rows: TabRow[];
   tabGroups: TabGroup[];
+  campaignIdForUpdateFromSideMenu: string | null;
+  setCampaignIdForUpdateFromSideMenu: (id: string | null) => void;
+  
   addTab: (tab: TabItem) => void;
   // removeTab: (tabId: number) => void;
   removeTab: (tabId: number, uniqueKey: string) => void;  // uniqueKey 매개변수 추가
@@ -50,17 +54,19 @@ export interface TabLayoutStore {
   removeTabGroup: (groupId: string) => void;
   moveTabToGroup: (tabId: number, groupId: string) => void;
   getTabCountById: (tabId: number) => number;
+  openCampaignManagerForUpdate: (campaignId: string, label: string) => void;
+  openCampaignProgressInfo: (campaignId: string, label: string) => void;
 }
 
 // const generateUniqueId = (prefix: string, existingIds: string[]) => {
 //   let counter = 1;
 //   let newId = `${prefix}-${counter}`;
-  
+
 //   while (existingIds.includes(newId)) {
 //     counter++;
 //     newId = `${prefix}-${counter}`;
 //   }
-  
+
 //   return newId;
 // };
 
@@ -75,12 +81,12 @@ export interface TabLayoutStore {
 const generateUniqueId = (prefix: string, existingIds: string[]) => {
   let counter = 1;
   let newId = `${prefix}-${counter}`;
-  
+
   while (existingIds.includes(newId)) {
     counter++;
     newId = `${prefix}-${counter}`;
   }
-  
+
   return newId;
 };
 
@@ -128,11 +134,11 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     return count;
   },
 
-    setActiveTab: (tabId: number, uniqueKey: string) => set(state => {
+  setActiveTab: (tabId: number, uniqueKey: string) => set(state => {
     const tab = state.openedTabs.find(t => t.id === tabId && t.uniqueKey === uniqueKey);
     if (!tab) return state;
 
-    return { 
+    return {
       ...state,
       activeTabId: tabId,
       activeTabKey: uniqueKey
@@ -142,7 +148,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
   addTab: (tab) => set((state) => {
     // 이미 열려있는 탭인 경우
     if (state.openedTabs.some(t => t.id === tab.id && t.uniqueKey === tab.uniqueKey)) {
-      return { 
+      return {
         activeTabId: tab.id,
         activeTabKey: tab.uniqueKey
       };
@@ -181,20 +187,20 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
 
   removeTab: (tabId: number, uniqueKey: string) => set((state) => {
     // uniqueKey를 기준으로 정확한 탭 찾기
-    const newTabs = state.openedTabs.filter((tab) => 
+    const newTabs = state.openedTabs.filter((tab) =>
       !(tab.id === tabId && tab.uniqueKey === uniqueKey)
     );
-  
+
     // 현재 활성화된 탭이 삭제되는 경우
     let newActiveTabId = state.activeTabId;
     let newActiveTabKey = state.activeTabKey;
-    
+
     if (state.activeTabId === tabId && state.activeTabKey === uniqueKey) {
       // 삭제되는 탭의 인덱스 찾기
       const index = state.openedTabs.findIndex(
         (t) => t.id === tabId && t.uniqueKey === uniqueKey
       );
-      
+
       // 다음 탭이나 이전 탭을 활성화
       const nextTab = newTabs[index] || newTabs[index - 1];
       if (nextTab) {
@@ -205,7 +211,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
         newActiveTabKey = null;
       }
     }
-  
+
     // rows의 sections에서도 해당 특정 탭만 제거
     const updatedRows = state.rows.map((row) => {
       const updatedSections = row.sections
@@ -216,13 +222,13 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
           ),
         }))
         .filter((sec) => sec.id === 'default' || sec.tabs.length > 0);
-  
+
       return {
         ...row,
         sections: adjustSectionWidths(updatedSections),
       };
     });
-  
+
     // tabGroups에서도 해당 특정 탭만 제거
     const updatedGroups = state.tabGroups
       .map((group) => ({
@@ -232,7 +238,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
         ),
       }))
       .filter((g) => g.tabs.length > 0);
-  
+
     return {
       ...state,
       openedTabs: newTabs,
@@ -249,9 +255,9 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
 
     // 새로운 uniqueKey 생성
     const uniqueKey = `tab-${tabId}-${Date.now()}`;
-    
+
     // 복제된 탭에 uniqueKey 추가
-    const duplicatedTab = { 
+    const duplicatedTab = {
       ...originalTab,
       uniqueKey,
     };
@@ -277,7 +283,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
 
     // openedTabs에 복제된 탭 추가
     const newOpenedTabs = [...state.openedTabs, duplicatedTab];
-    
+
     const rowToUpdate = state.rows[targetRowIndex];
     const sectionToUpdate = rowToUpdate.sections[targetSectionIndex];
 
@@ -308,7 +314,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
       activeTabId: duplicatedTab.id,      // 복제된 탭의 id
       activeTabKey: duplicatedTab.uniqueKey  // 복제된 탭의 uniqueKey
     };
-}),
+  }),
 
   addRow: () => set((state) => {
     const existingIds = state.rows.map(r => r.id);
@@ -496,7 +502,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     if (!tab) return state;
 
     // Extract numeric ID if necessary
-    const numericTabId = (typeof tabId === 'string' && String(tabId).startsWith('tab-')) ? 
+    const numericTabId = (typeof tabId === 'string' && String(tabId).startsWith('tab-')) ?
       parseInt(String(tabId).replace('tab-', '')) : (typeof tabId === 'number' ? tabId : 0);
 
     // 모든 섹션에서 제거
@@ -566,7 +572,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     if (!tab) return state;
 
     // Extract numeric ID if necessary
-    const numericTabId = typeof tabId === 'string' ? 
+    const numericTabId = typeof tabId === 'string' ?
       parseInt(String(tabId).replace('tab-', '')) : (typeof tabId === 'number' ? tabId : 0);
 
     // 모든 섹션에서 제거
@@ -594,4 +600,109 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
       tabGroups: updatedGroups,
     };
   }),
+
+  openCampaignManagerForUpdate: (campaignId: string, label: string) => set((state) => {
+    const existingTab = state.openedTabs.find(tab => tab.id === 2);
+
+    if (existingTab) {
+      // Update existing campaign manager tab
+      const updatedTab = {
+        ...existingTab,
+        campaignId: campaignId,
+        title: label !== "" ? `캠페인 관리 - ${label}` : `캠페인 관리`
+      };
+
+      const updatedTabs = state.openedTabs.map(tab =>
+        tab.uniqueKey === existingTab.uniqueKey ? updatedTab : tab
+      );
+
+      const updatedRows = state.rows.map(row => ({
+        ...row,
+        sections: row.sections.map(section => ({
+          ...section,
+          tabs: section.tabs.map(tab =>
+            tab.uniqueKey === existingTab.uniqueKey ? updatedTab : tab
+          )
+        }))
+      }));
+
+      return {
+        openedTabs: updatedTabs,
+        rows: updatedRows,
+        activeTabId: 2,
+        activeTabKey: existingTab.uniqueKey,
+      };
+    }
+
+    // Create new campaign manager tab
+    const newTabKey = `2-${campaignId}-${Date.now()}`;
+    const newTab = {
+      id: 2,
+      uniqueKey: newTabKey,
+      title: label !== "" ? `캠페인 관리 - ${label}` : `캠페인 관리`,
+      icon: "header-menu/캠페인관리.svg",
+      href: "/campaign",
+      campaignId: campaignId,
+      content: null
+    };
+
+    return {
+      openedTabs: [...state.openedTabs, newTab],
+      activeTabId: 2,
+      activeTabKey: newTabKey,
+      rows: state.rows.map(row =>
+        row.id === 'row-1' ? {
+          ...row,
+          sections: row.sections.map(section =>
+            section.id === 'default' ? {
+              ...section,
+              tabs: [...section.tabs, newTab]
+            } : section
+          )
+        } : row
+      )
+    };
+  }),
+
+  openCampaignProgressInfo: (campaignId: string, label: string) => set((state) => {
+    const newTabKey = `4-${campaignId}-${Date.now()}`;
+    const newTab = {
+      id: 4,
+      uniqueKey: newTabKey,
+      title: label !== "" ? `총진행상황 - ${label}` : "총진행상황",
+      icon: "/header-menu/총진행상황.svg",
+      href: "/status",
+      content: null,
+      campaignId: campaignId  // 캠페인 ID 저장
+    };
+
+    // 이전 총진행상황 탭 찾기
+    const existingTabs = state.openedTabs.filter(tab => tab.id === 4);
+    
+    // 이전 탭들 제거
+    existingTabs.forEach(tab => {
+      state.removeTab(tab.id, tab.uniqueKey);
+    });
+
+    return {
+      openedTabs: [...state.openedTabs, newTab],
+      activeTabId: 4,
+      activeTabKey: newTabKey,
+      rows: state.rows.map(row =>
+        row.id === 'row-1' ? {
+          ...row,
+          sections: row.sections.map(section =>
+            section.id === 'default' ? {
+              ...section,
+              tabs: [...section.tabs, newTab]
+            } : section
+          )
+        } : row
+      )
+    };
+  }),
+
+  campaignIdForUpdateFromSideMenu: null,
+  setCampaignIdForUpdateFromSideMenu: (id) => set({ campaignIdForUpdateFromSideMenu: id }),
+
 }));

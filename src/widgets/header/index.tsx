@@ -24,42 +24,48 @@ export default function Header() {
   const _sessionKey = Cookies.get('session_key') || '';
   const _tenantId = Number(Cookies.get('tenant_id'));
   const [alertState, setAlertState] = useState(errorMessage);
-  
+
   const {
     setCampaigns,
     setTenants,
     setCounselers,
   } = useMainStore();
 
-  const { 
-    addTab, 
-    openedTabs, 
-    duplicateTab, 
-    activeTabId, 
+  const {
+    addTab,
+    removeTab,
+    openedTabs,
+    duplicateTab,
+    activeTabId,
     activeTabKey,
-    getTabCountById, 
-    rows, 
-    tabGroups, 
-    setActiveTab 
+    getTabCountById,
+    rows,
+    tabGroups,
+    setActiveTab,
+    openCampaignManagerForUpdate,
+    setCampaignIdForUpdateFromSideMenu
   } = useTabStore();
 
   const handleMenuClick = (item: MenuItem, event: React.MouseEvent<HTMLButtonElement>) => {
     if (event.ctrlKey) {
       duplicateTab(item.id);
     } else {
+      // 해당 아이템의 이전 탭들을 모두 찾아서 제거
       const existingTabs = openedTabs.filter(tab => tab.id === item.id);
-      if (existingTabs.length > 0) {
-        const lastTab = existingTabs[existingTabs.length - 1];
-        setActiveTab(lastTab.id, lastTab.uniqueKey);
-      } else {
-        const newTabKey = `${item.id}-${Date.now()}`;
-        addTab({ 
-          ...item, 
-          uniqueKey: newTabKey,
-          content: item.content || null 
-        });
-      }
+      existingTabs.forEach(tab => {
+        removeTab(tab.id, tab.uniqueKey);
+      });
+  
+      // 새로운 탭 추가
+      const newTabKey = `${item.id}-${Date.now()}`;
+      addTab({
+        ...item,
+        uniqueKey: newTabKey,
+        content: item.content || null
+      });
     }
+    
+    setCampaignIdForUpdateFromSideMenu(null);
   };
 
   const isTabOpened = (itemId: number) => {
@@ -131,7 +137,7 @@ export default function Header() {
       fetchCounselorList({
         session_key: _sessionKey,
         tenant_id: 1,
-        roleId:6
+        roleId: 6
       });
 
     }
@@ -168,7 +174,7 @@ export default function Header() {
               />
               <span>홍길동(관리자)</span>
             </div>
-            <Button 
+            <Button
               variant="ghost"
               className="flex items-center space-x-1 text-sm text-white hover:bg-[#56CAD6]/20"
               onClick={handleLoginOut}

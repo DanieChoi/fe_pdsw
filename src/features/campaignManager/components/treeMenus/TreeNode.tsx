@@ -1,7 +1,11 @@
-// TreeNode.tsx
+// src\features\campaignManager\components\treeMenus\TreeNode.tsx
+"use client";
+
 import { TreeNodeProps } from "@/components/shared/layout/SidebarPresenter";
 import { ContextMenuForTreeNode } from "./ContextMenuForTreeNode";
 import { ChevronRight, ChevronDown, Folder, FileText } from "lucide-react";
+import { useTabStore } from '@/store/tabStore';
+import { useCallback } from 'react';
 
 export function TreeNode({
   item,
@@ -17,6 +21,23 @@ export function TreeNode({
   const isSelected = selectedNodeId === item.id;
   const statusIcon = getStatusIcon(item.status);
 
+  const { openCampaignManagerForUpdate, setCampaignIdForUpdateFromSideMenu } = useTabStore();
+
+  const handleDoubleClick = useCallback(() => {
+    if (item.type !== "campaign") return;
+    openCampaignManagerForUpdate(item.id, item.label);
+    setCampaignIdForUpdateFromSideMenu(item.id);
+  }, [item, openCampaignManagerForUpdate, setCampaignIdForUpdateFromSideMenu]);
+
+  // 일반 클릭
+  const handleClick = useCallback(() => {
+    onNodeSelect(item.id);
+    if (hasChildren) {
+      onNodeToggle(item.id);
+    }
+  }, [item.id, hasChildren, onNodeSelect, onNodeToggle]);
+
+  // 우클릭 메뉴 예시
   const handleEdit = () => {
     console.log('Edit clicked:', { id: item.id, label: item.label, type: item.type });
   };
@@ -32,15 +53,7 @@ export function TreeNode({
   const handleCopy = () => {
     console.log('Copy clicked:', { id: item.id, label: item.label, type: item.type });
   };
-
-  const handleClick = () => {
-    console.log('Node clicked:', { id: item.id, label: item.label, type: item.type });
-    onNodeSelect(item.id);
-    if (hasChildren) {
-      onNodeToggle(item.id);
-    }
-  };
-
+  
   return (
     <div className="select-none">
       <ContextMenuForTreeNode
@@ -54,6 +67,7 @@ export function TreeNode({
           className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150
             ${isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""}`}
           onClick={handleClick}
+          onDoubleClick={handleDoubleClick}
           style={{ paddingLeft: `${level * 16 + 8}px` }}
         >
           <div className="flex items-center w-full gap-2">

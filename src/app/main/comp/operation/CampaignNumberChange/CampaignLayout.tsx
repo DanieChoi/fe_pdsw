@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import DataGrid, { CellClickArgs } from "react-data-grid";
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useMainStore, useCampainManagerStore } from '@/store';
-import CampaignModal from './CampaignModal';
+import CampaignModal from '../CampaignModal';
 
 import { CommonButton } from "@/components/shared/CommonButton";
 import { Label } from "@/components/ui/label";

@@ -163,25 +163,31 @@ const OutgoingStrategyTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoing
   const handleMaxCallsRowsChange = (newRows: MaxCallsRow[]) => {
     setMaxCallsRows(newRows);
     const tempdata = newRows[0].call1+','+newRows[0].call2+','+newRows[0].call3+','+newRows[0].call4+','+newRows[0].call5
-    setTempOutgoingStrategyTab({...tempOutgoingStrategyTab      
+    onCampaignOutgoingStrategyChange({...tempOutgoingStrategyTab      
         , changeYn: true
         , campaignInfoChangeYn: true
         , redial_strategy: tempOutgoingStrategyTab.redial_strategy.map((val,index) => tempdata.split(',')[index]+val.substring(val.indexOf(':')))
     });
   };
 
+  const changeRedialStrategyData = (row: MainRow,value:string) => {
+    const tempRedialStrategy = value.substring(0,value.indexOf(':')+1)+'2.' + row.count1+'.'+row.duration1+'\/3.' 
+    + row.count2+'.'+row.duration2 + '\/4.'
+    + row.count3+'.'+row.duration3 + '\/5.'
+    + row.count4+'.'+row.duration4 + '\/6.'
+    + row.count5+'.'+row.duration5 + '\/10.'
+    + row.count6+'.'+row.duration6 + '\/99.'
+    + row.count7+'.'+row.duration7 + value.substring(value.indexOf('/2501'))
+    ;
+    return tempRedialStrategy;
+  }
+
   const handleMainRowsChange = (newRows: MainRow[]) => {
     setRows(newRows);
-    const tempRedialStrategy = newRows[0].count1+'.'+newRows[0].duration1+'\/3.' 
-    + newRows[0].count2+'.'+newRows[0].duration2 + '\/4.'
-    + newRows[0].count3+'.'+newRows[0].duration3 + '\/5.'
-    + newRows[0].count4+'.'+newRows[0].duration4 + '\/6.'
-    + newRows[0].count5+'.'+newRows[0].duration5 + '\/10.'
-    ;
-    setTempOutgoingStrategyTab({...tempOutgoingStrategyTab      
+    onCampaignOutgoingStrategyChange({...tempOutgoingStrategyTab      
         , changeYn: true
         , campaignInfoChangeYn: true
-        // , redial_strategy: tempOutgoingStrategyTab.redial_strategy.map((val,index) => tempdata.split(',')[index]+val.substring(val.indexOf(':')))
+        , redial_strategy: tempOutgoingStrategyTab.redial_strategy.map((val,index) => changeRedialStrategyData(newRows[index],val))
     });
   };
 
@@ -242,7 +248,9 @@ const OutgoingStrategyTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoing
             className="pb-1"
             title="재시도 전략 설정"
             buttons={[
-              { label: "초기화", onClick: () => console.log(""), variant: "secondary" },
+              { label: "초기화", onClick: () => onCampaignOutgoingStrategyChange({...tempOutgoingStrategyTab
+                , onInit: true
+              }), variant: "secondary" },
           ]}
           />
           <div className="grid-custom-wrap overflow-auto w-full h-[184px]">
@@ -257,8 +265,16 @@ const OutgoingStrategyTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoing
         </div>
       </div>
       <div className="flex justify-end gap-2 mt-5">
-        <CommonButton variant="secondary">확인</CommonButton>
-        <CommonButton variant="secondary">취소</CommonButton>
+        <CommonButton variant="secondary" onClick={()=> 
+          onCampaignOutgoingStrategyChange({...tempOutgoingStrategyTab
+            , onSave: true
+          })
+        }>확인</CommonButton>
+        <CommonButton variant="secondary" onClick={()=> 
+          onCampaignOutgoingStrategyChange({...tempOutgoingStrategyTab
+            , onClosed: true
+          })
+        }>취소</CommonButton>
       </div>
     </div>
   );

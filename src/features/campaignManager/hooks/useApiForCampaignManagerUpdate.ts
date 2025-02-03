@@ -1,5 +1,5 @@
 // src/features/campaignManager/hooks/useApiForCampaignManagerUpdate.ts
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchCampaignManagerUpdate } from '../api/mainCampaignManagerUpdate';
 import { UseMutationOptions } from '@tanstack/react-query';
 import { CampaignInfoUpdateRequest, UpdateResponse, CampaignApiError } from '../types/campaignManagerIndex';
@@ -7,6 +7,7 @@ import { CampaignInfoUpdateRequest, UpdateResponse, CampaignApiError } from '../
 export function useApiForCampaignManagerUpdate(
   options?: UseMutationOptions<UpdateResponse, CampaignApiError, CampaignInfoUpdateRequest>
 ) {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ['mainCampaignManagerUpdate'],
     mutationFn: fetchCampaignManagerUpdate,
@@ -16,6 +17,9 @@ export function useApiForCampaignManagerUpdate(
         message: data.result_msg,
       });
       options?.onSuccess?.(data, variables, context);
+
+    queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu"] });
+
     },
     onError: (error: CampaignApiError, variables: CampaignInfoUpdateRequest, context: unknown) => {
       // console.error('API Error:', error);

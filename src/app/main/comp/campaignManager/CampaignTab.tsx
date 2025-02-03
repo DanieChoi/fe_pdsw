@@ -12,6 +12,11 @@ import AdditionalInfoTab from "./AdditionalInfoTab";
 import { OperationTimeParam
   , OutgoingOrderTabParam
   , OutgoingStrategyTabParam 
+  , OutgoingMethodTabParam
+  , CallPacingTabParam
+  , CallbackTabParam
+  , NotificationTabParam
+  , AdditionalInfoTabParam
 } from './CampaignManagerDetail';
 import { CampaignScheDuleListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
@@ -19,16 +24,28 @@ import { MainDataResponse } from '@/features/auth/types/mainIndex';
 type Props = {
   campaignSchedule: CampaignScheDuleListDataResponse;
   campaignInfo: MainDataResponse;
+  campaignDialSpeedInfo: CallPacingTabParam;
   onCampaignScheduleChange: (param:OperationTimeParam) => void;
   onCampaignOutgoingOrderChange: (param:OutgoingOrderTabParam) => void;
   onCampaignOutgoingStrategyChange: (param:OutgoingStrategyTabParam) => void;
+  onCampaignOutgoingMethodChange: (param:OutgoingMethodTabParam) => void;
+  onHandleCallPacingTabChange: (param:CallPacingTabParam) => void;
+  onHandleCallbackTabChange: (param:CallbackTabParam) => void;
+  onHandleNotificationTabChange: (param:NotificationTabParam) => void;
+  onHandleAdditionalInfoTabChange: (param:AdditionalInfoTabParam) => void;
 };
 
 const CampaignTab: React.FC<Props> = ({ campaignSchedule
   , campaignInfo
+  , campaignDialSpeedInfo
   , onCampaignScheduleChange
   , onCampaignOutgoingOrderChange 
   , onCampaignOutgoingStrategyChange
+  , onCampaignOutgoingMethodChange
+  , onHandleCallPacingTabChange
+  , onHandleCallbackTabChange
+  , onHandleNotificationTabChange
+  , onHandleAdditionalInfoTabChange
 }) => {
   return (
     <Tabs defaultValue="tab1" className="w-full">
@@ -46,7 +63,7 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
         </TabsList>
       </div>
       <TabsContent value="tab1">
-        <OperationTimeTab campaignSchedule={campaignSchedule} onCampaignScheduleChange={onCampaignScheduleChange} />
+        <OperationTimeTab campaignInfo={campaignInfo} campaignSchedule={campaignSchedule} onCampaignScheduleChange={onCampaignScheduleChange} />
       </TabsContent>
       <TabsContent value="tab2">
         <OutgoingOrderTab campaignInfo={campaignInfo} onCampaignOutgoingOrderChange={onCampaignOutgoingOrderChange} />
@@ -55,22 +72,22 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
         <OutgoingStrategyTab campaignInfo={campaignInfo} onCampaignOutgoingStrategyChange={onCampaignOutgoingStrategyChange} />
       </TabsContent>
       <TabsContent value="tab4">
-        <OutgoingMethodTab />
+        <OutgoingMethodTab campaignInfo={campaignInfo} onCampaignOutgoingMethodChange={onCampaignOutgoingMethodChange} />
       </TabsContent>
       <TabsContent value="tab5">
-        <CallPacingTab />
+        <CallPacingTab campaignDialSpeedInfo={campaignDialSpeedInfo} onHandleCallPacingTabChange={onHandleCallPacingTabChange} />
       </TabsContent>
       <TabsContent value="tab6">
-        <CallbackTab />
+        <CallbackTab campaignInfo={campaignInfo} onHandleCallbackTabChange={onHandleCallbackTabChange} />
       </TabsContent>
       <TabsContent value="tab7">
-        <NotificationTab />
+        <NotificationTab campaignInfo={campaignInfo} onHandleNotificationTabChange={onHandleNotificationTabChange} />
       </TabsContent>
       <TabsContent value="tab8">
         <AssignedAgentTab />
       </TabsContent>
       <TabsContent value="tab9">
-        <AdditionalInfoTab />
+        <AdditionalInfoTab campaignInfo={campaignInfo} onHandleAdditionalInfoTabChange={onHandleAdditionalInfoTabChange} />
       </TabsContent>
     </Tabs>
   );
