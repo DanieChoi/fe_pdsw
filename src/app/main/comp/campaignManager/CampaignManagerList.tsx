@@ -17,6 +17,7 @@ const dialModeList = [
 type Column = {
   key: string;
   name: string;
+  width?: number;
 };
 
 type Row = {
@@ -31,11 +32,11 @@ type Row = {
 };
 
 const columns: Column[] = [
-  { key: "no", name: "NO." },
+  { key: "no", name: "NO.",width: 50  },
   { key: "idName", name: "아이디+이름" },
   { key: "startDate", name: "시작일자" },
   { key: "endDate", name: "종료일자" },
-  { key: "skill", name: "스킬" },
+  { key: "skill", name: "스킬" ,width: 50},
   { key: "dialMode", name: "다이얼모드" },
   { key: "callingNumber", name: "발신번호" },
 ];
@@ -117,6 +118,8 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
       });
       
       setSelectedCampaign(tempCampaigns[0]);
+    }else{
+      setTempData([]);
     }
   }, [tempCampaigns,schedules,campaignSkills,dialModeList,callingNumbers]);
 
@@ -127,7 +130,7 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
   }, [selectedCampaign]);
 
   useEffect(() => {
-    if( typeof campaignHeaderSearchParam != 'undefined' && typeof campaignId === 'undefined' ){
+    if( typeof campaignHeaderSearchParam != 'undefined' && campaignId === '' ){
       let _tempCampaigns = campaigns;
       if( campaignHeaderSearchParam.tenantId > 0 ){
         _tempCampaigns = _tempCampaigns.filter((campaign) => campaign.tenant_id === Number(campaignHeaderSearchParam.tenantId));

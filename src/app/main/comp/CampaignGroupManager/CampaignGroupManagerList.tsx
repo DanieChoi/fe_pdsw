@@ -1,18 +1,11 @@
 // components/main/CampaignList.tsx
-import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { MainDataResponse, TenantListDataResponse } from '@/features/auth/types/mainIndex';
 import { useMainStore, useCampainManagerStore } from '@/store';
 import {CampaignGroupHeaderSearch} from './CampaignGroupManagerHeader';
 import { useEffect, useState } from 'react';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { useApiForCampaignAgent } from '@/features/campaignManager/hooks/useApiForCampaignAgent';
-import DataGrid from "react-data-grid";
-
-const dialModeList = [
-  {dial_id:1, dial_name: 'Power'},
-  {dial_id:2, dial_name: 'Progressive'},
-  {dial_id:3, dial_name: 'Predictive'},
-  {dial_id:4, dial_name: 'System Preview'},
-];
+import DataGrid, { CellClickArgs, SelectColumn } from "react-data-grid";
 
 type Column = {
   key: string;
@@ -21,29 +14,37 @@ type Column = {
 
 type Row = {
   no: number;
-  division: number;
-  startTime: string;
-  endTime: string;
+  tenantId: number;
+  tenantName: string;
+  campaignGroupId: number;
+  campaignGroupName: string;
 };
 
 const columns: Column[] = [
   { key: "no", name: "NO." },
-  { key: "division", name: "테넌트" },
-  { key: "startTime", name: "캠페인 그룹 아이디" },
-  { key: "endTime", name: "캠페인 그룹명" },
+  { key: "tenantName", name: "테넌트" },
+  { key: "campaignGroupId", name: "캠페인 그룹 아이디" },
+  { key: "campaignGroupName", name: "캠페인 그룹명" },
+];
+
+const downColumns = [
+    SelectColumn,
+  { key: "no", name: "NO.",width: 50 },
+  { key: "tenantName", name: "테넌트" },
+  { key: "campaignGroupId", name: "캠페인 그룹 아이디" },
+  { key: "campaignGroupName", name: "캠페인 그룹명" },
 ];
 
 interface DataProps {
   no: number;
-  division: number;
-  startTime: string;
-  endTime: string;
+  tenantId: number;
+  tenantName: string;
+  campaignGroupId: number;
+  campaignGroupName: string;
 }
 
 const rows: Row[] = [
-  { no: 1, division: 1, startTime: "00:00", endTime: "00:00" },
-  { no: 2, division: 2, startTime: "01:00", endTime: "02:00" },
-  { no: 3, division: 3, startTime: "02:00", endTime: "03:00" },
+  { no: 1, tenantId: 1, tenantName: "00:00",campaignGroupId:1, campaignGroupName: "00:00" },
 ];
 
 type Props = {
@@ -56,10 +57,9 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
   const { schedules, callingNumbers, campaignSkills  } = useCampainManagerStore();
   const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>([]);
   const [tempData, setTempData] = useState<DataProps[]>([]);
-  
-  const handleRowClick = (campaign: MainDataResponse) => {
-    setSelectedCampaign(campaign);
-  };
+  const [tempDownData, setTempDownData] = useState<DataProps[]>([]);
+  const [tenantId, setTenantId] = useState<number>(-1);
+  const [tempTenants, setTempTenants] = useState<TenantListDataResponse[]>([]);
   
   // 캠페인 소속 상담사 리스트 요청
   const { mutate: fetchCampaignAgents } = useApiForCampaignAgent({
@@ -74,17 +74,43 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
   });
   
   useEffect(() => {
-    if( campaigns && typeof campaignId != 'undefined' && campaignId != '' ){
-      setTempCampaigns(campaigns.filter((campaign) => campaign.campaign_id === Number(campaignId)));
+    if( tenants && tenants.length > 0 ){
+      setTempTenants(tenants);
+    }
+  }, [tenants]);
+
+  useEffect(() => {
+    if( campaigns && tenantId > -1 ){
+      setTempCampaigns(campaigns.filter((campaign) => campaign.tenant_id === Number(tenantId)));
     }else{
       setTempCampaigns(campaigns);
     }
-    // setSelectedCampaign(tempCampaigns[0]);
-  }, [campaigns, campaignId]);
+    if( tempCampaigns.length > 0 ){
+      setSelectedCampaign(tempCampaigns[0]);
+    }else{
+      setSelectedCampaign(null);
+    }
+  }, [campaigns, tenantId]);
 
   useEffect(() => {
     if( tempCampaigns.length > 0 ){
+      setTempDownData([]);
+      tempCampaigns.map((data, index) => {
+        setTempDownData((prev) => [
+          ...prev,
+          {
+            no: index + 1,
+            tenantId: data.tenant_id,
+            tenantName: tempTenants.filter((tenant) => tenant.tenant_id === data.tenant_id)
+            .map((data) => data.tenant_name)[0],
+            campaignGroupId: data.campaign_id,
+            campaignGroupName: data.campaign_name,
+          }
+        ]);
+      });
       setSelectedCampaign(tempCampaigns[0]);
+    }else{
+      setTempDownData([]);
     }
   }, [tempCampaigns]);
 
@@ -96,42 +122,47 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
 
   useEffect(() => {
     if( typeof campaignGroupHeaderSearchParam != 'undefined' ){
-      // let _tempCampaigns = campaigns;
-      // if( campaignHeaderSearchParam.tenantId > 0 ){
-      //   _tempCampaigns = _tempCampaigns.filter((campaign) => campaign.tenant_id === Number(campaignHeaderSearchParam.tenantId));
-      // }
-      // if( campaignHeaderSearchParam.dailMode > 0 ){
-      //   _tempCampaigns = _tempCampaigns.filter((campaign) => campaign.dial_mode === Number(campaignHeaderSearchParam.dailMode));
-      // }
-      // if( campaignHeaderSearchParam.campaignName != '' ){
-      //   _tempCampaigns = _tempCampaigns.filter((campaign) => campaign.campaign_name.includes(campaignHeaderSearchParam.campaignName));
-      // }
-      // if( campaignHeaderSearchParam.callNumber != '' ){
-      //   const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.calling_number.includes(campaignHeaderSearchParam.callNumber));
-      //   _tempCampaigns = _tempCampaigns.filter((campaign) => 
-      //     tempCallNumber.some(callingNumber => callingNumber.campaign_id === campaign.campaign_id)
-      //   );
-      // }
-      // if( campaignHeaderSearchParam.skill > 0 ){
-      //   const tempCampaignSkills = campaignSkills.filter((campaignSkill) => campaignSkill.skill_id.includes(campaignHeaderSearchParam.skill));
-      //   _tempCampaigns = _tempCampaigns.filter((campaign) => 
-      //     tempCampaignSkills.some(campaignSkill => campaignSkill.campaign_id === campaign.campaign_id)
-      //   );
-      // }
-      
-      // setTempCampaigns(_tempCampaigns);
-      // if( tempCampaigns.length > 0 ){
-      //   setSelectedCampaign(tempCampaigns[0]);
-      // }else{
-      //   setSelectedCampaign(null);
-      // }
+      let _tempTenants = tenants;
+      if( campaignGroupHeaderSearchParam.tenantId > -1 ){
+        _tempTenants = _tempTenants.filter((tenant) => tenant.tenant_id === Number(campaignGroupHeaderSearchParam.tenantId));
+      }
+      if( campaignGroupHeaderSearchParam.campaignGroupName != '' ){
+        _tempTenants = _tempTenants.filter((tenant) => tenant.tenant_name.includes(campaignGroupHeaderSearchParam.campaignGroupName));
+      }
+      setTempTenants(_tempTenants);
     }
-  }, [campaignGroupHeaderSearchParam]);
+  }, [campaignGroupHeaderSearchParam, tenants]);
+
+  useEffect(() => {
+    if( tempTenants.length > 0 ){      
+      setTempData([]);
+      tempTenants.map((data, index) => {
+        setTempData((prev) => [
+          ...prev,
+          {
+            no: index + 1,
+            tenantId: data.tenant_id,
+            tenantName: data.tenant_name,
+            campaignGroupId: data.tenant_id,
+            campaignGroupName: data.tenant_name,
+          }
+        ]);
+      });
+      setTenantId(tempTenants[0].tenant_id);
+    }
+  }, [tempTenants]);
+
+  const handleCellClick = ({ row }: CellClickArgs<Row>) => {
+    setTenantId(row.tenantId);
+  };
+  const handleDownCellClick = ({ row }: CellClickArgs<Row>) => {
+    setSelectedCampaign(tempCampaigns.filter((campaign) => campaign.campaign_id === Number(row.campaignGroupId))[0]);
+  };
 
 
   return (
     <div className="w-[40%] shrink-0">
-      <TitleWrap title="캠페인 그룹 검색목록" totalCount={tempCampaigns.length} />
+      <TitleWrap title="캠페인 그룹 검색목록" totalCount={tempTenants.length} />
       <div className="overflow-x-auto">
         <div className="grid-custom-wrap h-[200px]">
           <DataGrid 
@@ -140,6 +171,7 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
             className="grid-custom" 
             rowHeight={26}
             headerRowHeight={26}
+            onCellClick={handleCellClick}
             />
         </div>
       </div>
@@ -147,11 +179,12 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
       <div className="overflow-x-auto">
         <div className="grid-custom-wrap h-[200px]">
           <DataGrid 
-            columns={columns} 
-            rows={tempData} 
+            columns={downColumns} 
+            rows={tempDownData} 
             className="grid-custom" 
             rowHeight={26}
             headerRowHeight={26}
+            onCellClick={handleDownCellClick}
             />
         </div>
       </div>

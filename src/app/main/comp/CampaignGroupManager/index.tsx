@@ -1,7 +1,7 @@
 // C:\Users\terec\fe_pdsw\src\app\main\comp\CampaignManager\index.tsx
 import React, { useState, useEffect } from 'react'
 import CampaignGroupManagerHeader, {CampaignGroupHeaderSearch} from './CampaignGroupManagerHeader';
-// import CampaignManagerDetail from './CampaignManagerDetail';
+import CampaignGroupManagerDetail from './CampaignGroupManagerDetail';
 import CampaignGroupManagerList from './CampaignGroupManagerList';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
@@ -91,7 +91,7 @@ const CampaignGroupManager = ({campaignId}: Props) => {
           <CampaignGroupManagerHeader onSearch={handleCampaignHeaderSearch}/>
           <div className="flex gap-5">
             <CampaignGroupManagerList campaignId={campaignIdForUpdateFromSideMenu||''} campaignGroupHeaderSearchParam={campaignGroupHeaderSearchParam}/>
-            {/* <CampaignManagerDetail /> */}
+            <CampaignGroupManagerDetail />
           </div>
         </div>
     </div>
