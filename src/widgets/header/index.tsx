@@ -24,6 +24,7 @@ export default function Header() {
   const _sessionKey = Cookies.get('session_key') || '';
   const _tenantId = Number(Cookies.get('tenant_id'));
   const [alertState, setAlertState] = useState(errorMessage);
+  const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
 
   const {
     setCampaigns,
@@ -133,22 +134,33 @@ export default function Header() {
     onSuccess: (data) => {
       console.log('Main API response:', data);
       setCampaigns(data.result_data);
-
-      fetchCounselorList({
-        session_key: _sessionKey,
-        tenant_id: 1,
-        roleId: 6
-      });
+      setShouldFetchCounselors(true);  // 이 시점에 상담사 목록 조회 활성화
 
     }
   });
 
-  const { mutate: fetchCounselorList } = useApiForFetchCounselorList({
-    onSuccess: (data) => {
-      // console.log('Counselors API response:', data);
-      setCounselers(data.counselorList);
-    }
+  // const { mutate: fetchCounselorList } = useApiForFetchCounselorList({
+  //   onSuccess: (data) => {
+  //     // console.log('Counselors API response:', data);
+  //     setCounselers(data.counselorList);
+  //   }
+  // });
+
+  const { data: counselorListData } = useApiForFetchCounselorList({
+    credentials: {
+      // 필요한 credentials 정보
+      session_key: _sessionKey,
+      tenant_id: 1,
+      roleId: 6
+    },
+    enabled: shouldFetchCounselors,  // fetchMain 완료 후에만 실행
   });
+
+  useEffect(() => {
+    if (counselorListData) {
+      setCounselers(counselorListData.result_data);
+    }
+  }, [counselorListData]);
 
   return (
     <div className="flex flex-col">

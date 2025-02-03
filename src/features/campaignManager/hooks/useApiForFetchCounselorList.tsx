@@ -1,21 +1,40 @@
-import { useMutation } from '@tanstack/react-query';
+// import { useMutation } from '@tanstack/react-query';
+// import { MainCredentials, MainResponse } from '@/features/auth/types/mainIndex';
+// import { fetchCounselorList } from '@/features/auth/api/main';
+
+// interface Props {
+//   onSuccess?: (data: any) => void;
+//   onError?: (error: Error) => void;
+// }
+
+// const useApiForFetchCounselorList = (props: Props) => {
+//   return useMutation({
+//     mutationFn: (credentials: MainCredentials) => fetchCounselorList(credentials),
+//     onSuccess: (data) => {
+//       props.onSuccess?.(data);
+//     },
+//     onError: (error: Error) => {
+//       props.onError?.(error);
+//     },
+//   });
+// };
+
+// export default useApiForFetchCounselorList;
+
+import { useQuery } from '@tanstack/react-query';
 import { MainCredentials, MainResponse } from '@/features/auth/types/mainIndex';
 import { fetchCounselorList } from '@/features/auth/api/main';
 
 interface Props {
-  onSuccess?: (data: any) => void;
-  onError?: (error: Error) => void;
+  credentials: MainCredentials;
+  enabled?: boolean;
 }
 
-const useApiForFetchCounselorList = (props: Props) => {
-  return useMutation({
-    mutationFn: (credentials: MainCredentials) => fetchCounselorList(credentials),
-    onSuccess: (data) => {
-      props.onSuccess?.(data);
-    },
-    onError: (error: Error) => {
-      props.onError?.(error);
-    },
+const useApiForFetchCounselorList = ({ credentials, enabled }: Props) => {
+  return useQuery({
+    queryKey: ['counselorList', credentials],
+    queryFn: () => fetchCounselorList(credentials),
+    enabled,
   });
 };
 
