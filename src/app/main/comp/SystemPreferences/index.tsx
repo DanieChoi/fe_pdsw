@@ -26,7 +26,7 @@ interface ChannelRow {
 }
 
 const SystemPreferences = () => {
-    const [refreshCycle, setRefreshCycle] = useState("5");
+    const [refreshCycle, setRefreshCycle] = useState("");
     const [monitoringType, setMonitoringType] = useState("periodic");
     const [equipmentNumber, setEquipmentNumber] = useState("");
     const [equipmentName, setEquipmentName] = useState("");
