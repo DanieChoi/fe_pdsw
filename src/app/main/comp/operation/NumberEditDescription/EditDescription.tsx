@@ -126,6 +126,10 @@ const EditDescription = () => {
     setInputPhone5('');
   };
 
+  const getRowClass = (row: PhoneRow) => {
+    return selectedRow?.id === row.id ? 'bg-[#FFFAEE]' : '';
+  };
+
   return (
     <div className="flex gap-8">
       <div className="w-[580px]">
@@ -139,6 +143,7 @@ const EditDescription = () => {
             selectedRows={selectedRow ? new Set([selectedRow.id]) : new Set()}
             rowHeight={26}
             headerRowHeight={26}
+            rowClass={getRowClass}
           />
         </div>
       </div>

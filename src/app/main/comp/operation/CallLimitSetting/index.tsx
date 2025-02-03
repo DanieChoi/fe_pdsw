@@ -109,6 +109,11 @@ const CampaignSettings = () => {
     setCampaignName(name);
   };
 
+  const getRowClass = (row: Row) => {
+    return selectedRow?.campaign_id === row.campaign_id && 
+           selectedRow?.limit_number === row.limit_number ? 'bg-[#FFFAEE]' : '';
+  };
+
   return (
     <div className="flex gap-8">
       <div className="w-[580px]">
@@ -122,6 +127,7 @@ const CampaignSettings = () => {
             selectedRows={selectedRow ? new Set<string>([selectedRow.campaign_id.toString()]) : new Set<string>()}
             rowHeight={26}
             headerRowHeight={26}
+            rowClass={getRowClass}
           />
         </div>
       </div>

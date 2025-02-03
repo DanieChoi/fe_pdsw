@@ -36,6 +36,7 @@ const SystemPreferences = () => {
     const [selectedDevice, setSelectedDevice] = useState<EquipmentRow | null>(null);
     const [selectedChannel, setSelectedChannel] = useState<ChannelRow | null>(null);
     const [filteredChannels, setFilteredChannels] = useState<ChannelRow[]>([]);
+    const [isEditable, setIsEditable] = useState(false);
 
     const { tenants, campaigns } = useMainStore();
     const [dialingDeviceList, setDialingDeviceList] = useState<DialingDeviceListDataResponse[]>([]);
@@ -83,6 +84,23 @@ const SystemPreferences = () => {
     const { mutate: fetchDialingDeviceList } = useApiForDialingDevice({
         onSuccess: (data) => {
             setDialingDeviceList(data.result_data);
+            
+            // 현재 저장된 장비를 찾아서 선택 상태로 설정
+            const currentDeviceId = equipmentNumber;
+            const savedDevice = data.result_data.find(device => 
+                device.device_id.toString() === currentDeviceId
+            );
+            
+            if (savedDevice) {
+                const deviceRow: EquipmentRow = {
+                    device_id: savedDevice.device_id.toString(),
+                    channel_count: savedDevice.channel_count,
+                    device_name: savedDevice.device_name,
+                    usage: getDeviceUsage(savedDevice.device_id)
+                };
+                setSelectedDevice(deviceRow);
+                setIsEditable(true);
+            }
         }
     });
 
@@ -96,13 +114,10 @@ const SystemPreferences = () => {
     // 채널 정보 수정 api 호출
     const { mutate: fetchChannelEdit } = useApiForChannelEdit({
         onSuccess: (data) => {
-            // 채널 목록 새로고침
             fetchChannelList();
-            // 장비 목록도 함께 새로고침
             fetchDialingDeviceList({
                 tenant_id_array: tenants.map(tenant => tenant.tenant_id)
             });
-            // showAlert('채널 정보가 성공적으로 수정되었습니다.');
         },
         onError: (error) => {
             showAlert('채널 정보 수정 중 오류가 발생했습니다: ' + error.message);
@@ -112,10 +127,10 @@ const SystemPreferences = () => {
     // 신규 등록 API
     const { mutate: createDevice } = useApiForDialingDeviceCreate({
         onSuccess: (data) => {
+            fetchChannelList();
             fetchDialingDeviceList({
                 tenant_id_array: tenants.map(tenant => tenant.tenant_id)
             });
-            // showAlert('새로운 장비가 성공적으로 저장되었습니다.');
         },
         onError: (error) => {
             showAlert('장비 정보 저장 중 오류가 발생했습니다: ' + error.message);
@@ -125,14 +140,12 @@ const SystemPreferences = () => {
     // 수정 API
     const { mutate: updateDevice } = useApiForDialingDeviceUpdate({
         onSuccess: (data) => {
-            console.log('장비 수정 성공: ', data);
+            fetchChannelList();
             fetchDialingDeviceList({
                 tenant_id_array: tenants.map(tenant => tenant.tenant_id)
             });
-            // showAlert('장비 정보가 성공적으로 수정되었습니다.');
         },
         onError: (error) => {
-            console.log('장비 수정 실패: ', error);
             showAlert('장비 정보 수정 중 오류가 발생했습니다: ' + error.message);
         }
     });
@@ -152,6 +165,7 @@ const SystemPreferences = () => {
             setEquipmentName(selectedDevice.device_name);
             setRefreshCycle(selectedDevice.channel_count.toString());
             setMonitoringType(selectedDevice.usage === "사용" ? "oneTime" : "periodic");
+            setIsEditable(true);
             
             const selectedDeviceChannels = channelList.find(
                 channel => channel.device_id.toString() === selectedDevice.device_id
@@ -168,10 +182,21 @@ const SystemPreferences = () => {
 
                 setFilteredChannels(channels);
                 
-                // 첫 번째 채널 자동 선택
+                // 이전에 선택된 채널 번호 확인
+                const prevChannelNumber = selectedChannel?.channelNumber;
+                if (prevChannelNumber !== undefined) {
+                    const existingChannel = channels.find(c => c.channelNumber === prevChannelNumber);
+                    if (existingChannel) {
+                        setSelectedChannel(existingChannel);
+                        setAllocationMode(selectedDeviceChannels.assign_kind.toString());
+                        setAllocationOutboundMode(existingChannel.assignValue.toString());
+                        return; // 첫 번째 채널 선택 방지
+                    }
+                }
+
+                // 첫 번째 채널 선택
                 if (channels.length > 0) {
                     setSelectedChannel(channels[0]);
-                    // 첫 번째 채널의 할당 모드 설정
                     setAllocationMode(selectedDeviceChannels.assign_kind.toString());
                     setAllocationOutboundMode(channels[0].assignValue.toString());
                 } else {
@@ -182,6 +207,8 @@ const SystemPreferences = () => {
             } else {
                 setFilteredChannels([]);
                 setSelectedChannel(null);
+                setAllocationMode("");
+                setAllocationOutboundMode("");
             }
         }
     }, [selectedDevice, channelList]);
@@ -189,7 +216,6 @@ const SystemPreferences = () => {
     // 채널 선택 시 상세 정보 업데이트
     useEffect(() => {
         if (selectedChannel) {
-            // 할당발신모드 설정
             setAllocationOutboundMode(selectedChannel.assignValue.toString());
         }
     }, [selectedChannel]);
@@ -202,7 +228,6 @@ const SystemPreferences = () => {
 
         if (!deviceChannels) return "사용안함";
 
-        // channel_assign 배열의 모든 값이 0인지 확인
         const isAllZero = deviceChannels.channel_assign.every(value => value === 0);
         return isAllZero ? "사용안함" : "사용";
     };
@@ -231,7 +256,7 @@ const SystemPreferences = () => {
             device_name: device.device_name,
             usage: getDeviceUsage(device.device_id)
         }));
-    }, [dialingDeviceList, channelList]); // channelList 의존성 추가
+    }, [dialingDeviceList, channelList]);
 
     const equipmentColumns = [
         { key: "device_id", name: "장비번호" },
@@ -248,7 +273,6 @@ const SystemPreferences = () => {
 
     const handleEquipmentCellClick = ({ row }: CellClickArgs<EquipmentRow>) => {
         setSelectedDevice(row);
-        // setSelectedChannel(null); // 장비 선택 시 채널 선택 초기화
     };
 
     const handleChannelCellClick = ({ row }: CellClickArgs<ChannelRow>) => {
@@ -257,27 +281,23 @@ const SystemPreferences = () => {
 
     // 장비 상세내역의 신규 버튼 클릭 핸들러
     const handleNewEquipment = () => {
-        // 마지막 장비번호 찾기
         const lastDeviceId = dialingDeviceList
             .map(device => device.device_id)
-            .sort((a, b) => a - b)  // 숫자 오름차순 정렬
-            .pop() || 0;  // 비어있을 경우 0
+            .sort((a, b) => a - b)
+            .pop() || 0;
         
-        // 새로운 장비번호 설정 (마지막 번호 + 1)
         const newDeviceId = (lastDeviceId + 1).toString();
 
-        // 장비 관련 상태 초기화
         setSelectedDevice(null);
         setEquipmentNumber(newDeviceId);
         setEquipmentName("");
         setRefreshCycle("");
         setMonitoringType("periodic");
-        
-        // 채널 관련 상태 초기화
         setFilteredChannels([]);
         setSelectedChannel(null);
         setAllocationMode("");
         setAllocationOutboundMode("");
+        setIsEditable(true);
     };
 
     // 장비 저장 핸들러 (신규/수정 공통 검증)
@@ -308,13 +328,10 @@ const SystemPreferences = () => {
         };
 
         if (selectedDevice) {
-            // 수정
             showConfirm('장비 정보를 수정하시겠습니까?', () => {
-                console.log('장비 수정 요청 시작', saveRequest);
                 updateDevice(saveRequest);
             });
         } else {
-            // 신규 등록
             showConfirm('새로운 장비 정보를 저장하시겠습니까?', () => {
                 createDevice(saveRequest);
             });
@@ -325,14 +342,12 @@ const SystemPreferences = () => {
         if (!selectedDevice || !selectedChannel) return;
 
         showConfirm('채널 정보를 수정하시겠습니까?', () => {
-            // 현재 선택된 장비의 채널 할당 정보 찾기
             const deviceChannels = channelList.find(
                 channel => channel.device_id.toString() === selectedDevice.device_id
             );
 
             if (!deviceChannels) return;
 
-            // 채널 할당 배열 업데이트
             const updatedChannelAssign = [...deviceChannels.channel_assign];
             updatedChannelAssign[selectedChannel.channelNumber] = parseInt(allocationOutboundMode);
 
@@ -351,16 +366,24 @@ const SystemPreferences = () => {
         const defaultOptions = [
             { value: "2147483647", label: "모든 캠페인사용" },
             { value: "0", label: "회선사용안함" },
-            // { value: "-1", label: "미할당" }
         ];
         
-        // 캠페인 옵션 추가
         const campaignOptions = campaigns.map(campaign => ({
             value: campaign.campaign_id.toString(),
             label: `ID[${campaign.campaign_id}] : ${campaign.campaign_name}`
         }));
 
         return [...defaultOptions, ...campaignOptions];
+    };
+
+    // 장비 목록용 rowClass 함수
+    const getEquipmentRowClass = (row: EquipmentRow) => {
+        return selectedDevice?.device_id === row.device_id ? 'bg-[#FFFAEE]' : '';
+    };
+    
+    // 채널 목록용 rowClass 함수
+    const getChannelRowClass = (row: ChannelRow) => {
+        return selectedChannel?.channelNumber === row.channelNumber ? 'bg-[#FFFAEE]' : '';
     };
 
     return (
@@ -380,6 +403,7 @@ const SystemPreferences = () => {
                                 selectedRows={selectedDevice ? new Set([selectedDevice.device_id]) : new Set()}
                                 rowHeight={26}
                                 headerRowHeight={26}
+                                rowClass={getEquipmentRowClass}
                             />
                         </div>
                     </div>
@@ -406,7 +430,6 @@ const SystemPreferences = () => {
                                     type="text"
                                     value={equipmentNumber}
                                     onChange={(e) => setEquipmentNumber(e.target.value)}
-                                    // disabled={selectedDevice !== null}
                                     disabled={true}
                                     className="w-full"
                                 />
@@ -417,6 +440,7 @@ const SystemPreferences = () => {
                                     type="text"
                                     value={equipmentName}
                                     onChange={(e) => setEquipmentName(e.target.value)}
+                                    disabled={!isEditable}
                                     className="w-full"
                                 />
                             </div>
@@ -426,6 +450,7 @@ const SystemPreferences = () => {
                                     type="number" 
                                     value={refreshCycle}
                                     onChange={(e) => setRefreshCycle(e.target.value)}
+                                    disabled={!isEditable}
                                     className="w-full"
                                 />
                             </div>
@@ -447,6 +472,7 @@ const SystemPreferences = () => {
                                 rowKeyGetter={(row) => row.channelNumber.toString()}
                                 rowHeight={26}
                                 headerRowHeight={26}
+                                rowClass={getChannelRowClass}
                             />
                         </div>
                     </div>

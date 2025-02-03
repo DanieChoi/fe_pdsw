@@ -5,6 +5,7 @@ import CampaignLayout from './CampaignNumberChange/CampaignLayout'
 import EditDescription from './NumberEditDescription/EditDescription'
 import CallLimitSetting from './CallLimitSetting'
 import DistributionLimit from './DistributionLimit'
+import SkillEdit from './SkillEdit'
 import ConsultResultSetting from './ConsultResultSetting'
 import SuspendView from './SuspendView'
 import Image from 'next/image'
@@ -32,7 +33,7 @@ export default function OperationBoard() {
     { id: 'section2', title: '전화번호별 설명 편집', content: <EditDescription/> },
     { id: 'section3', title: '예약콜 제한 설정', content: <CallLimitSetting/> },
     { id: 'section4', title: '분배호수 제한 설정', content: <DistributionLimit/>},
-    { id: 'section5', title: '스킬편집', content: '화면5' },
+    { id: 'section5', title: '스킬편집', content: <SkillEdit/> },
     { id: 'section6', title: '상담 결과코드 설정', content: <ConsultResultSetting/> },
     { id: 'section7', title: '서스팬드', content: <SuspendView/> },
   ]
