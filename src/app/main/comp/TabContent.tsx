@@ -10,6 +10,7 @@ import OutboundCallProgressPanel from './OutboundCallProgressPanel';
 import OperationBoard from './operation';
 import CampaignManager from './CampaignManager';
 import CampaignUpdatePanel from './CampaignUpdatePanel';
+import CampaignGroupManager from './CampaignGroupManager';
 
 const TabContent = () => {
   const { activeTabId } = useTabStore();
@@ -19,12 +20,7 @@ const TabContent = () => {
     switch (activeTabId) {
       
       case 1:
-        return (
-          <div className="space-y-0">
-            <div>CampaignList 컴포넌트</div>
-            <div>CampaignDetail 컴포넌트</div>
-          </div>
-        );
+        return <div className="p-2"><CampaignGroupManager /></div>;
       case 2:
         return <div className="p-2"><CampaignManager /></div>;
       case 3:
