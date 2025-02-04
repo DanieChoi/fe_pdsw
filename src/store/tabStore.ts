@@ -44,7 +44,7 @@ export interface TabLayoutStore {
   };
   setCounselorSkillAssignmentInfo: (info: { tenantId: string | null; counselorId: string | null; counselorName: string | null } | null) => void;
   setCampaignIdForUpdateFromSideMenu: (id: string | null) => void;
-  
+
   addTab: (tab: TabItem) => void;
   // removeTab: (tabId: number) => void;
   removeTab: (tabId: number, uniqueKey: string) => void;  // uniqueKey 매개변수 추가
@@ -700,7 +700,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
 
     // 이전 총진행상황 탭 찾기
     const existingTabs = state.openedTabs.filter(tab => tab.id === 4);
-    
+
     // 이전 탭들 제거
     existingTabs.forEach(tab => {
       state.removeTab(tab.id, tab.uniqueKey);
@@ -725,22 +725,45 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
   }),
 
   openRebroadcastSettings: (campaignId: string, label: string) => {
+    const state = get();
+
+    // 이전 재발신 설정 탭들 제거
+    const existingTabs = state.openedTabs.filter(tab => tab.id === 20);
+    existingTabs.forEach(tab => {
+      state.removeTab(tab.id, tab.uniqueKey);
+    });
+
+    // 상태 다시 가져오기 (제거된 후의 상태)
+    const updatedState = get();
+
     const newTabKey = `rebroadcast-${campaignId}-${Date.now()}`;
     const newTab = {
       id: 20,
       uniqueKey: newTabKey,
       title: label ? `재발신 설정 - ${label}` : "재발신 설정",
-      icon: "refresh",
+      icon: "/header-menu/발신진행상태.svg",
       href: "/rebroadcast",
       campaignId,
-      content: null
+      content: null,
     };
 
-    return set((state) => ({
-      openedTabs: [...state.openedTabs, newTab],
-      activeTabId: 20,
+    // 새로운 상태 설정
+    return set({
+      openedTabs: [...updatedState.openedTabs, newTab],
+      activeTabId: newTab.id,
       activeTabKey: newTabKey,
-    }));
+      rows: updatedState.rows.map(row =>
+        row.id === 'row-1' ? {
+          ...row,
+          sections: row.sections.map(section =>
+            section.id === 'default' ? {
+              ...section,
+              tabs: [...section.tabs, newTab]
+            } : section
+          )
+        } : row
+      )
+    });
   },
   campaignIdForUpdateFromSideMenu: null,
   setCampaignIdForUpdateFromSideMenu: (id) => set({ campaignIdForUpdateFromSideMenu: id }),
