@@ -6,24 +6,10 @@ export interface TenantItem {
 
 export interface TreeItem {
   id: string;
-  tenantId?: string;  // tenant_id 추가
   label: string;
-  type: 'folder' | 'campaign' | 'counselor' | 'team' | 'group';
-  status?: string;
-  direction?: 'inbound' | 'outbound';
+  type: 'group' | 'team' | 'counselor' | 'folder' | 'campaign' | 'tenant' | 'center';  // 'tenant'와 'center' 추가
   children?: TreeItem[];
-  // 상담원 관련 추가 필드
-  affiliationGroupName?: string;
-  affiliationTeamName?: string;
-  affiliationGroupId?: string;
-  affiliationTeamId?: string;
-  counselorId?: string;
-  blendKind?: string;
-  counselorAffiliation?: {
-    affiliationDepth: string;
-    affiliatedDepartmentId: string;
-    affiliatedDepartmentName: string;
-  }[];
+  tenantId?: string;
 }
 
 export interface CounselorData {
@@ -52,5 +38,4 @@ export interface TabData {
   id: string;
   label: string;
   items: TreeItem[];
-  tenants?: TenantItem[];
 }

@@ -6,6 +6,11 @@ export interface MainCredentials {
   tenant_id: number;
 }
 
+export interface MainCredentials2 {
+  roleId?: any;
+  tenant_id: number | string;
+}
+
 // 스킬마스터정보조회 요청 시 필요한 credentials 타입
 export interface SkillListCredentials {
   tenant_id_array: number[];

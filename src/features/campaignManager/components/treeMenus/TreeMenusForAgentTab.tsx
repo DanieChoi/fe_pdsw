@@ -1,16 +1,13 @@
-// src/features/campaignManager/components/treeMenus/TreeMenusForAgentTab.tsx
 "use client";
 
 import { useState, useEffect } from 'react';
 import { TreeItem } from '@/features/campaignManager/types/typeForSidebar2';
-import { useApiToFetchCounselorTreeData } from "@/features/campaignManager/hooks/useApiToFetchCounselorTreeData";
-import { TreeNode } from './TreeNode';
-import { useSideMenuStore } from "@/store/sideMenuStore";
-import { Building2, User, Users } from 'lucide-react';
 import { TreeNodeForTenantWithAgent } from './TreeNodeForTenantWithAgent';
-
+import { Skeleton } from "@/components/ui/skeleton";
+import { useSideMenuStore } from "@/store/sideMenuStore";
+import { useApiForGetDataForSidebarCounselorTab } from "@/features/auth/hooks/useApiForGetDataForSidebarCounselorTab";
 export function TreeMenusForAgentTab() {
-  const { data: treeData, isLoading, error } = useApiToFetchCounselorTreeData();
+  const { data: treeData, isLoading, error } = useApiForGetDataForSidebarCounselorTab();
   const selectedNodeId = useSideMenuStore((state) => state.selectedNodeId);
   const setSelectedNodeId = useSideMenuStore((state) => state.setSelectedNodeId);
 
@@ -31,9 +28,7 @@ export function TreeMenusForAgentTab() {
     });
   };
 
-  console.log("treeData for 상담원 목록: ", treeData);
-
-  // 초기 확장 설정
+  // 초기 확장 설정 (2레벨까지 자동 확장)
   useEffect(() => {
     if (!initialized && !isLoading && !error && treeData && treeData.length > 0) {
       const items = treeData[0].items || [];
@@ -50,26 +45,50 @@ export function TreeMenusForAgentTab() {
         }
       };
 
-      // 상담원 트리메뉴의 경우 2레벨까지 자동으로 펼치기
+      // 2레벨까지 자동 확장
       expandUpToLevel(items, 0, 2);
 
       setExpandedNodes(newExpanded);
       setInitialized(true);
     }
   }, [initialized, isLoading, error, treeData]);
-  
+
+  // 로딩 상태 UI
   if (isLoading) {
-    return <div className="p-4">Loading...</div>;
+    return (
+      <div className="p-4 space-y-3">
+        <Skeleton className="h-6 w-full" />
+        <Skeleton className="h-6 w-11/12" />
+        <Skeleton className="h-6 w-10/12" />
+        <Skeleton className="h-6 w-9/12" />
+      </div>
+    );
   }
 
+  // 에러 상태 UI
   if (error) {
-    return <div className="p-4 text-red-600">Error loading data</div>;
+    return (
+      <div className="p-4 text-red-600 bg-red-50 rounded-md">
+        데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.
+      </div>
+    );
+  }
+  console.log("treeData at agent tab: ", treeData);
+
+  // 데이터가 없는 경우 UI
+  if (!treeData?.length) {
+    return (
+      <div className="p-4 text-gray-500 text-center">
+        표시할 데이터가 없습니다.
+      </div>
+    );
   }
 
-  const items = treeData?.[0]?.items || [];
+  const items = treeData[0].items || [];
+  
 
   return (
-    <div className="flex-1 overflow-auto">
+    <div className="flex-1 overflow-auto px-2">
       {items.map((item: TreeItem) => (
         <TreeNodeForTenantWithAgent
           key={item.id}

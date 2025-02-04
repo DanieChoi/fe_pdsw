@@ -68,6 +68,7 @@ interface Counselor {
   affiliationTeamName: string;
 }
 
+// 상담원 목록, 사이드 메뉴
 export async function apiToFetchCounselorTreeData(credentials: MainCredentials): Promise<TabData[]> {
   const [tenantsData, counselorData] = await Promise.all([
     apiForGetTenantList(),
