@@ -11,6 +11,7 @@ import CampaignManager from './CampaignManager';
 import CampaignUpdatePanel from './CampaignUpdatePanel';
 import CampaignGroupManager from './CampaignGroupManager';
 import NewCampaignManager from './NewCampaignManager';
+import ListManager from './ListManager';
 import { SkillAssignmentTab } from '@/features/campaignManager/components/treeMenus/SkillAssignmentTab';
 
 const TabContent = () => {
@@ -32,7 +33,7 @@ const TabContent = () => {
       case 6:
         return <div className="p-2">채널 모니터 컨텐츠</div>;
       case 7:
-        return <div className="p-2">리스트 매니저 컨텐츠</div>;
+        return <div className="p-2"><ListManager /></div>;
       case 8:
         return <div className="p-2">예약콜 제한 설정 컨텐츠</div>;
       case 9:

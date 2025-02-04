@@ -259,6 +259,10 @@ input::placeholder {
   height: 100%;
 }
 
+.h-custom-important{
+  height: calc(100% - 26px) !important;
+}
+
 .grid-custom .rdg-header-row .rdg-cell{
   background: #F8F8F8;
   border-bottom: 1px solid #ebebeb;
@@ -506,4 +510,11 @@ html, body {
 
 .group_col:hover::before {
   background-color: #5BC2C1;
+}
+
+.grid-top-subject{
+  text-align: center;
+  font-size: 13px;
+  background: #ebebeb;
+  padding: 4px 0;
 }

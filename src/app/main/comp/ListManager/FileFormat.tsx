@@ -1,0 +1,418 @@
+import React, { useState, useMemo } from 'react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
+import CustomAlert from "@/components/shared/layout/CustomAlert";
+
+interface FileFormatProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+interface FormatItem {
+  id: string;
+  name: string;
+}
+
+interface FormatRow {
+  id?: string;
+  name: string;
+  start: number;
+  length: number;
+  field: string;
+}
+
+
+const FileFormat: React.FC<FileFormatProps> = ({ isOpen, onClose }) => {
+  
+
+  //필드항목
+  const [formatRows, setFormatRows] = useState<FormatRow[]>([]);
+
+   // 선택된 행의 인덱스를 추적하는 상태 추가
+   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
+
+   // 행 선택 핸들러
+   const handleRowSelect = (index: number) => {
+     setSelectedRowIndex(index);
+   };
+
+   // 위로 이동 핸들러
+  const handleMoveUp = () => {
+    if (selectedRowIndex === null || selectedRowIndex <= 0) return;
+
+    const newRows = [...formatRows];
+    // 선택된 행과 그 위의 행을 교환
+    [newRows[selectedRowIndex], newRows[selectedRowIndex - 1]] = 
+    [newRows[selectedRowIndex - 1], newRows[selectedRowIndex]];
+
+    // 선택된 행 인덱스도 함께 이동
+    setFormatRows(newRows);
+    setSelectedRowIndex(selectedRowIndex - 1);
+  };
+
+  // 아래로 이동 핸들러
+  const handleMoveDown = () => {
+    if (selectedRowIndex === null || selectedRowIndex >= formatRows.length - 1) return;
+
+    const newRows = [...formatRows];
+    // 선택된 행과 그 아래 행을 교환
+    [newRows[selectedRowIndex], newRows[selectedRowIndex + 1]] = 
+    [newRows[selectedRowIndex + 1], newRows[selectedRowIndex]];
+
+    // 선택된 행 인덱스도 함께 이동
+    setFormatRows(newRows);
+    setSelectedRowIndex(selectedRowIndex + 1);
+  };
+
+
+  const leftItems = useMemo(() => [
+    { id: '1', name: '고객키(1)' },
+    { id: '2', name: '고객키(2)' },
+    { id: '3', name: '고객키(3)' },
+    { id: '4', name: '고객이름' },
+    { id: '5', name: '고객 전화번호(1)' },
+    { id: '6', name: '고객 전화번호(2)' },
+    { id: '7', name: '고객 전화번호(3)' },
+    { id: '8', name: '고객 전화번호(4)' },
+    { id: '9', name: '고객 전화번호(5)' },
+  ], []);
+
+  const rightItems = useMemo(() => [
+    { id: '10', name: '고객성향[1]' },
+    { id: '11', name: '고객성향[2]' },
+    { id: '12', name: '고객성향[3]' },
+    { id: '13', name: '고객성향[4]' },
+    { id: '14', name: '고객성향[5]' },
+    { id: '15', name: '고객성향[6]' },
+    { id: '16', name: '상담원 아이디' },
+    { id: '17', name: '토큰데이터' },
+  ], []);
+
+  // 더블 클릭 핸들러 추가
+  const handleItemDoubleClick = (item: FormatItem) => {
+    // 이미 추가된 항목인지 확인
+    const isAlreadyAdded = formatRows.some(row => row.name === item.name);
+    
+    if (!isAlreadyAdded) {
+      const newRow: FormatRow = {
+        id: item.id,
+        name: item.name,
+        start: formatRows.length > 0 
+          ? formatRows[formatRows.length - 1].start + formatRows[formatRows.length - 1].length 
+          : 1,
+        length: 10, // 기본 길이, 필요에 따라 조정 가능
+        field: '', // 필드 값은 비워둠
+      };
+
+      setFormatRows([...formatRows, newRow]);
+    }
+  };
+
+
+
+
+  // 필드항목 구분자
+  const [positionRows, setPositionRows] = useState<FormatRow[]>([]);
+  const [selectedPositionRowIndex, setSelectedPositionRowIndex] = useState<number | null>(null);
+
+
+  const positionLeftItems = useMemo(() => [
+    { id: '1', name: '고객키(1)' },
+    { id: '2', name: '고객키(2)' },
+    { id: '3', name: '고객키(3)' },
+    { id: '4', name: '고객이름' },
+    { id: '5', name: '고객 전화번호(1)' },
+    { id: '6', name: '고객 전화번호(2)' },
+    { id: '7', name: '고객 전화번호(3)' },
+    { id: '8', name: '고객 전화번호(4)' },
+    { id: '9', name: '고객 전화번호(5)' },
+  ], []);
+
+  const positionRightItems = useMemo(() => [
+    { id: '10', name: '고객성향[1]' },
+    { id: '11', name: '고객성향[2]' },
+    { id: '12', name: '고객성향[3]' },
+    { id: '13', name: '고객성향[4]' },
+    { id: '14', name: '고객성향[5]' },
+    { id: '15', name: '고객성향[6]' },
+    { id: '16', name: '상담원 아이디' },
+    { id: '17', name: '토큰데이터' },
+  ], []);
+
+  const handlePositionItemDoubleClick = (item: FormatItem) => {
+    const isAlreadyAdded = positionRows.some(row => row.name === item.name);
+    
+    if (!isAlreadyAdded) {
+      const newRow: FormatRow = {
+        id: item.id,
+        name: item.name,
+        start: positionRows.length + 1,
+        length: 1,
+        field: '', 
+      };
+  
+      setPositionRows([...positionRows, newRow]);
+    }
+  };
+
+  const handlePositionRowSelect = (index: number) => {
+    setSelectedPositionRowIndex(index);
+  };
+  
+  const handlePositionMoveUp = () => {
+    if (selectedPositionRowIndex === null || selectedPositionRowIndex <= 0) return;
+  
+    const newRows = [...positionRows];
+    [newRows[selectedPositionRowIndex], newRows[selectedPositionRowIndex - 1]] = 
+    [newRows[selectedPositionRowIndex - 1], newRows[selectedPositionRowIndex]];
+  
+    setPositionRows(newRows);
+    setSelectedPositionRowIndex(selectedPositionRowIndex - 1);
+  };
+  
+  const handlePositionMoveDown = () => {
+    if (selectedPositionRowIndex === null || selectedPositionRowIndex >= positionRows.length - 1) return;
+  
+    const newRows = [...positionRows];
+    [newRows[selectedPositionRowIndex], newRows[selectedPositionRowIndex + 1]] = 
+    [newRows[selectedPositionRowIndex + 1], newRows[selectedPositionRowIndex]];
+  
+    setPositionRows(newRows);
+    setSelectedPositionRowIndex(selectedPositionRowIndex + 1);
+  };
+
+
+
+
+
+
+  const handleConfirm = () => {
+    // 상태 초기화
+    setFormatRows([]);
+    setSelectedRowIndex(null);
+    setPositionRows([]);
+    setSelectedPositionRowIndex(null);
+    onClose();
+  };
+
+  const handleCancle = () => {
+    // 상태 초기화
+    setFormatRows([]);
+    setSelectedRowIndex(null);
+    setPositionRows([]);
+    setSelectedPositionRowIndex(null);
+    onClose();
+  };
+ 
+  const modalContent = (
+    <div className="w-full">
+      <div className="flex items-center gap-2 mb-1">
+        <CustomCheckbox
+          id="originaldata"
+        />
+        <Label htmlFor="originaldata" className="text-sm">
+          원본 데이터를 사번전용 후 치재합니다.
+        </Label>
+      </div>
+
+      <div className="mb-4">
+        <p className="text-sm">* 블랙리스트의 경우 고객키[1], 고객이름 항목만 사용 합니다.</p>
+      </div>
+
+      <Tabs defaultValue="format-field">
+        <div className="tab-custom-wrap">
+          <TabsList>
+            <TabsTrigger value="format-field">필드항목 길이로 구분</TabsTrigger>
+            <TabsTrigger value="format-position">필드항목 구분자로 구분</TabsTrigger>
+          </TabsList>
+        </div>
+        <TabsContent value="format-field" className="mt-3">
+          <div className='mb-2'>원하는 항목을 더블 클릭 하세요</div>
+          <div className="flex gap-4">
+            <div className="w-1/2">
+              <div className="border p-2 rounded h-40 overflow-y-auto">
+                {leftItems.map(item => (
+                  <div 
+                    key={item.id} 
+                    className={`py-1 px-2 hover:bg-[#FFFAEE] cursor-pointer ${
+                      formatRows.some(row => row.name === item.name) 
+                        ? 'text-gray-300 hover:bg-transparent cursor-not-allowed' 
+                        : ''
+                    }`}
+                    onDoubleClick={() => handleItemDoubleClick(item)}
+                  >
+                    {item.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="w-1/2">
+              <div className="border p-2 rounded h-40 overflow-y-auto">
+                {rightItems.map(item => (
+                  <div 
+                    key={item.id} 
+                    className={`py-1 px-2 hover:bg-[#FFFAEE] cursor-pointer ${
+                      formatRows.some(row => row.name === item.name) 
+                        ? 'text-gray-300 hover:bg-transparent cursor-not-allowed' 
+                        : ''
+                    }`}
+                    onDoubleClick={() => handleItemDoubleClick(item)}
+                  >
+                    {item.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-5 mt-5">
+              <div className="border rounded h-[200px] overflow-y-auto w-full">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="border-r border-b p-1 font-normal text-sm bg-[#F8F8F8]">순서</th>
+                      <th className="border-r border-b p-1 font-normal text-sm bg-[#F8F8F8]">항목</th>
+                      <th className="border-r border-b p-1 font-normal text-sm bg-[#F8F8F8]">시작</th>
+                      <th className="border-r border-b p-1 font-normal text-sm bg-[#F8F8F8]">길이</th>
+                      <th className="border-b p-1 font-normal text-sm bg-[#F8F8F8]">필드</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      {formatRows.map((row, index) => (
+                        <tr 
+                          key={row.id || index}
+                          onClick={() => handleRowSelect(index)}
+                          className={`cursor-pointer ${
+                            selectedRowIndex === index ? 'bg-[#FFFAEE]' : ''
+                          }`}
+                        >
+                        <td className="border-b border-r p-1 text-center h-[26px]">{index + 1}</td>
+                        <td className="border-b border-r p-1 text-center h-[26px]">{row.name}</td>
+                        <td className="border-b border-r p-1 text-center h-[26px]">{row.start}</td>
+                        <td className="border-b border-r p-1 text-center h-[26px]">{row.length}</td>
+                        <td className="border-b p-1 text-center h-[26px]">{row.field}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="flex flex-col items-center gap-2 min-w-[22px] justify-center">
+                    <button
+                      className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
+                      onClick={handleMoveUp}
+                      disabled={selectedRowIndex === null || selectedRowIndex <= 0}
+                    >
+                    ↑
+                  </button>
+                  <button
+                      className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
+                      onClick={handleMoveDown}
+                      disabled={selectedRowIndex === null || selectedRowIndex >= formatRows.length - 1}
+                    >
+                    ↓
+                  </button>
+                </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="format-position" className="mt-3">
+          <div className='mb-2'>원하는 구분자를 더블 클릭 하세요</div>
+          <div className="flex gap-4">
+            <div className="w-1/2">
+              <div className="border p-2 rounded h-40 overflow-y-auto">
+                {positionLeftItems.map(item => (
+                  <div 
+                    key={item.id} 
+                    className={`py-1 px-2 hover:bg-[#FFFAEE] cursor-pointer ${
+                      positionRows.some(row => row.name === item.name) 
+                        ? 'text-gray-300 hover:bg-transparent cursor-not-allowed' 
+                        : ''
+                    }`}
+                    onDoubleClick={() => handlePositionItemDoubleClick(item)}
+                  >
+                    {item.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="w-1/2">
+              <div className="border p-2 rounded h-40 overflow-y-auto">
+                {positionRightItems.map(item => (
+                  <div 
+                    key={item.id} 
+                    className={`py-1 px-2 hover:bg-[#FFFAEE] cursor-pointer ${
+                      positionRows.some(row => row.name === item.name) 
+                        ? 'text-gray-300 hover:bg-transparent cursor-not-allowed' 
+                        : ''
+                    }`}
+                    onDoubleClick={() => handlePositionItemDoubleClick(item)}
+                  >
+                    {item.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-5 mt-5">
+            <div className="border rounded h-[200px] overflow-y-auto w-full">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr>
+                    <th className="border-r border-b p-1 font-normal text-sm bg-[#F8F8F8]">순서</th>
+                    <th className="border-r border-b p-1 font-normal text-sm bg-[#F8F8F8]">구분자</th>
+                    <th className="border-b p-1 font-normal text-sm bg-[#F8F8F8]">필드</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {positionRows.map((row, index) => (
+                    <tr 
+                      key={row.id || index}
+                      onClick={() => handlePositionRowSelect(index)}
+                      className={`cursor-pointer ${
+                        selectedPositionRowIndex === index ? 'bg-[#FFFAEE]' : ''
+                      }`}
+                    >
+                      <td className="border-b border-r p-1 text-center h-[26px]">{index + 1}</td>
+                      <td className="border-b border-r p-1 text-center h-[26px]">{row.name}</td>
+                      <td className="border-b p-1 text-center h-[26px]">{row.field}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex flex-col items-center gap-2 min-w-[22px] justify-center">
+              <button
+                className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
+                onClick={handlePositionMoveUp}
+                disabled={selectedPositionRowIndex === null || selectedPositionRowIndex <= 0}
+              >
+                ↑
+              </button>
+              <button
+                className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
+                onClick={handlePositionMoveDown}
+                disabled={selectedPositionRowIndex === null || selectedPositionRowIndex >= positionRows.length - 1}
+              >
+                ↓
+              </button>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+
+  return (
+    <CustomAlert
+      isOpen={isOpen}
+      title="파일포맷설정"
+      message={modalContent}
+      type="1"
+      onClose={handleConfirm}
+      onCancle={handleCancle}
+      width="max-w-modal"
+    />
+  );
+};
+
+export default FileFormat;

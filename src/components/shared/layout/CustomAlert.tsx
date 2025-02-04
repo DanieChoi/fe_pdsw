@@ -10,6 +10,7 @@ export interface CustomAlertRequest {
     onClose: () => void;
     onCancle?: () => void;
     width?: string; // width prop 추가
+    showButtons?: boolean;
 }
 
 const CustomAlert = ({ 
@@ -19,7 +20,8 @@ const CustomAlert = ({
     isOpen = true,
     onClose,
     onCancle,
-    width = 'max-w-sm' // 기본값 설정
+    width = 'max-w-sm', // 기본값 설정
+    showButtons = true
 }: CustomAlertRequest) => {
     return (
         <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -38,6 +40,7 @@ const CustomAlert = ({
                             </React.Fragment>
                         )) : message}
                     </div>
+                    {showButtons && (
                     <div className="flex justify-end gap-1.5">
                         {type === '1' ? (
                             <>
@@ -66,6 +69,7 @@ const CustomAlert = ({
                             </>
                         )}
                     </div>
+                    )}
                 </div>
             </AlertDialogContent>
         </AlertDialog>
