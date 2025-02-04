@@ -6,6 +6,7 @@ export interface TenantItem {
 
 export interface TreeItem {
   id: string;
+  tenantId?: string;  // tenant_id 추가
   label: string;
   type: 'folder' | 'campaign' | 'counselor' | 'team' | 'group';
   status?: string;

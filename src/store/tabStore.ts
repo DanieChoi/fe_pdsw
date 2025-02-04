@@ -37,6 +37,12 @@ export interface TabLayoutStore {
   rows: TabRow[];
   tabGroups: TabGroup[];
   campaignIdForUpdateFromSideMenu: string | null;
+  counselorSkillAssignmentInfo: {
+    tenantId: string | null;
+    counselorId: string | null;
+    counselorName: string | null;
+  };
+  setCounselorSkillAssignmentInfo: (info: { tenantId: string | null; counselorId: string | null; counselorName: string | null } | null) => void;
   setCampaignIdForUpdateFromSideMenu: (id: string | null) => void;
   
   addTab: (tab: TabItem) => void;
@@ -116,6 +122,20 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     }
   ],
   tabGroups: [],
+
+  counselorSkillAssignmentInfo: {
+    tenantId: null,
+    counselorId: null,
+    counselorName: null
+  },
+
+  setCounselorSkillAssignmentInfo: (info: { tenantId: string | null; counselorId: string | null; counselorName: string | null } | null) => set({
+    counselorSkillAssignmentInfo: info ? info : {
+      tenantId: null,
+      counselorId: null,
+      counselorName: null
+    }
+  }),
 
   getTabCountById: (menuId: number) => {
     const state = get();

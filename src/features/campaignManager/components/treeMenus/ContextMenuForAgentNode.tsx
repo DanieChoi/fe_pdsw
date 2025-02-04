@@ -21,6 +21,7 @@ interface ContextMenuForAgentNodeProps {
     type: string;
     id: string;
     label: string;
+    tenantId: string;
   };
   onEdit: () => void;
   onDelete: () => void;
@@ -41,21 +42,25 @@ export function ContextMenuForAgentNode({
   const isGroup = item.type === "group";
 
   const handleSkillAssignment = () => {
-    // 기존 스킬할당 탭들을 찾아서 제거하기 위해 removeTab 가져오기
-    const { removeTab, openedTabs } = useTabStore.getState();
+    const { removeTab, openedTabs, setCounselorSkillAssignmentInfo } = useTabStore.getState();
     
-    // ID가 100인 기존 탭들 찾기
+    // 상담원 스킬 할당 정보 설정
+    setCounselorSkillAssignmentInfo({
+      tenantId: item.tenantId,
+      counselorId: item.id,
+      counselorName: item.label
+    });
+  
+    // 기존 탭 제거 로직
     const existingTabs = openedTabs.filter(tab => tab.id === 100);
-    
-    // 기존 탭들 제거
     existingTabs.forEach(tab => {
       removeTab(tab.id, tab.uniqueKey);
     });
   
-    // 새로운 탭 생성
+    // 새 탭 추가
     const uniqueKey = `skill-assignment-${item.id}-${Date.now()}`;
     const newTab = {
-      id: 100, // 스킬 추가 탭의 ID
+      id: 100,
       uniqueKey,
       title: `상담원 스킬 할당 - ${item.label}`,
       icon: "header-menu/스킬할당.svg",

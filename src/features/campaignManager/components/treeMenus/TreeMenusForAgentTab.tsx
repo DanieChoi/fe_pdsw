@@ -31,8 +31,7 @@ export function TreeMenusForAgentTab() {
     });
   };
 
-  console.log("treeData : ", treeData);
-  
+  console.log("treeData for 상담원 목록: ", treeData);
 
   // 초기 확장 설정
   useEffect(() => {

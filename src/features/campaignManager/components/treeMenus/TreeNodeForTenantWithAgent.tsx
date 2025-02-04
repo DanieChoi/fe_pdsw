@@ -30,7 +30,7 @@ export function TreeNodeForTenantWithAgent({
 
   // type에 따른 아이콘 렌더링
   const renderIcon = () => {
-    switch(item.type) {
+    switch (item.type) {
       case 'counselor':
         return <User className="h-4 w-4 text-gray-500" />;
       case 'team':
@@ -44,6 +44,8 @@ export function TreeNodeForTenantWithAgent({
 
   // 일반 클릭
   const handleClick = useCallback(() => {
+    // console.log('Node clicked: (tenantId)', item.tenantId);
+
     onNodeSelect(item.id);
     if (hasChildren) {
       onNodeToggle(item.id);
@@ -62,11 +64,16 @@ export function TreeNodeForTenantWithAgent({
   const handleManage = () => {
     console.log('Manage agent:', { id: item.id, label: item.label, type: item.type });
   };
-  
+
   return (
     <div className="select-none">
       <ContextMenuForAgentNode
-        item={item}
+        item={{
+          type: item.type,
+          id: item.id,
+          label: item.label,
+          tenantId: item.tenantId ?? '' // tenantId 전달
+        }}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onManage={handleManage}
@@ -101,14 +108,14 @@ export function TreeNodeForTenantWithAgent({
         <div>
           {item.children?.map((child) => (
             <TreeNodeForTenantWithAgent
-                key={child.id}
-                item={child}
-                level={level + 1}
-                expandedNodes={expandedNodes}
-                selectedNodeId={selectedNodeId}
-                onNodeToggle={onNodeToggle}
-                onNodeSelect={onNodeSelect} 
-                />
+              key={child.id}
+              item={child}
+              level={level + 1}
+              expandedNodes={expandedNodes}
+              selectedNodeId={selectedNodeId}
+              onNodeToggle={onNodeToggle}
+              onNodeSelect={onNodeSelect}
+            />
           ))}
         </div>
       )}
