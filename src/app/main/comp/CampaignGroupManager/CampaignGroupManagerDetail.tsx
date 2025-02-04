@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { CommonButton } from "@/components/shared/CommonButton";
-// import CampaignTab from '../CampaignDetail/CampaignTab';
+import CampaignTab from '../CampaignManager/CampaignTab';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { CampaignSkillUpdateRequest
   , CampaignInfoUpdateRequest
@@ -318,7 +318,7 @@ export default function CampaignGroupManagerDetail() {
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
-    if( selectedCampaign !== null ){
+    if( typeof selectedCampaign !== 'undefined' && selectedCampaign !== null ){
       setChangeYn(false);
       setCampaignInfoChangeYn(false);
       setTempCampaignsInfo({...tempCampaignInfo,
@@ -987,19 +987,15 @@ export default function CampaignGroupManagerDetail() {
           className='border-b border-gray-300 pb-1'
           title="상세내역"
           buttons={[
-              { label: "새 캠페인", onClick: () => console.log("") },
-              { label: "캠페인 저장", onClick: () => handleCampaignSave(),},
-              { label: "캠페인 삭제", onClick: () => console.log("") },
+              { label: "새 캠페인 그룹", onClick: () => console.log("") },
+              { label: "일괄 저장", onClick: () => handleCampaignSave(),},
+              { label: "일괄 삭제", onClick: () => console.log("") },
               { label: "재발신", onClick: () => console.log(""), variant: "customblue"},
-              { label: "리스트 적용", onClick: () => console.log(""), variant: "customblue"},
-              { label: "리스트 삭제", onClick: () => console.log(""), variant: "customblue" },
-              { label: "예약콜 제한건수설정", onClick: () => console.log(""),variant: "customblue" },
-              { label: "분배호수 제한설정", onClick: () => console.log(""),variant: "customblue" },
           ]}
           />
           <div className="grid grid-cols-3 gap-x-4 gap-y-2">
           <div className='flex items-center gap-2'>
-            <Label className="w-[5.6rem] min-w-[5.6rem]">캠페인 아이디</Label>
+            <Label className="w-[5.6rem] min-w-[5.6rem]">그룹 아이디</Label>
             <CustomInput 
               type="number" 
               value={tempCampaignInfo.campaign_id } 
@@ -1029,7 +1025,7 @@ export default function CampaignGroupManagerDetail() {
           </div>
 
           <div className='flex items-center gap-2'>
-            <Label className="w-[5.6rem] min-w-[5.6rem]">캠페인명</Label>
+            <Label className="w-[5.6rem] min-w-[5.6rem]">그룹 이름</Label>
             <CustomInput 
               value={tempCampaignInfo.campaign_name || ''} 
               onChange={(e) => handleInputData(e.target.value, 'campaign_name')}         
@@ -1095,7 +1091,7 @@ export default function CampaignGroupManagerDetail() {
         </div>
       </div>
       <div>
-        {/* <CampaignTab campaignSchedule={tempCampaignSchedule}
+        <CampaignTab campaignSchedule={tempCampaignSchedule}
           campaignInfo={tempCampaignInfo}
           campaignDialSpeedInfo={tempCampaignDialSpeedInfoParam}
           onCampaignOutgoingOrderChange={(value) => handleCampaignOutgoingOrderChange(value)}
@@ -1106,7 +1102,7 @@ export default function CampaignGroupManagerDetail() {
           onHandleAdditionalInfoTabChange={(value) => handleAdditionalInfoTabChange(value)}
           onHandleCallbackTabChange={(value) => handleCallbackTabChange(value)}
           onHandleNotificationTabChange={(value) => handleNotificationTabChange(value)}
-        /> */}
+        />
       </div>
       <SkillListPopup
         param={tempCampaignSkills.skill_id||[]}

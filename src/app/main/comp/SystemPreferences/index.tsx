@@ -453,7 +453,7 @@ const SystemPreferences = () => {
                                     type="number" 
                                     value={refreshCycle}
                                     onChange={(e) => setRefreshCycle(e.target.value)}
-                                    disabled={!isEditable}
+                                    disabled={!isEditable || selectedDevice !== null}
                                     className="w-full"
                                 />
                             </div>

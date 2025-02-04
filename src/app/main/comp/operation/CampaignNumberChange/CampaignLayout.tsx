@@ -141,8 +141,9 @@ function CampaignLayout() {
             <CustomInput 
               type="text" 
               value={selectedCallingNumber}
-              placeholder="그리드에서 선택"
-              disabled
+              onChange={(e) => setSelectedCallingNumber(e.target.value)}
+              // placeholder="그리드에서 선택"
+              // disabled
               className=""
             />
           </div>
