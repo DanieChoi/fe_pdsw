@@ -9,7 +9,7 @@ import {
   ContextMenuSeparator,
 } from "@/components/ui/context-menu";
 import { useTabStore } from "@/store/tabStore";
-import { Edit, Copy, Activity, Trash2, Monitor, Settings, Search, List, Clock, History } from "lucide-react";
+import { Edit, Copy, Activity, Trash2, Monitor, Settings, Search, List, Clock, History, UserCheck, Shield, RefreshCcw } from "lucide-react";
 
 interface ContextMenuForTreeNodeProps {
   children: React.ReactNode;
@@ -33,7 +33,7 @@ export function ContextMenuForTreeNode({
   onCopy,
 }: ContextMenuForTreeNodeProps) {
   const isFolder = item.type === "folder";
-  const { openCampaignManagerForUpdate, setCampaignIdForUpdateFromSideMenu, openCampaignProgressInfo } = useTabStore();
+  const { openCampaignManagerForUpdate, setCampaignIdForUpdateFromSideMenu, openCampaignProgressInfo, openRebroadcastSettings } = useTabStore();
 
   const handleEditMenuClick = () => {
     openCampaignManagerForUpdate(item.id, item.label);
@@ -42,6 +42,10 @@ export function ContextMenuForTreeNode({
 
   const handleProgressInfoClick = () => {
     openCampaignProgressInfo(item.id, item.label);
+  };
+
+  const handleRebroadcastClick = () => {
+    openRebroadcastSettings(item.id, item.label);
   };
 
   return (
@@ -83,19 +87,19 @@ export function ContextMenuForTreeNode({
 
         <ContextMenuItem>
           <Monitor className="mr-2 h-4 w-4" />
-          실시간 재할당
+          실시간 재발신
         </ContextMenuItem>
 
-        <ContextMenuItem>
-          <Activity className="mr-2 h-4 w-4" />
-          예약 재할당
+        <ContextMenuItem onClick={handleRebroadcastClick}>
+          <RefreshCcw className="mr-2 h-4 w-4" />
+          예약 재발신 설정
         </ContextMenuItem>
 
         <ContextMenuSeparator />
 
         <ContextMenuItem onClick={onMonitor}>
           <Monitor className="mr-2 h-4 w-4" />
-          캠페인 상태
+          캠페인 삭제
         </ContextMenuItem>
 
         <ContextMenuItem onClick={onCopy}>

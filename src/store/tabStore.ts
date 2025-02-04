@@ -62,6 +62,8 @@ export interface TabLayoutStore {
   getTabCountById: (tabId: number) => number;
   openCampaignManagerForUpdate: (campaignId: string, label: string) => void;
   openCampaignProgressInfo: (campaignId: string, label: string) => void;
+  openRebroadcastSettings: (campaignId: string, label: string) => void;
+
 }
 
 // const generateUniqueId = (prefix: string, existingIds: string[]) => {
@@ -722,6 +724,24 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     };
   }),
 
+  openRebroadcastSettings: (campaignId: string, label: string) => {
+    const newTabKey = `rebroadcast-${campaignId}-${Date.now()}`;
+    const newTab = {
+      id: 20,
+      uniqueKey: newTabKey,
+      title: label ? `재발신 설정 - ${label}` : "재발신 설정",
+      icon: "refresh",
+      href: "/rebroadcast",
+      campaignId,
+      content: null
+    };
+
+    return set((state) => ({
+      openedTabs: [...state.openedTabs, newTab],
+      activeTabId: 20,
+      activeTabKey: newTabKey,
+    }));
+  },
   campaignIdForUpdateFromSideMenu: null,
   setCampaignIdForUpdateFromSideMenu: (id) => set({ campaignIdForUpdateFromSideMenu: id }),
 
