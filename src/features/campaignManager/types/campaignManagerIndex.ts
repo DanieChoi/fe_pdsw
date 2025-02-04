@@ -197,3 +197,10 @@ export interface CampaignInfoUpdateRequest {
   campaign_level: number;
   outbound_sequence: string;
 }
+
+// 캠페인정보 삭제 요청 데이터 타입
+export interface CampaignInfoDeleteRequest {
+  campaign_id: number;
+  tenant_id: number;
+  delete_dial_list: number;
+}

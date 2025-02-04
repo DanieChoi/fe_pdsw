@@ -1,8 +1,7 @@
 // C:\Users\terec\fe_pdsw\src\app\main\comp\CampaignManager\index.tsx
 import React, { useState, useEffect } from 'react'
-import CampaignGroupManagerHeader, {CampaignGroupHeaderSearch} from './CampaignGroupManagerHeader';
-import CampaignGroupManagerDetail from './CampaignGroupManagerDetail';
-import CampaignGroupManagerList from './CampaignGroupManagerList';
+import NewCampaignManagerDetail from './NewCampaignManagerDetail';
+// import CampaignManagerList from './CampaignManagerList';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
@@ -11,20 +10,20 @@ import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useA
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 
 type Props = {
-  campaignId?: string;
+  tenantId?: string;
 }
 
-const CampaignGroupManager = ({campaignId}: Props) => {
+const NewCampaignManager = ({tenantId}: Props) => {
   
   const { tenants } = useMainStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
   
-  const [campaignGroupHeaderSearchParam,setCampaignGroupHeaderSearchParam] = useState<CampaignGroupHeaderSearch>();
-  const handleCampaignHeaderSearch = (param:CampaignGroupHeaderSearch) => {
-    setCampaignGroupHeaderSearchParam(param);
-  };
+  // const [campaignHeaderSearchParam,setCampaignHeaderSearchParam] = useState<CampaignHeaderSearch>();
+  // const handleCampaignHeaderSearch = (param:CampaignHeaderSearch) => {
+  //   setCampaignHeaderSearchParam(param);
+  // };
   
   // 스케줄 조회
   const { mutate: fetchSchedules } = useApiForSchedules({
@@ -82,17 +81,18 @@ const CampaignGroupManager = ({campaignId}: Props) => {
     }
   }, [tenants]);
 
+  console.log('campaignIdForUpdateFromSideMenu render : ', campaignIdForUpdateFromSideMenu);
+  
+
   return (
     <div>
       <div className='flex flex-col gap-4'>
-          <CampaignGroupManagerHeader onSearch={handleCampaignHeaderSearch}/>
           <div className="flex gap-5">
-            <CampaignGroupManagerList campaignId={campaignIdForUpdateFromSideMenu||''} campaignGroupHeaderSearchParam={campaignGroupHeaderSearchParam}/>
-            <CampaignGroupManagerDetail />
-          </div>
+            <NewCampaignManagerDetail />
+          </div> 
         </div>
     </div>
   )
 }
 
-export default CampaignGroupManager
+export default NewCampaignManager
