@@ -74,7 +74,8 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrd
   ]);
 
   useEffect(() => {
-    if( phoneDescriptions.length > 0 && campaignInfo.dial_phone_id > 0 ) {    
+    console.log('phoneDescriptions.length'+phoneDescriptions.length);
+    if( phoneDescriptions.length > 0 && campaignInfo) {    
       setTempCampaignOutgoingOrderTab({...tempCampaignOutgoingOrderTab
         , dial_phone_id: campaignInfo.dial_phone_id
         , phone_order: campaignInfo.phone_order
@@ -111,6 +112,17 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrd
             phone3: tempDialPhoneId[0].description[2]+'',
             phone4: tempDialPhoneId[0].description[3]+'',
             phone5: tempDialPhoneId[0].description[4]+''
+          },
+        ]);
+      }else{
+        setTempData((prev) => [
+          ...prev,
+          {
+            phone1: phoneDescriptions[0].description[0]+'',
+            phone2: phoneDescriptions[0].description[1]+'',
+            phone3: phoneDescriptions[0].description[2]+'',
+            phone4: phoneDescriptions[0].description[3]+'',
+            phone5: phoneDescriptions[0].description[4]+''
           },
         ]);
       }
@@ -233,15 +245,19 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrd
             <Label className="w-[5rem] min-w-[5rem]">Phone ID</Label>
             <Select 
               onValueChange={(value) => handleSelectChange(value, 'dialMode')}
-              value={tempCampaignOutgoingOrderTab.dial_phone_id+'' || ''}
+              value={tempCampaignOutgoingOrderTab.dial_phone_id > 0 ?tempCampaignOutgoingOrderTab.dial_phone_id+'': phoneDescriptions[0].description_id+''}
             >
               <SelectTrigger className="">
                 <SelectValue placeholder=" " />
               </SelectTrigger>
               <SelectContent>
-                {
+                {tempCampaignOutgoingOrderTab.dial_phone_id > 0 ?
                   phoneDescriptions.filter((dialPhoneId) => dialPhoneId.description_id === tempCampaignOutgoingOrderTab.dial_phone_id)
                   .map((item) => (
+                    <SelectItem key={item.description_id} value={item.description_id+''}>{item.description_id}</SelectItem>
+                  ))
+                  :
+                  phoneDescriptions.map((item) => (
                     <SelectItem key={item.description_id} value={item.description_id+''}>{item.description_id}</SelectItem>
                   ))
                 }
