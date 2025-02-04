@@ -48,9 +48,12 @@ const TabContent = () => {
         );
         if (activeTab && 'counselorId' in activeTab && typeof activeTab.counselorId === 'string') {
           return (
-            <div className="p-2">
-              <SkillAssignmentTab counselorId={activeTab.counselorId} />
-            </div>
+            // <div className="p-2">
+            //   <SkillAssignmentTab counselorId={activeTab.counselorId} />
+            // </div>
+              <div className="py-3 max-w-2xl ">
+                <SkillAssignmentTab counselorId={activeTab.counselorId} />
+              </div>            
           );
         }
         return <div className="p-2">잘못된 스킬 할당 탭입니다.</div>;

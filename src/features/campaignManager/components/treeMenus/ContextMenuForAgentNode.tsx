@@ -41,6 +41,17 @@ export function ContextMenuForAgentNode({
   const isGroup = item.type === "group";
 
   const handleSkillAssignment = () => {
+    // 기존 스킬할당 탭들을 찾아서 제거하기 위해 removeTab 가져오기
+    const { removeTab, openedTabs } = useTabStore.getState();
+    
+    // ID가 100인 기존 탭들 찾기
+    const existingTabs = openedTabs.filter(tab => tab.id === 100);
+    
+    // 기존 탭들 제거
+    existingTabs.forEach(tab => {
+      removeTab(tab.id, tab.uniqueKey);
+    });
+  
     // 새로운 탭 생성
     const uniqueKey = `skill-assignment-${item.id}-${Date.now()}`;
     const newTab = {
@@ -52,7 +63,7 @@ export function ContextMenuForAgentNode({
       content: null,
       counselorId: item.id
     };
-
+  
     addTab(newTab);
   };
 

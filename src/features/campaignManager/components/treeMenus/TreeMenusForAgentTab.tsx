@@ -58,22 +58,7 @@ export function TreeMenusForAgentTab() {
       setInitialized(true);
     }
   }, [initialized, isLoading, error, treeData]);
-
-  // 상태에 따른 아이콘 반환 함수
-  const getStatusIcon = (type?: string) => {
-    // console.log("type : ", type);
-    
-    switch(type) {
-      case 'counselor':
-        return <User className="h-4 w-4 text-gray-500" />;
-      case 'team':
-        return <Users className="h-4 w-4 text-gray-500" />;
-      case 'group':
-        return <Building2 className="h-4 w-4 text-gray-500" />;
-      default:
-        return null;
-    }
-  };
+  
   if (isLoading) {
     return <div className="p-4">Loading...</div>;
   }
