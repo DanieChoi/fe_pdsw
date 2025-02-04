@@ -2,7 +2,7 @@
 import { MainDataResponse, TenantListDataResponse } from '@/features/auth/types/mainIndex';
 import { useMainStore, useCampainManagerStore } from '@/store';
 import {CampaignGroupHeaderSearch} from './CampaignGroupManagerHeader';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { useApiForCampaignAgent } from '@/features/campaignManager/hooks/useApiForCampaignAgent';
 import DataGrid, { CellClickArgs, SelectColumn } from "react-data-grid";
@@ -29,7 +29,7 @@ const columns: Column[] = [
 
 const downColumns = [
     SelectColumn,
-  { key: "no", name: "NO.",width: 50 },
+  { key: "no", name: "NO." },
   { key: "tenantName", name: "테넌트" },
   { key: "campaignGroupId", name: "캠페인 그룹 아이디" },
   { key: "campaignGroupName", name: "캠페인 그룹명" },
@@ -54,12 +54,16 @@ type Props = {
 
 export default function CampaignGroupManagerList({campaignId,campaignGroupHeaderSearchParam}: Props) {
   const { tenants, campaigns, selectedCampaign , setSelectedCampaign } = useMainStore();
-  const { schedules, callingNumbers, campaignSkills  } = useCampainManagerStore();
+  const [selectedCampaignGroups, setSelectedCampaignGroups] = useState<Set<number>>(new Set([]));
   const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>([]);
   const [tempData, setTempData] = useState<DataProps[]>([]);
   const [tempDownData, setTempDownData] = useState<DataProps[]>([]);
   const [tenantId, setTenantId] = useState<number>(-1);
   const [tempTenants, setTempTenants] = useState<TenantListDataResponse[]>([]);
+  const memoizedColumns = useMemo(() => columns, [columns]);
+  const memoizedRows = useMemo(() => tempData, [tempData]);
+  const memoizedDownDataRows = useMemo(() => tempDownData, [tempDownData]);
+  
   
   // 캠페인 소속 상담사 리스트 요청
   const { mutate: fetchCampaignAgents } = useApiForCampaignAgent({
@@ -159,6 +163,13 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
     setSelectedCampaign(tempCampaigns.filter((campaign) => campaign.campaign_id === Number(row.campaignGroupId))[0]);
   };
 
+  const handleSelectedRowsChange = (newSelection: Set<number>) => {
+    // 혹시 모를 0값이 포함되는 것을 방지
+    const filteredSelection = new Set(
+        Array.from(newSelection).filter(id => id !== 0)
+    );
+    setSelectedCampaignGroups(filteredSelection);
+  };
 
   return (
     <div className="w-[40%] shrink-0">
@@ -166,8 +177,8 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
       <div className="overflow-x-auto">
         <div className="grid-custom-wrap h-[200px]">
           <DataGrid 
-            columns={columns} 
-            rows={tempData} 
+            columns={memoizedColumns} 
+            rows={memoizedRows} 
             className="grid-custom" 
             rowHeight={26}
             headerRowHeight={26}
@@ -180,8 +191,11 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
         <div className="grid-custom-wrap h-[200px]">
           <DataGrid 
             columns={downColumns} 
-            rows={tempDownData} 
+            rows={memoizedDownDataRows} 
             className="grid-custom" 
+            rowKeyGetter={(row) => row.campaignGroupId}
+            selectedRows={selectedCampaignGroups}
+            onSelectedRowsChange={handleSelectedRowsChange}
             rowHeight={26}
             headerRowHeight={26}
             onCellClick={handleDownCellClick}

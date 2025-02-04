@@ -10,6 +10,7 @@ import OperationBoard from './operation';
 import CampaignManager from './CampaignManager';
 import CampaignUpdatePanel from './CampaignUpdatePanel';
 import CampaignGroupManager from './CampaignGroupManager';
+import NewCampaignManager from './NewCampaignManager';
 import { SkillAssignmentTab } from '@/features/campaignManager/components/treeMenus/SkillAssignmentTab';
 
 const TabContent = () => {
@@ -42,6 +43,8 @@ const TabContent = () => {
         return <div className="p-2"><OperationBoard /></div>;
       case 12:
         return <div className="p-2"><PreferencesBoard /></div>;
+      case 13:
+        return <div className="p-2"><NewCampaignManager /></div>;
       case 100:  // 스킬 할당 탭
         const activeTab = openedTabs.find(tab => 
           tab.id === activeTabId && tab.uniqueKey === activeTabKey
