@@ -18,8 +18,7 @@ export function useApiToFetchCounselorTreeData() {
     roleId: role_id,
   };
 
-  console.log("credentials at hook : ", credentials);
-  
+  // console.log("credentials at hook : ", credentials);
 
   // React Query로 데이터 가져오기
   const query = useQuery<TabData[], Error>({

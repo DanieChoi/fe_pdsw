@@ -34,3 +34,34 @@ export interface CounselorSkillApiError {
     };
   };
 }
+
+/**
+ * 상담원에게 스킬 할당 API 요청 타입
+ * 요청 예시:
+ * {
+ *   "request_data": {
+ *     "agent_id": [
+ *       "2002",
+ *       "KICC3402"
+ *     ]
+ *   }
+ * }
+ */
+export interface CounselorSkillAssignmentRequest {
+  request_data: {
+    agent_id: string[];
+  };
+}
+
+/**
+ * 상담원에게 스킬 할당 API 응답 타입
+ * 응답 예시:
+ * {
+ *   "result_code": 0,
+ *   "result_msg": "Success"
+ * }
+ */
+export interface CounselorSkillAssignmentResponse {
+  result_code: number;
+  result_msg: string;
+}

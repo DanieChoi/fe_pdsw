@@ -153,7 +153,7 @@ export default function Header() {
     // enabled: shouldFetchCounselors,  // fetchMain 완료 후에만 실행
   });
 
-  console.log('counselorListData at header :', counselorListData);
+  // console.log('counselorListData at header :', counselorListData);
 
   useEffect(() => {
     if (counselorListData) {
