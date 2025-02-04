@@ -1,9 +1,9 @@
-// src/features/skillAssignment/SkillAssignmentTab.tsx
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTabStore } from '@/store/tabStore';  // tabStore import 추가
 
 interface SkillAssignmentTabProps {
   counselorId: string;
@@ -18,6 +18,8 @@ const mockSkills = [
 
 export function SkillAssignmentTab({ counselorId }: SkillAssignmentTabProps) {
   const [selectedSkills, setSelectedSkills] = React.useState<number[]>([]);
+  const removeTab = useTabStore(state => state.removeTab);
+  const activeTabKey = useTabStore(state => state.activeTabKey);
 
   const handleSkillToggle = (skillId: number) => {
     setSelectedSkills(prev =>
@@ -30,6 +32,12 @@ export function SkillAssignmentTab({ counselorId }: SkillAssignmentTabProps) {
   const handleSave = () => {
     // TODO: API 호출하여 스킬 할당 저장
     console.log('Selected skills for counselor:', counselorId, selectedSkills);
+  };
+
+  const handleCancel = () => {
+    if (activeTabKey) {
+      removeTab(100, activeTabKey);
+    }
   };
 
   return (
@@ -70,7 +78,7 @@ export function SkillAssignmentTab({ counselorId }: SkillAssignmentTabProps) {
             </TableBody>
           </Table>
           <div className="flex justify-end space-x-2">
-            <Button variant="outline">취소</Button>
+            <Button variant="outline" onClick={handleCancel}>취소</Button>
             <Button onClick={handleSave}>확인</Button>
           </div>
         </div>
