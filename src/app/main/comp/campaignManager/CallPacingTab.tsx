@@ -65,7 +65,7 @@ const CallPacingTab: React.FC<Props> = ({ campaignDialSpeedInfo, onHandleCallPac
   };
 
   useEffect(() => {
-    if (campaignDialSpeedInfo && campaignDialSpeedInfo.dial_mode !== 0) {  
+    if (campaignDialSpeedInfo ) {  
       if( campaignDialSpeedInfo.dial_mode === 2 ){
         setPredictiveDisabled(true);
         setProgressiveValueDisabled(false);
@@ -76,7 +76,7 @@ const CallPacingTab: React.FC<Props> = ({ campaignDialSpeedInfo, onHandleCallPac
         setPredictiveDisabled(true);
         setProgressiveValueDisabled(true);
       }
-      setProgressiveValue( campaignDialSpeedInfo.progressive_dial_speed * 2 );
+      setProgressiveValue( campaignDialSpeedInfo.progressive_dial_speed * 2 < 25 ?25:campaignDialSpeedInfo.progressive_dial_speed * 2 );
       setPredictiveValue( campaignDialSpeedInfo.predictive_dial_speed < 50?50:campaignDialSpeedInfo.predictive_dial_speed );
     }
   }, [campaignDialSpeedInfo]);

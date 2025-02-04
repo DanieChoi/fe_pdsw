@@ -127,7 +127,7 @@ const NotificationTab: React.FC<Props> = ({ campaignInfo, onHandleNotificationTa
   };
 
   useEffect(() => {
-    if (campaignInfo && campaignInfo.campaign_id !== 0) {  
+    if (campaignInfo ) {  
       setTempNotificationTabParam({...tempNotificationTabParam
         , list_alarm_count: campaignInfo.list_alarm_count
         , use_list_alarm: campaignInfo.use_list_alarm

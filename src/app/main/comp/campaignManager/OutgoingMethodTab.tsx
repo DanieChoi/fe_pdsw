@@ -14,6 +14,11 @@ import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { OutgoingMethodTabParam } from './CampaignManagerDetail';
 import { useMainStore } from '@/store';
 
+const useCounselResultList = [
+  {useCounselResultId:0, useCounselResultName: '미사용'},
+  {useCounselResultId:1, useCounselResultName: '사용'}
+];
+
 const CampaignOutgoingMethodTab:OutgoingMethodTabParam = {
   changeYn: false,
   campaignInfoChangeYn: false,
@@ -56,7 +61,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingMe
   const [maxRings] = useState("10");
   const [tokenId, setTokenId] = useState("");
   const [consultationRegistration, setConsultationRegistration] =
-    useState("사용");
+    useState("미사용");
   const [dialModeOption, setDialModeOption] = useState("default");
   const [ivrNo, setIvrNo] = useState("");
   const [limitRateEnabled, setLimitRateEnabled] = useState(false);
@@ -132,9 +137,16 @@ const OutgoingMethodTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingMe
       , next_campaign: Number(value) 
     });
   };
+  const handleUseCounselResult = (value:string) => {
+    onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+      , changeYn: true
+      , campaignInfoChangeYn: true
+      , use_counsel_result: Number(value) 
+    });
+  };
 
   useEffect(() => {
-    if (campaignInfo.campaign_id !== 0) {  
+    if (campaignInfo) {  
       setTempOutgoingMethodTab({...tempOutgoingMethodTab
         ,trunk_access_code : campaignInfo.trunk_access_code
         ,dial_try_interval : campaignInfo.dial_try_interval
@@ -311,16 +323,16 @@ const OutgoingMethodTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingMe
           <div className="flex items-center gap-2 justify-between">
             <Label className="w-[8.3rem] min-w-[8.3rem]">상담결과 등록</Label>
             <Select
-              value={consultationRegistration}
-              onValueChange={setConsultationRegistration}
+              value={tempOutgoingMethodTab.use_counsel_result+''}
+              onValueChange={handleUseCounselResult}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder={consultationRegistration} />
+                <SelectValue placeholder={'미사용'} />
               </SelectTrigger>
               <SelectContent>
-                {["사용", "미사용"].map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {status}
+                {useCounselResultList.map((status) => (
+                  <SelectItem key={status.useCounselResultId} value={status.useCounselResultId+''}>
+                    {status.useCounselResultName}
                   </SelectItem>
                 ))}
               </SelectContent>

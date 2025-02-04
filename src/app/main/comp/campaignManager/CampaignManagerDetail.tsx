@@ -118,11 +118,11 @@ const CampaignManagerInfo: CampaignInfoUpdateRequest = {
   reuse_count: 0,
   use_counsel_result: 0,
   use_list_alarm: 0,
-  redial_strategy1: '',
-  redial_strategy2: '',
-  redial_strategy3: '',
-  redial_strategy4: '',
-  redial_strategy5: '',
+  redial_strategy1: "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+  redial_strategy2: "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+  redial_strategy3: "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+  redial_strategy4: "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+  redial_strategy5: "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
   dial_mode_option: 0,
   user_option: '',
   customer_char_id: 1,
@@ -173,7 +173,13 @@ export const CampaignInfo: MainDataResponse = {
   reuse_count: 0,
   use_counsel_result: 0,
   use_list_alarm: 0,
-  redial_strategy: [],
+  redial_strategy: [
+    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0"
+],
   dial_mode_option: 0,
   user_option: '',  
 }
@@ -643,6 +649,19 @@ export default function CampaignDetail() {
         , redial_strategy5: value.redial_strategy[4]
       });
     }  
+    //초기화버튼 클릭시
+    if( value.onInit ){
+      setTempCampaignsInfo({...tempCampaignInfo
+        , redial_strategy: CampaignInfo.redial_strategy
+      });
+      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+        , redial_strategy1: CampaignManagerInfo.redial_strategy1
+        , redial_strategy2: CampaignManagerInfo.redial_strategy2
+        , redial_strategy3: CampaignManagerInfo.redial_strategy3
+        , redial_strategy4: CampaignManagerInfo.redial_strategy4
+        , redial_strategy5: CampaignManagerInfo.redial_strategy5
+      });
+    }
     if( value.onSave ){
       setCampaignSaveYn(false);
       handleCampaignSave();

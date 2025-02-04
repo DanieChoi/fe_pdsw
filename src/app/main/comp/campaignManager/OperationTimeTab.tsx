@@ -62,6 +62,7 @@ type Props = {
   onCampaignScheduleChange: (param:OperationTimeParam) => void;
 };
 
+const today = new Date();
 const tempOperationTimeTab:OperationTimeParam = {
   changeYn: false,
   campaignInfoChangeYn: false,
@@ -69,8 +70,8 @@ const tempOperationTimeTab:OperationTimeParam = {
   onSave: false,
   onClosed: false,
   campaign_id: 0,
-  start_date: '',
-  end_date: '',
+  start_date: today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2),
+  end_date: today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2),
   start_time: [],
   end_time: [],
   start_flag: ''
@@ -78,8 +79,6 @@ const tempOperationTimeTab:OperationTimeParam = {
 
 const OperationTimeTab: React.FC<Props> = ({ campaignInfo, campaignSchedule, onCampaignScheduleChange }) => {
   const [tempData, setTempData] = useState<DataProps[]>([]);
-  const [startDate, setStartDate] = useState<Date | null>(new Date());
-  const [endDate, setEndDate] = useState<Date | null>(new Date());
   const [startTime, setStartTime] = useState(""); // 시작시간
   const [endTime, setEndTime] = useState(""); // 종료시간
   const [tempCampaignSchedule, setTempCampaignSchedule] = useState<OperationTimeParam>(tempOperationTimeTab);
@@ -99,8 +98,8 @@ const OperationTimeTab: React.FC<Props> = ({ campaignInfo, campaignSchedule, onC
       const tempCampaignSchedule = campaignSchedule;
       const CampaignScheduleStartTime = tempCampaignSchedule.start_time;
       const CampaignScheduleEndTime = tempCampaignSchedule.end_time;
-      setStartDate(new Date(tempCampaignSchedule.start_date.substring(0,4)+'-'+ tempCampaignSchedule.start_date.substring(4,6)+'-'+ tempCampaignSchedule.start_date.substring(6,8)));
-      setEndDate(new Date(tempCampaignSchedule.end_date.substring(0,4)+'-'+ tempCampaignSchedule.end_date.substring(4,6)+'-'+ tempCampaignSchedule.end_date.substring(6,8)));
+      // setStartDate(new Date(tempCampaignSchedule.start_date.substring(0,4)+'-'+ tempCampaignSchedule.start_date.substring(4,6)+'-'+ tempCampaignSchedule.start_date.substring(6,8)));
+      // setEndDate(new Date(tempCampaignSchedule.end_date.substring(0,4)+'-'+ tempCampaignSchedule.end_date.substring(4,6)+'-'+ tempCampaignSchedule.end_date.substring(6,8)));
       if( CampaignScheduleStartTime.length > 0 && CampaignScheduleEndTime.length > 0 ) {
         setTempData([]);
         CampaignScheduleStartTime.map((item:string, index) => {
@@ -135,7 +134,8 @@ const OperationTimeTab: React.FC<Props> = ({ campaignInfo, campaignSchedule, onC
           <div className="flex flex-col gap-y-2">
             <div className="flex items-center gap-2 justify-between">
               <Label className="w-[5rem] min-w-[5rem]">시작</Label>
-              <Select value={campaignInfo?.start_flag+''} onValueChange={(value) => handleSelectChange(value, 'startFlag')}>
+              <Select value={campaignInfo.start_flag === 0?'2':campaignInfo.start_flag+''} onValueChange={(value) => handleSelectChange(value, 'startFlag')}
+                disabled={campaignInfo.start_flag === 0} >
                 <SelectTrigger>
                   <SelectValue placeholder="시작" />
                 </SelectTrigger>
@@ -149,7 +149,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignInfo, campaignSchedule, onC
 
             <div className="flex items-center gap-2 justify-between">
               <Label className="w-[5rem] min-w-[5rem]">종료구분</Label>
-              <CustomInput disabled={true} value={campaignInfo?.end_flag === 1?'진행 중':'완료'}/>
+              <CustomInput disabled={true} value={campaignInfo?.end_flag === 1?'진행 중':campaignInfo?.end_flag === 2?'완료':''}/>
             </div>
 
             <div className="flex items-center gap-2 justify-between">
@@ -157,15 +157,24 @@ const OperationTimeTab: React.FC<Props> = ({ campaignInfo, campaignSchedule, onC
               <DatePicker
                 onChange={(value) => {
                   if (value instanceof Date || value === null) {
-                    setStartDate(value);
+                    // setStartDate(value);
+                    let tempStartDate = '';
+                    let tempEndDate = tempCampaignSchedule.end_date;
+                    if( value != null){
+                      tempStartDate = value.getFullYear() + ('0' + (value.getMonth() + 1)).slice(-2) + ('0' + value.getDate()).slice(-2);
+                      if( tempStartDate > tempEndDate){
+                        tempEndDate = tempStartDate;
+                      }
+                    }
                     onCampaignScheduleChange({...tempCampaignSchedule
                       , changeYn: true
                       , campaignScheduleChangeYn: true
-                      , start_date: value ? value.getFullYear() + ('0' + (value.getMonth() + 1)).slice(-2) + ('0' + value.getDate()).slice(-2) : ''
+                      , start_date: tempStartDate
+                      , end_date: tempEndDate
                     });
                   }
                 }}
-                value={tempCampaignSchedule.start_date ? new Date(tempCampaignSchedule.start_date.substring(0,4)+'-'+ tempCampaignSchedule.start_date.substring(4,6)+'-'+ tempCampaignSchedule.start_date.substring(6,8)) : startDate}
+                value={ new Date(tempCampaignSchedule.start_date.substring(0,4)+'-'+ tempCampaignSchedule.start_date.substring(4,6)+'-'+ tempCampaignSchedule.start_date.substring(6,8)) }
                 format="yyyy-MM-dd"
                 className="w-full custom-calendar"
                 calendarIcon={<CalendarIcon className="mr-2 h-4 w-4" color="#989898" />}
@@ -178,15 +187,24 @@ const OperationTimeTab: React.FC<Props> = ({ campaignInfo, campaignSchedule, onC
               <DatePicker
                 onChange={(value) => {
                   if (value instanceof Date || value === null) {
-                    setEndDate(value);
+                    // setEndDate(value);
+                    let tempStartDate = tempCampaignSchedule.start_date;
+                    let tempEndDate = '';
+                    if( value != null){
+                      tempEndDate = value.getFullYear() + ('0' + (value.getMonth() + 1)).slice(-2) + ('0' + value.getDate()).slice(-2);
+                      if( tempStartDate > tempEndDate){
+                        tempEndDate = tempStartDate;
+                      }
+                    }
                     onCampaignScheduleChange({...tempCampaignSchedule
                       , changeYn: true
                       , campaignScheduleChangeYn: true
-                      , end_date: value ? value.getFullYear() + ('0' + (value.getMonth() + 1)).slice(-2) + ('0' + value.getDate()).slice(-2) : ''
+                      , start_date: tempStartDate
+                      , end_date: tempEndDate
                     });
                   }
                 }}
-                value={tempCampaignSchedule.end_date ? new Date(tempCampaignSchedule.end_date.substring(0,4)+'-'+ tempCampaignSchedule.end_date.substring(4,6)+'-'+ tempCampaignSchedule.end_date.substring(6,8)) : endDate}
+                value={new Date(tempCampaignSchedule.end_date.substring(0,4)+'-'+ tempCampaignSchedule.end_date.substring(4,6)+'-'+ tempCampaignSchedule.end_date.substring(6,8)) }
                 format="yyyy-MM-dd"
                 className="w-full custom-calendar"
                 calendarIcon={<CalendarIcon className="mr-2 h-4 w-4" color="#989898" />}
