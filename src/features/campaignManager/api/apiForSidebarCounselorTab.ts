@@ -11,7 +11,6 @@ export async function apiForTreeMenuDataForSimeBarCounselorTab(credentials: Main
   return response.data;
 }
 
-
 export async function apiToFetchCounselorTreeData(credentials: MainCredentials2): Promise<TabData[]> {
   interface CounselorResponse {
     counselorList: Counselor[];

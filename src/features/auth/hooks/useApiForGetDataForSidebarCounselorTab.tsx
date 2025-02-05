@@ -1,20 +1,21 @@
-import { useQuery } from '@tanstack/react-query';
-import { useAuthStore } from '@/store/authStore';
-import { TabData } from '@/features/campaignManager/types/typeForSidebar2';
+import { useEffect } from 'react';
+import { useCounselorStoreForSideBar } from '@/store/counselorStoreForSideBar';
 import { apiToFetchCounselorTreeData } from '@/features/campaignManager/api/apiForSidebarCounselorTab';
 
-export function useApiForGetDataForSidebarCounselorTab() {
-  const { tenant_id, role_id } = useAuthStore();
+export function useApiForSidebarCounselor(tenant_id: number, role_id: number) {
+  const { updateTreeData, setLoading, setError } = useCounselorStoreForSideBar();
 
-  const credentials = {
-    tenant_id: tenant_id.toString(),
-    roleId: role_id
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const data = await apiToFetchCounselorTreeData({ tenant_id, roleId: role_id });
+        updateTreeData(data);
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "알 수 없는 오류 발생");
+      }
+    };
 
-  return useQuery<TabData[], Error>({
-    queryKey: ['counselorTreeData', tenant_id],
-    queryFn: () => apiToFetchCounselorTreeData(credentials),
-    // enabled: !!tenant_id && !!role_id,
-    // staleTime: 5 * 60 * 1000, // 5분 동안 캐시 유지
-  });
+    fetchData();
+  }, [tenant_id, role_id, updateTreeData, setLoading, setError]);
 }
