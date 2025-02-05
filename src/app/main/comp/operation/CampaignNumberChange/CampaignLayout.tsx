@@ -53,6 +53,17 @@ function CampaignLayout() {
     });
 };
 
+const showAlert = (message: string) => {
+  setAlertState({
+      isOpen: true,
+      message,
+      title: '알림',
+      type: '1',
+      onConfirm: closeAlert,
+      onCancel: () => {}
+  });
+};
+
 const closeAlert = () => {
     setAlertState(prev => ({ ...prev, isOpen: false }));
 };
@@ -175,6 +186,17 @@ const closeAlert = () => {
 
   // 발신번호 저장 버튼 핸들러
   const handleSave = () => {
+    // 유효성 검사
+    if (!selectedCampaignId) {
+      showConfirm('대상캠페인을 선택해주세요.', () => {})
+      return;
+    }
+
+    if (!selectedCallingNumber || selectedCallingNumber.trim().length === 0) {
+      showConfirm('발신번호를 입력해주세요.', () => {})
+      return;
+    }
+
     const existingCallingNumber = callingNumbers.find(num => num.campaign_id === Number(selectedCampaignId));
     const saveRequest = {
       campaign_id: Number(selectedCampaignId),
@@ -182,11 +204,11 @@ const closeAlert = () => {
     };
 
     if (existingCallingNumber) {
-      showConfirm('발신번호를 수정하시겠습니까?', () => {
+      showConfirm('발신번호가 성공적으로 수정되었습니다.', () => {
         fetchCallingNumberUpdate(saveRequest);
       });
     } else {
-      showConfirm('발신번호를 추가하시겠습니까?', () => {
+      showConfirm('새로운 발신번호가 성공적으로 저장되었습니다.', () => {
         fetchCallingNumberInsert(saveRequest);
       });
     }
