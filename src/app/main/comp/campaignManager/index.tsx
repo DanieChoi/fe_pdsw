@@ -82,9 +82,6 @@ const CampaignManager = ({campaignId}: Props) => {
     }
   }, [tenants]);
 
-  console.log('campaignIdForUpdateFromSideMenu render : ', campaignIdForUpdateFromSideMenu);
-  
-
   return (
     <div>
       <div className='flex flex-col gap-4'>
