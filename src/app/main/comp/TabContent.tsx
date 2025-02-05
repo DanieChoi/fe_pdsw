@@ -6,6 +6,7 @@ import PreferencesBoard from "./preferences";
 import SystemPreferences from "./SystemPreferences";
 import CampaignMonitorDashbord from "./CampaignMonitorDashbord";
 import OutboundCallProgressPanel from "./OutboundCallProgressPanel";
+import ListManager from "./ListManager";
 import OperationBoard from "./operation";
 import CampaignManager from "./CampaignManager";
 import CampaignUpdatePanel from "./CampaignUpdatePanel";
@@ -34,7 +35,7 @@ const TabContent = () => {
       case 6:
         return <div className="p-2">채널 모니터 컨텐츠</div>;
       case 7:
-        return <div className="p-2">리스트 매니저 컨텐츠</div>;
+        return <div className="p-2"><ListManager /></div>;
       case 8:
         return <div className="p-2">예약콜 제한 설정 컨텐츠</div>;
       case 9:

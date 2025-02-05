@@ -36,6 +36,13 @@ export const loginApi = {
         throw new Error(data.result_msg || '로그인 실패');
       }
 
+      //SSE 실시간 이벤트 구독
+      const eventSource = new EventSource("http://localhost:4000/api/v1/notification/0/subscribe");
+
+      eventSource.addEventListener("message", (event) => {
+        console.log("event = ", event.data);
+      });
+
       // 사용자 정보 전역 상태 저장
       const userInfo: UserInfoData = {
         id: dataFirst.id,

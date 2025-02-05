@@ -10,6 +10,7 @@ export interface TreeItem {
   type: 'group' | 'team' | 'counselor' | 'folder' | 'campaign' | 'tenant' | 'center';  // 'tenant'와 'center' 추가
   children?: TreeItem[];
   tenantId?: string;
+  status?: string;
 }
 
 export interface CounselorData {

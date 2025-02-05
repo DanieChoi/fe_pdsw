@@ -46,7 +46,7 @@ export function TreeMenusForAgentTab() {
       };
 
       // 2레벨까지 자동 확장
-      expandUpToLevel(items, 0, 2);
+      expandUpToLevel(items, 0, 3);
 
       setExpandedNodes(newExpanded);
       setInitialized(true);

@@ -723,19 +723,10 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
       )
     };
   }),
-
-  openRebroadcastSettings: (campaignId: string, label: string) => {
-    const state = get();
-
-    // 이전 재발신 설정 탭들 제거
-    const existingTabs = state.openedTabs.filter(tab => tab.id === 20);
-    existingTabs.forEach(tab => {
-      state.removeTab(tab.id, tab.uniqueKey);
-    });
-
-    // 상태 다시 가져오기 (제거된 후의 상태)
-    const updatedState = get();
-
+  openRebroadcastSettings: (campaignId: string, label: string) => set((state) => {
+    // 이전 재발신 설정 탭들 제거한 새로운 상태 생성
+    const filteredTabs = state.openedTabs.filter(tab => tab.id !== 20);
+    
     const newTabKey = `rebroadcast-${campaignId}-${Date.now()}`;
     const newTab = {
       id: 20,
@@ -746,25 +737,25 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
       campaignId,
       content: null,
     };
-
-    // 새로운 상태 설정
-    return set({
-      openedTabs: [...updatedState.openedTabs, newTab],
+  
+    return {
+      openedTabs: [...filteredTabs, newTab],
       activeTabId: newTab.id,
       activeTabKey: newTabKey,
-      rows: updatedState.rows.map(row =>
+      rows: state.rows.map(row =>
         row.id === 'row-1' ? {
           ...row,
           sections: row.sections.map(section =>
             section.id === 'default' ? {
               ...section,
-              tabs: [...section.tabs, newTab]
+              tabs: [...section.tabs.filter(tab => tab.id !== 20), newTab]
             } : section
           )
         } : row
       )
-    });
-  },
+    };
+  }),
+  
   campaignIdForUpdateFromSideMenu: null,
   setCampaignIdForUpdateFromSideMenu: (id) => set({ campaignIdForUpdateFromSideMenu: id }),
 
