@@ -7,7 +7,7 @@ export const fetchTenants = async (): Promise<TenantListResponse> => {
   const tenantRequestData = {
     filter: {      
       tenant_id: {
-        start: 1,
+        start: 0,
         end: 9999999,
       },
     },

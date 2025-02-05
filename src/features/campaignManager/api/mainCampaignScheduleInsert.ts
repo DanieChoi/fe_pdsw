@@ -1,10 +1,10 @@
-// src/features/campaignManager/hooks/fetchCampaignScheduleUpdate.ts
+// src/features/campaignManager/hooks/fetchCampaignScheduleInsert.ts
 import { axiosInstance } from '@/lib/axios';
 import { CampaignScheDuleListDataResponse, UpdateResponse } from '../types/campaignManagerIndex';
 
-// 캠페인 스케줄 수정 요청
-export const fetchCampaignScheduleUpdate = async (credentials: CampaignScheDuleListDataResponse): Promise<UpdateResponse> => {
-  const campaignScheduleUpdateRequestData = {
+// 캠페인 스케줄 등록 요청
+export const fetchCampaignScheduleInsert = async (credentials: CampaignScheDuleListDataResponse): Promise<UpdateResponse> => {
+  const campaignScheduleInsertRequestData = {
     request_data: {      
       tenant_id: credentials.tenant_id, 
       start_date: credentials.start_date,
@@ -15,9 +15,9 @@ export const fetchCampaignScheduleUpdate = async (credentials: CampaignScheDuleL
   };
 
   try {
-    const { data } = await axiosInstance.put<UpdateResponse>(
+    const { data } = await axiosInstance.post<UpdateResponse>(
       'campaigns/'+credentials.campaign_id+'/schedule', 
-      campaignScheduleUpdateRequestData
+      campaignScheduleInsertRequestData
     );
     return data;
   } catch (error: any) {
