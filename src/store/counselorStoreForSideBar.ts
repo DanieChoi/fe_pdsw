@@ -1,3 +1,4 @@
+// C:\nproject\fe_pdsw\src\store\counselorStoreForSideBar.ts
 import { create } from 'zustand';
 import { TabData, TreeItem } from '@/features/campaignManager/types/typeForSidebar2';
 

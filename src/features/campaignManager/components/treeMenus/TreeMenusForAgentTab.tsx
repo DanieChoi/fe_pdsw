@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSideMenuStore } from "@/store/sideMenuStore";
 import { useCounselorStoreForSideBar } from "@/store/counselorStoreForSideBar";
 import { useAuthStore } from "@/store/authStore"; // 현재 로그인된 유저의 tenant_id, role_id 가져오기
-import { useApiForSidebarCounselor } from "@/features/auth/hooks/useApiForGetDataForSidebarCounselorTab";
+import { useApiForSidebarCounselor } from "@/features/campaignManager/hooks/useApiForGetDataForSidebarCounselorTab";
 
 export function TreeMenusForAgentTab() {
   const { tenant_id, role_id } = useAuthStore(); // 현재 로그인된 사용자 정보 가져오기
