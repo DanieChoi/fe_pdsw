@@ -3,10 +3,11 @@ import { CustomInput } from "@/components/shared/CustomInput";
 import { Label } from "@/components/ui/label";
 import DataGrid, { CellClickArgs } from 'react-data-grid';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
-import { useMainStore, useCampainManagerStore } from '@/store';
+import { useMainStore } from '@/store';
 import { SkillListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import TitleWrap from "@/components/shared/TitleWrap";
+import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
@@ -18,7 +19,7 @@ const dialModeList = [
 interface CampaignModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (campaign: string) => void;
+  onSelect: (campaignId: string, campaignName: string) => void;
 }
 
 interface Row {
@@ -30,7 +31,7 @@ interface Row {
 
 export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignModalProps) {
   const { tenants, campaigns } = useMainStore();
-  const { skills } = useCampainManagerStore();
+  const [skills, setSkills] = useState<SkillListDataResponse[]>([]);
   const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
   const [tenantId, setTenantId] = useState('all');
   const [campaignName, setCampaignName] = useState('');
@@ -39,7 +40,19 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
   const [callNumber, setCallNumber] = useState('');
   const [tempSkills, setTempSkills] = useState<SkillListDataResponse[]>([]);
 
-  
+  // Fetch skills directly in the modal
+  const { mutate: fetchSkills } = useApiForSkills({
+    onSuccess: (data) => {
+      setSkills(data.result_data);
+    }
+  });
+
+  useEffect(() => {
+    fetchSkills({
+      tenant_id_array: tenants.map(t => t.tenant_id)
+    });
+  }, [tenants, fetchSkills]);
+
   const columns = useMemo(() => [
     { 
       key: 'campaign_id', 
@@ -73,35 +86,34 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
 
       return {
         campaign_id: campaign.campaign_id,
-          campaign_name: campaign.campaign_name,
-          tenant_name: tenant?.tenant_name || '',
-          skills: campaignSkills,
+        campaign_name: campaign.campaign_name,
+        tenant_name: tenant?.tenant_name || '',
+        skills: campaignSkills,
       };
     }), 
     [campaigns, tenants, skills]
   );
-  
-   // 그리드 행 클릭 핸들러
-   const handleCellClick = ({ row }: CellClickArgs<Row>) => {
+
+  const handleCellClick = ({ row }: CellClickArgs<Row>) => {
     const campaign = campaigns.find(c => c.campaign_id === row.campaign_id);
     if (campaign) {
       setSelectedCampaign(campaign);
     }
   };
 
-  // 확인 버튼 클릭 시
   const handleConfirm = () => {
     if (selectedCampaign) {
-      const tenant = tenants.find(t => t.tenant_id === selectedCampaign.tenant_id);
-      onSelect(tenant?.tenant_name || '');
+      onSelect(
+        selectedCampaign.campaign_id.toString(),
+        selectedCampaign.campaign_name
+      );
     }
     onClose();
   };
 
-  // 닫기 버튼 클릭 시
   const handleClose = () => {
     setSelectedCampaign(null);
-    onSelect('');
+    onSelect('', '');
     onClose();
   };
 
@@ -129,96 +141,97 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
   const modalContent = (
     <div className="w-full">
       {/* Search Section */}
-        <TitleWrap
-            title="조회조건"
-            buttons={[
-                { 
-                    label: "적용", 
-                    onClick: onHeaderSearch,
-                },
-            ]}
-        />
+      <TitleWrap
+        title="조회조건"
+        buttons={[
+          { 
+            label: "적용", 
+            onClick: onHeaderSearch,
+          },
+        ]}
+      />
       
-        {/* Search Fields */}
-        <div className="search-wrap flex flex-col gap-2">
-          <div className="flex gap-2">
-            <div className="flex items-center gap-1">
-              <Label className="w-20 min-w-20">테넌트</Label>
-              <div className='w-[140px]'>
-                <Select value={tenantId} onValueChange={setTenantId}>
-                  <SelectTrigger className="w-[140px]">
-                    <SelectValue placeholder="테넌트" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">전체</SelectItem>
-                    {tenants.map(option => (
-                      <SelectItem key={option.tenant_id} value={option.tenant_id+''}>{option.tenant_name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="flex items-center gap-1">
-              <Label className="w-20 min-w-20">캠페인이름</Label>
-              <CustomInput 
-                type="text" 
-                value={campaignName}
-                onChange={(e) => setCampaignName(e.target.value)}
-                className="w-[140px]"
-              />
-            </div>
-            <div className="flex items-center gap-1">
-              <Label className="w-20 min-w-20">다이얼모드</Label>
-              <div className='w-[140px]'>
-                <Select value={dailMode} onValueChange={setDailMode}>
-                  <SelectTrigger className="">
-                    <SelectValue placeholder="다이얼모드" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">전체</SelectItem>
-                    {dialModeList.map(option => (
-                      <SelectItem key={option.dial_id} value={option.dial_id+''}>{option.dial_name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                </div>
+      {/* Search Fields */}
+      <div className="search-wrap flex flex-col gap-2">
+        <div className="flex gap-2">
+          <div className="flex items-center gap-1">
+            <Label className="w-20 min-w-20">테넌트</Label>
+            <div className='w-[140px]'>
+              <Select value={tenantId} onValueChange={setTenantId}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="테넌트" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  {tenants.map(option => (
+                    <SelectItem key={option.tenant_id} value={option.tenant_id+''}>{option.tenant_name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
-
-          <div className="flex gap-2">
-            <div className="flex items-center gap-1">
-              <Label className="w-20 min-w-20">스킬</Label>
-              <div className='w-[140px]'>
-                <Select value={skill} onValueChange={setSkill}>
-                  <SelectTrigger className="w-[140px]">
-                    <SelectValue placeholder="스킬" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">전체</SelectItem>
-                    {tempSkills.map(option => (
-                      <SelectItem key={option.skill_id} value={option.skill_id+''}>{option.skill_name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="flex items-center gap-1">
-              <Label className="w-20 min-w-20">발신번호</Label>
-              <CustomInput 
-                type="text" 
-                value={callNumber}
-                onChange={(e) => setCallNumber(e.target.value)}
-                className="w-[140px]"
-                placeholder="발신번호 입력"
-              />
+          <div className="flex items-center gap-1">
+            <Label className="w-20 min-w-20">캠페인이름</Label>
+            <CustomInput 
+              type="text" 
+              value={campaignName}
+              onChange={(e) => setCampaignName(e.target.value)}
+              className="w-[140px]"
+            />
+          </div>
+          <div className="flex items-center gap-1">
+            <Label className="w-20 min-w-20">다이얼모드</Label>
+            <div className='w-[140px]'>
+              <Select value={dailMode} onValueChange={setDailMode}>
+                <SelectTrigger className="">
+                  <SelectValue placeholder="다이얼모드" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  {dialModeList.map(option => (
+                    <SelectItem key={option.dial_id} value={option.dial_id+''}>{option.dial_name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
 
-      {/* List Header */}
+        <div className="flex gap-2">
+          <div className="flex items-center gap-1">
+            <Label className="w-20 min-w-20">스킬</Label>
+            <div className='w-[140px]'>
+              <Select value={skill} onValueChange={setSkill}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="스킬" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  {tempSkills.map(option => (
+                    <SelectItem key={option.skill_id} value={option.skill_id+''}>{option.skill_name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex items-center gap-1">
+            <Label className="w-20 min-w-20">발신번호</Label>
+            <CustomInput 
+              type="text" 
+              value={callNumber}
+              onChange={(e) => setCallNumber(e.target.value)}
+              className="w-[140px]"
+              placeholder="발신번호 입력"
+            />
+          </div>
+        </div>
+      </div>
 
-
-      <TitleWrap title="캠페인 검색목록" totalCount={campaigns.length} className='mt-[14px]'/>
+      <TitleWrap 
+        title="캠페인 검색목록" 
+        totalCount={campaigns.length} 
+        className='mt-[14px]'
+      />
 
       {/* Grid */}
       <div className="grid-custom-wrap h-[400px]">
