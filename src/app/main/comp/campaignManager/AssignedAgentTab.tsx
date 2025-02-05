@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DataGrid, { Column } from 'react-data-grid';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import 'react-data-grid/lib/styles.css';
 import { CommonButton } from "@/components/shared/CommonButton";
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { useApiForCampaignAgent } from '@/features/campaignManager/hooks/useApiForCampaignAgent';
+import { useApiForCampaignAssignmentAgent } from '@/features/campaignManager/hooks/useApiForCampaignAssignmentAgent';
 
 interface ConsultingData {
   id: string;
@@ -23,7 +26,29 @@ interface TreeRow extends ConsultingData {
   children?: TreeRow[];
 }
 
-const AssignedAgentTab: React.FC = () => {
+type Props = {
+  campaignInfo: MainDataResponse;
+}
+
+const AssignedAgentTab: React.FC<Props> = ({campaignInfo}) => {
+  // 캠페인 소속 상담사 리스트 요청
+  const { mutate: fetchCampaignAgents } = useApiForCampaignAgent({
+    onSuccess: (data) => {
+      if( data.result_data.length > 0 && data.result_data[0].agent_id.length > 0 ){
+        fetchCampaignAssignmentAgents({
+          tenant_id: campaignInfo.tenant_id
+          , counselors: data.result_data[0].agent_id.join(',')
+        });
+      }
+    }
+  });
+  //할당상담원 정보 조회
+  const { mutate: fetchCampaignAssignmentAgents } = useApiForCampaignAssignmentAgent({
+    onSuccess: (data) => {
+      console.log(data.assignedCounselorList);
+    }
+  });
+  
   const initialData: TreeRow[] = [
     {
       id: 'group-124752',
@@ -85,6 +110,12 @@ const AssignedAgentTab: React.FC = () => {
   ];
 
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set(['group-124752']));
+
+  useEffect(() => {
+    if (campaignInfo && campaignInfo.campaign_id > 0 ) {  
+      fetchCampaignAgents({ campaign_id: campaignInfo.campaign_id });
+    }
+  }, [campaignInfo]);
 
   const toggleRowExpand = (rowId: string) => {
     const newExpandedRows = new Set(expandedRows);

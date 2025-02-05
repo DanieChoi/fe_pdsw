@@ -1,4 +1,4 @@
-// src/features/auth/api/apiForTenants.ts
+// src/features/campaignManager/api/apiForTenants.ts
 import { TenantApiError, TenantListResponse, TenantRequestData } from "@/features/campaignManager/types/typeForTenant";
 import { axiosInstance } from "@/lib/axios";
 
