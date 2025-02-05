@@ -23,6 +23,7 @@ import { MainDataResponse } from '@/features/auth/types/mainIndex';
 
 type Props = {
   campaignSchedule: CampaignScheDuleListDataResponse;
+  newCampaignYn: boolean;
   campaignInfo: MainDataResponse;
   campaignDialSpeedInfo: CallPacingTabParam;
   onCampaignScheduleChange: (param:OperationTimeParam) => void;
@@ -36,6 +37,7 @@ type Props = {
 };
 
 const CampaignTab: React.FC<Props> = ({ campaignSchedule
+  , newCampaignYn
   , campaignInfo
   , campaignDialSpeedInfo
   , onCampaignScheduleChange
@@ -63,7 +65,7 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
         </TabsList>
       </div>
       <TabsContent value="tab1">
-        <OperationTimeTab campaignInfo={campaignInfo} campaignSchedule={campaignSchedule} onCampaignScheduleChange={onCampaignScheduleChange} />
+        <OperationTimeTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} campaignSchedule={campaignSchedule} onCampaignScheduleChange={onCampaignScheduleChange} />
       </TabsContent>
       <TabsContent value="tab2">
         <OutgoingOrderTab campaignInfo={campaignInfo} onCampaignOutgoingOrderChange={onCampaignOutgoingOrderChange} />
@@ -84,7 +86,7 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
         <NotificationTab campaignInfo={campaignInfo} onHandleNotificationTabChange={onHandleNotificationTabChange} />
       </TabsContent>
       <TabsContent value="tab8">
-        <AssignedAgentTab campaignInfo={campaignInfo}/>
+        <AssignedAgentTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onHandleAdditionalInfoTabChange={onHandleAdditionalInfoTabChange} />
       </TabsContent>
       <TabsContent value="tab9">
         <AdditionalInfoTab campaignInfo={campaignInfo} onHandleAdditionalInfoTabChange={onHandleAdditionalInfoTabChange} />
