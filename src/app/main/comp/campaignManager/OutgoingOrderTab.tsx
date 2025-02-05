@@ -51,11 +51,12 @@ const CampaignOutgoingOrderTab:OutgoingOrderTabParam = {
 };
 
 type Props = {
+  newCampaignYn: boolean;
   campaignInfo: MainDataResponse;
   onCampaignOutgoingOrderChange: (param:OutgoingOrderTabParam) => void;
 };
 
-const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrderChange }) => {
+const OutgoingOrderTab: React.FC<Props> = ({ newCampaignYn, campaignInfo, onCampaignOutgoingOrderChange }) => {
   const { phoneDescriptions } = useCampainManagerStore();
   const [tempData, setTempData] = useState<DataProps[]>([]);
   const [tempRightData, setTempRightData] = useState<RightDataProps[]>([]);
@@ -359,6 +360,7 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrd
               </div>
             </div>
           </div>
+          {!newCampaignYn &&
           <div className="flex justify-end gap-2 mt-5">
             <CommonButton variant="secondary" onClick={()=> 
               onCampaignOutgoingOrderChange({...tempCampaignOutgoingOrderTab
@@ -371,6 +373,7 @@ const OutgoingOrderTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingOrd
               })
             }>취소</CommonButton>
           </div>
+          }
         </div>
       </div>
     </div>

@@ -42,11 +42,12 @@ const CampaignOutgoingMethodTab:OutgoingMethodTabParam = {
 };
 
 type Props = {
+  newCampaignYn: boolean;
   campaignInfo: MainDataResponse;
   onCampaignOutgoingMethodChange: (param:OutgoingMethodTabParam) => void;
 };
 
-const OutgoingMethodTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingMethodChange }) => {
+const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCampaignOutgoingMethodChange }) => {
   const { campaigns } = useMainStore();
   const [trunkAccessCode, setTrunkAccessCode] = useState("");
   const [retryInterval] = useState("20");
@@ -386,6 +387,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingMe
        </div>
       </div>
 
+      {!newCampaignYn &&
       <div className="flex justify-end gap-2 mt-5">
         <CommonButton variant="secondary" onClick={()=> 
           onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
@@ -398,6 +400,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingMe
           })
         }>취소</CommonButton>
       </div>
+      }
     </div>
   );
 };

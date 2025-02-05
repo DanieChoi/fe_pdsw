@@ -68,13 +68,13 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
         <OperationTimeTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} campaignSchedule={campaignSchedule} onCampaignScheduleChange={onCampaignScheduleChange} />
       </TabsContent>
       <TabsContent value="tab2">
-        <OutgoingOrderTab campaignInfo={campaignInfo} onCampaignOutgoingOrderChange={onCampaignOutgoingOrderChange} />
+        <OutgoingOrderTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onCampaignOutgoingOrderChange={onCampaignOutgoingOrderChange} />
       </TabsContent>
       <TabsContent value="tab3">
-        <OutgoingStrategyTab campaignInfo={campaignInfo} onCampaignOutgoingStrategyChange={onCampaignOutgoingStrategyChange} />
+        <OutgoingStrategyTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onCampaignOutgoingStrategyChange={onCampaignOutgoingStrategyChange} />
       </TabsContent>
       <TabsContent value="tab4">
-        <OutgoingMethodTab campaignInfo={campaignInfo} onCampaignOutgoingMethodChange={onCampaignOutgoingMethodChange} />
+        <OutgoingMethodTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onCampaignOutgoingMethodChange={onCampaignOutgoingMethodChange} />
       </TabsContent>
       <TabsContent value="tab5">
         <CallPacingTab campaignDialSpeedInfo={campaignDialSpeedInfo} onHandleCallPacingTabChange={onHandleCallPacingTabChange} />

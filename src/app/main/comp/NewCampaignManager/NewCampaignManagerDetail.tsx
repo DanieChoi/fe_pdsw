@@ -749,7 +749,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         });
       }
     }
-    if( tempCampaignManagerInfo.campaign_name === '' ){
+    if(!saveErrorCheck && tempCampaignManagerInfo.campaign_name === '' ){
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -759,7 +759,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
-    if( tempCampaignManagerInfo.tenant_id < 0 ){
+    if(!saveErrorCheck && tempCampaignManagerInfo.tenant_id < 0 ){
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -769,7 +769,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
-    if( tempCampaignSchedule.start_time.length === 0){
+    if( !saveErrorCheck && tempCampaignSchedule.start_time.length === 0){
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -954,7 +954,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
           title="캠페인정보"
           buttons={[
               { label: "캠페인 생성", onClick: () => handleCampaignSave(),},
-              { label: "생성 취소", onClick: () => console.log("") },
+              { label: "생성 취소", onClick: () => handleCampaignClosed() },
           ]}
           />
           <div className="grid grid-cols-3 gap-x-4 gap-y-2">

@@ -61,11 +61,12 @@ const CampaignOutgoingOrderTab:OutgoingStrategyTabParam = {
 };
 
 type Props = {
+  newCampaignYn: boolean;
   campaignInfo: MainDataResponse;
   onCampaignOutgoingStrategyChange: (param:OutgoingStrategyTabParam) => void;
 };
 
-const OutgoingStrategyTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoingStrategyChange }) => {
+const OutgoingStrategyTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCampaignOutgoingStrategyChange }) => {
   const [tempOutgoingStrategyTab, setTempOutgoingStrategyTab] = useState<OutgoingStrategyTabParam>(CampaignOutgoingOrderTab);
   const [maxCallsRows, setMaxCallsRows] = useState<MaxCallsRow[]>([
     {
@@ -264,6 +265,7 @@ const OutgoingStrategyTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoing
           </div>
         </div>
       </div>
+      {!newCampaignYn &&
       <div className="flex justify-end gap-2 mt-5">
         <CommonButton variant="secondary" onClick={()=> 
           onCampaignOutgoingStrategyChange({...tempOutgoingStrategyTab
@@ -276,6 +278,7 @@ const OutgoingStrategyTab: React.FC<Props> = ({ campaignInfo, onCampaignOutgoing
           })
         }>취소</CommonButton>
       </div>
+      }
     </div>
   );
 };
