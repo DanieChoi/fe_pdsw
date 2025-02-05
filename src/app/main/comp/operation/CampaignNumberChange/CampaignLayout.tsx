@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import DataGrid, { CellClickArgs } from "react-data-grid";
+import DataGrid from "react-data-grid";
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useMainStore, useCampainManagerStore } from '@/store';
 import CampaignModal from '../CampaignModal';
@@ -10,9 +10,9 @@ import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 
-interface Row extends MainDataResponse {
-  calling_number?: string;
-}
+type GridRow = MainDataResponse & {
+  calling_number: string;  // 필수 필드로 변경
+};
 
 function CampaignLayout() {
   const { 
@@ -22,9 +22,10 @@ function CampaignLayout() {
   const { callingNumbers, setCallingNumbers } = useCampainManagerStore();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCampaignValue, setSelectedCampaignValue] = useState('');
+  const [selectedRow, setSelectedRow] = useState<GridRow | null>(null);
+  const [selectedCampaignId, setSelectedCampaignId] = useState('');
+  const [selectedCampaignName, setSelectedCampaignName] = useState('');
   const [selectedCallingNumber, setSelectedCallingNumber] = useState('');
-  const [selectedRow, setSelectedRow] = useState<Row | null>(null);
 
   // 발신번호 조회
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
@@ -34,12 +35,19 @@ function CampaignLayout() {
   });
 
   useEffect(() => {
-    // 컴포넌트가 마운트될 때 발신번호 조회
     fetchCallingNumbers({
       session_key: '',
       tenant_id: 0,
     });
   }, [fetchCallingNumbers]);
+
+  // 발신번호 업데이트 함수
+  const updateCallingNumber = (campaignId: number) => {
+    const callingNumber = callingNumbers.find(
+      num => num.campaign_id === campaignId
+    );
+    setSelectedCallingNumber(callingNumber?.calling_number || '');
+  };
 
   const columns = useMemo(() => [
     {
@@ -63,26 +71,55 @@ function CampaignLayout() {
       );
       return {
         ...campaign,
-        calling_number: callingNumber?.calling_number || '' // 항상 string 값을 반환하도록 보장
+        calling_number: callingNumber?.calling_number || ''
       };
-    })
+    }).filter(row => row.calling_number !== '') // 발신번호가 있는 행만 필터링
   , [campaigns, callingNumbers]);
 
-  const handleCellClick = ({ row }: { row: Row }) => {
-    setSelectedRow(row);
-    setSelectedCampaign(row);
-    const callingNumber = callingNumbers.find(
-      (number) => number.campaign_id === row.campaign_id
-    );
-    setSelectedCallingNumber(callingNumber?.calling_number || '');
+  const handleCellClick = (args: { row: GridRow }) => {
+    setSelectedRow(args.row);
+    setSelectedCampaign(args.row);
+    setSelectedCampaignId(args.row.campaign_id.toString());
+    setSelectedCampaignName(args.row.campaign_name);
+    updateCallingNumber(args.row.campaign_id);
   };
 
-  const handleCampaignSelect = (tenantName: string) => {
-    setSelectedCampaignValue(tenantName);
-  };
-
-  const getRowClass = (row: Row) => {
+  const getRowClass = (row: GridRow) => {
     return selectedRow?.campaign_id === row.campaign_id ? 'bg-[#FFFAEE]' : ''; 
+  };
+
+  // 대상캠페인 Select 변경 핸들러
+  const handleCampaignIdChange = (value: string) => {
+    setSelectedCampaignId(value);
+    const campaign = campaigns.find(c => c.campaign_id.toString() === value);
+    if (campaign) {
+      const campaignWithCallingNumber: GridRow = {
+        ...campaign,
+        calling_number: callingNumbers.find(num => num.campaign_id === campaign.campaign_id)?.calling_number || ''
+      };
+      setSelectedCampaignName(campaign.campaign_name);
+      updateCallingNumber(campaign.campaign_id);
+      setSelectedRow(campaignWithCallingNumber);
+      setSelectedCampaign(campaign);
+    }
+  };
+
+  // 캠페인 모달에서 선택 시 핸들러
+  const handleModalSelect = (campaignId: string, campaignName: string) => {
+    setSelectedCampaignId(campaignId);
+    setSelectedCampaignName(campaignName);
+    const campaignIdNum = Number(campaignId);
+    updateCallingNumber(campaignIdNum);
+    
+    const campaign = campaigns.find(c => c.campaign_id === campaignIdNum);
+    if (campaign) {
+      const campaignWithCallingNumber: GridRow = {
+        ...campaign,
+        calling_number: callingNumbers.find(num => num.campaign_id === campaign.campaign_id)?.calling_number || ''
+      };
+      setSelectedRow(campaignWithCallingNumber);
+      setSelectedCampaign(campaign);
+    }
   };
 
   return (
@@ -90,13 +127,13 @@ function CampaignLayout() {
       {/* 왼쪽 그리드 */}
       <div className="w-[580px]">
         <div className='grid-custom-wrap h-[230px]'>
-          <DataGrid
+          <DataGrid<GridRow>
             columns={columns}
             rows={rows}
             className="grid-custom"
             onCellClick={handleCellClick}
-            rowKeyGetter={(row) => row.campaign_id.toString()}
-            selectedRows={selectedRow ? new Set<string>([selectedRow.campaign_id.toString()]) : new Set<string>()}
+            rowKeyGetter={(row) => row.campaign_id}
+            selectedRows={selectedRow ? new Set([selectedRow.campaign_id]) : new Set()}
             rowHeight={26}
             headerRowHeight={26}
             rowClass={getRowClass} 
@@ -111,25 +148,43 @@ function CampaignLayout() {
           <div className="flex items-center gap-2">
             <Label className="w-[5rem] min-w-[5rem]">대상캠페인</Label>
             <div className='w-[140px]'>
-              <Select>
+              <Select
+                value={selectedCampaignId}
+                onValueChange={handleCampaignIdChange}
+              >
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="선택" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="web_only">web_only</SelectItem>
+                  {campaigns.map(campaign => (
+                    <SelectItem 
+                      key={campaign.campaign_id} 
+                      value={campaign.campaign_id.toString()}
+                    >
+                      {campaign.campaign_id}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <CommonButton 
               variant="outline" 
               size="sm"
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => {
+                // 모달 열기 전 상세 정보 초기화
+                setSelectedRow(null);
+                setSelectedCampaign(null);
+                setSelectedCampaignId('');
+                setSelectedCampaignName('');
+                setSelectedCallingNumber('');
+                setIsModalOpen(true);
+              }}
             >
               캠페인조회
             </CommonButton>
             <CustomInput 
               type="text" 
-              value={selectedCampaignValue} 
+              value={selectedCampaignName} 
               readOnly 
               className=""
             />
@@ -142,8 +197,6 @@ function CampaignLayout() {
               type="text" 
               value={selectedCallingNumber}
               onChange={(e) => setSelectedCallingNumber(e.target.value)}
-              // placeholder="그리드에서 선택"
-              // disabled
               className=""
             />
           </div>
@@ -173,10 +226,10 @@ function CampaignLayout() {
       <CampaignModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSelect={handleCampaignSelect}
+        onSelect={handleModalSelect}
       />
     </div>
   );
-};
+}
 
 export default CampaignLayout;
