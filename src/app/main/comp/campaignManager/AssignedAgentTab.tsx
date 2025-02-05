@@ -11,11 +11,11 @@ import { useApiForCampaignAssignmentAgent } from '@/features/campaignManager/hoo
 
 interface ConsultingData {
   id: string;
-  상담그룹?: string;
-  상담팀?: string;
-  상담원?: string;
-  상담원아이디?: string;
-  상담원이름?: string;
+  affiliationGroupId?: string;
+  affiliationTeamId?: string;
+  counselorEmplNum?: string;
+  counselorId?: string;
+  counselorname?: string;
 }
 
 interface TreeRow extends ConsultingData {
@@ -31,6 +31,7 @@ type Props = {
 }
 
 const AssignedAgentTab: React.FC<Props> = ({campaignInfo}) => {
+  const [initialData, setInitialData] = useState<TreeRow[]>([]);
   // 캠페인 소속 상담사 리스트 요청
   const { mutate: fetchCampaignAgents } = useApiForCampaignAgent({
     onSuccess: (data) => {
@@ -42,74 +43,83 @@ const AssignedAgentTab: React.FC<Props> = ({campaignInfo}) => {
       }
     }
   });
+  const transformToTreeData = (counselors: any[]) => {
+    const result: any[] = [];
+
+    counselors.forEach((counselor) => {
+        let group = result.find(group => group.affiliationGroupId === counselor.affiliationGroupId);
+        if (!group) {
+            group = {
+                id: `group-${counselor.affiliationGroupId}`,
+                level: 0,
+                hasChildren: true,
+                affiliationGroupId: counselor.affiliationGroupId,
+                children: []
+            };
+            result.push(group);
+        }
+
+        let team = group.children.find((team: TreeRow) => team.affiliationTeamId === counselor.affiliationTeamId);
+        if (!team) {
+            team = {
+                id: `team-${counselor.affiliationTeamId}`,
+                parentId: group.id,
+                level: 1,
+                hasChildren: true,
+                affiliationTeamId: counselor.affiliationTeamId,
+                children: []
+            };
+            group.children.push(team);
+        }
+
+        team.children.push({
+            id: counselor.counselorEmplNum,
+            parentId: team.id,
+            level: 2,
+            counselorEmplNum: counselor.counselorEmplNum,
+            counselorId: counselor.counselorId,
+            counselorname: counselor.counselorname
+        });
+    });
+
+    return result;
+  };
   //할당상담원 정보 조회
   const { mutate: fetchCampaignAssignmentAgents } = useApiForCampaignAssignmentAgent({
     onSuccess: (data) => {
-      console.log(data.assignedCounselorList);
+      const transformedData = transformToTreeData(data.assignedCounselorList);
+      setInitialData(transformedData.sort((a, b) => a.id.localeCompare(b.id)));
     }
   });
   
-  const initialData: TreeRow[] = [
-    {
-      id: 'group-124752',
-      level: 0,
-      hasChildren: true,
-      상담그룹: '124752',
-      children: [
-        {
-          id: 'team-140201-1',
-          parentId: 'group-124752',
-          level: 1,
-          hasChildren: true,
-          상담팀: '140201',
-          children: [
-            {
-              id: '1101',
-              parentId: 'team-140201-1',
-              level: 2,
-              상담원: '110101',
-              상담원아이디: 'sktest008',
-              상담원이름: '111038',
-            },
-            {
-              id: '1102-1',
-              parentId: 'team-140201-1',
-              level: 2,
-              상담원: '110102',
-              상담원아이디: 'sktest009',
-              상담원이름: '111039',
-            },
-            {
-              id: '1102-2',
-              parentId: 'team-140201-1',
-              level: 2,
-              상담원: '110102',
-              상담원아이디: 'sktest009',
-              상담원이름: '111039',
-            }
-          ]
-        },
-        {
-          id: 'team-140201-2',
-          parentId: 'group-124752',
-          level: 1,
-          hasChildren: false,
-          상담팀: '140201',
-          children: []
-        },
-        {
-          id: 'team-140101',
-          parentId: 'group-124752',
-          level: 1,
-          hasChildren: false,
-          상담팀: '140101',
-          children: []
-        }
-      ]
+  useEffect(() => {
+    if( initialData.length > 0){
+      // const expandedRowIds = initialData.map(row => row.id);
+      const expandedData = initialData.map(group => ({
+        ...group,
+        children: group.children?.map(team => ({
+          ...team,
+          children: team.children?.map(counselor => ({
+            ...counselor,
+            expanded: true  // Marking the counselors as expanded
+          }))
+        }))
+      }));
+      const expandedRowIds = new Set<string>();
+      expandedData.forEach(group => {
+        expandedRowIds.add(group.id);
+        group.children?.forEach(team => {
+          expandedRowIds.add(team.id);
+          team.children?.forEach(counselor => {
+            expandedRowIds.add(counselor.id);
+          });
+        });
+      });
+      setExpandedRows(expandedRowIds);
     }
-  ];
+  }, [initialData]);
 
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set(['group-124752']));
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set([]));
 
   useEffect(() => {
     if (campaignInfo && campaignInfo.campaign_id > 0 ) {  
@@ -129,13 +139,15 @@ const AssignedAgentTab: React.FC<Props> = ({campaignInfo}) => {
 
   function flattenRows(rows: TreeRow[]): TreeRow[] {
     let flat: TreeRow[] = [];
-    rows.forEach((row) => {
-      const isExpanded = expandedRows.has(row.id);
-      flat.push({ ...row, isExpanded });
-      if (row.children && isExpanded) {
-        flat = flat.concat(flattenRows(row.children));
-      }
-    });
+    if( rows.length > 0 ){
+      rows.forEach((row) => {
+        const isExpanded = expandedRows.has(row.id);
+        flat.push({ ...row, isExpanded });
+        if (row.children && isExpanded) {
+          flat = flat.concat(flattenRows(row.children));
+        }
+      });
+    }
     return flat;
   }
 
@@ -152,9 +164,9 @@ const AssignedAgentTab: React.FC<Props> = ({campaignInfo}) => {
         let displayName = '';
 
         if (row.level === 0) {
-          displayName = `상담그룹 : ${row.상담그룹}`;
+          displayName = `상담그룹 : ${row.affiliationGroupId}`;
         } else if (row.level === 1) {
-          displayName = `상담팀${row.상담팀}`;
+          displayName = `상담팀${row.affiliationTeamId}`;
         } else {
           displayName = row.id;
         }
@@ -182,15 +194,15 @@ const AssignedAgentTab: React.FC<Props> = ({campaignInfo}) => {
       }
     },
     {
-      key: '상담원',
+      key: 'counselorEmplNum',
       name: '상담원'
     },
     {
-      key: '상담원아이디',
+      key: 'counselorId',
       name: '사번'
     },
     {
-      key: '상담원이름',
+      key: 'counselorname',
       name: '상담원 아이디'
     }
   ];
