@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { TreeItem } from "@/features/campaignManager/types/typeForSidebar2";
 import { TreeNodeForTenantWithAgent } from "./TreeNodeForTenantWithAgent";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useSideMenuStore } from "@/store/sideMenuStore";
 import { useCounselorStoreForSideBar } from "@/store/counselorStoreForSideBar";
 import { useAuthStore } from "@/store/authStore"; // 현재 로그인된 유저의 tenant_id, role_id 가져오기
 import { useApiForSidebarCounselor } from "@/features/campaignManager/hooks/useApiForGetDataForSidebarCounselorTab";
+import CommonSkeletonForSideMenu from "@/components/shared/CommonSkeleton/CommonSkeletonForSideMenu";
 
 export function TreeMenusForAgentTab() {
   const { tenant_id, role_id } = useAuthStore(); // 현재 로그인된 사용자 정보 가져오기
@@ -51,14 +51,7 @@ export function TreeMenusForAgentTab() {
   }, [initialized, isLoading, error, treeData]);
 
   if (isLoading) {
-    return (
-      <div className="p-4 space-y-3">
-        <Skeleton className="h-6 w-full" />
-        <Skeleton className="h-6 w-11/12" />
-        <Skeleton className="h-6 w-10/12" />
-        <Skeleton className="h-6 w-9/12" />
-      </div>
-    );
+    return <CommonSkeletonForSideMenu itemCount={8} indentLevel={1} />;
   }
 
   if (error) {
