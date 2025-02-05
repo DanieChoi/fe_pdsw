@@ -84,7 +84,7 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
         <NotificationTab campaignInfo={campaignInfo} onHandleNotificationTabChange={onHandleNotificationTabChange} />
       </TabsContent>
       <TabsContent value="tab8">
-        <AssignedAgentTab />
+        <AssignedAgentTab campaignInfo={campaignInfo}/>
       </TabsContent>
       <TabsContent value="tab9">
         <AdditionalInfoTab campaignInfo={campaignInfo} onHandleAdditionalInfoTabChange={onHandleAdditionalInfoTabChange} />
