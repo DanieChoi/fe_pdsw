@@ -9,6 +9,9 @@ import { CommonButton } from "@/components/shared/CommonButton";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
+import { useApiForCallingNumberUpdate } from '@/features/campaignManager/hooks/useApiForCallingNumberUpdate';
+import { useApiForCallingNumberInsert } from '@/features/campaignManager/hooks/useApiForCallingNumberInsert';
+import CustomAlert from '@/components/shared/layout/CustomAlert';
 
 type GridRow = MainDataResponse & {
   calling_number: string;  // 필수 필드로 변경
@@ -27,12 +30,60 @@ function CampaignLayout() {
   const [selectedCampaignName, setSelectedCampaignName] = useState('');
   const [selectedCallingNumber, setSelectedCallingNumber] = useState('');
 
+  const [alertState, setAlertState] = useState({
+    isOpen: false,
+    message: '',
+    title: '알림',
+    type: '1',
+    onConfirm: () => {},
+    onCancel: () => {}
+  });
+
+  const showConfirm = (message: string, onConfirm: () => void) => {
+    setAlertState({
+        isOpen: true,
+        message,
+        title: '확인',
+        type: '2',
+        onConfirm: () => {
+            onConfirm();
+            closeAlert();
+        },
+        onCancel: closeAlert
+    });
+};
+
+const closeAlert = () => {
+    setAlertState(prev => ({ ...prev, isOpen: false }));
+};
+
   // 발신번호 조회
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
       setCallingNumbers(data.result_data);
     }
   });
+
+  //캠페인 발신번호 추가 api 호출
+    const { mutate: fetchCallingNumberInsert } = useApiForCallingNumberInsert({
+      onSuccess: (data) => {
+        fetchCallingNumbers({
+          session_key: '',
+          tenant_id: 0,
+        });      
+      }
+    });
+
+  // 발신번호 수정
+  const { mutate: fetchCallingNumberUpdate } = useApiForCallingNumberUpdate({
+    onSuccess: (data) => {
+      console.log('Success');
+      fetchCallingNumbers({
+        session_key: '',
+        tenant_id: 0,
+      })
+    }
+  })
 
   useEffect(() => {
     fetchCallingNumbers({
@@ -122,6 +173,33 @@ function CampaignLayout() {
     }
   };
 
+  // 발신번호 저장 버튼 핸들러
+  const handleSave = () => {
+    const existingCallingNumber = callingNumbers.find(num => num.campaign_id === Number(selectedCampaignId));
+    const saveRequest = {
+      campaign_id: Number(selectedCampaignId),
+      calling_number: selectedCallingNumber,
+    };
+
+    if (existingCallingNumber) {
+      showConfirm('발신번호를 수정하시겠습니까?', () => {
+        fetchCallingNumberUpdate(saveRequest);
+      });
+    } else {
+      showConfirm('발신번호를 추가하시겠습니까?', () => {
+        fetchCallingNumberInsert(saveRequest);
+      });
+    }
+  };
+
+  const handleReset = () => {
+    setSelectedRow(null);
+    setSelectedCampaign(null);
+    setSelectedCampaignId('');
+    setSelectedCampaignName('');
+    setSelectedCallingNumber('');
+  };
+
   return (
     <div className="flex gap-8">
       {/* 왼쪽 그리드 */}
@@ -203,10 +281,10 @@ function CampaignLayout() {
 
           {/* 버튼 영역 */}
           <div className="flex justify-end gap-2 pt-4">
-            <CommonButton>
+            <CommonButton onClick={handleReset}>
               신규
             </CommonButton>
-            <CommonButton>
+            <CommonButton onClick={handleSave}>
               저장
             </CommonButton>
           </div>
@@ -227,6 +305,14 @@ function CampaignLayout() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSelect={handleModalSelect}
+      />
+      <CustomAlert
+          isOpen={alertState.isOpen}
+          message={alertState.message}
+          title={alertState.title}
+          type={alertState.type}
+          onClose={alertState.onConfirm}
+          onCancle={alertState.onCancel}
       />
     </div>
   );
