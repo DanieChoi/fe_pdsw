@@ -6,6 +6,7 @@ import { ChevronRight, ChevronDown } from 'lucide-react';
 import 'react-data-grid/lib/styles.css';
 import { CommonButton } from "@/components/shared/CommonButton";
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { AdditionalInfoTabParam } from './CampaignManagerDetail';
 import { useApiForCampaignAgent } from '@/features/campaignManager/hooks/useApiForCampaignAgent';
 import { useApiForCampaignAssignmentAgent } from '@/features/campaignManager/hooks/useApiForCampaignAssignmentAgent';
 
@@ -26,11 +27,20 @@ interface TreeRow extends ConsultingData {
   children?: TreeRow[];
 }
 
+const tempAdditionalInfoTab:AdditionalInfoTabParam = {
+  changeYn: false,
+  campaignInfoChangeYn: false,
+  onSave: false,
+  onClosed: false
+};
+
 type Props = {
+  newCampaignYn: boolean;
   campaignInfo: MainDataResponse;
+  onHandleAdditionalInfoTabChange: (param:AdditionalInfoTabParam) => void;
 }
 
-const AssignedAgentTab: React.FC<Props> = ({campaignInfo}) => {
+const AssignedAgentTab: React.FC<Props> = ({newCampaignYn,campaignInfo,onHandleAdditionalInfoTabChange}) => {
   const [initialData, setInitialData] = useState<TreeRow[]>([]);
   // 캠페인 소속 상담사 리스트 요청
   const { mutate: fetchCampaignAgents } = useApiForCampaignAgent({
@@ -122,10 +132,11 @@ const AssignedAgentTab: React.FC<Props> = ({campaignInfo}) => {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set([]));
 
   useEffect(() => {
-    if (campaignInfo && campaignInfo.campaign_id > 0 ) {  
+    if (!newCampaignYn && campaignInfo && campaignInfo.campaign_id > 0 ) {  
       fetchCampaignAgents({ campaign_id: campaignInfo.campaign_id });
     }
-  }, [campaignInfo]);
+    setInitialData([]);
+  }, [newCampaignYn,campaignInfo]);
 
   const toggleRowExpand = (rowId: string) => {
     const newExpandedRows = new Set(expandedRows);
@@ -228,8 +239,16 @@ const AssignedAgentTab: React.FC<Props> = ({campaignInfo}) => {
         />
       </div>
       <div className="flex justify-end gap-2 mt-5">
-        <CommonButton variant="secondary">확인</CommonButton>
-        <CommonButton variant="secondary">취소</CommonButton>
+        <CommonButton variant="secondary" onClick={()=> 
+          onHandleAdditionalInfoTabChange({...tempAdditionalInfoTab
+            , onSave: true
+          })
+        }>확인</CommonButton>
+        <CommonButton variant="secondary" onClick={()=> 
+          onHandleAdditionalInfoTabChange({...tempAdditionalInfoTab
+            , onClosed: true
+          })
+        }>취소</CommonButton>
       </div>
     </div>
   );

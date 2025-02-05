@@ -57,6 +57,7 @@ const errorMessage: CustomAlertRequest = {
 };
 
 type Props = {
+  newCampaignYn: boolean
   campaignInfo: MainDataResponse;
   campaignSchedule: CampaignScheDuleListDataResponse;
   onCampaignScheduleChange: (param:OperationTimeParam) => void;
@@ -77,7 +78,7 @@ const tempOperationTimeTab:OperationTimeParam = {
   start_flag: ''
 };
 
-const OperationTimeTab: React.FC<Props> = ({ campaignInfo, campaignSchedule, onCampaignScheduleChange }) => {
+const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaignSchedule, onCampaignScheduleChange }) => {
   const [tempData, setTempData] = useState<DataProps[]>([]);
   const [startTime, setStartTime] = useState(""); // 시작시간
   const [endTime, setEndTime] = useState(""); // 종료시간
@@ -124,7 +125,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignInfo, campaignSchedule, onC
         onSave: false,
       });
     }
-  }, [campaignSchedule,campaignInfo]);
+  }, [newCampaignYn,campaignSchedule,campaignInfo]);
 
   return (
     <div className="py-5">
@@ -306,6 +307,7 @@ const OperationTimeTab: React.FC<Props> = ({ campaignInfo, campaignSchedule, onC
           </div>
         </div>
       </div>
+      {!newCampaignYn &&
       <div className="flex justify-end gap-2 mt-5">
         <CommonButton variant="secondary" onClick={()=> 
           onCampaignScheduleChange({...tempCampaignSchedule
@@ -318,9 +320,10 @@ const OperationTimeTab: React.FC<Props> = ({ campaignInfo, campaignSchedule, onC
           })
         }>취소</CommonButton>
       </div>
+      }
       <CustomAlert
-        message={alertState.message}
-        title={alertState.title}
+      message={alertState.message}
+      title={alertState.title}
         type={alertState.type}
         isOpen={alertState.isOpen}
         onClose={() => {

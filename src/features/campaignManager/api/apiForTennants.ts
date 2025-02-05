@@ -6,7 +6,7 @@ export const apiForGetTenantList = async (): Promise<TenantListResponse> => {
   const tenantRequestData: TenantRequestData = {
     filter: {      
       tenant_id: {
-        start: 1,
+        start: 0,
         end: 9999999,
       },
     },

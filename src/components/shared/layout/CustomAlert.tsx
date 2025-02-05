@@ -55,7 +55,7 @@ const CustomAlert = ({
                                     </CommonButton>
                                 )}
                             </>
-                        ) : (
+                        ) : type === '0' ?(
                             <>
                                 <CommonButton onClick={onClose}>
                                     확인
@@ -65,6 +65,12 @@ const CustomAlert = ({
                                     onClick={onClose}
                                 >
                                     닫기
+                                </CommonButton>
+                            </>
+                        ) : (
+                            <>
+                                <CommonButton onClick={onClose}>
+                                    확인
                                 </CommonButton>
                             </>
                         )}
