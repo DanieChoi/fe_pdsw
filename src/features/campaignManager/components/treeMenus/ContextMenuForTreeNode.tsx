@@ -85,14 +85,14 @@ export function ContextMenuForTreeNode({
 
         <ContextMenuSeparator />
 
-        <ContextMenuItem>
+        {/* <ContextMenuItem>
           <Monitor className="mr-2 h-4 w-4" />
           실시간 재발신
-        </ContextMenuItem>
+        </ContextMenuItem> */}
 
         <ContextMenuItem onClick={handleRebroadcastClick}>
           <RefreshCcw className="mr-2 h-4 w-4" />
-          예약 재발신 설정
+          재발신
         </ContextMenuItem>
 
         <ContextMenuSeparator />
