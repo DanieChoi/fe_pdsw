@@ -204,13 +204,11 @@ const closeAlert = () => {
     };
 
     if (existingCallingNumber) {
-      showConfirm('발신번호가 성공적으로 수정되었습니다.', () => {
-        fetchCallingNumberUpdate(saveRequest);
-      });
+      fetchCallingNumberUpdate(saveRequest);
+      showConfirm('발신번호가 성공적으로 수정되었습니다.', () => {});
     } else {
-      showConfirm('새로운 발신번호가 성공적으로 저장되었습니다.', () => {
-        fetchCallingNumberInsert(saveRequest);
-      });
+      fetchCallingNumberInsert(saveRequest);
+      showConfirm('새로운 발신번호가 성공적으로 저장되었습니다.', () => {});
     }
   };
 
