@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import DataGrid, { CellClickArgs } from 'react-data-grid';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { useCampainManagerStore, useMainStore } from '@/store';
-import { SkillListDataResponse, CampaignSkillDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
+import { SkillListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
@@ -41,9 +41,8 @@ interface Row {
 
 export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignModalProps) {
   const { tenants, campaigns } = useMainStore();
-  const { setCampaignSkills, campaignSkills } = useCampainManagerStore();
+  const { campaignSkills, setCampaignSkills, callingNumbers, setCallingNumbers } = useCampainManagerStore();
   const [skills, setSkills] = useState<SkillListDataResponse[]>([]);
-  const [callingNumbers, setCallingNumbers] = useState<any[]>([]);
   const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
   const [tenantId, setTenantId] = useState('all');
   const [campaignName, setCampaignName] = useState('');
