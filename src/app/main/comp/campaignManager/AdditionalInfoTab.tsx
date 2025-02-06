@@ -14,11 +14,12 @@ const tempAdditionalInfoTab:AdditionalInfoTabParam = {
 };
 
 type Props = {
+  newCampaignYn: boolean;
   campaignInfo: MainDataResponse;
   onHandleAdditionalInfoTabChange: (param:AdditionalInfoTabParam) => void;
 };
 
-const AdditionalInfoTab: React.FC<Props> = ({ campaignInfo, onHandleAdditionalInfoTabChange }) => {
+const AdditionalInfoTab: React.FC<Props> = ({ newCampaignYn, campaignInfo, onHandleAdditionalInfoTabChange }) => {
   // 캠페인 생성 정보 상태
   const [creator, setCreator] = useState(''); // 생성 인
   const [creationDate, setCreationDate] = useState(""); // 생성 날짜
@@ -31,7 +32,7 @@ const AdditionalInfoTab: React.FC<Props> = ({ campaignInfo, onHandleAdditionalIn
 
   useEffect(() => {
     if (campaignInfo && campaignInfo.campaign_id !== 0) {  
-      setCreator(campaignInfo.creation_user+'');
+      setCreator(campaignInfo.creation_user);
       setCreationDate(campaignInfo.creation_time);
       setCreationPlace(campaignInfo.creation_ip);
       setEditor(campaignInfo.update_user+'');
@@ -125,6 +126,7 @@ const AdditionalInfoTab: React.FC<Props> = ({ campaignInfo, onHandleAdditionalIn
       </div>
 
       {/* 확인/취소 버튼 */}
+      {!newCampaignYn &&
       <div className="flex justify-end gap-2 mt-5">
         <CommonButton variant="secondary" onClick={()=> 
           onHandleAdditionalInfoTabChange({...tempAdditionalInfoTab
@@ -137,6 +139,7 @@ const AdditionalInfoTab: React.FC<Props> = ({ campaignInfo, onHandleAdditionalIn
           })
         }>취소</CommonButton>
       </div>
+      }
     </div>
   );
 };

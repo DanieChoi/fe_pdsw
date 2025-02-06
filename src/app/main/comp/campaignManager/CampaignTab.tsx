@@ -77,19 +77,19 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
         <OutgoingMethodTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onCampaignOutgoingMethodChange={onCampaignOutgoingMethodChange} />
       </TabsContent>
       <TabsContent value="tab5">
-        <CallPacingTab campaignDialSpeedInfo={campaignDialSpeedInfo} onHandleCallPacingTabChange={onHandleCallPacingTabChange} />
+        <CallPacingTab newCampaignYn={newCampaignYn} campaignDialSpeedInfo={campaignDialSpeedInfo} onHandleCallPacingTabChange={onHandleCallPacingTabChange} />
       </TabsContent>
       <TabsContent value="tab6">
-        <CallbackTab campaignInfo={campaignInfo} onHandleCallbackTabChange={onHandleCallbackTabChange} />
+        <CallbackTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onHandleCallbackTabChange={onHandleCallbackTabChange} />
       </TabsContent>
       <TabsContent value="tab7">
-        <NotificationTab campaignInfo={campaignInfo} onHandleNotificationTabChange={onHandleNotificationTabChange} />
+        <NotificationTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onHandleNotificationTabChange={onHandleNotificationTabChange} />
       </TabsContent>
       <TabsContent value="tab8">
         <AssignedAgentTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onHandleAdditionalInfoTabChange={onHandleAdditionalInfoTabChange} />
       </TabsContent>
       <TabsContent value="tab9">
-        <AdditionalInfoTab campaignInfo={campaignInfo} onHandleAdditionalInfoTabChange={onHandleAdditionalInfoTabChange} />
+        <AdditionalInfoTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onHandleAdditionalInfoTabChange={onHandleAdditionalInfoTabChange} />
       </TabsContent>
     </Tabs>
   );

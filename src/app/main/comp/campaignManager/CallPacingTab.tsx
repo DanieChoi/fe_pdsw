@@ -16,11 +16,12 @@ const tempCallPacingTab: CallPacingTabParam = {
 };
 
 type Props = {
+  newCampaignYn: boolean;
   campaignDialSpeedInfo: CallPacingTabParam;
   onHandleCallPacingTabChange: (param:CallPacingTabParam) => void;
 };
 
-const CallPacingTab: React.FC<Props> = ({ campaignDialSpeedInfo, onHandleCallPacingTabChange }) => {
+const CallPacingTab: React.FC<Props> = ({ newCampaignYn,campaignDialSpeedInfo, onHandleCallPacingTabChange }) => {
   const [predictiveValue, setPredictiveValue] = useState(50);
   const [progressiveValue, setProgressiveValue] = useState(500);
   const [predictiveUnit, setPredictiveUnit] = useState(1);
@@ -194,6 +195,7 @@ const CallPacingTab: React.FC<Props> = ({ campaignDialSpeedInfo, onHandleCallPac
         </div>
 
       </div>
+      {!newCampaignYn &&
       <div className="flex justify-end gap-2 mt-5">
         <CommonButton variant="secondary" onClick={()=> 
           onHandleCallPacingTabChange({...tempCallPacingTabParam
@@ -206,6 +208,7 @@ const CallPacingTab: React.FC<Props> = ({ campaignDialSpeedInfo, onHandleCallPac
           })
         }>취소</CommonButton>
       </div>
+      }
     </div>
   );
 };
