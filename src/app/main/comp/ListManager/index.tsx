@@ -190,7 +190,7 @@ const ListManager: React.FC = () => {
     {
       key: "deletable",
       name: "삭제 여부",
-      formatter: ({ row }) => (
+      formatter: ({ row }: { row: FileRow }) => (
         <CustomCheckbox
           checked={row.deletable}
           onChange={() =>
@@ -223,7 +223,7 @@ const ListManager: React.FC = () => {
   ], []);
 
   // selectedRows 메모이제이션
-  const selectedFileRows = useMemo(() => 
+  const selectedFileRows = useMemo<Set<number>>(() => 
     selectedFile ? new Set([selectedFile.id]) : new Set()
   , [selectedFile]);
 
@@ -490,6 +490,9 @@ const ListManager: React.FC = () => {
        <LoadingModal 
        isLoading={isLoading} 
        onClose={() => setIsLoading(false)} 
+       totalCount={100} 
+       completedCount={50} 
+       outboundProgress={75} 
        />
     </div>
   );

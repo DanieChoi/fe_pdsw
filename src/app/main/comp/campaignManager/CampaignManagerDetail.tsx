@@ -14,12 +14,15 @@ import { CampaignSkillUpdateRequest
   , CampaignScheDuleListDataResponse
   , CallingNumberListDataResponse 
   , CampaignDialSpeedUpdateRequest
+  , CampaignInfoDeleteRequest
 } from '@/features/campaignManager/types/campaignManagerIndex';
 import { useEffect, useState } from 'react';
 import SkillListPopup from '@/components/shared/layout/SkillListPopup';
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
 import { useApiForCampaignManagerUpdate } from '@/features/campaignManager/hooks/useApiForCampaignManagerUpdate';
+import { useApiForCampaignManagerDelete } from '@/features/campaignManager/hooks/useApiForCampaignManagerDelete';
 import { useApiForCampaignScheduleUpdate } from '@/features/campaignManager/hooks/useApiForCampaignScheduleUpdate';
+import { useApiForCampaignScheduleDelete } from '@/features/campaignManager/hooks/useApiForCampaignScheduleDelete';
 import { useApiForCallingNumberUpdate } from '@/features/campaignManager/hooks/useApiForCallingNumberUpdate';
 import { useApiForCallingNumberInsert } from '@/features/campaignManager/hooks/useApiForCallingNumberInsert';
 import { useApiForCallingNumberDelete } from '@/features/campaignManager/hooks/useApiForCallingNumberDelete';
@@ -156,10 +159,10 @@ export const CampaignInfo: MainDataResponse = {
   max_ring: 0,
   detect_mode: 0,
   auto_dial_interval: 0,
-  creation_user: 0,
+  creation_user: '',
   creation_time: '',
   creation_ip: '',
-  update_user: 0,
+  update_user: '',
   update_time: '',
   update_ip: '',
   dial_phone_id: 0,
@@ -254,6 +257,12 @@ const CampaignScheduleInfo: CampaignScheDuleListDataResponse = {
   start_time: [],
   end_time: []
 }
+
+const campaignInfoDelete:CampaignInfoDeleteRequest = {
+  campaign_id: 0,
+  tenant_id: 0,
+  delete_dial_list: 1
+};
 
 export interface CallPacingTabParam {
   changeYn: boolean;
@@ -846,31 +855,6 @@ export default function CampaignDetail() {
       if( campaignInfoChangeYn ){
         fetchCampaignManagerUpdate(tempCampaignManagerInfo);
       }
-      if( campaignSkillChangeYn ){
-        //캠페인 스킬 수정 api 호출
-        fetchCampaignSkillUpdate(tempCampaignSkills);
-      }
-      if( campaignScheduleChangeYn ){
-        //캠페인 스케줄 수정 api 호출
-        fetchCampaignScheduleUpdate(tempCampaignSchedule);
-      }
-      if( callingNumberChangeYn ){        
-        const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignInfo.campaign_id)
-          .map((data) => data.calling_number)
-          .join(',');
-        //캠페인 발신번호 추가,수정,삭제 api 호출
-        if( tempCallingNumberInfo.calling_number !== '' &&  tempCallNumber === '' ){
-          fetchCallingNumberInsert(tempCallingNumberInfo);
-        }else if( tempCallingNumberInfo.calling_number === '' &&  tempCallNumber !== '' ){
-          fetchCallingNumberDelete(tempCallingNumberInfo);
-        }else{
-          fetchCallingNumberUpdate(tempCallingNumberInfo);
-        }
-      }
-      if( campaignDialSpeedChangeYn ){
-        //캠페인 발신 속도 수정 api 호출
-        fetchDialSpeedUpdate( tempCampaignDialSpeedInfo );
-      }
     }
   }
 
@@ -890,37 +874,12 @@ export default function CampaignDetail() {
   
   //캠페인 삭제 실행.
   const handleCampaignDeleteExecute = () => {
-    // setAlertState((prev) => ({ ...prev, isOpen: false }));
-    // if( changeYn ){
-    //   if( campaignInfoChangeYn ){
-    //     fetchCampaignManagerUpdate(tempCampaignManagerInfo);
-    //   }
-    //   if( campaignSkillChangeYn ){
-    //     //캠페인 스킬 수정 api 호출
-    //     fetchCampaignSkillUpdate(tempCampaignSkills);
-    //   }
-    //   if( campaignScheduleChangeYn ){
-    //     //캠페인 스케줄 수정 api 호출
-    //     fetchCampaignScheduleUpdate(tempCampaignSchedule);
-    //   }
-    //   if( callingNumberChangeYn ){        
-    //     const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignInfo.campaign_id)
-    //       .map((data) => data.calling_number)
-    //       .join(',');
-    //     //캠페인 발신번호 추가,수정,삭제 api 호출
-    //     if( tempCallingNumberInfo.calling_number !== '' &&  tempCallNumber === '' ){
-    //       fetchCallingNumberInsert(tempCallingNumberInfo);
-    //     }else if( tempCallingNumberInfo.calling_number === '' &&  tempCallNumber !== '' ){
-    //       fetchCallingNumberDelete(tempCallingNumberInfo);
-    //     }else{
-    //       fetchCallingNumberUpdate(tempCallingNumberInfo);
-    //     }
-    //   }
-    //   if( campaignDialSpeedChangeYn ){
-    //     //캠페인 발신 속도 수정 api 호출
-    //     fetchDialSpeedUpdate( tempCampaignDialSpeedInfo );
-    //   }
-    // }
+    setAlertState((prev) => ({ ...prev, isOpen: false }));
+    // fetchCampaignScheduleDelete({
+    //   ...campaignInfoDelete
+    //   , campaign_id: tempCampaignManagerInfo.campaign_id
+    //   , tenant_id: tempCampaignManagerInfo.tenant_id
+    // });
   }
 
   //변경여부 체크
@@ -948,6 +907,70 @@ export default function CampaignDetail() {
   const { mutate: fetchCampaignManagerUpdate } = useApiForCampaignManagerUpdate({
     onSuccess: (data) => {
       setCampaignInfoChangeYn(false);
+      if( campaignSkillChangeYn ){
+        //캠페인 스킬 수정 api 호출
+        if( tempCampaignSkills.skill_id[0] === 0 ){
+          fetchCampaignSkillUpdate({...tempCampaignSkills
+            ,skill_id: []
+          });
+        }else{
+          fetchCampaignSkillUpdate(tempCampaignSkills);
+        }
+      }
+      if( campaignScheduleChangeYn ){
+        //캠페인 스케줄 수정 api 호출
+        fetchCampaignScheduleUpdate(tempCampaignSchedule);
+      }
+      if( callingNumberChangeYn ){        
+        const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignInfo.campaign_id)
+          .map((data) => data.calling_number)
+          .join(',');
+        //캠페인 발신번호 추가,수정,삭제 api 호출
+        if( tempCallingNumberInfo.calling_number !== '' &&  tempCallNumber === '' ){
+          fetchCallingNumberInsert(tempCallingNumberInfo);
+        }else if( tempCallingNumberInfo.calling_number === '' &&  tempCallNumber !== '' ){
+          fetchCallingNumberDelete(tempCallingNumberInfo);
+        }else{
+          fetchCallingNumberUpdate(tempCallingNumberInfo);
+        }
+      }
+      if( campaignDialSpeedChangeYn ){
+        //캠페인 발신 속도 수정 api 호출
+        fetchDialSpeedUpdate( tempCampaignDialSpeedInfo );
+      }
+    }
+    ,onError: (data) => {
+      setCampaignInfoChangeYn(false);
+    }
+  });
+
+  //캠페인 정보 삭제 api 호출
+  const { mutate: fetchCampaignManagerDelete } = useApiForCampaignManagerDelete({
+    onSuccess: (data) => {
+      // fetchCampaignSkillUpdate({...tempCampaignSkills
+      //   ,skill_id: []
+      // });
+      
+      // if( callingNumberChangeYn ){        
+      //   const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignInfo.campaign_id)
+      //     .map((data) => data.calling_number)
+      //     .join(',');
+      //   //캠페인 발신번호 추가,수정,삭제 api 호출
+      //   if( tempCallingNumberInfo.calling_number !== '' &&  tempCallNumber === '' ){
+      //     fetchCallingNumberInsert(tempCallingNumberInfo);
+      //   }else if( tempCallingNumberInfo.calling_number === '' &&  tempCallNumber !== '' ){
+      //     fetchCallingNumberDelete(tempCallingNumberInfo);
+      //   }else{
+      //     fetchCallingNumberUpdate(tempCallingNumberInfo);
+      //   }
+      // }
+      // if( campaignDialSpeedChangeYn ){
+      //   //캠페인 발신 속도 수정 api 호출
+      //   fetchDialSpeedUpdate( tempCampaignDialSpeedInfo );
+      // }
+    }
+    ,onError: (data) => {
+      setCampaignInfoChangeYn(false);
     }
   });
 
@@ -955,6 +978,9 @@ export default function CampaignDetail() {
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
       setCampaignSkills(data.result_data);
+      setCampaignSkillChangeYn(false);
+    }
+    ,onError: (data) => {
       setCampaignSkillChangeYn(false);
     }
   });
@@ -977,13 +1003,25 @@ export default function CampaignDetail() {
     }
   });
 
-  //캠페인 스케줄 수정 api 호출
+  //캠페인 스케줄 수정 api 호출 
   const { mutate: fetchCampaignScheduleUpdate } = useApiForCampaignScheduleUpdate({
     onSuccess: (data) => {
       const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       fetchSchedules({
         tenant_id_array: tempTenantIdArray
       });      
+    }
+  });
+  
+  //캠페인 스케줄 삭제 api 호출 
+  const { mutate: fetchCampaignScheduleDelete } = useApiForCampaignScheduleDelete({
+    onSuccess: (data) => {
+      //캠페인 정보 삭제.
+      fetchCampaignManagerDelete({
+        ...campaignInfoDelete
+        , campaign_id: tempCampaignManagerInfo.campaign_id
+        , tenant_id: tempCampaignManagerInfo.tenant_id
+      });
     }
   });
   
