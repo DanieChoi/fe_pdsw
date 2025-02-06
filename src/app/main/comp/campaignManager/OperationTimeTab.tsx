@@ -189,7 +189,7 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
                 onChange={(value) => {
                   if (value instanceof Date || value === null) {
                     // setEndDate(value);
-                    let tempStartDate = tempCampaignSchedule.start_date;
+                    const tempStartDate = tempCampaignSchedule.start_date;
                     let tempEndDate = '';
                     if( value != null){
                       tempEndDate = value.getFullYear() + ('0' + (value.getMonth() + 1)).slice(-2) + ('0' + value.getDate()).slice(-2);
