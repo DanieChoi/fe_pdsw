@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import * as XLSX from 'xlsx';
 
 // 공통 컴포넌트
 import TitleWrap from "@/components/shared/TitleWrap";
@@ -22,8 +23,9 @@ import {
 import DataGrid, { Column, CellClickArgs } from "react-data-grid";
 
 // 모달
-import FileFormat from './FileFormat';
+import FileFormat,{FormatRowData} from './FileFormat';
 import LoadingModal from './LoadingModal';
+
 
 // 인터페이스
 interface FileRow {
@@ -52,6 +54,7 @@ interface ProgressRow {
 }
 
 const ListManager: React.FC = () => {
+  const [delimiter, setDelimiter] = useState<string>('');
   // 아이디 생성용 카운터
   const [nextId, setNextId] = useState(1);
   
@@ -110,6 +113,29 @@ const ListManager: React.FC = () => {
   const handleFileFormatOpen = () => setIsFileFormatOpen(true);
   const handleFileFormatClose = () => setIsFileFormatOpen(false);
 
+  const tempSendColumns = useMemo<Column<SendRow>[]>(() => [
+    { key: "no", name: "고객키[1]" },
+    { key: "no2", name: "고객키[2]" },
+    { key: "no3", name: "고객키[3]" },
+    { key: "name", name: "고객이름" },
+    { key: "number", name: "고객전화번호[1]" },
+    { key: "number2", name: "고객전화번호[2]" },
+    { key: "number3", name: "고객전화번호[3]" },
+  ], []);
+
+  const [sendColumns, setSendColumns] = useState<Column<SendRow>[]>(tempSendColumns);
+  
+  //파일포맷설정 확인 이벤트.
+  const handleFileFormatConfirm = (data:FormatRowData) => {
+    setIsFileFormatOpen(false);
+    setDelimiter(data.delimiter);
+    const tempList: Column<SendRow>[] = data.datalist.map((tempData) => ({
+      key: tempData.field,
+      name: tempData.name
+    }));  
+    setSendColumns(tempList);
+  };
+
   // 파일 관련 핸들러
   const handleTargetTypeChange = (value: string) => {
     setTargetType(value as "general" | "blacklist");
@@ -129,6 +155,38 @@ const ListManager: React.FC = () => {
       setUploadedFiles((prev) => [...prev, newFileData]);
       setSelectedFileName(file.name);
       setNextId(nextId + 1);
+
+
+      const reader = new FileReader();
+      if( file.name.indexOf('.xls') > -1 ){
+        reader.onload = (event) => {
+          const fileContent = event.target?.result;
+          
+          if (fileContent) {
+            const workbook = XLSX.read(fileContent, { type: 'array' });
+    
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+    
+            const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }); // `header: 1` means treat the first row as header
+    
+            console.log("Excel Data:", data);
+          }
+
+        };
+        reader.readAsArrayBuffer(file);
+      }else{
+        reader.onload = (event) => {
+          const fileContent = event.target?.result;        
+          // Now, you can process fileContent here
+          console.log("File content:", fileContent);
+        };
+        reader.readAsText(file);
+      }
+      // Handle file reading errors
+      reader.onerror = (error) => {
+        console.error("Error reading file:", error);
+      };
     }
   };
  
@@ -205,16 +263,6 @@ const ListManager: React.FC = () => {
         />
       ),
     },
-  ], []);
-
-  const sendColumns = useMemo<Column<SendRow>[]>(() => [
-    { key: "no", name: "고객키[1]" },
-    { key: "no2", name: "고객키[2]" },
-    { key: "no3", name: "고객키[3]" },
-    { key: "name", name: "고객이름" },
-    { key: "number", name: "고객전화번호[1]" },
-    { key: "number2", name: "고객전화번호[2]" },
-    { key: "number3", name: "고객전화번호[3]" },
   ], []);
 
   const progressColumns = useMemo<Column<ProgressRow>[]>(() => [
@@ -473,6 +521,7 @@ const ListManager: React.FC = () => {
        {/* 파일포맷모달 */}
        <FileFormat 
         isOpen={isFileFormatOpen}
+        onConfirm={handleFileFormatConfirm}
         onClose={handleFileFormatClose}
       />
 
