@@ -64,10 +64,10 @@ export interface MainDataResponse {
   max_ring: number;
   detect_mode: number;
   auto_dial_interval: number;
-  creation_user: number;
+  creation_user: string;
   creation_time: string;
   creation_ip: string;
-  update_user: number;
+  update_user: string;
   update_time: string;
   update_ip: string;
   dial_phone_id: number;

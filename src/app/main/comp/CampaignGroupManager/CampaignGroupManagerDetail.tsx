@@ -146,10 +146,10 @@ export const CampaignInfo: MainDataResponse = {
   max_ring: 0,
   detect_mode: 0,
   auto_dial_interval: 0,
-  creation_user: 0,
+  creation_user: '',
   creation_time: '',
   creation_ip: '',
-  update_user: 0,
+  update_user: '',
   update_time: '',
   update_ip: '',
   dial_phone_id: 0,
@@ -419,10 +419,10 @@ export default function CampaignGroupManagerDetail() {
         max_ring: selectedCampaign.max_ring,
         detect_mode: selectedCampaign.detect_mode,
         auto_dial_interval: selectedCampaign.auto_dial_interval,
-        creation_user: selectedCampaign.creation_user+'',
+        creation_user: selectedCampaign.creation_user,
         creation_time: selectedCampaign.creation_time,
         creation_ip: selectedCampaign.creation_ip,
-        update_user: selectedCampaign.update_user+'',
+        update_user: selectedCampaign.update_user,
         update_time: selectedCampaign.update_time,
         update_ip: selectedCampaign.update_ip,
         dial_phone_id: selectedCampaign.dial_phone_id,
@@ -1092,6 +1092,7 @@ export default function CampaignGroupManagerDetail() {
       </div>
       <div>
         <CampaignTab campaignSchedule={tempCampaignSchedule}
+          newCampaignYn={false}
           campaignInfo={tempCampaignInfo}
           campaignDialSpeedInfo={tempCampaignDialSpeedInfoParam}
           onCampaignOutgoingOrderChange={(value) => handleCampaignOutgoingOrderChange(value)}

@@ -238,6 +238,7 @@ const AssignedAgentTab: React.FC<Props> = ({newCampaignYn,campaignInfo,onHandleA
           }}
         />
       </div>
+      {!newCampaignYn &&
       <div className="flex justify-end gap-2 mt-5">
         <CommonButton variant="secondary" onClick={()=> 
           onHandleAdditionalInfoTabChange({...tempAdditionalInfoTab
@@ -250,6 +251,7 @@ const AssignedAgentTab: React.FC<Props> = ({newCampaignYn,campaignInfo,onHandleA
           })
         }>취소</CommonButton>
       </div>
+      }
     </div>
   );
 };

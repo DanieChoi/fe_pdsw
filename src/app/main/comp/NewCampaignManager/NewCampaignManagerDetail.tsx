@@ -6,7 +6,6 @@ import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
-import { CommonButton } from "@/components/shared/CommonButton";
 import CampaignTab from '../CampaignManager/CampaignTab';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { CampaignSkillUpdateRequest
@@ -20,9 +19,6 @@ import SkillListPopup from '@/components/shared/layout/SkillListPopup';
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
 import { useApiForCampaignManagerInsert } from '@/features/campaignManager/hooks/useApiForCampaignManagerInsert';
 import { useApiForCampaignScheduleInsert } from '@/features/campaignManager/hooks/useApiForCampaignScheduleInsert';
-import { useApiForCallingNumberUpdate } from '@/features/campaignManager/hooks/useApiForCallingNumberUpdate';
-import { useApiForCallingNumberInsert } from '@/features/campaignManager/hooks/useApiForCallingNumberInsert';
-import { useApiForCallingNumberDelete } from '@/features/campaignManager/hooks/useApiForCallingNumberDelete';
 import { useApiForDialSpeedUpdate } from '@/features/campaignManager/hooks/useApiForDialSpeedUpdate';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
@@ -156,10 +152,10 @@ export const CampaignInfo: MainDataResponse = {
   max_ring: 0,
   detect_mode: 0,
   auto_dial_interval: 30,
-  creation_user: 0,
+  creation_user: '',
   creation_time: '',
   creation_ip: '',
-  update_user: 0,
+  update_user: '',
   update_time: '',
   update_ip: '',
   dial_phone_id: 0,
@@ -788,36 +784,8 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   const handleCampaignSaveExecute = () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     fetchCampaignManagerInsert(tempCampaignManagerInfo);
-    if( changeYn ){
-      if( campaignSkillChangeYn ){
-        //캠페인 스킬 수정 api 호출
-        fetchCampaignSkillUpdate(tempCampaignSkills);
-      }
-      // if( callingNumberChangeYn ){        
-      //   const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignInfo.campaign_id)
-      //     .map((data) => data.calling_number)
-      //     .join(',');
-      //   //캠페인 발신번호 추가,수정,삭제 api 호출
-      //   if( tempCallingNumberInfo.calling_number !== '' &&  tempCallNumber === '' ){
-      //     fetchCallingNumberInsert(tempCallingNumberInfo);
-      //   }else if( tempCallingNumberInfo.calling_number === '' &&  tempCallNumber !== '' ){
-      //     fetchCallingNumberDelete(tempCallingNumberInfo);
-      //   }else{
-      //     fetchCallingNumberUpdate(tempCallingNumberInfo);
-      //   }
-      // }
-      if( campaignDialSpeedChangeYn ){
-        //캠페인 발신 속도 수정 api 호출
-        fetchDialSpeedUpdate( tempCampaignDialSpeedInfo );
-      }
-    }
   }
 
-  //캠페인 스케줄 저장
-  const handleCampaignScheduleSave = () => {
-    
-  }
-  
   //변경여부 체크
   useEffect(() => {  
     if( changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !callingNumberChangeYn && !campaignDialSpeedChangeYn ){  
@@ -871,6 +839,16 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     onSuccess: (data) => {
       setSchedules(data.result_data);    
       setCampaignScheduleChangeYn(false);  
+      if( changeYn ){
+        if( campaignSkillChangeYn ){
+          //캠페인 스킬 수정 api 호출
+          fetchCampaignSkillUpdate(tempCampaignSkills);
+        }
+        if( campaignDialSpeedChangeYn ){
+          //캠페인 발신 속도 수정 api 호출
+          fetchDialSpeedUpdate( tempCampaignDialSpeedInfo );
+        }
+      }
     }
   });
 
@@ -880,36 +858,6 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
       const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       fetchSchedules({
         tenant_id_array: tempTenantIdArray
-      });      
-    }
-  });
-  
-  //캠페인 발신번호 삭제 api 호출
-  const { mutate: fetchCallingNumberDelete } = useApiForCallingNumberDelete({
-    onSuccess: (data) => {
-      fetchCallingNumbers({
-        session_key: '',
-        tenant_id: 0,
-      });      
-    }
-  });
-  
-  //캠페인 발신번호 추가 api 호출
-  const { mutate: fetchCallingNumberInsert } = useApiForCallingNumberInsert({
-    onSuccess: (data) => {
-      fetchCallingNumbers({
-        session_key: '',
-        tenant_id: 0,
-      });      
-    }
-  });
-  
-  //캠페인 발신번호 수정 api 호출
-  const { mutate: fetchCallingNumberUpdate } = useApiForCallingNumberUpdate({
-    onSuccess: (data) => {
-      fetchCallingNumbers({
-        session_key: '',
-        tenant_id: 0,
       });      
     }
   });

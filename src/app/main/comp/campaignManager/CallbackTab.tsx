@@ -8,6 +8,7 @@ import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { CallbackTabParam } from './CampaignManagerDetail';
 
 type Props = {
+  newCampaignYn: boolean;
   campaignInfo: MainDataResponse;
   onHandleCallbackTabChange: (param:CallbackTabParam) => void;
 };
@@ -21,7 +22,7 @@ const tempCallbackTab:CallbackTabParam = {
   service_code: 0
 };
 
-const CallbackTab: React.FC<Props> = ({ campaignInfo, onHandleCallbackTabChange }) => {
+const CallbackTab: React.FC<Props> = ({ newCampaignYn, campaignInfo, onHandleCallbackTabChange }) => {
   const [isChecked, setIsChecked] = useState(false); // 체크박스 상태 관리
   const [tempCallbackTabParam, setTempCallbackTabParam] = useState<CallbackTabParam>(tempCallbackTab);
 
@@ -111,6 +112,7 @@ const CallbackTab: React.FC<Props> = ({ campaignInfo, onHandleCallbackTabChange 
           />
         </div>
         {/* 확인 / 취소 버튼 */}
+        {!newCampaignYn &&
         <div className="flex justify-end gap-2 mt-5">
           <CommonButton variant="secondary" onClick={()=> 
             onHandleCallbackTabChange({...tempCallbackTabParam
@@ -123,6 +125,7 @@ const CallbackTab: React.FC<Props> = ({ campaignInfo, onHandleCallbackTabChange 
             })
           }>취소</CommonButton>
         </div>
+        }
       </div>
 
     </div>
