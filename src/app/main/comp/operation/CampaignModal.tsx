@@ -118,7 +118,7 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
       
       // 캠페인에 해당하는 스킬 ID 배열 찾기
       const campaignSkill = campaignSkills
-        .find(cs => cs.campaign_id === campaign.campaign_id);
+        .find(c => c.campaign_id === campaign.campaign_id);
       
       // 스킬 ID에 해당하는 스킬 이름 찾기
       const skillNames = skills
@@ -192,7 +192,7 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
       // Skill filter
       if (param.skill !== -1) {
         const campaignSkill = campaignSkills
-          .find(cs => cs.campaign_id === campaign.campaign_id);
+          .find(c => c.campaign_id === campaign.campaign_id);
         if (!campaignSkill?.skill_id?.includes(param.skill)) {
           return false;
         }
@@ -201,7 +201,7 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
       // Call number filter
       if (param.callNumber) {
         const campaignCallingNumber = callingNumbers
-          .find(cn => cn.campaign_id === campaign.campaign_id)
+          .find(c => c.campaign_id === campaign.campaign_id)
           ?.calling_number;
           
         if (!campaignCallingNumber?.toLowerCase().includes(param.callNumber.toLowerCase())) {
@@ -218,7 +218,7 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
         
         // 캠페인에 해당하는 스킬 ID 배열 찾기
         const campaignSkill = campaignSkills
-          .find(cs => cs.campaign_id === campaign.campaign_id);
+          .find(c => c.campaign_id === campaign.campaign_id);
         
         // 스킬 ID에 해당하는 스킬 이름 찾기
         const skillNames = skills
