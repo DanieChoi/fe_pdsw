@@ -3,23 +3,33 @@ import { CustomInput } from "@/components/shared/CustomInput";
 import { Label } from "@/components/ui/label";
 import DataGrid, { CellClickArgs } from 'react-data-grid';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
-import { useMainStore } from '@/store';
-import { SkillListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
+import { useCampainManagerStore, useMainStore } from '@/store';
+import { SkillListDataResponse, CampaignSkillDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
+import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
+import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 
 const dialModeList = [
-  {dial_id:1, dial_name: 'Power'},
-  {dial_id:2, dial_name: 'Progressive'},
-  {dial_id:3, dial_name: 'Predictive'},
-  {dial_id:4, dial_name: 'System Preview'},
+  { dial_id: 1, dial_name: 'Power' },
+  { dial_id: 2, dial_name: 'Progressive' },
+  { dial_id: 3, dial_name: 'Predictive' },
+  { dial_id: 4, dial_name: 'System Preview' },
 ];
 
 interface CampaignModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (campaignId: string, campaignName: string) => void;
+}
+
+interface CampaignHeaderSearch {
+  tenantId: number;
+  campaignName: string;
+  dailMode: number;
+  skill: number;
+  callNumber: string;
 }
 
 interface Row {
@@ -31,7 +41,9 @@ interface Row {
 
 export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignModalProps) {
   const { tenants, campaigns } = useMainStore();
+  const { setCampaignSkills, campaignSkills } = useCampainManagerStore();
   const [skills, setSkills] = useState<SkillListDataResponse[]>([]);
+  const [callingNumbers, setCallingNumbers] = useState<any[]>([]);
   const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
   const [tenantId, setTenantId] = useState('all');
   const [campaignName, setCampaignName] = useState('');
@@ -39,11 +51,26 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
   const [skill, setSkill] = useState('all');
   const [callNumber, setCallNumber] = useState('');
   const [tempSkills, setTempSkills] = useState<SkillListDataResponse[]>([]);
+  const [filteredRows, setFilteredRows] = useState<Row[]>([]);
 
-  // Fetch skills directly in the modal
+  // 발신번호
+  const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
+    onSuccess: (data) => {
+      setCallingNumbers(data.result_data);
+    }
+  });
+
+  // 검색 스킬
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data);
+    }
+  });
+
+  // 그리드스킬 조회
+  const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
+    onSuccess: (data) => {
+      setCampaignSkills(data.result_data);
     }
   });
 
@@ -51,7 +78,17 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
     fetchSkills({
       tenant_id_array: tenants.map(t => t.tenant_id)
     });
-  }, [tenants, fetchSkills]);
+
+    fetchCampaignSkills({
+      session_key: '',
+      tenant_id: 0,
+    });
+    
+    fetchCallingNumbers({
+      session_key: '',
+      tenant_id: 0,
+    });
+  }, [tenants, fetchSkills, fetchCallingNumbers, fetchCampaignSkills]);
 
   const columns = useMemo(() => [
     { 
@@ -79,8 +116,14 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
   const rows = useMemo(() => 
     campaigns.map((campaign) => {
       const tenant = tenants.find(t => t.tenant_id === campaign.tenant_id);
-      const campaignSkills = skills
-        .filter(skill => skill.tenant_id === campaign.tenant_id)
+      
+      // 캠페인에 해당하는 스킬 ID 배열 찾기
+      const campaignSkill = campaignSkills
+        .find(cs => cs.campaign_id === campaign.campaign_id);
+      
+      // 스킬 ID에 해당하는 스킬 이름 찾기
+      const skillNames = skills
+        .filter(skill => campaignSkill?.skill_id?.includes(skill.skill_id))
         .map(skill => skill.skill_name)
         .join(', ');
 
@@ -88,11 +131,15 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
         campaign_id: campaign.campaign_id,
         campaign_name: campaign.campaign_name,
         tenant_name: tenant?.tenant_name || '',
-        skills: campaignSkills,
+        skills: skillNames,
       };
     }), 
-    [campaigns, tenants, skills]
+    [campaigns, tenants, skills, campaignSkills]
   );
+
+  useEffect(() => {
+    setFilteredRows(rows);
+  }, [rows]);
 
   const handleCellClick = ({ row }: CellClickArgs<Row>) => {
     const campaign = campaigns.find(c => c.campaign_id === row.campaign_id);
@@ -118,13 +165,76 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
   };
 
   const onHeaderSearch = () => {
-    const param = {
+    const param: CampaignHeaderSearch = {
       tenantId: tenantId === 'all' ? -1 : Number(tenantId),
       campaignName: campaignName,
       dailMode: dailMode === 'all' ? -1 : Number(dailMode),
       skill: skill === 'all' ? -1 : Number(skill),
       callNumber: callNumber,
     };
+    
+    // Filter campaigns based on search parameters
+    const filteredCampaigns = campaigns.filter(campaign => {
+      // Tenant filter
+      if (param.tenantId !== -1 && campaign.tenant_id !== param.tenantId) {
+        return false;
+      }
+      
+      // Campaign name filter
+      if (param.campaignName && !campaign.campaign_name.toLowerCase().includes(param.campaignName.toLowerCase())) {
+        return false;
+      }
+      
+      // Dial mode filter
+      if (param.dailMode !== -1 && campaign.dial_mode !== param.dailMode) {
+        return false;
+      }
+      
+      // Skill filter
+      if (param.skill !== -1) {
+        const campaignSkill = campaignSkills
+          .find(cs => cs.campaign_id === campaign.campaign_id);
+        if (!campaignSkill?.skill_id?.includes(param.skill)) {
+          return false;
+        }
+      }
+      
+      // Call number filter
+      if (param.callNumber) {
+        const campaignCallingNumber = callingNumbers
+          .find(cn => cn.campaign_id === campaign.campaign_id)
+          ?.calling_number;
+          
+        if (!campaignCallingNumber?.toLowerCase().includes(param.callNumber.toLowerCase())) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+    
+    setFilteredRows(
+      filteredCampaigns.map(campaign => {
+        const tenant = tenants.find(t => t.tenant_id === campaign.tenant_id);
+        
+        // 캠페인에 해당하는 스킬 ID 배열 찾기
+        const campaignSkill = campaignSkills
+          .find(cs => cs.campaign_id === campaign.campaign_id);
+        
+        // 스킬 ID에 해당하는 스킬 이름 찾기
+        const skillNames = skills
+          .filter(skill => campaignSkill?.skill_id?.includes(skill.skill_id))
+          .map(skill => skill.skill_name)
+          .join(', ');
+
+        return {
+          campaign_id: campaign.campaign_id,
+          campaign_name: campaign.campaign_name,
+          tenant_name: tenant?.tenant_name || '',
+          skills: skillNames,
+        };
+      })
+    );
   };
 
   useEffect(() => {
@@ -229,7 +339,7 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
 
       <TitleWrap 
         title="캠페인 검색목록" 
-        totalCount={campaigns.length} 
+        totalCount={filteredRows.length} 
         className='mt-[14px]'
       />
 
@@ -237,7 +347,7 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
       <div className="grid-custom-wrap h-[400px]">
         <DataGrid
           columns={columns}
-          rows={rows}
+          rows={filteredRows}
           className="grid-custom"
           rowKeyGetter={(row) => row.campaign_id}
           onCellClick={handleCellClick}
