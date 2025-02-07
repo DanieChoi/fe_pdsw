@@ -1,9 +1,9 @@
-// src/app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "react-date-picker/dist/DatePicker.css"; 
 import "./globals.css";
 import ClientProvider from "@/components/providers/ClientProvider";
+import RedisTestButton from "@/components/providers/RedisTestButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +30,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased body-top`}
       >
-        <ClientProvider>{children}</ClientProvider>
+        <ClientProvider>
+          {/* ✅ ClientProvider 내부에서 RedisTestButton 실행 */}
+          <RedisTestButton />
+          {children}
+        </ClientProvider>
       </body>
     </html>
   );

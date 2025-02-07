@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Eye, EyeOff } from 'lucide-react';
@@ -81,6 +81,11 @@ export default function LoginPage() {
     setIsPending(true);
     login(formData);
   };
+
+  useEffect(() => {
+    // console.log('useEffect');
+    // console.log('isPending', isPending);
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center ">
