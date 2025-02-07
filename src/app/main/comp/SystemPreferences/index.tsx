@@ -331,38 +331,34 @@ const SystemPreferences = () => {
         };
 
         if (selectedDevice) {
-            showConfirm('장비 정보를 수정하시겠습니까?', () => {
-                updateDevice(saveRequest);
-            });
+            updateDevice(saveRequest);
+            showConfirm('장비 정보가 성공적으로 수정되었습니다.', () => {});
         } else {
-            showConfirm('새로운 장비 정보를 저장하시겠습니까?', () => {
-                createDevice(saveRequest);
-            });
+            createDevice(saveRequest);
+            showConfirm('새로운 장비 정보가 성공적으로 저장되었습니다..', () => {});
         }
     };
 
     const handleChannelEdit = () => {
         if (!selectedDevice || !selectedChannel) return;
+        const deviceChannels = channelList.find(
+            channel => channel.device_id.toString() === selectedDevice.device_id
+        );
 
-        showConfirm('채널 정보를 수정하시겠습니까?', () => {
-            const deviceChannels = channelList.find(
-                channel => channel.device_id.toString() === selectedDevice.device_id
-            );
+        if (!deviceChannels) return;
 
-            if (!deviceChannels) return;
+        const updatedChannelAssign = [...deviceChannels.channel_assign];
+        updatedChannelAssign[selectedChannel.channelNumber] = parseInt(allocationOutboundMode);
 
-            const updatedChannelAssign = [...deviceChannels.channel_assign];
-            updatedChannelAssign[selectedChannel.channelNumber] = parseInt(allocationOutboundMode);
+        const channelEditRequest = {
+            device_id: parseInt(selectedDevice.device_id),
+            assign_kind: parseInt(allocationMode),
+            channel_count: selectedDevice.channel_count,
+            channel_assign: updatedChannelAssign
+        };
 
-            const channelEditRequest = {
-                device_id: parseInt(selectedDevice.device_id),
-                assign_kind: parseInt(allocationMode),
-                channel_count: selectedDevice.channel_count,
-                channel_assign: updatedChannelAssign
-            };
-
-            fetchChannelEdit(channelEditRequest);
-        });
+        fetchChannelEdit(channelEditRequest);
+        showConfirm('채널 정보가 성공적으로 수정되었습니다.', () => {});
     };
 
     const getAllocationOutboundModeOptions = () => {

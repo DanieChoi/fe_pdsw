@@ -6,6 +6,7 @@ import PreferencesBoard from "./preferences";
 import SystemPreferences from "./SystemPreferences";
 import CampaignMonitorDashbord from "./CampaignMonitorDashbord";
 import OutboundCallProgressPanel from "./OutboundCallProgressPanel";
+import ChannelMonitor from "./ChannelMonitor";
 import ListManager from "./ListManager";
 import OperationBoard from "./operation";
 import CampaignManager from "./CampaignManager";
@@ -33,7 +34,7 @@ const TabContent = () => {
       case 5:
         return <div className="p-2"><OutboundCallProgressPanel /></div>;
       case 6:
-        return <div className="p-2">채널 모니터 컨텐츠</div>;
+        return <div className="p-2 h-full"><ChannelMonitor/></div>;
       case 7:
         return <div className="p-2"><ListManager /></div>;
       case 8:
@@ -74,7 +75,7 @@ const TabContent = () => {
   };
 
   return (
-    <div className="bg-white min-h-[calc(100vh-22.5rem)]">
+    <div className="bg-white min-h-[calc(100vh-22.5rem)] h-full">
       {renderContent()}
     </div>
   );

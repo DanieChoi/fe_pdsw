@@ -1141,7 +1141,6 @@ export default function CampaignDetail() {
               value={tempCampaignInfo.campaign_name || ''} 
               onChange={(e) => handleInputData(e.target.value, 'campaign_name')}         
               className="" 
-              readOnly
             />
           </div>
 

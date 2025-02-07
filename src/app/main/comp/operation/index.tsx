@@ -11,21 +11,10 @@ import SuspendView from './SuspendView'
 import Image from 'next/image'
 
 export default function OperationBoard() {
-  const [openSection, setOpenSection] = useState<{ [key: string]: boolean }>({
-    section1: true,
-    section2: false,
-    section3: false,
-    section4: false,
-    section5: false,
-    section6: false,
-    section7: false,
-  })
+  const [openSectionId, setOpenSectionId] = useState<string>('section1')
 
-  const toggleSection = (section: string) => {
-    setOpenSection((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }))
+  const toggleSection = (sectionId: string) => {
+    setOpenSectionId(openSectionId === sectionId ? '' : sectionId)
   }
 
   const sections = [
@@ -46,14 +35,14 @@ export default function OperationBoard() {
             <button
               type="button"
               className={`accordion-btn
-                ${!openSection[section.id] ? 'border-b-0' : ''} 
+                ${openSectionId !== section.id ? 'border-b-0' : ''} 
                 gap-[15px]`}
               onClick={() => toggleSection(section.id)}
-              aria-expanded={openSection[section.id]}
+              aria-expanded={openSectionId === section.id}
             >
-              <div className={`transform transition-transform duration-200 ${openSection[section.id] ? 'rotate-180' : ''}`}>
+              <div className={`transform transition-transform duration-200 ${openSectionId === section.id ? 'rotate-180' : ''}`}>
                 <Image 
-                  src="/chevron-down.svg"  // public 폴더 내의 SVG 경로
+                  src="/chevron-down.svg"
                   alt="chevron"
                   width={10}
                   height={10}
@@ -64,7 +53,7 @@ export default function OperationBoard() {
           </h2>
           <div
             className={`transition-[max-height,opacity] duration-200 ease-in-out overflow-hidden
-              ${openSection[section.id] ? 'opacity-100' : 'max-h-0 opacity-0'}`}
+              ${openSectionId === section.id ? 'opacity-100' : 'max-h-0 opacity-0'}`}
           >
             <div className="py-[35px] px-[40px] border-t border-gray-200">
               {section.content}

@@ -368,6 +368,10 @@ input::placeholder {
   color: hsl(var(--muted-foreground));
 }
 
+.custom-calendar .react-date-picker__inputGroup{
+  padding:0 10px;
+}
+
 /* 캘린더 헤더 */
 .custom-calendar .react-calendar__navigation {
   display: flex;
