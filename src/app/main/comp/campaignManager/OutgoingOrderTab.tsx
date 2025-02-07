@@ -75,7 +75,6 @@ const OutgoingOrderTab: React.FC<Props> = ({ newCampaignYn, campaignInfo, onCamp
   ]);
 
   useEffect(() => {
-    console.log('phoneDescriptions.length'+phoneDescriptions.length);
     if( phoneDescriptions.length > 0 && campaignInfo) {    
       setTempCampaignOutgoingOrderTab({...tempCampaignOutgoingOrderTab
         , dial_phone_id: campaignInfo.dial_phone_id
