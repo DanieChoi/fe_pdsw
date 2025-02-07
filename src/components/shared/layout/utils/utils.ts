@@ -76,7 +76,10 @@ export const processTreeItemsForSidebar = (items: TreeItem[], type: FilterType):
     .filter((item) => {
       if (type === 'all') return true;
       if (item.type === 'folder' && item.children && item.children.length > 0) return true;
-      return item.direction === type;
+      if (type === 'active' || type === 'inactive') {
+        return item.status === type;
+      }
+      return false;
     });
 };
 
@@ -107,7 +110,7 @@ export const sortTreeItemsForSidebar = (items: TreeItem[], type: SortType): Tree
 // if (start_flag === 1) return 'started';      // 종료된 상태
 // if (start_flag === 2) return 'pending';    // 대기 상태
 // if (start_flag === 3) return 'stopped';     // 진행중 
-export const getStatus = (start_flag?: number): string | null => {
+export const getStatusIcon = (start_flag?: number): string | null => {
   switch (start_flag) {
     case 1:
       return 'started'; // 종료된 상태
@@ -119,4 +122,5 @@ export const getStatus = (start_flag?: number): string | null => {
       return null;
   }
 };
+
   
