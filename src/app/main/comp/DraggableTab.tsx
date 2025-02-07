@@ -70,7 +70,8 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
           e.stopPropagation();
           onRemove();
         }}
-        className="ml-1 p-0.5 h-5 w-5 hover:bg-gray-200 rounded-full"
+        className={`ml-1 p-0.5 h-5 w-5 rounded-full 
+          ${isActive ? 'hover:bg-[#369ea9]' : 'hover:bg-gray-200'}`}
       >
         <X className="h-3 w-3" />
       </Button>
