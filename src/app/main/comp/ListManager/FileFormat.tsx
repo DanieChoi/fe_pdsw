@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
-import CustomAlert from "@/components/shared/layout/CustomAlert";
+import CustomAlert, { CustomAlertRequest } from "@/components/shared/layout/CustomAlert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 
 interface FormatItem {
@@ -39,6 +39,15 @@ export interface FormatRowData {
   datalist: FormatRow[];
 }
 
+const errorMessage: CustomAlertRequest = {
+  isOpen: false,
+  message: '',
+  title: '캠페인',
+  type: '1',
+  onClose: () => {},
+  onCancle: () => {},
+};
+
 interface FileFormatProps {
   isOpen: boolean;
   onConfirm: (data: FormatRowData) => void;
@@ -48,6 +57,7 @@ interface FileFormatProps {
 const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) => {
   const [delimiter, setDelimiter] = useState<string>(',');
   const [tabValue, setTabValue] = useState("format-field");
+  const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
 
   //필드항목
   const [formatRows, setFormatRows] = useState<FormatRow[]>(initData);
@@ -64,19 +74,30 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
    const handleRowSelect = (index: number) => {
      setSelectedRowIndex(index);
    };
+   // 그리드 행 삭제 keyUp 이벤트.
    const handleKeyUp = (e:any, index: number) => {
     if( e.key === 'Delete'){
       const newRows = [...formatRows];
-      newRows.splice(index, 1);
-      const cnt = newRows.length;
-      for( let i=0;i<cnt;i++){
-        if (i === 0) {
-          newRows[i]['start'] = 1;
-        } else {
-          newRows[i]['start'] = newRows[i - 1]['start'] + newRows[i - 1]['length'];
+      if( newRows[index].id === '1' ){
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "고객키[1]은 필수 항목입니다. 다시 확인하시고 설정해 주세요.",
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }else{
+        newRows.splice(index, 1);
+        const cnt = newRows.length;
+        for( let i=0;i<cnt;i++){
+          if (i === 0) {
+            newRows[i]['start'] = 1;
+          } else {
+            newRows[i]['start'] = newRows[i - 1]['start'] + newRows[i - 1]['length'];
+          }
         }
+        setFormatRows(newRows);
       }
-      setFormatRows(newRows);
     }
    };
 
@@ -239,11 +260,30 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
     setSelectedPositionRowIndex(selectedPositionRowIndex + 1);
   };
 
+   // 그리드 행 삭제 keyUp 이벤트.
   const handlePositionKeyUp = (e:any, index: number) => {
     if( e.key === 'Delete'){
       const newRows = [...positionRows];
-      newRows.splice(index, 1);
-      setPositionRows(newRows);
+      if( newRows[index].id === '1' ){
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "고객키[1]은 필수 항목입니다. 다시 확인하시고 설정해 주세요.",
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }else{
+        newRows.splice(index, 1);
+        const cnt = newRows.length;
+        for( let i=0;i<cnt;i++){
+          if (i === 0) {
+            newRows[i]['start'] = 1;
+          } else {
+            newRows[i]['start'] = newRows[i - 1]['start'] + newRows[i - 1]['length'];
+          }
+        }
+        setPositionRows(newRows);
+      }
     }
    };
 
@@ -257,7 +297,7 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
     setSelectedRowIndex(null);
     setPositionRows([]);
     setSelectedPositionRowIndex(null);
-    let data: FormatRowData = {
+    const data: FormatRowData = {
       delimiter: '',
       datalist: []
     };
@@ -553,6 +593,14 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
           </div>
         </TabsContent>
       </Tabs>
+      <CustomAlert
+        message={alertState.message}
+        title={alertState.title}
+        type={alertState.type}
+        isOpen={alertState.isOpen}
+        onClose={() => {
+          alertState.onClose()
+        }}/>
     </div>
   );
 

@@ -253,7 +253,7 @@ const OutgoingOrderTab: React.FC<Props> = ({ newCampaignYn, campaignInfo, onCamp
               </SelectTrigger>
               <SelectContent>
                 {tempCampaignOutgoingOrderTab.dial_phone_id > 0 ?
-                  phoneDescriptions.filter((dialPhoneId) => dialPhoneId.description_id === tempCampaignOutgoingOrderTab.dial_phone_id)
+                  phoneDescriptions//.filter((dialPhoneId) => dialPhoneId.description_id === tempCampaignOutgoingOrderTab.dial_phone_id)
                   .map((item) => (
                     <SelectItem key={item.description_id} value={item.description_id+''}>{item.description_id}</SelectItem>
                   ))

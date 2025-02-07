@@ -15,6 +15,7 @@ import { CampaignSkillUpdateRequest
   , CallingNumberListDataResponse 
   , CampaignDialSpeedUpdateRequest
   , CampaignInfoDeleteRequest
+  , MaxcallExtDeleteRequest
 } from '@/features/campaignManager/types/campaignManagerIndex';
 import { useEffect, useState } from 'react';
 import SkillListPopup from '@/components/shared/layout/SkillListPopup';
@@ -26,13 +27,18 @@ import { useApiForCampaignScheduleDelete } from '@/features/campaignManager/hook
 import { useApiForCallingNumberUpdate } from '@/features/campaignManager/hooks/useApiForCallingNumberUpdate';
 import { useApiForCallingNumberInsert } from '@/features/campaignManager/hooks/useApiForCallingNumberInsert';
 import { useApiForCallingNumberDelete } from '@/features/campaignManager/hooks/useApiForCallingNumberDelete';
+import { useApiForAutoRedialDelete } from '@/features/campaignManager/hooks/useApiForAutoRedialDelete';
+import { useApiForReservedCallDelete } from '@/features/campaignManager/hooks/useApiForReservedCallDelete';
+import { useApiForMaxcallExtDelete } from '@/features/campaignManager/hooks/useApiForMaxcallExtDelete';
 import { useApiForDialSpeedUpdate } from '@/features/campaignManager/hooks/useApiForDialSpeedUpdate';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
+import { useApiForAutoRedial } from '@/features/campaignManager/hooks/useApiForAutoRedial';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
+import { useApiForCampaignAgent } from '@/features/campaignManager/hooks/useApiForCampaignAgent';
 
 export interface TabItem {
   id: number;
@@ -249,11 +255,12 @@ export interface AdditionalInfoTabParam {
   onClosed: boolean;
 }
 
+const today = new Date();
 const CampaignScheduleInfo: CampaignScheDuleListDataResponse = {
   campaign_id: 0,
   tenant_id: 0,
-  start_date: '',
-  end_date: '',
+  start_date: today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2),
+  end_date: today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2),
   start_time: [],
   end_time: []
 }
@@ -263,6 +270,11 @@ const campaignInfoDelete:CampaignInfoDeleteRequest = {
   tenant_id: 0,
   delete_dial_list: 1
 };
+
+const agientListDelte:MaxcallExtDeleteRequest = {
+  campaign_id: 0,
+  agent_id_list: []
+}
 
 export interface CallPacingTabParam {
   changeYn: boolean;
@@ -317,7 +329,6 @@ export default function CampaignDetail() {
   const [callingNumberChangeYn, setCallingNumberChangeYn] = useState<boolean>(false); // 캠페인 발신번호 변경여부
   const [campaignScheduleChangeYn, setCampaignScheduleChangeYn] = useState<boolean>(false); // 캠페인 스케줄 변경여부
   const [campaignDialSpeedChangeYn, setCampaignDialSpeedChangeYn] = useState<boolean>(false); // 캠페인 발신속도 변경여부
-  const [campaignSaveYn, setCampaignSaveYn] = useState<boolean>(false); // 캠페인 저장여부
   const { tenants
     , setCampaigns
     , selectedCampaign
@@ -475,14 +486,21 @@ export default function CampaignDetail() {
         outbound_sequence: ''
       });
       if(  schedules.length > 0 ){ 
-        const tempCampaignSchedule = schedules.filter((schedule) => schedule.campaign_id === selectedCampaign?.campaign_id)[0];
+        const tempCampaignSchedule = schedules.filter((schedule) => schedule.campaign_id === selectedCampaign?.campaign_id);
+        if( tempCampaignSchedule.length > 0 ){
+          setTempCampaignSchedule({...tempCampaignSchedule[0],
+            campaign_id: selectedCampaign.campaign_id,
+            tenant_id: selectedCampaign.tenant_id,
+            start_date: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].start_date,
+            end_date: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].end_date,
+            start_time: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].start_time,
+            end_time: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].end_time
+          });
+        }
+      }else{
         setTempCampaignSchedule({...tempCampaignSchedule,
           campaign_id: selectedCampaign.campaign_id,
-          tenant_id: selectedCampaign.tenant_id,
-          start_date: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].start_date,
-          end_date: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].end_date,
-          start_time: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].start_time,
-          end_time: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].end_time
+          tenant_id: selectedCampaign.tenant_id
         });
       }
     }
@@ -875,11 +893,24 @@ export default function CampaignDetail() {
   //캠페인 삭제 실행.
   const handleCampaignDeleteExecute = () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
-    // fetchCampaignScheduleDelete({
-    //   ...campaignInfoDelete
-    //   , campaign_id: tempCampaignManagerInfo.campaign_id
-    //   , tenant_id: tempCampaignManagerInfo.tenant_id
-    // });
+    console.log(selectedCampaign?.start_flag);
+    if(  selectedCampaign?.start_flag === 3){
+      // 1)캠페인 삭제
+      fetchCampaignManagerDelete({
+        ...campaignInfoDelete
+        , campaign_id: tempCampaignManagerInfo.campaign_id
+        , tenant_id: tempCampaignManagerInfo.tenant_id
+      });
+      // fetchCampaignAgents({ campaign_id: tempCampaignManagerInfo.campaign_id });
+    }else{
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '캠페인 삭제는 중지 상태에서만 가능합니다.',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+        onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
   }
 
   //변경여부 체크
@@ -947,30 +978,13 @@ export default function CampaignDetail() {
   //캠페인 정보 삭제 api 호출
   const { mutate: fetchCampaignManagerDelete } = useApiForCampaignManagerDelete({
     onSuccess: (data) => {
-      // fetchCampaignSkillUpdate({...tempCampaignSkills
-      //   ,skill_id: []
-      // });
-      
-      // if( callingNumberChangeYn ){        
-      //   const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignInfo.campaign_id)
-      //     .map((data) => data.calling_number)
-      //     .join(',');
-      //   //캠페인 발신번호 추가,수정,삭제 api 호출
-      //   if( tempCallingNumberInfo.calling_number !== '' &&  tempCallNumber === '' ){
-      //     fetchCallingNumberInsert(tempCallingNumberInfo);
-      //   }else if( tempCallingNumberInfo.calling_number === '' &&  tempCallNumber !== '' ){
-      //     fetchCallingNumberDelete(tempCallingNumberInfo);
-      //   }else{
-      //     fetchCallingNumberUpdate(tempCallingNumberInfo);
-      //   }
-      // }
-      // if( campaignDialSpeedChangeYn ){
-      //   //캠페인 발신 속도 수정 api 호출
-      //   fetchDialSpeedUpdate( tempCampaignDialSpeedInfo );
-      // }
-    }
-    ,onError: (data) => {
-      setCampaignInfoChangeYn(false);
+      // 2)캠페인 스케줄 삭제
+      fetchCampaignScheduleDelete({
+        ...campaignInfoDelete
+        , campaign_id: tempCampaignManagerInfo.campaign_id
+        , tenant_id: tempCampaignManagerInfo.tenant_id
+      });
+      // removeTab(Number(activeTabId),activeTabKey+'');
     }
   });
 
@@ -980,18 +994,16 @@ export default function CampaignDetail() {
       setCampaignSkills(data.result_data);
       setCampaignSkillChangeYn(false);
     }
-    ,onError: (data) => {
-      setCampaignSkillChangeYn(false);
-    }
   });
   
   //캠페인 스킬 수정 api 호출
   const { mutate: fetchCampaignSkillUpdate } = useApiForCampaignSkillUpdate({
     onSuccess: (data) => {
-      fetchCampaignSkills({
-        session_key: '',
-        tenant_id: 0,
-      });
+      // fetchCampaignSkills({
+      //   session_key: '',
+      //   tenant_id: 0,
+      // });      
+      setCampaignSkillChangeYn(false);
     }
   });
   
@@ -1016,22 +1028,131 @@ export default function CampaignDetail() {
   //캠페인 스케줄 삭제 api 호출 
   const { mutate: fetchCampaignScheduleDelete } = useApiForCampaignScheduleDelete({
     onSuccess: (data) => {
-      //캠페인 정보 삭제.
-      fetchCampaignManagerDelete({
+      // 3)스킬편집 -> 캠페인 소속 스킬 할당 해제
+      const tempSkill = campaignSkills.filter((skill) => skill.campaign_id === tempCampaignInfo.campaign_id)
+        .map((data) => data.skill_id)
+        .join(',');
+      if(  tempSkill !== '' ){
+        fetchCampaignSkillUpdate({...tempCampaignSkills
+          ,skill_id: []
+        });
+      }
+      
+      // 4)캠페인별 발신번호 설정 삭제
+      const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignInfo.campaign_id)
+        .map((data) => data.calling_number)
+        .join(',');
+      if(  tempCallNumber !== '' ){
+        fetchCallingNumberDelete(tempCallingNumberInfo);
+      }
+
+      // 5)캠페인별 문자할당 삭제 : 기능 사용시 API 생성 예정
+      // 6)채널 할당 - 캠페인 모드시, 캠페인이 할당되면 Assign 해제 -> 회선사용 안함으로 변경 : /pds/channel-group - 제외
+      // 7)예약콜제한설정 삭제 
+      fetchReservedCallDelete({
         ...campaignInfoDelete
         , campaign_id: tempCampaignManagerInfo.campaign_id
         , tenant_id: tempCampaignManagerInfo.tenant_id
       });
+      
+    }
+  });
+  
+  //캠페인 예약호 마스터 정보 삭제 api 호출
+  const { mutate: fetchReservedCallDelete } = useApiForReservedCallDelete({
+    onSuccess: (data) => {
+      // 8)분배호수제한설정에 캠페인 할당된 정보 삭제 - 캠페인 소속 상담사 리스트 정보 조회 후 삭제한다.
+      // 캠페인 소속 상담사 리스트 요청
+      fetchCampaignAgents({ campaign_id: tempCampaignManagerInfo.campaign_id });
+    }
+  });
+  
+  // 캠페인 소속 상담사 리스트 요청
+  const { mutate: fetchCampaignAgents } = useApiForCampaignAgent({
+    onSuccess: (data) => {
+      // 8)분배호수제한설정에 캠페인 할당된 정보 삭제 - 캠페인 소속 상담사 리스트 정보 조회 후 삭제한다.
+      if( data.result_data.length > 0 && data.result_data[0].agent_id.length > 0 ){
+        const agentList = data.result_data[0].agent_id.join(',');
+        fetchMaxcallExtDelete({
+          ...agientListDelte
+          , campaign_id: tempCampaignManagerInfo.campaign_id
+          , agent_id_list: agentList.split(',').map(agent => ({ agent_id: agent }))
+        });
+      }else{
+        // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
+        fetchAutoRedials({
+          session_key: '',
+          tenant_id: 0,
+        });      
+      }
+    }
+  });
+  
+  //캠페인 분배제한 정보 삭제 api 호출
+  const { mutate: fetchMaxcallExtDelete } = useApiForMaxcallExtDelete({
+    onSuccess: (data) => {
+      // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
+      fetchAutoRedials({
+        session_key: '',
+        tenant_id: 0,
+      });    
+    }
+  });
+  
+  // 캠페인 재발신 스케줄링 정보 조회  api 호출
+  const { mutate: fetchAutoRedials } = useApiForAutoRedial({
+    onSuccess: (data) => {
+      // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
+      if( data.result_data.length > 0 ){
+        const dataList = data.result_data.filter((data) => data.campaign_id === tempCampaignInfo.campaign_id);
+        if( dataList.length > 0 && dataList[0].sequence_number != null ){
+          // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
+          fetchAutoRedialDelete({
+            campaign_id: tempCampaignInfo.campaign_id
+            , sequence_number: dataList[0].sequence_number
+          });
+        }else{
+          //캠페인관리 화면 닫기.
+          removeTab(Number(activeTabId),activeTabKey+'');
+          // fetchCampaignManagerDelete({
+          //   ...campaignInfoDelete
+          //   , campaign_id: tempCampaignManagerInfo.campaign_id
+          //   , tenant_id: tempCampaignManagerInfo.tenant_id
+          // });
+        }
+      }else{
+        //캠페인관리 화면 닫기.
+        removeTab(Number(activeTabId),activeTabKey+'');
+        // fetchCampaignManagerDelete({
+        //   ...campaignInfoDelete
+        //   , campaign_id: tempCampaignManagerInfo.campaign_id
+        //   , tenant_id: tempCampaignManagerInfo.tenant_id
+        // });
+      }
+    }
+  }); 
+
+
+  //캠페인 재발신 스케줄링 정보 삭제 api 호출
+  const { mutate: fetchAutoRedialDelete } = useApiForAutoRedialDelete({
+    onSuccess: (data) => {
+      //캠페인관리 화면 닫기.
+      removeTab(Number(activeTabId),activeTabKey+'');
+      // fetchCampaignManagerDelete({
+      //   ...campaignInfoDelete
+      //   , campaign_id: tempCampaignManagerInfo.campaign_id
+      //   , tenant_id: tempCampaignManagerInfo.tenant_id
+      // });
     }
   });
   
   //캠페인 발신번호 삭제 api 호출
   const { mutate: fetchCallingNumberDelete } = useApiForCallingNumberDelete({
     onSuccess: (data) => {
-      fetchCallingNumbers({
-        session_key: '',
-        tenant_id: 0,
-      });      
+      // fetchCallingNumbers({
+      //   session_key: '',
+      //   tenant_id: 0,
+      // });
     }
   });
   
@@ -1048,10 +1169,10 @@ export default function CampaignDetail() {
   //캠페인 발신번호 수정 api 호출
   const { mutate: fetchCallingNumberUpdate } = useApiForCallingNumberUpdate({
     onSuccess: (data) => {
-      fetchCallingNumbers({
-        session_key: '',
-        tenant_id: 0,
-      });      
+      // fetchCallingNumbers({
+      //   session_key: '',
+      //   tenant_id: 0,
+      // });      
     }
   });
   
@@ -1087,6 +1208,22 @@ export default function CampaignDetail() {
     }
   };
 
+  //리스트 적용,리스트 삭제 버튼 이벤트
+  const handleListManager = () => {
+    if ( openedTabs.some(tab => tab.id === 7)) {    
+      setActiveTab(7, '7');
+    } else if (!openedTabs.some(tab => tab.id === 7)) {
+      addTab({
+        id: 7,
+        uniqueKey: '7',
+        title: '리스트매니저',
+        icon: '',
+        href: '',
+        content: null,
+      });      
+    }
+  };
+
   return (
     <div className='flex flex-col gap-5 w-[60%] overflow-auto'>
       <div>
@@ -1098,8 +1235,8 @@ export default function CampaignDetail() {
               { label: "캠페인 저장", onClick: () => handleCampaignSave(),},
               { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
               { label: "재발신", onClick: () => console.log(""), variant: "customblue"},
-              { label: "리스트 적용", onClick: () => console.log(""), variant: "customblue"},
-              { label: "리스트 삭제", onClick: () => console.log(""), variant: "customblue" },
+              { label: "리스트 적용", onClick: () => handleListManager()},
+              { label: "리스트 삭제", onClick: () => handleListManager() },
               { label: "예약콜 제한건수설정", onClick: () => console.log(""),variant: "customblue" },
               { label: "분배호수 제한설정", onClick: () => console.log(""),variant: "customblue" },
           ]}
@@ -1231,9 +1368,7 @@ export default function CampaignDetail() {
         onClose={() => {
           alertState.onClose()
         }}
-        onCancle={() => {
-          alertState.onCancle && alertState.onCancle()
-        }}/>
+        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}/>
       <CallingNumberPopup
         param={inputCallingNumber}
         type={callingNumberPopupState.type}
