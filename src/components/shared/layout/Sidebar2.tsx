@@ -10,10 +10,7 @@ import { TreeMenusForAgentGroupTab } from "@/features/campaignManager/components
 import { TabActions } from "./comp/TabActions";
 import { useSideMenuStore } from "@/store/sideMenuStore";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
-// import { useAuthStore } from "@/store/authStore";
-// import { FilterType, SortType } from "@/features/campaignManager/types/typeForSidebar2";
 
-// 사이드바 너비 상태 (Zustand)
 interface SidebarWidthState {
   width: number;
   setWidth: (width: number) => void;
@@ -29,8 +26,6 @@ export default function SidebarContainer() {
   const [selectedTabId, setSelectedTabId] = useState<TabId>("campaign");
   const [isResizing, setIsResizing] = useState(false);
 
-  // todo: useMainStore 에서 counselor 가져 오기 here
-  
   // 선택된 노드 (전역 상태)
   const selectedNodeId = useSideMenuStore((state) => state.selectedNodeId);
   const setSelectedNodeId = useSideMenuStore((state) => state.setSelectedNodeId);
