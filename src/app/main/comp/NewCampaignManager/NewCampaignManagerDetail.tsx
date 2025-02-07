@@ -1023,9 +1023,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         onClose={() => {
           alertState.onClose()
         }}
-        onCancle={() => {
-          alertState.onCancle && alertState.onCancle()
-        }}/>
+        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}/>
       <CallingNumberPopup
         param={inputCallingNumber}
         type={callingNumberPopupState.type}

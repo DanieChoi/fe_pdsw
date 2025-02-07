@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
-import CustomAlert from "@/components/shared/layout/CustomAlert";
+import CustomAlert, { CustomAlertRequest } from "@/components/shared/layout/CustomAlert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 
 interface FormatItem {
@@ -27,7 +27,8 @@ const initData: FormatRow[] = [{
   field: 'CSKE'
 }]
 
-const delimiterList: { id: string; name: string; }[] = [{id:',',name:','}
+const delimiterList: { id: string; name: string; }[] = [
+  {id:',',name:','}
   ,{id:';',name:';'}
   ,{id:'!',name:'!'}
   ,{id:'\\',name:'\\'}
@@ -36,8 +37,18 @@ const delimiterList: { id: string; name: string; }[] = [{id:',',name:','}
 
 export interface FormatRowData {
   delimiter: string;
+  originDataSaveYn: boolean;
   datalist: FormatRow[];
 }
+
+const errorMessage: CustomAlertRequest = {
+  isOpen: false,
+  message: '',
+  title: '캠페인',
+  type: '1',
+  onClose: () => {},
+  onCancle: () => {},
+};
 
 interface FileFormatProps {
   isOpen: boolean;
@@ -47,7 +58,9 @@ interface FileFormatProps {
 
 const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) => {
   const [delimiter, setDelimiter] = useState<string>(',');
+  const [originaldataYn, setOriginaldataYn] = useState<boolean>(false);
   const [tabValue, setTabValue] = useState("format-field");
+  const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
 
   //필드항목
   const [formatRows, setFormatRows] = useState<FormatRow[]>(initData);
@@ -64,19 +77,30 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
    const handleRowSelect = (index: number) => {
      setSelectedRowIndex(index);
    };
+   // 그리드 행 삭제 keyUp 이벤트.
    const handleKeyUp = (e:any, index: number) => {
     if( e.key === 'Delete'){
       const newRows = [...formatRows];
-      newRows.splice(index, 1);
-      const cnt = newRows.length;
-      for( let i=0;i<cnt;i++){
-        if (i === 0) {
-          newRows[i]['start'] = 1;
-        } else {
-          newRows[i]['start'] = newRows[i - 1]['start'] + newRows[i - 1]['length'];
+      if( newRows[index].id === '1' ){
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "고객키[1]은 필수 항목입니다. 다시 확인하시고 설정해 주세요.",
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }else{
+        newRows.splice(index, 1);
+        const cnt = newRows.length;
+        for( let i=0;i<cnt;i++){
+          if (i === 0) {
+            newRows[i]['start'] = 1;
+          } else {
+            newRows[i]['start'] = newRows[i - 1]['start'] + newRows[i - 1]['length'];
+          }
         }
+        setFormatRows(newRows);
       }
-      setFormatRows(newRows);
     }
    };
 
@@ -239,11 +263,30 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
     setSelectedPositionRowIndex(selectedPositionRowIndex + 1);
   };
 
+   // 그리드 행 삭제 keyUp 이벤트.
   const handlePositionKeyUp = (e:any, index: number) => {
     if( e.key === 'Delete'){
       const newRows = [...positionRows];
-      newRows.splice(index, 1);
-      setPositionRows(newRows);
+      if( newRows[index].id === '1' ){
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "고객키[1]은 필수 항목입니다. 다시 확인하시고 설정해 주세요.",
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }else{
+        newRows.splice(index, 1);
+        const cnt = newRows.length;
+        for( let i=0;i<cnt;i++){
+          if (i === 0) {
+            newRows[i]['start'] = 1;
+          } else {
+            newRows[i]['start'] = newRows[i - 1]['start'] + newRows[i - 1]['length'];
+          }
+        }
+        setPositionRows(newRows);
+      }
     }
    };
 
@@ -255,26 +298,50 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
     // 상태 초기화
     // setFormatRows([]);
     setSelectedRowIndex(null);
-    setPositionRows([]);
     setSelectedPositionRowIndex(null);
-    let data: FormatRowData = {
+    const data: FormatRowData = {
       delimiter: '',
+      originDataSaveYn:originaldataYn,
       datalist: []
     };
+    let check = true;
     if (tabValue === 'format-field') {
-      data.datalist = formatRows.length > 0 ? formatRows : [];
+      if( formatRows.length > 0 && formatRows.filter((temp) => temp.id === '1').length > 0 ){
+        data.datalist = formatRows;
+      }else{
+        check = false;
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "고객키[1]은 필수 항목입니다. 다시 확인하시고 설정해 주세요.",
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }
     } else {
+      if( positionRows.length > 0 && positionRows.filter((temp) => temp.id === '1').length > 0 ){
+        data.datalist = positionRows;
+      }else{
+        check = false;
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "고객키[1]은 필수 항목입니다. 다시 확인하시고 설정해 주세요.",
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }
       data.delimiter = delimiter;
-      data.datalist = positionRows.length > 0 ? positionRows : [];
     }
-    onConfirm(data);
+    if( check ){
+      onConfirm(data);
+    }
   };
 
   const handleCancle = () => {
     // 상태 초기화
     // setFormatRows([]);
     setSelectedRowIndex(null);
-    setPositionRows([]);
     setSelectedPositionRowIndex(null);
     onClose();
   };
@@ -283,7 +350,7 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
     <div className="w-full">
       <div className="flex items-center gap-2 mb-1">
         <CustomCheckbox
-          id="originaldata"
+          id="originaldata" checked={originaldataYn} onChange={(e) => setOriginaldataYn((e.target as HTMLInputElement).checked)}
         />
         <Label htmlFor="originaldata" className="text-sm">
           원본 데이터를 서버전송 후 삭제합니다.
@@ -553,6 +620,14 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
           </div>
         </TabsContent>
       </Tabs>
+      <CustomAlert
+        message={alertState.message}
+        title={alertState.title}
+        type={alertState.type}
+        isOpen={alertState.isOpen}
+        onClose={() => {
+          alertState.onClose()
+        }}/>
     </div>
   );
 

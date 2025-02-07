@@ -99,6 +99,24 @@ export interface CallingNumberListResponse {
   result_data: CallingNumberListDataResponse[];
 }
 
+// 캠페인 재발신 스케줄링 정보 데이터 타입
+export interface AutoRedialListDataResponse {
+  campaign_id: number;
+  sequence_number: number;
+  start_time: string;
+  redial_condition: string;
+  run_flag: number;
+}
+
+// 캠페인 재발신 스케줄링 정보 데이터 타입
+export interface AutoRedialListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: AutoRedialListDataResponse[];
+}
+
 // 캠페인 소속 상담사 리스트 요청
 export interface CampaignAgentListDataRequest {
   campaign_id: number;
@@ -228,3 +246,19 @@ export interface CampaignInfoDeleteRequest {
   tenant_id: number;
   delete_dial_list: number;
 }
+
+// 캠페인 분배제한 정보 삭제 요청 데이터 타입
+export interface MaxcallExtDataDeleteRequest {
+  agent_id: string;
+}
+// 캠페인 분배제한 정보 삭제 요청 데이터 타입
+export interface MaxcallExtDeleteRequest {
+  campaign_id: number;
+  agent_id_list: MaxcallExtDataDeleteRequest[];
+}
+// 캠페인 재발신 스케줄링 삭제 데이터 요청 타입
+export interface AutoRedialDataRequest {
+  campaign_id: number;
+  sequence_number: number;
+}
+

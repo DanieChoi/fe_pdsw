@@ -23,7 +23,7 @@ import {
 import DataGrid, { Column, CellClickArgs } from "react-data-grid";
 
 // 모달
-import FileFormat,{FormatRowData} from './FileFormat';
+import FileFormat,{FormatRowData, FormatRow} from './FileFormat';
 import LoadingModal from './LoadingModal';
 
 
@@ -55,6 +55,8 @@ interface ProgressRow {
 
 const ListManager: React.FC = () => {
   const [delimiter, setDelimiter] = useState<string>('');
+  const [headerData,setHeaderData] = useState<FormatRow[]>([]);
+    const [originaldataYn, setOriginaldataYn] = useState<boolean>(false);
   // 아이디 생성용 카운터
   const [nextId, setNextId] = useState(1);
   
@@ -129,6 +131,8 @@ const ListManager: React.FC = () => {
   const handleFileFormatConfirm = (data:FormatRowData) => {
     setIsFileFormatOpen(false);
     setDelimiter(data.delimiter);
+    setOriginaldataYn(data.originDataSaveYn);
+    setHeaderData(data.datalist);
     const tempList: Column<SendRow>[] = data.datalist.map((tempData) => ({
       key: tempData.field,
       name: tempData.name

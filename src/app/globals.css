@@ -445,8 +445,11 @@ input::placeholder {
 
 html, body {
   height: 100%;
-  min-width: 1300px;
   overflow: hidden;
+}
+
+.limit-width{
+  min-width: 1200px;
 }
 /*아코디언*/
 
@@ -521,4 +524,35 @@ html, body {
   font-size: 13px;
   background: #ebebeb;
   padding: 4px 0;
+}
+
+.out-call-responsive-container{
+  flex-direction: column;
+}
+.out-call-responsive-left{
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.out-call-responsive-right{
+  height: 50%;
+}
+
+
+
+@media (max-width: 1300px) {
+  .out-call-responsive-container {
+    flex-direction: row !important;
+  }
+
+  .out-call-responsive-left {
+    width: 40% !important;
+    height: 100%;
+  }
+
+  .out-call-responsive-right {
+    width: 60% !important;
+    height: 100%;
+  }
 }

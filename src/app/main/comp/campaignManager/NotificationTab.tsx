@@ -136,7 +136,7 @@ const NotificationTab: React.FC<Props> = ({ newCampaignYn, campaignInfo, onHandl
       });
       if( campaignInfo.use_list_alarm === 0 ){
         setIsChecked( false );
-        setAlertMessage(false);
+        setAlertMessage(true);
         setAlertSound(false);
         setAlertCall(false);
       }else{

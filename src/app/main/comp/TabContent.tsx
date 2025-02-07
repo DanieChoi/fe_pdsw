@@ -24,33 +24,33 @@ const TabContent = () => {
 
     switch (activeTabId) {
       case 1:
-        return <div className="p-2"><CampaignGroupManager /></div>;
+        return <div className="p-2 limit-width"><CampaignGroupManager /></div>;
       case 2:
-        return <div className="p-2"><CampaignManager /></div>;
+        return <div className="p-2 limit-width"><CampaignManager /></div>;
       case 3:
-        return <div className="p-2">통합모니터 컨텐츠</div>;
+        return <div className="p-2 limit-width">통합모니터 컨텐츠</div>;
       case 4:
-        return <div className="p-2"><CampaignMonitorDashbord /></div>;
+        return <div className="p-2 limit-width"><CampaignMonitorDashbord /></div>;
       case 5:
-        return <div className="p-2"><OutboundCallProgressPanel /></div>;
+        return <div className="p-2 h-full limit-width"><OutboundCallProgressPanel /></div>;
       case 6:
-        return <div className="p-2 h-full"><ChannelMonitor/></div>;
+        return <div className="p-2 h-full limit-width"><ChannelMonitor/></div>;
       case 7:
-        return <div className="p-2"><ListManager /></div>;
+        return <div className="p-2 limit-width"><ListManager /></div>;
       case 8:
-        return <div className="p-2">예약콜 제한 설정 컨텐츠</div>;
+        return <div className="p-2 limit-width">예약콜 제한 설정 컨텐츠</div>;
       case 9:
-        return <div className="p-2">분배호수 제한 설정 컨텐츠</div>;
+        return <div className="p-2 limit-width">분배호수 제한 설정 컨텐츠</div>;
       case 10:
-        return <div className="p-2"><SystemPreferences /></div>;
+        return <div className="p-2 limit-width"><SystemPreferences /></div>;
       case 11:
-        return <div className="p-2"><OperationBoard /></div>;
+        return <div className="p-2 limit-width"><OperationBoard /></div>;
       case 12:
-        return <div className="p-2"><PreferencesBoard /></div>;
+        return <div className="p-2 limit-width"><PreferencesBoard /></div>;
       case 13:
-        return <div className="p-2"><NewCampaignManager /></div>;
+        return <div className="p-2 limit-width"><NewCampaignManager /></div>;
       case 20:
-        return <div className="p-2"><RebroadcastSettingsPanel /></div>; // 예약 재발신 설정 화면 추가
+        return <div className="p-2 limit-width"><RebroadcastSettingsPanel /></div>; // 예약 재발신 설정 화면 추가
 
       case 100:  // 스킬 할당 탭
         const activeTab = openedTabs.find(tab => 
