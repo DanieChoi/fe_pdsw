@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { create } from "zustand";
 import { getStatusIcon } from "@/components/shared/layout/utils/utils";
-import { FilterType, SortType } from "@/features/campaignManager/types/typeForSidebar2";
 import { baseTabs, TabId } from "@/features/campaignManager/components/data/baseTabs";
 import { TreeMenusForCampaigns } from "@/features/campaignManager/components/treeMenus/TreeMenusForCampaigns";
 import { TreeMenusForAgentTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentTab";
@@ -11,7 +10,8 @@ import { TreeMenusForAgentGroupTab } from "@/features/campaignManager/components
 import { TabActions } from "./comp/TabActions";
 import { useSideMenuStore } from "@/store/sideMenuStore";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
-import { useAuthStore } from "@/store/authStore";
+// import { useAuthStore } from "@/store/authStore";
+// import { FilterType, SortType } from "@/features/campaignManager/types/typeForSidebar2";
 
 // 사이드바 너비 상태 (Zustand)
 interface SidebarWidthState {
