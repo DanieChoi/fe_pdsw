@@ -88,7 +88,6 @@ const closeAlert = () => {
   // 발신번호 수정
   const { mutate: fetchCallingNumberUpdate } = useApiForCallingNumberUpdate({
     onSuccess: (data) => {
-      console.log('Success');
       fetchCallingNumbers({
         session_key: '',
         tenant_id: 0,
