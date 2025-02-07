@@ -107,7 +107,7 @@ const ChannelMonitor: React.FC = () => {
     { 
       key: 'status', 
       name: '상태',
-      formatter: ({ row }) => (
+      formatter: ({ row }: { row: ChannelData }) => (
         <div
           className="px-2 py-1 rounded text-center"
           style={{ 

@@ -531,6 +531,9 @@ html, body {
 }
 .out-call-responsive-left{
   height: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 .out-call-responsive-right{
   height: 50%;
