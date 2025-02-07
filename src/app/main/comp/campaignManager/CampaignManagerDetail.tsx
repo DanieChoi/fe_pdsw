@@ -334,7 +334,7 @@ export default function CampaignDetail() {
     , selectedCampaign
     , setSelectedCampaign
   } = useMainStore();
-  const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab } = useTabStore();
+  const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab,openRebroadcastSettings } = useTabStore();
   const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
   const [ inputSkills, setInputSkills ] = useState('');
   const [ inputCallingNumber, setInputCallingNumber ] = useState('');
@@ -893,7 +893,6 @@ export default function CampaignDetail() {
   //캠페인 삭제 실행.
   const handleCampaignDeleteExecute = () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
-    console.log(selectedCampaign?.start_flag);
     if(  selectedCampaign?.start_flag === 3){
       // 1)캠페인 삭제
       fetchCampaignManagerDelete({
@@ -1086,6 +1085,13 @@ export default function CampaignDetail() {
         });      
       }
     }
+    ,onError: (data) => {
+      // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
+      fetchAutoRedials({
+        session_key: '',
+        tenant_id: 0,
+      });      
+    }
   });
   
   //캠페인 분배제한 정보 삭제 api 호출
@@ -1103,31 +1109,26 @@ export default function CampaignDetail() {
   const { mutate: fetchAutoRedials } = useApiForAutoRedial({
     onSuccess: (data) => {
       // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
-      if( data.result_data.length > 0 ){
-        const dataList = data.result_data.filter((data) => data.campaign_id === tempCampaignInfo.campaign_id);
-        if( dataList.length > 0 && dataList[0].sequence_number != null ){
-          // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
-          fetchAutoRedialDelete({
-            campaign_id: tempCampaignInfo.campaign_id
-            , sequence_number: dataList[0].sequence_number
-          });
+      if( typeof data.result_data !== 'undefined'){
+        if( data.result_data.length > 0 ){
+          const dataList = data.result_data.filter((data) => data.campaign_id === tempCampaignInfo.campaign_id);
+          if( dataList.length > 0 && dataList[0].sequence_number != null ){
+            // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
+            fetchAutoRedialDelete({
+              campaign_id: tempCampaignInfo.campaign_id
+              , sequence_number: dataList[0].sequence_number
+            });
+          }else{
+            //캠페인관리 화면 닫기.
+            removeTab(Number(activeTabId),activeTabKey+'');
+          }
         }else{
           //캠페인관리 화면 닫기.
           removeTab(Number(activeTabId),activeTabKey+'');
-          // fetchCampaignManagerDelete({
-          //   ...campaignInfoDelete
-          //   , campaign_id: tempCampaignManagerInfo.campaign_id
-          //   , tenant_id: tempCampaignManagerInfo.tenant_id
-          // });
         }
       }else{
         //캠페인관리 화면 닫기.
         removeTab(Number(activeTabId),activeTabKey+'');
-        // fetchCampaignManagerDelete({
-        //   ...campaignInfoDelete
-        //   , campaign_id: tempCampaignManagerInfo.campaign_id
-        //   , tenant_id: tempCampaignManagerInfo.tenant_id
-        // });
       }
     }
   }); 
@@ -1138,11 +1139,6 @@ export default function CampaignDetail() {
     onSuccess: (data) => {
       //캠페인관리 화면 닫기.
       removeTab(Number(activeTabId),activeTabKey+'');
-      // fetchCampaignManagerDelete({
-      //   ...campaignInfoDelete
-      //   , campaign_id: tempCampaignManagerInfo.campaign_id
-      //   , tenant_id: tempCampaignManagerInfo.tenant_id
-      // });
     }
   });
   
@@ -1210,8 +1206,8 @@ export default function CampaignDetail() {
 
   //리스트 적용,리스트 삭제 버튼 이벤트
   const handleListManager = () => {
-    if ( openedTabs.some(tab => tab.id === 7)) {    
-      setActiveTab(7, '7');
+    if ( openedTabs.some(tab => tab.id === 7)) {   
+      setActiveTab(7, openedTabs.filter((data) => data.id === 7)[0].uniqueKey);
     } else if (!openedTabs.some(tab => tab.id === 7)) {
       addTab({
         id: 7,
@@ -1224,6 +1220,43 @@ export default function CampaignDetail() {
     }
   };
 
+  //예약콜 제한건수설정 버튼 이벤트
+  const handleReservedCall = () => {
+    if ( openedTabs.some(tab => tab.id === 8)) {    
+      setActiveTab(8, openedTabs.filter((data) => data.id === 8)[0].uniqueKey);
+    } else if (!openedTabs.some(tab => tab.id === 8)) {
+      addTab({
+        id: 8,
+        uniqueKey: '8',
+        title: '예약콜 제한 설정',
+        icon: '/header-menu/예약콜제한설정.svg', 
+        href: '/reserve',
+        content: null,
+      });      
+    }
+  };
+
+  //분배호수 제한설정 버튼 이벤트
+  const handleMaxCall = () => {
+    if ( openedTabs.some(tab => tab.id === 9)) {    
+      setActiveTab(9, openedTabs.filter((data) => data.id === 9)[0].uniqueKey);
+    } else if (!openedTabs.some(tab => tab.id === 9)) {
+      addTab({
+        id: 9,
+        uniqueKey: '9',
+        title: '분배호수 제한 설정',
+        icon: '/header-menu/분배호수제한설정.svg', 
+        href: '/distribute',
+        content: null,
+      });      
+    }
+  };
+
+  //재발신 버튼 이벤트
+  const handleRebroadcast = () => {
+    openRebroadcastSettings('20','재발신 설정');
+  };
+
   return (
     <div className='flex flex-col gap-5 w-[60%] overflow-auto'>
       <div>
@@ -1234,11 +1267,11 @@ export default function CampaignDetail() {
               { label: "새 캠페인", onClick: () => handleNewCampaign() },
               { label: "캠페인 저장", onClick: () => handleCampaignSave(),},
               { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
-              { label: "재발신", onClick: () => console.log(""), variant: "customblue"},
+              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue"},
               { label: "리스트 적용", onClick: () => handleListManager()},
               { label: "리스트 삭제", onClick: () => handleListManager() },
-              { label: "예약콜 제한건수설정", onClick: () => console.log(""),variant: "customblue" },
-              { label: "분배호수 제한설정", onClick: () => console.log(""),variant: "customblue" },
+              { label: "예약콜 제한건수설정", onClick: () => handleReservedCall() },
+              { label: "분배호수 제한설정", onClick: () => handleMaxCall() },
           ]}
           />
           <div className="grid grid-cols-3 gap-x-4 gap-y-2">

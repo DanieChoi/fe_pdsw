@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
@@ -27,7 +27,8 @@ const initData: FormatRow[] = [{
   field: 'CSKE'
 }]
 
-const delimiterList: { id: string; name: string; }[] = [{id:',',name:','}
+const delimiterList: { id: string; name: string; }[] = [
+  {id:',',name:','}
   ,{id:';',name:';'}
   ,{id:'!',name:'!'}
   ,{id:'\\',name:'\\'}
@@ -36,6 +37,7 @@ const delimiterList: { id: string; name: string; }[] = [{id:',',name:','}
 
 export interface FormatRowData {
   delimiter: string;
+  originDataSaveYn: boolean;
   datalist: FormatRow[];
 }
 
@@ -56,6 +58,7 @@ interface FileFormatProps {
 
 const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) => {
   const [delimiter, setDelimiter] = useState<string>(',');
+  const [originaldataYn, setOriginaldataYn] = useState<boolean>(false);
   const [tabValue, setTabValue] = useState("format-field");
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
 
@@ -295,26 +298,50 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
     // 상태 초기화
     // setFormatRows([]);
     setSelectedRowIndex(null);
-    setPositionRows([]);
     setSelectedPositionRowIndex(null);
     const data: FormatRowData = {
       delimiter: '',
+      originDataSaveYn:originaldataYn,
       datalist: []
     };
+    let check = true;
     if (tabValue === 'format-field') {
-      data.datalist = formatRows.length > 0 ? formatRows : [];
+      if( formatRows.length > 0 && formatRows.filter((temp) => temp.id === '1').length > 0 ){
+        data.datalist = formatRows;
+      }else{
+        check = false;
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "고객키[1]은 필수 항목입니다. 다시 확인하시고 설정해 주세요.",
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }
     } else {
+      if( positionRows.length > 0 && positionRows.filter((temp) => temp.id === '1').length > 0 ){
+        data.datalist = positionRows;
+      }else{
+        check = false;
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "고객키[1]은 필수 항목입니다. 다시 확인하시고 설정해 주세요.",
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }
       data.delimiter = delimiter;
-      data.datalist = positionRows.length > 0 ? positionRows : [];
     }
-    onConfirm(data);
+    if( check ){
+      onConfirm(data);
+    }
   };
 
   const handleCancle = () => {
     // 상태 초기화
     // setFormatRows([]);
     setSelectedRowIndex(null);
-    setPositionRows([]);
     setSelectedPositionRowIndex(null);
     onClose();
   };
@@ -323,7 +350,7 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
     <div className="w-full">
       <div className="flex items-center gap-2 mb-1">
         <CustomCheckbox
-          id="originaldata"
+          id="originaldata" checked={originaldataYn} onChange={(e) => setOriginaldataYn((e.target as HTMLInputElement).checked)}
         />
         <Label htmlFor="originaldata" className="text-sm">
           원본 데이터를 서버전송 후 삭제합니다.
