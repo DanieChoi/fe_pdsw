@@ -4,10 +4,11 @@ import { apiForGetCampaignList } from "./apiForCampaign";
 import { fetchCounselorList } from "@/features/auth/api/main";
 import { MainCredentials } from "@/features/auth/types/mainIndex";
 
-function getStatusFromFlags(start_flag: number, end_flag: number): string {
-  if (end_flag === 1) return 'stopped';      // 종료된 상태
+// TOFIX updatecapmaign 은 cmapaign master 으로 수정으로 구현 예정 
+function getStatusFromFlags(start_flag: number): string {
+  if (start_flag === 1) return 'started';      // 종료된 상태
   if (start_flag === 2) return 'pending';    // 대기 상태
-  if (start_flag === 3) return 'active';     // 진행중 
+  if (start_flag === 3) return 'stopped';     // 진행중 
   return 'stopped';                          // 기타 케이스는 stopped
 }
 
@@ -37,7 +38,7 @@ export async function apiForGetTreeMenuDataForSideMenu(): Promise<TabData[]> {
       id: campaign.campaign_id.toString(),
       label: campaign.campaign_name,
       type: 'campaign',
-      status: getStatusFromFlags(campaign.start_flag, campaign.end_flag),
+      status: getStatusFromFlags(campaign.start_flag),
       direction: 'outbound'
     })) || []
   }));

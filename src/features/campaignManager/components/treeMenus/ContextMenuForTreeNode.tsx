@@ -69,7 +69,7 @@ export function ContextMenuForTreeNode({
             </ContextMenuItem>
             <ContextMenuItem>
               <List className="mr-2 h-4 w-4" />
-              임시
+              멈춤
             </ContextMenuItem>
             <ContextMenuItem>
               <History className="mr-2 h-4 w-4" />
