@@ -32,7 +32,7 @@ export default function RootLayout({
       >
         <ClientProvider>
           {/* ✅ ClientProvider 내부에서 RedisTestButton 실행 */}
-          <RedisTestButton />
+          {/* <RedisTestButton /> */}
           {children}
         </ClientProvider>
       </body>
