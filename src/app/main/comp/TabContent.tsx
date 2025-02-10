@@ -1,7 +1,12 @@
+// src/app/main/comp/TabContent.tsx
 "use client";
 
 import React from "react";
 import { useTabStore } from "@/store/tabStore";
+
+// ─────────────────────────────────────────────────────────────────────────
+// 원래 코드에서 사용하던 실제 컴포넌트들 임포트
+// ─────────────────────────────────────────────────────────────────────────
 import PreferencesBoard from "./preferences";
 import SystemPreferences from "./SystemPreferences";
 import CampaignMonitorDashbord from "./CampaignMonitorDashbord";
@@ -10,73 +15,97 @@ import ChannelMonitor from "./ChannelMonitor";
 import ListManager from "./ListManager";
 import OperationBoard from "./operation";
 import CampaignManager from "./CampaignManager";
-import CampaignUpdatePanel from "./CampaignUpdatePanel";
+import CampaignUpdatePanel from "./CampaignUpdatePanel";         // 필요하다면
 import CampaignGroupManager from "./CampaignGroupManager";
 import NewCampaignManager from "./NewCampaignManager";
 import RebroadcastSettingsPanel from "./RebroadcastSettingsPanel";
-import { SkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/SkillAssignmentTab";
+// import { SkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/SkillAssignmentTab"; 
+// 필요하면 추가
 
-const TabContent = () => {
-  const { activeTabId, openedTabs, activeTabKey } = useTabStore();
+// 탭 ID별 실제 화면을 매핑하는 함수
+const renderContent = (tabId: number | null) => {
+  switch (tabId) {
+    case 1:
+      return <CampaignGroupManager />;
+    case 2:
+      return <CampaignManager />;
+    case 3:
+      return <>통합모니터 컨텐츠</>;
+    case 4:
+      return <CampaignMonitorDashbord />;
+    case 5:
+      return <OutboundCallProgressPanel />;
+    case 6:
+      return <ChannelMonitor />;
+    case 7:
+      return <ListManager />;
+    case 8:
+      return <>예약콜 제한 설정 컨텐츠</>;
+    case 9:
+      return <>분배호수 제한 설정 컨텐츠</>;
+    case 10:
+      return <SystemPreferences />;
+    case 11:
+      return <OperationBoard />;
+    case 12:
+      return <PreferencesBoard />;
+    case 13:
+      return <NewCampaignManager />;
+    case 20:
+      return <RebroadcastSettingsPanel />;
+    // case 100:
+    //   return <SkillAssignmentTab />;
+    case 100:
+      return <>잘못된 스킬 할당 탭입니다.</>;
 
-  const renderContent = () => {
-    console.log("activeTabId: ", activeTabId);
-
-    switch (activeTabId) {
-      case 1:
-        return <div className="p-2 limit-width"><CampaignGroupManager /></div>;
-      case 2:
-        return <div className="p-2 limit-width"><CampaignManager /></div>;
-      case 3:
-        return <div className="p-2 limit-width">통합모니터 컨텐츠</div>;
-      case 4:
-        return <div className="p-2 limit-width"><CampaignMonitorDashbord /></div>;
-      case 5:
-        return <div className="p-2 h-full limit-width"><OutboundCallProgressPanel /></div>;
-      case 6:
-        return <div className="p-2 h-full limit-width"><ChannelMonitor/></div>;
-      case 7:
-        return <div className="p-2 limit-width"><ListManager /></div>;
-      case 8:
-        return <div className="p-2 limit-width">예약콜 제한 설정 컨텐츠</div>;
-      case 9:
-        return <div className="p-2 limit-width">분배호수 제한 설정 컨텐츠</div>;
-      case 10:
-        return <div className="p-2 limit-width"><SystemPreferences /></div>;
-      case 11:
-        return <div className="p-2 limit-width"><OperationBoard /></div>;
-      case 12:
-        return <div className="p-2 limit-width"><PreferencesBoard /></div>;
-      case 13:
-        return <div className="p-2 limit-width"><NewCampaignManager /></div>;
-      case 20:
-        return <div className="p-2 limit-width"><RebroadcastSettingsPanel /></div>; // 예약 재발신 설정 화면 추가
-
-      case 100:  // 스킬 할당 탭
-        const activeTab = openedTabs.find(tab => 
-          tab.id === activeTabId && tab.uniqueKey === activeTabKey
-        );
-        if (activeTab && 'counselorId' in activeTab && typeof activeTab.counselorId === 'string') {
-          return (
-            <div className="py-3 max-w-2xl">
-              <SkillAssignmentTab counselorId={activeTab.counselorId} />
-            </div>
-          );
-        }
-        return <div className="p-2">잘못된 스킬 할당 탭입니다.</div>;
-
-      default:
+    default:
+      // 탭 ID가 null이면 '빈 공간', 그 외엔 '알 수 없는 탭'
+      if (tabId === null) {
         return (
-          <div className="flex items-center justify-center min-h-[calc(100vh-23rem)] text-gray-500">
-            탭을 선택해주세요
+          <div className="flex items-center justify-center h-full text-gray-400">
+            빈 공간
           </div>
         );
-    }
-  };
+      }
+      return (
+        <div className="flex items-center justify-center h-full text-gray-500">
+          알 수 없는 탭 ID입니다. (ID: {tabId})
+        </div>
+      );
+  }
+};
 
+const TabContent = () => {
+  const { rows } = useTabStore();
+
+  // 여러 Row가 있을 수 있으므로, Row를 세로로 나열
   return (
-    <div className="bg-white min-h-[calc(100vh-22.5rem)] h-full">
-      {renderContent()}
+    <div className="flex flex-col w-full h-full overflow-auto bg-white">
+      {rows.map((row) => (
+        <div
+          key={row.id}
+          className="flex w-full flex-1 border-b last:border-b-0"
+        >
+          {/* 각 Row 안에서 섹션들을 가로로 배치 */}
+          {row.sections.map((section) => {
+            // 섹션 단위로 현재 활성화된 탭(Unique Key) 확인
+            const activeKey = section.activeTabKey;
+            const activeTab = section.tabs.find((t) => t.uniqueKey === activeKey);
+            // 탭 ID를 구해 실제 컨텐츠 렌더링
+            const content = renderContent(activeTab?.id ?? null);
+
+            return (
+              <div
+                key={section.id}
+                className="p-2 overflow-auto"
+                style={{ width: `${section.width}%` }}
+              >
+                {content}
+              </div>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 };
