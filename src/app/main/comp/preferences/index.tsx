@@ -82,26 +82,6 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                 <span className="text-sm">캠페인 리스트 잔량 부족시의 알람모드를 설정합니다.</span>
               </TableCell>
             </TableRow>
-            <TableRow>
-              <TableHeader className="w-[12.5rem]">
-                <Label className="w-32">모니터 설정</Label>
-              </TableHeader>
-              <TableCell className="w-[17rem]">
-              <CommonRadio defaultValue="auto" className="flex gap-8">
-                <div className="flex items-center space-x-2">
-                  <CommonRadioItem value="grid" id="grid" />
-                  <Label htmlFor="grid">그리드형</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <CommonRadioItem value="auto" id="auto" />
-                  <Label htmlFor="auto">차트형</Label>
-                </div>
-              </CommonRadio>
-              </TableCell>
-              <TableCell>
-                <span className="text-sm">캠페인 진행현황을 보여주는 형태를 선택할 수 있습니다.</span>
-              </TableCell>
-            </TableRow>
             </tbody>
         </Table>
         </div> 
@@ -145,28 +125,6 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
               </TableCell>
               <TableCell>
                 <span className="text-sm">서버와의 접속시간을 설정합니다.</span>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableHeader className="w-[12.5rem]">
-                <Label className="w-32">PDS IP & PORT</Label>
-              </TableHeader>
-              <TableCell className="w-[17rem]">
-                <div className="flex items-center gap-3">
-                  <CustomInput
-                    value={ip}
-                    onChange={(e) => setIp(e.target.value)}
-                    className="w-32"
-                  />
-                  <CustomInput
-                    value={port}
-                    onChange={(e) => setPort(e.target.value)}
-                    className="w-20"
-                  />
-                </div>
-              </TableCell>
-              <TableCell>
-                <span className="text-sm">작업대상 리스트 파일을 업로드 할 서버의 IP와 PORT를 설정합니다.</span>
               </TableCell>
             </TableRow>
             </tbody>
