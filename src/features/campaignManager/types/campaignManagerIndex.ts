@@ -90,6 +90,19 @@ export interface CallingNumberListDataResponse {
   calling_number: string;
 }
 
+// 캠페인 상태 변경 응답 타입
+export interface CampaignStatusResponse {
+  result_code: number;
+  result_msg: string;
+  reason_code: number;
+}
+
+// 캠페인 상태 변경 요청 데이터 타입
+export interface CampaignStatusDataRequest {
+  campaign_id: number;
+  campaign_status: number;
+}
+
 // 캠페인발신번호 데이터 타입
 export interface CallingNumberListResponse {
   result_code: number;
