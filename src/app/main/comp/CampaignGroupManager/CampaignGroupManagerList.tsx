@@ -186,7 +186,7 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
             />
         </div>
       </div>
-      <TitleWrap title="캠페인 그룹 검색목록" totalCount={tempCampaigns.length} />        
+      <TitleWrap title="캠페인 그룹 검색목록" totalCount={tempCampaigns.length} className="mt-5"/>        
       <div className="overflow-x-auto">
         <div className="grid-custom-wrap h-[200px]">
           <DataGrid 
