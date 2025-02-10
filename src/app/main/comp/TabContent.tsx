@@ -11,6 +11,7 @@ import PreferencesBoard from "./preferences";
 import SystemPreferences from "./SystemPreferences";
 import CampaignMonitorDashbord from "./CampaignMonitorDashbord";
 import OutboundCallProgressPanel from "./OutboundCallProgressPanel";
+import StatusCampaign from "./StatusCampaign";
 import ChannelMonitor from "./ChannelMonitor";
 import ListManager from "./ListManager";
 import OperationBoard from "./operation";

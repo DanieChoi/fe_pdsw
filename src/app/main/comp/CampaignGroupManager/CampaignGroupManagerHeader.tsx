@@ -39,29 +39,31 @@ export default function CampaignGroupManagerHeader({onSearch}:Props) {
   }
 
   return (
-    <div className="grid grid-cols-6 gap-4 title-background">
-      <div className="flex items-center">
-          <Label className="w-20 min-w-20">테넌트</Label>
-          <Select defaultValue='all' value={tenantId} onValueChange={setTenantId}>
-              <SelectTrigger className="w-full">
-              <SelectValue placeholder="테넌트" />
-              </SelectTrigger>
-              <SelectContent>
-              <SelectItem value='all'>전체</SelectItem>
-              { tenants.map(option => (
-                <SelectItem key={option.tenant_id} value={option.tenant_id+''}>{option.tenant_name}</SelectItem>
-              )) }
-              </SelectContent>
-          </Select>
-      </div>
-      <div className="flex items-center">
-        <Label className="w-20 min-w-20">캠페인 그룹명</Label>
-        <CustomInput 
-        type="text" 
-        value={campaignGroupName}
-        onChange={(e) => setCampaignGroupName(e.target.value)}
-        className="w-full"
-      />
+    <div className="flex title-background justify-between">
+      <div className="flex gap-4 items-center">
+        <div className="flex items-center gap-1r">
+            <Label className="w-20 min-w-20">테넌트</Label>
+            <Select defaultValue='all' value={tenantId} onValueChange={setTenantId}>
+                <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="테넌트" />
+                </SelectTrigger>
+                <SelectContent>
+                <SelectItem value='all'>전체</SelectItem>
+                { tenants.map(option => (
+                  <SelectItem key={option.tenant_id} value={option.tenant_id+''}>{option.tenant_name}</SelectItem>
+                )) }
+                </SelectContent>
+            </Select>
+        </div>
+        <div className="flex items-center gap-1">
+          <Label className="w-20 min-w-20">캠페인 그룹명</Label>
+          <CustomInput 
+          type="text" 
+          value={campaignGroupName}
+          onChange={(e) => setCampaignGroupName(e.target.value)}
+          className="w-[180px]"
+        />
+        </div>
       </div>
         <div className="flex justify-end gap-2">
           {!readonly &&

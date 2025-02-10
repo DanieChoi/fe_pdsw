@@ -1,9 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import DataGrid, { CellClickArgs } from 'react-data-grid';
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { CommonButton } from "@/components/shared/CommonButton";
 import CustomAlert from '@/components/shared/layout/CustomAlert';
+import { useCampainManagerStore } from '@/store';
+import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
+import { fetchPhoneDescriptionUpdate } from '../../../../../features/campaignManager/api/mainPhoneDescriptionUpdate';
+import { useApiForPhoneDescriptionUpdate } from '@/features/campaignManager/hooks/useApiForPhoneDescriptionUpdate';
+import { useApiForPhoneDescriptionInsert } from '@/features/campaignManager/hooks/useApiForPhoneDescriptionInsert';
 
 interface PhoneRow {
   id: string;
@@ -14,7 +19,13 @@ interface PhoneRow {
   phone5: string;
 }
 
+interface PhoneDescription {
+  description_id: number;
+  description: string[];
+}
+
 const EditDescription = () => {
+  const { phoneDescriptions, setPhoneDescriptions } = useCampainManagerStore();
   const [selectedRow, setSelectedRow] = useState<PhoneRow | null>(null);
   const [inputId, setInputId] = useState('');
   const [inputPhone1, setInputPhone1] = useState('');
@@ -22,6 +33,55 @@ const EditDescription = () => {
   const [inputPhone3, setInputPhone3] = useState('');
   const [inputPhone4, setInputPhone4] = useState('');
   const [inputPhone5, setInputPhone5] = useState('');
+
+  // api 응답 데이터를 그리드 형식으로 변환하는 함수
+  const transformToGridData = (apiData: PhoneDescription[]): PhoneRow[] => {
+    return apiData.map(item => ({
+      id: item.description_id.toString(),
+      phone1: item.description[0] || '',
+      phone2: item.description[1] || '',
+      phone3: item.description[2] || '',
+      phone4: item.description[3] || '',
+      phone5: item.description[4] || ''
+    }));
+  };
+
+  //전화번호설명 템플릿 조회
+  const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
+    onSuccess: (data) => {
+      const sortedData = [...data.result_data].sort((a, b) => a.description_id - b.description_id);
+      setPhoneDescriptions(sortedData);
+    }
+  })
+
+  // 전화번호설명 추가
+  const { mutate: fetchPhoneDescriptionInsert } = useApiForPhoneDescriptionInsert({
+    onSuccess: (data) => {
+      fetchPhoneDescriptions({
+        session_key: '',
+        tenant_id: 0,
+      })
+      showConfirm('저장되었습니다', () => {});
+    }
+  })
+
+  // 전화번호설명 수정
+  const { mutate: fetchPhoneDescriptionUpdate } = useApiForPhoneDescriptionUpdate({
+    onSuccess: (data) => {
+      fetchPhoneDescriptions({
+        session_key: '',
+        tenant_id: 0,
+      });
+      showConfirm('수정되었습니다', () => {});
+    }
+  })
+
+  useEffect(() => {
+    fetchPhoneDescriptions({
+      session_key: '',
+      tenant_id: 0,
+    });
+  }, [])
   
   const [alertState, setAlertState] = useState({
     isOpen: false,
@@ -65,28 +125,24 @@ const EditDescription = () => {
     if (!validateData()) return;
 
     const saveData = {
-      id: inputId,
-      phone1: inputPhone1,
-      phone2: inputPhone2,
-      phone3: inputPhone3,
-      phone4: inputPhone4,
-      phone5: inputPhone5
+      description_id: Number(inputId),
+      description: [inputPhone1, inputPhone2, inputPhone3, inputPhone4, inputPhone5]
     };
 
     if (selectedRow) {
-      showConfirm('수정하시겠습니까?', () => {
-        console.log('Update:', saveData);
-      });
+      // 수정
+      fetchPhoneDescriptionUpdate(saveData);
+      showConfirm('수정되었습니다', () => {});
     } else {
-      showConfirm('저장하시겠습니까?', () => {
-        console.log('Create:', saveData);
-      });
+      // 신규 저장
+      fetchPhoneDescriptionInsert(saveData);
+      showConfirm('저장되었습니다', () => {});
     }
   };
 
   const validateData = () => {
     if (!inputId || !inputPhone1 || !inputPhone2 || !inputPhone3 || !inputPhone4 || !inputPhone5) {
-      showAlert('모든 필드를 입력해주세요.');
+      showConfirm('모든 필드를 입력해주세요.', () => {});
       return false;
     }
     return true;
@@ -101,10 +157,9 @@ const EditDescription = () => {
     { key: 'phone5', name: '전화번호5' },
   ], []);
 
-  const rows: PhoneRow[] = [
-    { id: '1214', phone1: '집전화', phone2: '회사전화', phone3: '핸드폰', phone4: '핸드폰2', phone5: '핸드폰3' },
-    { id: '1215', phone1: '집전화', phone2: '회사전화', phone3: '핸드폰', phone4: '핸드폰2', phone5: '핸드폰3' },
-  ];
+  const rows = useMemo(() => {
+    return transformToGridData(phoneDescriptions || []);
+  }, [phoneDescriptions]);
 
   const handleCellClick = ({ row }: CellClickArgs<PhoneRow>) => {
     setSelectedRow(row);
@@ -118,14 +173,20 @@ const EditDescription = () => {
 
   const handleNew = () => {
     setSelectedRow(null);
-    setInputId('');
+    // 그리드의 마지막 ID를 찾아서 +1 한 값을 설정
+    if (rows.length > 0) {
+      const lastId = Math.max(...rows.map(row => parseInt(row.id)));
+      setInputId((lastId + 1).toString());
+    } else {
+      setInputId('1'); // 데이터가 없는 경우 1부터 시작
+    }
     setInputPhone1('');
     setInputPhone2('');
     setInputPhone3('');
     setInputPhone4('');
     setInputPhone5('');
   };
-
+  
   const getRowClass = (row: PhoneRow) => {
     return selectedRow?.id === row.id ? 'bg-[#FFFAEE]' : '';
   };
@@ -134,7 +195,7 @@ const EditDescription = () => {
     <div className="flex gap-8">
       <div className="w-[580px]">
         <div className="grid-custom-wrap h-[230px]">
-          <DataGrid<PhoneRow>
+        <DataGrid<PhoneRow>
             columns={columns}
             rows={rows}
             className="grid-custom"
