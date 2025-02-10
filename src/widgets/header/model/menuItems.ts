@@ -45,6 +45,13 @@ export const menuItems: MenuItem[] = [
     content: null
   },
   { 
+    id: 14, 
+    title: '캠페인별상태', 
+    icon: '/header-menu/캠페인별상태.svg', 
+    href: '/chartCampaign',
+    content: null
+  },
+  { 
     id: 6, 
     title: '채널 모니터', 
     icon: '/header-menu/채널모니터.svg', 

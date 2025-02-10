@@ -128,7 +128,8 @@ input::placeholder {
 }
 .menu-item:nth-child(2)::after, 
 .menu-item:nth-child(7)::after, 
-.menu-item:nth-child(9)::after
+.menu-item:nth-child(8)::after,
+.menu-item:nth-child(10)::after
  {
   content: '';
   position: absolute;
