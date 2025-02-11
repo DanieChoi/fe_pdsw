@@ -84,7 +84,7 @@ const CampaignGroupManager = ({campaignId}: Props) => {
 
   return (
     <div>
-      <div className='flex flex-col gap-4'>
+      <div className='flex flex-col gap-4 limit-width'>
           <CampaignGroupManagerHeader onSearch={handleCampaignHeaderSearch}/>
           <div className="flex gap-5">
             <CampaignGroupManagerList campaignId={campaignIdForUpdateFromSideMenu||''} campaignGroupHeaderSearchParam={campaignGroupHeaderSearchParam}/>

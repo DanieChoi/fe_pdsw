@@ -353,7 +353,7 @@ const ListManager: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 limit-width">
       <div className="flex gap-5">
         {/* 작업대상목록 */}
         <div className="w-1/2 flex-1 flex flex-col gap-5">

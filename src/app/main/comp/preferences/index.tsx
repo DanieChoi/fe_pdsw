@@ -37,7 +37,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
   return (
-    <div className="w-full">
+    <div className="w-full limit-width">
      <div className="flex-col flex gap-5">
       <div>
         <TitleWrap title="화면표시" />
