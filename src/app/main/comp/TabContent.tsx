@@ -15,11 +15,11 @@ import StatusCampaign from "./StatusCampaign";
 import ChannelMonitor from "./ChannelMonitor";
 import ListManager from "./ListManager";
 import OperationBoard from "./operation";
-import CampaignManager from "./CampaignManager";
 import CampaignUpdatePanel from "./CampaignUpdatePanel";
 import CampaignGroupManager from "./CampaignGroupManager";
 import NewCampaignManager from "./NewCampaignManager";
 import RebroadcastSettingsPanel from "./RebroadcastSettingsPanel";
+import CampaignManager from "./campaignManager";
 
 // 탭 ID별 실제 화면을 매핑하는 함수
 const renderContent = (tabId: number | null) => {
