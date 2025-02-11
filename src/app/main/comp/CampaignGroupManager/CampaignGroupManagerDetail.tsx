@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { CommonButton } from "@/components/shared/CommonButton";
-import CampaignTab from '../CampaignManager/CampaignTab';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { CampaignSkillUpdateRequest
   , CampaignInfoUpdateRequest
@@ -30,6 +29,7 @@ import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiF
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
+import CampaignTab from '../CampaignManager/CampaignTab';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
