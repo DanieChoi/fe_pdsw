@@ -50,6 +50,8 @@ const renderContent = (tabId: number | null) => {
       return <PreferencesBoard />;
     case 13:
       return <NewCampaignManager />;
+    case 14:
+      return <StatusCampaign />;
     case 20:
       return <RebroadcastSettingsPanel />;
     case 100:
