@@ -28,7 +28,7 @@ export default function OperationBoard() {
   ]
 
   return (
-    <div className="divide-y accordion-wrap">
+    <div className="divide-y accordion-wrap limit-width">
       {sections.map((section) => (
         <div key={section.id} className="accordion">
           <h2>

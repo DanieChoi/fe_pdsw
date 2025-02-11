@@ -415,7 +415,7 @@ const RebroadcastSettingsPanel = () => {
     };
 
     return (
-        <div className="">
+        <div className="limit-width">
             <div className="flex flex-col gap-6">
                 <div className="flex title-background justify-between">
                     <div className="flex gap-4 items-center">

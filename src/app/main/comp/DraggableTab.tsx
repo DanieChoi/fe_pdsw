@@ -1,12 +1,12 @@
 // src/app/main/comp/DraggableTab.tsx
 "use client";
 
-import React from 'react';
-import { useDraggable } from '@dnd-kit/core';
-import { CSS } from '@dnd-kit/utilities';
-import { X } from 'lucide-react';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+import { X } from "lucide-react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 interface DraggableTabProps {
   id: number;
@@ -16,6 +16,10 @@ interface DraggableTabProps {
   isActive: boolean;
   onRemove: () => void;
   onSelect: () => void;
+
+  // DnD에서 어느 섹션으로부터 드래그되는지 판단 위해
+  rowId: string;
+  sectionId: string;
 }
 
 const DraggableTab: React.FC<DraggableTabProps> = ({
@@ -26,18 +30,22 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
   isActive,
   onRemove,
   onSelect,
+  rowId,
+  sectionId,
 }) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: uniqueKey,
     data: {
-      type: 'tab',
+      type: "tab",
       id,
-      uniqueKey
-    }
+      uniqueKey,
+      rowId,
+      sectionId,
+    },
   });
 
   const style = {
-    transform: CSS.Translate.toString(transform)
+    transform: CSS.Translate.toString(transform),
   };
 
   return (
@@ -49,7 +57,7 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
       className={`
         flex items-center gap-2 px-3 py-1.5 h-8
         border border-gray-200 rounded-lg cursor-pointer
-        ${isActive ? 'bg-[#56CAD6] text-[#fff]' : 'bg-white hover:bg-gray-50'}
+        ${isActive ? "bg-[#56CAD6] text-white" : "bg-white hover:bg-gray-50"}
       `}
       onClick={onSelect}
     >
@@ -71,7 +79,7 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
           onRemove();
         }}
         className={`ml-1 p-0.5 h-5 w-5 rounded-full 
-          ${isActive ? 'hover:bg-[#369ea9]' : 'hover:bg-gray-200'}`}
+          ${isActive ? "hover:bg-[#369ea9]" : "hover:bg-gray-200"}`}
       >
         <X className="h-3 w-3" />
       </Button>
