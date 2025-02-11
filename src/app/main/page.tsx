@@ -1,6 +1,7 @@
+// src/app/main/MainPage.tsx
 "use client";
 
-import React from 'react';
+import React from "react";
 import {
   DndContext,
   DragEndEvent,
@@ -9,11 +10,11 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-} from '@dnd-kit/core';
-import { useTabStore } from '@/store/tabStore';
-import TabContent from './comp/TabContent';
-import TabRow from './comp/TabRow';
-import DraggableTab from './comp/DraggableTab';
+} from "@dnd-kit/core";
+import { useTabStore } from "@/store/tabStore";
+import TabContent from "./comp/TabContent";
+import TabRow from "./comp/TabRow";
+import DraggableTab from "./comp/DraggableTab";
 
 interface ActiveTabState {
   id: number;
@@ -32,7 +33,7 @@ const MainPage = () => {
     activeTabKey,
     moveTabToSection,
     moveTabToGroup,
-    addSubTab, // 🆕 추가
+    setActiveTab: setGlobalActiveTab, // 전역 activeTab 설정 함수
   } = useTabStore();
 
   const sensors = useSensors(
@@ -45,13 +46,13 @@ const MainPage = () => {
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    const isTab = active.data.current?.type === 'tab';
+    const isTab = active.data.current?.type === "tab";
     if (!isTab) return;
 
     const tabId = active.data.current?.id;
     const uniqueKey = active.data.current?.uniqueKey;
-    
-    const tab = openedTabs.find(t => t.id === tabId && t.uniqueKey === uniqueKey);
+
+    const tab = openedTabs.find((t) => t.id === tabId && t.uniqueKey === uniqueKey);
     if (tab) {
       setActiveTab({
         id: tab.id,
@@ -66,45 +67,33 @@ const MainPage = () => {
     const { active, over } = event;
     if (!over) return;
 
-    const isTab = active.data.current?.type === 'tab';
+    const isTab = active.data.current?.type === "tab";
     if (!isTab) return;
 
     const tabId = active.data.current?.id;
     const uniqueKey = active.data.current?.uniqueKey;
     const overType = over.data.current?.type;
 
-    if (overType === 'section') {
+    if (overType === "section") {
       const targetRowId = over.data.current?.rowId;
       const targetSectionId = over.data.current?.sectionId;
       if (targetRowId && targetSectionId) {
         moveTabToSection(tabId, targetRowId, targetSectionId, uniqueKey);
       }
-    } else if (overType === 'group') {
+    } else if (overType === "group") {
       moveTabToGroup(tabId, over.data.current?.id);
-    } else {
-      // 🆕 `subTabs`에 추가
-      const tab = openedTabs.find(t => t.id === tabId && t.uniqueKey === uniqueKey);
-      if (tab) {
-        addSubTab(tab);
-      }
     }
 
     setActiveTab(null);
   };
 
   return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
+    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="flex flex-col h-full bg-white">
         <div className="flex-none border-b border-gray-200">
-          <div className="">
-            {rows.map((row) => (
-              <TabRow key={row.id} rowId={row.id} />
-            ))}
-          </div>
+          {rows.map((row) => (
+            <TabRow key={row.id} rowId={row.id} />
+          ))}
         </div>
 
         <div className="flex-1 overflow-auto py-[15px] px-[35px]">
@@ -121,7 +110,9 @@ const MainPage = () => {
             icon={activeTab.icon}
             isActive={activeTab.id === activeTabId && activeTab.uniqueKey === activeTabKey}
             onRemove={() => {}}
-            onSelect={() => {}}
+            onSelect={() => setGlobalActiveTab(activeTab.id, activeTab.uniqueKey)}
+            rowId=""
+            sectionId=""
           />
         ) : null}
       </DragOverlay>

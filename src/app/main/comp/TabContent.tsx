@@ -9,19 +9,18 @@ import { useTabStore } from "@/store/tabStore";
 // ─────────────────────────────────────────────────────────────────────────
 import PreferencesBoard from "./preferences";
 import SystemPreferences from "./SystemPreferences";
+import Campaignprogress from "./Campaignprogress";
 import CampaignMonitorDashbord from "./CampaignMonitorDashbord";
 import OutboundCallProgressPanel from "./OutboundCallProgressPanel";
 import StatusCampaign from "./StatusCampaign";
 import ChannelMonitor from "./ChannelMonitor";
 import ListManager from "./ListManager";
 import OperationBoard from "./operation";
-import CampaignManager from "./CampaignManager";
-import CampaignUpdatePanel from "./CampaignUpdatePanel";         // 필요하다면
+import CampaignUpdatePanel from "./CampaignUpdatePanel";
 import CampaignGroupManager from "./CampaignGroupManager";
 import NewCampaignManager from "./NewCampaignManager";
 import RebroadcastSettingsPanel from "./RebroadcastSettingsPanel";
-// import { SkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/SkillAssignmentTab"; 
-// 필요하면 추가
+import CampaignManager from "./CampaignManager";
 
 // 탭 ID별 실제 화면을 매핑하는 함수
 const renderContent = (tabId: number | null) => {
@@ -33,7 +32,7 @@ const renderContent = (tabId: number | null) => {
     case 3:
       return <>통합모니터 컨텐츠</>;
     case 4:
-      return <CampaignMonitorDashbord />;
+      return <Campaignprogress />; //총진행상황 상단 탭
     case 5:
       return <OutboundCallProgressPanel />;
     case 6:
@@ -52,22 +51,14 @@ const renderContent = (tabId: number | null) => {
       return <PreferencesBoard />;
     case 13:
       return <NewCampaignManager />;
+    case 14:
+      return <StatusCampaign />;
     case 20:
       return <RebroadcastSettingsPanel />;
-    // case 100:
-    //   return <SkillAssignmentTab />;
     case 100:
       return <>잘못된 스킬 할당 탭입니다.</>;
 
     default:
-      // 탭 ID가 null이면 '빈 공간', 그 외엔 '알 수 없는 탭'
-      if (tabId === null) {
-        return (
-          <div className="flex items-center justify-center h-full text-gray-400">
-            빈 공간
-          </div>
-        );
-      }
       return (
         <div className="flex items-center justify-center h-full text-gray-500">
           알 수 없는 탭 ID입니다. (ID: {tabId})
@@ -77,9 +68,8 @@ const renderContent = (tabId: number | null) => {
 };
 
 const TabContent = () => {
-  const { rows } = useTabStore();
+  const { rows, activeTabId, activeTabKey, setActiveTab } = useTabStore();
 
-  // 여러 Row가 있을 수 있으므로, Row를 세로로 나열
   return (
     <div className="flex flex-col w-full h-full overflow-auto bg-white">
       {rows.map((row) => (
@@ -89,19 +79,25 @@ const TabContent = () => {
         >
           {/* 각 Row 안에서 섹션들을 가로로 배치 */}
           {row.sections.map((section) => {
-            // 섹션 단위로 현재 활성화된 탭(Unique Key) 확인
             const activeKey = section.activeTabKey;
             const activeTab = section.tabs.find((t) => t.uniqueKey === activeKey);
-            // 탭 ID를 구해 실제 컨텐츠 렌더링
-            const content = renderContent(activeTab?.id ?? null);
+
+            // 전역 activeTabId와 activeTabKey가 있는 경우 우선 반영
+            const isActiveGlobal = activeTabId === activeTab?.id && activeTabKey === activeTab?.uniqueKey;
+            const tabIdToRender = isActiveGlobal ? activeTabId : activeTab?.id ?? null;
 
             return (
               <div
                 key={section.id}
-                className="p-2 overflow-auto"
+                className="p-2 overflow-auto cursor-pointer"
                 style={{ width: `${section.width}%` }}
+                onClick={() => {
+                  if (activeTab) {
+                    setActiveTab(activeTab.id, activeTab.uniqueKey);
+                  }
+                }}
               >
-                {content}
+                {renderContent(tabIdToRender)}
               </div>
             );
           })}

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import * as XLSX from 'xlsx';
 
 // 공통 컴포넌트
@@ -18,6 +18,12 @@ import {
   CommonRadio,
   CommonRadioItem,
 } from "@/components/shared/CommonRadio";
+import SenderList from './SenderList';
+import { useMainStore, useTabStore } from '@/store';
+import { CallingListInsertDataType
+  , CallingListInsertRequest
+} from '@/features/listManager/types/listManagerIndex';
+import { useApiForCallingListInsert } from '@/features/listManager/hooks/useApiForCallingListInsert';
 
 // 데이터그리드
 import DataGrid, { Column, CellClickArgs } from "react-data-grid";
@@ -38,13 +44,45 @@ interface FileRow {
 
 interface SendRow {
   id: number;    
-  no: string;
-  no2: string;
-  no3: string;
-  name: string;
-  number: string;
-  number2: string;
-  number3: string;
+  fileId: number;
+  CSKE: string;
+  CSK2: string;
+  CSK3: string;
+  CSNA: string;
+  TNO1: string;
+  TNO2: string;
+  TNO3: string;
+  TNO4: string;
+  TNO5: string;
+  CSC1: string;
+  CSC2: string;
+  CSC3: string;
+  CSC4: string;
+  CSC5: string;
+  CSC6: string;
+  EMPLOYEEID: string;
+  TKDA: string;
+}
+
+// 발신 리스트 추가 요청 데이터 타입
+const callListInsertDataType: CallingListInsertDataType = {
+  customer_key: '',
+  sequence_number: 0,
+  customer_name: '',
+  phone_number1: '',
+  phone_number2: '',
+  phone_number3: '',
+  phone_number4: '',
+  phone_number5: '',
+  reserved_time: '',
+  token_data: ''
+}
+
+// 발신 리스트 추가 요청 
+const callListInsertData: CallingListInsertRequest = {
+  campaign_id: 0,
+  list_flag: 'I',
+  calling_list: [] as CallingListInsertDataType[]
 }
 
 interface ProgressRow {
@@ -54,8 +92,14 @@ interface ProgressRow {
 }
 
 const ListManager: React.FC = () => {
+  const { campaigns } = useMainStore();
+  const { campaignIdForUpdateFromSideMenu } = useTabStore();
   const [delimiter, setDelimiter] = useState<string>('');
   const [headerData,setHeaderData] = useState<FormatRow[]>([]);
+  const [_callListInsertData, setCallListInsertData] = useState<CallingListInsertRequest>(callListInsertData);
+  const [fileFormat,setFileFormat ] = useState<string>('excel');
+  const [deleteData, setDeleteData] = useState(true);  // 기존 캠페인 데이터 삭제.
+  const [campaignIdDisabled,setCampaignIdDisabled] = useState<boolean>(false);
     const [originaldataYn, setOriginaldataYn] = useState<boolean>(false);
   // 아이디 생성용 카운터
   const [nextId, setNextId] = useState(1);
@@ -74,30 +118,12 @@ const ListManager: React.FC = () => {
   const [selectedProgressRow, setSelectedProgressRow] = useState<ProgressRow | null>(null);
   const [selectedFile, setSelectedFile] = useState<FileRow | null>(null);
 
-  // 목록 데이터 상태
-  const [sendList] = useState<SendRow[]>([
-    {
-      id: 1,
-      no: "0001",
-      no2: "",
-      no3: "",
-      name: "홍길동",
-      number: "0102234567",
-      number2: "",  
-      number3: "", 
-    },
-    {
-      id: 2,
-      no: "0001",
-      no2: "홍보몰",
-      no3: "",
-      name: "홍길동",
-      number: "0102234567",
-      number2: "",
-      number3: "",
-    },
-  ]);
-
+  //캠페인 발신번호 추가 api 호출
+  const { mutate: fetchCallingListInsert } = useApiForCallingListInsert({
+    onSuccess: (data) => {   
+    }
+  });
+  
   const [progressList] = useState<ProgressRow[]>([
     {
       id: 1,
@@ -115,17 +141,8 @@ const ListManager: React.FC = () => {
   const handleFileFormatOpen = () => setIsFileFormatOpen(true);
   const handleFileFormatClose = () => setIsFileFormatOpen(false);
 
-  const tempSendColumns = useMemo<Column<SendRow>[]>(() => [
-    { key: "no", name: "고객키[1]" },
-    { key: "no2", name: "고객키[2]" },
-    { key: "no3", name: "고객키[3]" },
-    { key: "name", name: "고객이름" },
-    { key: "number", name: "고객전화번호[1]" },
-    { key: "number2", name: "고객전화번호[2]" },
-    { key: "number3", name: "고객전화번호[3]" },
-  ], []);
-
-  const [sendColumns, setSendColumns] = useState<Column<SendRow>[]>(tempSendColumns);
+  const [sendColumns, setSendColumns] = useState<Column<SendRow>[]>([]);
+  const [sendList, setSendList] = useState<SendRow[]>([]);
   
   //파일포맷설정 확인 이벤트.
   const handleFileFormatConfirm = (data:FormatRowData) => {
@@ -145,52 +162,159 @@ const ListManager: React.FC = () => {
     setTargetType(value as "general" | "blacklist");
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {   
     const files = e.target.files;
     if (files && files.length > 0) {
-      const file = files[0];
-      const newFileData: FileRow = {
-        id: nextId,
-        fileName: file.name,
-        campaignId: targetType === "general" ? "G123" : "B456",
-        fileSize: (file.size / 1024).toFixed(2) + " KB",
-        deletable: false,
-      };
-      setUploadedFiles((prev) => [...prev, newFileData]);
-      setSelectedFileName(file.name);
-      setNextId(nextId + 1);
-
-
-      const reader = new FileReader();
-      if( file.name.indexOf('.xls') > -1 ){
-        reader.onload = (event) => {
-          const fileContent = event.target?.result;
-          
-          if (fileContent) {
-            const workbook = XLSX.read(fileContent, { type: 'array' });
-    
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
-    
-            const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }); // `header: 1` means treat the first row as header
-    
-            console.log("Excel Data:", data);
-          }
-
+      try{
+        setIsLoading(true);
+        const file = files[0];
+        const newFileData: FileRow = {
+          id: nextId,
+          fileName: file.name,
+          campaignId: targetType === "general" ? "G123" : "B456",
+          fileSize: (file.size / 1024).toFixed(2) + " KB",
+          deletable: false,
         };
-        reader.readAsArrayBuffer(file);
-      }else{
-        reader.onload = (event) => {
-          const fileContent = event.target?.result;        
-          // Now, you can process fileContent here
-          console.log("File content:", fileContent);
+        setUploadedFiles((prev) => [...prev, newFileData]);
+        setSelectedFileName(file.name);
+        setNextId(nextId + 1);
+
+
+        const reader = new FileReader();
+        if( fileFormat === 'excel' && file.name.indexOf('.xls') > -1 ){
+          reader.onload = (event) => {
+            const fileContent = event.target?.result;
+            
+            if (fileContent) {
+              const workbook = XLSX.read(fileContent, { type: 'array' });
+      
+              const sheetName = workbook.SheetNames[0];
+              const worksheet = workbook.Sheets[sheetName];
+      
+              const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }); 
+      
+              if( data.length > 0 ){
+                let index = 0;
+                const fileId = uploadedFiles.length+1;
+                const tempSendList = [];
+                for(let i=0; i< data.length;i++){
+                  const row = data[i] as unknown[];
+                  index = index+1;
+
+                  const tempData: SendRow = {
+                    id: index,
+                    fileId: fileId,
+                    CSKE: '',
+                    CSK2: '',
+                    CSK3: '',
+                    CSNA: '',
+                    TNO1: '',
+                    TNO2: '',
+                    TNO3: '',
+                    TNO4: '',
+                    TNO5: '',
+                    CSC1: '',
+                    CSC2: '',
+                    CSC3: '',
+                    CSC4: '',
+                    CSC5: '',
+                    CSC6: '',
+                    EMPLOYEEID: '',
+                    TKDA: '',
+                  };
+                  if( row.length > 0){
+                    for (let j = 0; j < row.length; j++) {
+                      const key = sendColumns[j].key as keyof SendRow;
+                      if (key in tempData) {
+                        if (typeof key === 'string' && key in tempData) {
+                          if (typeof key === 'string' && key in tempData) {
+                            (tempData as any)[key] = row[j] as string || '';
+                          }
+                        }
+                      }
+                    }
+                    tempSendList.push(tempData);
+                  }
+                  
+                }
+                setSendList(tempSendList);
+              }
+
+            }
+
+          };
+          reader.readAsArrayBuffer(file);
+        }else if( fileFormat === 'txt'){
+          reader.onload = (event) => {
+            const fileContent = event.target?.result;       
+            console.log("File content:", fileContent);
+            if( fileContent != null && fileContent !== '' ){
+              const tempdata = (fileContent+'').split('\r\n');
+              let index = 0;
+              const fileId = uploadedFiles.length+1;
+              const tempSendList = [];
+              for( let i=0;i<tempdata.length;i++){
+                // const row = tempdata[i].split(delimiter) as unknown[];
+                index = index+1;
+
+                const tempData: SendRow = {
+                  id: index,
+                  fileId: fileId,
+                  CSKE: '',
+                  CSK2: '',
+                  CSK3: '',
+                  CSNA: '',
+                  TNO1: '',
+                  TNO2: '',
+                  TNO3: '',
+                  TNO4: '',
+                  TNO5: '',
+                  CSC1: '',
+                  CSC2: '',
+                  CSC3: '',
+                  CSC4: '',
+                  CSC5: '',
+                  CSC6: '',
+                  EMPLOYEEID: '',
+                  TKDA: '',
+                };
+                //길이체크인 경우 
+                if( delimiter === '' ){
+                  
+                  //구분자인 경우
+                }else{ 
+                  const row = tempdata[i].split(delimiter) as unknown[];
+                  if( row.length > 0){
+                    for (let j = 0; j < row.length; j++) {
+                      const key = sendColumns[j].key as keyof SendRow;
+                      if (key in tempData) {
+                        if (typeof key === 'string' && key in tempData) {
+                          if (typeof key === 'string' && key in tempData) {
+                            (tempData as any)[key] = row[j] as string || '';
+                          }
+                        }
+                      }
+                    }
+                    tempSendList.push(tempData);
+                  }
+                }
+              }
+              setSendList(tempSendList);
+            }
+            // Now, you can process fileContent here
+          };
+          reader.readAsText(file);
+        }
+        // Handle file reading errors
+        reader.onerror = (error) => {
+          console.error("Error reading file:", error);
         };
-        reader.readAsText(file);
+      } catch (e) {
+        console.error("Error processing file:", e);
+  
+      }finally{
+        setIsLoading(false);
       }
-      // Handle file reading errors
-      reader.onerror = (error) => {
-        console.error("Error reading file:", error);
-      };
     }
   };
  
@@ -217,10 +341,6 @@ const ListManager: React.FC = () => {
   };
 
   // 행 클릭 핸들러
-  const handleSendRowClick = ({ row }: CellClickArgs<SendRow>) => {
-    setSelectedSendRow(row);
-  };
-
   const handleProgressRowClick = ({ row }: CellClickArgs<ProgressRow>) => {
     setSelectedProgressRow(row);
   };
@@ -352,6 +472,56 @@ const ListManager: React.FC = () => {
     }
   };
 
+  //select data change
+  const handleSelectChange = (value: string, type: string) => {
+    if( type === 'campaignId' ){
+      setCallListInsertData({
+        ..._callListInsertData,
+        campaign_id: Number(value)
+      });
+    }  
+    if( type === 'listFlag'){
+      setCallListInsertData({
+        ..._callListInsertData,
+        list_flag: value
+      });
+    }
+  }
+
+  //checkbox checked change
+  const handleCheckbox = (checked:boolean, type:string) => {
+    if( type === 'deleteData' ){  //체크 I 안하면 A
+      setDeleteData(checked);
+      if( checked ){
+        setCallListInsertData({
+          ..._callListInsertData,
+          list_flag: 'I'
+        });
+      }else{
+        setCallListInsertData({
+          ..._callListInsertData,
+          list_flag: 'A'
+        });
+      }
+    }  
+  }
+
+  useEffect(() => {
+    if( campaignIdForUpdateFromSideMenu ){
+      setCallListInsertData({
+        ..._callListInsertData,
+        campaign_id: Number(campaignIdForUpdateFromSideMenu)
+      });
+      setCampaignIdDisabled(true);
+    }else{
+      setCallListInsertData({
+        ..._callListInsertData,
+        campaign_id: 0
+      });
+      setCampaignIdDisabled(false);
+    }
+  }, [campaignIdForUpdateFromSideMenu]);
+
   return (
     <div className="flex flex-col gap-5 limit-width">
       <div className="flex gap-5">
@@ -400,14 +570,20 @@ const ListManager: React.FC = () => {
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label className="w-[100px] min-w-[100px]">대상캠페인</Label>
-                <Select>
+                <Select value={_callListInsertData.campaign_id+''} 
+                onValueChange={(value) => handleSelectChange(value, 'campaignId')}
+                defaultValue="0" disabled={campaignIdDisabled}
+                >
                   <SelectTrigger className="w-[300px]">
                     <SelectValue placeholder="대상캠페인" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">test1</SelectItem>
-                    <SelectItem value="2">test2</SelectItem>
-                    <SelectItem value="3">test3</SelectItem>
+                    <SelectItem key='0' value='0'>-선택-</SelectItem>
+                    {campaigns.map(option => (
+                      <SelectItem key={option.campaign_id} value={option.campaign_id.toString()}>
+                        [{option.campaign_id}]{option.campaign_name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <CustomInput
@@ -421,7 +597,7 @@ const ListManager: React.FC = () => {
                 <CommonRadio
                   defaultValue="auto"
                   className="flex gap-8"
-                  onValueChange={(value) => console.log(value)}
+                  onValueChange={(value) => setFileFormat(value)}
                 >
                   <div className="flex items-center space-x-2">
                     <CommonRadioItem value="excel" id="excel" />
@@ -452,19 +628,23 @@ const ListManager: React.FC = () => {
 
                 {targetType === "general" ? (
                   <div className="flex gap-2">
-                    <CustomCheckbox id="deleteData" />
+                    <CustomCheckbox id="deleteData" checked={deleteData}
+                      onCheckedChange={(checked) => handleCheckbox(checked === true, 'deleteData')} />
                     <Label htmlFor="deleteData" className="text-sm">
                       기존 캠페인 데이터 삭제
                     </Label>
                   </div>
                 ) : (
-                  <Select>
+                  <Select value={_callListInsertData.list_flag} 
+                  onValueChange={(value) => handleSelectChange(value, 'listFlag')}
+                  defaultValue="I"
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Insert: 기존리스트 삭제 후 등록" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="insert">Insert</SelectItem>
-                      <SelectItem value="append">Append</SelectItem>
+                      <SelectItem value="I">Insert</SelectItem>
+                      <SelectItem value="A">Append</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
@@ -475,25 +655,7 @@ const ListManager: React.FC = () => {
       </div>
 
       <div className="flex gap-5">
-        <div className="w-1/2">
-          <TitleWrap
-            title="발신 목록"
-            totalCount={sendList.length}
-          />
-          <div className="h-[300px] grid-custom-wrap">
-            <DataGrid<SendRow>
-              columns={sendColumns}
-              rows={sendList}
-              className="grid-custom cursor-pointer"
-              rowHeight={26}
-              headerRowHeight={26}
-              rowKeyGetter={(row) => row.id}
-              rowClass={getSendRowClass}
-              onCellClick={handleSendRowClick}
-              selectedRows={selectedSendRow ? new Set([selectedSendRow.id]) : new Set()}
-            />
-          </div>
-        </div>
+      <SenderList headerData={sendColumns} _sendList={sendList} />
         <div className="w-1/2">
           <div className="h-[300px] grid-custom-wrap mt-[28px]">
             <div className="grid-top-subject h-[26px]">
