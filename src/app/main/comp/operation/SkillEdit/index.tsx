@@ -260,7 +260,7 @@ const SkillEdit = () => {
 
           {/* 왼쪽 스킬 목록 그리드 */}
           <div>
-            <TitleWrap title="스킬 목록" totalCount={skillRows.length.toString()} />
+            <TitleWrap title="스킬 목록" totalCount={skillRows.length} />
             <div className="grid-custom-wrap h-[230px]">
             <DataGrid
                 columns={skillColumns}
@@ -268,7 +268,7 @@ const SkillEdit = () => {
                 className="grid-custom"
                 onCellClick={handleSkillClick}
                 rowKeyGetter={(row) => row.skillId}
-                selectedRows={selectedSkill ? new Set([selectedSkill.skillId]) : new Set()}
+                selectedRows={selectedSkill ? new Set<string>([selectedSkill.skillId]) : new Set<string>()}
                 rowHeight={26}
                 headerRowHeight={26}
                 rowClass={getRowClass}
@@ -280,7 +280,7 @@ const SkillEdit = () => {
           <div>
             <TitleWrap 
               title="소속 캠페인 목록" 
-              totalCount={filteredCampaigns.length.toString()}
+              totalCount={filteredCampaigns.length}
               buttons={[
                 { 
                   label: "선택 캠페인 스킬할당 해제",
@@ -307,7 +307,7 @@ const SkillEdit = () => {
           <div>
             <TitleWrap 
               title="소속 상담원 목록" 
-              totalCount={filteredAgents.length.toString()}
+              totalCount={filteredAgents.length}
               buttons={[
                 { 
                   label: "선택 상담원 스킬할당 해제",

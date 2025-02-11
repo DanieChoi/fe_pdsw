@@ -392,22 +392,29 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
   addSection: (rowId, tabId) => set((state) => {
     const rowIndex = state.rows.findIndex(r => r.id === rowId);
     if (rowIndex === -1) return state;
-
+  
     const row = state.rows[rowIndex];
+  
+    // 🚨 섹션이 2개 이상이면 추가하지 않음
+    if (row.sections.length >= 2) {
+      console.warn(`Row ${rowId} already has 2 sections. Cannot add more.`);
+      return state;
+    }
+  
     const existingIds = row.sections.map(s => s.id);
     const newSectionId = generateUniqueId('section', existingIds);
-
+  
     let maybeTab: TabItem | null = null;
     if (tabId) {
       maybeTab = state.openedTabs.find(t => t.id === tabId) || null;
     }
-
+  
     const newSection: TabSection = {
       id: newSectionId,
       tabs: maybeTab ? [maybeTab] : [],
       width: 0,
     };
-
+  
     let updatedSections = row.sections.map((sec) => ({
       ...sec,
       tabs: maybeTab ? sec.tabs.filter(t => t.id !== tabId) : sec.tabs,
@@ -415,14 +422,14 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     updatedSections = updatedSections.filter(
       (sec) => sec.id === 'default' || sec.tabs.length > 0
     );
-
+  
     updatedSections.push(newSection);
     updatedSections = adjustSectionWidths(updatedSections);
-
+  
     const updatedRow = { ...row, sections: updatedSections };
     const newRows = [...state.rows];
     newRows[rowIndex] = updatedRow;
-
+  
     return { rows: newRows };
   }),
 

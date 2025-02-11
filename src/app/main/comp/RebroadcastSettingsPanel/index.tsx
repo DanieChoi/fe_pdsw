@@ -9,7 +9,8 @@ import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/Cust
 import { CommonRadio, CommonRadioItem } from "@/components/shared/CommonRadio";
 import TitleWrap from "@/components/shared/TitleWrap";  
 import DatePicker from "react-date-picker";
-import type { Value } from 'react-date-picker';
+import { DatePickerProps } from 'react-date-picker';
+type Value = DatePickerProps['value'];
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { Calendar as CalendarIcon } from "lucide-react";
 import 'react-date-picker/dist/DatePicker.css';

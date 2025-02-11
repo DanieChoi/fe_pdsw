@@ -1,4 +1,3 @@
-// src/app/main/page.tsx
 "use client";
 
 import React from 'react';
@@ -33,6 +32,7 @@ const MainPage = () => {
     activeTabKey,
     moveTabToSection,
     moveTabToGroup,
+    addSubTab, // 🆕 추가
   } = useTabStore();
 
   const sensors = useSensors(
@@ -51,7 +51,6 @@ const MainPage = () => {
     const tabId = active.data.current?.id;
     const uniqueKey = active.data.current?.uniqueKey;
     
-    // uniqueKey로 정확한 탭을 찾습니다
     const tab = openedTabs.find(t => t.id === tabId && t.uniqueKey === uniqueKey);
     if (tab) {
       setActiveTab({
@@ -82,6 +81,12 @@ const MainPage = () => {
       }
     } else if (overType === 'group') {
       moveTabToGroup(tabId, over.data.current?.id);
+    } else {
+      // 🆕 `subTabs`에 추가
+      const tab = openedTabs.find(t => t.id === tabId && t.uniqueKey === uniqueKey);
+      if (tab) {
+        addSubTab(tab);
+      }
     }
 
     setActiveTab(null);
