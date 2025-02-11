@@ -29,7 +29,7 @@ import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiF
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
-import CampaignTab from '../CampaignManager/CampaignTab';
+import CampaignTab from '@/app/main/comp/CampaignManager/CampaignTab';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
