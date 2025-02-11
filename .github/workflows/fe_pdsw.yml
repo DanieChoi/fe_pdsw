@@ -24,10 +24,10 @@ jobs:
       #    ls -al
 
       # .env 설정 아래에 추가
-      - name: nodejs install
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+      #- name: nodejs install
+      #  uses: actions/setup-node@v4
+      #  with:
+      #    node-version: '22'
 
       # node_modules 생성
       - name: npm install
