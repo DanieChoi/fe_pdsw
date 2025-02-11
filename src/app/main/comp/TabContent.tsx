@@ -9,6 +9,7 @@ import { useTabStore } from "@/store/tabStore";
 // ─────────────────────────────────────────────────────────────────────────
 import PreferencesBoard from "./preferences";
 import SystemPreferences from "./SystemPreferences";
+import Campaignprogress from "./Campaignprogress";
 import CampaignMonitorDashbord from "./CampaignMonitorDashbord";
 import OutboundCallProgressPanel from "./OutboundCallProgressPanel";
 import StatusCampaign from "./StatusCampaign";
@@ -19,7 +20,7 @@ import CampaignUpdatePanel from "./CampaignUpdatePanel";
 import CampaignGroupManager from "./CampaignGroupManager";
 import NewCampaignManager from "./NewCampaignManager";
 import RebroadcastSettingsPanel from "./RebroadcastSettingsPanel";
-import CampaignManager from "./campaignManager";
+import CampaignManager from "./CampaignManager";
 
 // 탭 ID별 실제 화면을 매핑하는 함수
 const renderContent = (tabId: number | null) => {
@@ -31,7 +32,7 @@ const renderContent = (tabId: number | null) => {
     case 3:
       return <>통합모니터 컨텐츠</>;
     case 4:
-      return <CampaignMonitorDashbord />;
+      return <Campaignprogress />; //총진행상황 상단 탭
     case 5:
       return <OutboundCallProgressPanel />;
     case 6:
