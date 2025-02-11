@@ -17,11 +17,11 @@ jobs:
       - name: Checkout Repository Resources
         uses: actions/checkout@v4
 
-      - name: .env 환경 변수 동적 생성
-        run : |
-          echo "${{ secrets.CLIENT_ENV }}" > .env
-          pwd
-          ls -al
+      #- name: .env 환경 변수 동적 생성
+      #  run : |
+      #    echo "${{ secrets.CLIENT_ENV }}" > .env
+      #    pwd
+      #    ls -al
 
       # .env 설정 아래에 추가
       - name: nodejs install
@@ -42,7 +42,6 @@ jobs:
           npm run build
           ls ./build
 
-      # build EC2 업로드
       - name: 서버(PDSW)에 파일/폴더 업로드
         uses: appleboy/scp-action@v0.1.7
         with:
