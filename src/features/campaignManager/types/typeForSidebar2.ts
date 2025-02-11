@@ -11,6 +11,7 @@ export interface TreeItem {
   children?: TreeItem[];
   tenantId?: string;
   status?: string;
+  direction?: string;
 }
 
 export interface CounselorData {

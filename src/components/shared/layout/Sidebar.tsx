@@ -29,12 +29,20 @@ export default function Sidebar({ isMenuOpen, toggleSidebar }: SidebarProps) {
     counselers
   } = useMainStore();
 
-  const { mutate: fetchCounselorList } = useApiForFetchCounselorList({
-    onSuccess: (data) => {
-      // console.log('Counselors API response:', data);
-      setCounselers(data.counselorList);
+  const { data: counselorData } = useApiForFetchCounselorList({
+    credentials: {
+      session_key: _sessionKey,
+      tenant_id: _tenantId,
+      roleId: 0 // Add the appropriate roleId value here
     }
   });
+
+  useEffect(() => {
+    if (counselorData) {
+      // console.log('Counselors API response:', counselorData);
+      setCounselers(counselorData.counselorList);
+    }
+  }, [counselorData, setCounselers]);
 
   // const { mutate: fetchSkills } = useApiForSkills({
   //   onSuccess: (data) => {

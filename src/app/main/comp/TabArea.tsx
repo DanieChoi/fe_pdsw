@@ -15,6 +15,8 @@ interface TabAreaProps {
   tabs: TabItem[];
   title?: string;
   canRemove?: boolean;
+  rowId: string;
+  sectionId: string;
 }
 
 const TabArea: React.FC<TabAreaProps> = ({
@@ -23,7 +25,9 @@ const TabArea: React.FC<TabAreaProps> = ({
   width,
   tabs,
   title,
-  canRemove = true
+  canRemove = true,
+  rowId,
+  sectionId
 }) => {
   const { activeTabId, removeTab, setActiveTab } = useTabStore();
 
@@ -63,7 +67,6 @@ const TabArea: React.FC<TabAreaProps> = ({
       {/* 탭 목록 */}
     {/* 탭 목록 */}
     <div className="p-2">
-      <div className="flex flex-wrap gap-1">
         {tabs.map((tab) => (
           <DraggableTab
             key={tab.uniqueKey} // key를 uniqueKey로 변경
@@ -74,24 +77,24 @@ const TabArea: React.FC<TabAreaProps> = ({
             isActive={activeTabId === tab.id}
             onSelect={() => setActiveTab(tab.id, tab.uniqueKey)}
             onRemove={() => removeTab(tab.id, tab.uniqueKey)} // removeTab 함수 구현
+            rowId={rowId}
+            sectionId={sectionId}
           />
         ))}
       </div>
-    </div>
-
-      {/* 컨텐츠 영역 */}
-      {tabs.length > 0 && (
-        <div className="p-4 border-t border-gray-100">
-          {tabs.map(tab => (
-            <div
-              key={tab.id}
-              className={activeTabId === tab.id ? 'block' : 'hidden'}
-            >
-              {tab.title} 컨텐츠
-            </div>
-          ))}
-        </div>
-      )}
+    {/* 컨텐츠 영역 */}
+    {tabs.length > 0 && (
+      <div className="p-4 border-t border-gray-100">
+        {tabs.map(tab => (
+          <div
+            key={tab.id}
+            className={activeTabId === tab.id ? 'block' : 'hidden'}
+          >
+            {tab.title} 컨텐츠
+          </div>
+        ))}
+      </div>
+    )}
 
       {/* 빈 영역 안내 */}
       {tabs.length === 0 && (
