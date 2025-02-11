@@ -50,6 +50,8 @@ const TabGroup: React.FC<TabGroupProps> = ({ id, tabs, position }) => {
               isActive={activeTabId === tab.id && activeTabKey === tab.uniqueKey}
               onRemove={() => removeTab(tab.id, tab.uniqueKey)} // uniqueKey 추가
               onSelect={() => setActiveTab(tab.id, tab.uniqueKey)} // uniqueKey 추가
+              rowId={id}
+              sectionId={id}
             />
           ))}
         </div>

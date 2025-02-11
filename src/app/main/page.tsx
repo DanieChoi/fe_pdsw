@@ -32,7 +32,6 @@ const MainPage = () => {
     activeTabKey,
     moveTabToSection,
     moveTabToGroup,
-    addSubTab, // 🆕 추가
   } = useTabStore();
 
   const sensors = useSensors(
@@ -84,9 +83,9 @@ const MainPage = () => {
     } else {
       // 🆕 `subTabs`에 추가
       const tab = openedTabs.find(t => t.id === tabId && t.uniqueKey === uniqueKey);
-      if (tab) {
-        addSubTab(tab);
-      }
+      // if (tab) {
+      //   addSubTab(tab);
+      // }
     }
 
     setActiveTab(null);
@@ -122,6 +121,8 @@ const MainPage = () => {
             isActive={activeTab.id === activeTabId && activeTab.uniqueKey === activeTabKey}
             onRemove={() => {}}
             onSelect={() => {}}
+            rowId={"-1"}
+            sectionId={"-1"}
           />
         ) : null}
       </DragOverlay>
