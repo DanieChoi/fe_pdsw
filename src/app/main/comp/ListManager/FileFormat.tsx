@@ -58,7 +58,7 @@ interface FileFormatProps {
 
 const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) => {
   const [delimiter, setDelimiter] = useState<string>(',');
-  const [originaldataYn, setOriginaldataYn] = useState<boolean>(false);
+  const [originaldataYn, setOriginaldataYn] = useState<boolean>(true);
   const [tabValue, setTabValue] = useState("format-field");
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
 
@@ -350,7 +350,7 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
     <div className="w-full">
       <div className="flex items-center gap-2 mb-1">
         <CustomCheckbox
-          id="originaldata" checked={originaldataYn} onChange={(e) => setOriginaldataYn((e.target as HTMLInputElement).checked)}
+          id="originaldata" checked={originaldataYn} onCheckedChange={(checked) => setOriginaldataYn(checked === true)}
         />
         <Label htmlFor="originaldata" className="text-sm">
           원본 데이터를 서버전송 후 삭제합니다.
