@@ -62,7 +62,7 @@ jobs:
           port: ${{ secrets.PDSW_PORT }}
           script_stop: true
           script: |
-            sudo rm -rf /var/www/html/*
-            sudo mv /home/nexus/fe_pdsw/build/* /var/www/html/
+            sudo rm -rf /usr/share/nginx/html/*
+            sudo mv /home/nexus/fe_pdsw/build/* /usr/share/nginx/html/
             sudo systemctl restart nginx
             sudo rm -rf /home/nexus/fe_pdsw
