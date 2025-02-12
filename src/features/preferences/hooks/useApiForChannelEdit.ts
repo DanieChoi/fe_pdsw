@@ -1,10 +1,10 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { ChannelEditRequest, ChannelEditResponse } from "../types/SystemPreferences";
+import { ChannelEditRequest, SuccesResponse } from "../types/SystemPreferences";
 import { ApiError } from "next/dist/server/api-utils";
 import { fetchChannelEdit } from "../api/channelEdit";
 
 export function useApiForChannelEdit(
-    options?: UseMutationOptions<ChannelEditResponse, ApiError, ChannelEditRequest>
+    options?: UseMutationOptions<SuccesResponse, ApiError, ChannelEditRequest>
 ) {
     return useMutation({
         mutationKey: ['channelEdit'],
