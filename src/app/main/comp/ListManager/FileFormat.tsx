@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
@@ -108,6 +108,11 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
   const handleEditChange = (event: any, rowIndex: number, column: string) => {
     const newRows = [...formatRows];
     (newRows[rowIndex] as any)[column] = Number(event.target.value);
+    if( rowIndex < newRows.length-1){
+      for( let i=rowIndex;i<newRows.length-1;i++){
+        (newRows[i+1] as any)['start'] = newRows[i]['start'] + newRows[i]['length'];
+      }
+    }
     setFormatRows(newRows);
   };
 
@@ -148,26 +153,26 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
 
 
   const leftItems = useMemo(() => [
-    { id: '1', name: '고객키(1)', field: 'CSKE' },
-    { id: '2', name: '고객키(2)', field: 'CSK2' },
-    { id: '3', name: '고객키(3)', field: 'CSK3' },
-    { id: '4', name: '고객이름', field: 'CSNA' },
-    { id: '5', name: '고객 전화번호(1)', field: 'TNO1' },
-    { id: '6', name: '고객 전화번호(2)', field: 'TNO2' },
-    { id: '7', name: '고객 전화번호(3)', field: 'TNO3' },
-    { id: '8', name: '고객 전화번호(4)', field: 'TNO4' },
-    { id: '9', name: '고객 전화번호(5)', field: 'TNO5' },
+    { id: '1', name: '고객키(1)', field: 'CSKE', max: 30 },
+    { id: '2', name: '고객키(2)', field: 'CSK2', max: 1024 },
+    { id: '3', name: '고객키(3)', field: 'CSK3', max: 1024 },
+    { id: '4', name: '고객이름', field: 'CSNA', max: 20 },
+    { id: '5', name: '고객 전화번호(1)', field: 'TNO1', max: 40 },
+    { id: '6', name: '고객 전화번호(2)', field: 'TNO2', max: 40 },
+    { id: '7', name: '고객 전화번호(3)', field: 'TNO3', max: 40 },
+    { id: '8', name: '고객 전화번호(4)', field: 'TNO4', max: 40 },
+    { id: '9', name: '고객 전화번호(5)', field: 'TNO5', max: 40 },
   ], []);
 
   const rightItems = useMemo(() => [
-    { id: '10', name: '고객성향[1]', field: 'CSC1' },
-    { id: '11', name: '고객성향[2]', field: 'CSC2' },
-    { id: '12', name: '고객성향[3]', field: 'CSC3' },
-    { id: '13', name: '고객성향[4]', field: 'CSC4' },
-    { id: '14', name: '고객성향[5]', field: 'CSC5' },
-    { id: '15', name: '고객성향[6]', field: 'CSC6' },
-    { id: '16', name: '상담원 아이디', field: 'EMPLOYEEID' },
-    { id: '17', name: '토큰데이터', field: 'TKDA' },
+    { id: '10', name: '고객성향[1]', field: 'CSC1', max: 1024 },
+    { id: '11', name: '고객성향[2]', field: 'CSC2', max: 1024 },
+    { id: '12', name: '고객성향[3]', field: 'CSC3', max: 1024 },
+    { id: '13', name: '고객성향[4]', field: 'CSC4', max: 1024 },
+    { id: '14', name: '고객성향[5]', field: 'CSC5', max: 1024 },
+    { id: '15', name: '고객성향[6]', field: 'CSC6', max: 1024 },
+    { id: '16', name: '상담원 아이디', field: 'EMPLOYEEID', max: 1024 },
+    { id: '17', name: '토큰데이터', field: 'TKDA', max: 1024 },
   ], []);
 
   // 더블 클릭 핸들러 추가
@@ -199,26 +204,26 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
 
 
   const positionLeftItems = useMemo(() => [
-    { id: '1', name: '고객키(1)', field: 'CSKE' },
-    { id: '2', name: '고객키(2)', field: 'CSK2' },
-    { id: '3', name: '고객키(3)', field: 'CSK3' },
-    { id: '4', name: '고객이름', field: 'CSNA' },
-    { id: '5', name: '고객 전화번호(1)', field: 'TNO1' },
-    { id: '6', name: '고객 전화번호(2)', field: 'TNO2' },
-    { id: '7', name: '고객 전화번호(3)', field: 'TNO3' },
-    { id: '8', name: '고객 전화번호(4)', field: 'TNO4' },
-    { id: '9', name: '고객 전화번호(5)', field: 'TNO5' },
+    { id: '1', name: '고객키(1)', field: 'CSKE', max: 30 },
+    { id: '2', name: '고객키(2)', field: 'CSK2', max: 1024 },
+    { id: '3', name: '고객키(3)', field: 'CSK3', max: 1024 },
+    { id: '4', name: '고객이름', field: 'CSNA', max: 20 },
+    { id: '5', name: '고객 전화번호(1)', field: 'TNO1', max: 40 },
+    { id: '6', name: '고객 전화번호(2)', field: 'TNO2', max: 40 },
+    { id: '7', name: '고객 전화번호(3)', field: 'TNO3', max: 40 },
+    { id: '8', name: '고객 전화번호(4)', field: 'TNO4', max: 40 },
+    { id: '9', name: '고객 전화번호(5)', field: 'TNO5', max: 40 },
   ], []);
 
   const positionRightItems = useMemo(() => [
-    { id: '10', name: '고객성향[1]', field: 'CSC1' },
-    { id: '11', name: '고객성향[2]', field: 'CSC2' },
-    { id: '12', name: '고객성향[3]', field: 'CSC3' },
-    { id: '13', name: '고객성향[4]', field: 'CSC4' },
-    { id: '14', name: '고객성향[5]', field: 'CSC5' },
-    { id: '15', name: '고객성향[6]', field: 'CSC6' },
-    { id: '16', name: '상담원 아이디', field: 'EMPLOYEEID' },
-    { id: '17', name: '토큰데이터', field: 'TKDA' },
+    { id: '10', name: '고객성향[1]', field: 'CSC1', max: 1024 },
+    { id: '11', name: '고객성향[2]', field: 'CSC2', max: 1024 },
+    { id: '12', name: '고객성향[3]', field: 'CSC3', max: 1024 },
+    { id: '13', name: '고객성향[4]', field: 'CSC4', max: 1024 },
+    { id: '14', name: '고객성향[5]', field: 'CSC5', max: 1024 },
+    { id: '15', name: '고객성향[6]', field: 'CSC6', max: 1024 },
+    { id: '16', name: '상담원 아이디', field: 'EMPLOYEEID', max: 1024 },
+    { id: '17', name: '토큰데이터', field: 'TKDA', max: 1024 },
   ], []);
 
   const handlePositionItemDoubleClick = (item: FormatItem) => {
