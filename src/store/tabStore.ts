@@ -226,6 +226,15 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
   // ------------------------
   setSectionActiveTab: (rowId, sectionId, tabUniqueKey) =>
     set((state) => {
+      // 새로운 활성 탭 찾기: 타입 안전성을 위해 find 메서드 결과 타입을 명시
+      const activeTab = state.rows
+        .find(row => row.id === rowId)
+        ?.sections
+        .find(section => section.id === sectionId)
+        ?.tabs
+        .find((tab): tab is TabItem => tab.uniqueKey === tabUniqueKey);  // 타입 가드 추가
+  
+      // rows 업데이트
       const newRows = state.rows.map((row) => {
         if (row.id !== rowId) return row;
         return {
@@ -239,7 +248,14 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
           }),
         };
       });
-      return { ...state, rows: newRows };
+  
+      // 헤더의 활성 탭 상태도 함께 업데이트
+      return { 
+        ...state, 
+        rows: newRows,
+        activeTabId: activeTab ? activeTab.id : state.activeTabId,
+        activeTabKey: activeTab ? activeTab.uniqueKey : state.activeTabKey
+      };
     }),
 
   // ------------------------
