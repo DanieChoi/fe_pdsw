@@ -4,6 +4,8 @@
 
 import { create } from "zustand";
 import React from "react";
+import { menuItems } from "@/widgets/header/model/menuItems";
+import { simulateMenuClick } from "@/widgets/header/utils";
 
 export interface TabItem {
   id: number;
@@ -111,6 +113,7 @@ export interface TabLayoutStore {
   // 추가: 전역 activeTab을 설정하는 함수
   // ─────────────────────────────
   setActiveTab: (tabId: number, uniqueKey: string) => void;
+  simulateHeaderMenuClick: (menuId: number) => void;
 }
 
 const generateUniqueId = (prefix: string, existingIds: string[]) => {
@@ -161,6 +164,31 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     counselorName: null,
   },
   campaignIdForUpdateFromSideMenu: null,
+
+  // 헤더 메뉴 클릭
+  simulateHeaderMenuClick: (menuId: number) => {
+    const menuItem = menuItems.find(item => item.id === menuId);
+    if (!menuItem) return;
+
+    // 기존 탭들 제거
+    const existingTabs = get().openedTabs.filter(tab => tab.id === menuId);
+    existingTabs.forEach(tab => {
+      get().removeTab(tab.id, tab.uniqueKey);
+    });
+
+    // 새로운 탭 추가
+    const newTabKey = `${menuId}-${Date.now()}`;
+    const newTab = {
+      ...menuItem,
+      uniqueKey: newTabKey,
+      content: menuItem.content || null
+    };
+    get().addTab(newTab);
+
+    // 탭을 추가한 후 활성 탭 설정
+    get().setActiveTab(menuId, newTabKey);
+    get().setCampaignIdForUpdateFromSideMenu(null);
+  },
 
   // ------------------------
   // 스킬 할당 등 부가 로직
@@ -607,7 +635,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
   openCampaignManagerForUpdate: (campaignId, label) =>
     set((state) => {
       const existingTab = state.openedTabs.find((tab) => tab.id === 2);
-
+      
       if (existingTab) {
         const updatedTab = {
           ...existingTab,
@@ -639,18 +667,31 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
         };
       }
 
-      const newTabKey = `2-${campaignId}-${Date.now()}`;
-      const newTab: TabItem = {
-        id: 2,
+      // 캠페인 관리 메뉴 아이템 찾기
+      const campaignMenuItem = menuItems.find(item => item.id === 3);
+      if (!campaignMenuItem) return state;
+
+      // 기존 탭들 제거
+      // const existingTabs = state.openedTabs.filter(tab => tab.id === 3);
+      // existingTabs.forEach(tab => {
+      //   get().removeTab(tab.id, tab.uniqueKey);
+      // });
+
+      // 새로운 탭 생성 및 추가
+      const newTabKey = `3-${campaignId}-${Date.now()}`;
+      const newTab = {
+        ...campaignMenuItem,
         uniqueKey: newTabKey,
-        title: label !== "" ? `캠페인 관리 - ${label}` : `캠페인 관리`,
-        icon: "header-menu/캠페인관리.svg",
-        href: "/campaign",
+        title: label !== "" ? `통합 모니터터 - ${label}` : `통합 모니터`,
         campaignId,
         content: null,
       };
 
+      // 탭 추가 및 활성화
       get().addTab(newTab);
+      get().setActiveTab(2, newTabKey);
+      get().setCampaignIdForUpdateFromSideMenu(null);
+
       return state;
     }),
 

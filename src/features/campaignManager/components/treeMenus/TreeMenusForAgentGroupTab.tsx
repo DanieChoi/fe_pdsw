@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { ChevronRight, ChevronDown, MoreVertical } from "lucide-react";
 import { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem } from "@/components/ui/context-menu";
+import { useTabStore } from '@/store/tabStore';
 
 interface TreeNode {
   id: string;
   name: string;
-  type: "team" | "agent"; // 팀 or 상담원 구분
+  type: "team" | "agent";
   children?: TreeNode[];
 }
 
@@ -53,6 +54,11 @@ function TreeView({ data }: { data: TreeNode[] }) {
 function TreeNodeItem({ node }: { node: TreeNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const hasChildren = node.children && node.children.length > 0;
+  const { simulateHeaderMenuClick } = useTabStore();
+
+  const handleCounselorInfo = () => {
+    simulateHeaderMenuClick(6); // 발신진행상태 메뉴 클릭
+  };
 
   return (
     <li className="ml-2">
@@ -86,7 +92,9 @@ function TreeNodeItem({ node }: { node: TreeNode }) {
             <>
               <ContextMenuItem onClick={() => console.log(`상담 시작: ${node.name}`)}>상담 시작</ContextMenuItem>
               <ContextMenuItem onClick={() => console.log(`상담 중지: ${node.name}`)}>상담 중지</ContextMenuItem>
-              <ContextMenuItem onClick={() => console.log(`상담원 정보: ${node.name}`)}>상담원 Info</ContextMenuItem>
+              <ContextMenuItem onClick={handleCounselorInfo}>
+                상담원 Info
+              </ContextMenuItem>
             </>
           )}
         </ContextMenuContent>
