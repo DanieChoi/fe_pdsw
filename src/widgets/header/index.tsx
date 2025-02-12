@@ -59,15 +59,20 @@ export default function Header() {
   
       // 새로운 탭 추가
       const newTabKey = `${item.id}-${Date.now()}`;
-      addTab({
+      const newTab = {
         ...item,
         uniqueKey: newTabKey,
         content: item.content || null
-      });
+      };
+      addTab(newTab);
+  
+      // 탭을 추가한 후 활성 탭 설정
+      setActiveTab(item.id, newTabKey);
     }
     
     setCampaignIdForUpdateFromSideMenu(null);
   };
+  
 
   const isTabOpened = (itemId: number) => {
     const existingTabs = openedTabs.filter(tab => tab.id === itemId);
