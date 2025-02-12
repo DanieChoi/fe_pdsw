@@ -43,7 +43,7 @@ export interface CallingListInsertResponse {
   result_code: number;
   result_msg: string;
   result_count: number;
-  total_count: number;
+  request_count: number;
   result_data: CallingListInsertResponseDataType[];
 }
 
