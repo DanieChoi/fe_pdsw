@@ -104,10 +104,70 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
     }
    };
 
-  // const [rows, setRows] = useState(formatRows);
+  // 그리드 길이 항목 수정 이벤트.
   const handleEditChange = (event: any, rowIndex: number, column: string) => {
     const newRows = [...formatRows];
-    (newRows[rowIndex] as any)[column] = Number(event.target.value);
+    let tempLength = Number(event.target.value);
+    let _message = '';
+    if( newRows[rowIndex].field === 'CSKE' &&  tempLength > 30 ){
+      _message = '고객키[1] 사이즈는 최대 30byte 입니다.';
+      tempLength = 30;
+    }else if( newRows[rowIndex].field === 'CSK2' &&  tempLength > 30 ){
+      _message = '고객키[2] 사이즈는 최대 30byte 입니다.';
+      tempLength = 30;
+    }else if( newRows[rowIndex].field === 'CSK3' &&  tempLength > 30 ){
+      _message = '고객키[3] 사이즈는 최대 30byte 입니다.';
+      tempLength = 30;
+    }else if( newRows[rowIndex].field === 'CSNA' &&  tempLength > 50 ){
+      _message = '고객이름 사이즈는 최대 50byte 입니다.';
+      tempLength = 50;
+    }else if( newRows[rowIndex].field === 'TNO1' &&  tempLength > 20 ){
+      _message = '고객 전화번호[1] 사이즈는 최대 20byte 입니다.';
+      tempLength = 20;
+    }else if( newRows[rowIndex].field === 'TNO2' &&  tempLength > 20 ){
+      _message = '고객 전화번호[2] 사이즈는 최대 20byte 입니다.';
+      tempLength = 20;
+    }else if( newRows[rowIndex].field === 'TNO3' &&  tempLength > 20 ){
+      _message = '고객 전화번호[3] 사이즈는 최대 20byte 입니다.';
+      tempLength = 20;
+    }else if( newRows[rowIndex].field === 'TNO4' &&  tempLength > 20 ){
+      _message = '고객 전화번호[4] 사이즈는 최대 20byte 입니다.';
+      tempLength = 20;
+    }else if( newRows[rowIndex].field === 'TNO5' &&  tempLength > 20 ){
+      _message = '고객 전화번호[5] 사이즈는 최대 20byte 입니다.';
+      tempLength = 20;
+    }else if( newRows[rowIndex].field === 'CSC1' &&  tempLength > 20 ){
+      _message = '고객 성향[1] 사이즈는 최대 20byte 입니다.';
+      tempLength = 20;
+    }else if( newRows[rowIndex].field === 'CSC2' &&  tempLength > 20 ){
+      _message = '고객 성향[2] 사이즈는 최대 20byte 입니다.';
+      tempLength = 20;
+    }else if( newRows[rowIndex].field === 'CSC3' &&  tempLength > 20 ){
+      _message = '고객 성향[3] 사이즈는 최대 20byte 입니다.';
+      tempLength = 20;
+    }else if( newRows[rowIndex].field === 'CSC4' &&  tempLength > 20 ){
+      _message = '고객 성향[4] 사이즈는 최대 20byte 입니다.';
+      tempLength = 20;
+    }else if( newRows[rowIndex].field === 'CSC5' &&  tempLength > 20 ){
+      _message = '고객 성향[5] 사이즈는 최대 20byte 입니다.';
+      tempLength = 20;
+    }else if( newRows[rowIndex].field === 'EMPLOYEEID' &&  tempLength > 10 ){
+      _message = '상담원 ID 사이즈는 최대 20byte 입니다.';
+      tempLength = 10;
+    }else if( newRows[rowIndex].field === 'TKDA' &&  tempLength > 1024 ){
+      _message = '토큰데이터 사이즈는 최대 1024byte 입니다.';
+      tempLength = 1024;
+    }
+    if( _message !== ''){
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: _message,
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
+    (newRows[rowIndex] as any)[column] = tempLength;
     if( rowIndex < newRows.length-1){
       for( let i=rowIndex;i<newRows.length-1;i++){
         (newRows[i+1] as any)['start'] = newRows[i]['start'] + newRows[i]['length'];
@@ -153,26 +213,26 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
 
 
   const leftItems = useMemo(() => [
-    { id: '1', name: '고객키(1)', field: 'CSKE', max: 30 },
-    { id: '2', name: '고객키(2)', field: 'CSK2', max: 1024 },
-    { id: '3', name: '고객키(3)', field: 'CSK3', max: 1024 },
-    { id: '4', name: '고객이름', field: 'CSNA', max: 20 },
-    { id: '5', name: '고객 전화번호(1)', field: 'TNO1', max: 40 },
-    { id: '6', name: '고객 전화번호(2)', field: 'TNO2', max: 40 },
-    { id: '7', name: '고객 전화번호(3)', field: 'TNO3', max: 40 },
-    { id: '8', name: '고객 전화번호(4)', field: 'TNO4', max: 40 },
-    { id: '9', name: '고객 전화번호(5)', field: 'TNO5', max: 40 },
+    { id: '1', name: '고객키(1)', field: 'CSKE' },
+    { id: '2', name: '고객키(2)', field: 'CSK2' },
+    { id: '3', name: '고객키(3)', field: 'CSK3' },
+    { id: '4', name: '고객이름', field: 'CSNA' },
+    { id: '5', name: '고객 전화번호(1)', field: 'TNO1' },
+    { id: '6', name: '고객 전화번호(2)', field: 'TNO2' },
+    { id: '7', name: '고객 전화번호(3)', field: 'TNO3' },
+    { id: '8', name: '고객 전화번호(4)', field: 'TNO4' },
+    { id: '9', name: '고객 전화번호(5)', field: 'TNO5' },
   ], []);
 
   const rightItems = useMemo(() => [
-    { id: '10', name: '고객성향[1]', field: 'CSC1', max: 1024 },
-    { id: '11', name: '고객성향[2]', field: 'CSC2', max: 1024 },
-    { id: '12', name: '고객성향[3]', field: 'CSC3', max: 1024 },
-    { id: '13', name: '고객성향[4]', field: 'CSC4', max: 1024 },
-    { id: '14', name: '고객성향[5]', field: 'CSC5', max: 1024 },
-    { id: '15', name: '고객성향[6]', field: 'CSC6', max: 1024 },
-    { id: '16', name: '상담원 아이디', field: 'EMPLOYEEID', max: 1024 },
-    { id: '17', name: '토큰데이터', field: 'TKDA', max: 1024 },
+    { id: '10', name: '고객성향[1]', field: 'CSC1' },
+    { id: '11', name: '고객성향[2]', field: 'CSC2' },
+    { id: '12', name: '고객성향[3]', field: 'CSC3' },
+    { id: '13', name: '고객성향[4]', field: 'CSC4' },
+    { id: '14', name: '고객성향[5]', field: 'CSC5' },
+    { id: '15', name: '고객성향[6]', field: 'CSC6' },
+    { id: '16', name: '상담원 아이디', field: 'EMPLOYEEID' },
+    { id: '17', name: '토큰데이터', field: 'TKDA' },
   ], []);
 
   // 더블 클릭 핸들러 추가
@@ -204,26 +264,26 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
 
 
   const positionLeftItems = useMemo(() => [
-    { id: '1', name: '고객키(1)', field: 'CSKE', max: 30 },
-    { id: '2', name: '고객키(2)', field: 'CSK2', max: 1024 },
-    { id: '3', name: '고객키(3)', field: 'CSK3', max: 1024 },
-    { id: '4', name: '고객이름', field: 'CSNA', max: 20 },
-    { id: '5', name: '고객 전화번호(1)', field: 'TNO1', max: 40 },
-    { id: '6', name: '고객 전화번호(2)', field: 'TNO2', max: 40 },
-    { id: '7', name: '고객 전화번호(3)', field: 'TNO3', max: 40 },
-    { id: '8', name: '고객 전화번호(4)', field: 'TNO4', max: 40 },
-    { id: '9', name: '고객 전화번호(5)', field: 'TNO5', max: 40 },
+    { id: '1', name: '고객키(1)', field: 'CSKE' },
+    { id: '2', name: '고객키(2)', field: 'CSK2' },
+    { id: '3', name: '고객키(3)', field: 'CSK3' },
+    { id: '4', name: '고객이름', field: 'CSNA' },
+    { id: '5', name: '고객 전화번호(1)', field: 'TNO1' },
+    { id: '6', name: '고객 전화번호(2)', field: 'TNO2' },
+    { id: '7', name: '고객 전화번호(3)', field: 'TNO3' },
+    { id: '8', name: '고객 전화번호(4)', field: 'TNO4' },
+    { id: '9', name: '고객 전화번호(5)', field: 'TNO5' },
   ], []);
 
   const positionRightItems = useMemo(() => [
-    { id: '10', name: '고객성향[1]', field: 'CSC1', max: 1024 },
-    { id: '11', name: '고객성향[2]', field: 'CSC2', max: 1024 },
-    { id: '12', name: '고객성향[3]', field: 'CSC3', max: 1024 },
-    { id: '13', name: '고객성향[4]', field: 'CSC4', max: 1024 },
-    { id: '14', name: '고객성향[5]', field: 'CSC5', max: 1024 },
-    { id: '15', name: '고객성향[6]', field: 'CSC6', max: 1024 },
-    { id: '16', name: '상담원 아이디', field: 'EMPLOYEEID', max: 1024 },
-    { id: '17', name: '토큰데이터', field: 'TKDA', max: 1024 },
+    { id: '10', name: '고객성향[1]', field: 'CSC1' },
+    { id: '11', name: '고객성향[2]', field: 'CSC2' },
+    { id: '12', name: '고객성향[3]', field: 'CSC3' },
+    { id: '13', name: '고객성향[4]', field: 'CSC4' },
+    { id: '14', name: '고객성향[5]', field: 'CSC5' },
+    { id: '15', name: '고객성향[6]', field: 'CSC6' },
+    { id: '16', name: '상담원 아이디', field: 'EMPLOYEEID' },
+    { id: '17', name: '토큰데이터', field: 'TKDA' },
   ], []);
 
   const handlePositionItemDoubleClick = (item: FormatItem) => {
