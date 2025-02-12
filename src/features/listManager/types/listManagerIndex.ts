@@ -47,4 +47,10 @@ export interface CallingListInsertResponse {
   result_data: CallingListInsertResponseDataType[];
 }
 
+// 삭제 응답 타입
+export interface DeleteResponse {
+  result_code: number;
+  result_msg: string;
+}
+
 
