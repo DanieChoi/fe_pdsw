@@ -1,15 +1,15 @@
-// src/features/campaignManager/hooks/useApiForCallingListInsert.ts
+// src/features/campaignManager/hooks/useApiForBlacklistInsert.ts
 import { useMutation } from '@tanstack/react-query';
-import { fetchCallingListInsert } from '../api/mainCallingListInsert';
+import { fetchBlacklistInsert } from '../api/mainBlacklistInsert';
 import { UseMutationOptions } from '@tanstack/react-query';
 import { CallingListInsertRequest, CallingListInsertResponse, ListManagerApiError } from '../types/listManagerIndex';
 
-export function useApiForCallingListInsert(
+export function useApiForBlacklistInsert(
   options?: UseMutationOptions<CallingListInsertResponse, ListManagerApiError, CallingListInsertRequest>
 ) {
   return useMutation({
-    mutationKey: ['mainCallingListInsert'],
-    mutationFn: fetchCallingListInsert,
+    mutationKey: ['mainBlacklistInsert'],
+    mutationFn: fetchBlacklistInsert,
     onSuccess: (data, variables, context) => {
       console.log('API Response:', {
         code: data.result_code,
