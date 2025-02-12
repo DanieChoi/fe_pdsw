@@ -6,7 +6,7 @@ import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
-import CustomAlert from "@/components/shared/layout/CustomAlert";
+import CustomAlert,{CustomAlertRequest} from "@/components/shared/layout/CustomAlert";
 import {
   Select,
   SelectContent,
@@ -43,7 +43,7 @@ interface FileRow {
 }
 
 interface SendRow {
-  id: number;    
+  id: string;    
   fileId: number;
   CSKE: string;
   CSK2: string;
@@ -85,6 +85,15 @@ const callListInsertData: CallingListInsertRequest = {
   calling_list: [] as CallingListInsertDataType[]
 }
 
+const errorMessage: CustomAlertRequest = {
+  isOpen: false,
+  message: '',
+  title: '캠페인',
+  type: '1',
+  onClose: () => {},
+  onCancle: () => {},
+};
+
 interface ProgressRow {
   id: number;
   datetime: string;
@@ -95,12 +104,13 @@ const ListManager: React.FC = () => {
   const { campaigns } = useMainStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
   const [delimiter, setDelimiter] = useState<string>('');
-  const [headerData,setHeaderData] = useState<FormatRow[]>([]);
   const [_callListInsertData, setCallListInsertData] = useState<CallingListInsertRequest>(callListInsertData);
   const [fileFormat,setFileFormat ] = useState<string>('excel');
   const [deleteData, setDeleteData] = useState(true);  // 기존 캠페인 데이터 삭제.
   const [campaignIdDisabled,setCampaignIdDisabled] = useState<boolean>(false);
-    const [originaldataYn, setOriginaldataYn] = useState<boolean>(false);
+  const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
+  const [headerColumnData,setHeaderColumnData] = useState<FormatRow[]>([]);
+  const [originaldataYn, setOriginaldataYn] = useState<boolean>(false);
   // 아이디 생성용 카운터
   const [nextId, setNextId] = useState(1);
   
@@ -138,7 +148,11 @@ const ListManager: React.FC = () => {
   ]);
 
   // 모달 핸들러
-  const handleFileFormatOpen = () => setIsFileFormatOpen(true);
+  const handleFileFormatOpen = () => {    
+    setUploadedFiles([]);
+    setSendList([]);
+    setIsFileFormatOpen(true);
+  } 
   const handleFileFormatClose = () => setIsFileFormatOpen(false);
 
   const [sendColumns, setSendColumns] = useState<Column<SendRow>[]>([]);
@@ -149,7 +163,7 @@ const ListManager: React.FC = () => {
     setIsFileFormatOpen(false);
     setDelimiter(data.delimiter);
     setOriginaldataYn(data.originDataSaveYn);
-    setHeaderData(data.datalist);
+    setHeaderColumnData(data.datalist);
     const tempList: Column<SendRow>[] = data.datalist.map((tempData) => ({
       key: tempData.field,
       name: tempData.name
@@ -168,42 +182,115 @@ const ListManager: React.FC = () => {
       try{
         setIsLoading(true);
         const file = files[0];
-        const newFileData: FileRow = {
-          id: nextId,
-          fileName: file.name,
-          campaignId: targetType === "general" ? "G123" : "B456",
-          fileSize: (file.size / 1024).toFixed(2) + " KB",
-          deletable: false,
-        };
-        setUploadedFiles((prev) => [...prev, newFileData]);
-        setSelectedFileName(file.name);
-        setNextId(nextId + 1);
+        if( fileFormat === 'excel' && file.name.indexOf('.xls') === -1 ){              
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: "파일형식을 확인해 주세요.",
+            type: '2',
+            onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+          });
+        }else if( fileFormat === 'txt' && file.name.indexOf('.xls') > -1 ){    
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: "파일형식을 확인해 주세요.",
+            type: '2',
+            onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+          });
+        }else{          
+          const newFileData: FileRow = {
+            id: nextId,
+            fileName: file.name,
+            campaignId: targetType === "general" ? "G123" : "B456",
+            fileSize: (file.size / 1024).toFixed(2) + " KB",
+            deletable: false,
+          };
+          setUploadedFiles((prev) => [...prev, newFileData]);
+          setSelectedFileName(file.name);
 
+          const reader = new FileReader();
+          if( fileFormat === 'excel' && file.name.indexOf('.xls') > -1 ){
+            reader.onload = (event) => {
+              const fileContent = event.target?.result;
+              
+              if (fileContent) {
+                const workbook = XLSX.read(fileContent, { type: 'array' });
+        
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+        
+                const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }); 
+        
+                if( data.length > 0 ){
+                  let index = 0;
+                  const tempSendList: SendRow[] = [];
+                  for(let i=0; i< data.length;i++){
+                    const row = data[i] as unknown[];
+                    index = index+1;
 
-        const reader = new FileReader();
-        if( fileFormat === 'excel' && file.name.indexOf('.xls') > -1 ){
-          reader.onload = (event) => {
-            const fileContent = event.target?.result;
-            
-            if (fileContent) {
-              const workbook = XLSX.read(fileContent, { type: 'array' });
-      
-              const sheetName = workbook.SheetNames[0];
-              const worksheet = workbook.Sheets[sheetName];
-      
-              const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }); 
-      
-              if( data.length > 0 ){
+                    const tempData: SendRow = {
+                      id: nextId+'::'+index,
+                      fileId: nextId,
+                      CSKE: '',
+                      CSK2: '',
+                      CSK3: '',
+                      CSNA: '',
+                      TNO1: '',
+                      TNO2: '',
+                      TNO3: '',
+                      TNO4: '',
+                      TNO5: '',
+                      CSC1: '',
+                      CSC2: '',
+                      CSC3: '',
+                      CSC4: '',
+                      CSC5: '',
+                      CSC6: '',
+                      EMPLOYEEID: '',
+                      TKDA: '',
+                    };
+                    if( row.length > 0){
+                      let _length = row.length;
+                      if( _length > sendColumns.length){
+                        _length = sendColumns.length;
+                      }
+                      for (let j = 0; j < _length; j++) {
+                        const key = sendColumns[j].key as keyof SendRow;
+                        if (key in tempData) {
+                          if (typeof key === 'string' && key in tempData) {
+                            if (typeof key === 'string' && key in tempData) {
+                              (tempData as any)[key] = row[j] as string || '';
+                            }
+                          }
+                        }
+                      }
+                      tempSendList.push(tempData);
+                    }
+                    
+                  }
+                  setSendList(prev => [...prev, ...tempSendList]);
+                }
+
+              }
+
+            };
+            reader.readAsArrayBuffer(file);
+          }else if( fileFormat === 'txt' && file.name.indexOf('.xls') == -1 ){
+            reader.onload = (event) => {
+              const fileContent = event.target?.result;       
+              console.log("File content:", fileContent);
+              if( fileContent != null && fileContent !== '' ){
+                const tempdata = (fileContent+'').split('\r\n');
                 let index = 0;
-                const fileId = uploadedFiles.length+1;
-                const tempSendList = [];
-                for(let i=0; i< data.length;i++){
-                  const row = data[i] as unknown[];
+                const tempSendList: SendRow[] = [];
+                for( let i=0;i<tempdata.length;i++){
+                  // const row = tempdata[i].split(delimiter) as unknown[];
                   index = index+1;
 
                   const tempData: SendRow = {
-                    id: index,
-                    fileId: fileId,
+                    id: nextId+'::'+index,
+                    fileId: nextId,
                     CSKE: '',
                     CSK2: '',
                     CSK3: '',
@@ -222,100 +309,69 @@ const ListManager: React.FC = () => {
                     EMPLOYEEID: '',
                     TKDA: '',
                   };
-                  if( row.length > 0){
-                    for (let j = 0; j < row.length; j++) {
-                      const key = sendColumns[j].key as keyof SendRow;
+                  //길이체크인 경우 
+                  if( delimiter === '' ){
+                    for(let k=0;k<headerColumnData.length;k++){
+                      const key = headerColumnData[k].field as keyof SendRow;
                       if (key in tempData) {
                         if (typeof key === 'string' && key in tempData) {
                           if (typeof key === 'string' && key in tempData) {
-                            (tempData as any)[key] = row[j] as string || '';
+                            (tempData as any)[key] = tempdata[i].substring(headerColumnData[k].start-1, headerColumnData[k].start + headerColumnData[k].length -1) as string || '';
                           }
                         }
                       }
                     }
-                    tempSendList.push(tempData);
-                  }
-                  
-                }
-                setSendList(tempSendList);
-              }
-
-            }
-
-          };
-          reader.readAsArrayBuffer(file);
-        }else if( fileFormat === 'txt'){
-          reader.onload = (event) => {
-            const fileContent = event.target?.result;       
-            console.log("File content:", fileContent);
-            if( fileContent != null && fileContent !== '' ){
-              const tempdata = (fileContent+'').split('\r\n');
-              let index = 0;
-              const fileId = uploadedFiles.length+1;
-              const tempSendList = [];
-              for( let i=0;i<tempdata.length;i++){
-                // const row = tempdata[i].split(delimiter) as unknown[];
-                index = index+1;
-
-                const tempData: SendRow = {
-                  id: index,
-                  fileId: fileId,
-                  CSKE: '',
-                  CSK2: '',
-                  CSK3: '',
-                  CSNA: '',
-                  TNO1: '',
-                  TNO2: '',
-                  TNO3: '',
-                  TNO4: '',
-                  TNO5: '',
-                  CSC1: '',
-                  CSC2: '',
-                  CSC3: '',
-                  CSC4: '',
-                  CSC5: '',
-                  CSC6: '',
-                  EMPLOYEEID: '',
-                  TKDA: '',
-                };
-                //길이체크인 경우 
-                if( delimiter === '' ){
-                  
-                  //구분자인 경우
-                }else{ 
-                  const row = tempdata[i].split(delimiter) as unknown[];
-                  if( row.length > 0){
-                    for (let j = 0; j < row.length; j++) {
-                      const key = sendColumns[j].key as keyof SendRow;
-                      if (key in tempData) {
-                        if (typeof key === 'string' && key in tempData) {
+                    tempSendList.push(tempData);                  
+                    //구분자인 경우
+                  }else{ 
+                    const row = tempdata[i].split(delimiter) as unknown[];
+                    if( row.length > 0){
+                      let _length = row.length;
+                      if( _length > sendColumns.length){
+                        _length = sendColumns.length;
+                      }
+                      for (let j = 0; j < _length; j++) {
+                        const key = sendColumns[j].key as keyof SendRow;
+                        if (key in tempData) {
                           if (typeof key === 'string' && key in tempData) {
-                            (tempData as any)[key] = row[j] as string || '';
+                            if (typeof key === 'string' && key in tempData) {
+                              (tempData as any)[key] = row[j] as string || '';
+                            }
                           }
                         }
                       }
+                      tempSendList.push(tempData);
                     }
-                    tempSendList.push(tempData);
                   }
                 }
+                setSendList(prev => [...prev, ...tempSendList]);
               }
-              setSendList(tempSendList);
-            }
-            // Now, you can process fileContent here
+              // Now, you can process fileContent here
+            };
+            reader.readAsText(file);
+          }else{          
+            setAlertState({
+              ...errorMessage,
+              isOpen: true,
+              message: "파일형식을 확인해 주세요.",
+              type: '2',
+              onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+            });
+          }
+          // Handle file reading errors
+          reader.onerror = (error) => {
+            console.error("Error reading file:", error);
           };
-          reader.readAsText(file);
         }
-        // Handle file reading errors
-        reader.onerror = (error) => {
-          console.error("Error reading file:", error);
-        };
       } catch (e) {
         console.error("Error processing file:", e);
   
       }finally{
+        setNextId(nextId + 1);
         setIsLoading(false);
       }
-    }
+    }// 파일 업로드 후 input 값 초기화
+    e.target.value = '';
   };
  
   // 새 작업대상 핸들러
@@ -323,18 +379,31 @@ const ListManager: React.FC = () => {
     setSelectedFileName("");
     setTargetType("general");
     setSelectedFile(null);
+    setUploadedFiles([]);
+    setSendList([]);
   };
 
   // 작업대상 올리기
   const triggerFileInput = () => {
-    const fileInput = document.getElementById("fileInput") as HTMLInputElement;
-    if (fileInput) fileInput.click();
+    if( sendColumns.length === 0 ){
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "파일포맷 설정을 실행해 주세요.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }else{
+      const fileInput = document.getElementById("fileInput") as HTMLInputElement;
+      if (fileInput) fileInput.click();
+    }
   };
 
   // 삭제 핸들러
   const handleDeleteFile = () => {
     if (selectedFile) {
       setUploadedFiles(prev => prev.filter(file => file.id !== selectedFile.id));
+      setSendList(prev => prev.filter(data => data.fileId !== selectedFile.id));
       setSelectedFile(null);
       setSelectedFileName("");
     }
@@ -354,10 +423,6 @@ const ListManager: React.FC = () => {
   // rowClass 함수들
   const getFileRowClass = (row: FileRow) => {
     return selectedFile?.id === row.id ? 'bg-[#FFFAEE]' : '';
-  };
-  
-  const getSendRowClass = (row: SendRow) => {
-    return selectedSendRow?.id === row.id ? 'bg-[#FFFAEE]' : '';
   };
   
   const getProgressRowClass = (row: ProgressRow) => {
@@ -407,59 +472,53 @@ const ListManager: React.FC = () => {
     selectedProgressRow ? new Set([selectedProgressRow.id]) : new Set()
   , [selectedProgressRow]);
 
-
-
-   // 알림창 관련 상태
-   const [alertState, setAlertState] = useState({
-    isOpen: false,
-    message: '',
-    title: '알림',
-    type: '1',
-    onConfirm: () => {},
-    onCancel: () => {}
-  });
-
-  const showAlert = (message: string) => {
-    setAlertState({
-      isOpen: true,
-      message,
-      title: '알림',
-      type: '1',
-      onConfirm: closeAlert,
-      onCancel: () => {}
-    });
-  };
-
-  const showConfirm = (message: string, onConfirm: () => void) => {
-    setAlertState({
-      isOpen: true,
-      message,
-      title: '확인',
-      type: '2',
-      onConfirm: () => {
-        onConfirm();
-        closeAlert();
-      },
-      onCancel: closeAlert
-    });
-  };
-
-  const closeAlert = () => {
-    setAlertState(prev => ({ ...prev, isOpen: false }));
-  };
-
   // 작업시작 버튼 클릭 시
   const handleWorkStart = () => {
-    if (!selectedFile) {
+    if (uploadedFiles.length === 0) {
       // 작업대상이 선택되지 않은 경우 경고 알림창 표시
-      showAlert('작업 지정 대상을 선택해주세요.');
+      // showAlert('작업 지정 대상을 선택해주세요.');
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "발신목록이 없습니다.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    } else if ( _callListInsertData.campaign_id === 0) {
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "대상 캠페인을 선택해 주세요.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
     } else {
       // 작업대상이 선택된 경우 로딩 창 표시
       //setIsLoading(true);
+      const callingListInsertData: CallingListInsertRequest = {
+        ..._callListInsertData
+        , campaign_id: _callListInsertData.campaign_id
+        , list_flag: _callListInsertData.list_flag+''
+        ,calling_list: sendList.map((data, index) => ({
+          ...callListInsertDataType,
+          customer_key: data.CSKE+'',
+          sequence_number: index + 1,
+          customer_name: data.CSNA+'',
+          phone_number1: data.TNO1+'',
+          phone_number2: data.TNO2+'',
+          phone_number3: data.TNO3+'',
+          phone_number4: data.TNO4+'',
+          phone_number5: data.TNO5+'',
+          reserved_time: data.TKDA+'',
+          token_data: data.CSC1+''
+        }))
+      };
 
+      fetchCallingListInsert(callingListInsertData);
       // 실제 작업 로직 수행
       // ...
-
+      // fetchCallingListInsert();
+      
       // 작업 완료 후 로딩 창 숨기기
       //setIsLoading(true);
 
@@ -521,6 +580,12 @@ const ListManager: React.FC = () => {
       setCampaignIdDisabled(false);
     }
   }, [campaignIdForUpdateFromSideMenu]);
+
+  // useEffect(() => {
+  //   if( headerColumnData.length > 0 ){
+  //     console.log('headerColumnData ' + headerColumnData.length);
+  //   }
+  // }, [headerColumnData]);
 
   return (
     <div className="flex flex-col gap-5 limit-width">
@@ -597,6 +662,7 @@ const ListManager: React.FC = () => {
                 <CommonRadio
                   defaultValue="auto"
                   className="flex gap-8"
+                  value={fileFormat}
                   onValueChange={(value) => setFileFormat(value)}
                 >
                   <div className="flex items-center space-x-2">
@@ -693,13 +759,14 @@ const ListManager: React.FC = () => {
 
       {/* 얼럿 창 */}
       <CustomAlert
-        isOpen={alertState.isOpen}
         message={alertState.message}
         title={alertState.title}
         type={alertState.type}
-        onClose={alertState.onConfirm}
-        onCancle={alertState.onCancel}
-      />
+        isOpen={alertState.isOpen}
+        onClose={() => {
+          alertState.onClose()
+        }}
+        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}/>
       
       {/* 로딩 모달 */}
        <LoadingModal 

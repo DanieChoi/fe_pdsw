@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 // 공통 컴포넌트
 import TitleWrap from "@/components/shared/TitleWrap";
@@ -6,7 +6,7 @@ import TitleWrap from "@/components/shared/TitleWrap";
 import DataGrid, { Column, CellClickArgs } from "react-data-grid";
 
 interface SendRow {
-  id: number;    
+  id: string;    
   fileId: number;
   CSKE: string;
   CSK2: string;
@@ -62,9 +62,7 @@ const SenderList: React.FC<SenderListProps> = ({ headerData, _sendList }) => {
     if( headerData.length > 0 ) {     
       setSendColumns(headerData);
     }
-    if( _sendList.length > 0){
-      setSendList(_sendList);
-    }
+    setSendList(_sendList);
   }, [headerData, _sendList]);
   
   return (
