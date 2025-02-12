@@ -1,111 +1,127 @@
-import React from 'react';
+import React, { useState } from "react";
 import { useTabStore } from '@/store/tabStore';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell } from 'recharts';
+import TitleWrap from "@/components/shared/TitleWrap";
+import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-custom";
+import { Label } from "@/components/ui/label";
+import { CommonRadio, CommonRadioItem } from "@/components/shared/CommonRadio";
+import { CommonButton } from "@/components/shared/CommonButton";
+import GridView from './GridView';
+import ChartView from './ChartView';
+interface Tab {
+  uniqueKey: string;
+  title: string;
+  campaignId?: string;
+}
 
-const CampaignMonitorDashboard = () => {
-  // 현재 활성화된 탭 정보 가져오기
-  const activeTabKey = useTabStore((state) => state.activeTabKey);
-  const openedTabs = useTabStore((state) => state.openedTabs);
-  
-  // 현재 활성화된 탭에서 campaignId와 title 찾기
+interface CallItem {
+  id: number;
+  label: string;
+}
+
+type ViewType = "gridView" | "chartView";
+
+const CampaignMonitorDashboard: React.FC = () => {
+  // 상태 추가
+  const [viewType, setViewType] = useState<ViewType>("gridView");
+  const [selectedCall, setSelectedCall] = useState<number>(1);
+
+  const activeTabKey = useTabStore((state: { activeTabKey: string }) => state.activeTabKey);
+  const openedTabs = useTabStore((state: { openedTabs: Tab[] }) => state.openedTabs);
   const activeTab = openedTabs.find(tab => tab.uniqueKey === activeTabKey);
-  
-  const data = [
-    { name: '동의중', value: 25 },
-    { name: '대기/포기', value: 25 },
-    { name: '전화번호오류', value: 5 },
-    { name: '고객 비접 경험', value: 5 },
-    { name: '다이얼링 완료', value: 10 },
-    { name: '통화중', value: 10 },
-    { name: '부재중', value: 10 },
-    { name: '기타', value: 10 }
+
+  // 발신구분 데이터 (실제로는 API에서 받아올 데이터)
+  const callList: CallItem[] = [
+    { id: 1, label: '최초발신' },
+    { id: 2, label: '1번째 재발신' },
+    { id: 3, label: '2번째 재발신' },
+    { id: 4, label: '3번째 재발신' },
+    { id: 5, label: '4번째 재발신' }
   ];
 
-  const COLORS = ['#40E0D0', '#40E0D0', '#4169E1', '#4169E1', '#4169E1', '#9370DB', '#9370DB', '#9370DB'];
+  // 라디오 버튼 변경 핸들러
+  const handleViewTypeChange = (value: string) => {
+    setViewType(value as ViewType);
+  };
 
-  // 탭의 title에서 캠페인 이름 추출 ("총진행상황 - " 이후의 텍스트)
   const campaignName = activeTab?.title.replace('총진행상황 - ', '') || '';
 
   return (
-    <div className="grid grid-cols-12 gap-4">
+    <div className="flex gap-4 w-full limit-width">
       {/* 왼쪽 설정 영역 */}
-      <div className="col-span-3 bg-red-50 p-4">
-        <h2 className="font-bold mb-4">캠페인 정보</h2>
-        <div className="space-y-2">
-          <div>캠페인 아이디: {activeTab?.campaignId || ''}</div>
-          <div>캠페인 이름: {campaignName}</div>
+      <div className="flex flex-col gap-5 w-[230px] min-w-[230px]">
+        <div>
+          <TitleWrap title="캠페인 정보" />
+          <Table>
+            <tbody>
+              <TableRow>
+                <TableHeader className="w-[120px]">
+                  <Label>캠페인 아이디</Label>
+                </TableHeader>
+                <TableCell>
+                  <span className="text-sm">{activeTab?.campaignId || ''}</span>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableHeader className="w-[120px]">
+                  <Label>캠페인 이름</Label>
+                </TableHeader>
+                <TableCell>
+                  <span className="text-sm">{campaignName}</span>
+                </TableCell>
+              </TableRow>
+            </tbody>
+          </Table>
+        </div>
+
+        <div>
+          <TitleWrap title="표시방법" />
+          <CommonRadio 
+            className="flex gap-8 pl-4" 
+            value={viewType} 
+            onValueChange={handleViewTypeChange}
+          >
+            <div className="flex items-center space-x-2">
+              <CommonRadioItem value="gridView" id="gridView" />
+              <Label htmlFor="gridView">그리드형</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CommonRadioItem value="chartView" id="chartView" />
+              <Label htmlFor="chartView">차트형</Label>
+            </div>
+          </CommonRadio>
+        </div>
+
+        <div className="flex-1 h-full">
+          <TitleWrap title="발신구분" />
+          <div className="border rounded overflow-y-auto h-[calc(100%-20px)]">
+            <table className="w-full text-sm border-collapse">
+              <tbody>
+                {callList.map((item) => (
+                  <tr
+                    key={item.id}
+                    onClick={() => setSelectedCall(item.id)}
+                    className={`cursor-pointer hover:bg-[#FFFAEE] ${
+                      selectedCall === item.id ? "bg-[#FFFAEE]" : ""
+                    }`}
+                  >
+                    <td className="border-b border-r px-3 py-1">
+                      {item.label}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <CommonButton>사용 시간 보기</CommonButton>
         </div>
       </div>
 
       {/* 오른쪽 대시보드 영역 */}
-      <div className="col-span-9 bg-blue-50 p-4">
-        <div className="grid grid-cols-2 gap-4">
-          {/* 파이 차트 */}
-          <Card className="col-span-1">
-            <CardHeader>
-              <CardTitle className="text-lg">발신 진행사유 현황</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 w-full flex justify-center">
-                <PieChart width={250} height={250}>
-                  <Pie
-                    data={data}
-                    cx={125}
-                    cy={125}
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={2}
-                    dataKey="value"
-                  >
-                    {data.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* 진행률 바 */}
-          <Card className="col-span-1">
-            <CardHeader>
-              <CardTitle className="text-lg">발신 상공률</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <div className="text-sm mb-2">발신성공</div>
-                  <div className="w-full bg-gray-200 rounded-full h-4">
-                    <div className="bg-pink-400 h-4 rounded-full" style={{width: '70%'}}></div>
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm mb-2">리스트대비</div>
-                  <div className="w-full bg-gray-200 rounded-full h-4">
-                    <div className="bg-blue-400 h-4 rounded-full" style={{width: '60%'}}></div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* 하단 통계 그리드 */}
-        <div className="grid grid-cols-5 gap-4 mt-4">
-          {['총 리스트', '순수발신', '미발신', '발신 성공', '실담결과 예약'].map((title, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <CardTitle className="text-sm">{title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl font-bold">
-                  {i === 0 ? '15' : i === 1 ? '0' : i === 2 ? '15' : i === 3 ? '7' : '0'}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <div className="flex-1">
+        {viewType === "gridView" ? <GridView /> : <ChartView />}
       </div>
     </div>
   );

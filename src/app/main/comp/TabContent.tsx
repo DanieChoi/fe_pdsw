@@ -54,7 +54,9 @@ const renderContent = (tabId: number | null) => {
     case 14:
       return <StatusCampaign />;
     case 20:
-      return <RebroadcastSettingsPanel />;
+      return <RebroadcastSettingsPanel />; //재발신
+    case 21:
+        return <CampaignMonitorDashbord />;//오른쪽버튼 캠페인총진행상황
     case 100:
       return <>잘못된 스킬 할당 탭입니다.</>;
 

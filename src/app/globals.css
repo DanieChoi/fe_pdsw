@@ -204,11 +204,12 @@ input::placeholder {
 .table-custom th{
   background: #F8F8F8;
   text-align: left;
-  padding: 3px 15px;
+  padding: 0px 15px;
   border-bottom: 1px solid hsl(var(--border));
 }
 .table-custom td{
   border-bottom: 1px solid hsl(var(--border));
+  padding: 2px 15px;
 }
 .table-custom tr:first-child th:first-child {
   border-top-left-radius: 3px; /* 왼쪽 위 둥글게 */
