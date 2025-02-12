@@ -32,7 +32,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/counselor/:path*',
-        destination: 'http://localhost:4000/api/v1/counselor/:path*'
+        destination: 'http://10.10.30.228:4000/api/v1/counselor/:path*'
       },
       {
         source: '/api/:path*',

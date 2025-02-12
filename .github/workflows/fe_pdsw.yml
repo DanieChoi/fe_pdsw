@@ -68,5 +68,5 @@ jobs:
             cd /home/nexus/fe_pdsw
             npm -v
             npm install next@latest
-            #pm2 delete fe_pdsw
+            pm2 delete fe_pdsw
             pm2 start "npx next start" --name fe_pdsw
