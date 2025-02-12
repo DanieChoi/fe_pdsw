@@ -65,8 +65,8 @@ jobs:
             #sudo mv /home/nexus/fe_pdsw/build/* /usr/share/nginx/html/
             #sudo systemctl restart nginx
             #sudo rm -rf /home/nexus/fe_pdsw
-            sudo cd /home/nexus/fe_pdsw
+            cd /home/nexus/fe_pdsw
             npm -v
             npm install next@latest
-            pm2 delete fe_pdsw
+            #pm2 delete fe_pdsw
             pm2 start "npx next start" --name fe_pdsw
