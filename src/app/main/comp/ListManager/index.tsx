@@ -25,6 +25,7 @@ import { CallingListInsertDataType
 } from '@/features/listManager/types/listManagerIndex';
 import { useApiForCallingListInsert } from '@/features/listManager/hooks/useApiForCallingListInsert';
 import { useApiForBlacklistInsert } from '@/features/listManager/hooks/useApiForBlacklistInsert';
+import { useApiForBlacklistDelete } from '@/features/listManager/hooks/useApiForBlacklistDelete';
 
 // 데이터그리드
 import DataGrid, { Column, CellClickArgs } from "react-data-grid";
@@ -159,7 +160,8 @@ const ListManager: React.FC = () => {
         };
         setProgressList(prev => [newProgressListData, ...prev]);
       }
-      console.log(data.result_code);
+      setUploadedFiles([]);
+      setSendList([]);
     }
     , onError: (data) => {
       const now = new Date();
@@ -197,7 +199,47 @@ const ListManager: React.FC = () => {
         };
         setProgressList(prev => [newProgressListData, ...prev]);
       }
-      console.log(data.result_code);
+      setUploadedFiles([]);
+      setSendList([]);
+    }
+    , onError: (data) => {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      const newProgressListData = { ...progressListData
+        , id: progressList.length+1
+        , datetime: hours + ':' + minutes + ':' + seconds
+        , message: '파일 전송 도중 에러 : ' + data.message
+      };
+      setProgressList(prev => [newProgressListData, ...prev]);
+    }
+  });
+
+  // 블랙리스트 업로드 취소 api 호출
+  const { mutate: fetchBlacklistDelete } = useApiForBlacklistDelete({
+    onSuccess: (data) => {   
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      if( data.result_code === 0){
+        const newProgressListData = { ...progressListData
+          , id: progressList.length+1
+          , datetime: hours + ':' + minutes + ':' + seconds
+          , message: '서버에 리스트 파일 등록 완료'
+        };
+        setProgressList(prev => [newProgressListData, ...prev]);
+      }else{
+        const newProgressListData = { ...progressListData
+          , id: progressList.length+1
+          , datetime: hours + ':' + minutes + ':' + seconds
+          , message: '서버에 리스트 파일 등록 에러 : ' + data.result_msg
+        };
+        setProgressList(prev => [newProgressListData, ...prev]);
+      }
+      setUploadedFiles([]);
+      setSendList([]);
     }
     , onError: (data) => {
       const now = new Date();
@@ -242,6 +284,10 @@ const ListManager: React.FC = () => {
   // 파일 관련 핸들러
   const handleTargetTypeChange = (value: string) => {
     setTargetType(value as "general" | "blacklist");
+    setCallListInsertData({
+      ..._callListInsertData,
+      list_flag: 'I'
+    });
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {   
@@ -603,8 +649,13 @@ const ListManager: React.FC = () => {
           token_data: data.CSC1+''
         }))
       };
-
-      fetchCallingListInsert(callingListInsertData);
+      if( _callListInsertData.list_flag === 'T'){
+        fetchBlacklistDelete(_callListInsertData.campaign_id);
+      }else if( targetType === 'general' ){
+        fetchCallingListInsert(callingListInsertData);
+      }else{
+        fetchBlacklistInsert(callingListInsertData);
+      }
       // 실제 작업 로직 수행
       // ...
       // fetchCallingListInsert();
@@ -800,7 +851,9 @@ const ListManager: React.FC = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="I">Insert : 기존리스트 삭제 후 등록</SelectItem>
+                      <SelectItem value="D">Delete : 특정리스트 삭제</SelectItem>
                       <SelectItem value="A">Append : 발신리스트 추가</SelectItem>
+                      <SelectItem value="T">블랙리스트 전체 삭제</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
