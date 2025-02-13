@@ -7,7 +7,7 @@ import { CommonButton } from "@/components/shared/CommonButton";
 import { Label } from "@/components/ui/label";
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import { CommonRadio, CommonRadioItem } from "@/components/shared/CommonRadio";
-import TitleWrap from "@/components/shared/TitleWrap";  
+import TitleWrap from "@/components/shared/TitleWrap";
 import DatePicker from "react-date-picker";
 import { DatePickerProps } from 'react-date-picker';
 type Value = DatePickerProps['value'];
@@ -18,69 +18,69 @@ import 'react-calendar/dist/Calendar.css';
 import { useTabStore } from '@/store/tabStore';
 
 interface RebroadcastSettings {
-  campaignId: string;
-  startDate: string;
-  startTime: string;
-  changeYn: boolean;
-  scheduleChangeYn: boolean;
+    campaignId: string;
+    startDate: string;
+    startTime: string;
+    changeYn: boolean;
+    scheduleChangeYn: boolean;
 }
 
 interface RebroadcastItem {
-  id: number;
-  scheduleStartDate: string;
-  scheduleStartTime: string;
-  outgoingResults: string[];
-  outgoingType: string;
-  outgoingTime: {
-    type: string;
-    startDate: string;
-    endDate: string;
-  };
-  isDummy?: boolean;
+    id: number;
+    scheduleStartDate: string;
+    scheduleStartTime: string;
+    outgoingResults: string[];
+    outgoingType: string;
+    outgoingTime: {
+        type: string;
+        startDate: string;
+        endDate: string;
+    };
+    isDummy?: boolean;
 }
 
 const errorMessage: CustomAlertRequest = {
-  isOpen: false,
-  message: '',
-  title: '재발신 설정',
-  type: '0',
-  onClose: () => {},
-  onCancle: () => {},
+    isOpen: false,
+    message: '',
+    title: '재발신 설정',
+    type: '0',
+    onClose: () => { },
+    onCancle: () => { },
 };
 
 const today = new Date();
 const initialSettings: RebroadcastSettings = {
-  campaignId: '',
-  startDate: today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2),
-  startTime: '',
-  changeYn: false,
-  scheduleChangeYn: false
+    campaignId: '',
+    startDate: today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2),
+    startTime: '',
+    changeYn: false,
+    scheduleChangeYn: false
 };
 
 const getOutgoingResultLabel = (key: string) => {
-  const labels: {[key: string]: string} = {
-    'outgoing-success-ok': '발신성공',
-    'outgoing-success-no': '발신미성공',
-    'fail-busy': '통화중',
-    'fail-no-answer': '무응답',
-    'fail-fax': '팩스',
-    'fail-machine': '자동응답기',
-    'fail-etc': '기타',
-    'fail-wrong-num': '잘못된 번호',
-    'fail-line': '회선장애',
-    'fail-hangup': '끊김',
-    'fail-no-tone': '발신음 없음',
-    'fail-no-dial': '발신 불가',
-    'outgoing-attempt': '발신시도',
-  };
-  return labels[key] || key;
+    const labels: { [key: string]: string } = {
+        'outgoing-success-ok': '발신성공',
+        'outgoing-success-no': '발신미성공',
+        'fail-busy': '통화중',
+        'fail-no-answer': '무응답',
+        'fail-fax': '팩스',
+        'fail-machine': '자동응답기',
+        'fail-etc': '기타',
+        'fail-wrong-num': '잘못된 번호',
+        'fail-line': '회선장애',
+        'fail-hangup': '끊김',
+        'fail-no-tone': '발신음 없음',
+        'fail-no-dial': '발신 불가',
+        'outgoing-attempt': '발신시도',
+    };
+    return labels[key] || key;
 };
 
 const RebroadcastSettingsPanel = () => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
     const activeTabKey = useTabStore((state) => state.activeTabKey);
     const openedTabs = useTabStore((state) => state.openedTabs);
-    
+
     // 현재 활성화된 탭에서 campaignId와 title 찾기
     const activeTab = openedTabs.find(tab => tab.uniqueKey === activeTabKey);
 
@@ -103,7 +103,7 @@ const RebroadcastSettingsPanel = () => {
     const [canEdit, setCanEdit] = useState(true);
 
     // 발신결과 체크박스 상태 관리
-    const [selectedOutgoingResults, setSelectedOutgoingResults] = useState<{[key: string]: boolean}>({
+    const [selectedOutgoingResults, setSelectedOutgoingResults] = useState<{ [key: string]: boolean }>({
         'outgoing-success-ok': false,
         'outgoing-success-no': false,
         'fail-busy': false,
@@ -131,9 +131,9 @@ const RebroadcastSettingsPanel = () => {
 
     // 버튼 활성화 상태 관리
     const shouldShowAddDelete = broadcastType === "reservation" && rebroadcastList.every(item => !item.isDummy);
-    const shouldShowApply = (broadcastType === "realtime") || 
-                       (broadcastType === "reservation" && 
-                        rebroadcastList.some(item => item.isDummy));
+    const shouldShowApply = (broadcastType === "realtime") ||
+        (broadcastType === "reservation" &&
+            rebroadcastList.some(item => item.isDummy));
 
     useEffect(() => {
         resetAllStates();
@@ -154,7 +154,7 @@ const RebroadcastSettingsPanel = () => {
         setTimeType("final-call-date");
         setSelectedRebroadcastId(null);
         setSelectedRebroadcastDetails(null);
-    
+
         // 모드별 체크박스 상태 설정
         if (broadcastType === "realtime") {
             setOutgoingResultChecked(true);
@@ -171,9 +171,9 @@ const RebroadcastSettingsPanel = () => {
         if (value instanceof Date || value === null) {
             let tempStartDate = '';
             if (value != null) {
-                tempStartDate = value.getFullYear() + 
-                            ('0' + (value.getMonth() + 1)).slice(-2) + 
-                            ('0' + value.getDate()).slice(-2);
+                tempStartDate = value.getFullYear() +
+                    ('0' + (value.getMonth() + 1)).slice(-2) +
+                    ('0' + value.getDate()).slice(-2);
             }
             setStartDate(value);
             setSettings(prev => ({
@@ -235,7 +235,7 @@ const RebroadcastSettingsPanel = () => {
             },
             isDummy: true
         };
-    
+
         setRebroadcastList([...rebroadcastList, newRebroadcast]);
         resetAllStates();
     };
@@ -245,7 +245,7 @@ const RebroadcastSettingsPanel = () => {
             const updatedList = rebroadcastList.filter(item => item.id !== selectedRebroadcastId);
             setRebroadcastList(updatedList);
             setSelectedRebroadcastId(null);
-    
+
             if (updatedList.length === 0) {
                 resetAllStates();
             }
@@ -256,7 +256,7 @@ const RebroadcastSettingsPanel = () => {
 
         // 더미 항목이 있는지 확인
         const hasDummyItem = rebroadcastList.some(item => item.isDummy);
-    
+
         if (hasDummyItem) {
             setAlertState({
                 isOpen: true,
@@ -271,48 +271,48 @@ const RebroadcastSettingsPanel = () => {
 
         // 기존 선택 로직
         setSelectedRebroadcastId(prevId => (prevId === id ? null : id));
-        
+
         // 선택된 항목 찾기
         const selected = rebroadcastList.find(item => item.id === id);
-        
+
         if (selected) {
             setSelectedRebroadcastDetails(selected);
-            
+
             // 발신결과 체크박스 상태 초기화
             const newSelectedResults = { ...selectedOutgoingResults };
             Object.keys(newSelectedResults).forEach(key => {
                 newSelectedResults[key] = false;
             });
-            
+
             // 선택된 항목의 발신결과로 체크박스 상태 업데이트
-            if (Array.isArray(selected.outgoingResults)) { 
+            if (Array.isArray(selected.outgoingResults)) {
                 selected.outgoingResults.forEach(result => {
                     if (newSelectedResults.hasOwnProperty(result)) {
                         newSelectedResults[result] = true;
                     }
                 });
             }
-            
+
             // 상태 업데이트
             setSelectedOutgoingResults(newSelectedResults);
-            
+
             // 날짜 및 시간 설정
             if (selected.scheduleStartDate) {
                 setStartDate(new Date(selected.scheduleStartDate));
             }
-            
+
             if (selected.scheduleStartTime) {
                 setStartTime(selected.scheduleStartTime);
             }
-            
+
             if (selected.outgoingType) {
                 setCallType(selected.outgoingType);
             }
-            
+
             if (selected.outgoingTime && selected.outgoingTime.type) {
                 setTimeType(selected.outgoingTime.type);
             }
-            
+
             if (selected.outgoingTime && selected.outgoingTime.endDate) {
                 setEndDate(new Date(selected.outgoingTime.endDate));
             }
@@ -321,7 +321,7 @@ const RebroadcastSettingsPanel = () => {
             setSelectedRebroadcastDetails(null);
             resetAllStates();
         }
-        };
+    };
 
     const handleApplyRebroadcast = () => {
         // 예약 모드에서 실제 데이터 처리
@@ -329,7 +329,7 @@ const RebroadcastSettingsPanel = () => {
             const selectedResults = Object.entries(selectedOutgoingResults)
                 .filter(([_, isSelected]) => isSelected)
                 .map(([key]) => key);
-    
+
             if (selectedResults.length === 0) {
                 setAlertState({
                     isOpen: true,
@@ -341,7 +341,7 @@ const RebroadcastSettingsPanel = () => {
                 });
                 return;
             }
-    
+
             const processedRebroadcasts = rebroadcastList
                 .filter(item => item.isDummy)
                 .map(item => ({
@@ -356,15 +356,15 @@ const RebroadcastSettingsPanel = () => {
                         endDate: endDate ? endDate.toString() : '',
                     }
                 }));
-    
-            setRebroadcastList(prevList => 
-                prevList.map(item => 
-                    item.isDummy 
+
+            setRebroadcastList(prevList =>
+                prevList.map(item =>
+                    item.isDummy
                         ? processedRebroadcasts.find(proc => proc.id === item.id) || item
                         : item
                 )
             );
-    
+
             setAlertState({
                 isOpen: true,
                 message: "재발신 설정이 적용되었습니다.",
@@ -394,9 +394,9 @@ const RebroadcastSettingsPanel = () => {
                     endDate: endDate ? endDate.toString() : '',
                 }
             };
-    
+
             console.log('실시간 재발신 데이터:', realTimeData);
-            
+
             setAlertState({
                 isOpen: true,
                 message: "실시간 재발신이 적용되었습니다.",
@@ -428,15 +428,16 @@ const RebroadcastSettingsPanel = () => {
                                     </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value={activeTab?.campaignId ?? ''}>
-                                        {activeTab?.campaignId ?? ''}
+                                    <SelectItem value={activeTab?.campaignId ?? '-'}>
+                                        {activeTab?.campaignId ?? '선택된 캠페인 없음'}
                                     </SelectItem>
+
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="flex items-center gap-2">
                             <Label className="w-20 min-w-20">캠페인 이름</Label>
-                            <CustomInput 
+                            <CustomInput
                                 className="w-[140px]"
                                 disabled
                                 value={activeTab?.title?.replace('재발신 설정 - ', '') ?? ''}
@@ -462,19 +463,19 @@ const RebroadcastSettingsPanel = () => {
                         <CommonButton onClick={handleCheckListCount}>
                             리스트 건수 확인
                         </CommonButton>
-                        <CommonButton 
-                            onClick={handleAddRebroadcast} 
+                        <CommonButton
+                            onClick={handleAddRebroadcast}
                             disabled={!shouldShowAddDelete}
                         >
                             추가
                         </CommonButton>
-                        <CommonButton 
+                        <CommonButton
                             onClick={handleRemoveRebroadcast}
                             disabled={selectedRebroadcastId === null}
                         >
                             삭제
                         </CommonButton>
-                        <CommonButton 
+                        <CommonButton
                             onClick={handleApplyRebroadcast}
                             disabled={!shouldShowApply}
                         >
@@ -505,7 +506,7 @@ const RebroadcastSettingsPanel = () => {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Label className="w-20 min-w-20">시작시간</Label>
-                                    <CustomInput 
+                                    <CustomInput
                                         className="w-full"
                                         type="text"
                                         value={startTime}
@@ -522,16 +523,15 @@ const RebroadcastSettingsPanel = () => {
                             <div className="border p-2 rounded h-[400px] py-[20px] px-[20px]">
                                 <ul className="flex flex-col gap-2">
                                     {rebroadcastList.map((item, index) => (
-                                        <li 
+                                        <li
                                             key={item.id}
                                             onClick={() => handleSelectRebroadcast(item.id)}
-                                            className={`text-sm cursor-pointer p-[5px] ${
-                                                selectedRebroadcastId === item.id 
-                                                ? 'bg-[#FFFAEE]' 
-                                                : item.isDummy 
-                                                ? 'bg-[#F0F0F0]' 
-                                                : 'hover:bg-[#FFFAEE]'
-                                            }`}
+                                            className={`text-sm cursor-pointer p-[5px] ${selectedRebroadcastId === item.id
+                                                    ? 'bg-[#FFFAEE]'
+                                                    : item.isDummy
+                                                        ? 'bg-[#F0F0F0]'
+                                                        : 'hover:bg-[#FFFAEE]'
+                                                }`}
                                         >
                                             {`${index + 1}번째 재발신`}
                                             {item.isDummy && <span className="text-xs text-gray-500 ml-2">(추가 중)</span>}
@@ -543,7 +543,7 @@ const RebroadcastSettingsPanel = () => {
                     </div>
                     <div className="flex-1 w-1/3 flex flex-col gap-2">
                         <div className="flex gap-2 items-center">
-                            <CustomCheckbox 
+                            <CustomCheckbox
                                 id="outgoing-result"
                                 checked={outgoingResultChecked}
                                 onCheckedChange={(checked: boolean) => setOutgoingResultChecked(checked)}
@@ -552,10 +552,10 @@ const RebroadcastSettingsPanel = () => {
                                 발신결과
                             </Label>
                         </div>
-                        <div className={`border p-2 rounded py-[20px] px-[20px] flex flex-col gap-2 ${!outgoingResultChecked ? "opacity-50 pointer-events-none" : ""}`} style={{height:"calc(100% - 29px)"}}>
+                        <div className={`border p-2 rounded py-[20px] px-[20px] flex flex-col gap-2 ${!outgoingResultChecked ? "opacity-50 pointer-events-none" : ""}`} style={{ height: "calc(100% - 29px)" }}>
                             {Object.keys(selectedOutgoingResults).map((key) => (
                                 <div key={key} className="flex gap-2 items-center">
-                                    <CustomCheckbox 
+                                    <CustomCheckbox
                                         id={key}
                                         checked={selectedOutgoingResults[key]}
                                         onCheckedChange={(checked: boolean) => handleOutgoingResultChange(key, checked)}
@@ -571,7 +571,7 @@ const RebroadcastSettingsPanel = () => {
                     <div className="flex-1 w-1/3 flex flex-col gap-5">
                         <div className="flex flex-col gap-2 h-[40%]">
                             <div className="flex gap-2 items-center">
-                                <CustomCheckbox 
+                                <CustomCheckbox
                                     id="outgoing-type"
                                     checked={outgoingTypeChecked}
                                     onCheckedChange={(checked: boolean) => setOutgoingTypeChecked(checked)}
@@ -580,7 +580,7 @@ const RebroadcastSettingsPanel = () => {
                                     발신구분
                                 </Label>
                             </div>
-                            <div className={`border p-2 rounded py-[20px] px-[20px] flex flex-col gap-6 ${!outgoingTypeChecked ? "opacity-50 pointer-events-none" : ""}`} style={{height:"calc(100% - 29px)"}}>
+                            <div className={`border p-2 rounded py-[20px] px-[20px] flex flex-col gap-6 ${!outgoingTypeChecked ? "opacity-50 pointer-events-none" : ""}`} style={{ height: "calc(100% - 29px)" }}>
                                 <div className="text-sm">재콜 구분을 선택합니다.</div>
                                 <CommonRadio
                                     defaultValue="not-sent"
@@ -602,7 +602,7 @@ const RebroadcastSettingsPanel = () => {
                         </div>
                         <div className="flex flex-col gap-2 h-[60%]">
                             <div className="flex gap-2 items-center">
-                                <CustomCheckbox 
+                                <CustomCheckbox
                                     id="outgoing-time"
                                     checked={outgoingTimeChecked}
                                     onCheckedChange={(checked: boolean) => setOutgoingTimeChecked(checked)}
@@ -611,7 +611,7 @@ const RebroadcastSettingsPanel = () => {
                                     발신시간
                                 </Label>
                             </div>
-                            <div className={`border p-2 rounded py-[20px] px-[20px] flex flex-col gap-6 ${!outgoingTimeChecked ? "opacity-50 pointer-events-none" : ""}`} style={{height:"calc(100% - 29px)"}}>
+                            <div className={`border p-2 rounded py-[20px] px-[20px] flex flex-col gap-6 ${!outgoingTimeChecked ? "opacity-50 pointer-events-none" : ""}`} style={{ height: "calc(100% - 29px)" }}>
                                 <CommonRadio
                                     defaultValue="final-call-date"
                                     className="flex gap-5"
