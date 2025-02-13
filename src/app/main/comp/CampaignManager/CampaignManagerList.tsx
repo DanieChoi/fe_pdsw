@@ -1,6 +1,6 @@
 // components/main/CampaignList.tsx
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
-import { useMainStore, useCampainManagerStore } from '@/store';
+import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 import {CampaignHeaderSearch} from './CampaignManagerHeader';
 import { useEffect, useState } from 'react';
 import TitleWrap from "@/components/shared/TitleWrap";
@@ -62,6 +62,7 @@ type Props = {
 
 export default function CampaignManagerList({campaignId,campaignHeaderSearchParam}: Props) {
   const { campaigns, selectedCampaign , setSelectedCampaign } = useMainStore();
+  const { setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const { schedules, callingNumbers, campaignSkills  } = useCampainManagerStore();
   const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>([]);
   const [tempData, setTempData] = useState<DataProps[]>([]);
@@ -145,7 +146,8 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
   }, [campaignHeaderSearchParam,campaignId]);
 
   const handleCellClick = ({ row }: CellClickArgs<Row>) => {
-    setSelectedCampaign(campaigns.filter((campaign) => campaign.campaign_id === Number(row.campaignId))[0]);
+    setSelectedCampaign(campaigns.filter((campaign) => campaign.campaign_id === Number(row.campaignId))[0]);    
+    setCampaignIdForUpdateFromSideMenu(row.campaignId+'');
   };
 
   return (
