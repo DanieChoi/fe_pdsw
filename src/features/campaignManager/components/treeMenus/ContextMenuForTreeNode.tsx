@@ -145,10 +145,10 @@ export function ContextMenuForTreeNode({
 
         <ContextMenuSeparator />
 
-        <ContextMenuItem onClick={handleMonitorClick}>
+        {/* <ContextMenuItem onClick={handleMonitorClick}>
           <Monitor className="mr-2 h-4 w-4" />
            상담원 상태 모니터링
-        </ContextMenuItem>
+        </ContextMenuItem> */}
 
         <ContextMenuItem onClick={onCopy}>
           <Copy className="mr-2 h-4 w-4" />
@@ -162,7 +162,7 @@ export function ContextMenuForTreeNode({
           캠페인 리스트 삭제
         </ContextMenuItem>
 
-        <ContextMenuItem onClick={handleAgentStatusMonitor}>
+        <ContextMenuItem onClick={handleMonitorClick}>
           <Activity className="mr-2 h-4 w-4" />
           상담원 상태 모니터
         </ContextMenuItem>
