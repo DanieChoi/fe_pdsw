@@ -6,6 +6,7 @@ import { create } from "zustand";
 import React from "react";
 import { menuItems } from "@/widgets/header/model/menuItems";
 import { simulateMenuClick } from "@/widgets/header/utils";
+import { contextMenuItems } from "@/widgets/header/model/contextMenuItems";
 
 export interface TabItem {
   id: number;
@@ -113,7 +114,7 @@ export interface TabLayoutStore {
   // 추가: 전역 activeTab을 설정하는 함수
   // ─────────────────────────────
   setActiveTab: (tabId: number, uniqueKey: string) => void;
-  simulateHeaderMenuClick: (menuId: number) => void;
+  simulateHeaderMenuClick: (menuId: number, campaignId?: string, label?: string) => void;
 }
 
 const generateUniqueId = (prefix: string, existingIds: string[]) => {
@@ -166,28 +167,37 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
   campaignIdForUpdateFromSideMenu: null,
 
   // 헤더 메뉴 클릭
-  simulateHeaderMenuClick: (menuId: number) => {
-    const menuItem = menuItems.find(item => item.id === menuId);
+  simulateHeaderMenuClick: (menuId: number, campaignId?: string, label?: string) => {
+    // 먼저 헤더 메뉴에서 찾기
+    let menuItem = menuItems.find(item => item.id === menuId);
+    
+    // 없으면 컨텍스트 메뉴에서 찾기
+    if (!menuItem) {
+      menuItem = contextMenuItems.find(item => item.id === menuId);
+    }
+    
     if (!menuItem) return;
-
+  
     // 기존 탭들 제거
     const existingTabs = get().openedTabs.filter(tab => tab.id === menuId);
     existingTabs.forEach(tab => {
       get().removeTab(tab.id, tab.uniqueKey);
     });
-
+  
     // 새로운 탭 추가
-    const newTabKey = `${menuId}-${Date.now()}`;
+    const newTabKey = `${menuId}-${campaignId ? campaignId : ''}-${Date.now()}`;
     const newTab = {
       ...menuItem,
       uniqueKey: newTabKey,
-      content: menuItem.content || null
+      content: menuItem.content || null,
+      campaignId: campaignId || undefined,
+      title: label ? `${menuItem.title} - ${label}` : menuItem.title
     };
     get().addTab(newTab);
-
+  
     // 탭을 추가한 후 활성 탭 설정
     get().setActiveTab(menuId, newTabKey);
-    get().setCampaignIdForUpdateFromSideMenu(null);
+    get().setCampaignIdForUpdateFromSideMenu(campaignId || null);
   },
 
   // ------------------------

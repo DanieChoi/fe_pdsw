@@ -4,7 +4,7 @@ export interface MenuItem {
   title: string;
   icon: string;
   href: string;
-  content: null;
+  content?: null;
   uniqueKey?: string;
 }
 

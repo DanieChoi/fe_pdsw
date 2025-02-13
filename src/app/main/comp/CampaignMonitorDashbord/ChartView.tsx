@@ -1,97 +1,224 @@
-
-
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell } from 'recharts';
+import { PieChart, Pie, Cell, Legend, ResponsiveContainer } from 'recharts';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-custom";
 import { Label } from "@/components/ui/label";
 
-const ChartView = () => {
+interface ChartData {
+  name: string;
+  value: number;
+  color: string;
+}
 
-  const data = [
-    { name: '동의중', value: 25 },
-    { name: '대기/포기', value: 25 },
-    { name: '전화번호오류', value: 5 },
-    { name: '고객 비접 경험', value: 5 },
-    { name: '다이얼링 완료', value: 10 },
-    { name: '통화중', value: 10 },
-    { name: '부재중', value: 10 },
-    { name: '기타', value: 10 }
+const ChartView: React.FC = () => {
+  // 발신 현황 데이터
+  const callStatusData: ChartData[] = [
+    { name: '발신시도', value: 50, color: '#40E0D0' },
+    { name: '발신성공', value: 8, color: '#2CC7B5' },
+    { name: '발신실패', value: 3, color: '#20AE9C' }
   ];
 
-  const COLORS = ['#40E0D0', '#40E0D0', '#4169E1', '#4169E1', '#4169E1', '#9370DB', '#9370DB', '#9370DB'];
+  // 리스트 상태 데이터
+  const listStatusData: ChartData[] = [
+    { name: '대기리스트', value: 5, color: '#87CEFA' },
+    { name: '방지리스트', value: 5, color: '#FFB6C6' }
+  ];
 
+  const renderCustomizedLegend = (props: any) => {
+    const { payload } = props;
+    
+    return (
+      <div className="flex justify-center gap-4 mt-2">
+        {payload.map((entry: any, index: number) => (
+          <div key={`item-${index}`} className="flex items-center gap-1">
+            <div 
+              className="w-3 h-3"
+              style={{ backgroundColor: entry.color }}
+            />
+            <span className="text-xs">{entry.value}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
-      <div className="">
-        <div className="grid grid-cols-2 gap-4">
-          {/* 파이 차트 */}
-          <Card className="col-span-1">
-            <CardHeader>
-              <CardTitle className="text-lg">c차트</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 w-full flex justify-center">
-                <PieChart width={250} height={250}>
-                  <Pie
-                    data={data}
-                    cx={125}
-                    cy={125}
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={2}
-                    dataKey="value"
-                  >
-                    {data.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* 진행률 바 */}
-          <Card className="col-span-1">
-            <CardHeader>
-              <CardTitle className="text-lg">발신 상공률</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <div className="text-sm mb-2">발신성공</div>
-                  <div className="w-full bg-gray-200 rounded-full h-4">
-                    <div className="bg-pink-400 h-4 rounded-full" style={{width: '70%'}}></div>
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm mb-2">리스트대비</div>
-                  <div className="w-full bg-gray-200 rounded-full h-4">
-                    <div className="bg-blue-400 h-4 rounded-full" style={{width: '60%'}}></div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* 하단 통계 그리드 */}
-        <div className="grid grid-cols-5 gap-4 mt-4">
-          {['총 리스트', '순수발신', '미발신', '발신 성공', '실담결과 예약'].map((title, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <CardTitle className="text-sm">{title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl font-bold">
-                  {i === 0 ? '15' : i === 1 ? '0' : i === 2 ? '15' : i === 3 ? '7' : '0'}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+    <div className="flex flex-col gap-2">
+      <div>
+        <TitleWrap title="리스트 현황" />
+        <Table className='table-continued'>
+          <tbody>
+            <TableRow>
+              <TableHeader className="w-[120px]">
+                <Label>진행률(%)</Label>
+              </TableHeader>
+              <TableCell className="text-center text-sm">
+                0
+              </TableCell>
+              <TableHeader className="w-[160px]">
+                <Label>리스트 대비 성공률 (%)</Label>
+              </TableHeader>
+              <TableCell className="text-center text-sm">
+                0
+              </TableCell>
+              <TableHeader className="w-[120px]">
+                <Label>총 리스트</Label>
+              </TableHeader>
+              <TableCell className="text-center text-sm">
+                0
+              </TableCell>
+              <TableHeader className="w-[120px]">
+                <Label>순수발신</Label>
+              </TableHeader>
+              <TableCell className="text-center text-sm">
+                0
+              </TableCell>
+              <TableHeader className="w-[120px]">
+                <Label>미발신</Label>
+              </TableHeader>
+              <TableCell className="text-center text-sm">
+                0
+              </TableCell>
+              <TableHeader className="w-[120px]">
+                <Label>상담결과 예약</Label>
+              </TableHeader>
+              <TableCell className="text-center text-sm">
+                0
+              </TableCell>
+            </TableRow>
+          </tbody>
+        </Table>
+        <div className="h-[370px] border border-[#ebebeb] rounded-b-[3px] p-2 flex justify-center items-center gap-5">
+          <div className="flex flex-col gap-3">
+            <p className="text-sm text-center">총 발신 : 3, 발신대비 성공률 : 66.7%</p>
+            <div className="relative">
+              <PieChart width={260} height={250}>
+                <Pie
+                  data={callStatusData}
+                  cx={130}
+                  cy={100}
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={0}
+                  dataKey="value"
+                >
+                  {callStatusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Legend 
+                  content={renderCustomizedLegend}
+                  payload={callStatusData.map(item => ({
+                    value: item.name,
+                    color: item.color,
+                  }))}
+                />
+              </PieChart>
+            </div>
+          </div>
+          <div className="flex flex-col gap-3">
+            <p className="text-sm text-center">미발신 : 1</p>
+            <div className="relative">
+              <PieChart width={260} height={250}>
+                <Pie
+                  data={listStatusData}
+                  cx={130}
+                  cy={100}
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={0}
+                  dataKey="value"
+                >
+                  {listStatusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Legend 
+                  content={renderCustomizedLegend}
+                  payload={listStatusData.map(item => ({
+                    value: item.name,
+                    color: item.color,
+                  }))}
+                />
+              </PieChart>
+            </div>
+          </div>
         </div>
       </div>
+      <div>
+        <TitleWrap title="발신성공" />
+        <Table className='table-continued'>
+          <tbody>
+            <TableRow>
+              <TableHeader className="w-[120px] !text-center border-r border-b">
+                <Label>대기 상담원 없음</Label>
+              </TableHeader>
+              <TableHeader className="w-[160px] !text-center border-r border-b">
+                <Label>상담원연결</Label>
+              </TableHeader>
+              <TableHeader className="w-[120px] !text-center border-r border-b">
+                <Label>상담원 연결실패</Label>
+              </TableHeader>
+              <TableHeader className="w-[120px] !text-center border-r border-b">
+                <Label>상담원 무응답</Label>
+              </TableHeader>
+              <TableHeader className="w-[120px] !text-center">
+                <Label>상담원 통화중</Label>
+              </TableHeader>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-sm !text-center">
+                0
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                0
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                0
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                0
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                0
+              </TableCell>
+            </TableRow>
+          </tbody>
+        </Table>
+        <Table>
+          <tbody>
+            <TableRow>
+              <TableHeader className="w-[120px] !text-center border-r border-b">
+                <Label>상담원 바로 끊음</Label>
+              </TableHeader>
+              <TableHeader className="w-[160px] !text-center border-r border-b">
+                <Label>고객 포기</Label>
+              </TableHeader>
+              <TableHeader className="w-[120px] !text-center border-r border-b">
+                <Label>고객 최대 대기시간 초과</Label>
+              </TableHeader>
+              <TableHeader className="w-[120px] !text-center">
+                <Label>멘트 청취 후 상담원 연결 안함</Label>
+              </TableHeader>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-sm !text-center">
+                0
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                0
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                0
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                0
+              </TableCell>
+            </TableRow>
+          </tbody>
+        </Table>
+      </div>
+    </div>
   );
 };
 

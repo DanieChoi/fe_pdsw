@@ -8,7 +8,7 @@ export const axiosInstance = axios.create({
 });
 
 export const axiosRedisInstance = axios.create({
-  baseURL: '/api',
+  baseURL: '/api/v1',
   withCredentials: true
 });
 
