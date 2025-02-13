@@ -5,7 +5,7 @@ import { Counselor, CounselorNode, GroupNode, TabData, TeamNode, TenantNode } fr
 
 export async function apiForTreeMenuDataForSimeBarCounselorTab(credentials: MainCredentials2) {
   const { tenant_id, roleId } = credentials;
-  const response = await axiosRedisInstance.get(
+  const response = await axiosInstance.get(
     `/counselor/list?tenantId=${tenant_id}&roleId=${roleId}`
   );
   return response.data;
