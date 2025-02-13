@@ -94,7 +94,7 @@ const TabContent = () => {
             return (
               <div
                 key={section.id}
-                className="p-2 overflow-auto cursor-pointer"
+                className="p-2 overflow-auto"
                 style={{ width: `${section.width}%` }}
                 onClick={() => {
                   if (activeTab) {

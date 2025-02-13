@@ -50,7 +50,7 @@ jobs:
           password: ${{ secrets.PDSW_PASSWORD }}
           port: ${{ secrets.PDSW_PORT }}
           source: "./.next/*"
-          target: "/home/nexus/fe_pdsw"
+          target: "/home/nexus/fe_pdsw/recent"
 
       - name: SSH로 서버(PDSW)에 접속후 서버 재시작
         uses: appleboy/ssh-action@v1.2.0
@@ -61,11 +61,10 @@ jobs:
           port: ${{ secrets.PDSW_PORT }}
           script_stop: true
           script: |
-            #sudo rm -rf /usr/share/nginx/html/*
-            #sudo mv /home/nexus/fe_pdsw/build/* /usr/share/nginx/html/
-            #sudo systemctl restart nginx
-            #sudo rm -rf /home/nexus/fe_pdsw
-            cd /home/nexus/fe_pdsw
+            rm -rf /home/nexus/fe_pdsw/www/*
+            mv /home/nexus/fe_pdsw/recent/* /home/nexus/fe_pdsw/www/
+            rm -rf /home/nexus/fe_pdsw/recent
+            cd /home/nexus/fe_pdsw/www
             npm -v
             npm install next@latest
             pm2 delete fe_pdsw
