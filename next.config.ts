@@ -31,11 +31,11 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/counselor/:path*',
-        destination: 'http://10.10.30.228:4000/api/v1/counselor/:path*'
+        source: '/api/:path*',
+        destination: 'http://10.10.30.228:4000/api/v1/:path*'
       },
       {
-        source: '/api/:path*',
+        source: '/pds/:path*',
         destination: 'http://10.10.40.145:8010/pds/:path*'
       }
     ]

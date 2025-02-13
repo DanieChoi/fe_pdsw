@@ -3,6 +3,11 @@ import axios from 'axios';
 import { getCookie } from './cookies';
 
 export const axiosInstance = axios.create({
+  baseURL: '/pds',
+  withCredentials: true
+});
+
+export const axiosRedisInstance = axios.create({
   baseURL: '/api',
   withCredentials: true
 });
