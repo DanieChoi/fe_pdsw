@@ -25,8 +25,8 @@ const CampaignMonitorDashboard: React.FC = () => {
   const [viewType, setViewType] = useState<ViewType>("gridView");
   const [selectedCall, setSelectedCall] = useState<number>(1);
 
-  const activeTabKey = useTabStore((state: { activeTabKey: string }) => state.activeTabKey);
-  const openedTabs = useTabStore((state: { openedTabs: Tab[] }) => state.openedTabs);
+  const activeTabKey = useTabStore((state) => state.activeTabKey);
+  const openedTabs = useTabStore((state) => state.openedTabs);
   const activeTab = openedTabs.find(tab => tab.uniqueKey === activeTabKey);
 
   // 발신구분 데이터 (실제로는 API에서 받아올 데이터)
