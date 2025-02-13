@@ -10,7 +10,21 @@ import {
   ContextMenuSeparator,
 } from "@/components/ui/context-menu";
 import { useTabStore } from "@/store/tabStore";
-import { Edit, Copy, Activity, Trash2, Monitor, Settings, Search, List, Clock, History, UserCheck, Shield, RefreshCcw } from "lucide-react";
+import { 
+  Edit, 
+  Copy, 
+  Activity, 
+  Trash2, 
+  Monitor, 
+  Settings, 
+  Search, 
+  List, 
+  Clock, 
+  History, 
+  UserCheck, 
+  Shield, 
+  RefreshCcw 
+} from "lucide-react";
 
 interface ContextMenuForTreeNodeProps {
   children: React.ReactNode;
@@ -151,6 +165,21 @@ export function ContextMenuForTreeNode({
     simulateHeaderMenuClick(22, item.id, item.label); // 상담원상태모니터링
   };
 
+  const handleCampaignListDelete = () => {
+    // Implement campaign list deletion logic
+    console.log('Campaign list delete clicked');
+  };
+
+  const handleAgentStatusMonitor = () => {
+    // Implement agent status monitoring logic
+    console.log('Agent status monitor clicked');
+  };
+
+  const handleBlacklistCount = () => {
+    // Implement blacklist count check logic
+    console.log('Blacklist count check clicked');
+  };
+
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
@@ -190,7 +219,7 @@ export function ContextMenuForTreeNode({
 
         <ContextMenuItem onClick={handleRebroadcastClick}>
           <RefreshCcw className="mr-2 h-4 w-4" />
-          재발신
+          예약 재발신
         </ContextMenuItem>
 
         <ContextMenuSeparator />
@@ -205,12 +234,23 @@ export function ContextMenuForTreeNode({
           캠페인 복사
         </ContextMenuItem>
 
-        {!isFolder && (
-          <ContextMenuItem onClick={onDelete} className="text-red-500">
-            <Trash2 className="mr-2 h-4 w-4" />
-            캠페인 삭제
-          </ContextMenuItem>
-        )}
+        <ContextMenuSeparator />
+
+        <ContextMenuItem onClick={handleCampaignListDelete}>
+          <Trash2 className="mr-2 h-4 w-4" />
+          캠페인 리스트 삭제
+        </ContextMenuItem>
+
+        <ContextMenuItem onClick={handleAgentStatusMonitor}>
+          <Activity className="mr-2 h-4 w-4" />
+          상담원 상태 모니터
+        </ContextMenuItem>
+
+        <ContextMenuItem onClick={handleBlacklistCount}>
+          <Shield className="mr-2 h-4 w-4" />
+          블랙리스트 건수 조회
+        </ContextMenuItem>
+
       </ContextMenuContent>
     </ContextMenu>
   );
