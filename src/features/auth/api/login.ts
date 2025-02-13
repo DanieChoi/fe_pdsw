@@ -30,7 +30,7 @@ export const loginApi = {
         password: credentials.password,
       };
 
-      const { data } = await axiosInstance.post<LoginResponse>('/pds/login', loginData);
+      const { data } = await axiosInstance.post<LoginResponse>('/login', loginData);
 
       if (data.result_code !== 0) {
         throw new Error(data.result_msg || '로그인 실패');
