@@ -34,9 +34,9 @@ const renderContent = (tabId: number | null) => {
     case 7:
       return <ListManager />;
     case 8:
-      return <>예약콜 제한 설정 컨텐츠</>;
+      return <OperationBoard />;
     case 9:
-      return <>분배호수 제한 설정 컨텐츠</>;
+      return <OperationBoard />;
     case 10:
       return <SystemPreferences />;
     case 11:
