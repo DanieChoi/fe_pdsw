@@ -64,6 +64,8 @@ export function TreeMenusForAgentTab() {
 
   const items = treeData[0].items || [];
 
+  console.log("treeData at 상담원 트리 메뉴 : ", treeData);
+
   return (
     <div className="flex-1 overflow-auto px-2">
       {items.map((item: TreeItem) => (

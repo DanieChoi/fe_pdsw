@@ -8,7 +8,7 @@ import { CommonButton } from "@/components/shared/CommonButton";
 
 
 const AgentStatusMonitoring: React.FC = () => {
- 
+
 
   return (
     <div className="w-full limit-width">
