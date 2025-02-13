@@ -30,14 +30,14 @@ export const loginApi = {
         password: credentials.password,
       };
 
-      const { data } = await axiosInstance.post<LoginResponse>('/login', loginData);
+      const { data } = await axiosInstance.post<LoginResponse>('/pds/login', loginData);
 
       if (data.result_code !== 0) {
         throw new Error(data.result_msg || '로그인 실패');
       }
 
       //SSE 실시간 이벤트 구독
-      const eventSource = new EventSource("http://localhost:4000/api/v1/notification/0/subscribe");
+      const eventSource = new EventSource("/api/v1/notification/0/subscribe");
 
       eventSource.addEventListener("message", (event) => {
         console.log("event = ", event.data);
