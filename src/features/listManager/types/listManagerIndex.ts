@@ -1,6 +1,6 @@
 // src/features/listManager/types/listManagerIndex.ts
 
-export const apiUrl: string = 'http://localhost:4000/api/v1/counselor';
+export const apiUrl: string = '/api/v1/counselor';
 
 // 리스트매니저 API 에러 타입
 export interface ListManagerApiError {
