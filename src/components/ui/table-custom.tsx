@@ -13,8 +13,26 @@ export function TableRow({ children, className }: TableProps) {
   return <tr className={className}>{children}</tr>;
 }
 
-export function TableHeader({ children, className }: TableProps) {
-  return <th className={`px-3 py-1 ${className || ""}`}>{children}</th>;
+interface TableHeaderProps extends TableProps {
+  colSpan?: number;
+  rowSpan?: number;
+}
+
+export function TableHeader({
+  children,
+  className,
+  colSpan,
+  rowSpan,
+}: TableHeaderProps) {
+  return (
+    <th
+      className={`px-3 py-1 ${className || ""}`}
+      colSpan={colSpan}
+      rowSpan={rowSpan}
+    >
+      {children}
+    </th>
+  );
 }
 
 interface TableCellProps extends TableProps {

@@ -21,6 +21,7 @@ import CampaignGroupManager from "./CampaignGroupManager";
 import NewCampaignManager from "./NewCampaignManager";
 import RebroadcastSettingsPanel from "./RebroadcastSettingsPanel";
 import CampaignManager from "./CampaignManager";
+import AgentStatusMonitoring from "./AgentStatusMonitoring";
 
 // 탭 ID별 실제 화면을 매핑하는 함수
 const renderContent = (tabId: number | null) => {
@@ -54,7 +55,11 @@ const renderContent = (tabId: number | null) => {
     case 14:
       return <StatusCampaign />;
     case 20:
-      return <RebroadcastSettingsPanel />;
+      return <RebroadcastSettingsPanel />; //재발신
+    case 21:
+        return <CampaignMonitorDashbord />;//오른쪽버튼 캠페인총진행상황
+    case 22:
+      return <AgentStatusMonitoring />;//상담원상태모니터링
     case 100:
       return <>잘못된 스킬 할당 탭입니다.</>;
 

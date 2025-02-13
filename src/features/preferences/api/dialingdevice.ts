@@ -1,8 +1,8 @@
 import { axiosInstance } from "@/lib/axios";
-import { DialingDeviceCreateRequest, DialingDeviceCreateResponse, DialingDeviceListCredentials, DialingDeviceListResponse } from "../types/SystemPreferences";
+import { DialingDeviceCreateRequest, SuccesResponse, TenantIdCredentials, DialingDeviceListResponse } from "../types/SystemPreferences";
 
 // 시스템 설정 장비 리스트 요청
-export const fetchDialingDeviceList = async (credentials: DialingDeviceListCredentials): Promise<DialingDeviceListResponse> => {
+export const fetchDialingDeviceList = async (credentials: TenantIdCredentials): Promise<DialingDeviceListResponse> => {
     const dialingDeviceListRequestData = {
         filter: {
             device_id: {
@@ -39,7 +39,7 @@ export const fetchDialingDeviceList = async (credentials: DialingDeviceListCrede
 
 
 // 신규 등록 API (POST)
-export const createDialingDevice = async (credentials: DialingDeviceCreateRequest): Promise<DialingDeviceCreateResponse> => {
+export const createDialingDevice = async (credentials: DialingDeviceCreateRequest): Promise<SuccesResponse> => {
     const requestData = {
         request_data: {
             tenant_id: credentials.tenant_id,
@@ -50,7 +50,7 @@ export const createDialingDevice = async (credentials: DialingDeviceCreateReques
     };
     
     try {
-        const { data } = await axiosInstance.post<DialingDeviceCreateResponse>(
+        const { data } = await axiosInstance.post<SuccesResponse>(
             '/dialing-device',
             requestData
         );
@@ -64,7 +64,7 @@ export const createDialingDevice = async (credentials: DialingDeviceCreateReques
 };
 
 // 수정 API (PUT)
-export const updateDialingDevice = async (credentials: DialingDeviceCreateRequest): Promise<DialingDeviceCreateResponse> => {
+export const updateDialingDevice = async (credentials: DialingDeviceCreateRequest): Promise<SuccesResponse> => {
     const requestData = {
         request_data: {
             tenant_id: credentials.tenant_id,
@@ -75,7 +75,7 @@ export const updateDialingDevice = async (credentials: DialingDeviceCreateReques
     };
     
     try {
-        const { data } = await axiosInstance.put<DialingDeviceCreateResponse>(
+        const { data } = await axiosInstance.put<SuccesResponse>(
             '/dialing-device',
             requestData
         );
