@@ -10,6 +10,7 @@ interface ChartData {
   color: string;
 }
 
+
 const ChartView: React.FC = () => {
   // 발신 현황 데이터
   const callStatusData: ChartData[] = [
@@ -39,6 +40,30 @@ const ChartView: React.FC = () => {
           </div>
         ))}
       </div>
+    );
+  };
+
+  const renderCustomizedLabel = (props: any) => {
+    const { cx, cy, midAngle, innerRadius, outerRadius, percent, value, index } = props;
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius * 1.1; // 레이블을 바깥쪽으로 이동
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    
+    const total = props.data.reduce((sum: number, entry: ChartData) => sum + entry.value, 0);
+    const percentage = ((value / total) * 100).toFixed(0);
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="#666"
+        textAnchor={x > cx ? 'start' : 'end'}
+        dominantBaseline="central"
+        className="text-[10px]"
+      >
+        {`${percentage}%`}
+      </text>
     );
   };
 
@@ -97,9 +122,14 @@ const ChartView: React.FC = () => {
                   data={callStatusData}
                   cx={130}
                   cy={100}
-                  innerRadius={60}
-                  outerRadius={80}
+                  innerRadius={30}
+                  outerRadius={70}
                   paddingAngle={0}
+                  label={({ value, x, y }) => (
+                    <text x={x} y={y} className="text-[10px]" textAnchor="middle">
+                      {`${value}%`}
+                    </text>
+                  )}
                   dataKey="value"
                 >
                   {callStatusData.map((entry, index) => (
@@ -124,9 +154,14 @@ const ChartView: React.FC = () => {
                   data={listStatusData}
                   cx={130}
                   cy={100}
-                  innerRadius={60}
-                  outerRadius={80}
+                  innerRadius={30}
+                  outerRadius={70}
                   paddingAngle={0}
+                  label={({ value, x, y }) => (
+                    <text x={x} y={y} className="text-[10px]" textAnchor="middle">
+                      {`${value}%`}
+                    </text>
+                  )}
                   dataKey="value"
                 >
                   {listStatusData.map((entry, index) => (

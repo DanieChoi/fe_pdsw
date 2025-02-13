@@ -51,11 +51,15 @@ const GridView: React.FC = () => {
                         data={pieChartData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={35}
-                        outerRadius={55}
+                        innerRadius={25}
+                        outerRadius={50}
                         paddingAngle={2}
                         dataKey="value"
-                        label={({ value }) => `${value}%`}
+                        label={({ value, x, y }) => (
+                          <text x={x} y={y} className="text-[10px]" textAnchor="middle">
+                            {`${value}%`}
+                          </text>
+                        )}
                         labelLine={{ stroke: '#999999', strokeWidth: 1 }}
                       >
                         {pieChartData.map((entry, index) => (
