@@ -5,6 +5,7 @@ import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-c
 import { Label } from "@/components/ui/label";
 import { CommonRadio, CommonRadioItem } from "@/components/shared/CommonRadio";
 import { CommonButton } from "@/components/shared/CommonButton";
+import UsageTimePopup from './UsageTimePopup';
 import GridView from './GridView';
 import ChartView from './ChartView';
 interface Tab {
@@ -24,6 +25,7 @@ const CampaignMonitorDashboard: React.FC = () => {
   // 상태 추가
   const [viewType, setViewType] = useState<ViewType>("gridView");
   const [selectedCall, setSelectedCall] = useState<number>(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const activeTabKey = useTabStore((state) => state.activeTabKey);
   const openedTabs = useTabStore((state) => state.openedTabs);
@@ -115,7 +117,11 @@ const CampaignMonitorDashboard: React.FC = () => {
         </div>
 
         <div className="flex justify-end gap-2">
-          <CommonButton>사용 시간 보기</CommonButton>
+          <CommonButton 
+            onClick={() => setIsModalOpen(true)}
+            >
+            사용 시간 보기
+          </CommonButton>
         </div>
       </div>
 
@@ -123,6 +129,13 @@ const CampaignMonitorDashboard: React.FC = () => {
       <div className="flex-1">
         {viewType === "gridView" ? <GridView /> : <ChartView />}
       </div>
+
+      {/* 사용 시간 팝업 */}
+      <UsageTimePopup 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+
     </div>
   );
 };
