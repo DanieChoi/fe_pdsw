@@ -33,16 +33,36 @@ export interface FolderContextMenuProps {
 }
 
 export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
-  const { addTab } = useTabStore();
+  const { addTab, openedTabs, setActiveTab } = useTabStore();
 
   const handleNewCampaign = () => {
-    // 추후 구현
-    console.log('새 캠페인 추가:', item.id);
+    if (openedTabs.some(tab => tab.id === 13)) {    
+      setActiveTab(13, '13');
+    } else {
+      addTab({
+        id: 13,
+        uniqueKey: '13',
+        title: '새 캠페인',
+        icon: '',
+        href: '',
+        content: null,
+      });
+    }
   };
 
   const handleViewAllCampaigns = () => {
-    // 추후 구현
-    console.log('캠페인 전체 보기:', item.id);
+    if (openedTabs.some(tab => tab.id === 14)) {
+      setActiveTab(14, '14');
+    } else {
+      addTab({
+        id: 14,
+        uniqueKey: '14',
+        title: '캠페인 전체 보기',
+        icon: '',
+        href: '',
+        content: null,
+      });
+    }
   };
 
   const handleViewSelectedSkills = () => {
