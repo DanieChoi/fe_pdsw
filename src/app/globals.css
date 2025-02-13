@@ -231,6 +231,19 @@ input::placeholder {
   border-bottom-right-radius: 3px; /* 오른쪽 아래 둥글게 */
 }
 
+
+.table-custom.table-continued{
+  border-bottom: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0px;
+}
+.table-custom.table-continued tr:last-child th:first-child{
+  border-bottom-left-radius: 0;
+}
+.table-custom.table-continued tr:last-child td:last-child{
+  border-bottom-right-radius: 0px;
+}
+
 /*tab 커스텀*/
 .tab-custom-wrap {
   position: relative;
