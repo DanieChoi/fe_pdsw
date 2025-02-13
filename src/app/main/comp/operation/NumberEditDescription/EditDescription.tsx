@@ -81,7 +81,7 @@ const EditDescription = () => {
       session_key: '',
       tenant_id: 0,
     });
-  }, [])
+  }, [fetchPhoneDescriptions])
   
   const [alertState, setAlertState] = useState({
     isOpen: false,

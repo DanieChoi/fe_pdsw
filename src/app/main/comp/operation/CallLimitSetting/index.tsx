@@ -110,7 +110,7 @@ const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
     fetchCallLimitSettingList({
       tenant_id_array: tenants.map(tenant => tenant.tenant_id)
     });
-  }, [fetchCallLimitSettingList])
+  }, [fetchCallLimitSettingList, tenants])
 
   const columns = useMemo(() => [
     { key: 'campaign_id', name: '캠페인 아이디' },
