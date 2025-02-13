@@ -208,18 +208,20 @@ const OutboundCallProgressPanel: React.FC = () => {
         <div className="flex-1 out-call-responsive-left gap-5">
           <div className="">
             <Table>
-              <TableRow>
-                <TableHeader className="!bg-[#DDF4F2] !text-center text-sm font-normal text-[#3A9D6C]">대기 상담원</TableHeader>
-                <TableHeader className="!bg-[#FEE9EC] !text-center text-sm font-normal text-[#C95E5E]">최초발신</TableHeader>
-                <TableHeader className="!bg-[#E8EFFA] !text-center text-sm font-normal text-[#338BD3]">재시도 발신</TableHeader>
-                <TableHeader className="!bg-[#F6F0FA] !text-center text-sm font-normal text-[#9459BF]">분배대기</TableHeader>
-              </TableRow>
-              <TableRow>
-                <TableCell className="!text-center text-sm">{currentData.stats.waiting}</TableCell>
-                <TableCell className="!text-center text-sm">{currentData.stats.firstCall}</TableCell>
-                <TableCell className="!text-center text-sm">{currentData.stats.retryCall}</TableCell>
-                <TableCell className="!text-center text-sm">{currentData.stats.distributing}</TableCell>
-              </TableRow>
+              <tbody>
+                <TableRow>
+                  <TableHeader className="!bg-[#DDF4F2] !text-center text-sm font-normal text-[#3A9D6C]">대기 상담원</TableHeader>
+                  <TableHeader className="!bg-[#FEE9EC] !text-center text-sm font-normal text-[#C95E5E]">최초발신</TableHeader>
+                  <TableHeader className="!bg-[#E8EFFA] !text-center text-sm font-normal text-[#338BD3]">재시도 발신</TableHeader>
+                  <TableHeader className="!bg-[#F6F0FA] !text-center text-sm font-normal text-[#9459BF]">분배대기</TableHeader>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="!text-center text-sm">{currentData.stats.waiting}</TableCell>
+                  <TableCell className="!text-center text-sm">{currentData.stats.firstCall}</TableCell>
+                  <TableCell className="!text-center text-sm">{currentData.stats.retryCall}</TableCell>
+                  <TableCell className="!text-center text-sm">{currentData.stats.distributing}</TableCell>
+                </TableRow>
+              </tbody>
             </Table>
           </div>
           
