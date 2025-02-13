@@ -1,4 +1,3 @@
-// src\features\campaignManager\components\treeMenus\TreeNode.tsx
 "use client";
 
 import { TreeNodeProps } from "@/components/shared/layout/SidebarPresenter";
@@ -23,15 +22,8 @@ export function TreeNode({
 
   const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu } = useTabStore();
 
-  // const handleDoubleClick = useCallback(() => {
-  //   if (item.type !== "campaign") return;
-  //   openCampaignManagerForUpdate(item.id, item.label);
-  //   setCampaignIdForUpdateFromSideMenu(item.id);
-  // }, [item, openCampaignManagerForUpdate, setCampaignIdForUpdateFromSideMenu]);
-
   const handleDoubleClick = useCallback(() => {
     if (item.type !== "campaign") return;
-    // openCampaignManagerForUpdate(item.id, item.label); // 이전 코드 제거
     simulateHeaderMenuClick(2); // 캠페인 관리(id: 2) 메뉴 클릭
     setCampaignIdForUpdateFromSideMenu(item.id);
   }, [item, simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu]);
