@@ -15,7 +15,8 @@ import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { Calendar as CalendarIcon } from "lucide-react";
 import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
-import { useTabStore } from '@/store/tabStore';
+import { useTabStore, useMainStore } from '@/store';
+import RebroadcastSettingsPanelHeader from './RebroadcastSettingsPanelHeader';
 
 interface RebroadcastSettings {
     campaignId: string;
@@ -78,8 +79,8 @@ const getOutgoingResultLabel = (key: string) => {
 
 const RebroadcastSettingsPanel = () => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
-    const activeTabKey = useTabStore((state) => state.activeTabKey);
-    const openedTabs = useTabStore((state) => state.openedTabs);
+    const { campaigns } = useMainStore();
+    const { campaignIdForUpdateFromSideMenu, activeTabKey, openedTabs } = useTabStore();
 
     // 현재 활성화된 탭에서 campaignId와 title 찾기
     const activeTab = openedTabs.find(tab => tab.uniqueKey === activeTabKey);
@@ -101,6 +102,8 @@ const RebroadcastSettingsPanel = () => {
     const [selectedRebroadcastDetails, setSelectedRebroadcastDetails] = useState<RebroadcastItem | null>(null);
     const [isApplying, setIsApplying] = useState(false);
     const [canEdit, setCanEdit] = useState(true);
+
+    const [_campaignId, set_campaignId] = useState<string>('0');
 
     // 발신결과 체크박스 상태 관리
     const [selectedOutgoingResults, setSelectedOutgoingResults] = useState<{ [key: string]: boolean }>({
@@ -414,75 +417,16 @@ const RebroadcastSettingsPanel = () => {
         }
     };
 
+    useEffect(() => {
+        if( campaignIdForUpdateFromSideMenu ){
+            set_campaignId(campaignIdForUpdateFromSideMenu);
+        }
+    }, [campaignIdForUpdateFromSideMenu]);
+
     return (
         <div className="limit-width">
             <div className="flex flex-col gap-6">
-                <div className="flex title-background justify-between">
-                    <div className="flex gap-4 items-center">
-                        <div className="flex items-center gap-2">
-                            <Label className="w-20 min-w-20">캠페인 아이디</Label>
-                            <Select disabled value={activeTab?.campaignId ?? ''}>
-                                <SelectTrigger className="w-[140px]">
-                                    <SelectValue placeholder="캠페인선택">
-                                        {activeTab?.campaignId ?? ''}
-                                    </SelectValue>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value={activeTab?.campaignId ?? '-'}>
-                                        {activeTab?.campaignId ?? '선택된 캠페인 없음'}
-                                    </SelectItem>
-
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Label className="w-20 min-w-20">캠페인 이름</Label>
-                            <CustomInput
-                                className="w-[140px]"
-                                disabled
-                                value={activeTab?.title?.replace('재발신 설정 - ', '') ?? ''}
-                            />
-                        </div>
-                        <CommonRadio
-                            defaultValue="reservation"
-                            className="flex gap-5"
-                            onValueChange={(value) => setBroadcastType(value)}
-                            value={broadcastType}
-                        >
-                            <div className="flex items-center space-x-2">
-                                <CommonRadioItem value="reservation" id="reservation" />
-                                <Label htmlFor="reservation">예약</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <CommonRadioItem value="realtime" id="realtime" />
-                                <Label htmlFor="realtime">실시간</Label>
-                            </div>
-                        </CommonRadio>
-                    </div>
-                    <div className="flex gap-2">
-                        <CommonButton onClick={handleCheckListCount}>
-                            리스트 건수 확인
-                        </CommonButton>
-                        <CommonButton
-                            onClick={handleAddRebroadcast}
-                            disabled={!shouldShowAddDelete}
-                        >
-                            추가
-                        </CommonButton>
-                        <CommonButton
-                            onClick={handleRemoveRebroadcast}
-                            disabled={selectedRebroadcastId === null}
-                        >
-                            삭제
-                        </CommonButton>
-                        <CommonButton
-                            onClick={handleApplyRebroadcast}
-                            disabled={!shouldShowApply}
-                        >
-                            적용
-                        </CommonButton>
-                    </div>
-                </div>
+                <RebroadcastSettingsPanelHeader campaignId={_campaignId}/>
 
                 <div className="flex gap-5 h-[580px]">
                     <div className={`flex-1 w-1/3 flex flex-col gap-5 ${broadcastType === "realtime" ? "opacity-50 pointer-events-none" : ""}`}>

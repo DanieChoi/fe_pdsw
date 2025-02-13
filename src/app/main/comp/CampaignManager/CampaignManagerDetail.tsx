@@ -1279,7 +1279,19 @@ export default function CampaignDetail() {
 
   //재발신 버튼 이벤트
   const handleRebroadcast = () => {
-    openRebroadcastSettings('20','재발신 설정');
+    // openRebroadcastSettings('20','재발신 설정');
+    if ( openedTabs.some(tab => tab.id === 20)) {    
+      setActiveTab(20, openedTabs.filter((data) => data.id === 20)[0].uniqueKey);
+    } else if (!openedTabs.some(tab => tab.id === 20)) {
+      addTab({
+        id: 20,
+        uniqueKey: '20',
+        title: '재발신 설정',
+        icon: '', 
+        href: '',
+        content: null,
+      });      
+    }
   };
 
   //캠페인 상태 변경 에러 코드.
