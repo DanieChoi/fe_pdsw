@@ -224,6 +224,7 @@ const RebroadcastSettingsPanel = () => {
         }));
     };
 
+    //추가 버튼 클릭 이벤트.
     const handleAddRebroadcast = () => {
         const newRebroadcast: RebroadcastItem = {
             id: rebroadcastList.length + 1,
@@ -417,6 +418,10 @@ const RebroadcastSettingsPanel = () => {
         }
     };
 
+    const handleBroadcastTypeChange = (param:string) => {
+        setBroadcastType(param);
+    };
+    
     useEffect(() => {
         if( campaignIdForUpdateFromSideMenu ){
             set_campaignId(campaignIdForUpdateFromSideMenu);
@@ -426,7 +431,11 @@ const RebroadcastSettingsPanel = () => {
     return (
         <div className="limit-width">
             <div className="flex flex-col gap-6">
-                <RebroadcastSettingsPanelHeader campaignId={_campaignId}/>
+                <RebroadcastSettingsPanelHeader campaignId={_campaignId} 
+                    handleBroadcastTypeChange={handleBroadcastTypeChange} 
+                    handleAddRebroadcast={handleAddRebroadcast}
+                    handleRemoveRebroadcast={handleRemoveRebroadcast}
+                />
 
                 <div className="flex gap-5 h-[580px]">
                     <div className={`flex-1 w-1/3 flex flex-col gap-5 ${broadcastType === "realtime" ? "opacity-50 pointer-events-none" : ""}`}>
