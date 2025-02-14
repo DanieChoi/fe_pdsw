@@ -21,10 +21,10 @@ export const tabsData: TabData[] = [
             label: 'NEXUS_DEV',
             type: 'folder',
             children: [
-              { id: 'campaign1', label: '100번캠페인1', type: 'campaign', status: 'active', direction: 'inbound' },
+              { id: 'campaign1', label: '100번캠페인1', type: 'campaign', status: 'pending', direction: 'inbound' },
               { id: 'campaign2', label: '101번캠페인2', type: 'campaign', status: 'pending', direction: 'outbound' },
               { id: 'campaign3', label: '102번캠페인3', type: 'campaign', status: 'stopped', direction: 'inbound' },
-              { id: 'campaign4', label: '103번캠페인4', type: 'campaign', status: 'active', direction: 'outbound' },
+              { id: 'campaign4', label: '103번캠페인4', type: 'campaign', status: 'started', direction: 'outbound' },
               { id: 'cp1000', label: 'CP1000', type: 'campaign', status: 'pending', direction: 'inbound' },
               { id: '1111', label: '1111', type: 'campaign', status: 'stopped', direction: 'outbound' },
             ]
