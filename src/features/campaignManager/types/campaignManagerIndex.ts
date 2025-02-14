@@ -1,6 +1,6 @@
 // src/features/campaignManager/types/campaignManagerIndex.ts
 
-export const apiUrl: string = '/api/v1/counselor';
+export const apiUrl: string = '/counselor';
 
 // 캠페인스케줄 데이터 타입
 export interface CampaignScheDuleListDataResponse {
