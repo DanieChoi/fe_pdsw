@@ -5,8 +5,8 @@ import { useApiForGetCampaignList } from '@/features/auth/hooks/useApiForGetCamp
 import { useMemo } from 'react';
 import { TabData, TreeItem } from '@/features/campaignManager/types/typeForSidebar2';
 
-function getStatusFromFlags(start_flag: number, end_flag: number): string {
-  if (start_flag === 3) return 'active';
+function getStatusFromFlags(start_flag: number, end_flag: number): "pending" | "started" | "stopped" {
+  if (start_flag === 3) return 'started';
   if (start_flag === 2) return 'pending';
   return 'stopped';
 }

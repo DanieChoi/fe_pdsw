@@ -76,7 +76,7 @@ export const processTreeItemsForSidebar = (items: TreeItem[], type: FilterType):
     .filter((item) => {
       if (type === 'all') return true;
       if (item.type === 'folder' && item.children && item.children.length > 0) return true;
-      return item.status === type;
+      return item.status === type as 'started' | 'pending' | 'stopped';
     });
 };
 
