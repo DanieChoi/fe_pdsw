@@ -77,98 +77,32 @@ type Props = {
   handleBroadcastTypeChange: (param:string) => void;
   handleAddRebroadcast:() => void;
   handleRemoveRebroadcast:() => void;
+  handleApplyRebroadcast:() => void;
 }
 
-const RebroadcastSettingsPanelHeader = ({campaignId,handleBroadcastTypeChange,handleAddRebroadcast,handleRemoveRebroadcast}:Props) => {
+const RebroadcastSettingsPanelHeader = ({campaignId
+    , handleBroadcastTypeChange
+    , handleAddRebroadcast
+    , handleRemoveRebroadcast
+    , handleApplyRebroadcast
+}:Props) => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
     const { campaigns } = useMainStore();
-    const { removeTab, activeTabKey, openedTabs } = useTabStore();
+    const { removeTab } = useTabStore();
     
-    // 현재 활성화된 탭에서 campaignId와 title 찾기
-    const activeTab = openedTabs.find(tab => tab.uniqueKey === activeTabKey);
-
-    const [settings, setSettings] = useState<RebroadcastSettings>(initialSettings);
-    const [startDate, setStartDate] = useState<Value | null>(new Date());
-    const [endDate, setEndDate] = useState<Value | null>(new Date());
-    const [startTime, setStartTime] = useState("");
     const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
     const [broadcastType, setBroadcastType] = useState("reservation");
-    const [outgoingResultChecked, setOutgoingResultChecked] = useState(true);
-    const [outgoingTypeChecked, setOutgoingTypeChecked] = useState(false);
-    const [callType, setCallType] = useState("not-sent");
-    const [outgoingTimeChecked, setOutgoingTimeChecked] = useState(false);
-    const [timeType, setTimeType] = useState("final-call-date");
     const [listCount, setListCount] = useState<number>(0);
     const [rebroadcastList, setRebroadcastList] = useState<RebroadcastItem[]>([]);
     const [selectedRebroadcastId, setSelectedRebroadcastId] = useState<number | null>(null);
-    const [selectedRebroadcastDetails, setSelectedRebroadcastDetails] = useState<RebroadcastItem | null>(null);
 
     const [headerCampaignId, setHeaderCampaignId] = useState<string>('');
-
-    // 발신결과 체크박스 상태 관리
-    const [selectedOutgoingResults, setSelectedOutgoingResults] = useState<{[key: string]: boolean}>({
-        'outgoing-success-ok': false,
-        'outgoing-success-no': false,
-        'fail-busy': false,
-        'fail-no-answer': false,
-        'fail-fax': false,
-        'fail-machine': false,
-        'fail-etc': false,
-        'fail-wrong-num': false,
-        'fail-line': false,
-        'fail-hangup': false,
-        'fail-no-tone': false,
-        'fail-no-dial': false,
-        'outgoing-attempt': false
-    });
-
-
-    useEffect(() => {
-        if (activeTab) {
-            setSettings(prev => ({
-                ...prev,
-                campaignId: activeTab.campaignId ?? ''
-            }));
-        }
-    }, [activeTab]);
 
     // 버튼 활성화 상태 관리
     const shouldShowAddDelete = broadcastType === "reservation" && rebroadcastList.every(item => !item.isDummy);
     const shouldShowApply = (broadcastType === "realtime") || 
                        (broadcastType === "reservation" && 
                         rebroadcastList.some(item => item.isDummy));
-
-    useEffect(() => {
-        resetAllStates();
-    }, [broadcastType]);
-
-    const resetAllStates = () => {
-        setStartDate(new Date());
-        setEndDate(new Date());
-        setStartTime("");
-        setSelectedOutgoingResults(prevState => {
-            const newState = { ...prevState };
-            Object.keys(newState).forEach(key => {
-                newState[key] = false;
-            });
-            return newState;
-        });
-        setCallType("not-sent");
-        setTimeType("final-call-date");
-        setSelectedRebroadcastId(null);
-        setSelectedRebroadcastDetails(null);
-    
-        // 모드별 체크박스 상태 설정
-        if (broadcastType === "realtime") {
-            setOutgoingResultChecked(true);
-            setOutgoingTypeChecked(true);
-            setOutgoingTimeChecked(true);
-        } else {
-            setOutgoingResultChecked(true);
-            setOutgoingTypeChecked(false);
-            setOutgoingTimeChecked(false);
-        }
-    };
 
     //리스트 건수 확인 버튼 클릭 이벤트.
     const handleCheckListCount = () => {
@@ -198,95 +132,9 @@ const RebroadcastSettingsPanelHeader = ({campaignId,handleBroadcastTypeChange,ha
         handleBroadcastTypeChange(value);
     };
 
-    const handleApplyRebroadcast = () => {
-        // 예약 모드에서 실제 데이터 처리
-        if (broadcastType === "reservation") {
-            const selectedResults = Object.entries(selectedOutgoingResults)
-                .filter(([_, isSelected]) => isSelected)
-                .map(([key]) => key);
-    
-            if (selectedResults.length === 0) {
-                setAlertState({
-                    isOpen: true,
-                    message: '최소 하나 이상의 발신결과를 선택해주세요.',
-                    title: '알림',
-                    type: '0',
-                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-                });
-                return;
-            }
-    
-            const processedRebroadcasts = rebroadcastList
-                .filter(item => item.isDummy)
-                .map(item => ({
-                    id: item.id,
-                    scheduleStartDate: startDate ? startDate.toString() : '',
-                    scheduleStartTime: startTime,
-                    outgoingResults: selectedResults,
-                    outgoingType: callType,
-                    outgoingTime: {
-                        type: timeType,
-                        startDate: startDate ? startDate.toString() : '',
-                        endDate: endDate ? endDate.toString() : '',
-                    }
-                }));
-    
-            setRebroadcastList(prevList => 
-                prevList.map(item => 
-                    item.isDummy 
-                        ? processedRebroadcasts.find(proc => proc.id === item.id) || item
-                        : item
-                )
-            );
-    
-            setAlertState({
-                isOpen: true,
-                message: "재발신 설정이 적용되었습니다.",
-                title: '재발신 적용 완료',
-                type: '0',
-                onClose: () => {
-                    setAlertState(prev => ({ ...prev, isOpen: false }));
-                    resetAllStates();
-                },
-                onCancle: () => {
-                    setAlertState(prev => ({ ...prev, isOpen: false }));
-                    resetAllStates();
-                }
-            });
-        }
-        // 실시간 모드 처리 로직은 기존과 동일
-        else if (broadcastType === "realtime") {
-            // 기존 실시간 모드 로직 유지
-            const realTimeData = {
-                outgoingResults: Object.entries(selectedOutgoingResults)
-                    .filter(([_, isSelected]) => isSelected)
-                    .map(([key]) => key),
-                outgoingType: callType,
-                outgoingTime: {
-                    type: timeType,
-                    startDate: startDate ? startDate.toString() : '',
-                    endDate: endDate ? endDate.toString() : '',
-                }
-            };
-    
-            console.log('실시간 재발신 데이터:', realTimeData);
-            
-            setAlertState({
-                isOpen: true,
-                message: "실시간 재발신이 적용되었습니다.",
-                title: '재발신 적용',
-                type: '0',
-                onClose: () => {
-                    setAlertState(prev => ({ ...prev, isOpen: false }));
-                    resetAllStates();
-                },
-                onCancle: () => {
-                    setAlertState(prev => ({ ...prev, isOpen: false }));
-                    resetAllStates();
-                }
-            });
-        }
+    //적용 버튼 클릭 이벤트.
+    const handleApplyRebroadcastClick = () => {
+        handleApplyRebroadcast();
     };
 
     useEffect(() => {
@@ -358,7 +206,7 @@ const RebroadcastSettingsPanelHeader = ({campaignId,handleBroadcastTypeChange,ha
                             삭제
                         </CommonButton>
                         <CommonButton 
-                            onClick={handleApplyRebroadcast}
+                            onClick={handleApplyRebroadcastClick}
                             disabled={!shouldShowApply}
                         >
                             적용
