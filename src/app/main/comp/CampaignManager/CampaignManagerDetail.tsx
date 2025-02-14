@@ -1367,6 +1367,7 @@ export default function CampaignDetail() {
             <Select
               onValueChange={(value) => handleSelectChange(value, 'tenant')}
               value={tempCampaignInfo.tenant_id+'' || ''}
+              disabled={true}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="테넌트를 선택하세요" />

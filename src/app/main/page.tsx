@@ -107,7 +107,7 @@ const MainPage = () => {
             id={activeTab.id}
             uniqueKey={activeTab.uniqueKey}
             title={activeTab.title}
-            icon={activeTab.icon}
+            //icon={activeTab.icon}
             isActive={activeTab.id === activeTabId && activeTab.uniqueKey === activeTabKey}
             onRemove={() => {}}
             onSelect={() => setGlobalActiveTab(activeTab.id, activeTab.uniqueKey)}
