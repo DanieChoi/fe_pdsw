@@ -73,7 +73,7 @@ const TabArea: React.FC<TabAreaProps> = ({
             id={tab.id}
             uniqueKey={tab.uniqueKey} // 탭의 실제 uniqueKey 전달
             title={tab.title}
-            icon={tab.icon}
+            //icon={tab.icon}
             isActive={activeTabId === tab.id}
             onSelect={() => setActiveTab(tab.id, tab.uniqueKey)}
             onRemove={() => removeTab(tab.id, tab.uniqueKey)} // removeTab 함수 구현

@@ -46,7 +46,7 @@ const TabGroup: React.FC<TabGroupProps> = ({ id, tabs, position }) => {
               id={tab.id}
               uniqueKey={tab.uniqueKey} // uniqueKey 추가
               title={tab.title}
-              icon={tab.icon}
+              //icon={tab.icon}
               isActive={activeTabId === tab.id && activeTabKey === tab.uniqueKey}
               onRemove={() => removeTab(tab.id, tab.uniqueKey)} // uniqueKey 추가
               onSelect={() => setActiveTab(tab.id, tab.uniqueKey)} // uniqueKey 추가
