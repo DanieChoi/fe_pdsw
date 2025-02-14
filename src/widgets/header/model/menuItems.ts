@@ -59,6 +59,13 @@ export const menuItems: MenuItem[] = [
     content: null
   },
   { 
+    id: 23, 
+    title: '시스템모니터링', 
+    icon: '/header-menu/시스템모니터링.svg', 
+    href: '/settings',
+    content: null
+  },
+  { 
     id: 7, 
     title: '리스트 매니저', 
     icon: '/header-menu/리스트매니저.svg', 
