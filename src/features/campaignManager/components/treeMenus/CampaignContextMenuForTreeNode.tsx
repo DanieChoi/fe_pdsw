@@ -7,21 +7,22 @@ import {
   ContextMenuSeparator,
 } from "@/components/ui/context-menu";
 import { useTabStore } from "@/store/tabStore";
-import { 
-  Edit, 
-  Copy, 
-  Activity, 
-  Trash2, 
-  Monitor, 
-  Settings, 
-  Search, 
-  List, 
-  Clock, 
-  History, 
-  Shield, 
+import {
+  Edit,
+  Copy,
+  Activity,
+  Trash2,
+  Monitor,
+  Settings,
+  Search,
+  List,
+  Clock,
+  History,
+  Shield,
   RefreshCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useApiForCampaignStatusUpdate } from "@/features/campaignManager/hooks/useApiForCampaignStatusUpdate";
 
 export type CampaignStatus = 'started' | 'pending' | 'stopped';
 
@@ -43,23 +44,33 @@ export interface CampaignContextMenuProps {
   onDelete: () => void;
   onMonitor: () => void;
   onCopy: () => void;
-  onStatusChange?: (status: CampaignStatus) => void;
+  // onStatusChange?: (campaignId: string, status: CampaignStatus) => void;
 }
 
-export const CampaignContextMenu = ({ 
-  item, 
+export const CampaignContextMenu = ({
+  item,
   onEdit,
   onDelete,
   onMonitor,
   onCopy,
-  onStatusChange,
+  // onStatusChange,
 }: CampaignContextMenuProps) => {
-  const { 
-    openCampaignManagerForUpdate, 
+  const {
+    openCampaignManagerForUpdate,
     setCampaignIdForUpdateFromSideMenu,
     simulateHeaderMenuClick,
     addTab
   } = useTabStore();
+
+  const { mutate: updateCampaignStatus, isPending } = useApiForCampaignStatusUpdate({
+    onSuccess: (data, variables) => {
+      console.log("캠페인 상태 업데이트 성공:", data);
+      // onStatusChange?.(variables.campaign_id, variables.status);
+    },
+    onError: (error) => {
+      console.error("캠페인 상태 업데이트 실패:", error);
+    },
+  });
 
   const handleEditMenuClick = () => {
     simulateHeaderMenuClick(TabIds.CAMPAIGN_EDIT, item.id, item.label);
@@ -78,7 +89,7 @@ export const CampaignContextMenu = ({
       icon: '',
       href: '',
       content: null,
-    });   
+    });
   };
 
   const handleMonitorClick = () => {
@@ -92,9 +103,16 @@ export const CampaignContextMenu = ({
     });
   };
 
-  const handleStatusChange = (newStatus: CampaignStatus) => {
-    if (item.status === newStatus) return;
-    onStatusChange?.(newStatus);
+  const statusToNumber = {
+    stopped: 0,
+    started: 1,
+    pending: 2
+  };
+
+  const handleChangeForCampaignStatus = (newStatus: CampaignStatus) => {
+    if (item.status === newStatus || isPending) return;
+
+    updateCampaignStatus({ campaign_id: +item.id, campaign_status: statusToNumber[newStatus] });
   };
 
   return (
@@ -103,20 +121,20 @@ export const CampaignContextMenu = ({
         <Edit className="mr-2 h-4 w-4" />
         캠페인 수정
       </ContextMenuItem>
-      
+
       <ContextMenuSub>
         <ContextMenuSubTrigger>
           <Search className="mr-2 h-4 w-4" />
-          시작구분
+          시작구분: {item.id}
         </ContextMenuSubTrigger>
         <ContextMenuSubContent className="w-48">
-          <ContextMenuItem 
-            onClick={() => handleStatusChange('started')}
+          <ContextMenuItem
+            onClick={() => handleChangeForCampaignStatus('started')}
             className={cn(
               item.status === 'started' && "opacity-50 cursor-not-allowed",
               "flex items-center"
             )}
-            disabled={item.status === 'started'}
+            disabled={item.status === 'started' || isPending}
           >
             <Clock className={cn(
               "mr-2 h-4 w-4",
@@ -125,14 +143,14 @@ export const CampaignContextMenu = ({
             시작
             {item.status === 'started' && " (현재)"}
           </ContextMenuItem>
-          
-          <ContextMenuItem 
-            onClick={() => handleStatusChange('pending')}
+
+          <ContextMenuItem
+            onClick={() => handleChangeForCampaignStatus('pending')}
             className={cn(
               item.status === 'pending' && "opacity-50 cursor-not-allowed",
               "flex items-center"
             )}
-            disabled={item.status === 'pending'}
+            disabled={item.status === 'pending' || isPending}
           >
             <List className={cn(
               "mr-2 h-4 w-4",
@@ -141,14 +159,14 @@ export const CampaignContextMenu = ({
             멈춤
             {item.status === 'pending' && " (현재)"}
           </ContextMenuItem>
-          
-          <ContextMenuItem 
-            onClick={() => handleStatusChange('stopped')}
+
+          <ContextMenuItem
+            onClick={() => handleChangeForCampaignStatus('stopped')}
             className={cn(
               item.status === 'stopped' && "opacity-50 cursor-not-allowed",
               "flex items-center"
             )}
-            disabled={item.status === 'stopped'}
+            disabled={item.status === 'stopped' || isPending}
           >
             <History className={cn(
               "mr-2 h-4 w-4",
