@@ -2,7 +2,7 @@ import { TabData, TreeItem, FilterType, SortType } from '@/features/campaignMana
 import { TabActions } from './comp/TabActions';
 
 interface TreeNodeProps {
-  item: TreeItem;
+  item: any;
   level: number;
   expandedNodes: Set<string>;
   selectedNodeId?: string;

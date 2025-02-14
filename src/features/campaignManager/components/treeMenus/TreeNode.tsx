@@ -92,6 +92,7 @@ export function TreeNode({
 
             <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
               {item.label}
+              {/* {item.status} */}
             </span>
           </div>
         </div>
@@ -99,7 +100,7 @@ export function TreeNode({
 
       {hasChildren && isExpanded && (
         <div>
-          {item.children?.map((child) => (
+          {item.children?.map((child: typeof item) => (
             <TreeNode
               key={child.id}
               item={child}

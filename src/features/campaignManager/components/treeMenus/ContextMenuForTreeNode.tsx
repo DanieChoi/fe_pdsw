@@ -1,13 +1,15 @@
 import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
-import { CampaignContextMenu } from "./CampaignContextMenuForTreeNode";
+import { CampaignContextMenu, CampaignStatus } from "./CampaignContextMenuForTreeNode";
 import { FolderContextMenu } from "./FolderContextMenuForTreeNode";
+import { TreeItem } from "../../types/typeForSidebar2";
 
 interface ContextMenuForTreeNodeProps {
   children: React.ReactNode;
   item: {
-    type: string;
     id: string;
     label: string;
+    type: any;
+    status: CampaignStatus; // status를 필수값으로 변경
   };
   onEdit: () => void;
   onDelete: () => void;
@@ -27,11 +29,11 @@ export function ContextMenuForTreeNode({
     <ContextMenu>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
       {item.type === "folder" ? (
-        <FolderContextMenu 
+        <FolderContextMenu
           item={item}
         />
       ) : (
-        <CampaignContextMenu 
+        <CampaignContextMenu
           item={item}
           onEdit={onEdit}
           onDelete={onDelete}
