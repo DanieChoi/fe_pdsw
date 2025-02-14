@@ -186,7 +186,7 @@ export const CampaignContextMenu = ({
         캠페인 리스트 삭제
       </ContextMenuItem>
 
-      <ContextMenuItem onClick={onMonitor}>
+      <ContextMenuItem onClick={handleMonitorClick}>
         <Activity className="mr-2 h-4 w-4" />
         상담원 상태 모니터
       </ContextMenuItem>
