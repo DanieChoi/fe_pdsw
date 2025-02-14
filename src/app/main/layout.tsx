@@ -146,6 +146,7 @@ export default function MainLayout({
               style={{ width: `calc(100% - ${width}px)` }}
             >
             <div
+              className='overflow-auto'
               style={{
                 height: `calc(100% - ${footerHeight}px)`,
               }}
