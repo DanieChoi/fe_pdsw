@@ -16,6 +16,7 @@ import RebroadcastSettingsPanel from "./RebroadcastSettingsPanel";
 import CampaignManager from "./CampaignManager";
 import AgentStatusMonitoring from "./AgentStatusMonitoring";
 import SystemMonitoring from "./SystemMonitoring";
+import CampaignClonePanel from "@/widgets/sidebar/pannels/CampaignClonePanel";
 
 // 탭 ID별 실제 화면을 매핑하는 함수
 const renderContent = (tabId: number | null) => {
@@ -58,6 +59,9 @@ const renderContent = (tabId: number | null) => {
         return <SystemMonitoring />;
     case 100:
       return <>잘못된 스킬 할당 탭입니다.</>;
+    case 130: // 캠페인 복사 화면을 리턴 해야함
+      return <CampaignClonePanel />;
+
     default:
       return (
         <div className="flex items-center justify-center h-full text-gray-500">

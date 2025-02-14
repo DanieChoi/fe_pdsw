@@ -43,7 +43,7 @@ export interface CampaignContextMenuProps {
   onEdit: () => void;
   onDelete: () => void;
   onMonitor: () => void;
-  onCopy: () => void;
+  onHandleCampaignCopy: () => void;
   // onStatusChange?: (campaignId: string, status: CampaignStatus) => void;
 }
 
@@ -52,7 +52,7 @@ export const CampaignContextMenu = ({
   onEdit,
   onDelete,
   onMonitor,
-  onCopy,
+  onHandleCampaignCopy,
   // onStatusChange,
 }: CampaignContextMenuProps) => {
   const {
@@ -192,7 +192,7 @@ export const CampaignContextMenu = ({
 
       <ContextMenuSeparator />
 
-      <ContextMenuItem onClick={onCopy}>
+      <ContextMenuItem onClick={onHandleCampaignCopy}>
         <Copy className="mr-2 h-4 w-4" />
         캠페인 복사
       </ContextMenuItem>

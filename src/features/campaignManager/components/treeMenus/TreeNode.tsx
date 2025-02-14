@@ -20,7 +20,7 @@ export function TreeNode({
   const isSelected = selectedNodeId === item.id;
   const statusIcon = getStatusIcon(item.status);
 
-  const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu } = useTabStore();
+  const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab } = useTabStore();
 
   const handleDoubleClick = useCallback(() => {
     if (item.type !== "campaign") return;
@@ -49,8 +49,17 @@ export function TreeNode({
     console.log('Monitor clicked:', { id: item.id, label: item.label, type: item.type });
   };
 
-  const handleCopy = () => {
+  const onHandleCampaignCopy = () => {
     console.log('Copy clicked:', { id: item.id, label: item.label, type: item.type });
+    // onNodeSelect(item.id);
+    addTab({
+      id: 130,
+      uniqueKey: '130',
+      title: '캠페인 복사',
+      icon: '',
+      href: '',
+      content: null,
+    });    
   };
   
   return (
@@ -60,7 +69,7 @@ export function TreeNode({
         onEdit={handleEdit}
         onDelete={handleDelete}
         onMonitor={handleMonitor}
-        onCopy={handleCopy}
+        onHandleCampaignCopy={onHandleCampaignCopy}
       >
         <div
           className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150

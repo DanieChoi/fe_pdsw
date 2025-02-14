@@ -14,7 +14,7 @@ interface ContextMenuForTreeNodeProps {
   onEdit: () => void;
   onDelete: () => void;
   onMonitor: () => void;
-  onCopy: () => void;
+  onHandleCampaignCopy: () => void;
 }
 
 export function ContextMenuForTreeNode({
@@ -23,7 +23,7 @@ export function ContextMenuForTreeNode({
   onEdit,
   onDelete,
   onMonitor,
-  onCopy,
+  onHandleCampaignCopy,
 }: ContextMenuForTreeNodeProps) {
   return (
     <ContextMenu>
@@ -38,7 +38,7 @@ export function ContextMenuForTreeNode({
           onEdit={onEdit}
           onDelete={onDelete}
           onMonitor={onMonitor}
-          onCopy={onCopy}
+          onHandleCampaignCopy={onHandleCampaignCopy}
         />
       )}
     </ContextMenu>
