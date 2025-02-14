@@ -7,12 +7,8 @@ import { CommonButton } from "@/components/shared/CommonButton";
 import { Label } from "@/components/ui/label";
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import { CommonRadio, CommonRadioItem } from "@/components/shared/CommonRadio";
-import TitleWrap from "@/components/shared/TitleWrap";  
-import DatePicker from "react-date-picker";
 import { DatePickerProps } from 'react-date-picker';
 type Value = DatePickerProps['value'];
-import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
-import { Calendar as CalendarIcon } from "lucide-react";
 import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
 import { useMainStore, useTabStore } from '@/store';
@@ -78,13 +74,15 @@ const getOutgoingResultLabel = (key: string) => {
 
 type Props = {
   campaignId?: string;
+  handleBroadcastTypeChange: (param:string) => void;
+  handleAddRebroadcast:() => void;
+  handleRemoveRebroadcast:() => void;
 }
 
-const RebroadcastSettingsPanelHeader = ({campaignId}:Props) => {
+const RebroadcastSettingsPanelHeader = ({campaignId,handleBroadcastTypeChange,handleAddRebroadcast,handleRemoveRebroadcast}:Props) => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
     const { campaigns } = useMainStore();
-    const activeTabKey = useTabStore((state) => state.activeTabKey);
-    const openedTabs = useTabStore((state) => state.openedTabs);
+    const { removeTab, activeTabKey, openedTabs } = useTabStore();
     
     // 현재 활성화된 탭에서 campaignId와 title 찾기
     const activeTab = openedTabs.find(tab => tab.uniqueKey === activeTabKey);
@@ -106,7 +104,6 @@ const RebroadcastSettingsPanelHeader = ({campaignId}:Props) => {
     const [selectedRebroadcastDetails, setSelectedRebroadcastDetails] = useState<RebroadcastItem | null>(null);
 
     const [headerCampaignId, setHeaderCampaignId] = useState<string>('');
-    const [campaignName, setCampaignName] = useState<string>('');
 
     // 발신결과 체크박스 상태 관리
     const [selectedOutgoingResults, setSelectedOutgoingResults] = useState<{[key: string]: boolean}>({
@@ -173,119 +170,33 @@ const RebroadcastSettingsPanelHeader = ({campaignId}:Props) => {
         }
     };
 
+    //리스트 건수 확인 버튼 클릭 이벤트.
     const handleCheckListCount = () => {
-
         setAlertState({
             isOpen: true,
             message: `선택된 재발신 조건에 해당되는 리스트 수 : ${listCount}`,
             title: '리스트 건수 확인',
-            type: '0',
+            type: '2',
             onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
             onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
         });
     };
 
-    const handleAddRebroadcast = () => {
-        const newRebroadcast: RebroadcastItem = {
-            id: rebroadcastList.length + 1,
-            scheduleStartDate: "",
-            scheduleStartTime: "",
-            outgoingResults: [],
-            outgoingType: "",
-            outgoingTime: {
-                type: "",
-                startDate: "",
-                endDate: ""
-            },
-            isDummy: true
-        };
-    
-        setRebroadcastList([...rebroadcastList, newRebroadcast]);
-        resetAllStates();
+    //추가 버튼 클릭 이벤트.
+    const handleAddRebroadcastClick = () => {
+        handleAddRebroadcast();
     };
 
-    const handleRemoveRebroadcast = () => {
-        if (selectedRebroadcastId !== null && rebroadcastList.some(item => item.id === selectedRebroadcastId)) {
-            const updatedList = rebroadcastList.filter(item => item.id !== selectedRebroadcastId);
-            setRebroadcastList(updatedList);
-            setSelectedRebroadcastId(null);
-    
-            if (updatedList.length === 0) {
-                resetAllStates();
-            }
-        }
+    //삭제 버튼 클릭 이벤트.
+    const handleRemoveRebroadcastClick = () => {
+        handleRemoveRebroadcast();
     };
 
-    const handleSelectRebroadcast = (id: number) => {
-
-        // 더미 항목이 있는지 확인
-        const hasDummyItem = rebroadcastList.some(item => item.isDummy);
-    
-        if (hasDummyItem) {
-            setAlertState({
-                isOpen: true,
-                message: '현재 추가 중인 재발신 항목이 있습니다. 적용 또는 취소해주세요.',
-                title: '알림',
-                type: '0',
-                onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-            });
-            return;
-        }
-
-        // 기존 선택 로직
-        setSelectedRebroadcastId(prevId => (prevId === id ? null : id));
-        
-        // 선택된 항목 찾기
-        const selected = rebroadcastList.find(item => item.id === id);
-        
-        if (selected) {
-            setSelectedRebroadcastDetails(selected);
-            
-            // 발신결과 체크박스 상태 초기화
-            const newSelectedResults = { ...selectedOutgoingResults };
-            Object.keys(newSelectedResults).forEach(key => {
-                newSelectedResults[key] = false;
-            });
-            
-            // 선택된 항목의 발신결과로 체크박스 상태 업데이트
-            if (Array.isArray(selected.outgoingResults)) { 
-                selected.outgoingResults.forEach(result => {
-                    if (newSelectedResults.hasOwnProperty(result)) {
-                        newSelectedResults[result] = true;
-                    }
-                });
-            }
-            
-            // 상태 업데이트
-            setSelectedOutgoingResults(newSelectedResults);
-            
-            // 날짜 및 시간 설정
-            if (selected.scheduleStartDate) {
-                setStartDate(new Date(selected.scheduleStartDate));
-            }
-            
-            if (selected.scheduleStartTime) {
-                setStartTime(selected.scheduleStartTime);
-            }
-            
-            if (selected.outgoingType) {
-                setCallType(selected.outgoingType);
-            }
-            
-            if (selected.outgoingTime && selected.outgoingTime.type) {
-                setTimeType(selected.outgoingTime.type);
-            }
-            
-            if (selected.outgoingTime && selected.outgoingTime.endDate) {
-                setEndDate(new Date(selected.outgoingTime.endDate));
-            }
-        } else {
-            // 선택 해제된 경우 상태 초기화
-            setSelectedRebroadcastDetails(null);
-            resetAllStates();
-        }
-        };
+    //예약, 실시간 변경 이벤트.
+    const handleBroadcastType = (value: string) => {
+        setBroadcastType(value);
+        handleBroadcastTypeChange(value);
+    };
 
     const handleApplyRebroadcast = () => {
         // 예약 모드에서 실제 데이터 처리
@@ -417,7 +328,7 @@ const RebroadcastSettingsPanelHeader = ({campaignId}:Props) => {
                         <CommonRadio
                             defaultValue="reservation"
                             className="flex gap-5"
-                            onValueChange={(value) => setBroadcastType(value)}
+                            onValueChange={(value) => handleBroadcastType(value) }
                             value={broadcastType}
                         >
                             <div className="flex items-center space-x-2">
@@ -435,13 +346,13 @@ const RebroadcastSettingsPanelHeader = ({campaignId}:Props) => {
                             리스트 건수 확인
                         </CommonButton>
                         <CommonButton 
-                            onClick={handleAddRebroadcast} 
+                            onClick={handleAddRebroadcastClick} 
                             disabled={!shouldShowAddDelete}
                         >
                             추가
                         </CommonButton>
                         <CommonButton 
-                            onClick={handleRemoveRebroadcast}
+                            onClick={handleRemoveRebroadcastClick}
                             disabled={selectedRebroadcastId === null}
                         >
                             삭제
@@ -451,6 +362,11 @@ const RebroadcastSettingsPanelHeader = ({campaignId}:Props) => {
                             disabled={!shouldShowApply}
                         >
                             적용
+                        </CommonButton>
+                        <CommonButton 
+                            onClick={() => removeTab(20,'20')}
+                        >
+                            닫기
                         </CommonButton>
                     </div>
                     <CustomAlert
