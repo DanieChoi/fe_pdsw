@@ -39,7 +39,7 @@ export default function LoginPage() {
   const { mutate: login } = useApiForLogin({
     onSuccess: (data) => {
       setIsPending(false);
-      
+
       console.log('data (로그인 응답)', data);
 
       setAuth(
@@ -90,23 +90,23 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center">
       <Card className="w-[500px] shadow-none border-0 py-7 px-10">
-          <div className="flex mb-8 mb-70">
-              <Image 
-              src="/logo/pds-logo.svg" 
-              alt="NEXPDS" 
-              width={230}
-              height={51}
-              className=""
-              priority
-            />
-          </div>
+        <div className="flex mb-8 mb-70">
+          <Image
+            src="/logo/pds-logo.svg"
+            alt="NEXPDS"
+            width={230}
+            height={51}
+            className=""
+            priority
+          />
+        </div>
         <CardContent className="p-0">
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div className="relative">
-                <Image 
-                  src="/logo/icon_id.svg" 
-                  alt="id" 
+                <Image
+                  src="/logo/icon_id.svg"
+                  alt="id"
                   width={14}
                   height={16}
                   className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
@@ -120,11 +120,11 @@ export default function LoginPage() {
                   disabled={isPending}
                 />
               </div>
-              
+
               <div className="relative">
-                <Image 
-                  src="/logo/icon_pw.svg" 
-                  alt="id" 
+                <Image
+                  src="/logo/icon_pw.svg"
+                  alt="id"
                   width={14}
                   height={19}
                   className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10"
@@ -157,31 +157,31 @@ export default function LoginPage() {
                 <Checkbox
                   id="remember"
                   checked={formData.remember}
-                  onCheckedChange={(checked) => 
+                  onCheckedChange={(checked) =>
                     setFormData(prev => ({ ...prev, remember: checked as boolean }))
                   }
-                  className="border-gray-400"
+                  className="h-5 w-5 rounded-full border-2 border-gray-300 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 transition-colors duration-200"
                 />
                 <label
                   htmlFor="remember"
-                  className="text-sm text-gray-600 cursor-pointer"
+                  className="text-sm font-medium text-gray-600 cursor-pointer select-none"
                 >
                   기억하기
                 </label>
               </div>
             </div>
 
-            <Button 
+            <Button
               variant="login"
-              type="submit" 
+              type="submit"
               className="mt-100"
             >
               {isPending ? '로그인 중...' : '로그인'}
-            </Button>          
+            </Button>
           </form>
         </CardContent>
       </Card>
-      
+
       <p className="footer-text">
         © {new Date().getFullYear()} NEXUS COMMUNITY All rights reserved.
       </p>

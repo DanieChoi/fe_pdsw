@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   title: "NEXPDS",
   description: "NEXPDS project",
   icons: {
-    icon: 'nexus.ico',           // /public/favicon.ico
+    icon: 'nexpds.ico',           // /public/favicon.ico
     shortcut: 'nexpds.ico',
     // apple: '/apple-touch-icon.png', // /public/apple-touch-icon.png
   }
