@@ -17,7 +17,7 @@ export const fetchCallLimitSettingList = async (credentials: TenantIdCredentials
         },
         page: {
             index: 1,
-            items: 10
+            items: 9999999
         }
     };
 

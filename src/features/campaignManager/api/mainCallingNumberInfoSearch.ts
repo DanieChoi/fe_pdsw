@@ -16,7 +16,7 @@ export const fetchCallingNumbers = async (credentials: CampaignCredentials): Pro
     },
     page: {
       index: 1,
-      items: 10,
+      items: 9999999,
     },
   };
 
