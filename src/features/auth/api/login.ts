@@ -112,7 +112,11 @@ export const loginApi = {
         tenant_id = data.tenant_id;
       }
 
-      const eventSource = new EventSource("/api/v1/notification/" + tenant_id + "/subscribe");
+      console.log("단계 = ", process.env.NEXT_PUBLIC_API_URL);
+
+      const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+
+      const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
 
       console.log("eventSource = ", eventSource);
 
