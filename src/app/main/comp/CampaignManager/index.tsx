@@ -1,4 +1,4 @@
-// C:\Users\terec\fe_pdsw\src\app\main\comp\CampaignManager\index.tsx
+// src\app\main\comp\CampaignManager\index.tsx
 import React, { useState, useEffect } from 'react'
 import CampaignManagerHeader, {CampaignHeaderSearch} from './CampaignManagerHeader';
 import CampaignManagerDetail from './CampaignManagerDetail';
