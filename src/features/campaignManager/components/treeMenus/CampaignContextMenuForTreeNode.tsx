@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   ContextMenuContent,
   ContextMenuItem,
@@ -23,6 +24,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useApiForCampaignStatusUpdate } from "@/features/campaignManager/hooks/useApiForCampaignStatusUpdate";
+import BlackListCountPopup from '@/features/campaignManager/components/popups/BlackListCountPopup';
 
 export type CampaignStatus = 'started' | 'pending' | 'stopped';
 
@@ -55,6 +57,8 @@ export const CampaignContextMenu = ({
   onHandleCampaignCopy,
   // onStatusChange,
 }: CampaignContextMenuProps) => {
+  const [isBlacklistPopupOpen, setIsBlacklistPopupOpen] = useState(false);
+
   const {
     openCampaignManagerForUpdate,
     setCampaignIdForUpdateFromSideMenu,
@@ -115,7 +119,16 @@ export const CampaignContextMenu = ({
     updateCampaignStatus({ campaign_id: +item.id, campaign_status: statusToNumber[newStatus] });
   };
 
+  const handleBlacklistCountClick = () => {
+    // 컨텍스트 메뉴를 명시적으로 닫음
+    document.body.click(); // 컨텍스트 메뉴를 강제로 닫음
+    // 약간의 딜레이 후 팝업을 엶
+    setTimeout(() => {
+      setIsBlacklistPopupOpen(true);
+    }, 100);
+  };
   return (
+    <>
     <ContextMenuContent className="w-56">
       <ContextMenuItem onClick={handleEditMenuClick}>
         <Edit className="mr-2 h-4 w-4" />
@@ -209,10 +222,17 @@ export const CampaignContextMenu = ({
         상담원 상태 모니터
       </ContextMenuItem>
 
-      <ContextMenuItem onClick={onMonitor}>
+      <ContextMenuItem onClick={handleBlacklistCountClick}>
         <Shield className="mr-2 h-4 w-4" />
         블랙리스트 건수 조회
       </ContextMenuItem>
     </ContextMenuContent>
+    <BlackListCountPopup
+        campaignId={item.id}
+        isOpen={isBlacklistPopupOpen}
+        onConfirm={() => setIsBlacklistPopupOpen(false)}
+        onCancel={() => setIsBlacklistPopupOpen(false)}
+      />
+    </>
   );
 };
