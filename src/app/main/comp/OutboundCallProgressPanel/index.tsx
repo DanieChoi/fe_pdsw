@@ -134,19 +134,19 @@ const OutboundCallProgressPanel: React.FC = () => {
     const totalBarData = [
       {
         name: '최초 발신용',
-        value: Object.values(campaignData).reduce((sum, campaign) => 
+        value: Object.values(campaignData).reduce((sum, campaign) =>
           sum + (campaign.barData.find(item => item.name === '최초 발신용')?.value ?? 0), 0
         )
       },
       {
         name: '재시도 발신용',
-        value: Object.values(campaignData).reduce((sum, campaign) => 
+        value: Object.values(campaignData).reduce((sum, campaign) =>
           sum + (campaign.barData.find(item => item.name === '재시도 발신용')?.value ?? 0), 0
         )
       },
       {
         name: '분배 대기',
-        value: Object.values(campaignData).reduce((sum, campaign) => 
+        value: Object.values(campaignData).reduce((sum, campaign) =>
           sum + (campaign.barData.find(item => item.name === '분배 대기')?.value ?? 0), 0
         )
       }
@@ -160,7 +160,7 @@ const OutboundCallProgressPanel: React.FC = () => {
       barData: totalBarData,
       gridData: totalGridData
     };
-  }, [campaignData]);  
+  }, [campaignData]);
 
   // 현재 선택된 캠페인의 데이터
   const currentData = selectedCampaign === 'all' ? allCampaignData : campaignData[selectedCampaign];
@@ -207,7 +207,7 @@ const OutboundCallProgressPanel: React.FC = () => {
       <div className="flex gap-5 h-[calc(100%-46px)] out-call-responsive-container">
         <div className="flex-1 out-call-responsive-left gap-5">
           <div className="">
-            <Table>
+            {/* <Table>
               <TableRow>
                 <TableHeader className="!bg-[#DDF4F2] !text-center text-sm font-normal text-[#3A9D6C]">대기 상담원</TableHeader>
                 <TableHeader className="!bg-[#FEE9EC] !text-center text-sm font-normal text-[#C95E5E]">최초발신</TableHeader>
@@ -220,32 +220,51 @@ const OutboundCallProgressPanel: React.FC = () => {
                 <TableCell className="!text-center text-sm">{currentData.stats.retryCall}</TableCell>
                 <TableCell className="!text-center text-sm">{currentData.stats.distributing}</TableCell>
               </TableRow>
+            </Table> */}
+
+            <Table>
+              <thead>
+                <TableRow>
+                  <TableHeader className="!bg-[#DDF4F2] !text-center text-sm font-normal text-[#3A9D6C]">대기 상담원</TableHeader>
+                  <TableHeader className="!bg-[#FEE9EC] !text-center text-sm font-normal text-[#C95E5E]">최초발신</TableHeader>
+                  <TableHeader className="!bg-[#E8EFFA] !text-center text-sm font-normal text-[#338BD3]">재시도 발신</TableHeader>
+                  <TableHeader className="!bg-[#F6F0FA] !text-center text-sm font-normal text-[#9459BF]">분배대기</TableHeader>
+                </TableRow>
+              </thead>
+              <tbody>
+                <TableRow>
+                  <TableCell className="!text-center text-sm">{currentData.stats.waiting}</TableCell>
+                  <TableCell className="!text-center text-sm">{currentData.stats.firstCall}</TableCell>
+                  <TableCell className="!text-center text-sm">{currentData.stats.retryCall}</TableCell>
+                  <TableCell className="!text-center text-sm">{currentData.stats.distributing}</TableCell>
+                </TableRow>
+              </tbody>
             </Table>
           </div>
-          
+
           <div className="w-full h-[calc(100%-57px)]">
             <ResponsiveContainer width="100%" height="100%" className="m-auto">
               <BarChart
                 data={currentData.barData}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                layout="vertical" 
+                layout="vertical"
               >
                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={true} />
-                <XAxis 
-                  type="number" 
+                <XAxis
+                  type="number"
                   tick={{ fontSize: 13 }}
                   axisLine={{ stroke: '#999' }}
-                  />  
-                <YAxis 
-                  type="category" 
-                  dataKey="name" 
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
                   width={100}
                   tick={{ fontSize: 13 }}
                   axisLine={{ stroke: '#999' }}
                 />
                 <Tooltip />
-                <Bar 
-                  dataKey="value" 
+                <Bar
+                  dataKey="value"
                   fill="#4FD1C5"
                   barSize={20}
                 />

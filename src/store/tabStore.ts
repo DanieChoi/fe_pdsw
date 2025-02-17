@@ -114,6 +114,15 @@ export interface TabLayoutStore {
   // ─────────────────────────────
   setActiveTab: (tabId: number, uniqueKey: string) => void;
   simulateHeaderMenuClick: (menuId: number) => void;
+
+  // 화면 분할 관련 상태 추가
+  splitMode: boolean;
+  splitLayout: 'none' | 'vertical';
+  
+  // 화면 분할 관련 메서드 추가
+  setSplitMode: (mode: boolean) => void;
+  setSplitLayout: (layout: 'none' | 'vertical') => void;
+
 }
 
 const generateUniqueId = (prefix: string, existingIds: string[]) => {
@@ -164,6 +173,12 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     counselorName: null,
   },
   campaignIdForUpdateFromSideMenu: null,
+
+  splitMode: false,
+  splitLayout: 'none',
+  
+  setSplitMode: (mode) => set({ splitMode: mode }),
+  setSplitLayout: (layout) => set({ splitLayout: layout }),
 
   // 헤더 메뉴 클릭
   simulateHeaderMenuClick: (menuId: number) => {
