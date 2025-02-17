@@ -1375,10 +1375,10 @@ export default function CampaignDetail() {
             { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
             { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
             { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
-            { label: "리스트 적용", onClick: () => handleListManager() },
-            { label: "리스트 삭제", onClick: () => handleListManager() },
-            { label: "예약콜 제한건수설정", onClick: () => handleReservedCall() },
-            { label: "분배호수 제한설정", onClick: () => handleMaxCall() },
+            { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+            { label: "리스트 삭제", onClick: () => handleListManager(), variant: "customblue" },
+            { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
+            { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
           ]}
         />
         <div className="grid grid-cols-3 gap-x-4 gap-y-2">
