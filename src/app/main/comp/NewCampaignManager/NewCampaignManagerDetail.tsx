@@ -992,7 +992,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
           </div>
         </div>
       </div>
-      {/* <div>
+      <div>
         <CampaignTab campaignSchedule={tempCampaignSchedule}
           newCampaignYn={true}
           campaignInfo={tempCampaignInfo}
@@ -1006,8 +1006,8 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
           onHandleCallbackTabChange={(value) => handleCallbackTabChange(value)}
           onHandleNotificationTabChange={(value) => handleNotificationTabChange(value)}
         />
-      </div> */}
-      {/* <SkillListPopup
+      </div>
+      <SkillListPopup
         param={tempCampaignSkills.skill_id||[]}
         tenantId={tempCampaignInfo.tenant_id}
         type={skillPopupState.type}
@@ -1030,7 +1030,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         isOpen={callingNumberPopupState.isOpen}
         onConfirm={(param) => handleCallingNumlber(param)}
         onCancle={() => setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))}
-      /> */}
+      />
     </div>
   );
 }
