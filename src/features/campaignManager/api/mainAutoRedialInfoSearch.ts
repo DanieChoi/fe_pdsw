@@ -21,7 +21,7 @@ export const fetchAutoRedials = async (credentials: CampaignCredentials): Promis
     },
     page: {
       index: 1,
-      items: 10,
+      items: 9999999,
     },
   };
 
