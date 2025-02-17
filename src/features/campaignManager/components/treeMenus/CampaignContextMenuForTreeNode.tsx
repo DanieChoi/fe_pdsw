@@ -76,14 +76,24 @@ export const CampaignContextMenu = ({
     },
   });
 
+  // const handleEditMenuClick = () => {
+  //   simulateHeaderMenuClick(TabIds.CAMPAIGN_EDIT, item.id, item.label);
+  //   setCampaignIdForUpdateFromSideMenu(item.id);
+  // };
+
+  // const handleProgressInfoClick = () => {
+  //   simulateHeaderMenuClick(TabIds.CAMPAIGN_PROGRESS, item.id, item.label);
+  // };
+
   const handleEditMenuClick = () => {
-    simulateHeaderMenuClick(TabIds.CAMPAIGN_EDIT, item.id, item.label);
+    simulateHeaderMenuClick(TabIds.CAMPAIGN_EDIT);
     setCampaignIdForUpdateFromSideMenu(item.id);
   };
 
   const handleProgressInfoClick = () => {
-    simulateHeaderMenuClick(TabIds.CAMPAIGN_PROGRESS, item.id, item.label);
+    simulateHeaderMenuClick(TabIds.CAMPAIGN_PROGRESS);
   };
+
 
   const handleRebroadcastClick = () => {
     addTab({

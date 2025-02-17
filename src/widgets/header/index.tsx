@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Check } from 'lucide-react'
+import { Check, LayoutGrid } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useTabStore } from '@/store/tabStore'
@@ -11,6 +11,7 @@ import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 import useApiForFetchCounselorList from '@/features/campaignManager/hooks/useApiForFetchCounselorList';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
+import { SplitScreenDialog } from './ui/SplitScreenDialog'
 
 const errorMessage = {
   isOpen: false,
@@ -25,6 +26,7 @@ export default function Header() {
   const _tenantId = Number(Cookies.get('tenant_id'));
   const [alertState, setAlertState] = useState(errorMessage);
   const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
+  const [isSplitDialogOpen, setIsSplitDialogOpen] = useState(false);
 
   const {
     setCampaigns,
@@ -56,7 +58,7 @@ export default function Header() {
       existingTabs.forEach(tab => {
         removeTab(tab.id, tab.uniqueKey);
       });
-  
+
       // 새로운 탭 추가
       const newTabKey = `${item.id}-${Date.now()}`;
       const newTab = {
@@ -65,14 +67,14 @@ export default function Header() {
         content: item.content || null
       };
       addTab(newTab);
-  
+
       // 탭을 추가한 후 활성 탭 설정
       setActiveTab(item.id, newTabKey);
     }
-    
+
     setCampaignIdForUpdateFromSideMenu(null);
   };
-  
+
 
   const isTabOpened = (itemId: number) => {
     const existingTabs = openedTabs.filter(tab => tab.id === itemId);
@@ -250,7 +252,34 @@ export default function Header() {
                 );
               })}
             </nav>
+            <div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsSplitDialogOpen(true)}
+                  className="flex items-center gap-2 text-gray-600 hover:bg-gray-50"
+                >
+                  {/* 화면 분할에 어울리는 아이콘 lucide icon*/}
+                  <LayoutGrid size={16} />
+                  <span className="text-xs">화면 분할</span>
+                </Button>
+                <SplitScreenDialog
+                  isOpen={isSplitDialogOpen}
+                  onClose={() => setIsSplitDialogOpen(false)}
+                  tabs={openedTabs}
+                  onApply={() => {
+                    // 여기에 화면 분할 적용 로직 추가
+                    setIsSplitDialogOpen(false);
+                  }}
+                />
+              </div>
+
+            </div>
           </div>
+
+
         </div>
       </header>
       <CustomAlert
