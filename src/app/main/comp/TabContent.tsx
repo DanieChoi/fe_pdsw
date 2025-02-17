@@ -18,6 +18,7 @@ import AgentStatusMonitoring from "./AgentStatusMonitoring";
 import SystemMonitoring from "./SystemMonitoring";
 import CampaignClonePanel from "@/widgets/sidebar/pannels/CampaignClonePanel";
 import IntegratedMonitoringDashboard from "./IntegratedMonitoringDashboard";
+import { SkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/SkillAssignmentTab";
 
 // 탭 ID별 실제 화면을 매핑하는 함수
 const renderContent = (tabId: number | null) => {
@@ -62,6 +63,15 @@ const renderContent = (tabId: number | null) => {
       return <>잘못된 스킬 할당 탭입니다.</>;
     case 130: // 캠페인 복사 화면 리턴
       return <CampaignClonePanel />;
+    case 500:
+        return (
+          <div className="flex justify-left w-full">
+            <div className="max-w-[500px] w-full">
+              <SkillAssignmentTab counselorId={""} />
+            </div>
+          </div>
+        );
+      
 
     default:
       return (
