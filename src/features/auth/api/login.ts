@@ -104,9 +104,18 @@ export const loginApi = {
       }
 
       //SSE 실시간 이벤트 구독
-      const eventSource = new EventSource("/api/v1/notification/0/subscribe");
+      let tenant_id;
+
+      if (data.role_id == 5 || data.role_id == 6) {
+        tenant_id = 0;
+      } else {
+        tenant_id = data.tenant_id;
+      }
+
+      const eventSource = new EventSource("/api/v1/notification/" + tenant_id + "/subscribe");
 
       eventSource.addEventListener("message", (event) => {
+        //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
         console.log("event = ", event.data);
       });
 
