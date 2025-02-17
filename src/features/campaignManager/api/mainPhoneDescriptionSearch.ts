@@ -16,7 +16,7 @@ export const fetchPhoneDescriptions = async (credentials: CampaignCredentials): 
     },
     page: {
       index: 1,
-      items: 10,
+      items: 9999999,
     },
   };
 
