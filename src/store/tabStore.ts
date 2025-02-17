@@ -48,6 +48,10 @@ export interface TabLayoutStore {
 
   // 스킬 할당에 사용하던 부가 정보들
   campaignIdForUpdateFromSideMenu: string | null;
+
+  // 캠페인 복사용 아이디
+  campaignIdForCopyCampaign: string | null;
+
   counselorSkillAssignmentInfo: {
     tenantId: string | null;
     counselorId: string | null;
@@ -63,6 +67,7 @@ export interface TabLayoutStore {
       | null
   ) => void;
   setCampaignIdForUpdateFromSideMenu: (id: string | null) => void;
+  setCampaignIdForCopyCampaign: (id: string | null) => void;
 
   // -----------------------------
   // 아래는 탭 관련 로직
@@ -165,6 +170,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     counselorName: null,
   },
   campaignIdForUpdateFromSideMenu: null,
+  campaignIdForCopyCampaign: null,
 
   // 헤더 메뉴 클릭
   simulateHeaderMenuClick: (menuId: number, campaignId?: string, label?: string) => {
@@ -212,6 +218,9 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
 
   setCampaignIdForUpdateFromSideMenu: (id) =>
     set({ campaignIdForUpdateFromSideMenu: id }),
+
+  setCampaignIdForCopyCampaign: (id) =>
+    set({ campaignIdForCopyCampaign: id }),
 
   // 특정 메뉴 id(예: 1,2,3...) 탭 개수 세기
   getTabCountById: (menuId: number) => {
