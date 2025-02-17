@@ -6,9 +6,7 @@ import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiF
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
-import CampaignManagerHeader, { CampaignHeaderSearch } from '@/app/main/comp/CampaignManager/CampaignManagerHeader';
-import CampaignManagerList from '@/app/main/comp/CampaignManager/CampaignManagerList';
-import CampaignManagerDetail from '@/app/main/comp/CampaignManager/CampaignManagerDetail';
+import CampaignCloneDetail from './CampaignCloneDetail';
 
 type Props = {
   campaignId?: string;
@@ -16,15 +14,10 @@ type Props = {
 
 const CampaignClonePanel = ({ campaignId }: Props) => {
   const { tenants } = useMainStore();
-  const { campaignIdForUpdateFromSideMenu } = useTabStore();
+  const { campaignIdForCopyCampaign } = useTabStore();
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
   
-  const [campaignHeaderSearchParam, setCampaignHeaderSearchParam] = useState<CampaignHeaderSearch>();
-  const handleCampaignHeaderSearch = (param: CampaignHeaderSearch) => {
-    setCampaignHeaderSearchParam(param);
-  };
-
   // 스케줄 조회
   const { mutate: fetchSchedules } = useApiForSchedules({
     onSuccess: (data) => {
@@ -88,16 +81,8 @@ const CampaignClonePanel = ({ campaignId }: Props) => {
   return (
     <div>
       <div className='flex flex-col gap-4 limit-width'>
-        <CampaignManagerHeader 
-          campaignId={campaignIdForUpdateFromSideMenu || ''} 
-          onSearch={handleCampaignHeaderSearch}
-        />
         <div className="flex gap-5">
-          <CampaignManagerList 
-            campaignId={campaignIdForUpdateFromSideMenu || ''} 
-            campaignHeaderSearchParam={campaignHeaderSearchParam}
-          />
-          <CampaignManagerDetail />
+          <CampaignCloneDetail />
         </div>
       </div>
     </div>
