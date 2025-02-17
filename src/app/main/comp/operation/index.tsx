@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CampaignLayout from './CampaignNumberChange/CampaignLayout'
 import EditDescription from './NumberEditDescription/EditDescription'
 import CallLimitSetting from './CallLimitSetting'
@@ -9,9 +9,19 @@ import SkillEdit from './SkillEdit'
 import ConsultResultSetting from './ConsultResultSetting'
 import SuspendView from './SuspendView'
 import Image from 'next/image'
+import { useTabStore } from '@/store'
 
 export default function OperationBoard() {
   const [openSectionId, setOpenSectionId] = useState<string>('section1')
+  const { activeTabId } = useTabStore()
+
+  useEffect(() => {
+    if (activeTabId === 8) {
+      setOpenSectionId('section3')
+    } else if (activeTabId === 9) {
+      setOpenSectionId('section4')
+    }
+  }, [activeTabId])
 
   const toggleSection = (sectionId: string) => {
     setOpenSectionId(openSectionId === sectionId ? '' : sectionId)

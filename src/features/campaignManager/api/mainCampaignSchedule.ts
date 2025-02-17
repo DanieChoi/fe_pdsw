@@ -18,7 +18,7 @@ export const fetchSchedules = async (credentials: SkillListCredentials): Promise
     },
     page: {
       index: 1,
-      items: 10,
+      items: 9999999,
     },
   };
 

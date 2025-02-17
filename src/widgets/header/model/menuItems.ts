@@ -4,7 +4,7 @@ export interface MenuItem {
   title: string;
   icon: string;
   href: string;
-  content: null;
+  content?: null;
   uniqueKey?: string;
 }
 
@@ -56,6 +56,13 @@ export const menuItems: MenuItem[] = [
     title: '채널 모니터', 
     icon: '/header-menu/채널모니터.svg', 
     href: '/channel',
+    content: null
+  },
+  { 
+    id: 23, 
+    title: '시스템모니터링', 
+    icon: '/header-menu/시스템모니터링.svg', 
+    href: '/settings',
     content: null
   },
   { 

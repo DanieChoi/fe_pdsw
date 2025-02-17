@@ -21,10 +21,10 @@ export const tabsData: TabData[] = [
             label: 'NEXUS_DEV',
             type: 'folder',
             children: [
-              { id: 'campaign1', label: '100번캠페인1', type: 'campaign', status: 'active', direction: 'inbound' },
+              { id: 'campaign1', label: '100번캠페인1', type: 'campaign', status: 'pending', direction: 'inbound' },
               { id: 'campaign2', label: '101번캠페인2', type: 'campaign', status: 'pending', direction: 'outbound' },
               { id: 'campaign3', label: '102번캠페인3', type: 'campaign', status: 'stopped', direction: 'inbound' },
-              { id: 'campaign4', label: '103번캠페인4', type: 'campaign', status: 'active', direction: 'outbound' },
+              { id: 'campaign4', label: '103번캠페인4', type: 'campaign', status: 'started', direction: 'outbound' },
               { id: 'cp1000', label: 'CP1000', type: 'campaign', status: 'pending', direction: 'inbound' },
               { id: '1111', label: '1111', type: 'campaign', status: 'stopped', direction: 'outbound' },
             ]
@@ -42,14 +42,14 @@ export const tabsData: TabData[] = [
         label: '상담원 목록',
         type: 'folder',
         children: [
-          { id: 'agent1', label: '상담원1', type: 'campaign', status: 'active', direction: 'inbound' },
+          { id: 'agent1', label: '상담원1', type: 'campaign', status: 'started', direction: 'inbound' },
           { id: 'agent2', label: '상담원2', type: 'campaign', status: 'pending', direction: 'outbound' },
           { 
             id: 'department1',
             label: '영업부',
             type: 'folder',
             children: [
-              { id: 'agent3', label: '상담원3', type: 'campaign', status: 'active', direction: 'inbound' },
+              { id: 'agent3', label: '상담원3', type: 'campaign', status: 'started', direction: 'inbound' },
               { id: 'agent4', label: '상담원4', type: 'campaign', status: 'stopped', direction: 'outbound' }
             ]
           }
@@ -71,7 +71,7 @@ export const tabsData: TabData[] = [
             label: '영업팀',
             type: 'folder',
             children: [
-              { id: 'subgroup1', label: '1팀', type: 'campaign', status: 'active', direction: 'inbound' },
+              { id: 'subgroup1', label: '1팀', type: 'campaign', status: 'started', direction: 'inbound' },
               { id: 'subgroup2', label: '2팀', type: 'campaign', status: 'pending', direction: 'outbound' }
             ]
           },
@@ -80,7 +80,7 @@ export const tabsData: TabData[] = [
             label: '고객지원팀',
             type: 'folder',
             children: [
-              { id: 'subgroup3', label: 'A팀', type: 'campaign', status: 'active', direction: 'inbound' },
+              { id: 'subgroup3', label: 'A팀', type: 'campaign', status: 'started', direction: 'inbound' },
               { id: 'subgroup4', label: 'B팀', type: 'campaign', status: 'stopped', direction: 'outbound' }
             ]
           }
@@ -99,7 +99,7 @@ export const agentTab: TabData = {
       label: '상담원 목록',
       type: 'folder',
       children: [
-        { id: 'agent1', label: '상담원1', type: 'campaign', status: 'active', direction: 'inbound' },
+        { id: 'agent1', label: '상담원1', type: 'campaign', status: 'started', direction: 'inbound' },
         { id: 'agent2', label: '상담원2', type: 'campaign', status: 'pending', direction: 'outbound' }
       ]
     }
@@ -115,7 +115,7 @@ export const agentGroupTab: TabData = {
       label: '그룹 목록',
       type: 'folder',
       children: [
-        { id: 'group1', label: '그룹1', type: 'campaign', status: 'active', direction: 'inbound' },
+        { id: 'group1', label: '그룹1', type: 'campaign', status: 'started', direction: 'inbound' },
         { id: 'group2', label: '그룹2', type: 'campaign', status: 'stopped', direction: 'outbound' }
       ]
     }

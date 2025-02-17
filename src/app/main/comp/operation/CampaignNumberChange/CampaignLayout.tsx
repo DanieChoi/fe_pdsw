@@ -18,10 +18,7 @@ type GridRow = MainDataResponse & {
 };
 
 function CampaignLayout() {
-  const { 
-    campaigns, 
-    setSelectedCampaign,
-  } = useMainStore();
+  const { campaigns, setSelectedCampaign } = useMainStore();
   const { callingNumbers, setCallingNumbers } = useCampainManagerStore();
   
   const [isModalOpen, setIsModalOpen] = useState(false);

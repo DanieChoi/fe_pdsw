@@ -1,5 +1,5 @@
 // src/features/auth/api/fetchCampaigns.ts
-import { axiosInstance } from '@/lib/axios';
+import { axiosInstance, axiosRedisInstance } from '@/lib/axios';
 import { MainCredentials, MainResponse } from '../types/mainIndex';
 
 // 캠페인 리스트 요청
@@ -16,7 +16,7 @@ export const fetchCampaigns = async (credentials: MainCredentials): Promise<Main
     },
     page: {
       index: 1,
-      items: 10,
+      items: 9999999,
     },
   };
 
@@ -36,8 +36,9 @@ export const fetchCampaigns = async (credentials: MainCredentials): Promise<Main
 
 export const fetchCounselorList = async (credentials: MainCredentials): Promise<any> => {
   try {
-    const { data } = await axiosInstance.get<any>(
-      `http://localhost:4000/api/v1/counselor/list?tenantId=${credentials.tenant_id}&roleId=${credentials.roleId}`
+    const { data } = await axiosRedisInstance.get<any>(
+      // `/api/v1/counselor/list?tenantId=${credentials.tenant_id}&roleId=${credentials.roleId}`
+      `/counselor/list?tenantId=${credentials.tenant_id}&roleId=${credentials.roleId}`
     );
     return data;
   } catch (error: any) {

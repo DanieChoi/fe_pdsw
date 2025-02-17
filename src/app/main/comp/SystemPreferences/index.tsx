@@ -5,10 +5,10 @@ import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import DataGrid, { CellClickArgs } from 'react-data-grid';
 import { useMainStore } from '@/store';
-import { ChannelListDataResponse, DialingDeviceListDataResponse } from '@/features/systemPreferences/types/SystemPreferences';
-import { useApiForChannelList } from '@/features/systemPreferences/hooks/useApiForChannelList';
-import { useApiForChannelEdit } from '@/features/systemPreferences/hooks/useApiForChannelEdit';
-import { useApiForDialingDevice, useApiForDialingDeviceCreate, useApiForDialingDeviceUpdate } from '@/features/systemPreferences/hooks/useApiForDialingDevice';
+import { ChannelListDataResponse, DialingDeviceListDataResponse } from '@/features/preferences/types/SystemPreferences';
+import { useApiForChannelList } from '@/features/preferences/hooks/useApiForChannelList';
+import { useApiForChannelEdit } from '@/features/preferences/hooks/useApiForChannelEdit';
+import { useApiForDialingDevice, useApiForDialingDeviceCreate, useApiForDialingDeviceUpdate } from '@/features/preferences/hooks/useApiForDialingDevice';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 
 interface EquipmentRow {

@@ -5,7 +5,7 @@ import { fetchCounselorList } from "@/features/auth/api/main";
 import { MainCredentials } from "@/features/auth/types/mainIndex";
 
 // TOFIX updatecapmaign 은 cmapaign master 으로 수정으로 구현 예정 
-function getStatusFromFlags(start_flag: number): string {
+function getStatusFromFlags(start_flag: number): 'started' | 'pending' | 'stopped' {
   if (start_flag === 1) return 'started';      // 종료된 상태
   if (start_flag === 2) return 'pending';    // 대기 상태
   if (start_flag === 3) return 'stopped';     // 진행중 

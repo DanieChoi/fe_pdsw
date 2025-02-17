@@ -16,7 +16,7 @@ const MenuButton: React.FC<MenuButtonProps> = ({ item }) => {
     if (e.ctrlKey && openedTabs.some(tab => tab.id === item.id)) {
       duplicateTab(item.id);
     } else if (!openedTabs.some(tab => tab.id === item.id)) {
-      addTab({ ...item, uniqueKey: item.uniqueKey ?? '' });
+      addTab({ ...item, uniqueKey: item.uniqueKey ?? '', content: item.content ?? null });
     }
   };
 

@@ -860,6 +860,12 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         tenant_id_array: tempTenantIdArray
       });      
     }
+    ,onError: (data) => {
+      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
+      fetchSchedules({
+        tenant_id_array: tempTenantIdArray
+      });      
+    }
   });
   
   //캠페인 발신 속도 수정 api 호출

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Eye, EyeOff } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from "@/components/ui/checkbox";
 import { useApiForLogin } from '@/features/auth/hooks/useApiForLogin';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { useAuthStore } from '@/store/authStore';
 interface LoginFormData {
   user_name: string;
   password: string;
+  remember: boolean;
 }
 
 export default function LoginPage() {
@@ -21,7 +23,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<LoginFormData>({
     user_name: '',
-    password: ''
+    password: '',
+    remember: false
   });
   const [isPending, setIsPending] = useState(false);
   const [alertState, setAlertState] = useState({
@@ -30,24 +33,6 @@ export default function LoginPage() {
     title: '로그인',
     type: '0',
   });
-
-  
-
-  // const { mutate: login } = useApiForLogin({
-  //   onSuccess: () => {
-  //     setIsPending(false);
-  //     router.push('/main');
-  //   },
-  //   onError: (e) => {
-  //     setAlertState({
-  //       isOpen: true,
-  //       message: e.message,
-  //       title: '로그인',
-  //       type: '0',
-  //     });
-  //     setIsPending(false);
-  //   },
-  // });
 
   const { setAuth } = useAuthStore();
 
@@ -63,6 +48,14 @@ export default function LoginPage() {
         data.session_key, // session_key
         data.role_id     // role_id 추가
       );
+
+      // 기억하기가 체크되어 있다면 로컬 스토리지에 저장
+      if (formData.remember) {
+        localStorage.setItem('remembered_username', formData.user_name);
+      } else {
+        localStorage.removeItem('remembered_username');
+      }
+
       router.push('/main');
     },
     onError: (e) => {
@@ -82,31 +75,38 @@ export default function LoginPage() {
     login(formData);
   };
 
+  // 컴포넌트 마운트 시 저장된 사용자 이름 불러오기
   useEffect(() => {
-    // console.log('useEffect');
-    // console.log('isPending', isPending);
+    const rememberedUsername = localStorage.getItem('remembered_username');
+    if (rememberedUsername) {
+      setFormData(prev => ({
+        ...prev,
+        user_name: rememberedUsername,
+        remember: true
+      }));
+    }
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center ">
+    <div className="min-h-screen flex flex-col justify-center items-center">
       <Card className="w-[500px] shadow-none border-0 py-7 px-10">
-          <div className="flex mb-8 mb-70">
-              <Image 
-              src="/logo/pds-logo.svg" 
-              alt="NEXPDS" 
-              width={230}
-              height={51}
-              className=""
-              priority
-            />
-          </div>
+        <div className="flex mb-8 mb-70">
+          <Image
+            src="/logo/pds-logo.svg"
+            alt="NEXPDS"
+            width={230}
+            height={51}
+            className=""
+            priority
+          />
+        </div>
         <CardContent className="p-0">
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div className="relative">
-                <Image 
-                  src="/logo/icon_id.svg" 
-                  alt="id" 
+                <Image
+                  src="/logo/icon_id.svg"
+                  alt="id"
                   width={14}
                   height={16}
                   className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
@@ -120,11 +120,11 @@ export default function LoginPage() {
                   disabled={isPending}
                 />
               </div>
-              
+
               <div className="relative">
-                <Image 
-                  src="/logo/icon_pw.svg" 
-                  alt="id" 
+                <Image
+                  src="/logo/icon_pw.svg"
+                  alt="id"
                   width={14}
                   height={19}
                   className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10"
@@ -152,20 +152,36 @@ export default function LoginPage() {
                   </button>
                 </div>
               </div>
+
+              <div className="flex items-center justify-end space-x-2">
+                <Checkbox
+                  id="remember"
+                  checked={formData.remember}
+                  onCheckedChange={(checked) =>
+                    setFormData(prev => ({ ...prev, remember: checked as boolean }))
+                  }
+                  className="h-5 w-5 rounded-full border-2 border-gray-300 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 transition-colors duration-200"
+                />
+                <label
+                  htmlFor="remember"
+                  className="text-sm font-medium text-gray-600 cursor-pointer select-none"
+                >
+                  기억하기
+                </label>
+              </div>
             </div>
 
-            <Button 
+            <Button
               variant="login"
-              type="submit" 
+              type="submit"
               className="mt-100"
-              // disabled={isLoading}
             >
               {isPending ? '로그인 중...' : '로그인'}
-            </Button>          
+            </Button>
           </form>
         </CardContent>
       </Card>
-      
+
       <p className="footer-text">
         © {new Date().getFullYear()} NEXUS COMMUNITY All rights reserved.
       </p>

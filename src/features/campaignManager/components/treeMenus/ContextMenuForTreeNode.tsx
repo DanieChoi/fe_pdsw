@@ -11,18 +11,20 @@ import {
 } from "@/components/ui/context-menu";
 import { useTabStore } from "@/store/tabStore";
 import { Edit, Copy, Activity, Trash2, Monitor, Settings, Search, List, Clock, History, UserCheck, Shield, RefreshCcw } from "lucide-react";
+import { CampaignStatus } from "./CampaignContextMenuForTreeNode";
 
 interface ContextMenuForTreeNodeProps {
   children: React.ReactNode;
   item: {
-    type: string;
     id: string;
     label: string;
+    type: any;
+    status: CampaignStatus; // status를 필수값으로 변경
   };
   onEdit: () => void;
   onDelete: () => void;
   onMonitor: () => void;
-  onCopy: () => void;
+  onHandleCampaignCopy: () => void;
 }
 
 // export function ContextMenuForTreeNode({
@@ -125,7 +127,7 @@ export function ContextMenuForTreeNode({
   onEdit,
   onDelete,
   onMonitor,
-  onCopy,
+  onHandleCampaignCopy,
 }: ContextMenuForTreeNodeProps) {
   const isFolder = item.type === "folder";
   const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu } = useTabStore();
@@ -200,7 +202,7 @@ export function ContextMenuForTreeNode({
           캠페인 모니터링
         </ContextMenuItem>
 
-        <ContextMenuItem onClick={onCopy}>
+        <ContextMenuItem onClick={onHandleCampaignCopy}>
           <Copy className="mr-2 h-4 w-4" />
           캠페인 복사
         </ContextMenuItem>

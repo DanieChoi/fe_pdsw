@@ -1,7 +1,7 @@
 import { axiosInstance } from "@/lib/axios";
-import { ChannelEditRequest, ChannelEditResponse } from "../types/SystemPreferences"
+import { ChannelEditRequest, SuccesResponse } from "../types/SystemPreferences"
 
-export const fetchChannelEdit = async (credentials: ChannelEditRequest): Promise<ChannelEditResponse> => {
+export const fetchChannelEdit = async (credentials: ChannelEditRequest): Promise<SuccesResponse> => {
     const channelEditRequestData = {
         request_data: {
             device_id: credentials.device_id,
@@ -12,7 +12,7 @@ export const fetchChannelEdit = async (credentials: ChannelEditRequest): Promise
     };
 
     try {
-        const { data } = await axiosInstance.put<ChannelEditResponse>(
+        const { data } = await axiosInstance.put<SuccesResponse>(
             '/channel-assign',
             channelEditRequestData
         );

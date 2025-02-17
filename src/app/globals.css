@@ -127,9 +127,9 @@ input::placeholder {
   position: relative;
 }
 .menu-item:nth-child(2)::after, 
-.menu-item:nth-child(7)::after, 
-.menu-item:nth-child(8)::after,
-.menu-item:nth-child(10)::after
+.menu-item:nth-child(8)::after, 
+.menu-item:nth-child(9)::after,
+.menu-item:nth-child(11)::after
  {
   content: '';
   position: absolute;
@@ -204,11 +204,12 @@ input::placeholder {
 .table-custom th{
   background: #F8F8F8;
   text-align: left;
-  padding: 3px 15px;
+  padding: 0px 15px;
   border-bottom: 1px solid hsl(var(--border));
 }
 .table-custom td{
   border-bottom: 1px solid hsl(var(--border));
+  padding: 2px 15px;
 }
 .table-custom tr:first-child th:first-child {
   border-top-left-radius: 3px; /* 왼쪽 위 둥글게 */
@@ -229,6 +230,20 @@ input::placeholder {
 .table-custom tr:last-child td:last-child {
   border-bottom-right-radius: 3px; /* 오른쪽 아래 둥글게 */
 }
+
+
+.table-custom.table-continued{
+  border-bottom: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0px;
+}
+.table-custom.table-continued tr:last-child th:first-child{
+  border-bottom-left-radius: 0;
+}
+.table-custom.table-continued tr:last-child td:last-child{
+  border-bottom-right-radius: 0px;
+}
+
 
 /*tab 커스텀*/
 .tab-custom-wrap {

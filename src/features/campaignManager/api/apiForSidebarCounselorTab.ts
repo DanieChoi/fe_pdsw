@@ -1,11 +1,11 @@
-// C:\Users\terec\fe_pdsw\src\features\campaignManager\api\apiForSidebarCounselorTab2.ts
+// C:\Users\terec\fe_pdsw\src\features\campaignManager\api\apiForSidebarCounselorTab.ts
 import { MainCredentials2 } from "@/features/auth/types/mainIndex";
-import { axiosInstance } from "@/lib/axios";
+import { axiosInstance, axiosRedisInstance } from "@/lib/axios";
 import { Counselor, CounselorNode, GroupNode, TabData, TeamNode, TenantNode } from "../types/typeForSideBarCounselorTab";
 
 export async function apiForTreeMenuDataForSimeBarCounselorTab(credentials: MainCredentials2) {
   const { tenant_id, roleId } = credentials;
-  const response = await axiosInstance.get(
+  const response = await axiosRedisInstance.get(
     `/counselor/list?tenantId=${tenant_id}&roleId=${roleId}`
   );
   return response.data;

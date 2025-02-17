@@ -6,6 +6,7 @@ import { create } from "zustand";
 import React from "react";
 import { menuItems } from "@/widgets/header/model/menuItems";
 import { simulateMenuClick } from "@/widgets/header/utils";
+import { contextMenuItems } from "@/widgets/header/model/contextMenuItems";
 
 export interface TabItem {
   id: number;
@@ -47,6 +48,10 @@ export interface TabLayoutStore {
 
   // 스킬 할당에 사용하던 부가 정보들
   campaignIdForUpdateFromSideMenu: string | null;
+
+  // 캠페인 복사용 아이디
+  campaignIdForCopyCampaign: string | null;
+
   counselorSkillAssignmentInfo: {
     tenantId: string | null;
     counselorId: string | null;
@@ -62,6 +67,7 @@ export interface TabLayoutStore {
       | null
   ) => void;
   setCampaignIdForUpdateFromSideMenu: (id: string | null) => void;
+  setCampaignIdForCopyCampaign: (id: string | null) => void;
 
   // -----------------------------
   // 아래는 탭 관련 로직
@@ -173,6 +179,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
     counselorName: null,
   },
   campaignIdForUpdateFromSideMenu: null,
+  campaignIdForCopyCampaign: null,
 
   splitMode: false,
   splitLayout: 'none',
@@ -181,28 +188,37 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
   setSplitLayout: (layout) => set({ splitLayout: layout }),
 
   // 헤더 메뉴 클릭
-  simulateHeaderMenuClick: (menuId: number) => {
-    const menuItem = menuItems.find(item => item.id === menuId);
+  simulateHeaderMenuClick: (menuId: number, campaignId?: string, label?: string) => {
+    // 먼저 헤더 메뉴에서 찾기
+    let menuItem = menuItems.find(item => item.id === menuId);
+    
+    // 없으면 컨텍스트 메뉴에서 찾기
+    if (!menuItem) {
+      menuItem = contextMenuItems.find(item => item.id === menuId);
+    }
+    
     if (!menuItem) return;
-
+  
     // 기존 탭들 제거
     const existingTabs = get().openedTabs.filter(tab => tab.id === menuId);
     existingTabs.forEach(tab => {
       get().removeTab(tab.id, tab.uniqueKey);
     });
-
+  
     // 새로운 탭 추가
-    const newTabKey = `${menuId}-${Date.now()}`;
+    const newTabKey = `${menuId}-${campaignId ? campaignId : ''}-${Date.now()}`;
     const newTab = {
       ...menuItem,
       uniqueKey: newTabKey,
-      content: menuItem.content || null
+      content: menuItem.content || null,
+      campaignId: campaignId || undefined,
+      title: label ? `${menuItem.title} - ${label}` : menuItem.title
     };
     get().addTab(newTab);
-
+  
     // 탭을 추가한 후 활성 탭 설정
     get().setActiveTab(menuId, newTabKey);
-    get().setCampaignIdForUpdateFromSideMenu(null);
+    get().setCampaignIdForUpdateFromSideMenu(campaignId || null);
   },
 
   // ------------------------
@@ -217,6 +233,9 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
 
   setCampaignIdForUpdateFromSideMenu: (id) =>
     set({ campaignIdForUpdateFromSideMenu: id }),
+
+  setCampaignIdForCopyCampaign: (id) =>
+    set({ campaignIdForCopyCampaign: id }),
 
   // 특정 메뉴 id(예: 1,2,3...) 탭 개수 세기
   getTabCountById: (menuId: number) => {

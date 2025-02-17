@@ -12,7 +12,7 @@ interface DraggableTabProps {
   id: number;
   uniqueKey: string;
   title: string;
-  icon: string;
+  //icon: string;
   isActive: boolean;
   onRemove: () => void;
   onSelect: () => void;
@@ -26,7 +26,7 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
   id,
   uniqueKey,
   title,
-  icon,
+  //icon,
   isActive,
   onRemove,
   onSelect,
@@ -61,7 +61,7 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
       `}
       onClick={onSelect}
     >
-      {icon && (
+      {/* {icon && (
         <Image
           src={icon}
           alt={title}
@@ -69,7 +69,7 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
           height={16}
           className="flex-none object-contain"
         />
-      )}
+      )} */}
       <span className="text-sm whitespace-nowrap">{title}</span>
       <Button
         variant="ghost"

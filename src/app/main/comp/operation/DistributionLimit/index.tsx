@@ -6,7 +6,7 @@ import { CustomInput } from "@/components/shared/CustomInput";
 import { Label } from "@/components/ui/label";
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import CampaignModal from '../CampaignModal';
-
+import { useMainStore } from '@/store';
 
 interface Row {
   center: string;
@@ -20,10 +20,11 @@ interface Row {
 }
 
 const DistributionLimit = () => {
+  const { campaigns, setSelectedCampaign } = useMainStore();
   const [selectedRow, setSelectedRow] = useState<Row | null>(null);
+  const [selectedCampaignId, setSelectedCampaignId] = useState('');
+  const [selectedCampaignName, setSelectedCampaignName] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [campaignId, setCampaignId] = useState('');
-  const [campaignName, setCampaignName] = useState('');
   
   const [formData, setFormData] = useState({
     center: '',
@@ -44,6 +45,84 @@ const DistributionLimit = () => {
     onConfirm: () => {},
     onCancel: () => {}
   });
+
+  const showAlert = (message: string) => {
+    setAlertState({
+      isOpen: true,
+      message,
+      title: '알림',
+      type: '1',
+      onConfirm: closeAlert,
+      onCancel: () => {}
+    });
+  };
+
+  const showConfirm = (message: string, onConfirm: () => void) => {
+    setAlertState({
+      isOpen: true,
+      message,
+      title: '확인',
+      type: '2',
+      onConfirm: () => {
+        onConfirm();
+        closeAlert();
+      },
+      onCancel: closeAlert
+    });
+  };
+
+  // 캠페인 ID Select 변경 핸들러
+  const handleCampaignIdChange = (value: string) => {
+    setSelectedCampaignId(value);
+    const campaign = campaigns.find(c => c.campaign_id.toString() === value);
+    if (campaign) {
+      setSelectedCampaignName(campaign.campaign_name);
+      setSelectedCampaign(campaign);
+    }
+  };
+
+  // 캠페인 모달에서 선택 시 핸들러
+  const handleModalSelect = (campaignId: string, campaignName: string) => {
+    setSelectedCampaignId(campaignId);
+    setSelectedCampaignName(campaignName);
+    const campaign = campaigns.find(c => c.campaign_id === Number(campaignId));
+    if (campaign) {
+      setSelectedCampaign(campaign);
+    }
+  };
+
+  const [isTimeSettingOpen, setIsTimeSettingOpen] = useState(false);
+  const [isTimeRemoveOpen, setIsTimeRemoveOpen] = useState(false);
+  const [timeValue, setTimeValue] = useState('');
+
+  const handleTimeSettingSave = () => {
+    if (!timeValue) {
+      showAlert('시간을 입력해주세요.');
+      return;
+    }
+    console.log('Save time setting:', timeValue);
+    setIsTimeSettingOpen(false);
+  };
+
+  const handleTimeRemove = () => {
+    console.log('Remove time setting');
+    setIsTimeRemoveOpen(false);
+  };
+
+  const closeAlert = () => {
+    setAlertState(prev => ({ ...prev, isOpen: false }));
+  };
+
+  const handleSave = () => {
+    if (!formData.center || !formData.agentId) {
+      showAlert('필수 필드를 입력해주세요.');
+      return;
+    }
+
+    showConfirm('저장하시겠습니까?', () => {
+      console.log('Save:', formData);
+    });
+  };
 
   const columns = useMemo(() => [
     { key: 'center', name: '상담센터' },
@@ -79,69 +158,6 @@ const DistributionLimit = () => {
     }
   ];
 
-  const showAlert = (message: string) => {
-    setAlertState({
-      isOpen: true,
-      message,
-      title: '알림',
-      type: '1',
-      onConfirm: closeAlert,
-      onCancel: () => {}
-    });
-  };
-
-  const showConfirm = (message: string, onConfirm: () => void) => {
-    setAlertState({
-      isOpen: true,
-      message,
-      title: '확인',
-      type: '2',
-      onConfirm: () => {
-        onConfirm();
-        closeAlert();
-      },
-      onCancel: closeAlert
-    });
-  };
-
-
-  // 초기화 시간 설정 관련 state들 추가
-  const [isTimeSettingOpen, setIsTimeSettingOpen] = useState(false);
-  const [isTimeRemoveOpen, setIsTimeRemoveOpen] = useState(false);
-  const [timeValue, setTimeValue] = useState('');
-
-
-  // 초기화 시간 설정 핸들러
-  const handleTimeSettingSave = () => {
-    if (!timeValue) {
-      showAlert('시간을 입력해주세요.');
-      return;
-    }
-    console.log('Save time setting:', timeValue);
-    setIsTimeSettingOpen(false);
-  };
-
-  // 초기화 시간 설정 해제 핸들러
-  const handleTimeRemove = () => {
-    console.log('Remove time setting');
-    setIsTimeRemoveOpen(false);
-  };
-
-  const closeAlert = () => {
-    setAlertState(prev => ({ ...prev, isOpen: false }));
-  };
-
-  const handleSave = () => {
-    if (!formData.center || !formData.agentId) {
-      showAlert('필수 필드를 입력해주세요.');
-      return;
-    }
-
-    showConfirm('저장하시겠습니까?', () => {
-      console.log('Save:', formData);
-    });
-  };
-
   const handleCellClick = ({ row }: { row: Row }) => {
     setSelectedRow(row);
     setFormData({
@@ -170,10 +186,6 @@ const DistributionLimit = () => {
     });
   };
 
-  const handleCampaignSelect = (name: string) => {
-    setCampaignName(name);
-  };
-
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -188,28 +200,39 @@ const DistributionLimit = () => {
         <div className="flex gap-4 items-center">
           <div className="flex items-center gap-2">
             <Label className="w-20 min-w-20">캠페인 아이디</Label>
-            <Select>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="캠페인선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='test1'>test</SelectItem>
-                  <SelectItem value='test2'>test2</SelectItem>
-                  <SelectItem value='test3'>test3</SelectItem>
-                  <SelectItem value='test4'>test4</SelectItem>
-                  <SelectItem value='test5'>test5</SelectItem>
-                </SelectContent>
-              </Select>
+            <Select
+              value={selectedCampaignId}
+              onValueChange={handleCampaignIdChange}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="캠페인선택" />
+              </SelectTrigger>
+              <SelectContent>
+                {campaigns.map(campaign => (
+                  <SelectItem 
+                    key={campaign.campaign_id} 
+                    value={campaign.campaign_id.toString()}
+                  >
+                    {campaign.campaign_id}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <CommonButton 
             variant="outline" 
             size="sm"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setSelectedCampaignId('');
+              setSelectedCampaignName('');
+              setSelectedCampaign(null);
+              setIsModalOpen(true);
+            }}
           >
             캠페인조회
           </CommonButton>
           <CustomInput 
-            value={campaignName}
+            value={selectedCampaignName}
             readOnly 
             className="w-[140px]"
             disabled={true}
@@ -220,7 +243,7 @@ const DistributionLimit = () => {
         </div>
         <div className="flex gap-2">
           <CommonButton onClick={() => setIsTimeSettingOpen(true)}>초기화시간 변경</CommonButton>
-          <CommonButton  onClick={() => setIsTimeRemoveOpen(true)}>초기화시간 설정해제</CommonButton>
+          <CommonButton onClick={() => setIsTimeRemoveOpen(true)}>초기화시간 설정해제</CommonButton>
           <CommonButton>적용</CommonButton>
         </div>
       </div>
@@ -365,7 +388,7 @@ const DistributionLimit = () => {
         <CampaignModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onSelect={handleCampaignSelect}
+          onSelect={handleModalSelect}
         />
 
         <CustomAlert
@@ -387,7 +410,6 @@ const DistributionLimit = () => {
           onClose={handleTimeSettingSave}
           onCancle={() => setIsTimeSettingOpen(false)}
         />
-
 
         <CustomAlert
           isOpen={isTimeRemoveOpen}

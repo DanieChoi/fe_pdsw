@@ -1,12 +1,5 @@
-// src/app/main/comp/TabContent.tsx
-"use client";
-
-import React from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { useTabStore } from "@/store/tabStore";
-
-// ─────────────────────────────────────────────────────────────────────────
-// 원래 코드에서 사용하던 실제 컴포넌트들 임포트
-// ─────────────────────────────────────────────────────────────────────────
 import PreferencesBoard from "./preferences";
 import SystemPreferences from "./SystemPreferences";
 import Campaignprogress from "./Campaignprogress";
@@ -21,6 +14,11 @@ import CampaignGroupManager from "./CampaignGroupManager";
 import NewCampaignManager from "./NewCampaignManager";
 import RebroadcastSettingsPanel from "./RebroadcastSettingsPanel";
 import CampaignManager from "./CampaignManager";
+import AgentStatusMonitoring from "./AgentStatusMonitoring";
+import SystemMonitoring from "./SystemMonitoring";
+import CampaignClonePanel from "@/widgets/sidebar/pannels/CampaignClonePanel";
+import IntegratedMonitoringDashboard from "./IntegratedMonitoringDashboard";
+import { SkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/SkillAssignmentTab";
 
 // 탭 ID별 실제 화면을 매핑하는 함수
 const renderContent = (tabId: number | null) => {
@@ -30,9 +28,9 @@ const renderContent = (tabId: number | null) => {
     case 2:
       return <CampaignManager />;
     case 3:
-      return <>통합모니터 컨텐츠</>;
+      return <IntegratedMonitoringDashboard />;
     case 4:
-      return <Campaignprogress />; //총진행상황 상단 탭
+      return <Campaignprogress />; 
     case 5:
       return <OutboundCallProgressPanel />;
     case 6:
@@ -40,9 +38,9 @@ const renderContent = (tabId: number | null) => {
     case 7:
       return <ListManager />;
     case 8:
-      return <>예약콜 제한 설정 컨텐츠</>;
+      return <OperationBoard />;
     case 9:
-      return <>분배호수 제한 설정 컨텐츠</>;
+      return <OperationBoard />;
     case 10:
       return <SystemPreferences />;
     case 11:
@@ -54,9 +52,26 @@ const renderContent = (tabId: number | null) => {
     case 14:
       return <StatusCampaign />;
     case 20:
-      return <RebroadcastSettingsPanel />;
+      return <RebroadcastSettingsPanel />; 
+    case 21:
+      return <CampaignMonitorDashbord />;
+    case 22:
+      return <AgentStatusMonitoring />;
+    case 23:
+        return <SystemMonitoring />;
     case 100:
       return <>잘못된 스킬 할당 탭입니다.</>;
+    case 130: // 캠페인 복사 화면 리턴
+      return <CampaignClonePanel />;
+    case 500:
+        return (
+          <div className="flex justify-left w-full">
+            <div className="max-w-[500px] w-full">
+              <SkillAssignmentTab counselorId={""} />
+            </div>
+          </div>
+        );
+      
 
     default:
       return (
@@ -69,36 +84,117 @@ const renderContent = (tabId: number | null) => {
 
 const TabContent = () => {
   const { rows, activeTabId, activeTabKey, setActiveTab } = useTabStore();
+  const [isDragging, setIsDragging] = useState(false);
+  const dragRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const widthsRef = useRef({ left: 50, right: 50 });
+  const startXRef = useRef(0);
+  const [sections, setSections] = useState(rows[0]?.sections || []);
+
+  // Performance optimization using requestAnimationFrame
+  const updateWidths = useCallback((leftWidth: number) => {
+    const clampedLeft = Math.max(20, Math.min(80, leftWidth));
+    const right = 100 - clampedLeft;
+    
+    requestAnimationFrame(() => {
+      if (sections.length === 2) {
+        const newSections = [...sections];
+        newSections[0] = { ...newSections[0], width: clampedLeft };
+        newSections[1] = { ...newSections[1], width: right };
+        setSections(newSections);
+        widthsRef.current = { left: clampedLeft, right };
+      }
+    });
+  }, [sections]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    
+    setIsDragging(true);
+    startXRef.current = e.clientX;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none'; // Prevent text selection while dragging
+  }, []);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging || !containerRef.current) return;
+
+    const container = containerRef.current.getBoundingClientRect();
+    const deltaX = e.clientX - startXRef.current;
+    const containerWidth = container.width;
+    
+    // Calculate new width based on delta movement
+    const deltaPercentage = (deltaX / containerWidth) * 100;
+    const newLeftWidth = widthsRef.current.left + deltaPercentage;
+    
+    updateWidths(newLeftWidth);
+    startXRef.current = e.clientX;
+  }, [isDragging, updateWidths]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+    document.body.style.cursor = 'default';
+    document.body.style.userSelect = 'auto';
+  }, []);
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('mouseleave', handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mouseleave', handleMouseUp);
+    };
+  }, [isDragging, handleMouseMove, handleMouseUp]);
+
+  // Update sections when rows change
+  useEffect(() => {
+    setSections(rows[0]?.sections || []);
+  }, [rows]);
 
   return (
-    <div className="flex flex-col w-full h-full overflow-auto bg-white">
+    <div ref={containerRef} className="flex flex-col w-full h-full overflow-auto bg-white">
       {rows.map((row) => (
         <div
           key={row.id}
-          className="flex w-full flex-1 border-b last:border-b-0"
+          className="flex w-full flex-1 border-b last:border-b-0 relative"
         >
-          {/* 각 Row 안에서 섹션들을 가로로 배치 */}
-          {row.sections.map((section) => {
+          {sections.map((section, index) => {
             const activeKey = section.activeTabKey;
             const activeTab = section.tabs.find((t) => t.uniqueKey === activeKey);
-
-            // 전역 activeTabId와 activeTabKey가 있는 경우 우선 반영
             const isActiveGlobal = activeTabId === activeTab?.id && activeTabKey === activeTab?.uniqueKey;
             const tabIdToRender = isActiveGlobal ? activeTabId : activeTab?.id ?? null;
 
             return (
-              <div
-                key={section.id}
-                className="p-2 overflow-auto cursor-pointer"
-                style={{ width: `${section.width}%` }}
-                onClick={() => {
-                  if (activeTab) {
-                    setActiveTab(activeTab.id, activeTab.uniqueKey);
-                  }
-                }}
-              >
-                {renderContent(tabIdToRender)}
-              </div>
+              <React.Fragment key={section.id}>
+                <div
+                  className="p-2 overflow-auto transition-all duration-75 ease-out"
+                  style={{
+                    width: `${section.width}%`,
+                    border: sections.length === 2 ? '1px solid #bbb' : 'none'
+                  }}
+                  onClick={() => {
+                    if (activeTab) {
+                      setActiveTab(activeTab.id, activeTab.uniqueKey);
+                    }
+                  }}
+                >
+                  {renderContent(tabIdToRender)}
+                </div>
+                {index === 0 && sections.length === 2 && (
+                  <div
+                    ref={dragRef}
+                    className="w-1 bg-gray-200 hover:bg-[#55BEC8] active:bg-[#55BEC8] cursor-col-resize select-none"
+                    onMouseDown={handleMouseDown}
+                    style={{
+                      touchAction: 'none',
+                    }}
+                  />
+                )}
+              </React.Fragment>
             );
           })}
         </div>

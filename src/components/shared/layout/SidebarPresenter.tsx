@@ -2,7 +2,7 @@ import { TabData, TreeItem, FilterType, SortType } from '@/features/campaignMana
 import { TabActions } from './comp/TabActions';
 
 interface TreeNodeProps {
-  item: TreeItem;
+  item: any;
   level: number;
   expandedNodes: Set<string>;
   selectedNodeId?: string;
@@ -66,7 +66,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
       </div>
       {hasChildren && isExpanded && (
         <div>
-          {item.children?.map(child => (
+          {item.children?.map((child: TreeItem) => (
             <TreeNode 
               key={child.id} 
               item={child} 

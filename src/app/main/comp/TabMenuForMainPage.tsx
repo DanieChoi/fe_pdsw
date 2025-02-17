@@ -46,14 +46,14 @@ const TabMenuForMainPage = () => {
                 `}
                 onClick={() => setActiveTab(tab.id, tab.uniqueKey)}
               >
-                <div className="w-4 h-4 relative">
+                {/* <div className="w-4 h-4 relative">
                   <Image
                     src={tab.icon}
                     alt={tab.title}
                     fill
                     className="object-contain"
                   />
-                </div>
+                </div> */}
                 <span className="text-sm whitespace-nowrap">{tab.title}</span>
               </Button>
               <Button

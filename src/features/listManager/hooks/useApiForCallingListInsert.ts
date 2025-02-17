@@ -15,7 +15,7 @@ export function useApiForCallingListInsert(
         code: data.result_code,
         message: data.result_msg,
         count: data.result_count,
-        total: data.total_count,
+        requestCount: data.request_count,
         data: data.result_data
       });
       options?.onSuccess?.(data, variables, context);

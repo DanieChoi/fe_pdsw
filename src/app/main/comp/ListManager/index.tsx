@@ -24,6 +24,8 @@ import { CallingListInsertDataType
   , CallingListInsertRequest
 } from '@/features/listManager/types/listManagerIndex';
 import { useApiForCallingListInsert } from '@/features/listManager/hooks/useApiForCallingListInsert';
+import { useApiForBlacklistInsert } from '@/features/listManager/hooks/useApiForBlacklistInsert';
+import { useApiForBlacklistDelete } from '@/features/listManager/hooks/useApiForBlacklistDelete';
 
 // 데이터그리드
 import DataGrid, { Column, CellClickArgs } from "react-data-grid";
@@ -76,14 +78,22 @@ const callListInsertDataType: CallingListInsertDataType = {
   phone_number5: '',
   reserved_time: '',
   token_data: ''
-}
+};
 
 // 발신 리스트 추가 요청 
 const callListInsertData: CallingListInsertRequest = {
   campaign_id: 0,
   list_flag: 'I',
   calling_list: [] as CallingListInsertDataType[]
-}
+};
+
+const progressListData: ProgressRow = 
+  {
+    id: 1,
+    datetime: "10:54:28",
+    message: "현재 작업을 진행 하겠습니다. 진행하겠습니다. [ 1 ]",
+  }
+;
 
 const errorMessage: CustomAlertRequest = {
   isOpen: false,
@@ -131,21 +141,121 @@ const ListManager: React.FC = () => {
   //캠페인 발신번호 추가 api 호출
   const { mutate: fetchCallingListInsert } = useApiForCallingListInsert({
     onSuccess: (data) => {   
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      if( data.result_code === 0){
+        const newProgressListData = { ...progressListData
+          , id: progressList.length+1
+          , datetime: hours + ':' + minutes + ':' + seconds
+          , message: '서버에 리스트 파일 등록 완료 : 총 ' + data.request_count + '건, 성공 ' + data.result_count + '건'
+        };
+        setProgressList(prev => [newProgressListData, ...prev]);
+      }else{
+        const newProgressListData = { ...progressListData
+          , id: progressList.length+1
+          , datetime: hours + ':' + minutes + ':' + seconds
+          , message: '서버에 리스트 파일 등록 에러 : ' + data.result_msg
+        };
+        setProgressList(prev => [newProgressListData, ...prev]);
+      }
+      setUploadedFiles([]);
+      setSendList([]);
+    }
+    , onError: (data) => {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      const newProgressListData = { ...progressListData
+        , id: progressList.length+1
+        , datetime: hours + ':' + minutes + ':' + seconds
+        , message: '파일 전송 도중 에러 : ' + data.message
+      };
+      setProgressList(prev => [newProgressListData, ...prev]);
     }
   });
   
-  const [progressList] = useState<ProgressRow[]>([
-    {
-      id: 1,
-      datetime: "10:54:28",
-      message: "현재 작업을 진행 하겠습니다. 진행하겠습니다. [ 1 ]",
-    },
-    {
-      id: 2,
-      datetime: "10:54:28",
-      message: "파일분석시작 : C:/Users/WDeskstop/Work/발신리스트_20250228.txt...",
-    },
-  ]);
+  // 블랙리스트 추가 api 호출
+  const { mutate: fetchBlacklistInsert } = useApiForBlacklistInsert({
+    onSuccess: (data) => {   
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      if( data.result_code === 0){
+        const newProgressListData = { ...progressListData
+          , id: progressList.length+1
+          , datetime: hours + ':' + minutes + ':' + seconds
+          , message: '서버에 리스트 파일 등록 완료 : 총 ' + data.request_count + '건, 성공 ' + data.result_count + '건'
+        };
+        setProgressList(prev => [newProgressListData, ...prev]);
+      }else{
+        const newProgressListData = { ...progressListData
+          , id: progressList.length+1
+          , datetime: hours + ':' + minutes + ':' + seconds
+          , message: '서버에 리스트 파일 등록 에러 : ' + data.result_msg
+        };
+        setProgressList(prev => [newProgressListData, ...prev]);
+      }
+      setUploadedFiles([]);
+      setSendList([]);
+    }
+    , onError: (data) => {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      const newProgressListData = { ...progressListData
+        , id: progressList.length+1
+        , datetime: hours + ':' + minutes + ':' + seconds
+        , message: '파일 전송 도중 에러 : ' + data.message
+      };
+      setProgressList(prev => [newProgressListData, ...prev]);
+    }
+  });
+
+  // 블랙리스트 업로드 취소 api 호출
+  const { mutate: fetchBlacklistDelete } = useApiForBlacklistDelete({
+    onSuccess: (data) => {   
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      if( data.result_code === 0){
+        const newProgressListData = { ...progressListData
+          , id: progressList.length+1
+          , datetime: hours + ':' + minutes + ':' + seconds
+          , message: '서버에 리스트 파일 등록 완료'
+        };
+        setProgressList(prev => [newProgressListData, ...prev]);
+      }else{
+        const newProgressListData = { ...progressListData
+          , id: progressList.length+1
+          , datetime: hours + ':' + minutes + ':' + seconds
+          , message: '서버에 리스트 파일 등록 에러 : ' + data.result_msg
+        };
+        setProgressList(prev => [newProgressListData, ...prev]);
+      }
+      setUploadedFiles([]);
+      setSendList([]);
+    }
+    , onError: (data) => {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      const newProgressListData = { ...progressListData
+        , id: progressList.length+1
+        , datetime: hours + ':' + minutes + ':' + seconds
+        , message: '파일 전송 도중 에러 : ' + data.message
+      };
+      setProgressList(prev => [newProgressListData, ...prev]);
+    }
+  });
+
+  const [progressList, setProgressList] = useState<ProgressRow[]>([]);
 
   // 모달 핸들러
   const handleFileFormatOpen = () => {    
@@ -174,6 +284,10 @@ const ListManager: React.FC = () => {
   // 파일 관련 핸들러
   const handleTargetTypeChange = (value: string) => {
     setTargetType(value as "general" | "blacklist");
+    setCallListInsertData({
+      ..._callListInsertData,
+      list_flag: 'I'
+    });
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {   
@@ -186,7 +300,7 @@ const ListManager: React.FC = () => {
           setAlertState({
             ...errorMessage,
             isOpen: true,
-            message: "파일형식을 확인해 주세요.",
+            message: "파일 포맷 형식과 다른 형식의 파일입니다. 파일 또는 포맷 형식을 확인해 주세요.",
             type: '2',
             onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
           });
@@ -194,7 +308,7 @@ const ListManager: React.FC = () => {
           setAlertState({
             ...errorMessage,
             isOpen: true,
-            message: "파일형식을 확인해 주세요.",
+            message: "파일 포맷 형식과 다른 형식의 파일입니다. 파일 또는 포맷 형식을 확인해 주세요.",
             type: '2',
             onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
           });
@@ -208,7 +322,18 @@ const ListManager: React.FC = () => {
           };
           setUploadedFiles((prev) => [...prev, newFileData]);
           setSelectedFileName(file.name);
-
+          
+          const now = new Date();
+          const hours = now.getHours().toString().padStart(2, '0');
+          const minutes = now.getMinutes().toString().padStart(2, '0');
+          const seconds = now.getSeconds().toString().padStart(2, '0');
+          const newProgressListData = { ...progressListData
+            , id: progressList.length+1
+            , datetime: hours + ':' + minutes + ':' + seconds
+            , message: '현재 로드된 파일 갯수 : ' + (uploadedFiles.length+1)
+          };
+          setProgressList(prev => [newProgressListData, ...prev]);
+          
           const reader = new FileReader();
           if( fileFormat === 'excel' && file.name.indexOf('.xls') > -1 ){
             reader.onload = (event) => {
@@ -353,7 +478,7 @@ const ListManager: React.FC = () => {
             setAlertState({
               ...errorMessage,
               isOpen: true,
-              message: "파일형식을 확인해 주세요.",
+              message: "파일 포맷 형식과 다른 형식의 파일입니다. 파일 또는 포맷 형식을 확인해 주세요.",
               type: '2',
               onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
             });
@@ -389,7 +514,7 @@ const ListManager: React.FC = () => {
       setAlertState({
         ...errorMessage,
         isOpen: true,
-        message: "파일포맷 설정을 실행해 주세요.",
+        message: "파일 포맷이 설정되어 있지 않습니다. 파일 포맷을 설정해 주세요.",
         type: '2',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
@@ -495,6 +620,17 @@ const ListManager: React.FC = () => {
     } else {
       // 작업대상이 선택된 경우 로딩 창 표시
       //setIsLoading(true);
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      const newProgressListData = { ...progressListData
+        , id: progressList.length+1
+        , datetime: hours + ':' + minutes + ':' + seconds
+        , message: '서버에 리스트 파일 등록 시작'
+      };
+      setProgressList(prev => [newProgressListData, ...prev]);
+      
       const callingListInsertData: CallingListInsertRequest = {
         ..._callListInsertData
         , campaign_id: _callListInsertData.campaign_id
@@ -513,8 +649,13 @@ const ListManager: React.FC = () => {
           token_data: data.CSC1+''
         }))
       };
-
-      fetchCallingListInsert(callingListInsertData);
+      if( _callListInsertData.list_flag === 'T'){
+        fetchBlacklistDelete(_callListInsertData.campaign_id);
+      }else if( targetType === 'general' ){
+        fetchCallingListInsert(callingListInsertData);
+      }else{
+        fetchBlacklistInsert(callingListInsertData);
+      }
       // 실제 작업 로직 수행
       // ...
       // fetchCallingListInsert();
@@ -709,8 +850,10 @@ const ListManager: React.FC = () => {
                       <SelectValue placeholder="Insert: 기존리스트 삭제 후 등록" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="I">Insert</SelectItem>
-                      <SelectItem value="A">Append</SelectItem>
+                      <SelectItem value="I">Insert : 기존리스트 삭제 후 등록</SelectItem>
+                      <SelectItem value="D">Delete : 특정리스트 삭제</SelectItem>
+                      <SelectItem value="A">Append : 발신리스트 추가</SelectItem>
+                      <SelectItem value="T">블랙리스트 전체 삭제</SelectItem>
                     </SelectContent>
                   </Select>
                 )}

@@ -1,6 +1,6 @@
 // src/features/listManager/types/listManagerIndex.ts
 
-export const apiUrl: string = 'http://localhost:4000/api/v1/counselor';
+export const apiUrl: string = '/counselor';
 
 // 리스트매니저 API 에러 타입
 export interface ListManagerApiError {
@@ -43,8 +43,14 @@ export interface CallingListInsertResponse {
   result_code: number;
   result_msg: string;
   result_count: number;
-  total_count: number;
+  request_count: number;
   result_data: CallingListInsertResponseDataType[];
+}
+
+// 삭제 응답 타입
+export interface DeleteResponse {
+  result_code: number;
+  result_msg: string;
 }
 
 

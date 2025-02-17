@@ -73,6 +73,8 @@ export function TreeMenusForCampaigns({
 
   const items = treeData?.[0]?.items || [];
 
+  console.log("items for treeMenus check : ", items);
+
   return (
     <div className="flex-1 overflow-auto">
       {items.map((item: TreeItem) => (
