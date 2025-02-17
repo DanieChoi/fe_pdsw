@@ -8,18 +8,9 @@ import { Label } from "@/components/ui/label";
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import { CommonRadio, CommonRadioItem } from "@/components/shared/CommonRadio";
 import { DatePickerProps } from 'react-date-picker';
-type Value = DatePickerProps['value'];
 import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
 import { useMainStore, useTabStore } from '@/store';
-
-interface RebroadcastSettings {
-  campaignId: string;
-  startDate: string;
-  startTime: string;
-  changeYn: boolean;
-  scheduleChangeYn: boolean;
-}
 
 interface RebroadcastItem {
   id: number;
@@ -44,43 +35,16 @@ const errorMessage: CustomAlertRequest = {
   onCancle: () => {},
 };
 
-const today = new Date();
-const initialSettings: RebroadcastSettings = {
-  campaignId: '',
-  startDate: today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2),
-  startTime: '',
-  changeYn: false,
-  scheduleChangeYn: false
-};
-
-const getOutgoingResultLabel = (key: string) => {
-  const labels: {[key: string]: string} = {
-    'outgoing-success-ok': '발신성공',
-    'outgoing-success-no': '발신미성공',
-    'fail-busy': '통화중',
-    'fail-no-answer': '무응답',
-    'fail-fax': '팩스',
-    'fail-machine': '자동응답기',
-    'fail-etc': '기타',
-    'fail-wrong-num': '잘못된 번호',
-    'fail-line': '회선장애',
-    'fail-hangup': '끊김',
-    'fail-no-tone': '발신음 없음',
-    'fail-no-dial': '발신 불가',
-    'outgoing-attempt': '발신시도',
-  };
-  return labels[key] || key;
-};
-
 type Props = {
   campaignId?: string;
+  reservationShouldShowApply: boolean;
   handleBroadcastTypeChange: (param:string) => void;
   handleAddRebroadcast:() => void;
   handleRemoveRebroadcast:() => void;
   handleApplyRebroadcast:() => void;
 }
 
-const RebroadcastSettingsPanelHeader = ({campaignId
+const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply
     , handleBroadcastTypeChange
     , handleAddRebroadcast
     , handleRemoveRebroadcast
@@ -95,14 +59,15 @@ const RebroadcastSettingsPanelHeader = ({campaignId
     const [listCount, setListCount] = useState<number>(0);
     const [rebroadcastList, setRebroadcastList] = useState<RebroadcastItem[]>([]);
     const [selectedRebroadcastId, setSelectedRebroadcastId] = useState<number | null>(null);
+    const [shouldShowApply, setShouldShowApply] = useState<boolean>(false);
 
     const [headerCampaignId, setHeaderCampaignId] = useState<string>('');
 
     // 버튼 활성화 상태 관리
     const shouldShowAddDelete = broadcastType === "reservation" && rebroadcastList.every(item => !item.isDummy);
-    const shouldShowApply = (broadcastType === "realtime") || 
-                       (broadcastType === "reservation" && 
-                        rebroadcastList.some(item => item.isDummy));
+    // const shouldShowApply = (broadcastType === "realtime") || 
+    //                    (broadcastType === "reservation" && 
+    //                     rebroadcastList.some(item => item.isDummy));
 
     //리스트 건수 확인 버튼 클릭 이벤트.
     const handleCheckListCount = () => {
@@ -130,12 +95,22 @@ const RebroadcastSettingsPanelHeader = ({campaignId
     const handleBroadcastType = (value: string) => {
         setBroadcastType(value);
         handleBroadcastTypeChange(value);
+        if( value === 'realtime' ){
+            setShouldShowApply(true);
+        }else{
+            setShouldShowApply(reservationShouldShowApply);
+        }
     };
 
     //적용 버튼 클릭 이벤트.
     const handleApplyRebroadcastClick = () => {
         handleApplyRebroadcast();
     };
+
+    //적용 버튼 
+    useEffect(() => {
+        setShouldShowApply(reservationShouldShowApply);
+    }, [reservationShouldShowApply]);
 
     useEffect(() => {
         if( campaigns && campaignId !== '0' ){
