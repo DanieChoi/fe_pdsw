@@ -20,7 +20,7 @@ export function TreeNode({
   const isSelected = selectedNodeId === item.id;
   const statusIcon = getStatusIcon(item.status);
 
-  const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab } = useTabStore();
+  const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab, setCampaignIdForCopyCampaign } = useTabStore();
 
   const handleDoubleClick = useCallback(() => {
     if (item.type !== "campaign") return;
@@ -52,6 +52,10 @@ export function TreeNode({
   const onHandleCampaignCopy = () => {
     console.log('Copy clicked:', { id: item.id, label: item.label, type: item.type });
     // onNodeSelect(item.id);
+
+    setCampaignIdForUpdateFromSideMenu(item.id);
+    setCampaignIdForCopyCampaign(item.id);
+
     addTab({
       id: 130,
       uniqueKey: '130',

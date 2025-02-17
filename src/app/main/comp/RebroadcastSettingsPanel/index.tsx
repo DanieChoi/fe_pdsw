@@ -15,6 +15,7 @@ import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
 import { useTabStore, useMainStore } from '@/store';
 import RebroadcastSettingsPanelHeader from './RebroadcastSettingsPanelHeader';
+import { useApiForCampaignAutoRedial } from '@/features/rebroadcastSettingsPanel/hooks/useApiForCampaignAutoRedial';
 
 interface RebroadcastSettings {
     campaignId: string;
@@ -35,6 +36,7 @@ interface RebroadcastItem {
         startDate: string;
         endDate: string;
     };
+    redialCondition: string;
     isDummy?: boolean;
 }
 
@@ -113,6 +115,8 @@ const RebroadcastSettingsPanel = () => {
 
     const [_campaignId, set_campaignId] = useState<string>('0');
     const [listRedialQuery, setListRedialQuery] = useState<string>('');
+    const [reservationShouldShowApply,setReservationShouldShowApply ] = useState<boolean>(false);
+    const [outgoingResultDisabled,setOutgoingResultDisabled ] = useState<boolean>(false);
 
     // 발신결과 체크박스 상태 관리
     const [selectedOutgoingResults, setSelectedOutgoingResults] = useState<{ [key: string]: boolean }>(initOutgoingResult);
@@ -123,10 +127,354 @@ const RebroadcastSettingsPanel = () => {
         setStartTime("");
         setTimeType("final-call-date"); //발신시간.
         setCallType("not-sent");
-        if( broadcastType === 'realtime'){
-            setSelectedOutgoingResults(initOutgoingResult);
+        
+        setSelectedRebroadcastId(null);
+        setSelectedRebroadcastDetails(null);
+
+        // 모드별 체크박스 상태 설정
+        setOutgoingResultChecked(true);
+        setOutgoingTypeChecked(false);
+        setOutgoingTimeChecked(false);
+    };
+
+    const handleDateChange = (value: Value) => {
+        if (value instanceof Date || value === null) {
+            let tempStartDate = '';
+            if (value != null) {
+                tempStartDate = value.getFullYear() +
+                    ('0' + (value.getMonth() + 1)).slice(-2) +
+                    ('0' + value.getDate()).slice(-2);
+            }
+            setStartDate(value);
+            setSettings(prev => ({
+                ...prev,
+                startDate: tempStartDate,
+                changeYn: true,
+                scheduleChangeYn: true
+            }));
+        }
+    };
+
+    const handleEndDateChange = (value: Value) => {
+        setEndDate(value);
+    };
+
+    //시작시간 이벤트.
+    const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        if (value.length <= 4 && /^\d*$/.test(value)) {
+            setStartTime(value);
+        }
+    };
+
+    const handleOutgoingResultChange = (id: string, checked: boolean) => {
+        setSelectedOutgoingResults(prev => ({
+            ...prev,
+            [id]: checked
+        }));
+    };
+
+    const MakeRedialPacket = () => {
+        let returnValue = '';
+        //발신결과.
+        if( outgoingResultChecked ){            
+            if( selectedOutgoingResults['outgoing-success-ok'] && selectedOutgoingResults['outgoing-success-no'] ){
+                returnValue += "35210@";
+            }else{
+                //80954, "발신 성공 상담원 연결 성공"
+                if( selectedOutgoingResults['outgoing-success-ok'] ){
+                    returnValue += "35233@";
+                }
+                //80955, "발신 성공 상담원 연결 실패"
+                if( selectedOutgoingResults['outgoing-success-no'] ){
+                    returnValue += "35223@35213@";
+                }
+            }
+            //80174, "통화중 실패")
+            if( selectedOutgoingResults['fail-busy'] ){
+                returnValue += "26232@";
+            }
+            //80175, "무응답 실패")
+            if( selectedOutgoingResults['fail-no-answer'] ){
+                returnValue += "26233@";
+            }
+            //80176, "팩스/모뎀 실패)
+            if( selectedOutgoingResults['fail-fax'] ){
+                returnValue += "26234@";
+            }
+            //80177, "기계음 실패"
+            if( selectedOutgoingResults['fail-machine'] ){
+                returnValue += "26235@";
+            }
+            //80178, "기타실패"
+            if( selectedOutgoingResults['fail-etc'] ){
+                returnValue += "26236@";
+            }
+            //80179, "전화번호 오류 실패"
+            if( selectedOutgoingResults['fail-wrong-num'] ){
+                returnValue += "26237@";
+            }
+            //80180, "회선오류 실패"
+            if( selectedOutgoingResults['fail-line'] ){
+                returnValue += "26239@";
+            }
+            //80181, "고객 바로끊음 실패"
+            if( selectedOutgoingResults['fail-hangup'] ){
+                returnValue += "262310@";
+            }
+            //80182, "통화음 없음 실패"
+            if( selectedOutgoingResults['fail-no-tone'] ){
+                returnValue += "262311@";
+            }
+            //80183, "다이얼톤 없음 실패"
+            if( selectedOutgoingResults['fail-no-dial'] ){
+                returnValue += "262312@";
+            }
+            //80185, "발신 시도 건수"
+            if( selectedOutgoingResults['outgoing-attempt'] ){
+                returnValue += "26238@";
+            }
+        }
+        //발신구분 체크박스.
+        if( outgoingTypeChecked ){
+            returnValue += "^";
+            //발신되지 않은 예약콜
+            if( callType === 'not-sent'){
+                returnValue += "402399";
+            }
+            //발신되어진 예약콜
+            if( callType === 'sent'){
+                returnValue += "4023100";
+            }
+        }
+        //발신시간 체크박스
+        if( outgoingTimeChecked ){
+            if(!outgoingResultChecked && !outgoingTypeChecked ){
+                // 최종발신날짜
+                if( timeType === 'final-call-date'){
+                    if (startDate && endDate) {
+                        if (startDate instanceof Date && endDate instanceof Date) {
+                            returnValue += "2714" + startDate.toISOString().slice(0, 10).replace(/-/g, '') + " 000000^2715" + endDate.toISOString().slice(0, 10).replace(/-/g, '') + " 235959";
+                        }
+                    }
+                }else{// 재콜예약날짜
+                    if (startDate && endDate) {
+                        if (startDate instanceof Date && endDate instanceof Date) {
+                            returnValue += "4315" + startDate.toISOString().slice(0, 10).replace(/-/g, '') + " 000000^2715" + endDate.toISOString().slice(0, 10).replace(/-/g, '') + " 235959";
+                        }
+                    }
+                }
+            }else{
+                returnValue += "^";
+                // 최종발신날짜
+                if( timeType === 'final-call-date'){
+                    if (startDate && endDate) {
+                        if (startDate instanceof Date && endDate instanceof Date) {
+                            returnValue += "(2714" + startDate.toISOString().slice(0, 10).replace(/-/g, '') + " 000000^2715" + endDate.toISOString().slice(0, 10).replace(/-/g, '') + " 235959)";
+                        }
+                    }
+                }else{// 재콜예약날짜
+                    if (startDate && endDate) {
+                        if (startDate instanceof Date && endDate instanceof Date) {
+                            returnValue += "(4315" + startDate.toISOString().slice(0, 10).replace(/-/g, '') + " 000000^2715" + endDate.toISOString().slice(0, 10).replace(/-/g, '') + " 235959)";
+                        }
+                    }
+                }
+            }
+        }
+
+        return returnValue;
+    };
+
+    //재발송 예약 추가 버튼 클릭 이벤트.
+    const handleAddRebroadcast = () => {
+        const redialCondition = MakeRedialPacket();
+        const newRebroadcast: RebroadcastItem = {
+            id: rebroadcastList.length + 1,
+            scheduleStartDate: "",
+            scheduleStartTime: "",
+            outgoingResults: [],
+            outgoingType: "",
+            outgoingTime: {
+                type: "",
+                startDate: "",
+                endDate: ""
+            },
+            redialCondition:'',
+            isDummy: true
+        };
+        setReservationShouldShowApply(true);
+
+        setRebroadcastList([...rebroadcastList, newRebroadcast]);
+        resetAllStates();
+    };
+
+    const handleRemoveRebroadcast = () => {
+        if (selectedRebroadcastId !== null && rebroadcastList.some(item => item.id === selectedRebroadcastId)) {
+            const updatedList = rebroadcastList.filter(item => item.id !== selectedRebroadcastId);
+            setRebroadcastList(updatedList);
+            setSelectedRebroadcastId(null);
+
+            if (updatedList.length === 0) {
+                resetAllStates();
+            }
+        }
+    };
+
+    const handleSelectRebroadcast = (id: number) => {
+
+        // 더미 항목이 있는지 확인
+        const hasDummyItem = rebroadcastList.some(item => item.isDummy);
+
+        if (hasDummyItem) {
+            setAlertState({
+                isOpen: true,
+                message: '현재 추가 중인 재발신 항목이 있습니다. 적용 또는 취소해주세요.',
+                title: '알림',
+                type: '0',
+                onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+            });
+            return;
+        }
+
+        // 기존 선택 로직
+        setSelectedRebroadcastId(prevId => (prevId === id ? null : id));
+
+        // 선택된 항목 찾기
+        const selected = rebroadcastList.find(item => item.id === id);
+
+        if (selected) {
+            setSelectedRebroadcastDetails(selected);
+
+            // 발신결과 체크박스 상태 초기화
+            // const newSelectedResults = { ...selectedOutgoingResults };
+            // Object.keys(newSelectedResults).forEach(key => {
+            //     newSelectedResults[key] = false;
+            // });
+
+            // 선택된 항목의 발신결과로 체크박스 상태 업데이트
+            // if (Array.isArray(selected.outgoingResults)) {
+            //     selected.outgoingResults.forEach(result => {
+            //         if (newSelectedResults.hasOwnProperty(result)) {
+            //             newSelectedResults[result] = true;
+            //         }
+            //     });
+            // }
+
+            // 상태 업데이트
+            // setSelectedOutgoingResults(newSelectedResults);
+
+            // 날짜 및 시간 설정
+            if (selected.scheduleStartDate) {
+                setStartDate(new Date(selected.scheduleStartDate));
+            }
+
+            if (selected.scheduleStartTime) {
+                setStartTime(selected.scheduleStartTime);
+            }
+
+            if (selected.outgoingType) {
+                setCallType(selected.outgoingType);
+            }
+
+            if (selected.outgoingTime && selected.outgoingTime.type) {
+                setTimeType(selected.outgoingTime.type);
+            }
+
+            if (selected.outgoingTime && selected.outgoingTime.endDate) {
+                setEndDate(new Date(selected.outgoingTime.endDate));
+            }
+            setListRedialQuery(selected.redialCondition);
+        } else {
+            // 선택 해제된 경우 상태 초기화
+            setSelectedRebroadcastDetails(null);
+            resetAllStates();
+        }
+    };
+
+    //적용 버튼 클릭 이벤트.
+    const handleApplyRebroadcast = () => {
+        // 예약 모드에서 실제 데이터 처리
+        if (broadcastType === "reservation") {
+            const selectedResults = Object.entries(selectedOutgoingResults)
+                .filter(([_, isSelected]) => isSelected)
+                .map(([key]) => key);
+
+            if (selectedResults.length === 0) {
+                setAlertState({
+                    isOpen: true,
+                    message: '최소 하나 이상의 발신결과를 선택해주세요.',
+                    title: '알림',
+                    type: '0',
+                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                });
+                return;
+            }
+
+            const processedRebroadcasts = rebroadcastList
+                .filter(item => item.isDummy)
+                .map(item => ({
+                    id: item.id,
+                    scheduleStartDate: startDate ? startDate.toString() : '',
+                    scheduleStartTime: startTime,
+                    outgoingResults: selectedResults,
+                    outgoingType: callType,
+                    outgoingTime: {
+                        type: timeType,
+                        startDate: startDate ? startDate.toString() : '',
+                        endDate: endDate ? endDate.toString() : '',
+                    },
+                    redialCondition:''
+                }));
+
+            setRebroadcastList(prevList =>
+                prevList.map(item =>
+                    item.isDummy
+                        ? processedRebroadcasts.find(proc => proc.id === item.id) || item
+                        : item
+                )
+            );
+
+            setAlertState({
+                isOpen: true,
+                message: "재발신 설정이 적용되었습니다.",
+                title: '재발신 적용 완료',
+                type: '0',
+                onClose: () => {
+                    setAlertState(prev => ({ ...prev, isOpen: false }));
+                    resetAllStates();
+                },
+                onCancle: () => {
+                    setAlertState(prev => ({ ...prev, isOpen: false }));
+                    resetAllStates();
+                }
+            });
+        }
+        // 실시간 모드 처리 로직은 기존과 동일
+        else if (broadcastType === "realtime") {
+            console.log('작업중입니다.');
+        }
+    };
+
+    //예약, 실시간 변경 이벤트.
+    const handleBroadcastTypeChange = (param:string) => {
+        setBroadcastType(param);        
+        resetAllStates();
+        if( param === 'realtime' ){
+            setOutgoingResultDisabled(false);  
+            // setShouldShowApply(true);
         }else{
-            if( listRedialQuery !== ''){
+            // setShouldShowApply(reservationShouldShowApply);
+        }
+    };
+    
+    useEffect(() => {
+        if( listRedialQuery !== '' ){
+            if( broadcastType === 'realtime'){
+                setSelectedOutgoingResults(initOutgoingResult);
+            }else{
                 let outgoingSuccessOk = false;  //80954, "발신 성공 상담원 연결 성공"
                 if( listRedialQuery.indexOf('35233') > -1 ){   
                     outgoingSuccessOk = true;
@@ -206,17 +554,18 @@ const RebroadcastSettingsPanel = () => {
                 if (listRedialQuery.indexOf("(") > 0 || listRedialQuery.indexOf("235959") > 0){
                     if( listRedialQuery.indexOf("(") > 0 ){
                         const strTimes = listRedialQuery.split(/[()]/);
-                        if (strTimes[1].indexOf("2714") > 0) // 최종발신날짜
+                        if (strTimes[1].indexOf("2714") > 0) // 최종발신날짜 
                         {
                             setTimeType("final-call-date");
-                            setStartDate(strTimes[1].substring(4, 4) + "-" + strTimes[1].substring(8, 2) + "-" + strTimes[1].substring(10, 2));
-                            setEndDate(strTimes[1].substring(24, 4) + "-" + strTimes[1].substring(28, 2) + "-" + strTimes[1].substring(30, 2));
+                            setStartDate(strTimes[1].substring(4, 8) + "-" + strTimes[1].substring(8, 10) + "-" + strTimes[1].substring(10, 12));
+                            setEndDate(strTimes[1].substring(24, 28) + "-" + strTimes[1].substring(28, 30) + "-" + strTimes[1].substring(30, 32));
                         } else {// 재콜예약날짜
                             setTimeType("recall-date");
-                            setStartDate(strTimes[1].substring(4, 4) + "-" + strTimes[1].substring(8, 2) + "-" + strTimes[1].substring(10, 2));
-                            setEndDate(strTimes[1].substring(24, 4) + "-" + strTimes[1].substring(28, 2) + "-" + strTimes[1].substring(30, 2));
+                            setStartDate(strTimes[1].substring(4, 8) + "-" + strTimes[1].substring(8, 10) + "-" + strTimes[1].substring(10, 12));
+                            setEndDate(strTimes[1].substring(24, 28) + "-" + strTimes[1].substring(28, 30) + "-" + strTimes[1].substring(30, 32));
                         }
                     }
+                    // setOutgoingTimeChecked(true);
                 }
                 //발신되지 않은 예약콜
                 if( listRedialQuery.indexOf('402399') > -1 ){   
@@ -226,263 +575,55 @@ const RebroadcastSettingsPanel = () => {
                 if( listRedialQuery.indexOf('4023100') > -1 ){   
                     setCallType('sent');
                 }
-            }else{
-                setSelectedOutgoingResults(initOutgoingResult);
             }
+        }else{
+            setSelectedOutgoingResults(initOutgoingResult);
         }
-        setSelectedRebroadcastId(null);
-        setSelectedRebroadcastDetails(null);
+    }, [listRedialQuery, broadcastType]);
 
-        // 모드별 체크박스 상태 설정
-        setOutgoingResultChecked(true);
-        setOutgoingTypeChecked(false);
-        setOutgoingTimeChecked(false);
-    };
-
-    const handleDateChange = (value: Value) => {
-        if (value instanceof Date || value === null) {
-            let tempStartDate = '';
-            if (value != null) {
-                tempStartDate = value.getFullYear() +
-                    ('0' + (value.getMonth() + 1)).slice(-2) +
-                    ('0' + value.getDate()).slice(-2);
-            }
-            setStartDate(value);
-            setSettings(prev => ({
-                ...prev,
-                startDate: tempStartDate,
-                changeYn: true,
-                scheduleChangeYn: true
-            }));
-        }
-    };
-
-    const handleEndDateChange = (value: Value) => {
-        setEndDate(value);
-    };
-
-    const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        if (value.length <= 4 && /^\d*$/.test(value)) {
-            setStartTime(value);
-        }
-    };
-
-    const handleOutgoingResultChange = (id: string, checked: boolean) => {
-        setSelectedOutgoingResults(prev => ({
-            ...prev,
-            [id]: checked
-        }));
-    };
-
-    //추가 버튼 클릭 이벤트.
-    const handleAddRebroadcast = () => {
-        const newRebroadcast: RebroadcastItem = {
-            id: rebroadcastList.length + 1,
-            scheduleStartDate: "",
-            scheduleStartTime: "",
-            outgoingResults: [],
-            outgoingType: "",
-            outgoingTime: {
-                type: "",
-                startDate: "",
-                endDate: ""
-            },
-            isDummy: true
-        };
-
-        setRebroadcastList([...rebroadcastList, newRebroadcast]);
-        resetAllStates();
-    };
-
-    const handleRemoveRebroadcast = () => {
-        if (selectedRebroadcastId !== null && rebroadcastList.some(item => item.id === selectedRebroadcastId)) {
-            const updatedList = rebroadcastList.filter(item => item.id !== selectedRebroadcastId);
-            setRebroadcastList(updatedList);
-            setSelectedRebroadcastId(null);
-
-            if (updatedList.length === 0) {
-                resetAllStates();
-            }
-        }
-    };
-
-    const handleSelectRebroadcast = (id: number) => {
-
-        // 더미 항목이 있는지 확인
-        const hasDummyItem = rebroadcastList.some(item => item.isDummy);
-
-        if (hasDummyItem) {
-            setAlertState({
-                isOpen: true,
-                message: '현재 추가 중인 재발신 항목이 있습니다. 적용 또는 취소해주세요.',
-                title: '알림',
-                type: '0',
-                onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-            });
-            return;
-        }
-
-        // 기존 선택 로직
-        setSelectedRebroadcastId(prevId => (prevId === id ? null : id));
-
-        // 선택된 항목 찾기
-        const selected = rebroadcastList.find(item => item.id === id);
-
-        if (selected) {
-            setSelectedRebroadcastDetails(selected);
-
-            // 발신결과 체크박스 상태 초기화
-            const newSelectedResults = { ...selectedOutgoingResults };
-            Object.keys(newSelectedResults).forEach(key => {
-                newSelectedResults[key] = false;
-            });
-
-            // 선택된 항목의 발신결과로 체크박스 상태 업데이트
-            if (Array.isArray(selected.outgoingResults)) {
-                selected.outgoingResults.forEach(result => {
-                    if (newSelectedResults.hasOwnProperty(result)) {
-                        newSelectedResults[result] = true;
-                    }
-                });
-            }
-
-            // 상태 업데이트
-            setSelectedOutgoingResults(newSelectedResults);
-
-            // 날짜 및 시간 설정
-            if (selected.scheduleStartDate) {
-                setStartDate(new Date(selected.scheduleStartDate));
-            }
-
-            if (selected.scheduleStartTime) {
-                setStartTime(selected.scheduleStartTime);
-            }
-
-            if (selected.outgoingType) {
-                setCallType(selected.outgoingType);
-            }
-
-            if (selected.outgoingTime && selected.outgoingTime.type) {
-                setTimeType(selected.outgoingTime.type);
-            }
-
-            if (selected.outgoingTime && selected.outgoingTime.endDate) {
-                setEndDate(new Date(selected.outgoingTime.endDate));
-            }
-        } else {
-            // 선택 해제된 경우 상태 초기화
-            setSelectedRebroadcastDetails(null);
-            resetAllStates();
-        }
-    };
-
-    const handleApplyRebroadcast = () => {
-        // 예약 모드에서 실제 데이터 처리
-        if (broadcastType === "reservation") {
-            const selectedResults = Object.entries(selectedOutgoingResults)
-                .filter(([_, isSelected]) => isSelected)
-                .map(([key]) => key);
-
-            if (selectedResults.length === 0) {
-                setAlertState({
-                    isOpen: true,
-                    message: '최소 하나 이상의 발신결과를 선택해주세요.',
-                    title: '알림',
-                    type: '0',
-                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-                });
-                return;
-            }
-
-            const processedRebroadcasts = rebroadcastList
-                .filter(item => item.isDummy)
-                .map(item => ({
-                    id: item.id,
-                    scheduleStartDate: startDate ? startDate.toString() : '',
-                    scheduleStartTime: startTime,
-                    outgoingResults: selectedResults,
-                    outgoingType: callType,
-                    outgoingTime: {
-                        type: timeType,
-                        startDate: startDate ? startDate.toString() : '',
-                        endDate: endDate ? endDate.toString() : '',
-                    }
-                }));
-
-            setRebroadcastList(prevList =>
-                prevList.map(item =>
-                    item.isDummy
-                        ? processedRebroadcasts.find(proc => proc.id === item.id) || item
-                        : item
-                )
-            );
-
-            setAlertState({
-                isOpen: true,
-                message: "재발신 설정이 적용되었습니다.",
-                title: '재발신 적용 완료',
-                type: '0',
-                onClose: () => {
-                    setAlertState(prev => ({ ...prev, isOpen: false }));
-                    resetAllStates();
-                },
-                onCancle: () => {
-                    setAlertState(prev => ({ ...prev, isOpen: false }));
-                    resetAllStates();
+    // 캠페인 재발신 정보 리스트 조회
+    const { mutate: fetchCampaignAutoRedials } = useApiForCampaignAutoRedial({
+        onSuccess: (data) => {
+            if (data.result_data.length > 0) {
+                const tempList = data.result_data.filter(data => data.campaign_id === Number(campaignIdForUpdateFromSideMenu));
+                if (tempList.length > 0) {
+                    const prevList = tempList.map(item => ({
+                        id: item.sequence_number,
+                        scheduleStartDate: item.start_date.substring(0, 4) + '-' + item.start_date.substring(4, 6) + '-' + item.start_date.substring(6, 8),
+                        scheduleStartTime: item.start_date.substring(8, 12),
+                        outgoingResults: [],
+                        outgoingType: "",
+                        outgoingTime: { type: "", startDate: "", endDate: "" },
+                        redialCondition: item.redial_condition,
+                        isDummy: false
+                    }));
+                    setRebroadcastList(prevList);
+                    //첫번째 row 선택.
+                    setSelectedRebroadcastId(prevList[0].id);
+                    setListRedialQuery(prevList[0].redialCondition);
+                    //발신결과 disabled 설정.
+                    setOutgoingResultDisabled(true);    
+                    setOutgoingResultChecked(false);
+                    setOutgoingTypeChecked(false);
+                    setOutgoingTimeChecked(false);
                 }
-            });
+            }
         }
-        // 실시간 모드 처리 로직은 기존과 동일
-        else if (broadcastType === "realtime") {
-            // 기존 실시간 모드 로직 유지
-            const realTimeData = {
-                outgoingResults: Object.entries(selectedOutgoingResults)
-                    .filter(([_, isSelected]) => isSelected)
-                    .map(([key]) => key),
-                outgoingType: callType,
-                outgoingTime: {
-                    type: timeType,
-                    startDate: startDate ? startDate.toString() : '',
-                    endDate: endDate ? endDate.toString() : '',
-                }
-            };
-
-            console.log('실시간 재발신 데이터:', realTimeData);
-
-            setAlertState({
-                isOpen: true,
-                message: "실시간 재발신이 적용되었습니다.",
-                title: '재발신 적용',
-                type: '0',
-                onClose: () => {
-                    setAlertState(prev => ({ ...prev, isOpen: false }));
-                    resetAllStates();
-                },
-                onCancle: () => {
-                    setAlertState(prev => ({ ...prev, isOpen: false }));
-                    resetAllStates();
-                }
-            });
-        }
-    };
-
-    //예약, 실시간 변경 이벤트.
-    const handleBroadcastTypeChange = (param:string) => {
-        setBroadcastType(param);        
-        resetAllStates();
-    };
+    });
     
+    //최초 캠페인 재발신 정보 리스트 조회 실행.
     useEffect(() => {
         if( campaigns && campaignIdForUpdateFromSideMenu && campaignIdForUpdateFromSideMenu !== '' ){
             set_campaignId(campaignIdForUpdateFromSideMenu);
-            setSettings(prev => ({
-                ...prev,
-                campaignId: campaignIdForUpdateFromSideMenu
-            }));
-            setListRedialQuery(campaigns.filter(data=> Number(campaignIdForUpdateFromSideMenu) === data.campaign_id)[0].list_redial_query);
+            setSettings(prev => ({ ...prev, campaignId: campaignIdForUpdateFromSideMenu }));
+            const campaign = campaigns.find(data => Number(campaignIdForUpdateFromSideMenu) === data.campaign_id);
+            if (campaign) {
+                setListRedialQuery(campaign.list_redial_query);
+            }
+            fetchCampaignAutoRedials({
+                session_key: '',
+                tenant_id: 0,
+            });
         }
     }, [campaignIdForUpdateFromSideMenu,campaigns]);
 
@@ -490,6 +631,7 @@ const RebroadcastSettingsPanel = () => {
         <div className="limit-width">
             <div className="flex flex-col gap-6">
                 <RebroadcastSettingsPanelHeader campaignId={_campaignId} 
+                    reservationShouldShowApply={reservationShouldShowApply}
                     handleBroadcastTypeChange={handleBroadcastTypeChange} 
                     handleAddRebroadcast={handleAddRebroadcast}
                     handleRemoveRebroadcast={handleRemoveRebroadcast}
@@ -525,7 +667,7 @@ const RebroadcastSettingsPanel = () => {
                                         onChange={handleTimeChange}
                                         maxLength={4}
                                         placeholder="0000"
-                                        disabled={broadcastType === "realtime"}
+                                        disabled={broadcastType === "realtime"}                                        
                                     />
                                 </div>
                             </div>
@@ -534,21 +676,23 @@ const RebroadcastSettingsPanel = () => {
                             <TitleWrap title="예약 재발신 목록" />
                             <div className="border p-2 rounded h-[400px] py-[20px] px-[20px]">
                                 <ul className="flex flex-col gap-2">
-                                    {rebroadcastList.map((item, index) => (
-                                        <li
-                                            key={item.id}
-                                            onClick={() => handleSelectRebroadcast(item.id)}
-                                            className={`text-sm cursor-pointer p-[5px] ${selectedRebroadcastId === item.id
-                                                    ? 'bg-[#FFFAEE]'
-                                                    : item.isDummy
-                                                        ? 'bg-[#F0F0F0]'
-                                                        : 'hover:bg-[#FFFAEE]'
-                                                }`}
-                                        >
-                                            {`${index + 1}번째 재발신`}
-                                            {item.isDummy && <span className="text-xs text-gray-500 ml-2">(추가 중)</span>}
-                                        </li>
-                                    ))}
+                                    { broadcastType === 'reservation'?
+                                        rebroadcastList.map((item, index) => (
+                                            <li
+                                                key={item.id}
+                                                onClick={() => handleSelectRebroadcast(item.id)}
+                                                className={`text-sm cursor-pointer p-[5px] ${selectedRebroadcastId === item.id
+                                                        ? 'bg-[#FFFAEE]'
+                                                        : item.isDummy
+                                                            ? 'bg-[#F0F0F0]'
+                                                            : 'hover:bg-[#FFFAEE]'
+                                                    }`}
+                                            >
+                                                {`${index + 1}번째 재발신`}
+                                                {item.isDummy && <span className="text-xs text-gray-500 ml-2">(추가 중)</span>}
+                                            </li>
+                                        )):null
+                                    }
                                 </ul>
                             </div>
                         </div>
@@ -559,6 +703,7 @@ const RebroadcastSettingsPanel = () => {
                                 id="outgoing-result"
                                 checked={outgoingResultChecked}
                                 onCheckedChange={(checked: boolean) => setOutgoingResultChecked(checked)}
+                                disabled={outgoingResultDisabled}
                             />
                             <Label htmlFor="outgoing-result" className="text-sm">
                                 발신결과
@@ -587,6 +732,7 @@ const RebroadcastSettingsPanel = () => {
                                     id="outgoing-type"
                                     checked={outgoingTypeChecked}
                                     onCheckedChange={(checked: boolean) => setOutgoingTypeChecked(checked)}
+                                    disabled={outgoingResultDisabled}
                                 />
                                 <Label htmlFor="outgoing-type" className="text-sm">
                                     발신구분
@@ -618,6 +764,7 @@ const RebroadcastSettingsPanel = () => {
                                     id="outgoing-time"
                                     checked={outgoingTimeChecked}
                                     onCheckedChange={(checked: boolean) => setOutgoingTimeChecked(checked)}
+                                    disabled={outgoingResultDisabled}
                                 />
                                 <Label htmlFor="outgoing-time" className="text-sm">
                                     발신시간

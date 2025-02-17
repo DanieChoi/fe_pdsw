@@ -860,6 +860,12 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         tenant_id_array: tempTenantIdArray
       });      
     }
+    ,onError: (data) => {
+      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
+      fetchSchedules({
+        tenant_id_array: tempTenantIdArray
+      });      
+    }
   });
   
   //캠페인 발신 속도 수정 api 호출
@@ -992,7 +998,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
           </div>
         </div>
       </div>
-      {/* <div>
+      <div>
         <CampaignTab campaignSchedule={tempCampaignSchedule}
           newCampaignYn={true}
           campaignInfo={tempCampaignInfo}
@@ -1006,8 +1012,8 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
           onHandleCallbackTabChange={(value) => handleCallbackTabChange(value)}
           onHandleNotificationTabChange={(value) => handleNotificationTabChange(value)}
         />
-      </div> */}
-      {/* <SkillListPopup
+      </div>
+      <SkillListPopup
         param={tempCampaignSkills.skill_id||[]}
         tenantId={tempCampaignInfo.tenant_id}
         type={skillPopupState.type}
@@ -1030,7 +1036,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         isOpen={callingNumberPopupState.isOpen}
         onConfirm={(param) => handleCallingNumlber(param)}
         onCancle={() => setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))}
-      /> */}
+      />
     </div>
   );
 }

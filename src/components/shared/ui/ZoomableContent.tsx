@@ -1,4 +1,4 @@
-// C:\nproject\fe_pdsw\src\components\shared\ui\ZoomableContent.tsx
+// src\components\shared\ui\ZoomableContent.tsx
 "use client";
 
 import React, { useState } from "react";

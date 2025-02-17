@@ -1,19 +1,19 @@
-// src/features/campaignManager/api/mainAutoRedialInfoSearch.ts
+// src/features/campaignManager/hooks/fetchCampaignAutoRedials.ts
 import { axiosInstance } from '@/lib/axios';
-import { CampaignCredentials, AutoRedialListResponse } from '../types/campaignManagerIndex';
+import { CampaignCredentials, CampaignAutoRedialResponse } from '../types/rebroadcastSettingsPanelIndex';
 
-// 캠페인 재발신 스케줄링 정보 조회 요청
-export const fetchAutoRedials = async (credentials: CampaignCredentials): Promise<AutoRedialListResponse> => {
-  const autoRedialListSearchRequestData = {
+// 캠페인 재발신 조회 리스트 요청
+export const fetchCampaignAutoRedials = async (credentials: CampaignCredentials): Promise<CampaignAutoRedialResponse> => {
+  const campaignAutoRedialSearchRequestData = {
     filter: {      
       campaign_id: {
         start: 1,
         end: 9999999,
       },    
-      sequence_number: {
-          start: 0,
-          end: 999
-      }
+    },
+    sequence_number:{
+      start: 0,
+      end: 999
     },
     sort: {
       campaign_id: 0,
@@ -26,9 +26,9 @@ export const fetchAutoRedials = async (credentials: CampaignCredentials): Promis
   };
 
   try {
-    const { data } = await axiosInstance.post<AutoRedialListResponse>(
+    const { data } = await axiosInstance.post<CampaignAutoRedialResponse>(
       '/collections/campaign-auto-redial', 
-      autoRedialListSearchRequestData
+      campaignAutoRedialSearchRequestData
     );
     return data;
   } catch (error: any) {

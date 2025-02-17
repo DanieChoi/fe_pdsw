@@ -14,6 +14,7 @@ import {
   History,
   Settings
 } from "lucide-react";
+import { SkillAssignmentTab } from "./SkillAssignmentTab";
 
 interface ContextMenuForAgentNodeProps {
   children: React.ReactNode;
@@ -41,9 +42,16 @@ export function ContextMenuForAgentNode({
   const isTeam = item.type === "team";
   const isGroup = item.type === "group";
 
+  // 02-17
   const handleSkillAssignment = () => {
-    const { removeTab, openedTabs, setCounselorSkillAssignmentInfo } = useTabStore.getState();
-    
+    const { setCounselorSkillAssignmentInfo, removeTab, openedTabs } = useTabStore.getState();
+  
+    // 기존에 열린 탭 중 id가 500인 것 제거
+    const existingTabs = openedTabs.filter(tab => tab.id === 500);
+    existingTabs.forEach(tab => {
+      removeTab(tab.id, tab.uniqueKey);
+    });
+  
     // 상담원 스킬 할당 정보 설정
     setCounselorSkillAssignmentInfo({
       tenantId: item.tenantId,
@@ -51,26 +59,18 @@ export function ContextMenuForAgentNode({
       counselorName: item.label
     });
   
-    // 기존 탭 제거 로직
-    const existingTabs = openedTabs.filter(tab => tab.id === 100);
-    existingTabs.forEach(tab => {
-      removeTab(tab.id, tab.uniqueKey);
-    });
-  
-    // 새 탭 추가
-    const uniqueKey = `skill-assignment-${item.id}-${Date.now()}`;
-    const newTab = {
-      id: 100,
-      uniqueKey,
+    // 새로운 탭 추가
+    addTab({
+      id: 500, // SkillAssignmentTab을 위한 ID
+      uniqueKey: `skill-assignment-${item.id}-${Date.now()}`, // 유니크한 키 추가
       title: `상담원 스킬 할당 - ${item.label}`,
-      icon: "header-menu/스킬할당.svg",
-      href: "/skill-assignment",
+      icon: '',
+      href: '/skill-assignment',
       content: null,
-      counselorId: item.id
-    };
-  
-    addTab(newTab);
+    });
   };
+  
+  
 
   return (
     <>

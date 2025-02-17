@@ -9,21 +9,12 @@ import {
 import { useTabStore } from "@/store/tabStore";
 import { 
   Edit, 
-  Copy, 
-  Activity, 
-  Trash2, 
-  Monitor, 
-  Settings, 
-  Search, 
-  List, 
-  Clock, 
-  History, 
-  Shield, 
-  RefreshCcw,
   Plus,
   Eye,
-  BarChart 
+  BarChart,
+  Check 
 } from "lucide-react";
+import { useState } from "react";
 
 export interface FolderContextMenuProps {
   item: {
@@ -34,77 +25,95 @@ export interface FolderContextMenuProps {
 
 export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
   const { addTab, openedTabs, setActiveTab } = useTabStore();
+  const [selectedMenu, setSelectedMenu] = useState<number | null>(null);
+  
+  const checkableMenuIds = [14, 23];
 
-  const handleNewCampaign = () => {
-    if (openedTabs.some(tab => tab.id === 13)) {    
-      setActiveTab(13, '13');
-    } else {
-      addTab({
-        id: 13,
-        uniqueKey: '13',
-        title: '새 캠페인',
-        icon: '',
-        href: '',
-        content: null,
-      });
+  const handleMenuClick = (menuId: number) => {
+    if (checkableMenuIds.includes(menuId)) {
+      setSelectedMenu(selectedMenu === menuId ? null : menuId);
     }
   };
 
-  const handleViewAllCampaigns = () => {
-    if (openedTabs.some(tab => tab.id === 14)) {
-      setActiveTab(14, '14');
-    } else {
-      addTab({
-        id: 14,
-        uniqueKey: '14',
-        title: '캠페인 전체 보기',
-        icon: '',
-        href: '',
-        content: null,
-      });
-    }
-  };
-
-  const handleViewSelectedSkills = () => {
-    addTab({
+  const menuItems = [
+    {
+      id: 13,
+      title: '새 캠페인',
+      prefix: '+',
+      icon: Plus,
+      handler: () => {
+        if (openedTabs.some(tab => tab.id === 13)) {    
+          setActiveTab(13, '13');
+        } else {
+          addTab({
+            id: 13,
+            uniqueKey: '13',
+            title: '새 캠페인',
+            icon: '',
+            href: '',
+            content: null,
+          });
+        }
+      }
+    },
+    {
+      id: 14,
+      title: '캠페인 전체 보기',
+      icon: Edit,
+      handler: () => handleMenuClick(14)
+    },
+    {
       id: 23,
-      uniqueKey: `23-${Date.now()}`,
       title: '선택한 스킬 보기',
-      icon: '',
-      href: '',
-      content: null,
-    });
-  };
-
-  const handleAgentStatusView = () => {
-    addTab({
+      icon: Eye,
+      handler: () => handleMenuClick(23)
+    },
+    {
       id: 22,
-      uniqueKey: `22-${Date.now()}`,
       title: '상담원 상태 모니터',
-      icon: '',
-      href: '',
-      content: null,
-    });
-  };
+      icon: BarChart,
+      handler: () => {
+        addTab({
+          id: 22,
+          uniqueKey: `22-${Date.now()}`,
+          title: '상담원 상태 모니터',
+          icon: '',
+          href: '',
+          content: null,
+        });
+      }
+    }
+  ];
 
   return (
-    <ContextMenuContent className="w-56">
-      <ContextMenuItem onClick={handleNewCampaign}>
-        <Plus className="mr-2 h-4 w-4" />
-        새 캠페인
-      </ContextMenuItem>
-      <ContextMenuItem onClick={handleViewAllCampaigns}>
-        <Edit className="mr-2 h-4 w-4" />
-        캠페인 전체 보기
-      </ContextMenuItem>
-      <ContextMenuItem onClick={handleViewSelectedSkills}>
-        <Eye className="mr-2 h-4 w-4" />
-        선택한 스킬 보기
-      </ContextMenuItem>
-      <ContextMenuItem onClick={handleAgentStatusView}>
-        <BarChart className="mr-2 h-4 w-4" />
-        상담원 상태 모니터
-      </ContextMenuItem>
+    <ContextMenuContent className="w-56 py-1 text-sm">
+      {menuItems.map((menuItem) => (
+        <ContextMenuItem
+          key={menuItem.id}
+          onClick={menuItem.handler}
+          className="px-2 py-1.5 focus:bg-slate-100 focus:text-slate-900"
+        >
+          <div className="flex items-center space-x-2 text-slate-700">
+            {menuItem.prefix ? (
+              <span className="flex w-4 justify-center text-sm font-medium">
+                {menuItem.prefix}
+              </span>
+            ) : checkableMenuIds.includes(menuItem.id) ? (
+              <span className="flex w-4 justify-center">
+                {selectedMenu === menuItem.id ? (
+                  <Check className="h-3.5 w-3.5" />
+                ) : (
+                  <span className="h-3.5 w-3.5" />
+                )}
+              </span>
+            ) : (
+              <span className="w-4" />
+            )}
+            <menuItem.icon className="h-3.5 w-3.5" />
+            <span className="flex-1">{menuItem.title}</span>
+          </div>
+        </ContextMenuItem>
+      ))}
     </ContextMenuContent>
   );
 };
