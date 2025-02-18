@@ -2,10 +2,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchCampaignManagerInsert } from '../api/mainCampaignManagerInsert';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { CampaignInfoUpdateRequest, UpdateResponse, CampaignApiError } from '../types/campaignManagerIndex';
+import { CampaignInfoUpdateRequest, CampaignInsertResponse, CampaignApiError } from '../types/campaignManagerIndex';
 
 export function useApiForCampaignManagerInsert(
-  options?: UseMutationOptions<UpdateResponse, CampaignApiError, CampaignInfoUpdateRequest>
+  options?: UseMutationOptions<CampaignInsertResponse, CampaignApiError, CampaignInfoUpdateRequest>
 ) {
   const queryClient = useQueryClient();
   return useMutation({
