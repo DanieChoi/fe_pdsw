@@ -1,15 +1,18 @@
 // src/features/campaignManager/api/apiForCampaignAssignmentAgentList.ts
 import { axiosRedisInstance } from "@/lib/axios";
 import { CampaignAssignmentAgentCredentials, CampaignAssignmentAgentListResponse, apiUrl } from '../types/campaignManagerIndex';
+import { getCookie } from '@/lib/cookies';
 
 export const fetchCampaignAssignmentAgents = async (credentials: CampaignAssignmentAgentCredentials): Promise<CampaignAssignmentAgentListResponse> => {
   const campaignAssignmentAgentInfoSearchRequestData = {
-    counselors: credentials.counselors
+    tenantId: credentials.tenantId,
+    campaignId: credentials.campaignId,
+    sessionKey: getCookie('session_key')
   };
 
   try {
     const { data } = await axiosRedisInstance.post<CampaignAssignmentAgentListResponse>(
-      apiUrl+`/${credentials.tenant_id}/counselorInfo`, 
+      apiUrl+`/counselorInfo`, 
       campaignAssignmentAgentInfoSearchRequestData
     );
     return data;

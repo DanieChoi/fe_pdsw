@@ -612,6 +612,27 @@ const RebroadcastSettingsPanel = () => {
                     setOutgoingTimeChecked(false);
                     setOutgoingResultDisabled(true);    
                     setSequenceNumber(Math.max(...tempList.map(item => item.sequence_number))+1);  
+                    
+                    // 선택된 항목 찾기
+                    const selected = prevList[0];
+                    setSelectedRebroadcastDetails(prevList[0]);
+                    // 날짜 및 시간 설정
+                    if (selected.scheduleStartDate) {
+                        setStartDate(new Date(selected.scheduleStartDate));
+                    }
+                    if (selected.scheduleStartTime) {
+                        setStartTime(selected.scheduleStartTime);
+                    }
+                    if (selected.outgoingType) {
+                        setCallType(selected.outgoingType);
+                    }
+                    if (selected.outgoingTime && selected.outgoingTime.type) {
+                        setTimeType(selected.outgoingTime.type);
+                    }
+                    if (selected.outgoingTime && selected.outgoingTime.endDate) {
+                        setEndDate(new Date(selected.outgoingTime.endDate));
+                    }
+                    setListRedialQuery(selected.redialCondition);
                 }
             }
         }
