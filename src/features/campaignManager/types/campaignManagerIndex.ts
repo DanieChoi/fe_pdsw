@@ -116,7 +116,7 @@ export interface CallingNumberListResponse {
 export interface AutoRedialListDataResponse {
   campaign_id: number;
   sequence_number: number;
-  start_time: string;
+  start_date: string;
   redial_condition: string;
   run_flag: number;
 }

@@ -27,7 +27,7 @@ export const fetchAutoRedials = async (credentials: CampaignCredentials): Promis
 
   try {
     const { data } = await axiosInstance.post<AutoRedialListResponse>(
-      '/collections/campaign-auto-redial', 
+      '/collections/campaign-scheduled-redial', 
       autoRedialListSearchRequestData
     );
     return data;
