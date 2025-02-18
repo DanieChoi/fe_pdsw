@@ -57,12 +57,12 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		},
 		  width: {
-			'modal': '780px',  // 이렇게 하면 w-modal로 사용 가능
+			'modal': '800px',  // 이렇게 하면 w-modal로 사용 가능
 			'modal-lg': '1024px',
 			'modal-sm': '480px',
 		  },
 		  maxWidth: {
-			'modal': '780px',  // 이렇게 하면 max-w-modal로 사용 가능
+			'modal': '800px',  // 이렇게 하면 max-w-modal로 사용 가능
 			'modal-lg': '1024px',
 			'modal-sm': '480px',
 		  }
