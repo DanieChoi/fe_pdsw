@@ -5,6 +5,8 @@ import { ContextMenuForTreeNode } from "./ContextMenuForTreeNode";
 import { ChevronRight, ChevronDown, Folder, FileText } from "lucide-react";
 import { useTabStore } from '@/store/tabStore';
 import { useCallback } from 'react';
+import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
+import { FolderContextMenu } from "./FolderContextMenuForTreeNode";
 
 export function TreeNode({
   item,
@@ -75,48 +77,71 @@ export function TreeNode({
   
   return (
     <div className="select-none">
-      <ContextMenuForTreeNode
-        item={item}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onMonitor={handleMonitor}
-        onHandleCampaignCopy={onHandleCampaignCopy}
-      >
-        <div
-          className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150
-            ${isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""}`}
-          onClick={handleClick}
-          onDoubleClick={handleDoubleClick}
-          style={{ paddingLeft: `${level * 16 + 8}px` }}
+      {item.type === "folder" ? (
+        <ContextMenu>
+          <ContextMenuTrigger>
+            <div
+              className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150
+                ${isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""}`}
+              onClick={handleClick}
+              style={{ paddingLeft: `${level * 16 + 8}px` }}
+            >
+              <div className="flex items-center w-full gap-2">
+                {hasChildren ? (
+                  isExpanded ? (
+                    <ChevronDown className="h-4 w-4 text-gray-500" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 text-gray-500" />
+                  )
+                ) : (
+                  <span className="w-4" />
+                )}
+                <Folder className="h-4 w-4 text-gray-400" />
+                <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
+                  {item.label}
+                </span>
+              </div>
+            </div>
+          </ContextMenuTrigger>
+          <FolderContextMenu item={item} />
+        </ContextMenu>
+      ) : (
+        <ContextMenuForTreeNode
+          item={item}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onMonitor={handleMonitor}
+          onHandleCampaignCopy={onHandleCampaignCopy}
         >
-          <div className="flex items-center w-full gap-2">
-            {hasChildren ? (
-              isExpanded ? (
-                <ChevronDown className="h-4 w-4 text-gray-500" />
+          <div
+            className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150
+              ${isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""}`}
+            onClick={handleClick}
+            onDoubleClick={handleDoubleClick}
+            style={{ paddingLeft: `${level * 16 + 8}px` }}
+          >
+            <div className="flex items-center w-full gap-2">
+              {hasChildren ? (
+                isExpanded ? (
+                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-gray-500" />
+                )
               ) : (
-                <ChevronRight className="h-4 w-4 text-gray-500" />
-              )
-            ) : (
-              <span className="w-4" />
-            )}
-
-            {item.type === "folder" ? (
-              <Folder className="h-4 w-4 text-gray-400" />
-            ) : (
-              statusIcon ? (
+                <span className="w-4" />
+              )}
+              {statusIcon ? (
                 <img src={statusIcon} alt="status" className="w-4 h-4" />
               ) : (
                 <FileText className="h-4 w-4 text-gray-400" />
-              )
-            )}
-
-            <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
-              {item.label}
-              {/* {item.status} */}
-            </span>
+              )}
+              <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
+                {item.label}
+              </span>
+            </div>
           </div>
-        </div>
-      </ContextMenuForTreeNode>
+        </ContextMenuForTreeNode>
+      )}
 
       {hasChildren && isExpanded && (
         <div>

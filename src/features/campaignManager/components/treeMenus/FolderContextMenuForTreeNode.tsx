@@ -1,19 +1,9 @@
 import {
   ContextMenuContent,
   ContextMenuItem,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
-  ContextMenuSeparator,
 } from "@/components/ui/context-menu";
 import { useTabStore } from "@/store/tabStore";
-import { 
-  Edit, 
-  Plus,
-  Eye,
-  BarChart,
-  Check 
-} from "lucide-react";
+import { Check } from "lucide-react";
 import { useState } from "react";
 
 export interface FolderContextMenuProps {
@@ -29,8 +19,9 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
   
   const checkableMenuIds = [14, 23];
 
-  const handleMenuClick = (menuId: number) => {
+  const handleMenuClick = (menuId: number, e: React.MouseEvent) => {
     if (checkableMenuIds.includes(menuId)) {
+      e.preventDefault();
       setSelectedMenu(selectedMenu === menuId ? null : menuId);
     }
   };
@@ -39,8 +30,6 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
     {
       id: 13,
       title: '새 캠페인',
-      prefix: '+',
-      icon: Plus,
       handler: () => {
         if (openedTabs.some(tab => tab.id === 13)) {    
           setActiveTab(13, '13');
@@ -57,21 +46,8 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
       }
     },
     {
-      id: 14,
-      title: '캠페인 전체 보기',
-      icon: Edit,
-      handler: () => handleMenuClick(14)
-    },
-    {
-      id: 23,
-      title: '선택한 스킬 보기',
-      icon: Eye,
-      handler: () => handleMenuClick(23)
-    },
-    {
       id: 22,
       title: '상담원 상태 모니터',
-      icon: BarChart,
       handler: () => {
         addTab({
           id: 22,
@@ -82,35 +58,43 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
           content: null,
         });
       }
+    },
+    {
+      id: 14,
+      title: '캠페인 전체 보기',
+      handler: (e: React.MouseEvent) => handleMenuClick(14, e)
+    },
+    {
+      id: 23,
+      title: '선택한 스킬 보기', 
+      handler: (e: React.MouseEvent) => handleMenuClick(23, e)
     }
   ];
 
   return (
-    <ContextMenuContent className="w-56 py-1 text-sm">
+    <ContextMenuContent className="w-48 py-1 text-sm bg-white border border-gray-200 shadow-md">
       {menuItems.map((menuItem) => (
         <ContextMenuItem
           key={menuItem.id}
           onClick={menuItem.handler}
-          className="px-2 py-1.5 focus:bg-slate-100 focus:text-slate-900"
+          className={`
+            cursor-pointer hover:bg-blue-50 focus:bg-blue-50
+            ${checkableMenuIds.includes(menuItem.id) ? 'bg-[#f5f6f8]' : ''}
+          `}
         >
-          <div className="flex items-center space-x-2 text-slate-700">
-            {menuItem.prefix ? (
-              <span className="flex w-4 justify-center text-sm font-medium">
-                {menuItem.prefix}
-              </span>
-            ) : checkableMenuIds.includes(menuItem.id) ? (
-              <span className="flex w-4 justify-center">
-                {selectedMenu === menuItem.id ? (
-                  <Check className="h-3.5 w-3.5" />
-                ) : (
-                  <span className="h-3.5 w-3.5" />
-                )}
-              </span>
-            ) : (
-              <span className="w-4" />
-            )}
-            <menuItem.icon className="h-3.5 w-3.5" />
-            <span className="flex-1">{menuItem.title}</span>
+          <div className="flex items-center text-gray-700 h-7">
+            <span className={`
+              w-5 h-full flex justify-center items-center
+              ${checkableMenuIds.includes(menuItem.id) 
+                ? 'bg-[#eceef2] border-r border-gray-200' 
+                : 'invisible'
+              }
+            `}>
+              {checkableMenuIds.includes(menuItem.id) && selectedMenu === menuItem.id && (
+                <Check className="h-3 w-3 text-blue-600" />
+              )}
+            </span>
+            <span className="flex-1 px-2">{menuItem.title}</span>
           </div>
         </ContextMenuItem>
       ))}
