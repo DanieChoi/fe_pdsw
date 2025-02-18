@@ -316,6 +316,7 @@ export default function CampaignDetail() {
   const [callingNumberChangeYn, setCallingNumberChangeYn] = useState<boolean>(false); // 캠페인 발신번호 변경여부
   const [campaignScheduleChangeYn, setCampaignScheduleChangeYn] = useState<boolean>(false); // 캠페인 스케줄 변경여부
   const [campaignDialSpeedChangeYn, setCampaignDialSpeedChangeYn] = useState<boolean>(false); // 캠페인 발신속도 변경여부
+  const [tempCampaignId, setTempCampaignId] = useState<number>(0);
   const { tenants
     , setCampaigns
     , campaigns
@@ -931,18 +932,28 @@ export default function CampaignDetail() {
   const { mutate: fetchCampaignManagerInsert } = useApiForCampaignManagerInsert({
     onSuccess: (data) => {
       // setCampaignInfoChangeYn(false);
+      setTempCampaignId(data.result_data.campaign_id);
+      const _tempCampaignSchedule = {...tempCampaignSchedule,
+        campaign_id: data.result_data.campaign_id
+      }
       //캠페인 스케줄 수정 api 호출
-      fetchCampaignScheduleInsert(tempCampaignSchedule);
+      fetchCampaignScheduleInsert(_tempCampaignSchedule);
     }
   });
 
   //캠페인 스케줄 등록 api 호출
   const { mutate: fetchCampaignScheduleInsert } = useApiForCampaignScheduleInsert({
     onSuccess: (data) => {
-      if( tempCampaignSkills.skill_id.length > 0 ){
-        fetchCampaignSkillUpdate(tempCampaignSkills);
-      }else if (tempCallingNumberInfo.calling_number === '' ) {
-        fetchCallingNumberInsert(tempCallingNumberInfo);
+      if( tempCampaignSkills.skill_id[0] !== 0 ){
+        const _tempCampaignSkills = {...tempCampaignSkills,
+          campaign_id: tempCampaignId
+        }
+        fetchCampaignSkillUpdate(_tempCampaignSkills);
+      }else if (tempCallingNumberInfo.calling_number !== '' ) {
+        const _tempCallingNumberInfo = {...tempCallingNumberInfo,
+          campaign_id: tempCampaignId
+        }
+        fetchCallingNumberInsert(_tempCallingNumberInfo);
       }else{    
         fetchMain({
           session_key: '',
@@ -951,10 +962,16 @@ export default function CampaignDetail() {
       }
     }
     ,onError: (data) => {
-      if( tempCampaignSkills.skill_id.length > 0 ){
-        fetchCampaignSkillUpdate(tempCampaignSkills);
-      }else if (tempCallingNumberInfo.calling_number === '' ) {
-        fetchCallingNumberInsert(tempCallingNumberInfo);
+      if( tempCampaignSkills.skill_id[0] !== 0 ){
+        const _tempCampaignSkills = {...tempCampaignSkills,
+          campaign_id: tempCampaignId
+        }
+        fetchCampaignSkillUpdate(_tempCampaignSkills);
+      }else if (tempCallingNumberInfo.calling_number !== '' ) {
+        const _tempCallingNumberInfo = {...tempCallingNumberInfo,
+          campaign_id: tempCampaignId
+        }
+        fetchCallingNumberInsert(_tempCallingNumberInfo);
       }else{    
         fetchMain({
           session_key: '',
@@ -967,8 +984,11 @@ export default function CampaignDetail() {
   //캠페인 스킬 수정 api 호출
   const { mutate: fetchCampaignSkillUpdate } = useApiForCampaignSkillUpdate({
     onSuccess: (data) => {
-      if (tempCallingNumberInfo.calling_number === '' ) {
-        fetchCallingNumberInsert(tempCallingNumberInfo);
+      if (tempCallingNumberInfo.calling_number !== '' ) {
+        const _tempCallingNumberInfo = {...tempCallingNumberInfo,
+          campaign_id: tempCampaignId
+        }
+        fetchCallingNumberInsert(_tempCallingNumberInfo);
       }else{        
         fetchMain({
           session_key: '',
@@ -998,7 +1018,7 @@ export default function CampaignDetail() {
       removeTab(Number(activeTabId), activeTabKey + '');
     }
   });
-
+  
   useEffect(() => {
     if( campaigns ){
       setSelectedCampaign(campaigns.filter(data => data.campaign_id === Number(campaignIdForCopyCampaign))[0]);

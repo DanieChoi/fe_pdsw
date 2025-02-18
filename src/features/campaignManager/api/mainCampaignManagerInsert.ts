@@ -1,9 +1,9 @@
 // src/features/campaignManager/hooks/fetchCampaignManagerInsert.ts
 import { axiosInstance } from '@/lib/axios';
-import { CampaignInfoUpdateRequest, UpdateResponse } from '../types/campaignManagerIndex';
+import { CampaignInfoUpdateRequest, CampaignInsertResponse } from '../types/campaignManagerIndex';
 
 // 캠페인 관리 등록 요청
-export const fetchCampaignManagerInsert = async (credentials: CampaignInfoUpdateRequest): Promise<UpdateResponse> => {
+export const fetchCampaignManagerInsert = async (credentials: CampaignInfoUpdateRequest): Promise<CampaignInsertResponse> => {
   const campaignManagerInsertRequestData = {
     request_data: {      
       campaign_name: credentials.campaign_name, 
@@ -65,7 +65,7 @@ export const fetchCampaignManagerInsert = async (credentials: CampaignInfoUpdate
   };
 
   try {
-    const { data } = await axiosInstance.post<UpdateResponse>(
+    const { data } = await axiosInstance.post<CampaignInsertResponse>(
       'campaigns/'+credentials.campaign_id, 
       campaignManagerInsertRequestData
     );

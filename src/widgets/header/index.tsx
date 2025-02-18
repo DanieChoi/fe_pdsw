@@ -226,11 +226,11 @@ export default function Header() {
                       onClick={(e) => handleMenuClick(item, e)}
                       className="relative p-2"
                     >
-                      {isActive && (
+                      {/* {isActive && (
                         <div className="absolute top-1 right-1">
                           <Check className="w-3 h-3 text-[#fff]" />
                         </div>
-                      )}
+                      )} */}
                       <div className="flex items-center justify-center p-1">
                         <Image
                           src={item.icon}

@@ -116,7 +116,7 @@ export interface CallingNumberListResponse {
 export interface AutoRedialListDataResponse {
   campaign_id: number;
   sequence_number: number;
-  start_time: string;
+  start_date: string;
   redial_condition: string;
   run_flag: number;
 }
@@ -179,6 +179,18 @@ export interface PhoneDescriptionListResponse {
   result_count: number;
   total_count: number;
   result_data: PhoneDescriptionListDataResponse[];
+}
+
+// 캠페인 추가 응답 타입
+export interface CampaignInsertDataResponse {
+  campaign_id: number;
+}
+
+// 캠페인 추가 응답 타입
+export interface CampaignInsertResponse {
+  result_code: number;
+  result_msg: string;
+  result_data: CampaignInsertDataResponse;
 }
 
 // 수정 응답 타입

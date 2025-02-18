@@ -1169,6 +1169,10 @@ export default function CampaignDetail() {
         //캠페인관리 화면 닫기.
         removeTab(Number(activeTabId), activeTabKey + '');
       }
+    },onError: (data) => {
+      // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
+      //캠페인관리 화면 닫기.
+      removeTab(Number(activeTabId), activeTabKey + '');
     }
   });
 
