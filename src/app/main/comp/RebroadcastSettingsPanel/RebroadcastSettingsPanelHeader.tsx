@@ -38,13 +38,15 @@ const errorMessage: CustomAlertRequest = {
 type Props = {
   campaignId?: string;
   reservationShouldShowApply: boolean;
+  reservationShouldShowAdd:boolean;
+  reservationShouldShowDelete:boolean;
   handleBroadcastTypeChange: (param:string) => void;
   handleAddRebroadcast:() => void;
   handleRemoveRebroadcast:() => void;
   handleApplyRebroadcast:() => void;
 }
 
-const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply
+const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply,reservationShouldShowAdd, reservationShouldShowDelete
     , handleBroadcastTypeChange
     , handleAddRebroadcast
     , handleRemoveRebroadcast
@@ -59,12 +61,14 @@ const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply
     const [listCount, setListCount] = useState<number>(0);
     const [rebroadcastList, setRebroadcastList] = useState<RebroadcastItem[]>([]);
     const [selectedRebroadcastId, setSelectedRebroadcastId] = useState<number | null>(null);
-    const [shouldShowApply, setShouldShowApply] = useState<boolean>(false);
+    const [shouldShowApply, setShouldShowApply] = useState<boolean>(false);    //적용 버튼.
+    const [shouldShowAdd, setShouldShowAdd] = useState<boolean>(false);        //추가 버튼.
+    const [shouldShowAddDelete, setShouldShowDelete] = useState<boolean>(false);    //삭제 버튼.
 
     const [headerCampaignId, setHeaderCampaignId] = useState<string>('');
 
     // 버튼 활성화 상태 관리
-    const shouldShowAddDelete = broadcastType === "reservation" && rebroadcastList.every(item => !item.isDummy);
+    // const shouldShowAddDelete = broadcastType === "reservation" && rebroadcastList.every(item => !item.isDummy);
     // const shouldShowApply = (broadcastType === "realtime") || 
     //                    (broadcastType === "reservation" && 
     //                     rebroadcastList.some(item => item.isDummy));
@@ -110,7 +114,9 @@ const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply
     //적용 버튼 
     useEffect(() => {
         setShouldShowApply(reservationShouldShowApply);
-    }, [reservationShouldShowApply]);
+        setShouldShowAdd(reservationShouldShowAdd);
+        setShouldShowDelete(reservationShouldShowDelete);
+    }, [reservationShouldShowApply,reservationShouldShowAdd,reservationShouldShowDelete]);
 
     useEffect(() => {
         if( campaigns && campaignId !== '0' ){
@@ -170,13 +176,13 @@ const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply
                         </CommonButton>
                         <CommonButton 
                             onClick={handleAddRebroadcastClick} 
-                            disabled={!shouldShowAddDelete}
+                            disabled={!shouldShowAdd}
                         >
                             추가
                         </CommonButton>
                         <CommonButton 
                             onClick={handleRemoveRebroadcastClick}
-                            disabled={selectedRebroadcastId === null}
+                            disabled={!shouldShowAddDelete}
                         >
                             삭제
                         </CommonButton>

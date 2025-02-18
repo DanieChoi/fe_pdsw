@@ -15,7 +15,7 @@ import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
 import { useTabStore, useMainStore } from '@/store';
 import RebroadcastSettingsPanelHeader from './RebroadcastSettingsPanelHeader';
-import { useApiForCampaignAutoRedial } from '@/features/rebroadcastSettingsPanel/hooks/useApiForCampaignAutoRedial';
+import { useApiForAutoRedial } from '@/features/campaignManager/hooks/useApiForAutoRedial';
 
 interface RebroadcastSettings {
     campaignId: string;
@@ -115,7 +115,9 @@ const RebroadcastSettingsPanel = () => {
 
     const [_campaignId, set_campaignId] = useState<string>('0');
     const [listRedialQuery, setListRedialQuery] = useState<string>('');
-    const [reservationShouldShowApply,setReservationShouldShowApply ] = useState<boolean>(false);
+    const [reservationShouldShowApply,setReservationShouldShowApply ] = useState<boolean>(false);   //적용 버튼.
+    const [reservationShouldShowAdd,setReservationShouldShowAdd ] = useState<boolean>(false);       //추가 버튼.
+    const [reservationShouldShowDelete,setReservationShouldShowDelete ] = useState<boolean>(false);       //삭제 버튼.
     const [outgoingResultDisabled,setOutgoingResultDisabled ] = useState<boolean>(false);
 
     // 발신결과 체크박스 상태 관리
@@ -303,7 +305,10 @@ const RebroadcastSettingsPanel = () => {
             redialCondition:'',
             isDummy: true
         };
-        setReservationShouldShowApply(true);
+        //버튼 설정.        
+        setReservationShouldShowApply(true);            
+        setReservationShouldShowAdd(false);
+        setReservationShouldShowDelete(false);
 
         setRebroadcastList([...rebroadcastList, newRebroadcast]);
         resetAllStates();
@@ -464,9 +469,36 @@ const RebroadcastSettingsPanel = () => {
         resetAllStates();
         if( param === 'realtime' ){
             setOutgoingResultDisabled(false);  
-            // setShouldShowApply(true);
+            //버튼 설정.        
+            setReservationShouldShowApply(true);            
+            setReservationShouldShowAdd(false);
+            setReservationShouldShowDelete(false);
         }else{
             // setShouldShowApply(reservationShouldShowApply);
+            if( rebroadcastList.length > 0 && rebroadcastList.filter(data => data.isDummy ).length > 0 ){
+                //버튼 설정.
+                setReservationShouldShowApply(true);
+                setReservationShouldShowAdd(false);
+                setReservationShouldShowDelete(false);
+            }else if( rebroadcastList.length > 0){
+                //첫번째 row 선택.
+                setSelectedRebroadcastId(rebroadcastList[0].id);
+                setListRedialQuery(rebroadcastList[0].redialCondition);
+                //발신결과 disabled 설정.
+                setOutgoingResultDisabled(true);    
+                setOutgoingResultChecked(false);
+                setOutgoingTypeChecked(false);
+                setOutgoingTimeChecked(false);
+                //버튼 설정.
+                setReservationShouldShowApply(false);
+                setReservationShouldShowAdd(true);
+                setReservationShouldShowDelete(true);
+            }else{
+                //버튼 설정.
+                setReservationShouldShowApply(false);
+                setReservationShouldShowAdd(true);
+                setReservationShouldShowDelete(true);
+            }
         }
     };
     
@@ -582,7 +614,7 @@ const RebroadcastSettingsPanel = () => {
     }, [listRedialQuery, broadcastType]);
 
     // 캠페인 재발신 정보 리스트 조회
-    const { mutate: fetchCampaignAutoRedials } = useApiForCampaignAutoRedial({
+    const { mutate: fetchCampaignAutoRedials } = useApiForAutoRedial({
         onSuccess: (data) => {
             if (data.result_data.length > 0) {
                 const tempList = data.result_data.filter(data => data.campaign_id === Number(campaignIdForUpdateFromSideMenu));
@@ -620,6 +652,9 @@ const RebroadcastSettingsPanel = () => {
             if (campaign) {
                 setListRedialQuery(campaign.list_redial_query);
             }
+            //버튼 설정.                    
+            setReservationShouldShowAdd(true);
+            setReservationShouldShowDelete(true);
             fetchCampaignAutoRedials({
                 session_key: '',
                 tenant_id: 0,
@@ -632,6 +667,8 @@ const RebroadcastSettingsPanel = () => {
             <div className="flex flex-col gap-6">
                 <RebroadcastSettingsPanelHeader campaignId={_campaignId} 
                     reservationShouldShowApply={reservationShouldShowApply}
+                    reservationShouldShowAdd={reservationShouldShowAdd}
+                    reservationShouldShowDelete={reservationShouldShowDelete}
                     handleBroadcastTypeChange={handleBroadcastTypeChange} 
                     handleAddRebroadcast={handleAddRebroadcast}
                     handleRemoveRebroadcast={handleRemoveRebroadcast}
