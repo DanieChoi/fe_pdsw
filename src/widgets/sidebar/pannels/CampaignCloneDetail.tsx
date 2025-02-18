@@ -1018,8 +1018,7 @@ export default function CampaignDetail() {
       removeTab(Number(activeTabId), activeTabKey + '');
     }
   });
-  tempCampaignId
-
+  
   useEffect(() => {
     if( campaigns ){
       setSelectedCampaign(campaigns.filter(data => data.campaign_id === Number(campaignIdForCopyCampaign))[0]);
