@@ -180,10 +180,30 @@ export function ContextMenuForTreeNode({
 
   const handleRebroadcastClick = () => {
     simulateHeaderMenuClick(5);
+
+    // 20번에 대해 add tab 예약 재발신
+    addTab({
+      id: 20,
+      uniqueKey: '20',
+      title: '재발신 설정',
+      icon: '',
+      href: '',
+      content: null,
+    });
+
   };
 
   const handleMonitorClick = () => {
-    simulateHeaderMenuClick(3);
+    // simulateHeaderMenuClick(3);
+    // 상담원 상태 모니터 add tab 21
+    addTab({
+      id: 21,
+      uniqueKey: '21',
+      title: '상담원 상태 모니터',
+      icon: '',
+      href: '',
+      content: null,
+    });
   };
 
   const handleStartClick = () => {
@@ -192,6 +212,7 @@ export function ContextMenuForTreeNode({
 
   const handleBlacklistCountCheckClick = () => {
     // simulateHeaderMenuClick(7); // 블랙리스트 건수 조회
+    // alert("블랙 리스트 클릭")
     addTab({
       id: 501,
       uniqueKey: '501',
