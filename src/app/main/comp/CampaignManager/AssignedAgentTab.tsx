@@ -7,7 +7,6 @@ import 'react-data-grid/lib/styles.css';
 import { CommonButton } from "@/components/shared/CommonButton";
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { AdditionalInfoTabParam } from './CampaignManagerDetail';
-import { useApiForCampaignAgent } from '@/features/campaignManager/hooks/useApiForCampaignAgent';
 import { useApiForCampaignAssignmentAgent } from '@/features/campaignManager/hooks/useApiForCampaignAssignmentAgent';
 
 interface ConsultingData {
@@ -42,17 +41,6 @@ type Props = {
 
 const AssignedAgentTab: React.FC<Props> = ({newCampaignYn,campaignInfo,onHandleAdditionalInfoTabChange}) => {
   const [initialData, setInitialData] = useState<TreeRow[]>([]);
-  // 캠페인 소속 상담사 리스트 요청
-  const { mutate: fetchCampaignAgents } = useApiForCampaignAgent({
-    onSuccess: (data) => {
-      if( data.result_data.length > 0 && data.result_data[0].agent_id.length > 0 ){
-        fetchCampaignAssignmentAgents({
-          tenant_id: campaignInfo.tenant_id
-          , counselors: data.result_data[0].agent_id.join(',')
-        });
-      }
-    }
-  });
   const transformToTreeData = (counselors: any[]) => {
     const result: any[] = [];
 
@@ -133,7 +121,10 @@ const AssignedAgentTab: React.FC<Props> = ({newCampaignYn,campaignInfo,onHandleA
 
   useEffect(() => {
     if (!newCampaignYn && campaignInfo && campaignInfo.campaign_id > 0 ) {  
-      fetchCampaignAgents({ campaign_id: campaignInfo.campaign_id });
+      fetchCampaignAssignmentAgents({
+        tenantId: campaignInfo.tenant_id+''
+        , campaignId: campaignInfo.campaign_id+''
+      });
     }
     setInitialData([]);
   }, [newCampaignYn,campaignInfo]);

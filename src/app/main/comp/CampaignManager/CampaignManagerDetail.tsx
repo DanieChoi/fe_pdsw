@@ -336,7 +336,8 @@ export default function CampaignDetail() {
     , selectedCampaign
     , setSelectedCampaign
   } = useMainStore();
-  const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab, openRebroadcastSettings } = useTabStore();
+  const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab
+    , campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
   const [inputSkills, setInputSkills] = useState('');
   const [inputCallingNumber, setInputCallingNumber] = useState('');
@@ -1315,6 +1316,9 @@ export default function CampaignDetail() {
   //재발신 버튼 이벤트
   const handleRebroadcast = () => {
     // openRebroadcastSettings('20','재발신 설정');
+    if( campaignIdForUpdateFromSideMenu == null || campaignIdForUpdateFromSideMenu === ''){
+      setCampaignIdForUpdateFromSideMenu(tempCampaignInfo.campaign_id+'');
+    }
     if (openedTabs.some(tab => tab.id === 20)) {
       setActiveTab(20, openedTabs.filter((data) => data.id === 20)[0].uniqueKey);
     } else if (!openedTabs.some(tab => tab.id === 20)) {

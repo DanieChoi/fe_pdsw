@@ -51,8 +51,8 @@ export interface SkillListCredentials {
 
 // 캠페인 할당상담원 요청 시 필요한 credentials 타입
 export interface CampaignAssignmentAgentCredentials {
-  tenant_id: number;
-  counselors: string;
+  tenantId: string;
+  campaignId: string;
 }
 
 // 캠페인 할당상담원 데이터 타입
