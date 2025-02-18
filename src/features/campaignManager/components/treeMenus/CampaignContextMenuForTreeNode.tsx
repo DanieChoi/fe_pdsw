@@ -139,105 +139,105 @@ export const CampaignContextMenu = ({
   };
   return (
     <>
-    <ContextMenuContent className="w-56">
-      <ContextMenuItem onClick={handleEditMenuClick}>
-        <Edit className="mr-2 h-4 w-4" />
-        캠페인 수정
-      </ContextMenuItem>
+      <ContextMenuContent className="w-56">
+        <ContextMenuItem onClick={handleEditMenuClick}>
+          <Edit className="mr-2 h-4 w-4" />
+          캠페인 수정
+        </ContextMenuItem>
 
-      <ContextMenuSub>
-        <ContextMenuSubTrigger>
-          <Search className="mr-2 h-4 w-4" />
-          시작구분: {item.id}
-        </ContextMenuSubTrigger>
-        <ContextMenuSubContent className="w-48">
-          <ContextMenuItem
-            onClick={() => handleChangeForCampaignStatus('started')}
-            className={cn(
-              item.status === 'started' && "opacity-50 cursor-not-allowed",
-              "flex items-center"
-            )}
-            disabled={item.status === 'started' || isPending}
-          >
-            <Clock className={cn(
-              "mr-2 h-4 w-4",
-              item.status === 'started' && "text-green-500"
-            )} />
-            시작
-            {item.status === 'started' && " (현재)"}
-          </ContextMenuItem>
+        <ContextMenuSub>
+          <ContextMenuSubTrigger>
+            <Search className="mr-2 h-4 w-4" />
+            시작구분: {item.id}
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent className="w-48">
+            <ContextMenuItem
+              onClick={() => handleChangeForCampaignStatus('started')}
+              className={cn(
+                item.status === 'started' && "opacity-50 cursor-not-allowed",
+                "flex items-center"
+              )}
+              disabled={item.status === 'started' || isPending}
+            >
+              <Clock className={cn(
+                "mr-2 h-4 w-4",
+                item.status === 'started' && "text-green-500"
+              )} />
+              시작
+              {item.status === 'started' && " (현재)"}
+            </ContextMenuItem>
 
-          <ContextMenuItem
-            onClick={() => handleChangeForCampaignStatus('pending')}
-            className={cn(
-              item.status === 'pending' && "opacity-50 cursor-not-allowed",
-              "flex items-center"
-            )}
-            disabled={item.status === 'pending' || isPending}
-          >
-            <List className={cn(
-              "mr-2 h-4 w-4",
-              item.status === 'pending' && "text-yellow-500"
-            )} />
-            멈춤
-            {item.status === 'pending' && " (현재)"}
-          </ContextMenuItem>
+            <ContextMenuItem
+              onClick={() => handleChangeForCampaignStatus('pending')}
+              className={cn(
+                item.status === 'pending' && "opacity-50 cursor-not-allowed",
+                "flex items-center"
+              )}
+              disabled={item.status === 'pending' || isPending}
+            >
+              <List className={cn(
+                "mr-2 h-4 w-4",
+                item.status === 'pending' && "text-yellow-500"
+              )} />
+              멈춤
+              {item.status === 'pending' && " (현재)"}
+            </ContextMenuItem>
 
-          <ContextMenuItem
-            onClick={() => handleChangeForCampaignStatus('stopped')}
-            className={cn(
-              item.status === 'stopped' && "opacity-50 cursor-not-allowed",
-              "flex items-center"
-            )}
-            disabled={item.status === 'stopped' || isPending}
-          >
-            <History className={cn(
-              "mr-2 h-4 w-4",
-              item.status === 'stopped' && "text-red-500"
-            )} />
-            중지
-            {item.status === 'stopped' && " (현재)"}
-          </ContextMenuItem>
-        </ContextMenuSubContent>
-      </ContextMenuSub>
+            <ContextMenuItem
+              onClick={() => handleChangeForCampaignStatus('stopped')}
+              className={cn(
+                item.status === 'stopped' && "opacity-50 cursor-not-allowed",
+                "flex items-center"
+              )}
+              disabled={item.status === 'stopped' || isPending}
+            >
+              <History className={cn(
+                "mr-2 h-4 w-4",
+                item.status === 'stopped' && "text-red-500"
+              )} />
+              중지
+              {item.status === 'stopped' && " (현재)"}
+            </ContextMenuItem>
+          </ContextMenuSubContent>
+        </ContextMenuSub>
 
-      <ContextMenuItem onClick={handleProgressInfoClick}>
-        <Settings className="mr-2 h-4 w-4" />
-        캠페인 진행정보
-      </ContextMenuItem>
+        <ContextMenuItem onClick={handleProgressInfoClick}>
+          <Settings className="mr-2 h-4 w-4" />
+          캠페인 진행정보
+        </ContextMenuItem>
 
-      <ContextMenuSeparator />
+        <ContextMenuSeparator />
 
-      <ContextMenuItem onClick={handleRebroadcastClick}>
-        <RefreshCcw className="mr-2 h-4 w-4" />
-        예약 재발신
-      </ContextMenuItem>
+        <ContextMenuItem onClick={handleRebroadcastClick}>
+          <RefreshCcw className="mr-2 h-4 w-4" />
+          예약 재발신
+        </ContextMenuItem>
 
-      <ContextMenuSeparator />
+        <ContextMenuSeparator />
 
-      <ContextMenuItem onClick={onHandleCampaignCopy}>
-        <Copy className="mr-2 h-4 w-4" />
-        캠페인 복사
-      </ContextMenuItem>
+        <ContextMenuItem onClick={onHandleCampaignCopy}>
+          <Copy className="mr-2 h-4 w-4" />
+          캠페인 복사
+        </ContextMenuItem>
 
-      <ContextMenuSeparator />
+        <ContextMenuSeparator />
 
-      <ContextMenuItem onClick={onDelete}>
-        <Trash2 className="mr-2 h-4 w-4" />
-        캠페인 리스트 삭제
-      </ContextMenuItem>
+        <ContextMenuItem onClick={onDelete}>
+          <Trash2 className="mr-2 h-4 w-4" />
+          캠페인 리스트 삭제
+        </ContextMenuItem>
 
-      <ContextMenuItem onClick={handleMonitorClick}>
-        <Activity className="mr-2 h-4 w-4" />
-        상담원 상태 모니터
-      </ContextMenuItem>
+        <ContextMenuItem onClick={handleMonitorClick}>
+          <Activity className="mr-2 h-4 w-4" />
+          상담원 상태 모니터
+        </ContextMenuItem>
 
-      <ContextMenuItem onClick={handleBlacklistCountClick}>
-        <Shield className="mr-2 h-4 w-4" />
-        블랙리스트 건수 조회
-      </ContextMenuItem>
-    </ContextMenuContent>
-    <BlackListCountPopup/>
+        <ContextMenuItem onClick={handleBlacklistCountClick}>
+          <Shield className="mr-2 h-4 w-4" />
+          블랙리스트 건수 조회
+        </ContextMenuItem>
+      </ContextMenuContent>
+      <BlackListCountPopup />
     </>
   );
 };
