@@ -811,8 +811,11 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   const { mutate: fetchCampaignManagerInsert } = useApiForCampaignManagerInsert({
     onSuccess: (data) => {
       setCampaignInfoChangeYn(false);
+      const _tempCampaignSchedule = {...tempCampaignSchedule,
+        campaign_id: data.result_data.campaign_id
+      }
       //캠페인 스케줄 수정 api 호출
-      fetchCampaignScheduleInsert(tempCampaignSchedule);
+      fetchCampaignScheduleInsert(_tempCampaignSchedule);
     }
   });
 

@@ -12,7 +12,7 @@ export const fetchAutoRedialDelete = async (credentials: AutoRedialDataRequest):
   
   try {
     const { data } = await axiosInstance.delete<UpdateResponse>(
-      'campaigns/' + credentials.campaign_id + '/auto-redial',
+      'campaigns/' + credentials.campaign_id + '/scheduled-redial',
       {
         headers: {
           'Content-Type': 'application/json' 

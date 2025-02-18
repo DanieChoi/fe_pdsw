@@ -181,6 +181,18 @@ export interface PhoneDescriptionListResponse {
   result_data: PhoneDescriptionListDataResponse[];
 }
 
+// 캠페인 추가 응답 타입
+export interface CampaignInsertDataResponse {
+  campaign_id: number;
+}
+
+// 캠페인 추가 응답 타입
+export interface CampaignInsertResponse {
+  result_code: number;
+  result_msg: string;
+  result_data: CampaignInsertDataResponse;
+}
+
 // 수정 응답 타입
 export interface UpdateResponse {
   result_code: number;

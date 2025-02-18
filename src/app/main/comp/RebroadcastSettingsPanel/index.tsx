@@ -16,6 +16,8 @@ import 'react-calendar/dist/Calendar.css';
 import { useTabStore, useMainStore } from '@/store';
 import RebroadcastSettingsPanelHeader from './RebroadcastSettingsPanelHeader';
 import { useApiForAutoRedial } from '@/features/campaignManager/hooks/useApiForAutoRedial';
+import { useApiForCampaignAutoRedialInsert } from '@/features/rebroadcastSettingsPanel/hooks/useApiForCampaignAutoRedialInsert';
+import { useApiForAutoRedialDelete } from '@/features/campaignManager/hooks/useApiForAutoRedialDelete';
 
 interface RebroadcastSettings {
     campaignId: string;
@@ -44,7 +46,7 @@ const errorMessage: CustomAlertRequest = {
     isOpen: false,
     message: '',
     title: '재발신 설정',
-    type: '0',
+    type: '1',
     onClose: () => { },
     onCancle: () => { },
 };
@@ -119,6 +121,7 @@ const RebroadcastSettingsPanel = () => {
     const [reservationShouldShowAdd,setReservationShouldShowAdd ] = useState<boolean>(false);       //추가 버튼.
     const [reservationShouldShowDelete,setReservationShouldShowDelete ] = useState<boolean>(false);       //삭제 버튼.
     const [outgoingResultDisabled,setOutgoingResultDisabled ] = useState<boolean>(false);
+    const [sequenceNumber, setSequenceNumber] = useState<number>(1);
 
     // 발신결과 체크박스 상태 관리
     const [selectedOutgoingResults, setSelectedOutgoingResults] = useState<{ [key: string]: boolean }>(initOutgoingResult);
@@ -126,7 +129,7 @@ const RebroadcastSettingsPanel = () => {
     const resetAllStates = () => {
         setStartDate(new Date());
         setEndDate(new Date());
-        setStartTime("");
+        setStartTime("0000");
         setTimeType("final-call-date"); //발신시간.
         setCallType("not-sent");
         
@@ -292,9 +295,9 @@ const RebroadcastSettingsPanel = () => {
     const handleAddRebroadcast = () => {
         const redialCondition = MakeRedialPacket();
         const newRebroadcast: RebroadcastItem = {
-            id: rebroadcastList.length + 1,
+            id: sequenceNumber,
             scheduleStartDate: "",
-            scheduleStartTime: "",
+            scheduleStartTime: '0000',
             outgoingResults: [],
             outgoingType: "",
             outgoingTime: {
@@ -309,23 +312,39 @@ const RebroadcastSettingsPanel = () => {
         setReservationShouldShowApply(true);            
         setReservationShouldShowAdd(false);
         setReservationShouldShowDelete(false);
+        //발신결과 disabled 설정.
+        setOutgoingResultDisabled(false);   
 
         setRebroadcastList([...rebroadcastList, newRebroadcast]);
         resetAllStates();
     };
 
+    //삭제 버튼 클릭 이벤트.
     const handleRemoveRebroadcast = () => {
         if (selectedRebroadcastId !== null && rebroadcastList.some(item => item.id === selectedRebroadcastId)) {
-            const updatedList = rebroadcastList.filter(item => item.id !== selectedRebroadcastId);
-            setRebroadcastList(updatedList);
-            setSelectedRebroadcastId(null);
-
-            if (updatedList.length === 0) {
-                resetAllStates();
-            }
+            fetchAutoRedialDelete({
+              campaign_id: Number(campaignIdForUpdateFromSideMenu)
+              , sequence_number: selectedRebroadcastId
+            });
         }
     };
 
+    const handleWorkDelete = () => {
+        const tempRebroadcastList = rebroadcastList.filter(data => !data.isDummy);
+        setRebroadcastList(tempRebroadcastList);
+        setAlertState(prev => ({ ...prev, isOpen: false }));
+        //버튼 설정.        
+        setReservationShouldShowApply(false);            
+        setReservationShouldShowAdd(true);
+        setReservationShouldShowDelete(true);
+        //발신결과 disabled 설정. 
+        setOutgoingResultChecked(false);
+        setOutgoingTypeChecked(false);
+        setOutgoingTimeChecked(false);
+        setOutgoingResultDisabled(true);   
+    };
+
+    //그리드 클릭이벤트..
     const handleSelectRebroadcast = (id: number) => {
 
         // 더미 항목이 있는지 확인
@@ -333,11 +352,12 @@ const RebroadcastSettingsPanel = () => {
 
         if (hasDummyItem) {
             setAlertState({
+                ...errorMessage,
                 isOpen: true,
-                message: '현재 추가 중인 재발신 항목이 있습니다. 적용 또는 취소해주세요.',
+                message: '재발신 추가중입니다. \n추가를 중단하고 삭제하시겠습니까?',
                 title: '알림',
-                type: '0',
-                onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                type: '1',
+                onClose: handleWorkDelete,
                 onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
             });
             return;
@@ -351,24 +371,6 @@ const RebroadcastSettingsPanel = () => {
 
         if (selected) {
             setSelectedRebroadcastDetails(selected);
-
-            // 발신결과 체크박스 상태 초기화
-            // const newSelectedResults = { ...selectedOutgoingResults };
-            // Object.keys(newSelectedResults).forEach(key => {
-            //     newSelectedResults[key] = false;
-            // });
-
-            // 선택된 항목의 발신결과로 체크박스 상태 업데이트
-            // if (Array.isArray(selected.outgoingResults)) {
-            //     selected.outgoingResults.forEach(result => {
-            //         if (newSelectedResults.hasOwnProperty(result)) {
-            //             newSelectedResults[result] = true;
-            //         }
-            //     });
-            // }
-
-            // 상태 업데이트
-            // setSelectedOutgoingResults(newSelectedResults);
 
             // 날짜 및 시간 설정
             if (selected.scheduleStartDate) {
@@ -418,44 +420,14 @@ const RebroadcastSettingsPanel = () => {
                 return;
             }
 
-            const processedRebroadcasts = rebroadcastList
-                .filter(item => item.isDummy)
-                .map(item => ({
-                    id: item.id,
-                    scheduleStartDate: startDate ? startDate.toString() : '',
-                    scheduleStartTime: startTime,
-                    outgoingResults: selectedResults,
-                    outgoingType: callType,
-                    outgoingTime: {
-                        type: timeType,
-                        startDate: startDate ? startDate.toString() : '',
-                        endDate: endDate ? endDate.toString() : '',
-                    },
-                    redialCondition:''
-                }));
-
-            setRebroadcastList(prevList =>
-                prevList.map(item =>
-                    item.isDummy
-                        ? processedRebroadcasts.find(proc => proc.id === item.id) || item
-                        : item
-                )
-            );
-
-            setAlertState({
-                isOpen: true,
-                message: "재발신 설정이 적용되었습니다.",
-                title: '재발신 적용 완료',
-                type: '0',
-                onClose: () => {
-                    setAlertState(prev => ({ ...prev, isOpen: false }));
-                    resetAllStates();
-                },
-                onCancle: () => {
-                    setAlertState(prev => ({ ...prev, isOpen: false }));
-                    resetAllStates();
-                }
+            fetchCampaignAutoRedialInsert({
+                campaign_id: Number(campaignIdForUpdateFromSideMenu),
+                sequence_number: sequenceNumber,
+                start_date: startDate instanceof Date ? startDate.getFullYear() + ('0' + (startDate.getMonth() + 1)).slice(-2) + ('0' + startDate.getDate()).slice(-2) + startTime + '00' : '',
+                redial_condition: MakeRedialPacket(),
+                run_flag: 2
             });
+
         }
         // 실시간 모드 처리 로직은 기존과 동일
         else if (broadcastType === "realtime") {
@@ -468,11 +440,11 @@ const RebroadcastSettingsPanel = () => {
         setBroadcastType(param);        
         resetAllStates();
         if( param === 'realtime' ){
-            setOutgoingResultDisabled(false);  
             //버튼 설정.        
             setReservationShouldShowApply(true);            
             setReservationShouldShowAdd(false);
             setReservationShouldShowDelete(false);
+            setOutgoingResultDisabled(false);  
         }else{
             // setShouldShowApply(reservationShouldShowApply);
             if( rebroadcastList.length > 0 && rebroadcastList.filter(data => data.isDummy ).length > 0 ){
@@ -484,11 +456,11 @@ const RebroadcastSettingsPanel = () => {
                 //첫번째 row 선택.
                 setSelectedRebroadcastId(rebroadcastList[0].id);
                 setListRedialQuery(rebroadcastList[0].redialCondition);
-                //발신결과 disabled 설정.
-                setOutgoingResultDisabled(true);    
+                //발신결과 disabled 설정. 
                 setOutgoingResultChecked(false);
                 setOutgoingTypeChecked(false);
                 setOutgoingTimeChecked(false);
+                setOutgoingResultDisabled(true);   
                 //버튼 설정.
                 setReservationShouldShowApply(false);
                 setReservationShouldShowAdd(true);
@@ -618,7 +590,7 @@ const RebroadcastSettingsPanel = () => {
         onSuccess: (data) => {
             if (data.result_data.length > 0) {
                 const tempList = data.result_data.filter(data => data.campaign_id === Number(campaignIdForUpdateFromSideMenu));
-                if (tempList.length > 0) {
+                if (tempList.length > 0) {                  
                     const prevList = tempList.map(item => ({
                         id: item.sequence_number,
                         scheduleStartDate: item.start_date.substring(0, 4) + '-' + item.start_date.substring(4, 6) + '-' + item.start_date.substring(6, 8),
@@ -632,16 +604,67 @@ const RebroadcastSettingsPanel = () => {
                     setRebroadcastList(prevList);
                     //첫번째 row 선택.
                     setSelectedRebroadcastId(prevList[0].id);
+                    // handleSelectRebroadcast(prevList[0].id);
                     setListRedialQuery(prevList[0].redialCondition);
                     //발신결과 disabled 설정.
-                    setOutgoingResultDisabled(true);    
                     setOutgoingResultChecked(false);
                     setOutgoingTypeChecked(false);
                     setOutgoingTimeChecked(false);
+                    setOutgoingResultDisabled(true);    
+                    setSequenceNumber(Math.max(...tempList.map(item => item.sequence_number))+1);  
                 }
             }
         }
     });
+    
+    // 캠페인 재발신 정보 추가
+    const { mutate: fetchCampaignAutoRedialInsert } = useApiForCampaignAutoRedialInsert({
+        onSuccess: (data) => {
+            const tempData = data.result_data;
+            const processedRebroadcasts = rebroadcastList
+                .filter(item => item.isDummy)
+                .map(item => ({
+                    id: tempData.sequence_number,
+                    scheduleStartDate: tempData.start_date.substring(0,4)+'-'+tempData.start_date.substring(4,6)+'-'+tempData.start_date.substring(6,8),
+                    scheduleStartTime: tempData.start_date.substring(8,12),
+                    outgoingResults: [],
+                    outgoingType: callType,
+                    outgoingTime: {
+                        type: timeType,
+                        startDate: startDate ? startDate.toString() : '',
+                        endDate: endDate ? endDate.toString() : '',
+                    },
+                    redialCondition:tempData.redial_condition,
+                    isDummy: false
+                }));
+
+            setRebroadcastList(prevList =>
+                prevList.map(item =>
+                    item.isDummy
+                        ? processedRebroadcasts.find(proc => proc.id === item.id) || item
+                        : item
+                )
+            );
+            //발신결과 disabled 설정.
+            setOutgoingResultDisabled(true);   
+            setSequenceNumber(tempData.sequence_number+1);
+
+        }
+    });
+    
+    // 캠페인 재발신 정보 삭제 api 호출
+    const { mutate: fetchAutoRedialDelete } = useApiForAutoRedialDelete({
+        onSuccess: (data) => {            
+            const updatedList = rebroadcastList.filter(item => item.id !== selectedRebroadcastId);
+            setRebroadcastList(updatedList);
+            setSelectedRebroadcastId(null);
+
+            if (updatedList.length === 0) {
+                resetAllStates();
+            }
+        }
+    });
+
     
     //최초 캠페인 재발신 정보 리스트 조회 실행.
     useEffect(() => {
@@ -867,12 +890,9 @@ const RebroadcastSettingsPanel = () => {
                 type={alertState.type}
                 isOpen={alertState.isOpen}
                 onClose={() => {
-                    setAlertState((prev) => ({ ...prev, isOpen: false }));
+                  alertState.onClose()
                 }}
-                onCancle={() => {
-                    setAlertState((prev) => ({ ...prev, isOpen: false }));
-                }}
-            />
+                onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
         </div>
     );
 };
