@@ -1,88 +1,66 @@
-import React, { useState, useEffect, ReactNode } from 'react';
-import CustomAlert from '@/components/shared/layout/CustomAlert';
+"use client";
+
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
 export interface BlackListCountPopupProps {
-    campaignId: string;
     isOpen?: boolean;
-    onConfirm: () => void;
-    onCancel?: () => void;
+    onOpenChange?: (open: boolean) => void;
 }
 
 const BlackListCountPopup = ({
-    campaignId,
-    isOpen = false,
-    onConfirm,
-    onCancel
+    isOpen = true,
+    onOpenChange
 }: BlackListCountPopupProps) => {
-    // 가짜 데이터를 위한 상태
-    const [mockData, setMockData] = useState({
-        blacklistCount: 0,
-        maxBlacklistCount: 1000000,
-        commonBlacklistCount: 0
-    });
-    const [isLoading, setIsLoading] = useState(false);
+    const [open, setOpen] = useState(isOpen);
 
-    useEffect(() => {
-        if (isOpen) {
-            setIsLoading(true);
-            // 가짜 로딩 효과
-            setTimeout(() => {
-                setIsLoading(false);
-            }, 500);
-        }
-    }, [isOpen]);
-
-    const content = (
-        <div 
-            className="space-y-4"
-            onClick={(e) => e.stopPropagation()}
-            onContextMenu={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-            }}
-        >
-            <div className="flex items-center gap-2 justify-between">
-                <Label className="w-48">캠페인 ID</Label>
-                <span>{campaignId}</span>
-            </div>
-            <div className="flex items-center gap-2 justify-between">
-                <Label className="w-48">블랙리스트 등록건수</Label>
-                {isLoading ? (
-                    <span>로딩 중...</span>
-                ) : (
-                    <span>{mockData.blacklistCount.toLocaleString()}</span>
-                )}
-            </div>
-            <div className="flex items-center gap-2 justify-between">
-                <Label className="w-48">블랙리스트 MAX 등록 건수</Label>
-                {isLoading ? (
-                    <span>로딩 중...</span>
-                ) : (
-                    <span>{mockData.maxBlacklistCount.toLocaleString()}</span>
-                )}
-            </div>
-            <div className="flex items-center gap-2 justify-between">
-                <Label className="w-48">공통 적용된 블랙리스트 등록 건수</Label>
-                {isLoading ? (
-                    <span>로딩 중...</span>
-                ) : (
-                    <span>{mockData.commonBlacklistCount.toLocaleString()}</span>
-                )}
-            </div>
-        </div>
-    );
+    const handleOpenChange = (newOpen: boolean) => {
+        setOpen(newOpen);
+        onOpenChange?.(newOpen);
+    };
 
     return (
-       
-        <CustomAlert
-            isOpen={isOpen}
-            title="블랙리스트 건수 조회"
-            message={content}
-            onClose={onConfirm}
-            onCancle={onCancel}  // Changed from onCancel to onCancle
-            type="info"
-        />
+        <Dialog open={open} onOpenChange={handleOpenChange}>
+            <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                    <DialogTitle>블랙리스트 건수 조회</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="flex items-center gap-2 justify-between">
+                        <Label className="w-48 text-right">캠페인 ID</Label>
+                        <span className="flex-1">CAMPAIGN_001</span>
+                    </div>
+                    <div className="flex items-center gap-2 justify-between">
+                        <Label className="w-48 text-right">블랙리스트 등록건수</Label>
+                        <span className="flex-1">500,000</span>
+                    </div>
+                    <div className="flex items-center gap-2 justify-between">
+                        <Label className="w-48 text-right">블랙리스트 MAX 등록 건수</Label>
+                        <span className="flex-1">1,000,000</span>
+                    </div>
+                    <div className="flex items-center gap-2 justify-between">
+                        <Label className="w-48 text-right">공통 적용된 블랙리스트 등록 건수</Label>
+                        <span className="flex-1">100,000</span>
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button 
+                        variant="outline" 
+                        onClick={() => handleOpenChange(false)}
+                    >
+                        닫기
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 

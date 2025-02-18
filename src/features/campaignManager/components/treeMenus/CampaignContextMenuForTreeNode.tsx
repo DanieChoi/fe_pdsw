@@ -237,12 +237,7 @@ export const CampaignContextMenu = ({
         블랙리스트 건수 조회
       </ContextMenuItem>
     </ContextMenuContent>
-    <BlackListCountPopup
-        campaignId={item.id}
-        isOpen={isBlacklistPopupOpen}
-        onConfirm={() => setIsBlacklistPopupOpen(false)}
-        onCancel={() => setIsBlacklistPopupOpen(false)}
-      />
+    <BlackListCountPopup/>
     </>
   );
 };

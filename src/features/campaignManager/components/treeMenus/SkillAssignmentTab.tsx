@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTabStore } from '@/store/tabStore';
+import { useAuthStore } from '@/store/authStore';  // 추가된 import
 import { CounselorSkill } from '../../types/typeForCounselorSkill';
 import { useApiForCounselorSkill } from '../../hooks/useApiForCounselorSkill';
 import { useApiForAssignCheckedSkilsToCounselor } from "@/features/campaignManager/hooks/useApiForAssignCheckedSkilsToCounselor";
@@ -20,6 +21,7 @@ export function SkillAssignmentTab({ counselorId }: SkillAssignmentTabProps) {
   const removeTab = useTabStore(state => state.removeTab);
   const activeTabKey = useTabStore(state => state.activeTabKey);
   const skillAssignmentInfo = useTabStore(state => state.counselorSkillAssignmentInfo);
+  const userId = useAuthStore(state => state.id);  // 로그인 사용자 ID 가져오기
 
   // 상담원 스킬 목록 가져오기
   const { data: skillListData, isLoading, error } = useApiForCounselorSkill(
@@ -76,12 +78,13 @@ export function SkillAssignmentTab({ counselorId }: SkillAssignmentTabProps) {
   const skills = skillListData?.result_data || [];
 
   return (
-    // <Card className="max-w-3xl w-full mx-auto">
-      <Card className="w-full max-w-[800px] mx-auto">
+    <Card className="w-full max-w-[800px] mx-auto">
       <CardHeader>
-        <CardTitle className="text-lg">상담원 스킬 할당2</CardTitle>
+        <CardTitle className="text-lg">상담원 스킬 할당</CardTitle>
         <div className="text-sm text-gray-500">
           TenantID: {skillAssignmentInfo.tenantId || 'N/A'}
+          <br />
+          로그인 사용자 ID: {userId || 'N/A'}  {/* 로그인 사용자 ID 표시 */}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -128,6 +131,5 @@ export function SkillAssignmentTab({ counselorId }: SkillAssignmentTabProps) {
         )}
       </CardContent>
     </Card>
-
   );
 }

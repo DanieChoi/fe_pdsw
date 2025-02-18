@@ -17,13 +17,15 @@ export async function apiToFetchCounselorTreeData(credentials: MainCredentials2)
   }
  
   const { counselorList } = await apiForTreeMenuDataForSimeBarCounselorTab({
-    tenant_id: 1,
+    tenant_id: 0,
     roleId: 6
   }) as CounselorResponse || { counselorList: [] };
  
   const tenantMap = new Map<string, TenantNode>();
   const groupMap = new Map<string, GroupNode>();
   const teamMap = new Map<string, TeamNode>();
+  
+  console.log("counselorList at apiToFetchCounselorTreeData : ", counselorList);
  
   counselorList.forEach((counselor: Counselor) => {
     if (!tenantMap.has(counselor.tenantId)) {

@@ -12,6 +12,7 @@ import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 import useApiForFetchCounselorList from '@/features/campaignManager/hooks/useApiForFetchCounselorList';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { SplitScreenDialog } from './ui/SplitScreenDialog'
+import SplitScreenDialog2 from './ui/SplitScreenDialog2'
 
 const errorMessage = {
   isOpen: false,
@@ -265,6 +266,7 @@ export default function Header() {
                   <LayoutGrid size={16} />
                   <span className="text-xs">화면 분할</span>
                 </Button>
+
                 <SplitScreenDialog
                   isOpen={isSplitDialogOpen}
                   onClose={() => setIsSplitDialogOpen(false)}
@@ -274,6 +276,9 @@ export default function Header() {
                     setIsSplitDialogOpen(false);
                   }}
                 />
+
+                <SplitScreenDialog2 tabs={openedTabs}/>
+
               </div>
 
             </div>

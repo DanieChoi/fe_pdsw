@@ -1,31 +1,31 @@
-// src\features\campaignManager\components\treeMenus\ContextMenuForTreeNode.tsx
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
-  ContextMenuTrigger,
-  ContextMenuSeparator,
-} from "@/components/ui/context-menu";
-import { useTabStore } from "@/store/tabStore";
-import { Edit, Copy, Activity, Trash2, Monitor, Settings, Search, List, Clock, History, UserCheck, Shield, RefreshCcw } from "lucide-react";
-import { CampaignStatus } from "./CampaignContextMenuForTreeNode";
+// // src\features\campaignManager\components\treeMenus\ContextMenuForTreeNode.tsx
+// import {
+//   ContextMenu,
+//   ContextMenuContent,
+//   ContextMenuItem,
+//   ContextMenuSub,
+//   ContextMenuSubContent,
+//   ContextMenuSubTrigger,
+//   ContextMenuTrigger,
+//   ContextMenuSeparator,
+// } from "@/components/ui/context-menu";
+// import { useTabStore } from "@/store/tabStore";
+// import { Edit, Copy, Activity, Trash2, Monitor, Settings, Search, List, Clock, History, UserCheck, Shield, RefreshCcw } from "lucide-react";
+// import { CampaignStatus } from "./CampaignContextMenuForTreeNode";
 
-interface ContextMenuForTreeNodeProps {
-  children: React.ReactNode;
-  item: {
-    id: string;
-    label: string;
-    type: any;
-    status: CampaignStatus; // status를 필수값으로 변경
-  };
-  onEdit: () => void;
-  onDelete: () => void;
-  onMonitor: () => void;
-  onHandleCampaignCopy: () => void;
-}
+// interface ContextMenuForTreeNodeProps {
+//   children: React.ReactNode;
+//   item: {
+//     id: string;
+//     label: string;
+//     type: any;
+//     status: CampaignStatus; // status를 필수값으로 변경
+//   };
+//   onEdit: () => void;
+//   onDelete: () => void;
+//   onMonitor: () => void;
+//   onHandleCampaignCopy: () => void;
+// }
 
 // export function ContextMenuForTreeNode({
 //   children,
@@ -33,22 +33,30 @@ interface ContextMenuForTreeNodeProps {
 //   onEdit,
 //   onDelete,
 //   onMonitor,
-//   onCopy,
+//   onHandleCampaignCopy,
 // }: ContextMenuForTreeNodeProps) {
 //   const isFolder = item.type === "folder";
-//   const { openCampaignManagerForUpdate, setCampaignIdForUpdateFromSideMenu, openCampaignProgressInfo, openRebroadcastSettings } = useTabStore();
+//   const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu } = useTabStore();
 
 //   const handleEditMenuClick = () => {
-//     openCampaignManagerForUpdate(item.id, item.label);
+//     simulateHeaderMenuClick(2); // 캠페인 관리
 //     setCampaignIdForUpdateFromSideMenu(item.id);
 //   };
 
 //   const handleProgressInfoClick = () => {
-//     openCampaignProgressInfo(item.id, item.label);
+//     simulateHeaderMenuClick(4); // 총진행상황
 //   };
 
 //   const handleRebroadcastClick = () => {
-//     openRebroadcastSettings(item.id, item.label);
+//     simulateHeaderMenuClick(5); // 발신진행상태
+//   };
+
+//   const handleMonitorClick = () => {
+//     simulateHeaderMenuClick(3); // 통합모니터
+//   };
+
+//   const handleStartClick = () => {
+//     simulateHeaderMenuClick(14); // 캠페인별상태
 //   };
 
 //   return (
@@ -66,15 +74,15 @@ interface ContextMenuForTreeNodeProps {
 //             시작구분
 //           </ContextMenuSubTrigger>
 //           <ContextMenuSubContent className="w-48">
-//             <ContextMenuItem>
+//             <ContextMenuItem onClick={handleStartClick}>
 //               <Clock className="mr-2 h-4 w-4" />
 //               시작
 //             </ContextMenuItem>
-//             <ContextMenuItem>
+//             <ContextMenuItem onClick={handleStartClick}>
 //               <List className="mr-2 h-4 w-4" />
 //               멈춤
 //             </ContextMenuItem>
-//             <ContextMenuItem>
+//             <ContextMenuItem onClick={handleStartClick}>
 //               <History className="mr-2 h-4 w-4" />
 //               중지
 //             </ContextMenuItem>
@@ -88,11 +96,6 @@ interface ContextMenuForTreeNodeProps {
 
 //         <ContextMenuSeparator />
 
-//         {/* <ContextMenuItem>
-//           <Monitor className="mr-2 h-4 w-4" />
-//           실시간 재발신
-//         </ContextMenuItem> */}
-
 //         <ContextMenuItem onClick={handleRebroadcastClick}>
 //           <RefreshCcw className="mr-2 h-4 w-4" />
 //           재발신
@@ -100,12 +103,12 @@ interface ContextMenuForTreeNodeProps {
 
 //         <ContextMenuSeparator />
 
-//         <ContextMenuItem onClick={onMonitor}>
+//         <ContextMenuItem onClick={handleMonitorClick}>
 //           <Monitor className="mr-2 h-4 w-4" />
-//           캠페인 삭제
+//           캠페인 모니터링
 //         </ContextMenuItem>
 
-//         <ContextMenuItem onClick={onCopy}>
+//         <ContextMenuItem onClick={onHandleCampaignCopy}>
 //           <Copy className="mr-2 h-4 w-4" />
 //           캠페인 복사
 //         </ContextMenuItem>
@@ -121,6 +124,40 @@ interface ContextMenuForTreeNodeProps {
 //   );
 // }
 
+// src\features\campaignManager\components\treeMenus\ContextMenuForTreeNode.tsx
+"use client";
+
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+  ContextMenuSeparator,
+} from "@/components/ui/context-menu";
+import { useTabStore } from "@/store/tabStore";
+import { 
+  Edit, Copy, Activity, Trash2, Monitor, Settings, Search, List, Clock, History, 
+  UserCheck, Shield, RefreshCcw, AlertTriangle 
+} from "lucide-react";
+import { CampaignStatus } from "./CampaignContextMenuForTreeNode";
+
+interface ContextMenuForTreeNodeProps {
+  children: React.ReactNode;
+  item: {
+    id: string;
+    label: string;
+    type: any;
+    status: CampaignStatus;
+  };
+  onEdit: () => void;
+  onDelete: () => void;
+  onMonitor: () => void;
+  onHandleCampaignCopy: () => void;
+}
+
 export function ContextMenuForTreeNode({
   children,
   item,
@@ -130,27 +167,39 @@ export function ContextMenuForTreeNode({
   onHandleCampaignCopy,
 }: ContextMenuForTreeNodeProps) {
   const isFolder = item.type === "folder";
-  const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu } = useTabStore();
+  const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab } = useTabStore();
 
   const handleEditMenuClick = () => {
-    simulateHeaderMenuClick(2); // 캠페인 관리
+    simulateHeaderMenuClick(2);
     setCampaignIdForUpdateFromSideMenu(item.id);
   };
 
   const handleProgressInfoClick = () => {
-    simulateHeaderMenuClick(4); // 총진행상황
+    simulateHeaderMenuClick(4);
   };
 
   const handleRebroadcastClick = () => {
-    simulateHeaderMenuClick(5); // 발신진행상태
+    simulateHeaderMenuClick(5);
   };
 
   const handleMonitorClick = () => {
-    simulateHeaderMenuClick(3); // 통합모니터
+    simulateHeaderMenuClick(3);
   };
 
   const handleStartClick = () => {
-    simulateHeaderMenuClick(14); // 캠페인별상태
+    simulateHeaderMenuClick(14);
+  };
+
+  const handleBlacklistCountCheckClick = () => {
+    // simulateHeaderMenuClick(7); // 블랙리스트 건수 조회
+    addTab({
+      id: 501,
+      uniqueKey: '501',
+      title: '블랙 리스트 목록',
+      icon: '',
+      href: '',
+      content: null,
+    });
   };
 
   return (
@@ -199,7 +248,7 @@ export function ContextMenuForTreeNode({
 
         <ContextMenuItem onClick={handleMonitorClick}>
           <Monitor className="mr-2 h-4 w-4" />
-          캠페인 모니터링
+          상담원 상태 모니터
         </ContextMenuItem>
 
         <ContextMenuItem onClick={onHandleCampaignCopy}>
@@ -213,6 +262,13 @@ export function ContextMenuForTreeNode({
             캠페인 삭제
           </ContextMenuItem>
         )}
+
+        <ContextMenuSeparator />
+
+        <ContextMenuItem onClick={handleBlacklistCountCheckClick}>
+          <AlertTriangle className="mr-2 h-4 w-4 text-yellow-500" />
+          블랙리스트 건수 조회
+        </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
   );

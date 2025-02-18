@@ -19,6 +19,7 @@ import SystemMonitoring from "./SystemMonitoring";
 import CampaignClonePanel from "@/widgets/sidebar/pannels/CampaignClonePanel";
 import IntegratedMonitoringDashboard from "./IntegratedMonitoringDashboard";
 import { SkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/SkillAssignmentTab";
+import BlackListCountPopup from "@/features/campaignManager/components/popups/BlackListCountPopup";
 
 // 탭 ID별 실제 화면을 매핑하는 함수
 const renderContent = (tabId: number | null) => {
@@ -71,6 +72,12 @@ const renderContent = (tabId: number | null) => {
             </div>
           </div>
         );
+        case 501:
+          return (
+            <div className="flex justify-left w-full">
+              <BlackListCountPopup />
+            </div>
+          );        
       
 
     default:
