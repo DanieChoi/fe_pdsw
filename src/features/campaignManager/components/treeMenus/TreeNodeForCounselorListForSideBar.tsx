@@ -1,6 +1,15 @@
 "use client";
 
-import { ChevronRight, ChevronDown, Building, Users, UserCircle2, FolderTree, Network } from "lucide-react";
+import {
+  ChevronRight,
+  ChevronDown,
+  Building,
+  Users,
+  UserCircle2,
+  FolderTree,
+  Network,
+} from "lucide-react";
+
 import { IContextMenuForTennantForCounselorTreeMenu } from "./ContextMenus/IContextMenuForTennantForCounselorTreeMenu";
 import { IContextMenuForGroupAndTeamAndCounselor } from "./ContextMenus/IContextMenuForGroupAndTeamAndCounselorProps";
 
@@ -85,15 +94,26 @@ export function TreeNodeForCounselorListForSideBar({
   const renderIcon = () => {
     switch (type) {
       case 'organization':
-        return <Building className="h-4 w-4 text-blue-600" />;
+        // return <Building className="h-4 w-4 text-blue-600" />;
+        return <img src="/tree-menu/tennant_office.png" alt="테넌트" className="h-4 w-4" />;
       case 'tenant':
-        return <Network className="h-4 w-4 text-indigo-600" />;
+        return <img src="/tree-menu/tennant_office.png" alt="테넌트" className="h-4 w-4" />;
       case 'group':
-        return <FolderTree className="h-4 w-4 text-green-600" />;
+        return <img src="/tree-menu/group_icon_for_tree.png" alt="그룹" className="h-4 w-4" />;
       case 'team':
-        return <Users className="h-4 w-4 text-purple-600" />;
+        return <img src="/tree-menu/team_icon_for_tree.png" alt="팀" className="h-4 w-4" />;
       case 'counselor':
-        return <UserCircle2 className="h-4 w-4 text-gray-600" />;
+        const blendKind = Number(data.blendKind);
+        switch (blendKind) {
+          case 1:
+            return <img src="/tree-menu/inbound_counselor.png" alt="인바운드" className="h-4 w-4" />;
+          case 2:
+            return <img src="/tree-menu/outbound_counselor.png" alt="아웃바운드" className="h-4 w-4" />;
+          case 3:
+            return <img src="/tree-menu/inbound_outbound_mix.png" alt="블렌드" className="h-4 w-4" />;
+          default:
+            return <UserCircle2 className="h-4 w-4 text-gray-600" />;
+        }
     }
   };
 
