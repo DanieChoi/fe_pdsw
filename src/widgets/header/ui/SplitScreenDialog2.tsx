@@ -47,7 +47,7 @@ const SplitScreenDialog2 = ({ buttonText = "2탭 보기", tabs }: Props) => {
         </VisuallyHidden>
         <div className="w-full h-full overflow-x-auto">
           <div className="h-full p-4 bg-gray-100 inline-flex">
-            <div classNme="flex h-full gap-4">
+            <div className="flex h-full gap-4">
               {displayTabs.map((tab, index) => (
                 <div
                   key={`screen-${index}`}
