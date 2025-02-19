@@ -1,4 +1,4 @@
-// components/main/CampaignList.tsx
+// components/main/CampaignManagerList.tsx
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 import {CampaignHeaderSearch} from './CampaignManagerHeader';
@@ -61,7 +61,7 @@ type Props = {
 }
 
 export default function CampaignManagerList({campaignId,campaignHeaderSearchParam}: Props) {
-  const { campaigns, selectedCampaign , setSelectedCampaign } = useMainStore();
+  const { campaigns, setSelectedCampaign } = useMainStore();
   const { setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const { schedules, callingNumbers, campaignSkills  } = useCampainManagerStore();
   const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>([]);

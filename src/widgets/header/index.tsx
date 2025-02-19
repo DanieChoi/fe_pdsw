@@ -93,6 +93,12 @@ export default function Header() {
     router.push('/login');
   }
 
+  // authStore 에서 tenant_id, role_id 가져오기
+  const tenant_id = useAuthStore((state) => state.tenant_id);
+  const role_id = useAuthStore((state) => state.role_id);
+  const id = useAuthStore((state) => state.id);
+  //상담사 역할 ID(1: 상담사, 2: 파트매니저, 3: 그룹매니저, 4: 테넌트메니저, 5: 시스템 메니저, 6: 전체)
+
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
       console.log('Tenants API response:', data);
@@ -105,7 +111,11 @@ export default function Header() {
         Cookies.remove('session_key');
         router.push('/login');
       } else {
-        setTenants(data.result_data);
+        if( tenant_id === 0){
+          setTenants(data.result_data);
+        }else{
+          setTenants(data.result_data.filter(data=>data.tenant_id === tenant_id));
+        }
         // const tempTenantIdArray = data.result_data.map(tenant => Number(tenant.tenant_id));
         // fetchSkills({
         //   tenant_id_array: tempTenantIdArray
@@ -141,19 +151,16 @@ export default function Header() {
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       // console.log('Main API response:', data);
-      setCampaigns(data.result_data);
+      // setCampaigns(data.result_data);
+      if( tenant_id === 0){
+        setCampaigns(data.result_data);
+      }else{
+        setCampaigns(data.result_data.filter(data=>data.tenant_id === tenant_id));
+      }
       setShouldFetchCounselors(true);  // 이 시점에 상담사 목록 조회 활성화
 
     }
   });
-
-  // authStore 에서 tenant_id, role_id 가져오기
-  const tenant_id = useAuthStore((state) => state.tenant_id);
-  const role_id = useAuthStore((state) => state.role_id);
-  const id = useAuthStore((state) => state.id);
-  //상담사 역할 ID(1: 상담사, 2: 파트매니저, 3: 그룹매니저, 4: 테넌트메니저, 5: 시스템 메니저, 6: 전체)
-
-  console.log('id '+id);
 
   const { data: counselorListData } = useApiForFetchCounselorList({
     credentials: {
