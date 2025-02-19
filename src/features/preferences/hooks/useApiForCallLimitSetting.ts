@@ -1,6 +1,6 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { ApiError, CallLimitSettingCreateRequest, CallLimitSettingListResponse, SuccesResponse, TenantIdCredentials } from "../types/SystemPreferences";
-import { createCallLimitSetting, fetchCallLimitSettingList, UpdateCallLimitSetting } from "../api/callLimitSetting";
+import { createCallLimitSetting, fetchCallLimitSettingList, UpdateCallLimitSetting } from "../api/apiForCallLimitSetting";
 
 // 운영설정 예약콜 제한설정 리스트 요청을 위한 hook
 export function useApiForCallLimitSettingList(

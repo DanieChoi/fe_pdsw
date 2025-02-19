@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { DialingDeviceCreateRequest, SuccesResponse, TenantIdCredentials, DialingDeviceListResponse } from "../types/SystemPreferences";
 import { ApiError } from "next/dist/server/api-utils";
-import { createDialingDevice, fetchDialingDeviceList, updateDialingDevice } from "../api/dialingdevice";
+import { createDialingDevice, fetchDialingDeviceList, updateDialingDevice } from "../api/apiForDialingdevice";
 
 // 장비 리스트 요청을 위한 hook
 export function useApiForDialingDevice(
@@ -28,7 +28,12 @@ export function useApiForDialingDeviceCreate(
     return useMutation({
         mutationKey: ['dialingDeviceCreate'],
         mutationFn: createDialingDevice,
-        ...options,
+        onSuccess: (data, variables, context) => {
+            options?.onSuccess?.(data, variables, context);
+        },
+        onError: (error: ApiError, variables: DialingDeviceCreateRequest, context: unknown) => {
+            options?.onError?.(error, variables, context);
+        }
     });
 }
 
@@ -39,6 +44,11 @@ export function useApiForDialingDeviceUpdate(
     return useMutation({
         mutationKey: ['dialingDeviceUpdate'],
         mutationFn: updateDialingDevice,
-        ...options,
+        onSuccess: (data, variables, context) => {
+            options?.onSuccess?.(data, variables, context);
+        },
+        onError: (error: ApiError, variables: DialingDeviceCreateRequest, context: unknown) => {
+            options?.onError?.(error, variables, context);
+        }
     });
 }
