@@ -3,15 +3,12 @@
 import {
   ChevronRight,
   ChevronDown,
-  Building,
-  Users,
   UserCircle2,
-  FolderTree,
-  Network,
 } from "lucide-react";
 
 import { IContextMenuForTennantForCounselorTreeMenu } from "./ContextMenus/IContextMenuForTennantForCounselorTreeMenu";
 import { IContextMenuForGroupAndTeamAndCounselor } from "./ContextMenus/IContextMenuForGroupAndTeamAndCounselorProps";
+import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
 
 interface ExpandConfig {
   organization?: boolean;
@@ -42,6 +39,8 @@ export function TreeNodeForCounselorListForSideBar({
   type,
   defaultExpanded
 }: ITreeNodeForCounselorListForSideBar) {
+  const { selectedBlendKind } = useCounselorFilterStore();
+
   const getId = () => {
     switch (type) {
       case 'organization': return `org-${data.centerId}`;
@@ -76,10 +75,20 @@ export function TreeNodeForCounselorListForSideBar({
         type: 'team',
         data: team
       }));
-      case 'team': return data.counselorInfo?.map((counselor: any) => ({
-        type: 'counselor',
-        data: counselor
-      }));
+      case 'team': {
+        const counselors = data.counselorInfo?.map((counselor: any) => ({
+          type: 'counselor',
+          data: counselor
+        }));
+        
+        // Apply blend kind filter if selected
+        if (selectedBlendKind !== null && counselors) {
+          return counselors.filter(
+            (counselor: any) => Number(counselor.data.blendKind) === selectedBlendKind
+          );
+        }
+        return counselors;
+      }
       case 'counselor': return null;
     }
   };
@@ -94,7 +103,6 @@ export function TreeNodeForCounselorListForSideBar({
   const renderIcon = () => {
     switch (type) {
       case 'organization':
-        // return <Building className="h-4 w-4 text-blue-600" />;
         return <img src="/tree-menu/tennant_office.png" alt="테넌트" className="h-4 w-4" />;
       case 'tenant':
         return <img src="/tree-menu/tennant_office.png" alt="테넌트" className="h-4 w-4" />;

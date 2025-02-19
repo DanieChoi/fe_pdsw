@@ -1,4 +1,3 @@
-// IContextMenuForTennantForCounselorTreeMenu.tsx
 "use client";
 
 import {
@@ -10,21 +9,20 @@ import {
   ContextMenuSubTrigger,
   ContextMenuSubContent,
 } from "@/components/ui/context-menu";
-import { Users, History, Mail, LogOut } from "lucide-react";
+import { Users, History } from "lucide-react";
+import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
 
 interface IContextMenuForTennantForCounselorTreeMenuProps {
   children: React.ReactNode;
   onViewHistory?: () => void;
-  onInboard?: () => void;
-  onOutboard?: () => void;
 }
 
 export function IContextMenuForTennantForCounselorTreeMenu({
   children,
   onViewHistory,
-  onInboard,
-  onOutboard,
 }: IContextMenuForTennantForCounselorTreeMenuProps) {
+  const { setSelectedBlendKind, resetFilter } = useCounselorFilterStore();
+
   return (
     <ContextMenu>
       <ContextMenuTrigger>{children}</ContextMenuTrigger>
@@ -35,17 +33,24 @@ export function IContextMenuForTennantForCounselorTreeMenu({
             상담원 보기
           </ContextMenuSubTrigger>
           <ContextMenuSubContent className="w-48">
-            <ContextMenuItem onClick={onViewHistory}>
+            <ContextMenuItem onClick={() => {
+              resetFilter();
+              onViewHistory?.();
+            }}>
               <History className="mr-2 h-4 w-4" />
               전체 보기
             </ContextMenuItem>
-            <ContextMenuItem onClick={onInboard}>
-              <Mail className="mr-2 h-4 w-4" />
+            <ContextMenuItem onClick={() => setSelectedBlendKind(1)}>
+              <img src="/tree-menu/inbound_counselor.png" alt="인바운드" className="mr-2 h-4 w-4" />
               인바운드
             </ContextMenuItem>
-            <ContextMenuItem onClick={onOutboard}>
-              <LogOut className="mr-2 h-4 w-4" />
+            <ContextMenuItem onClick={() => setSelectedBlendKind(2)}>
+              <img src="/tree-menu/outbound_counselor.png" alt="아웃바운드" className="mr-2 h-4 w-4" />
               아웃바운드
+            </ContextMenuItem>
+            <ContextMenuItem onClick={() => setSelectedBlendKind(3)}>
+              <img src="/tree-menu/inbound_outbound_mix.png" alt="블렌드" className="mr-2 h-4 w-4" />
+              블렌드
             </ContextMenuItem>
           </ContextMenuSubContent>
         </ContextMenuSub>

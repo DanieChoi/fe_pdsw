@@ -1,3 +1,4 @@
+// src\features\campaignManager\components\popups\BlackListCountPopup.tsx
 import React, { useState, useEffect, ReactNode } from 'react';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { Label } from "@/components/ui/label";
