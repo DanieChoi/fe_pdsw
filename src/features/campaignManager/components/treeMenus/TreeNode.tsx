@@ -2,7 +2,7 @@
 
 import { TreeNodeProps } from "@/components/shared/layout/SidebarPresenter";
 import { ContextMenuForTreeNode } from "./ContextMenuForTreeNode";
-import { ChevronRight, ChevronDown, Folder, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 import { useTabStore } from '@/store/tabStore';
 import { useCallback } from 'react';
 import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
@@ -24,20 +24,12 @@ export function TreeNode({
 
   const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, setCampaignIdForCopyCampaign, addTab } = useTabStore();
 
-  // const handleDoubleClick = useCallback(() => {
-  //   if (item.type !== "campaign") return;
-  //   openCampaignManagerForUpdate(item.id, item.label);
-  //   setCampaignIdForUpdateFromSideMenu(item.id);
-  // }, [item, openCampaignManagerForUpdate, setCampaignIdForUpdateFromSideMenu]);
-
   const handleDoubleClick = useCallback(() => {
     if (item.type !== "campaign") return;
-    // openCampaignManagerForUpdate(item.id, item.label); // 이전 코드 제거
-    simulateHeaderMenuClick(2); // 캠페인 관리(id: 2) 메뉴 클릭
+    simulateHeaderMenuClick(2);
     setCampaignIdForUpdateFromSideMenu(item.id);
   }, [item, simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu]);
 
-  // 일반 클릭
   const handleClick = useCallback(() => {
     onNodeSelect(item.id);
     if (hasChildren) {
@@ -45,7 +37,6 @@ export function TreeNode({
     }
   }, [item.id, hasChildren, onNodeSelect, onNodeToggle]);
 
-  // 우클릭 메뉴 예시
   const handleEdit = () => {
     console.log('Edit clicked:', { id: item.id, label: item.label, type: item.type });
   };
@@ -60,8 +51,6 @@ export function TreeNode({
 
   const onHandleCampaignCopy = () => {
     console.log('Copy clicked:', { id: item.id, label: item.label, type: item.type });
-    // onNodeSelect(item.id);
-
     setCampaignIdForUpdateFromSideMenu(item.id);
     setCampaignIdForCopyCampaign(item.id);
 
@@ -89,14 +78,14 @@ export function TreeNode({
               <div className="flex items-center w-full gap-2">
                 {hasChildren ? (
                   isExpanded ? (
-                    <ChevronDown className="h-4 w-4 text-gray-500" />
+                    <img src="/tree-menu/minus_for_tree.png" alt="접기" className="h-4 w-4" />
                   ) : (
-                    <ChevronRight className="h-4 w-4 text-gray-500" />
+                    <img src="/tree-menu/plus_icon_for_tree.png" alt="펼치기" className="h-4 w-4" />
                   )
                 ) : (
                   <span className="w-4" />
                 )}
-                <Folder className="h-4 w-4 text-gray-400" />
+                <img src="/tree-menu/tennant_office.png" alt="테넌트" className="h-4 w-4" />
                 <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
                   {item.label}
                 </span>
@@ -123,9 +112,9 @@ export function TreeNode({
             <div className="flex items-center w-full gap-2">
               {hasChildren ? (
                 isExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                  <img src="/tree-menu/minus_for_tree.png" alt="접기" className="h-4 w-4" />
                 ) : (
-                  <ChevronRight className="h-4 w-4 text-gray-500" />
+                  <img src="/tree-menu/plus_icon_for_tree.png" alt="펼치기" className="h-4 w-4" />
                 )
               ) : (
                 <span className="w-4" />

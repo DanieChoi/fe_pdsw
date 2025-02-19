@@ -10,6 +10,7 @@ import { TreeMenusForAgentGroupTab } from "@/features/campaignManager/components
 import { TabActions } from "./comp/TabActions";
 import { useSideMenuStore } from "@/store/sideMenuStore";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
+import { BottomTabsForSideMenu } from "./BottomTabsForSideMenu";
 
 interface SidebarWidthState {
   width: number;
@@ -90,7 +91,13 @@ export default function SidebarContainer() {
         {/* 상단 헤더 */}
         <div className="flex-none flex items-center justify-between p-2 bg-gray-50 px-3 border-b">
           <div className="flex items-center gap-2 py-1.5">
-            <img src="/sidebar-menu/phone_icon.svg" alt="navigation" className="w-4 h-4" />
+
+            {/* <img src="/sidebar-menu/phone_icon.svg" alt="navigation" className="w-4 h-4" /> */}
+            {/* 현재 탭에 따라 아이콘 달라져야 됨 */}
+            {/* 상담원 탭: C:\nproject\fe_pdsw\public\tree-menu\ghost_icon_for_counselor_tab.png */}
+            {/* 캠페인 탭: C:\nproject\fe_pdsw\public\tree-menu\campaign_icon_for_campaign_tab.png */}
+            {/* 상담원 그룹 탭: C:\nproject\fe_pdsw\public\tree-menu\group_icon_for_agent_group_tab.png */}
+
             <span className="text-sm text-gray-800 font-medium">
               {baseTabs.find((tab) => tab.id === selectedTabId)?.label}
             </span>
@@ -104,7 +111,7 @@ export default function SidebarContainer() {
         {renderTreeMenu()}
 
         {/* 하단 탭 목록 */}
-        <div className="flex-none border-t">
+        {/* <div className="flex-none border-t">
           {baseTabs.map((tab) => (
             <button
               key={tab.id}
@@ -119,7 +126,13 @@ export default function SidebarContainer() {
               {tab.label}
             </button>
           ))}
-        </div>
+        </div> */}
+
+        <BottomTabsForSideMenu
+          selectedTabId={selectedTabId}
+          onTabChange={setSelectedTabId}
+        />
+
       </div>
 
       {/* 리사이즈 핸들 */}
