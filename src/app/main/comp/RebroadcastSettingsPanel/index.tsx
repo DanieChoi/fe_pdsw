@@ -715,6 +715,15 @@ const RebroadcastSettingsPanel = () => {
                     onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
                     onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 });
+            }else{                
+                setAlertState({
+                    isOpen: true,
+                    message: '재발신 적용 완료했습니다.',
+                    title: '재발신',
+                    type: '2',
+                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                });
             }
         },
         onError: (data) => {  
