@@ -31,7 +31,7 @@ const renderContent = (tabId: number | null) => {
     case 3:
       return <IntegratedMonitoringDashboard />;
     case 4:
-      return <Campaignprogress />; 
+      return <Campaignprogress />;
     case 5:
       return <OutboundCallProgressPanel />;
     case 6:
@@ -53,32 +53,32 @@ const renderContent = (tabId: number | null) => {
     case 14:
       return <StatusCampaign />;
     case 20:
-      return <RebroadcastSettingsPanel />; 
+      return <RebroadcastSettingsPanel />;
     case 21:
       return <CampaignMonitorDashbord />;
     case 22:
       return <AgentStatusMonitoring />;
     case 23:
-        return <SystemMonitoring />;
+      return <SystemMonitoring />;
     case 100:
       return <>잘못된 스킬 할당 탭입니다.</>;
     case 130: // 캠페인 복사 화면 리턴
       return <CampaignClonePanel />;
     case 500:
-        return (
-          <div className="flex justify-left w-full">
-            <div className="max-w-[500px] w-full">
-              <SkillAssignmentTab counselorId={""} />
-            </div>
+      return (
+        <div className="flex justify-left w-full">
+          <div className="max-w-[500px] w-full">
+            <SkillAssignmentTab counselorId={""} />
           </div>
-        );
-        case 501:
-          return (
-            <div className="flex justify-left w-full">
-              <BlackListCountPopup />
-            </div>
-          );        
-      
+        </div>
+      );
+    case 501:
+      return (
+        <div className="flex justify-left w-full">
+          <BlackListCountPopup />
+        </div>
+      );
+
 
     default:
       return (
@@ -102,7 +102,7 @@ const TabContent = () => {
   const updateWidths = useCallback((leftWidth: number) => {
     const clampedLeft = Math.max(20, Math.min(80, leftWidth));
     const right = 100 - clampedLeft;
-    
+
     requestAnimationFrame(() => {
       if (sections.length === 2) {
         const newSections = [...sections];
@@ -116,7 +116,7 @@ const TabContent = () => {
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (!containerRef.current) return;
-    
+
     setIsDragging(true);
     startXRef.current = e.clientX;
     document.body.style.cursor = 'col-resize';
@@ -129,11 +129,11 @@ const TabContent = () => {
     const container = containerRef.current.getBoundingClientRect();
     const deltaX = e.clientX - startXRef.current;
     const containerWidth = container.width;
-    
+
     // Calculate new width based on delta movement
     const deltaPercentage = (deltaX / containerWidth) * 100;
     const newLeftWidth = widthsRef.current.left + deltaPercentage;
-    
+
     updateWidths(newLeftWidth);
     startXRef.current = e.clientX;
   }, [isDragging, updateWidths]);
