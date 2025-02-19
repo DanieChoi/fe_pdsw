@@ -18,6 +18,7 @@ import RebroadcastSettingsPanelHeader from './RebroadcastSettingsPanelHeader';
 import { useApiForAutoRedial } from '@/features/campaignManager/hooks/useApiForAutoRedial';
 import { useApiForCampaignAutoRedialInsert } from '@/features/rebroadcastSettingsPanel/hooks/useApiForCampaignAutoRedialInsert';
 import { useApiForAutoRedialDelete } from '@/features/campaignManager/hooks/useApiForAutoRedialDelete';
+import { useApiForCampaignRedialPreviewSearch } from '@/features/rebroadcastSettingsPanel/hooks/useApiForCampaignRedialPreviewSearch';
 
 interface RebroadcastSettings {
     campaignId: string;
@@ -122,6 +123,7 @@ const RebroadcastSettingsPanel = () => {
     const [reservationShouldShowDelete,setReservationShouldShowDelete ] = useState<boolean>(false);       //삭제 버튼.
     const [outgoingResultDisabled,setOutgoingResultDisabled ] = useState<boolean>(false);
     const [sequenceNumber, setSequenceNumber] = useState<number>(1);
+    const [caseType, setCaseType] = useState<number>(0);
 
     // 발신결과 체크박스 상태 관리
     const [selectedOutgoingResults, setSelectedOutgoingResults] = useState<{ [key: string]: boolean }>(initOutgoingResult);
@@ -428,10 +430,12 @@ const RebroadcastSettingsPanel = () => {
                 run_flag: 2
             });
 
-        }
-        // 실시간 모드 처리 로직은 기존과 동일
-        else if (broadcastType === "realtime") {
-            console.log('작업중입니다.');
+        }else if (broadcastType === "realtime") {
+            setCaseType(2);
+            fetchCampaignRedialPreviewSearch({
+                campaign_id: Number(campaignIdForUpdateFromSideMenu),
+                condition: MakeRedialPacket()
+            });
         }
     };
 
@@ -669,6 +673,10 @@ const RebroadcastSettingsPanel = () => {
             //발신결과 disabled 설정.
             setOutgoingResultDisabled(true);   
             setSequenceNumber(tempData.sequence_number+1);
+            //버튼 설정.
+            setReservationShouldShowApply(false);
+            setReservationShouldShowAdd(true);
+            setReservationShouldShowDelete(true);
 
         }
     });
@@ -686,6 +694,43 @@ const RebroadcastSettingsPanel = () => {
         }
     });
 
+    // 캠페인 재발신 미리보기 api 호출
+    const { mutate: fetchCampaignRedialPreviewSearch } = useApiForCampaignRedialPreviewSearch({
+        onSuccess: (data) => {  
+            if( caseType === 1 ){            
+                setAlertState({
+                    isOpen: true,
+                    message: `선택된 재발신 조건에 해당되는 리스트 수 : ${data.result_data.redial_count}`,
+                    title: '리스트 건수 확인',
+                    type: '2',
+                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                });
+            }else if( caseType === 2 ){
+                if( data.result_data.redial_count > 0){   
+                    console.log('API 작업중입니다. :: ' + data.result_data.redial_count);
+                }else{        
+                    setAlertState({
+                        isOpen: true,
+                        message: '적용할 건수가 없습니다.',
+                        title: '리스트 건수 확인',
+                        type: '2',
+                        onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    });
+                }
+            }
+        }
+    });
+
+    //실시간 리스트 건수 확인 버튼 클릭 이벤트.
+    const handleCheckListCount = async () => {
+        setCaseType(1);
+        fetchCampaignRedialPreviewSearch({
+            campaign_id: Number(campaignIdForUpdateFromSideMenu),
+            condition: MakeRedialPacket()
+        });
+    };
     
     //최초 캠페인 재발신 정보 리스트 조회 실행.
     useEffect(() => {
@@ -717,6 +762,7 @@ const RebroadcastSettingsPanel = () => {
                     handleAddRebroadcast={handleAddRebroadcast}
                     handleRemoveRebroadcast={handleRemoveRebroadcast}
                     handleApplyRebroadcast={handleApplyRebroadcast}
+                    handleCheckListCount={handleCheckListCount}
                 />
 
                 <div className="flex gap-5 h-[580px]">
