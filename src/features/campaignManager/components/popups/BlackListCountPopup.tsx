@@ -3,16 +3,16 @@ import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { Label } from "@/components/ui/label";
 
 export interface BlackListCountPopupProps {
-    campaignId: string;
+    campaignId?: string;
     isOpen?: boolean;
-    onConfirm: () => void;
+    onConfirm?: () => void;
     onCancel?: () => void;
 }
 
 const BlackListCountPopup = ({
     campaignId,
     isOpen = false,
-    onConfirm,
+    onConfirm = () => {},
     onCancel
 }: BlackListCountPopupProps) => {
     // 가짜 데이터를 위한 상태
