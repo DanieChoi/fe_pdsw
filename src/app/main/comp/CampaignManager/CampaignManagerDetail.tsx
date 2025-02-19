@@ -360,7 +360,6 @@ export default function CampaignDetail() {
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
-    console.log('tenant_id :: '+tenant_id);
     if (selectedCampaign !== null) {
       // setChangeYn(false);
       // setCampaignInfoChangeYn(true);
