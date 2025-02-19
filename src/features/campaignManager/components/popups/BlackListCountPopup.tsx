@@ -1,42 +1,89 @@
-"use client";
+import React, { useState, useEffect, ReactNode } from 'react';
+import CustomAlert from '@/components/shared/layout/CustomAlert';
+import { Label } from "@/components/ui/label";
 
-import React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-
-export interface BlackListCountProps {
-    campaignId?: string;
+export interface BlackListCountPopupProps {
+    campaignId: string;
+    isOpen?: boolean;
+    onConfirm: () => void;
+    onCancel?: () => void;
 }
 
-const BlackListCount = ({ campaignId = "10001" }: BlackListCountProps) => {
-    return (
-        <div className="flex items-center justify-start h-full p-4">
-            <Card className="w-[400px] shadow-sm">
-                <CardHeader className="bg-[#5DC2BD] pb-2">
-                    <CardTitle className="text-base font-medium text-white">확인</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4">
-                    <div className="space-y-3 text-sm">
-                        <div>
-                            <span>캠페인 아이디 : </span>
-                            <span>{campaignId}</span>
-                        </div>
-                        <div>
-                            <span>블랙리스트 등록 건수 : </span>
-                            <span>0</span>
-                        </div>
-                        <div>
-                            <span>블랙리스트 MAX 등록 건수 : </span>
-                            <span>1000000</span>
-                        </div>
-                        <div>
-                            <span>공통 적용된 블랙리스트 건수 : </span>
-                            <span>0</span>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+const BlackListCountPopup = ({
+    campaignId,
+    isOpen = false,
+    onConfirm,
+    onCancel
+}: BlackListCountPopupProps) => {
+    // 가짜 데이터를 위한 상태
+    const [mockData, setMockData] = useState({
+        blacklistCount: 0,
+        maxBlacklistCount: 1000000,
+        commonBlacklistCount: 0
+    });
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            setIsLoading(true);
+            // 가짜 로딩 효과
+            setTimeout(() => {
+                setIsLoading(false);
+            }, 500);
+        }
+    }, [isOpen]);
+
+    const content = (
+        <div 
+            className="space-y-4"
+            onClick={(e) => e.stopPropagation()}
+            onContextMenu={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }}
+        >
+            <div className="flex items-center gap-2 justify-between">
+                <Label className="w-48">캠페인 ID</Label>
+                <span>{campaignId}</span>
+            </div>
+            <div className="flex items-center gap-2 justify-between">
+                <Label className="w-48">블랙리스트 등록건수</Label>
+                {isLoading ? (
+                    <span>로딩 중...</span>
+                ) : (
+                    <span>{mockData.blacklistCount.toLocaleString()}</span>
+                )}
+            </div>
+            <div className="flex items-center gap-2 justify-between">
+                <Label className="w-48">블랙리스트 MAX 등록 건수</Label>
+                {isLoading ? (
+                    <span>로딩 중...</span>
+                ) : (
+                    <span>{mockData.maxBlacklistCount.toLocaleString()}</span>
+                )}
+            </div>
+            <div className="flex items-center gap-2 justify-between">
+                <Label className="w-48">공통 적용된 블랙리스트 등록 건수</Label>
+                {isLoading ? (
+                    <span>로딩 중...</span>
+                ) : (
+                    <span>{mockData.commonBlacklistCount.toLocaleString()}</span>
+                )}
+            </div>
         </div>
+    );
+
+    return (
+       
+        <CustomAlert
+            isOpen={isOpen}
+            title="블랙리스트 건수 조회"
+            message={content}
+            onClose={onConfirm}
+            onCancle={onCancel}  // Changed from onCancel to onCancle
+            type="info"
+        />
     );
 };
 
-export default BlackListCount;
+export default BlackListCountPopup;

@@ -143,6 +143,8 @@ import {
   UserCheck, Shield, RefreshCcw, AlertTriangle 
 } from "lucide-react";
 import { CampaignStatus } from "./CampaignContextMenuForTreeNode";
+import { useState } from "react";
+import BlackListCountPopup from '@/features/campaignManager/components/popups/BlackListCountPopup';
 
 interface ContextMenuForTreeNodeProps {
   children: React.ReactNode;
@@ -168,6 +170,7 @@ export function ContextMenuForTreeNode({
 }: ContextMenuForTreeNodeProps) {
   const isFolder = item.type === "folder";
   const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab } = useTabStore();
+  const [isBlacklistPopupOpen, setIsBlacklistPopupOpen] = useState(false);
 
   const handleEditMenuClick = () => {
     simulateHeaderMenuClick(2);
@@ -175,11 +178,11 @@ export function ContextMenuForTreeNode({
   };
 
   const handleProgressInfoClick = () => {
-    simulateHeaderMenuClick(4);
+    simulateHeaderMenuClick(21);
   };
 
   const handleRebroadcastClick = () => {
-    simulateHeaderMenuClick(5);
+   // simulateHeaderMenuClick(5);
 
     // 20번에 대해 add tab 예약 재발신
     addTab({
@@ -197,8 +200,8 @@ export function ContextMenuForTreeNode({
     // simulateHeaderMenuClick(3);
     // 상담원 상태 모니터 add tab 21
     addTab({
-      id: 21,
-      uniqueKey: '21',
+      id: 22,
+      uniqueKey: '22',
       title: '상담원 상태 모니터',
       icon: '',
       href: '',
@@ -210,20 +213,30 @@ export function ContextMenuForTreeNode({
     simulateHeaderMenuClick(14);
   };
 
+  // const handleBlacklistCountCheckClick = () => {
+  //   // simulateHeaderMenuClick(7); // 블랙리스트 건수 조회
+  //   // alert("블랙 리스트 클릭")
+  //   addTab({
+  //     id: 501,
+  //     uniqueKey: '501',
+  //     title: '블랙 리스트 목록',
+  //     icon: '',
+  //     href: '',
+  //     content: null,
+  //   });
+  // };
+
   const handleBlacklistCountCheckClick = () => {
-    // simulateHeaderMenuClick(7); // 블랙리스트 건수 조회
-    // alert("블랙 리스트 클릭")
-    addTab({
-      id: 501,
-      uniqueKey: '501',
-      title: '블랙 리스트 목록',
-      icon: '',
-      href: '',
-      content: null,
-    });
+    // 컨텍스트 메뉴를 명시적으로 닫음
+    document.body.click();
+    // 약간의 딜레이 후 팝업을 엶
+    setTimeout(() => {
+      setIsBlacklistPopupOpen(true);
+    }, 100);
   };
 
   return (
+    <>
     <ContextMenu>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
       <ContextMenuContent className="w-56">
@@ -292,5 +305,15 @@ export function ContextMenuForTreeNode({
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
+    {/* 팝업은 컨텍스트 메뉴와 분리하여 최상위에 위치시킵니다 */}
+    {isBlacklistPopupOpen && (
+        <BlackListCountPopup
+          campaignId={item.id}
+          isOpen={isBlacklistPopupOpen}
+          onConfirm={() => setIsBlacklistPopupOpen(false)}
+          onCancel={() => setIsBlacklistPopupOpen(false)}
+        />
+      )}
+    </>
   );
 }

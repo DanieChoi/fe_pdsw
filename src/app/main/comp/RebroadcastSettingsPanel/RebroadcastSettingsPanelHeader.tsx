@@ -44,6 +44,7 @@ type Props = {
   handleAddRebroadcast:() => void;
   handleRemoveRebroadcast:() => void;
   handleApplyRebroadcast:() => void;
+  handleCheckListCount:() => void;
 }
 
 const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply,reservationShouldShowAdd, reservationShouldShowDelete
@@ -51,6 +52,7 @@ const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply,
     , handleAddRebroadcast
     , handleRemoveRebroadcast
     , handleApplyRebroadcast
+    , handleCheckListCount
 }:Props) => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
     const { campaigns } = useMainStore();
@@ -59,30 +61,26 @@ const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply,
     const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
     const [broadcastType, setBroadcastType] = useState("reservation");
     const [listCount, setListCount] = useState<number>(0);
-    const [rebroadcastList, setRebroadcastList] = useState<RebroadcastItem[]>([]);
-    const [selectedRebroadcastId, setSelectedRebroadcastId] = useState<number | null>(null);
     const [shouldShowApply, setShouldShowApply] = useState<boolean>(false);    //적용 버튼.
     const [shouldShowAdd, setShouldShowAdd] = useState<boolean>(false);        //추가 버튼.
     const [shouldShowAddDelete, setShouldShowDelete] = useState<boolean>(false);    //삭제 버튼.
 
     const [headerCampaignId, setHeaderCampaignId] = useState<string>('');
 
-    // 버튼 활성화 상태 관리
-    // const shouldShowAddDelete = broadcastType === "reservation" && rebroadcastList.every(item => !item.isDummy);
-    // const shouldShowApply = (broadcastType === "realtime") || 
-    //                    (broadcastType === "reservation" && 
-    //                     rebroadcastList.some(item => item.isDummy));
-
     //리스트 건수 확인 버튼 클릭 이벤트.
-    const handleCheckListCount = () => {
-        setAlertState({
-            isOpen: true,
-            message: `선택된 재발신 조건에 해당되는 리스트 수 : ${listCount}`,
-            title: '리스트 건수 확인',
-            type: '2',
-            onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-            onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-        });
+    const handleCheckListCountHeader = () => {
+        if( broadcastType === 'reservation'){   //예약인 경우.
+            setAlertState({
+                isOpen: true,
+                message: `선택된 재발신 조건에 해당되는 리스트 수 : ${listCount}`,
+                title: '리스트 건수 확인',
+                type: '2',
+                onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+            });
+        }else{  //실시간인 경우.
+            handleCheckListCount();
+        }
     };
 
     //추가 버튼 클릭 이벤트.
@@ -171,7 +169,7 @@ const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply,
                         </CommonRadio>
                     </div>
                     <div className="flex gap-2">
-                        <CommonButton onClick={handleCheckListCount}>
+                        <CommonButton onClick={handleCheckListCountHeader}>
                             리스트 건수 확인
                         </CommonButton>
                         <CommonButton 
