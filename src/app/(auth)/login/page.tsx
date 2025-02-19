@@ -114,7 +114,13 @@ export default function LoginPage() {
                 <Input
                   type="text"
                   placeholder="아이디를 입력하세요"
-                  className="h-12 pl-10 border-b-1 border-black shadow-none border-t-0 border-l-0 border-r-0 focus:border-black focus:border-b-[0px] focus:outline-none focus:ring-0 rounded-none focus:bg-[#F0F0F0] placeholder-[#aaa] font-16"
+                  className="h-12 pl-10 
+                  border-b-1 
+                  border-black shadow-none 
+                  border-t-transparent border-l-transparent border-r-transparent 
+                  focus:border-b-[0px] 
+                  focus:outline-none focus:ring-0 rounded-none
+                   focus:bg-[#F0F0F0] placeholder-[#aaa] font-16"
                   value={formData.user_name}
                   onChange={(e) => setFormData(prev => ({ ...prev, user_name: e.target.value }))}
                   disabled={isPending}
@@ -133,7 +139,13 @@ export default function LoginPage() {
                   <Input
                     type={showPassword ? "text" : "password"}
                     placeholder="비밀번호를 입력하세요"
-                    className="h-12 pl-10 border-b-1 border-black shadow-none border-t-0 border-l-0 border-r-0 focus:border-black focus:border-b-[0px] focus:outline-none focus:ring-0 rounded-none focus:bg-[#F0F0F0] placeholder-[#aaa] font-16"
+                    className="h-12 pl-10 
+                    border-b-1 
+                    border-black shadow-none 
+                    border-t-transparent border-l-transparent border-r-transparent 
+                    focus:border-b-[0px] 
+                    focus:outline-none focus:ring-0 rounded-none
+                    focus:bg-[#F0F0F0] placeholder-[#aaa] font-16"
                     value={formData.password}
                     onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                     disabled={isPending}
@@ -152,29 +164,29 @@ export default function LoginPage() {
                   </button>
                 </div>
               </div>
-
-              <div className="flex items-center justify-end space-x-2">
+            </div>
+            
+            <div className="flex items-center justify-end mt-10 gap-2">
                 <Checkbox
                   id="remember"
                   checked={formData.remember}
                   onCheckedChange={(checked) =>
                     setFormData(prev => ({ ...prev, remember: checked as boolean }))
                   }
-                  className="h-5 w-5 rounded-full border-2 border-gray-300 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 transition-colors duration-200"
+                   className="peer h-5 w-5 rounded-full border border-[#8E8E8E] data-[state=checked]:!border-[#8E8E8E] focus:ring-0 focus:outline-none transition-colors duration-200"
                 />
                 <label
                   htmlFor="remember"
-                  className="text-sm font-medium text-gray-600 cursor-pointer select-none"
+                  className="text-sm font-medium  cursor-pointer select-none"
                 >
-                  기억하기
+                  ID 기억하기
                 </label>
-              </div>
             </div>
 
             <Button
               variant="login"
               type="submit"
-              className="mt-100"
+              className="mt-12"
             >
               {isPending ? '로그인 중...' : '로그인'}
             </Button>
