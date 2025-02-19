@@ -59,12 +59,21 @@ export default function LoginPage() {
       router.push('/main');
     },
     onError: (e) => {
-      setAlertState({
-        isOpen: true,
-        message: e.message,
-        title: '로그인',
-        type: '0',
-      });
+      if( e.message === 'Request failed with status code 500'){
+        setAlertState({
+          isOpen: true,
+          message: '아이디, 또는 암호가 잘못 입력되었습니다.',
+          title: '로그인',
+          type: '2',
+        });
+      }else{
+        setAlertState({
+          isOpen: true,
+          message: e.message,
+          title: '로그인',
+          type: '2',
+        });
+      }
       setIsPending(false);
     },
   });
@@ -72,7 +81,23 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsPending(true);
-    login(formData);
+    if( formData.user_name === ''){
+      setAlertState({
+        isOpen: true,
+        message: '아이디를 입력하세요',
+        title: '로그인',
+        type: '2',
+      });
+    }else if( formData.password === ''){
+      setAlertState({
+        isOpen: true,
+        message: '비밀번호를 입력하세요',
+        title: '로그인',
+        type: '2',
+      });
+    }else{
+      login(formData);
+    }
   };
 
   // 컴포넌트 마운트 시 저장된 사용자 이름 불러오기

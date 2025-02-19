@@ -1,6 +1,6 @@
 "use client";
 // components/CampaignManager/CampaignManagerDetail.tsx
-import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
+import { useMainStore, useCampainManagerStore, useTabStore,useAuthStore } from '@/store';
 import Image from 'next/image'
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
@@ -336,6 +336,9 @@ export default function CampaignDetail() {
     , selectedCampaign
     , setSelectedCampaign
   } = useMainStore();
+  const { tenant_id
+    , role_id
+  } = useAuthStore();
   const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab
     , campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
@@ -357,6 +360,7 @@ export default function CampaignDetail() {
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
+    console.log('tenant_id :: '+tenant_id);
     if (selectedCampaign !== null) {
       // setChangeYn(false);
       // setCampaignInfoChangeYn(true);
@@ -964,6 +968,11 @@ export default function CampaignDetail() {
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
+      // if( tenant_id === 0){
+      //   setCampaigns(data.result_data);
+      // }else{
+      //   setCampaigns(data.result_data.filter(data=>data.tenant_id === tenant_id));
+      // }
       setSelectedCampaign(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
       setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
       setChangeYn(false);
