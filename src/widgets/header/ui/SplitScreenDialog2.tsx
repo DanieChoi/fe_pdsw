@@ -31,7 +31,7 @@ const TabPreview = ({ tab, index }: { tab: TabItem; index: number }) => {
   );
 };
 
-const SplitScreenDialog2 = ({ buttonText = "전체화면 보기", tabs }: Props) => {
+const SplitScreenDialog2 = ({ buttonText = "2탭 보기", tabs }: Props) => {
   const displayTabs = tabs.slice(0, 2);
 
   return (
