@@ -131,7 +131,7 @@ const AgentStatusMonitoring: React.FC = () => {
 
 
   return (
-    <div className="w-full h-full limit-width grid grid-rows-[80px_1fr] gap-4">
+    <div className="w-full h-full flex flex-col  gap-4">
       <div>
         <TitleWrap
           title="상담원 상태 통계"
@@ -168,7 +168,7 @@ const AgentStatusMonitoring: React.FC = () => {
           </tbody>
         </Table>
       </div>
-      <div className="h-[calc(100%-16px)]">
+      <div className="h-[calc(100%-100px)]">
         <TitleWrap
           title="상담원 상태"
           className="border-b border-gray-300 pb-1"
@@ -225,7 +225,7 @@ const AgentStatusMonitoring: React.FC = () => {
             </button>
           </div>
         </div>
-        <div className="h-[calc(100%-55px)] overflow-auto border border-[#ebebeb] rounded-b-[3px]">
+        <div className="h-[calc(100%-59px)] overflow-auto border border-[#ebebeb] rounded-b-[3px]">
           <table className="w-full table-auto rounded-[3px] border-separate border-spacing-0">
             <tbody>
               {sortedAndFilteredAgents.map((agent) => (
