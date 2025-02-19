@@ -150,6 +150,10 @@ export default function Header() {
   // authStore 에서 tenant_id, role_id 가져오기
   const tenant_id = useAuthStore((state) => state.tenant_id);
   const role_id = useAuthStore((state) => state.role_id);
+  const id = useAuthStore((state) => state.id);
+  //상담사 역할 ID(1: 상담사, 2: 파트매니저, 3: 그룹매니저, 4: 테넌트메니저, 5: 시스템 메니저, 6: 전체)
+
+  console.log('id '+id);
 
   const { data: counselorListData } = useApiForFetchCounselorList({
     credentials: {
@@ -191,7 +195,13 @@ export default function Header() {
                 height={18}
                 priority
               />
-              <span>홍길동(관리자)</span>
+              <span>{id}({role_id === 1?'상담사'
+              :role_id === 2?'파트매니저'
+              :role_id === 3?'그룹매니저'
+              :role_id === 4?'테넌트메니저'
+              :role_id === 5?'시스템 메니저'
+              :role_id === 6?'전체'
+              :''})</span>
             </div>
             <Button
               variant="ghost"

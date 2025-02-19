@@ -1,6 +1,6 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { ApiError, ChannelListResponse } from "../types/SystemPreferences";
-import { fetchChannelList } from "../api/channellist";
+import { fetchChannelList } from "../api/apiForChannellist";
 
 export function useApiForChannelList(
     options?: UseMutationOptions<ChannelListResponse, ApiError>

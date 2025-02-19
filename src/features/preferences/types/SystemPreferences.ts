@@ -1,3 +1,5 @@
+export const apiUrl: string = '/counselor';
+
 // API 에러 타입
 export interface ApiError {
     message: string;
@@ -91,4 +93,103 @@ export interface CallLimitSettingCreateRequest {
   call_timeout: number;
   max_call: number;
   max_criteria: number;
+}
+
+// 상담사 리스트
+export interface CounselorListCredentials {
+  tenantId: number;
+  roleId: number;
+}
+
+export interface GetCounselorListResponse {
+  code: string;
+  message: string;
+  organizationList: IOrganization[];
+}
+
+export interface IOrganization {
+  centerId: string;
+  centerName: string;
+  tenantInfo: ITenant[];
+}
+
+interface ITenant {
+  tenantId: string;
+  tenantName: string;
+  groupInfo: IGroup[];
+}
+
+export interface IGroup {
+  groupId: string;
+  groupName: string;
+  teamInfo: ITeam[];
+}
+
+export interface ITeam {
+  teamId: string;
+  teamName: string;
+  counselorInfo: ICounselor[];
+}
+
+export interface ICounselor {
+  counselorId: string;
+  counselorname: string;
+  blendKind: string;
+}
+
+export interface MaxCallListCredentials {
+  campaign_id: number[];
+}
+
+export interface MaxCallListDataResponse {
+  agent_id: string; 
+  campaign_id: number;
+  max_call: number;
+  answered_call: number;
+}
+
+export interface MaxCallListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: MaxCallListDataResponse[];
+}
+
+export interface CreateMaxCallRequest {
+  campaign_id: number;
+  agent_id: string;
+  max_call: number;
+  fix_fleg: number;
+}
+
+export interface MaxCallDataResponse {
+  agent_id: string;
+  campaign_id: number;
+  max_call: number;
+  answered_call: number;
+}
+
+export interface CreateMaxCallResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  request_count: number;
+  result_data: MaxCallDataResponse[];
+}
+
+export interface CampaignAgentListCredentials {
+  campaign_id: number[];
+}
+
+export interface CampaignAgentListDataResponse {
+  campaign_id: number;
+  agent_id: string[];
+}
+
+export interface CampaignAgentListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  result_data: CampaignAgentListDataResponse[];
 }

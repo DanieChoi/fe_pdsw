@@ -43,7 +43,7 @@ export default function LoginPage() {
       console.log('data (로그인 응답)', data);
 
       setAuth(
-        '',              // id
+        formData.user_name,              // id
         data.tenant_id,  // tenant_id
         data.session_key, // session_key
         data.role_id     // role_id 추가

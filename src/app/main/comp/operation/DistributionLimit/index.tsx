@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import DataGrid from "react-data-grid";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { CommonButton } from "@/components/shared/CommonButton";
@@ -6,7 +6,10 @@ import { CustomInput } from "@/components/shared/CustomInput";
 import { Label } from "@/components/ui/label";
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import CampaignModal from '../CampaignModal';
-import { useMainStore } from '@/store';
+import { useAuthStore, useMainStore } from '@/store';
+import { useApiForCounselorList } from '@/features/preferences/hooks/useApiForCounselorList';
+import { useApiForCreateMaxCall, useApiForMaxCallList, useApiForUpdateMaxCall } from '@/features/preferences/hooks/useApiForMaxCall';
+import { useApiForCampaignAgentList } from '@/features/preferences/hooks/useApiForSkillMaster';
 
 interface Row {
   center: string;
@@ -20,11 +23,14 @@ interface Row {
 }
 
 const DistributionLimit = () => {
+  const { tenant_id, role_id } = useAuthStore();
   const { campaigns, setSelectedCampaign } = useMainStore();
+  const [rows, setRows] = useState<Row[]>([]);
   const [selectedRow, setSelectedRow] = useState<Row | null>(null);
   const [selectedCampaignId, setSelectedCampaignId] = useState('');
   const [selectedCampaignName, setSelectedCampaignName] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [campaignAgents, setCampaignAgents] = useState<string[]>([]);
   
   const [formData, setFormData] = useState({
     center: '',
@@ -34,7 +40,7 @@ const DistributionLimit = () => {
     agentName: '',
     maxDist: '',
     currentResp: '',
-    fixedNumber: 'all'
+    fixedNumber: 'N'
   });
 
   const [alertState, setAlertState] = useState({
@@ -51,7 +57,7 @@ const DistributionLimit = () => {
       isOpen: true,
       message,
       title: '알림',
-      type: '1',
+      type: '2',
       onConfirm: closeAlert,
       onCancel: () => {}
     });
@@ -62,7 +68,7 @@ const DistributionLimit = () => {
       isOpen: true,
       message,
       title: '확인',
-      type: '2',
+      type: '1',
       onConfirm: () => {
         onConfirm();
         closeAlert();
@@ -91,6 +97,129 @@ const DistributionLimit = () => {
     }
   };
 
+  // 캠페인별 상담원 목록 조회
+  const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
+    onSuccess: (response) => {
+      if (response?.result_data && response.result_data.length > 0) {
+        // 캠페인에 소속된 상담사 ID 목록 저장
+        const agentIds = response.result_data[0].agent_id;
+        setCampaignAgents(agentIds);
+      } else {
+        setCampaignAgents([]);
+      }
+    },
+    onError: (error) => {
+      console.error('캠페인 상담원 목록 조회 실패:', error);
+      setCampaignAgents([]);
+    }
+  });
+
+  // 백엔드에서 가져온 상담원 리스트 정보 처리
+  const { mutate: fetchCounselorList } = useApiForCounselorList({
+    onSuccess: (response) => {
+      if (response?.organizationList && selectedCampaignId) {
+        const counselorRows: Row[] = [];
+        
+        response.organizationList.forEach(org => {
+          const centerName = org.centerName;
+          
+          org.tenantInfo.forEach(tenant => {
+            tenant.groupInfo.forEach(group => {
+              group.teamInfo.forEach(team => {
+                team.counselorInfo.forEach(counselor => {
+                  // 캠페인에 소속된 상담사만 추가
+                  if (campaignAgents.includes(counselor.counselorId)) {
+                    counselorRows.push({
+                      center: centerName,
+                      group: group.groupId,
+                      part: team.teamId,
+                      agent_id: counselor.counselorId,
+                      agent_name: counselor.counselorname,
+                      max_dist: '0',
+                      current_resp: '0',
+                      fixed_number: 'N'
+                    });
+                  }
+                });
+              });
+            });
+          });
+        });
+        
+        setRows(counselorRows);
+      } else {
+        setRows([]);
+      }
+    },
+    onError: (error) => {
+      console.error('상담원 목록 조회 실패:', error);
+      setRows([]);
+    }
+  });
+
+  // 운영설정 분배호수 제한 설정 리스트 API 호출
+  const { mutate: fetchMaxCallList } = useApiForMaxCallList({
+    onSuccess: (maxCallResponse) => {
+      if (maxCallResponse?.result_data) {
+        setRows(prevRows => {
+          return prevRows.map(row => {
+            const maxCallInfo = maxCallResponse.result_data.find(
+              call => call.agent_id === row.agent_id
+            );
+            
+            if (maxCallInfo) {
+              return {
+                ...row,
+                max_dist: maxCallInfo.max_call.toString(),
+                current_resp: maxCallInfo.answered_call.toString()
+              };
+            }
+            // 매칭되는 정보가 없으면 기존 row 반환
+            return row;
+          });
+        });
+      }
+    },
+    onError: (error) => {
+      console.error('운영설정 분배호수 제한 설정 리스트 조회 실패:', error);
+    }
+  });
+
+  const { mutate: createMaxCallMutation } = useApiForCreateMaxCall();
+  const { mutate: updateMaxCallMutation } = useApiForUpdateMaxCall();
+
+  useEffect(() => {
+    if (selectedCampaignId) {
+      // 1. 먼저 캠페인 상담원 목록을 가져옴
+      fetchCampaignAgentList({
+        campaign_id: [Number(selectedCampaignId)]
+      });
+    } else {
+      setCampaignAgents([]);
+      setRows([]);
+    }
+  }, [selectedCampaignId, fetchCampaignAgentList]);
+  
+  // campaignAgents가 업데이트되면 상담원 목록 조회
+  useEffect(() => {
+    if (selectedCampaignId && campaignAgents.length > 0) {
+      fetchCounselorList({
+        tenantId: tenant_id,
+        roleId: role_id
+      });
+    }
+  }, [tenant_id, role_id, selectedCampaignId, campaignAgents, fetchCounselorList]);
+
+  // 캠페인이 선택되고 상담원 목록이 로드된 후에 분배호수 제한 설정 조회
+  useEffect(() => {
+    if (selectedCampaignId && rows.length > 0) {
+      fetchMaxCallList({
+        campaign_id: [Number(selectedCampaignId)]
+      });
+    }
+  }, [selectedCampaignId, rows.length, fetchMaxCallList]);
+  
+
   const [isTimeSettingOpen, setIsTimeSettingOpen] = useState(false);
   const [isTimeRemoveOpen, setIsTimeRemoveOpen] = useState(false);
   const [timeValue, setTimeValue] = useState('');
@@ -114,13 +243,65 @@ const DistributionLimit = () => {
   };
 
   const handleSave = () => {
+    if (!selectedCampaignId) {
+      showAlert('캠페인을 선택해주세요.');
+      return;
+    }
     if (!formData.center || !formData.agentId) {
       showAlert('필수 필드를 입력해주세요.');
       return;
     }
 
-    showConfirm('저장하시겠습니까?', () => {
-      console.log('Save:', formData);
+    const maxDist = parseInt(formData.maxDist);
+    if (isNaN(maxDist) || maxDist < 0) {
+      showAlert('최대 분배호수는 0 이상의 숫자로 입력해주세요.');
+      return;
+    }
+
+    const saveData = {
+      campaign_id: parseInt(selectedCampaignId),
+      agent_id: formData.agentId,
+      max_call: maxDist,
+      fix_fleg: formData.fixedNumber === 'Y' ? 1 : 0
+    };
+
+    const existingRow = rows.find(row => row.agent_id === formData.agentId);
+    const isUpdate = existingRow && existingRow.max_dist !== '0';
+
+    showConfirm(`${isUpdate ? '수정' : '신규 등록'}하시겠습니까?`, () => {
+      if (isUpdate) {
+        updateMaxCallMutation(saveData, {
+          onSuccess: (response) => {
+            if (response.result_code === 0) {
+              showAlert('성공적으로 수정되었습니다.');
+              fetchMaxCallList({
+                campaign_id: [parseInt(selectedCampaignId)]
+              });
+            } else {
+              showAlert(`수정 실패: ${response.result_msg}`);
+            }
+          },
+          onError: (error: any) => {
+            showAlert(`수정 중 오류가 발생했습니다: ${error.message}`);
+          }
+        });
+      } else {
+        createMaxCallMutation(saveData, {
+          onSuccess: (response) => {
+            if (response.result_code === 0) {
+              showAlert('성공적으로 등록되었습니다.');
+              fetchMaxCallList({
+                campaign_id: [parseInt(selectedCampaignId)]
+              });
+            } else {
+              showAlert(`등록 실패: ${response.result_msg}`);
+            }
+          },
+          onError: (error: any) => {
+            showAlert(`등록 중 오류가 발생했습니다: ${error.message}`);
+          }
+        });
+      }
     });
   };
 
@@ -134,30 +315,7 @@ const DistributionLimit = () => {
     { key: 'current_resp', name: '현재 응답호수' },
     { key: 'fixed_number', name: '호수 고정' }
   ], []);
-
-  const rows = [
-    { 
-      center: 'Center A',
-      group: 'Group 1',
-      part: 'Part A',
-      agent_id: 'AG001',
-      agent_name: '김상담',
-      max_dist: '100',
-      current_resp: '45',
-      fixed_number: 'Y'
-    },
-    { 
-      center: 'Center B',
-      group: 'Group 2',
-      part: 'Part B',
-      agent_id: 'AG002',
-      agent_name: '이상담',
-      max_dist: '150',
-      current_resp: '78',
-      fixed_number: 'N'
-    }
-  ];
-
+  
   const handleCellClick = ({ row }: { row: Row }) => {
     setSelectedRow(row);
     setFormData({
@@ -271,7 +429,7 @@ const DistributionLimit = () => {
           <div className='grid-custom-wrap h-[400px]'>
             <DataGrid
               columns={columns}
-              rows={rows}
+              rows={rows} 
               className="grid-custom"
               onCellClick={handleCellClick}
               rowKeyGetter={(row) => row.agent_id}
