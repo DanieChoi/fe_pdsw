@@ -335,7 +335,7 @@ const SystemPreferences = () => {
             showConfirm('장비 정보가 성공적으로 수정되었습니다.', () => {});
         } else {
             createDevice(saveRequest);
-            showConfirm('새로운 장비 정보가 성공적으로 저장되었습니다..', () => {});
+            showConfirm('새로운 장비 정보가 성공적으로 저장되었습니다.', () => {});
         }
     };
 
