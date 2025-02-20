@@ -1388,7 +1388,7 @@ export default function CampaignDetail() {
           title="상세내역"
           buttons={[
             { label: "새 캠페인", onClick: () => handleNewCampaign() },
-            { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+            // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
             { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
             { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
             { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
