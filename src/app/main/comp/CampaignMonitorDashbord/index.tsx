@@ -27,7 +27,7 @@ type ViewType = "gridView" | "chartView";
 const CampaignMonitorDashboard: React.FC = () => {
   // 상태 추가
   const [viewType, setViewType] = useState<ViewType>("gridView");
-  const [selectedCall, setSelectedCall] = useState<number>(1);
+  const [selectedCall, setSelectedCall] = useState<CampaignProgressInformationResponseDataType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const activeTabKey = useTabStore((state) => state.activeTabKey);
@@ -135,19 +135,19 @@ const CampaignMonitorDashboard: React.FC = () => {
           <div className="border rounded overflow-y-auto h-[calc(100%-20px)]">
             <table className="w-full text-sm border-collapse">
               <tbody>
-                {callList.map((item) => (
+                {dataList.length > 0 ? dataList.map((item) => (
                   <tr
-                    key={item.id}
-                    onClick={() => setSelectedCall(item.id)}
+                    key={item.reuseCnt}
+                    onClick={() => setSelectedCall(item)}
                     className={`cursor-pointer hover:bg-[#FFFAEE] ${
-                      selectedCall === item.id ? "bg-[#FFFAEE]" : ""
+                      selectedCall === item ? "bg-[#FFFAEE]" : ""
                     }`}
                   >
                     <td className="border-b border-r px-3 py-1">
-                      {item.label}
+                      {item.reuseCnt === 1?'최초발신':(item.reuseCnt-1)+'번째 재발신'}
                     </td>
                   </tr>
-                ))}
+                )):null}
               </tbody>
             </table>
           </div>
@@ -164,7 +164,7 @@ const CampaignMonitorDashboard: React.FC = () => {
 
       {/* 오른쪽 대시보드 영역 */}
       <div className="flex-1">
-        {viewType === "gridView" ? <GridView /> : <ChartView />}
+        {viewType === "gridView" ? <GridView selectedCall={selectedCall} /> : <ChartView selectedCall={selectedCall} />}
       </div>
 
       {/* 사용 시간 팝업 */}
