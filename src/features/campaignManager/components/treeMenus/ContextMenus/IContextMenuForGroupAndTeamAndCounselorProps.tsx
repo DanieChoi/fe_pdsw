@@ -28,7 +28,7 @@ export function IContextMenuForGroupAndTeamAndCounselor({
   const { addTab, removeTab, openedTabs } = useTabStore();
   const { setSelectedCounselor } = useCounselorFilterStore();
 
-  console.log("item at: ", item.type);
+  // console.log("item at: ", item.type);
 
   const getTabId = () => {
     switch (item.type) {

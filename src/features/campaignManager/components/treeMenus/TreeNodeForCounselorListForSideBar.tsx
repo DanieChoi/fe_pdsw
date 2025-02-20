@@ -41,8 +41,43 @@ export function TreeNodeForCounselorListForSideBar({
 }: ITreeNodeForCounselorListForSideBar) {
   const { selectedBlendKind } = useCounselorFilterStore();
 
-  // console.log("data at tree node : ", data);
-  
+  const getCounselorsForNode = () => {
+    switch (type) {
+      case 'counselor':
+        return [data]; // 상담원 노드인 경우 자기 자신
+      case 'team':
+        return data.counselorInfo || []; // 팀 노드인 경우 직속 상담원들
+      case 'group':
+        // 그룹 노드인 경우 모든 하위 팀의 상담원들을 합침
+        return data.teamInfo?.reduce((acc: any[], team: any) => {
+          return acc.concat(team.counselorInfo || []);
+        }, []) || [];
+      // case 'tenant':
+      //   // 테넌트 노드인 경우 모든 하위 그룹과 팀의 상담원들을 합침
+      //   return data.groupInfo?.reduce((acc: any[], group: any) => {
+      //     return acc.concat(
+      //       group.teamInfo?.reduce((teamAcc: any[], team: any) => {
+      //         return teamAcc.concat(team.counselorInfo || []);
+      //       }, []) || []
+      //     );
+      //   }, []) || [];
+      // case 'organization':
+      //   // 조직 노드인 경우 모든 하위 테넌트, 그룹, 팀의 상담원들을 합침
+      //   return data.tenantInfo?.reduce((acc: any[], tenant: any) => {
+      //     return acc.concat(
+      //       tenant.groupInfo?.reduce((groupAcc: any[], group: any) => {
+      //         return groupAcc.concat(
+      //           group.teamInfo?.reduce((teamAcc: any[], team: any) => {
+      //             return teamAcc.concat(team.counselorInfo || []);
+      //           }, []) || []
+      //         );
+      //       }, []) || []
+      //     );
+      //   }, []) || [];
+      default:
+        return [];
+    }
+  };
 
   const getId = () => {
     switch (type) {
@@ -135,6 +170,10 @@ export function TreeNodeForCounselorListForSideBar({
       onClick={() => {
         onNodeSelect(id);
         if (hasChildren) onNodeToggle(id);
+        
+        // 노드 클릭시 상담원 리스트 출력
+        const counselors = getCounselorsForNode();
+        console.log(`${type} 노드의 상담원 목록:`, counselors);
       }}
       style={{ paddingLeft: `${level * 16 + 8}px` }}
     >
@@ -164,14 +203,6 @@ export function TreeNodeForCounselorListForSideBar({
         </IContextMenuForTennantForCounselorTreeMenu>
       );
     }
-
-    // if (['group', 'team', 'counselor'].includes(type)) {
-    //   return (
-    //     <IContextMenuForGroupAndTeamAndCounselor item={data}>
-    //       {content}
-    //     </IContextMenuForGroupAndTeamAndCounselor>
-    //   );
-    // }
 
     if (['group', 'team', 'counselor'].includes(type)) {
       const contextMenuItem = {
