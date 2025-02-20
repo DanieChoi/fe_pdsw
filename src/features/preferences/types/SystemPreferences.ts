@@ -146,6 +146,7 @@ export interface MaxCallListDataResponse {
   campaign_id: number;
   max_call: number;
   answered_call: number;
+  fix_flag: number;
 }
 
 export interface MaxCallListResponse {
@@ -160,7 +161,7 @@ export interface CreateMaxCallRequest {
   campaign_id: number;
   agent_id: string;
   max_call: number;
-  fix_fleg: number;
+  fix_flag: number;
 }
 
 export interface MaxCallDataResponse {
@@ -192,4 +193,21 @@ export interface CampaignAgentListResponse {
   result_msg: string;
   result_count: number;
   result_data: CampaignAgentListDataResponse[];
+}
+
+export interface MaxCallInitTimeListResponse {
+  result_code: number;
+  result_msg: string;
+  result_data: {
+    init_time: string;
+  }
+}
+
+export interface MaxCallInitTimeUpdateRequest {
+  init_time: string;
+}
+
+export interface MaxCallInitTimeUpdateResponse {
+  result_code: number;
+  result_msg: string;
 }
