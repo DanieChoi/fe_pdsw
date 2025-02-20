@@ -732,35 +732,35 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     console.log(tempCampaignManagerInfo);
     console.log('power_divert_queue :: '+tempCampaignManagerInfo.power_divert_queue);
     let saveErrorCheck = false;
-    //2018.11.27 Gideon #23127 캠페인 수정창 연결 IVR 입력 예외 처리
-    if( tempCampaignManagerInfo.dial_mode === 1 && (tempCampaignManagerInfo.token_id === 0 || tempCampaignManagerInfo.token_id === 3) ){
-      if( tempCampaignManagerInfo.power_divert_queue === '0' || tempCampaignManagerInfo.power_divert_queue === ''){
-        saveErrorCheck = true;
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: "'발신 방법' 탭의 '연결 IVR NO' 값을 입력해 주시기 바랍니다.",
-          type: '2',
-          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
-        });
-      }
-    }
-    if(!saveErrorCheck && tempCampaignManagerInfo.campaign_name === '' ){
-      saveErrorCheck = true;
-      setAlertState({
-        ...errorMessage,
-        isOpen: true,
-        message: "캠페인명을 입력해 주세요.",
-        type: '2',
-        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
-      });
-    }
     if(!saveErrorCheck && tempCampaignManagerInfo.tenant_id < 0 ){
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
         isOpen: true,
         message: "테넌트를 선택해 주세요.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
+    //2018.11.27 Gideon #23127 캠페인 수정창 연결 IVR 입력 예외 처리
+    // if( tempCampaignManagerInfo.dial_mode === 1 && (tempCampaignManagerInfo.token_id === 0 || tempCampaignManagerInfo.token_id === 3) ){
+      if(!saveErrorCheck && tempCampaignManagerInfo.power_divert_queue === '0' || tempCampaignManagerInfo.power_divert_queue === ''){
+        saveErrorCheck = true;
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "'발신 방법' 탭의 '연결 IVR NO' 값을 입력해 주시기 바랍니다.", 
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }
+    // }
+    if(!saveErrorCheck && tempCampaignManagerInfo.campaign_name === '' ){
+      saveErrorCheck = true;
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "캠페인명을 입력해 주세요.",
         type: '2',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });

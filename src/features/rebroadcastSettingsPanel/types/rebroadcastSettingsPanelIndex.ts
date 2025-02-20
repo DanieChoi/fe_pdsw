@@ -2,6 +2,12 @@
 
 export const apiUrl: string = '/counselor';
 
+// 재발신 수정 API 응답
+export interface UpdateResponse {
+  result_code: number;
+  result_msg: string;
+}
+
 // 재발신 API 에러 타입
 export interface rebroadcastSettingsPanelApiError {
   result_code: number;
@@ -50,6 +56,13 @@ export interface CampaignRedialPreviewSearchResponse {
   result_code: number;
   result_msg: string;
   result_data: CampaignRedialPreviewSearchResponseDataType;
+}
+
+// 캠페인 재발신 추출 응답
+export interface CampaignCurrentRedialResponse {
+  reason_code: number;
+  result_code: number;
+  result_msg: string;
 }
 
 

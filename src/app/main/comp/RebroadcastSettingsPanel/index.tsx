@@ -19,6 +19,7 @@ import { useApiForAutoRedial } from '@/features/campaignManager/hooks/useApiForA
 import { useApiForCampaignAutoRedialInsert } from '@/features/rebroadcastSettingsPanel/hooks/useApiForCampaignAutoRedialInsert';
 import { useApiForAutoRedialDelete } from '@/features/campaignManager/hooks/useApiForAutoRedialDelete';
 import { useApiForCampaignRedialPreviewSearch } from '@/features/rebroadcastSettingsPanel/hooks/useApiForCampaignRedialPreviewSearch';
+import { useApiForCampaignCurrentRedial } from '@/features/rebroadcastSettingsPanel/hooks/useApiForCampaignCurrentRedial';
 
 interface RebroadcastSettings {
     campaignId: string;
@@ -694,6 +695,49 @@ const RebroadcastSettingsPanel = () => {
         }
     });
 
+    //캠페인 재발신 추출 api 호출.
+    const { mutate: fetchCampaignCurrentRedial } = useApiForCampaignCurrentRedial({
+        onSuccess: (data) => {  
+            if( data.result_code != 0){
+                let _message = '';
+                if( data.reason_code === -2){
+                    _message = '[-2]재발신 추출 에러';
+                }else if( data.reason_code === -1){
+                    _message = '[-1]실시간 재발신 요청을 실패 하였습니다. \n서버의 상태를 확인 후 다시 시도하여 주십시오.';
+                }else if( data.reason_code === -3){
+                    _message = '[-3]상담원과 고객이 통화 중이라 캠페인 통계가 완료되지 않았습니다. \n잠시만 기다려주세요.';
+                }
+                setAlertState({
+                    isOpen: true,
+                    message: _message,
+                    title: '리스트 오류',
+                    type: '2',
+                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                });
+            }else{                
+                setAlertState({
+                    isOpen: true,
+                    message: '재발신 적용 완료했습니다.',
+                    title: '재발신',
+                    type: '2',
+                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                });
+            }
+        },
+        onError: (data) => {  
+            setAlertState({
+                isOpen: true,
+                message: data.result_msg,
+                title: '리스트 오류',
+                type: '2',
+                onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+            });
+        }
+    });
+
     // 캠페인 재발신 미리보기 api 호출
     const { mutate: fetchCampaignRedialPreviewSearch } = useApiForCampaignRedialPreviewSearch({
         onSuccess: (data) => {  
@@ -707,8 +751,12 @@ const RebroadcastSettingsPanel = () => {
                     onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 });
             }else if( caseType === 2 ){
-                if( data.result_data.redial_count > 0){   
-                    console.log('API 작업중입니다. :: ' + data.result_data.redial_count);
+                if( data.result_data.redial_count > 0){ 
+                    //캠페인 실시간 적용 이벤트.  
+                    fetchCampaignCurrentRedial({
+                        campaign_id: Number(campaignIdForUpdateFromSideMenu),
+                        condition: MakeRedialPacket()
+                    });
                 }else{        
                     setAlertState({
                         isOpen: true,
@@ -719,6 +767,27 @@ const RebroadcastSettingsPanel = () => {
                         onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                     });
                 }
+            }
+        },
+        onError: (data) => {  
+            if( caseType === 1 ){     
+                setAlertState({
+                    isOpen: true,
+                    message: '선택된 재발신 조건에 해당되는 리스트 수 : 0',
+                    title: '리스트 건수 확인',
+                    type: '2',
+                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                });
+            }else if( caseType === 2 ){     
+                setAlertState({
+                    isOpen: true,
+                    message: '적용할 건수가 없습니다.',
+                    title: '리스트 건수 확인',
+                    type: '2',
+                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                });
             }
         }
     });
