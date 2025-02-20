@@ -1,111 +1,89 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useTabStore } from '@/store/tabStore';
-import { useAuthStore } from '@/store/authStore';  // 추가된 import
-import { CounselorSkill } from '../../types/typeForCounselorSkill';
-import { useApiForCounselorSkill } from '../../hooks/useApiForCounselorSkill';
-import { useApiForAssignCheckedSkilsToCounselor } from "@/features/campaignManager/hooks/useApiForAssignCheckedSkilsToCounselor";
-import { toast } from 'react-toastify';
+import { useTabStore } from "@/store/tabStore";
+import { useAuthStore } from "@/store/authStore";
+import { CounselorSkill } from "../../types/typeForCounselorSkill";
+import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
+import { useApiForGetRelatedInfoForAssignSkilToCounselor } from "@/features/preferences/hooks/useApiForGetRelatedInfoForAssignSkilToCounselor";
 
-interface SkillAssignmentTabProps {
-  counselorId: string;
-}
+export function SkillAssignmentTab() {
+  const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
+  const removeTab = useTabStore((state) => state.removeTab);
+  const activeTabKey = useTabStore((state) => state.activeTabKey);
+  const userId = useAuthStore((state) => state.id);
+  
+  // useCounselorFilterStore에서 상담원 정보와 블랜딩 종류 가져오기
+  const selectedBlendKind = useCounselorFilterStore((state) => state.selectedBlendKind);
+  const selectedCounselor = useCounselorFilterStore((state) => state.selectedCounselor);
 
-export function SkillAssignmentTab({ counselorId }: SkillAssignmentTabProps) {
-  const [selectedSkills, setSelectedSkills] = React.useState<number[]>([]);
-  const removeTab = useTabStore(state => state.removeTab);
-  const activeTabKey = useTabStore(state => state.activeTabKey);
-  const skillAssignmentInfo = useTabStore(state => state.counselorSkillAssignmentInfo);
-  const userId = useAuthStore(state => state.id);  // 로그인 사용자 ID 가져오기
+  console.log("📌 선택된 상담원 정보:", selectedCounselor);
 
-  // 상담원 스킬 목록 가져오기
-  const { data: skillListData, isLoading, error } = useApiForCounselorSkill(
-    Number(skillAssignmentInfo.tenantId),
-    counselorId
+  // API 호출에 선택된 상담원 정보 사용
+  const { assignedSkills, assignableSkills, isLoading, error } = useApiForGetRelatedInfoForAssignSkilToCounselor(
+    selectedCounselor.counselorId ?? "",
+    Number(selectedCounselor.tenantId)
   );
 
-  // 스킬 할당 API 호출용 커스텀 훅
-  const { assign, isLoading: assignIsLoading, error: assignError } = useApiForAssignCheckedSkilsToCounselor();
+  console.log("📌 할당 가능한 스킬 목록들 조회:", assignableSkills);
+  console.log("📌 상담원이 보유한 스킬 목록들 조회:", assignedSkills);
+
+  useEffect(() => {
+    if ((assignedSkills?.result_data ?? []).length > 0) {
+      const assignedSkillIds = assignedSkills?.result_data.flatMap((item) => item.skill_id) ?? [];
+      setSelectedSkills(assignedSkillIds);
+    }
+  }, [assignedSkills]);
 
   const handleSkillToggle = (skillId: number) => {
-    setSelectedSkills(prev =>
-      prev.includes(skillId)
-        ? prev.filter(id => id !== skillId)
-        : [...prev, skillId]
+    setSelectedSkills((prev) =>
+      prev.includes(skillId) ? prev.filter((id) => id !== skillId) : [...prev, skillId]
     );
-  };
-
-  const handleSave = async () => {
-    try {
-      await assign([counselorId], selectedSkills);
-      toast.success("스킬 할당이 완료되었습니다.");
-    } catch (err) {
-      console.error("❌ Error assigning skills:", err);
-    }
   };
 
   const handleCancel = () => {
     if (activeTabKey) {
-      removeTab(100, activeTabKey);
+      removeTab(500, activeTabKey);
     }
   };
-
-  if (isLoading) {
-    return (
-      <Card className="max-w-2xl mx-auto">
-        <CardContent className="pt-6">
-          <div>Loading...</div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   if (error) {
     return (
       <Card className="max-w-2xl mx-auto">
         <CardContent className="pt-6">
-          <div className="text-red-500">Error: {error.message}</div>
+          <div className="text-red-500">Error: {error}</div>
         </CardContent>
       </Card>
     );
   }
 
-  const skills = skillListData?.result_data || [];
-
   return (
     <Card className="w-full max-w-[800px] mx-auto">
       <CardHeader>
-        <CardTitle className="text-lg">상담원 스킬 할당</CardTitle>
+        <CardTitle className="text-lg">상담원 스킬 목록</CardTitle>
         <div className="text-sm text-gray-500">
-          TenantID: {skillAssignmentInfo.tenantId || 'N/A'}
-          <br />
-          로그인 사용자 ID: {userId || 'N/A'}  {/* 로그인 사용자 ID 표시 */}
+          <div>Tenant ID: {selectedCounselor.tenantId || "N/A"}</div>
+          <div>상담원 ID: {selectedCounselor.counselorId || "N/A"}</div>
+          <div>상담원 이름: {selectedCounselor.counselorName || "N/A"}</div>
+          <div>로그인 사용자 ID: {userId || "N/A"}</div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="text-sm text-gray-500">
-          상담원에게 할당할 스킬을 선택하세요.
-          <br />
-          선택된 스킬만이 정상 할당됩니다.
-          <br />
-          (상담원에게 최대 10개 스킬까지만 할당 가능 합니다.)
-        </div>
         <div className="overflow-x-auto">
           <Table className="max-w-full w-full">
             <TableHeader>
               <TableRow>
                 <TableHead className="w-16 text-center">선택</TableHead>
-                <TableHead className="w-20 text-center">아이디</TableHead>
+                {/* <TableHead className="w-20 text-center">아이디</TableHead> */}
                 <TableHead className="w-40 text-center">이름</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {skills.map((skill: CounselorSkill) => (
+              {assignableSkills?.result_data.map((skill: CounselorSkill) => (
                 <TableRow key={`${skill.tenant_id}-${skill.skill_id}`}>
                   <TableCell className="text-center">
                     <Checkbox
@@ -113,7 +91,7 @@ export function SkillAssignmentTab({ counselorId }: SkillAssignmentTabProps) {
                       onCheckedChange={() => handleSkillToggle(skill.skill_id)}
                     />
                   </TableCell>
-                  <TableCell className="text-center">{skill.skill_id}</TableCell>
+                  {/* <TableCell className="text-center">{skill.skill_id}</TableCell> */}
                   <TableCell className="text-center">{skill.skill_name}</TableCell>
                 </TableRow>
               ))}
@@ -121,14 +99,10 @@ export function SkillAssignmentTab({ counselorId }: SkillAssignmentTabProps) {
           </Table>
         </div>
         <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={handleCancel}>취소</Button>
-          <Button onClick={handleSave} disabled={assignIsLoading}>확인</Button>
+          <Button variant="outline" onClick={handleCancel}>
+            닫기
+          </Button>
         </div>
-        {assignError && (
-          <div className="text-red-500 text-sm">
-            스킬 할당 중 오류가 발생했습니다. 다시 시도해주세요.
-          </div>
-        )}
       </CardContent>
     </Card>
   );

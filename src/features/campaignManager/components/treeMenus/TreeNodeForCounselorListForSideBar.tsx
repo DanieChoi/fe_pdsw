@@ -164,7 +164,7 @@ export function TreeNodeForCounselorListForSideBar({
 
     if (['group', 'team', 'counselor'].includes(type)) {
       return (
-        <IContextMenuForGroupAndTeamAndCounselor>
+        <IContextMenuForGroupAndTeamAndCounselor item={data}>
           {content}
         </IContextMenuForGroupAndTeamAndCounselor>
       );

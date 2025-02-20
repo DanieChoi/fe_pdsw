@@ -68,7 +68,7 @@ const renderContent = (tabId: number | null) => {
       return (
         <div className="flex justify-left w-full">
           <div className="max-w-[500px] w-full">
-            <SkillAssignmentTab counselorId={""} />
+            <SkillAssignmentTab />
           </div>
         </div>
       );

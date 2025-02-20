@@ -7,6 +7,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { LayoutGrid, Ban } from "lucide-react";
+import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
 import { useTabStore } from "@/store/tabStore";
 
 interface IContextMenuForGroupAndTeamAndCounselorProps {
@@ -22,7 +23,8 @@ export function IContextMenuForGroupAndTeamAndCounselor({
   children,
   item,
 }: IContextMenuForGroupAndTeamAndCounselorProps) {
-  const { addTab, removeTab, setCounselorSkillAssignmentInfo, openedTabs } = useTabStore();
+  const { addTab, removeTab, openedTabs } = useTabStore();
+  const { setSelectedCounselor } = useCounselorFilterStore();
 
   const openSkillAssignmentTab = () => {
     // 기존 500번 탭이 있으면 삭제
@@ -31,12 +33,10 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       removeTab(tab.id, tab.uniqueKey);
     });
 
+    console.log("item : ", item);
+    
     // 상담원 정보 저장
-    setCounselorSkillAssignmentInfo({
-      tenantId: item.tenantId || null,
-      counselorId: item.counselorId || null,
-      counselorName: item.counselorName || null,
-    });
+    setSelectedCounselor(item.counselorId, item.counselorName, item.tenantId);
 
     // 새 500번 탭 추가
     addTab({

@@ -1,24 +1,75 @@
-// src\store\storeForSideMenuCounselorTab.ts
-
-// todo1:
-// 현재 사이드 메뉴에서 검색 조건으로 블랜딩 종류(1: 인바운드, 2: 아웃바운드, 3: 블랜드) 에 대한 전역 상태 설정
-
-// todo2:
-// ITreeNodeForCounselorListForSideBar 에서 블랜딩 종류에 따라 아이콘을 다르게 표시하도록 수정
+"use client";
 
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 
-// Define types for blend kinds
 export type BlendKind = 1 | 2 | 3 | null; // 1: inbound, 2: outbound, 3: blend
 
 interface CounselorFilterState {
   selectedBlendKind: BlendKind;
+  selectedCounselor: {
+    counselorId: string | null;
+    counselorName: string | null;
+    tenantId: string | null;
+  };
   setSelectedBlendKind: (blendKind: BlendKind) => void;
+  setSelectedCounselor: (counselorId: string, counselorName: string, tenantId: string) => void;
   resetFilter: () => void;
+  getState: () => void;
 }
 
-export const useCounselorFilterStore = create<CounselorFilterState>((set) => ({
-  selectedBlendKind: null,
-  setSelectedBlendKind: (blendKind) => set({ selectedBlendKind: blendKind }),
-  resetFilter: () => set({ selectedBlendKind: null }),
-}));
+export const useCounselorFilterStore = create<CounselorFilterState>()(
+  devtools(
+    (set, get) => ({
+      selectedBlendKind: null,
+      selectedCounselor: {
+        counselorId: null,
+        counselorName: null,
+        tenantId: null,
+      },
+      setSelectedBlendKind: (blendKind) => {
+        set(
+          { selectedBlendKind: blendKind },
+          false,
+          'counselorFilter/setSelectedBlendKind'
+        );
+        console.log('Blend Kind updated:', get().selectedBlendKind);
+      },
+      setSelectedCounselor: (counselorId, counselorName, tenantId) => {
+        set(
+          { 
+            selectedCounselor: { 
+              counselorId, 
+              counselorName, 
+              tenantId 
+            } 
+          },
+          false,
+          'counselorFilter/setSelectedCounselor'
+        );
+        console.log('Counselor updated:', get().selectedCounselor);
+      },
+      resetFilter: () => {
+        set(
+          {
+            selectedBlendKind: null,
+            selectedCounselor: { counselorId: null, counselorName: null, tenantId: null },
+          },
+          false,
+          'counselorFilter/resetFilter'
+        );
+        console.log('Store reset');
+      },
+      getState: () => {
+        console.log('Current state:', {
+          selectedBlendKind: get().selectedBlendKind,
+          selectedCounselor: get().selectedCounselor
+        });
+      }
+    }),
+    {
+      name: 'Counselor Filter Store',
+      enabled: process.env.NODE_ENV === 'development'
+    }
+  )
+);
