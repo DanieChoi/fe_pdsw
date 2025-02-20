@@ -9,6 +9,7 @@ import {
 import { IContextMenuForTennantForCounselorTreeMenu } from "./ContextMenus/IContextMenuForTennantForCounselorTreeMenu";
 import { IContextMenuForGroupAndTeamAndCounselor } from "./ContextMenus/IContextMenuForGroupAndTeamAndCounselorProps";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
+import Image from "next/image";
 
 interface ExpandConfig {
   organization?: boolean;
@@ -40,6 +41,9 @@ export function TreeNodeForCounselorListForSideBar({
   defaultExpanded
 }: ITreeNodeForCounselorListForSideBar) {
   const { selectedBlendKind } = useCounselorFilterStore();
+
+  // console.log("data at tree node : ", data);
+  
 
   const getId = () => {
     switch (type) {
@@ -103,22 +107,22 @@ export function TreeNodeForCounselorListForSideBar({
   const renderIcon = () => {
     switch (type) {
       case 'organization':
-        return <img src="/tree-menu/tennant_office.png" alt="테넌트" className="h-4 w-4" />;
+        return  <Image src="/tree-menu/organization.png" alt="조직" width={14} height={12} />;
       case 'tenant':
-        return <img src="/tree-menu/tennant_office.png" alt="테넌트" className="h-4 w-4" />;
+        return  <Image src="/tree-menu/tennant_office.png" alt="테넌트"width={14} height={12} />;
       case 'group':
-        return <img src="/tree-menu/group_icon_for_tree.png" alt="그룹" className="h-4 w-4" />;
+        return <Image src="/tree-menu/group_icon_for_tree.png" alt="그룹"width={15} height={12} />;
       case 'team':
-        return <img src="/tree-menu/team_icon_for_tree.png" alt="팀" className="h-4 w-4" />;
+        return <Image src="/tree-menu/team_icon_for_tree.png" alt="팀"width={14} height={12} />;
       case 'counselor':
         const blendKind = Number(data.blendKind);
         switch (blendKind) {
           case 1:
-            return <img src="/tree-menu/inbound_counselor.png" alt="인바운드" className="h-4 w-4" />;
+            return <Image src="/tree-menu/inbound_counselor.png" alt="인바운드"width={15} height={12} />;
           case 2:
-            return <img src="/tree-menu/outbound_counselor.png" alt="아웃바운드" className="h-4 w-4" />;
+            return <Image src="/tree-menu/outbound_counselor.png" alt="아웃바운드"width={15} height={12} />;
           case 3:
-            return <img src="/tree-menu/inbound_outbound_mix.png" alt="블렌드" className="h-4 w-4" />;
+            return <Image src="/tree-menu/inbound_outbound_mix.png" alt="블렌드"width={15} height={12} />;
           default:
             return <UserCircle2 className="h-4 w-4 text-gray-600" />;
         }
@@ -129,11 +133,13 @@ export function TreeNodeForCounselorListForSideBar({
     <div
       className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer
         ${isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""}`}
+        
       onClick={() => {
         onNodeSelect(id);
         if (hasChildren) onNodeToggle(id);
       }}
-      style={{ paddingLeft: `${level * 16 + 8}px` }}
+      style={{ paddingLeft: `${level * 16 + 8}px`,
+       }}
     >
       <div className="flex items-center w-full gap-2">
         {hasChildren ? (
@@ -162,9 +168,28 @@ export function TreeNodeForCounselorListForSideBar({
       );
     }
 
+    // if (['group', 'team', 'counselor'].includes(type)) {
+    //   return (
+    //     <IContextMenuForGroupAndTeamAndCounselor item={data}>
+    //       {content}
+    //     </IContextMenuForGroupAndTeamAndCounselor>
+    //   );
+    // }
+
     if (['group', 'team', 'counselor'].includes(type)) {
+      const contextMenuItem = {
+        id: type === 'counselor' ? data.counselorId : 
+            type === 'team' ? data.teamId : 
+            data.groupId,
+        name: type === 'counselor' ? data.counselorname : 
+              type === 'team' ? data.teamName : 
+              data.groupName,
+        tenantId: data.tenantId,
+        type: type as 'counselor' | 'team' | 'group'
+      };
+    
       return (
-        <IContextMenuForGroupAndTeamAndCounselor item={data}>
+        <IContextMenuForGroupAndTeamAndCounselor item={contextMenuItem}>
           {content}
         </IContextMenuForGroupAndTeamAndCounselor>
       );

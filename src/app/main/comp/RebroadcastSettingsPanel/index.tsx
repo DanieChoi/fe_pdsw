@@ -751,11 +751,14 @@ const RebroadcastSettingsPanel = () => {
                     onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 });
             }else if( caseType === 2 ){
-                if( data.result_data.redial_count > 0){ 
-                    //캠페인 실시간 적용 이벤트.  
-                    fetchCampaignCurrentRedial({
-                        campaign_id: Number(campaignIdForUpdateFromSideMenu),
-                        condition: MakeRedialPacket()
+                if( data.result_data.redial_count > 0){           
+                    setAlertState({
+                        isOpen: true,
+                        message: `캠페인 아이디 : ${campaignIdForUpdateFromSideMenu} 캠페인을 바로 시작하시겠습니까?`,
+                        title: '재발신 적용',
+                        type: '1',
+                        onClose: handleCampaignCurrentRedial,
+                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                     });
                 }else{        
                     setAlertState({
@@ -791,6 +794,14 @@ const RebroadcastSettingsPanel = () => {
             }
         }
     });
+
+    //캠페인 실시간 적용 이벤트.  
+    const handleCampaignCurrentRedial = () => {
+        fetchCampaignCurrentRedial({
+            campaign_id: Number(campaignIdForUpdateFromSideMenu),
+            condition: MakeRedialPacket()
+        });
+    };
 
     //실시간 리스트 건수 확인 버튼 클릭 이벤트.
     const handleCheckListCount = async () => {

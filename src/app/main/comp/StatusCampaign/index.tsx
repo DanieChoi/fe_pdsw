@@ -3,7 +3,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
-import { useCampainManagerStore } from '@/store';
+import { useCampainManagerStore, useTabStore, useMainStore } from '@/store';
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
 
 interface ChartDataItem {
   name: string;
@@ -33,8 +34,11 @@ const StatusCampaign: React.FC = () => {
   const [selectedSkill, setSelectedSkill] = useState<string>('total');
   const [selectedDispatch, setSelectedDispatch] = useState<DispatchType>(DISPATCH_TYPES.INITIAL);
   const { campaignSkills, setCampaignSkills } = useCampainManagerStore();
+  const { campaigns } = useMainStore();
+  const { campaignIdForUpdateFromSideMenu } = useTabStore();
   const [skills, setSkills] = useState<any[]>([]);
   const [chartData, setChartData] = useState<ChartDataItem[]>([]);
+  const [campaignInfo, setCampaignInfo] = useState<MainDataResponse | null>(null);
 
   // 스킬 조회
   const { mutate: fetchSkills } = useApiForSkills({
@@ -122,6 +126,13 @@ const StatusCampaign: React.FC = () => {
 
   const itemHeight = 50;
   const chartHeight = Math.max(chartData.length * itemHeight + 100, 300);
+
+  useEffect(() => {
+    if( campaigns && campaignIdForUpdateFromSideMenu && campaignIdForUpdateFromSideMenu !== '' ){
+      const tempCampaign = campaigns.filter(data => data.campaign_id === Number(campaignIdForUpdateFromSideMenu))[0];
+      setCampaignInfo( tempCampaign );
+    }
+  }, [campaignIdForUpdateFromSideMenu,campaigns]);
 
   return (
     <div className="">
