@@ -204,7 +204,20 @@ export function TreeNodeForCounselorListForSideBar({
       );
     }
 
+    // if (['group', 'team', 'counselor'].includes(type)) {
+    //   const contextMenuItem = {
+    //     id: type === 'counselor' ? data.counselorId : 
+    //         type === 'team' ? data.teamId : 
+    //         data.groupId,
+    //     name: type === 'counselor' ? data.counselorname : 
+    //           type === 'team' ? data.teamName : 
+    //           data.groupName,
+    //     tenantId: data.tenantId,
+    //     type: type as 'counselor' | 'team' | 'group'
+    //   };
+
     if (['group', 'team', 'counselor'].includes(type)) {
+      const counselors = getCounselorsForNode(); // 기존 함수 활용
       const contextMenuItem = {
         id: type === 'counselor' ? data.counselorId : 
             type === 'team' ? data.teamId : 
@@ -213,8 +226,9 @@ export function TreeNodeForCounselorListForSideBar({
               type === 'team' ? data.teamName : 
               data.groupName,
         tenantId: data.tenantId,
-        type: type as 'counselor' | 'team' | 'group'
-      };
+        type: type as 'counselor' | 'team' | 'group',
+        members: counselors // 상담원 목록 추가
+      };    
     
       return (
         <IContextMenuForGroupAndTeamAndCounselor item={contextMenuItem}>

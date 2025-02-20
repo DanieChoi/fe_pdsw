@@ -11,6 +11,16 @@ import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
 import { useTabStore } from "@/store/tabStore";
 import { log } from "console";
 
+// interface IContextMenuForGroupAndTeamAndCounselorProps {
+//   children: React.ReactNode;
+//   item: {
+//     id: string;
+//     name: string;
+//     tenantId: string;
+//     type: "counselor" | "team" | "group";
+//   };
+// }
+
 interface IContextMenuForGroupAndTeamAndCounselorProps {
   children: React.ReactNode;
   item: {
@@ -18,6 +28,7 @@ interface IContextMenuForGroupAndTeamAndCounselorProps {
     name: string;
     tenantId: string;
     type: "counselor" | "team" | "group";
+    members?: any[]; // members 속성 추가
   };
 }
 
@@ -26,48 +37,42 @@ export function IContextMenuForGroupAndTeamAndCounselor({
   item,
 }: IContextMenuForGroupAndTeamAndCounselorProps) {
   const { addTab, removeTab, openedTabs } = useTabStore();
-  const { setSelectedCounselor } = useCounselorFilterStore();
-
-  // console.log("item at: ", item.type);
+  const { setSelectedCounselor, setCandidateMembersForSkilAssign } = useCounselorFilterStore();
 
   const getTabId = () => {
     switch (item.type) {
-      case "counselor":
-        return 600;
-      case "team":
-        return 601;
-      case "group":
-        return 602;
-      default:
-        console.log("Invalid type : ", item.type);
-        return 100; // 예외 처리
+      case "counselor": return 600;
+      case "team": return 601;
+      case "group": return 602;
+      default: return 100;
     }
   };
 
   const openSkillAssignmentTab = () => {
     const tabId = getTabId();
 
-    // 기존 동일한 탭이 있으면 삭제
+    // 기존 탭 삭제
     const existingTabs = openedTabs.filter((tab) => tab.id === tabId);
     existingTabs.forEach((tab) => {
       removeTab(tab.id, tab.uniqueKey);
     });
 
-    // 상담원 정보 저장 (상담원일 경우에만)
+    // 상담원/팀/그룹에 따른 처리
     if (item.type === "counselor") {
       setSelectedCounselor(item.id, item.name, item.tenantId);
+    } else if (["team", "group"].includes(item.type) && item.members) {
+      setCandidateMembersForSkilAssign(item.members);
     }
 
     // 새 탭 추가
     addTab({
       id: tabId,
       uniqueKey: `${item.type}-skill-assignment-${Date.now()}`,
-      title:
-        item.type === "counselor"
-          ? "상담원 스킬 할당"
-          : item.type === "team"
-          ? "팀 스킬 할당"
-          : "그룹 스킬 할당",
+      title: item.type === "counselor" 
+        ? "상담원 스킬 할당"
+        : item.type === "team"
+        ? "팀 스킬 할당"
+        : "그룹 스킬 할당",
       icon: "",
       href: "",
       content: null,

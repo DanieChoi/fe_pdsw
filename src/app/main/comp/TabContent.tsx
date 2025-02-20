@@ -20,6 +20,8 @@ import CampaignClonePanel from "@/widgets/sidebar/pannels/CampaignClonePanel";
 import IntegratedMonitoringDashboard from "./IntegratedMonitoringDashboard";
 import { SkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/SkillAssignmentTab";
 import BlackListCountPopup from "@/features/campaignManager/components/popups/BlackListCountPopup";
+import { TeamSkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/TeamSkillAssignmentTab";
+import { GroupSkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/GroupSkillAssignmentTab";
 
 // 탭 ID별 실제 화면을 매핑하는 함수
 const renderContent = (tabId: number | null) => {
@@ -70,30 +72,51 @@ const renderContent = (tabId: number | null) => {
           <BlackListCountPopup />
         </div>
       );
-      case 600: // 상담원 스킬 할당 탭
-        return (
-          <div className="flex justify-left w-full">
-            <div className="max-w-[500px] w-full">
-              <SkillAssignmentTab />
-            </div>
+    case 600: // 상담원 스킬 할당 탭
+      return (
+        <div className="flex justify-left w-full">
+          <div className="max-w-[500px] w-full">
+            <SkillAssignmentTab />
           </div>
-        );
-      case 601: // 팀 스킬 할당 탭
-        return (
-          <div className="flex justify-left w-full">
-            <div className="max-w-[500px] w-full">
-              팀 스킬 할당
-            </div>
+        </div>
+      );
+    // case 601: // 팀 스킬 할당 탭
+    //   return (
+    //     <div className="flex justify-left w-full">
+    //       <div className="max-w-[500px] w-full">
+    //         팀 스킬 할당
+    //       </div>
+    //     </div>
+    //   );
+
+    // TabContent.tsx의 renderContent 함수 내부
+
+    case 601: // 팀 스킬 할당 탭
+      return (
+        <div className="flex justify-left w-full">
+          <div className="max-w-[500px] w-full">
+            <TeamSkillAssignmentTab />
           </div>
-        );
-      case 602: // 그룹 스킬 할당 탭
-        return (
-          <div className="flex justify-left w-full">
-            <div className="max-w-[500px] w-full">
-              그룹 스킬 할당
-            </div>
+        </div>
+      );
+
+    case 602: // 그룹 스킬 할당 탭
+      return (
+        <div className="flex justify-left w-full">
+          <div className="max-w-[500px] w-full">
+            <GroupSkillAssignmentTab />
           </div>
-        );
+        </div>
+      );
+
+    case 602: // 그룹 스킬 할당 탭
+      return (
+        <div className="flex justify-left w-full">
+          <div className="max-w-[500px] w-full">
+            그룹 스킬 할당
+          </div>
+        </div>
+      );
 
     default:
       return (
