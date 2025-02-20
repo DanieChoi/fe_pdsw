@@ -10,20 +10,26 @@ import { useAuthStore } from "@/store/authStore";
 import { CounselorSkill } from "../../types/typeForCounselorSkill";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
 import { useApiForGetRelatedInfoForAssignSkilToCounselor } from "@/features/preferences/hooks/useApiForGetRelatedInfoForAssignSkilToCounselor";
+import { useApiForDeleteCounselorsForSpecificSkill } from "@/features/campaignManager/hooks/useApiForDeleteCounselorsForSpecificSkill";
 import { X } from "lucide-react";
+import { toast } from "react-toastify";
 
 export function SkillAssignmentTab() {
   const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
   const removeTab = useTabStore((state) => state.removeTab);
   const activeTabKey = useTabStore((state) => state.activeTabKey);
   const userId = useAuthStore((state) => state.id);
-  
+
   const selectedBlendKind = useCounselorFilterStore((state) => state.selectedBlendKind);
   const selectedCounselor = useCounselorFilterStore((state) => state.selectedCounselor);
 
   const { assignedSkills, assignableSkills, isLoading, error } = useApiForGetRelatedInfoForAssignSkilToCounselor(
     selectedCounselor.counselorId ?? "",
     Number(selectedCounselor.tenantId)
+  );
+
+  const deleteCounselorMutation = useApiForDeleteCounselorsForSpecificSkill(
+    selectedCounselor.tenantId ?? "0"
   );
 
   useEffect(() => {
@@ -36,17 +42,26 @@ export function SkillAssignmentTab() {
   const handleSkillToggle = (skillId: number) => {
     setSelectedSkills((prev) => {
       const isCurrentlySelected = prev.includes(skillId);
-      
-      // 체크가 해제될 때 로그 출력
+
       if (isCurrentlySelected) {
         console.log("📌 체크 해제된 스킬 정보:", {
           skillId: skillId,
           counselorId: selectedCounselor.counselorId,
         });
+
+        // 체크 해제시 API 호출
+        deleteCounselorMutation.mutate({
+          skillId: skillId,
+          counselorIds: [selectedCounselor.counselorId ?? ""]
+        }, {
+          onSuccess: () => {
+            toast.success('스킬이 해제되었습니다.');
+          }
+        });
       }
 
-      return isCurrentlySelected 
-        ? prev.filter(id => id !== skillId) 
+      return isCurrentlySelected
+        ? prev.filter(id => id !== skillId)
         : [...prev, skillId];
     });
   };
@@ -95,7 +110,7 @@ export function SkillAssignmentTab() {
             <X className="h-5 w-5" />
           </button>
         </div>
-        
+
         <div className="p-4">
           <div className="text-sm text-gray-600 mb-4">
             상담원에게 스킬을 할당 할 수 있는 창입니다.<br />
@@ -131,14 +146,14 @@ export function SkillAssignmentTab() {
         </div>
 
         <div className="p-4 border-t border-gray-200 flex justify-center gap-2">
-          <Button 
+          <Button
             onClick={handleConfirm}
             className="px-8 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
           >
             확인
           </Button>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={handleCancel}
             className="px-8 py-2 border border-gray-300 rounded"
           >
@@ -148,6 +163,4 @@ export function SkillAssignmentTab() {
       </Card>
     </div>
   );
-
 }
-

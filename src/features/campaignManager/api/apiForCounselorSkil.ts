@@ -149,11 +149,13 @@ export const apiForDeleteCounselorsForSpecificSkill = async (
   console.log("🔗 제외할 상담사 목록:", counselorIds);
 
   try {
-    const { data } = await axiosInstance.put<CounselorSkillAssignmentResponse>(
+    const { data } = await axiosInstance.delete<CounselorSkillAssignmentResponse>(
       `skills/${skillId}/agent-list`,
       {
-        request_data: {
-          agent_id: counselorIds
+        data: {                // request_data를 data 안에 넣음
+          request_data: {
+            agent_id: counselorIds
+          }
         }
       }
     );
