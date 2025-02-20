@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-custom";
@@ -51,8 +51,40 @@ interface Column extends DataGridColumn<GridData> {
   key: keyof GridData;
   name: string;
 }
-const OutboundCallProgressPanel: React.FC = () => {
-  const [selectedCampaign, setSelectedCampaign] = useState<string>('all');
+
+interface OutboundCallProgressPanelProps {
+  externalCampaignId?: string;
+  onCampaignChange?: (campaignId: string) => void;
+  onDataUpdate?: (data: CampaignData) => void;
+}
+
+const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
+  externalCampaignId,
+  onCampaignChange,
+  onDataUpdate
+}) => {
+  const [internalSelectedCampaign, setInternalSelectedCampaign] = useState<string>('all');
+
+  // 실제 사용할 캠페인 ID 결정
+  const selectedCampaign = externalCampaignId ?? internalSelectedCampaign;
+
+
+
+  // 빈 데이터 정의
+  const emptyData: CampaignData = {
+    stats: {
+      waiting: 0,
+      firstCall: 0,
+      retryCall: 0,
+      distributing: 0
+    },
+    barData: [
+      { name: '최초 발신용', value: 0 },
+      { name: '재시도 발신용', value: 0 },
+      { name: '분배 대기', value: 0 }
+    ],
+    gridData: []
+  };
 
   // 캠페인별 데이터
   const campaignData: CampaignDataMap = {
@@ -122,6 +154,7 @@ const OutboundCallProgressPanel: React.FC = () => {
 
   // 전체 데이터 계산을 위한 useMemo 훅 사용
   const allCampaignData = useMemo<CampaignData>(() => {
+    if (Object.keys(campaignData).length === 0) return emptyData;
     // 모든 캠페인의 통계 합계 계산
     const totalStats = Object.values(campaignData).reduce((acc, campaign) => ({
       waiting: acc.waiting + campaign.stats.waiting,
@@ -162,8 +195,19 @@ const OutboundCallProgressPanel: React.FC = () => {
     };
   }, [campaignData]);
 
-  // 현재 선택된 캠페인의 데이터
-  const currentData = selectedCampaign === 'all' ? allCampaignData : campaignData[selectedCampaign];
+ // 현재 선택된 캠페인의 데이터 (안전하게 처리)
+ const currentData = useMemo(() => {
+  if (selectedCampaign === 'all') return allCampaignData;
+  if (!selectedCampaign) return emptyData;
+  return campaignData[selectedCampaign] || emptyData;
+}, [selectedCampaign, allCampaignData, campaignData]);
+
+  // 데이터 업데이트 시 부모 컴포넌트에 알림
+  useEffect(() => {
+    if (onDataUpdate) {
+      onDataUpdate(currentData);
+    }
+  }, [currentData, onDataUpdate]);
 
   // 그리드 컬럼 정의
   const columns: Column[] = [
@@ -183,52 +227,57 @@ const OutboundCallProgressPanel: React.FC = () => {
     { key: 'result', name: '다이얼 결과' }
   ];
 
+  // 캠페인 변경 핸들러
   const handleCampaignChange = (value: string): void => {
-    setSelectedCampaign(value);
+    if (onCampaignChange) {
+      onCampaignChange(value);
+    } else {
+      setInternalSelectedCampaign(value);
+    }
   };
 
+  // Select 컴포넌트 렌더링 여부 결정
+  const shouldRenderSelect = externalCampaignId === undefined;
 
   return (
-    <div className="flex flex-col gap-5 h-full">
-      <div className="flex items-center gap-2">
-        <Label className="w-20 min-w-20">캠페인</Label>
-        <Select onValueChange={handleCampaignChange} value={selectedCampaign}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="캠페인전체" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">캠페인전체</SelectItem>
-            <SelectItem value="test1">테스트1</SelectItem>
-            <SelectItem value="test2">테스트2</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="flex flex-col gap-5 h-full out-wrap">
+      {shouldRenderSelect && (
+        <div className="flex items-center gap-2">
+          <Label className="w-20 min-w-20">캠페인</Label>
+          <Select onValueChange={handleCampaignChange} value={selectedCampaign}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="캠페인전체" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">캠페인전체</SelectItem>
+              {Object.entries(campaignData).map(([id, data]) => (
+                <SelectItem key={id} value={id}>
+                  {data.gridData[0]?.campaignName || id}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <div className="flex gap-5 h-[calc(100%-46px)] out-call-responsive-container">
         <div className="flex-1 out-call-responsive-left gap-5">
           <div className="">
-            {/* <Table>
-              <TableRow>
-                <TableHeader className="!bg-[#DDF4F2] !text-center text-sm font-normal text-[#3A9D6C]">대기 상담원</TableHeader>
-                <TableHeader className="!bg-[#FEE9EC] !text-center text-sm font-normal text-[#C95E5E]">최초발신</TableHeader>
-                <TableHeader className="!bg-[#E8EFFA] !text-center text-sm font-normal text-[#338BD3]">재시도 발신</TableHeader>
-                <TableHeader className="!bg-[#F6F0FA] !text-center text-sm font-normal text-[#9459BF]">분배대기</TableHeader>
-              </TableRow>
-              <TableRow>
-                <TableCell className="!text-center text-sm">{currentData.stats.waiting}</TableCell>
-                <TableCell className="!text-center text-sm">{currentData.stats.firstCall}</TableCell>
-                <TableCell className="!text-center text-sm">{currentData.stats.retryCall}</TableCell>
-                <TableCell className="!text-center text-sm">{currentData.stats.distributing}</TableCell>
-              </TableRow>
-            </Table> */}
-
             <Table>
               <thead>
                 <TableRow>
-                  <TableHeader className="!bg-[#DDF4F2] !text-center text-sm font-normal text-[#3A9D6C]">대기 상담원</TableHeader>
-                  <TableHeader className="!bg-[#FEE9EC] !text-center text-sm font-normal text-[#C95E5E]">최초발신</TableHeader>
-                  <TableHeader className="!bg-[#E8EFFA] !text-center text-sm font-normal text-[#338BD3]">재시도 발신</TableHeader>
-                  <TableHeader className="!bg-[#F6F0FA] !text-center text-sm font-normal text-[#9459BF]">분배대기</TableHeader>
+                  <TableHeader className="!bg-[#DDF4F2] !text-center text-sm font-normal text-[#3A9D6C]">
+                    대기 상담원
+                  </TableHeader>
+                  <TableHeader className="!bg-[#FEE9EC] !text-center text-sm font-normal text-[#C95E5E]">
+                    최초발신
+                  </TableHeader>
+                  <TableHeader className="!bg-[#E8EFFA] !text-center text-sm font-normal text-[#338BD3]">
+                    재시도 발신
+                  </TableHeader>
+                  <TableHeader className="!bg-[#F6F0FA] !text-center text-sm font-normal text-[#9459BF]">
+                    분배대기
+                  </TableHeader>
                 </TableRow>
               </thead>
               <tbody>

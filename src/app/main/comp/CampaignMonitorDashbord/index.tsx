@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useTabStore } from '@/store/tabStore';
+import React, { useState, useEffect } from "react";
+import { useTabStore, useMainStore } from '@/store';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-custom";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,9 @@ import { CommonButton } from "@/components/shared/CommonButton";
 import UsageTimePopup from './UsageTimePopup';
 import GridView from './GridView';
 import ChartView from './ChartView';
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
+import { CampaignProgressInformationResponseDataType } from '@/features/monitoring/types/monitoringIndex';
 interface Tab {
   uniqueKey: string;
   title: string;
@@ -31,6 +34,11 @@ const CampaignMonitorDashboard: React.FC = () => {
   const openedTabs = useTabStore((state) => state.openedTabs);
   const activeTab = openedTabs.find(tab => tab.uniqueKey === activeTabKey);
 
+  const { campaigns } = useMainStore();
+  const { campaignIdForUpdateFromSideMenu } = useTabStore();
+  const [campaignInfo, setCampaignInfo] = useState<MainDataResponse | null>(null);
+  const [dataList, setDataList] = useState<CampaignProgressInformationResponseDataType[]>([]);
+
   // 발신구분 데이터 (실제로는 API에서 받아올 데이터)
   const callList: CallItem[] = [
     { id: 1, label: '최초발신' },
@@ -47,6 +55,35 @@ const CampaignMonitorDashboard: React.FC = () => {
 
   const campaignName = activeTab?.title.replace('총진행상황 - ', '') || '';
 
+  // 캠페인 진행 정보 api 호출
+  const { mutate: fetchCampaignProgressInformation } = useApiForCampaignProgressInformation({
+      onSuccess: (data) => {  
+        const tempList = data.progressInfoList.sort((a, b) => a.reuseCnt - b.reuseCnt);
+        setDataList(tempList);
+        console.log(tempList);
+      }
+  });
+
+  useEffect(() => {
+      fetchCampaignProgressInformation({
+        tenantId: 1,
+        campaignId: 101
+      });
+      const tempCampaign = campaigns.filter(data => data.campaign_id === 101)[0];
+      setCampaignInfo( tempCampaign );
+  }, []);
+  
+  // useEffect(() => {
+  //   if( campaigns && campaignIdForUpdateFromSideMenu && campaignIdForUpdateFromSideMenu !== '' ){
+  //     const tempCampaign = campaigns.filter(data => data.campaign_id === Number(campaignIdForUpdateFromSideMenu))[0];
+  //     setCampaignInfo( tempCampaign );
+  //     fetchCampaignProgressInformation({
+  //       tenantId: tempCampaign.tenant_id,
+  //       campaignId: tempCampaign.campaign_id
+  //     });
+  //   }
+  // }, [campaignIdForUpdateFromSideMenu,campaigns]);
+
   return (
     <div className="flex gap-4 w-full limit-width">
       {/* 왼쪽 설정 영역 */}
@@ -60,7 +97,7 @@ const CampaignMonitorDashboard: React.FC = () => {
                   <Label>캠페인 아이디</Label>
                 </TableHeader>
                 <TableCell>
-                  <span className="text-sm">{activeTab?.campaignId || ''}</span>
+                  <span className="text-sm">{campaignInfo?.campaign_id || ''}</span>
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -68,7 +105,7 @@ const CampaignMonitorDashboard: React.FC = () => {
                   <Label>캠페인 이름</Label>
                 </TableHeader>
                 <TableCell>
-                  <span className="text-sm">{campaignName}</span>
+                  <span className="text-sm">{campaignInfo?.campaign_name || ''}</span>
                 </TableCell>
               </TableRow>
             </tbody>
