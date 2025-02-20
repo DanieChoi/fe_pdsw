@@ -1,8 +1,9 @@
-import React from 'react';
+import React,{ useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, Legend, ResponsiveContainer } from 'recharts';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-custom";
 import { Label } from "@/components/ui/label";
+import { CampaignProgressInformationResponseDataType } from '@/features/monitoring/types/monitoringIndex';
 
 interface ChartData {
   name: string;
@@ -10,20 +11,15 @@ interface ChartData {
   color: string;
 }
 
+type Props = {
+  selectedCall: CampaignProgressInformationResponseDataType | null;
+}
 
-const ChartView: React.FC = () => {
-  // 발신 현황 데이터
-  const callStatusData: ChartData[] = [
-    { name: '발신시도', value: 50, color: '#40E0D0' },
-    { name: '발신성공', value: 8, color: '#2CC7B5' },
-    { name: '발신실패', value: 3, color: '#20AE9C' }
-  ];
+const ChartView: React.FC<Props> = ({ selectedCall }) => {
 
-  // 리스트 상태 데이터
-  const listStatusData: ChartData[] = [
-    { name: '대기리스트', value: 5, color: '#87CEFA' },
-    { name: '방지리스트', value: 5, color: '#FFB6C6' }
-  ];
+  const [tempCallStatusData, setTempCallStatusData] = useState<ChartData[]>([]);
+  const [tempListStatusData, setTempListStatusData] = useState<ChartData[]>([]);
+  const [failCnt, setFailCnt] = useState<number>(0);
 
   const renderCustomizedLegend = (props: any) => {
     const { payload } = props;
@@ -67,6 +63,38 @@ const ChartView: React.FC = () => {
     );
   };
 
+  useEffect(() => {
+    if( selectedCall ){
+      const totalCnt = selectedCall.buct
+      +selectedCall.fact
+      +selectedCall.tect
+      +selectedCall.customerOnHookCnt
+      +selectedCall.dialToneSilence
+      +selectedCall.nact
+      +selectedCall.etct
+      +selectedCall.lineStopCnt
+      +selectedCall.detectSilenceCnt
+      +selectedCall.acct
+      ;
+      setFailCnt(totalCnt);
+      setTempCallStatusData([]);
+      const callStatusData: ChartData[] = [
+        { name: '발신시도:'+(selectedCall.firstCall), value: selectedCall.firstCall, color: '#40E0D0' },
+        { name: '발신성공:'+(selectedCall.scct), value: selectedCall.scct, color: '#2CC7B5' },
+        { name: '발신실패:'+totalCnt, value: totalCnt, color: '#20AE9C' }
+      ];
+      setTempCallStatusData(callStatusData);
+      setTempListStatusData([]);
+      const delay = selectedCall.totLstCnt-selectedCall.scct-totalCnt-selectedCall.recallCnt;
+      // 리스트 상태 데이터
+      const listStatusData: ChartData[] = [
+        { name: '대기리스트:'+delay, value: delay, color: '#87CEFA' },
+        { name: '방지리스트:'+(selectedCall.nogdeleteGL), value: selectedCall.nogdeleteGL, color: '#FFB6C6' }
+      ];
+      setTempListStatusData(listStatusData);  
+    }
+  }, [selectedCall]);
+  
   return (
     <div className="flex flex-col gap-2">
       <div>
@@ -78,48 +106,48 @@ const ChartView: React.FC = () => {
                 <Label>진행률(%)</Label>
               </TableHeader>
               <TableCell className="text-center text-sm">
-                0
+                {(selectedCall?.totDialCnt || 0) === 0?0:(selectedCall?.totLstCnt || 0)/(selectedCall?.totDialCnt || 0)*100 }
               </TableCell>
               <TableHeader className="w-[160px]">
                 <Label>리스트 대비 성공률 (%)</Label>
               </TableHeader>
               <TableCell className="text-center text-sm">
-                0
+                {(selectedCall?.totLstCnt || 0) === 0?0:(selectedCall?.scct || 0)/(selectedCall?.totLstCnt || 0)*100 }
               </TableCell>
               <TableHeader className="w-[120px]">
                 <Label>총 리스트</Label>
               </TableHeader>
               <TableCell className="text-center text-sm">
-                0
+                {selectedCall?.totLstCnt || 0}
               </TableCell>
               <TableHeader className="w-[120px]">
                 <Label>순수발신</Label>
               </TableHeader>
               <TableCell className="text-center text-sm">
-                0
+                {selectedCall?.nonTTCT||0}
               </TableCell>
               <TableHeader className="w-[120px]">
                 <Label>미발신</Label>
               </TableHeader>
               <TableCell className="text-center text-sm">
-                0
+                {(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-failCnt-(selectedCall?.recallCnt || 0)}
               </TableCell>
               <TableHeader className="w-[120px]">
                 <Label>상담결과 예약</Label>
               </TableHeader>
               <TableCell className="text-center text-sm">
-                0
+                {selectedCall?.recallCnt||0}
               </TableCell>
             </TableRow>
           </tbody>
         </Table>
         <div className="h-[370px] border border-[#ebebeb] rounded-b-[3px] p-2 flex justify-center items-center gap-5">
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-center">총 발신 : 3, 발신대비 성공률 : 66.7%</p>
+            <p className="text-sm text-center">총 발신 : {selectedCall?.totDialCnt || 0}, 발신대비 성공률 : {(selectedCall?.scct || 0) === 0?0:(selectedCall?.scct || 0)/(selectedCall?.totDialCnt || 0)*100 }%</p>
             <div className="relative">
               <PieChart width={260} height={250}>
                 <Pie
-                  data={callStatusData}
+                  data={tempCallStatusData}
                   cx={130}
                   cy={100}
                   innerRadius={30}
@@ -132,13 +160,13 @@ const ChartView: React.FC = () => {
                   )}
                   dataKey="value"
                 >
-                  {callStatusData.map((entry, index) => (
+                  {tempCallStatusData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Legend 
                   content={renderCustomizedLegend}
-                  payload={callStatusData.map(item => ({
+                  payload={tempCallStatusData.map(item => ({
                     value: item.name,
                     color: item.color,
                   }))}
@@ -147,11 +175,11 @@ const ChartView: React.FC = () => {
             </div>
           </div>
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-center">미발신 : 1</p>
+            <p className="text-sm text-center">미발신 : {(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-failCnt-(selectedCall?.recallCnt || 0)}</p>
             <div className="relative">
               <PieChart width={260} height={250}>
                 <Pie
-                  data={listStatusData}
+                  data={tempListStatusData}
                   cx={130}
                   cy={100}
                   innerRadius={30}
@@ -164,13 +192,13 @@ const ChartView: React.FC = () => {
                   )}
                   dataKey="value"
                 >
-                  {listStatusData.map((entry, index) => (
+                  {tempListStatusData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Legend 
                   content={renderCustomizedLegend}
-                  payload={listStatusData.map(item => ({
+                  payload={tempListStatusData.map(item => ({
                     value: item.name,
                     color: item.color,
                   }))}
@@ -203,19 +231,19 @@ const ChartView: React.FC = () => {
             </TableRow>
             <TableRow>
               <TableCell className="text-sm !text-center">
-                0
+                {selectedCall?.noAgentCnt||0}
               </TableCell>
               <TableCell className="text-sm !text-center">
-                0
+                {selectedCall?.agentConnect||0}
               </TableCell>
               <TableCell className="text-sm !text-center">
-                0
+                {selectedCall?.abct||0}
               </TableCell>
               <TableCell className="text-sm !text-center">
-                0
+                {selectedCall?.agentNoAnswerCnt||0}
               </TableCell>
               <TableCell className="text-sm !text-center">
-                0
+                {selectedCall?.agentBusyCnt||0}
               </TableCell>
             </TableRow>
           </tbody>
@@ -238,16 +266,16 @@ const ChartView: React.FC = () => {
             </TableRow>
             <TableRow>
               <TableCell className="text-sm !text-center">
-                0
+                {selectedCall?.agentDropCnt||0}
               </TableCell>
               <TableCell className="text-sm !text-center">
-                0
+                {selectedCall?.customerDropCnt||0}
               </TableCell>
               <TableCell className="text-sm !text-center">
-                0
+                {selectedCall?.nonServiceCnt||0}
               </TableCell>
               <TableCell className="text-sm !text-center">
-                0
+                {selectedCall?.noAgentCnt||0}
               </TableCell>
             </TableRow>
           </tbody>
