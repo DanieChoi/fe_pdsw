@@ -170,3 +170,34 @@ export const apiForDeleteCounselorsForSpecificSkill = async (
     );
   }
 };
+
+// apiForDeleteCounselorsForSpecificSkill 를 post 로 바꾸면 된다 to apiForAddCounselorsForSpecificSkills
+// 특정 스킬에 대한 상담사 목록에 대한 추가 api 이다 apiForDeleteCounselorsForSpecificSkill 와 url 같고 http method 만 post 야 구현해줘 copilot 아래에 구현 해줘
+export const apiForAddCounselorsForSpecificSkill = async (
+  skillId: number,
+  counselorIds: string[]
+): Promise<CounselorSkillAssignmentResponse> => {
+  console.log("📌 스킬에 상담사 추가 시작");
+  console.log("🎯 대상 스킬 ID:", skillId);
+  console.log("🔗 추가할 상담사 목록:", counselorIds);
+
+  try {
+    const { data } = await axiosInstance.post<CounselorSkillAssignmentResponse>(
+      `skills/${skillId}/agent-list`,
+      {
+        request_data: {
+          agent_id: counselorIds
+        }
+      }
+    );
+
+    console.log("✅ 스킬을 가진 상담사 목록에 특정 상담사들 추가 성공:", data);
+    return data;
+  } catch (error) {
+    console.error("❌ 스킬에 상담사 추가 실패:", error);
+    const typedError = error as CounselorSkillApiError;
+    throw new Error(
+      typedError.response?.data?.result_msg || "스킬에 상담사 추가 중 오류가 발생했습니다."
+    );
+  }
+};

@@ -11,11 +11,13 @@ import { CounselorSkill } from "../../types/typeForCounselorSkill";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
 import { useApiForGetRelatedInfoForAssignSkilToCounselor } from "@/features/preferences/hooks/useApiForGetRelatedInfoForAssignSkilToCounselor";
 import { useApiForDeleteCounselorsForSpecificSkill } from "@/features/campaignManager/hooks/useApiForDeleteCounselorsForSpecificSkill";
+import { useApiForAddCounselorsForSpecificSkill } from "@/features/campaignManager/hooks/useApiForAddCounselorsForSpecificSkill";
 import { X } from "lucide-react";
 import { toast } from "react-toastify";
 
 export function SkillAssignmentTab() {
   const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
+  const [initialSkills, setInitialSkills] = useState<number[]>([]);
   const removeTab = useTabStore((state) => state.removeTab);
   const activeTabKey = useTabStore((state) => state.activeTabKey);
   const userId = useAuthStore((state) => state.id);
@@ -32,10 +34,15 @@ export function SkillAssignmentTab() {
     selectedCounselor.tenantId ?? "0"
   );
 
+  const addCounselorMutation = useApiForAddCounselorsForSpecificSkill(
+    selectedCounselor.tenantId ?? "0"
+  );
+
   useEffect(() => {
     if ((assignedSkills?.result_data ?? []).length > 0) {
       const assignedSkillIds = assignedSkills?.result_data.flatMap((item) => item.skill_id) ?? [];
       setSelectedSkills(assignedSkillIds);
+      setInitialSkills(assignedSkillIds);
     }
   }, [assignedSkills]);
 
@@ -49,13 +56,31 @@ export function SkillAssignmentTab() {
           counselorId: selectedCounselor.counselorId,
         });
 
-        // 체크 해제시 API 호출
         deleteCounselorMutation.mutate({
           skillId: skillId,
           counselorIds: [selectedCounselor.counselorId ?? ""]
         }, {
           onSuccess: () => {
             toast.success('스킬이 해제되었습니다.');
+          }
+        });
+      } else {
+        console.log("📌 체크된 스킬 정보:", {
+          skillId: skillId,
+          counselorId: selectedCounselor.counselorId,
+        });
+
+        if (prev.length >= 10) {
+          toast.error('최대 10개의 스킬만 할당할 수 있습니다.');
+          return prev;
+        }
+
+        addCounselorMutation.mutate({
+          skillId: skillId,
+          counselorIds: [selectedCounselor.counselorId ?? ""]
+        }, {
+          onSuccess: () => {
+            toast.success('스킬이 할당되었습니다.');
           }
         });
       }
@@ -73,10 +98,32 @@ export function SkillAssignmentTab() {
   };
 
   const handleConfirm = () => {
-    console.log("선택된 스킬 ID:", selectedSkills);
-    console.log("상담원 정보:", {
-      counselorId: selectedCounselor.counselorId,
-    });
+    const skillsToAdd = selectedSkills.filter(skillId => !initialSkills.includes(skillId));
+    const skillsToRemove = initialSkills.filter(skillId => !selectedSkills.includes(skillId));
+
+    // 추가할 스킬 처리
+    if (skillsToAdd.length > 0) {
+      skillsToAdd.forEach(skillId => {
+        addCounselorMutation.mutate({
+          skillId,
+          counselorIds: [selectedCounselor.counselorId ?? ""]
+        });
+      });
+    }
+
+    // 제거할 스킬 처리
+    if (skillsToRemove.length > 0) {
+      skillsToRemove.forEach(skillId => {
+        deleteCounselorMutation.mutate({
+          skillId,
+          counselorIds: [selectedCounselor.counselorId ?? ""]
+        });
+      });
+    }
+
+    if (activeTabKey) {
+      removeTab(500, activeTabKey);
+    }
   };
 
   if (error) {
