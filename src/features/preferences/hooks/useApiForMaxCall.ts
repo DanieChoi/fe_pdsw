@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { CreateMaxCallRequest, CreateMaxCallResponse, MaxCallListCredentials, MaxCallListResponse } from "../types/SystemPreferences";
+import { CreateMaxCallRequest, CreateMaxCallResponse, MaxCallInitTimeListResponse, MaxCallInitTimeUpdateRequest, MaxCallInitTimeUpdateResponse, MaxCallListCredentials, MaxCallListResponse } from "../types/SystemPreferences";
 import { ApiError } from "next/dist/server/api-utils";
-import { createMaxCall, fetchMaxCallList, updateMaxCall } from "../api/apiForMaxCall";
+import { createMaxCall, fetchMaxCallInitTimeList, fetchMaxCallList, updateMaxCall, updateMaxCallInitTime } from "../api/apiForMaxCall";
 
 // 운영설정 분배호수 제한 설정 리스트 요청을 위한 hook
 export function useApiForMaxCallList(
@@ -49,4 +49,36 @@ export function useApiForUpdateMaxCall(
             option?.onError?.(error, variables, context);
         }
     }); 
+}
+
+// 운영설정 분배호수 제한 설정 초기화 시각 조회를 위한 hook
+export function useApiForMaxCallInitTimeList(
+    options?: UseMutationOptions<MaxCallInitTimeListResponse, ApiError, unknown>
+) {
+    return useMutation({
+        mutationKey: ['maxCallInitTimeList'],
+        mutationFn: fetchMaxCallInitTimeList,
+        onSuccess: (data, variables, context) => {
+            options?.onSuccess?.(data, variables, context);
+        },
+        onError: (error: ApiError, variables: unknown, context: unknown) => {
+            options?.onError?.(error, variables, context);
+        }
+    });
+}
+
+// 운영설정 분배호수 제한 설정 초기화 시각 수정을 위한 hook
+export function useApiForMaxCallInitTimeUpdate(
+    options?: UseMutationOptions<MaxCallInitTimeUpdateResponse, ApiError, MaxCallInitTimeUpdateRequest>
+) {
+    return useMutation({
+        mutationKey: ['maxCallInitTimeUpdate'],
+        mutationFn: updateMaxCallInitTime,
+        onSuccess: (data, variables, context) => {
+            options?.onSuccess?.(data, variables, context);
+        },
+        onError: (error: ApiError, variables: MaxCallInitTimeUpdateRequest, context: unknown) => {   
+            options?.onError?.(error, variables, context);
+        }
+    });
 }

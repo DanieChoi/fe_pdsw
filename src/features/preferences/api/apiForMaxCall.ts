@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/lib/axios";
-import { CreateMaxCallRequest, CreateMaxCallResponse, MaxCallListCredentials, MaxCallListResponse } from "../types/SystemPreferences";
+import { CreateMaxCallRequest, CreateMaxCallResponse, MaxCallInitTimeListResponse, MaxCallInitTimeUpdateRequest, MaxCallInitTimeUpdateResponse, MaxCallListCredentials, MaxCallListResponse } from "../types/SystemPreferences";
 
 // 운영설정 분배호수 제한 설정 리스트 요청
 export const fetchMaxCallList = async (credentials: MaxCallListCredentials): Promise<MaxCallListResponse> => {
@@ -42,7 +42,7 @@ export const createMaxCall = async (credentials: CreateMaxCallRequest): Promise<
             {
                 agent_id: credentials.agent_id,
                 max_call: credentials.max_call,
-                fix_fleg: credentials.fix_fleg
+                fix_flag: credentials.fix_flag
             }
         ]
     };
@@ -68,7 +68,7 @@ export const updateMaxCall = async (credentials: CreateMaxCallRequest): Promise<
             {
                 agent_id: credentials.agent_id,
                 max_call: credentials.max_call,
-                fix_fleg: credentials.fix_fleg
+                fix_fleg: credentials.fix_flag
             }
         ]
     };
@@ -86,3 +86,40 @@ export const updateMaxCall = async (credentials: CreateMaxCallRequest): Promise<
         throw new Error(error.response?.data?.result_code + '||' + error.response?.data?.result_msg || '데이터 가져오기 실패');
     }
 };
+
+// 운영설정 분배호수 제한 설정 초기화 시각 조회 API
+export const fetchMaxCallInitTimeList = async (): Promise<MaxCallInitTimeListResponse> => {
+    try {
+        const { data } = await axiosInstance.post<MaxCallInitTimeListResponse>(
+            '/collections/maxcall-init-time',
+        );
+        return data;
+    } catch (error: any) {
+        if (error.response?.status === 401) {
+            throw new Error('세션이 만료되었습니다. 다시 로그인해주세요.');
+        }
+        throw new Error(error.response?.data?.result_code + '||' + error.response?.data?.result_msg || '데이터 가져오기 실패');
+    }
+}
+
+// 운영설정 분배호수 제한 설정 초기화 시각 수정 API
+export const updateMaxCallInitTime = async (crenentials: MaxCallInitTimeUpdateRequest): Promise<MaxCallInitTimeUpdateResponse> => {
+    const requestData = {
+        request_data: {
+            init_time: crenentials.init_time
+        }
+    };
+
+    try {
+        const { data } = await axiosInstance.put<MaxCallInitTimeUpdateResponse>(
+            '/maxcall-init-time',
+            requestData
+        );
+        return data;
+    } catch (error: any) {
+        if (error.response?.status === 401) {
+            throw new Error('세션이 만료되었습니다. 다시 로그인해주세요.');
+        }
+        throw new Error(error.response?.data?.result_code + '||' + error.response?.data?.result_msg || '데이터 가져오기 실패');
+    }
+}

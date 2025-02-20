@@ -1,3 +1,4 @@
+console.log("커밋 오류");
 import React, { useState, useMemo, useEffect } from 'react';
 import DataGrid from "react-data-grid";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
@@ -8,7 +9,7 @@ import CustomAlert from '@/components/shared/layout/CustomAlert';
 import CampaignModal from '../CampaignModal';
 import { useAuthStore, useMainStore } from '@/store';
 import { useApiForCounselorList } from '@/features/preferences/hooks/useApiForCounselorList';
-import { useApiForCreateMaxCall, useApiForMaxCallList, useApiForUpdateMaxCall } from '@/features/preferences/hooks/useApiForMaxCall';
+import { useApiForCreateMaxCall, useApiForMaxCallInitTimeList, useApiForMaxCallInitTimeUpdate, useApiForMaxCallList, useApiForUpdateMaxCall } from '@/features/preferences/hooks/useApiForMaxCall';
 import { useApiForCampaignAgentList } from '@/features/preferences/hooks/useApiForSkillMaster';
 
 interface Row {
@@ -19,7 +20,7 @@ interface Row {
   agent_name: string;
   max_dist: string;
   current_resp: string;
-  fixed_number: string;
+  fix_flag: string;
 }
 
 const DistributionLimit = () => {
@@ -31,6 +32,8 @@ const DistributionLimit = () => {
   const [selectedCampaignName, setSelectedCampaignName] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [campaignAgents, setCampaignAgents] = useState<string[]>([]);
+  const [initTime, setInitTime] = useState<string>('없음');
+  const [viewFilter, setViewFilter] = useState('all');
   
   const [formData, setFormData] = useState({
     center: '',
@@ -40,7 +43,7 @@ const DistributionLimit = () => {
     agentName: '',
     maxDist: '',
     currentResp: '',
-    fixedNumber: 'N'
+    fix_flag: 'N'
   });
 
   const [alertState, setAlertState] = useState({
@@ -97,6 +100,47 @@ const DistributionLimit = () => {
     }
   };
 
+  // 필터링된 rows를 계산하는 함수
+  const filteredRows = useMemo(() => {
+    switch (viewFilter) {
+      case 'remaining':
+        // 잔여 호수가 남은 상담원 (최대 분배호수 > 현재 응답호수)
+        return rows.filter(row => {
+          const maxDist = parseInt(row.max_dist);
+          const currentResp = parseInt(row.current_resp);
+          return maxDist > currentResp && (maxDist > 0 || currentResp > 0);
+        });
+      
+      case 'no-remaining':
+        // 잔여 호수가 없는 상담원 (최대 분배호수 = 현재 응답호수)
+        return rows.filter(row => {
+          const maxDist = parseInt(row.max_dist);
+          const currentResp = parseInt(row.current_resp);
+          return maxDist === currentResp && (maxDist > 0 || currentResp > 0);
+        });
+      
+      case 'no-limit':
+        // 최대 분배호수가 설정되지 않은 상담원 (데이터가 없거나 둘 다 0인 경우)
+        return rows.filter(row => {
+          const maxDist = parseInt(row.max_dist);
+          const currentResp = parseInt(row.current_resp);
+          return maxDist === 0 && currentResp === 0;
+        });
+      
+      case 'has-limit':
+        // 최대 분배호수가 설정된 상담원 (최대 분배호수나 현재 응답호수 중 하나라도 값이 있는 경우)
+        return rows.filter(row => {
+          const maxDist = parseInt(row.max_dist);
+          const currentResp = parseInt(row.current_resp);
+          return maxDist > 0 || currentResp > 0;
+        });
+      
+      default:
+        // 전체 상담원
+        return rows;
+    }
+  }, [rows, viewFilter]);
+
   // 캠페인별 상담원 목록 조회
   const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
     onSuccess: (response) => {
@@ -137,7 +181,7 @@ const DistributionLimit = () => {
                       agent_name: counselor.counselorname,
                       max_dist: '0',
                       current_resp: '0',
-                      fixed_number: 'N'
+                      fix_flag: 'N'
                     });
                   }
                 });
@@ -171,7 +215,8 @@ const DistributionLimit = () => {
               return {
                 ...row,
                 max_dist: maxCallInfo.max_call.toString(),
-                current_resp: maxCallInfo.answered_call.toString()
+                current_resp: maxCallInfo.answered_call.toString(),
+                fix_flag: maxCallInfo.fix_flag === 1 ? 'Y' : 'N'
               };
             }
             // 매칭되는 정보가 없으면 기존 row 반환
@@ -187,8 +232,29 @@ const DistributionLimit = () => {
 
   const { mutate: createMaxCallMutation } = useApiForCreateMaxCall();
   const { mutate: updateMaxCallMutation } = useApiForUpdateMaxCall();
+  const { mutate: fetchMaxCallInitTimeList } = useApiForMaxCallInitTimeList({
+    onSuccess: (data) => {
+      setInitTime(data.result_data.init_time);
+    }
+  });
+
+  // 응답호수 초기화 시각 수정
+  const { mutate: updateMaxCallInitTime } = useApiForMaxCallInitTimeUpdate({
+    onSuccess: (data) => {
+      if (data.result_code === 0) {
+        // showAlert('초기화 시간이 성공적으로 변경되었습니다.');
+        fetchMaxCallInitTimeList({}); // 변경 후 목록 재조회
+      } else {
+        showAlert(`초기화 시간 변경 실패: ${data.result_msg}`);
+      }
+    },
+    onError: (error) => {
+      showAlert(`초기화 시간 변경 중 오류가 발생했습니다: ${error.message}`);
+    }
+  });
 
   useEffect(() => {
+    fetchMaxCallInitTimeList({});
     if (selectedCampaignId) {
       // 1. 먼저 캠페인 상담원 목록을 가져옴
       fetchCampaignAgentList({
@@ -198,7 +264,7 @@ const DistributionLimit = () => {
       setCampaignAgents([]);
       setRows([]);
     }
-  }, [selectedCampaignId, fetchCampaignAgentList]);
+  }, [selectedCampaignId, fetchCampaignAgentList, fetchMaxCallInitTimeList]);
   
   // campaignAgents가 업데이트되면 상담원 목록 조회
   useEffect(() => {
@@ -229,12 +295,21 @@ const DistributionLimit = () => {
       showAlert('시간을 입력해주세요.');
       return;
     }
-    console.log('Save time setting:', timeValue);
+
+    // 시간 형식 검증 (0000-2359 사이의 4자리 숫자)
+    const timeRegex = /^([0-1][0-9]|2[0-3])[0-5][0-9]$/;
+    if (!timeRegex.test(timeValue)) {
+      showAlert('올바른 시간 형식이 아닙니다. (예: 2300)');
+      return;
+    }
+
+    updateMaxCallInitTime({ init_time: timeValue });
+    setTimeValue('');
     setIsTimeSettingOpen(false);
   };
 
   const handleTimeRemove = () => {
-    console.log('Remove time setting');
+    updateMaxCallInitTime({ init_time: "9999" }); // 초기화 시간을 "없음"으로 설정
     setIsTimeRemoveOpen(false);
   };
 
@@ -262,7 +337,7 @@ const DistributionLimit = () => {
       campaign_id: parseInt(selectedCampaignId),
       agent_id: formData.agentId,
       max_call: maxDist,
-      fix_fleg: formData.fixedNumber === 'Y' ? 1 : 0
+      fix_flag: formData.fix_flag === 'Y' ? 1 : 0
     };
 
     const existingRow = rows.find(row => row.agent_id === formData.agentId);
@@ -313,7 +388,7 @@ const DistributionLimit = () => {
     { key: 'agent_name', name: '상담원 이름' },
     { key: 'max_dist', name: '최대 분배호수' },
     { key: 'current_resp', name: '현재 응답호수' },
-    { key: 'fixed_number', name: '호수 고정' }
+    { key: 'fix_flag', name: '호수 고정' }
   ], []);
   
   const handleCellClick = ({ row }: { row: Row }) => {
@@ -326,7 +401,7 @@ const DistributionLimit = () => {
       agentName: row.agent_name,
       maxDist: row.max_dist,
       currentResp: row.current_resp,
-      fixedNumber: row.fixed_number
+      fix_flag: row.fix_flag
     });
   };
 
@@ -340,7 +415,7 @@ const DistributionLimit = () => {
       agentName: '',
       maxDist: '',
       currentResp: '',
-      fixedNumber: 'all'
+      fix_flag: 'all'
     });
   };
 
@@ -365,7 +440,8 @@ const DistributionLimit = () => {
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="캠페인선택" />
               </SelectTrigger>
-              <SelectContent>
+              {/* 스크롤이 없어서 셀렉트 값이 다 안보여서 스크롤 추가 */}
+              <SelectContent style={{ maxHeight: '300px', overflowY: 'auto' }}> 
                 {campaigns.map(campaign => (
                   <SelectItem 
                     key={campaign.campaign_id} 
@@ -396,13 +472,13 @@ const DistributionLimit = () => {
             disabled={true}
           />
           <div className="text-sm">
-            응답호수 초기화 시간: 없음
+            응답호수 초기화 시간: {initTime === "9999" ? "없음" : `${initTime.slice(0, 2)}:${initTime.slice(2)}`}
           </div>
         </div>
         <div className="flex gap-2">
           <CommonButton onClick={() => setIsTimeSettingOpen(true)}>초기화시간 변경</CommonButton>
           <CommonButton onClick={() => setIsTimeRemoveOpen(true)}>초기화시간 설정해제</CommonButton>
-          <CommonButton>적용</CommonButton>
+          {/* <CommonButton onClick={handleSave}>적용</CommonButton> */}
         </div>
       </div>
 
@@ -412,7 +488,11 @@ const DistributionLimit = () => {
             <div className="text-sm">할당 상담원 목록</div>
             <div className="flex items-center gap-2">
               <Label className="w-20 min-w-20">보기설정</Label>
-              <Select defaultValue='all'>
+              <Select 
+                value={viewFilter}
+                onValueChange={setViewFilter}
+                defaultValue='all'
+              >
                 <SelectTrigger className="w-[250px]">
                   <SelectValue placeholder="해당 상담원 전체" />
                 </SelectTrigger>
@@ -429,7 +509,7 @@ const DistributionLimit = () => {
           <div className='grid-custom-wrap h-[400px]'>
             <DataGrid
               columns={columns}
-              rows={rows} 
+              rows={filteredRows} 
               className="grid-custom"
               onCellClick={handleCellClick}
               rowKeyGetter={(row) => row.agent_id}
@@ -515,8 +595,8 @@ const DistributionLimit = () => {
             <div className="flex items-center gap-2">
               <Label className="w-[8rem] min-w-[8rem]">호수 고정</Label>
               <Select 
-                value={formData.fixedNumber}
-                onValueChange={(value) => handleInputChange('fixedNumber', value)}
+                value={formData.fix_flag}
+                onValueChange={(value) => handleInputChange('fix_flag', value)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="선택" />
@@ -571,7 +651,7 @@ const DistributionLimit = () => {
 
         <CustomAlert
           isOpen={isTimeRemoveOpen}
-          message="초기화 시간 설정값을 해제 하시겠습니까?"
+          message="초기화 시간이 성공적으로 변경되었습니다."
           title="초기화 시간 설정해제"
           type="2"
           onClose={handleTimeRemove}
