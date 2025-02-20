@@ -1,4 +1,3 @@
-console.log("커밋 오류");
 import React, { useState, useMemo, useEffect } from 'react';
 import DataGrid from "react-data-grid";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
