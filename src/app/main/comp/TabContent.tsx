@@ -64,21 +64,36 @@ const renderContent = (tabId: number | null) => {
       return <>잘못된 스킬 할당 탭입니다.</>;
     case 130: // 캠페인 복사 화면 리턴
       return <CampaignClonePanel />;
-    case 500:
-      return (
-        <div className="flex justify-left w-full">
-          <div className="max-w-[500px] w-full">
-            <SkillAssignmentTab />
-          </div>
-        </div>
-      );
     case 501:
       return (
         <div className="flex justify-left w-full">
           <BlackListCountPopup />
         </div>
       );
-
+      case 600: // 상담원 스킬 할당 탭
+        return (
+          <div className="flex justify-left w-full">
+            <div className="max-w-[500px] w-full">
+              <SkillAssignmentTab />
+            </div>
+          </div>
+        );
+      case 601: // 팀 스킬 할당 탭
+        return (
+          <div className="flex justify-left w-full">
+            <div className="max-w-[500px] w-full">
+              팀 스킬 할당
+            </div>
+          </div>
+        );
+      case 602: // 그룹 스킬 할당 탭
+        return (
+          <div className="flex justify-left w-full">
+            <div className="max-w-[500px] w-full">
+              그룹 스킬 할당
+            </div>
+          </div>
+        );
 
     default:
       return (

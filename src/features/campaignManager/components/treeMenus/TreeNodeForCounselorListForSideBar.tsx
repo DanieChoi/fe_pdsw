@@ -41,6 +41,9 @@ export function TreeNodeForCounselorListForSideBar({
 }: ITreeNodeForCounselorListForSideBar) {
   const { selectedBlendKind } = useCounselorFilterStore();
 
+  // console.log("data at tree node : ", data);
+  
+
   const getId = () => {
     switch (type) {
       case 'organization': return `org-${data.centerId}`;
@@ -162,9 +165,28 @@ export function TreeNodeForCounselorListForSideBar({
       );
     }
 
+    // if (['group', 'team', 'counselor'].includes(type)) {
+    //   return (
+    //     <IContextMenuForGroupAndTeamAndCounselor item={data}>
+    //       {content}
+    //     </IContextMenuForGroupAndTeamAndCounselor>
+    //   );
+    // }
+
     if (['group', 'team', 'counselor'].includes(type)) {
+      const contextMenuItem = {
+        id: type === 'counselor' ? data.counselorId : 
+            type === 'team' ? data.teamId : 
+            data.groupId,
+        name: type === 'counselor' ? data.counselorname : 
+              type === 'team' ? data.teamName : 
+              data.groupName,
+        tenantId: data.tenantId,
+        type: type
+      };
+    
       return (
-        <IContextMenuForGroupAndTeamAndCounselor item={data}>
+        <IContextMenuForGroupAndTeamAndCounselor item={contextMenuItem}>
           {content}
         </IContextMenuForGroupAndTeamAndCounselor>
       );
