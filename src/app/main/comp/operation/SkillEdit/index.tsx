@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import DataGrid, { SelectColumn } from "react-data-grid";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { CustomInput } from "@/components/shared/CustomInput";
@@ -6,6 +6,9 @@ import { Label } from "@/components/ui/label";
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import TitleWrap from "@/components/shared/TitleWrap";
 import 'react-data-grid/lib/styles.css';
+import { useApiForCounselorList } from '@/features/preferences/hooks/useApiForCounselorList';
+import { useApiForCampaignList, useApiForSkillAgentList, useApiForSkillCampaignList, useApiForSkillList } from '@/features/preferences/hooks/useApiForSkill';
+import { useAuthStore, useMainStore } from '@/store';
 
 // 메인 스킬 정보
 interface SkillRow {
@@ -18,7 +21,7 @@ interface SkillRow {
   agentCount: number;
 }
 
-// 캠페인 정보
+// 캠페인 정보 (그리드용)
 interface CampaignRow {
   skillId: string;
   campaignId: string;
@@ -26,7 +29,7 @@ interface CampaignRow {
   mode: string;
 }
 
-// 상담원 정보
+// 상담원 정보 (그리드용)
 interface AgentRow {
   skillId: string;
   teamId: string;
@@ -38,11 +41,15 @@ interface AgentRow {
 }
 
 const SkillEdit = () => {
+  const { tenants, campaigns } = useMainStore();
+  const { tenant_id, role_id } = useAuthStore();
+  const [rows, setRows] = useState<SkillRow[]>([]);
   const [selectedSkill, setSelectedSkill] = useState<SkillRow | null>(null);
   const [selectedCampaignRows, setSelectedCampaignRows] = useState<Set<string>>(new Set());
   const [selectedAgentRows, setSelectedAgentRows] = useState<Set<string>>(new Set());
   const [filteredCampaigns, setFilteredCampaigns] = useState<CampaignRow[]>([]);
   const [filteredAgents, setFilteredAgents] = useState<AgentRow[]>([]);
+  const [allCampaigns, setAllCampaigns] = useState<CampaignRow[]>([]);
   
   const [alertState, setAlertState] = useState({
     isOpen: false,
@@ -53,7 +60,7 @@ const SkillEdit = () => {
     onCancel: () => {}
   });
 
-  // 메인 스킬 그리드 컬럼
+  // 스킬 그리드 컬럼
   const skillColumns = useMemo(() => [
     { key: 'center', name: '센터' },
     { key: 'tenant', name: '테넌트' },
@@ -83,84 +90,39 @@ const SkillEdit = () => {
     { key: 'consultMode', name: '상담모드' }
   ], []);
 
-  // 전체 데이터
-  const skillRows: SkillRow[] = [
-    { 
-      center: 'Center A', 
-      tenant: 'nexus', 
-      skillId: 'SK001', 
-      skillName: '일반상담', 
-      description: '일반상담 스킬',
-      campaignCount: 3,
-      agentCount: 10
-    },
-    { 
-      center: 'Center B', 
-      tenant: 'nexus', 
-      skillId: 'SK002', 
-      skillName: 'VIP상담', 
-      description: 'VIP고객 상담 스킬',
-      campaignCount: 2,
-      agentCount: 5
+  // 캠페인 발신 모드 변환 함수
+  const getDialModeText = (dialMode: number): string => {
+    switch (dialMode) {
+      case 1: return 'Power Mode';
+      case 2: return 'Progressive Mode';
+      case 3: return 'Predictive Mode';
+      case 5: return 'Preview Mode';
+      default: return 'Unknown';
     }
-  ];
-
-  const allCampaignRows: CampaignRow[] = [
-    { 
-      skillId: 'SK001',
-      campaignId: 'CP001', 
-      campaignName: '일반상담 캠페인', 
-      mode: 'Progressive'
-    },
-    { 
-      skillId: 'SK001',
-      campaignId: 'CP002', 
-      campaignName: 'VIP상담 캠페인', 
-      mode: 'Preview'
-    },
-    { 
-      skillId: 'SK002',
-      campaignId: 'CP003', 
-      campaignName: '고객상담 캠페인', 
-      mode: 'Progressive'
-    }
-  ];
-
-  const allAgentRows: AgentRow[] = [
-    { 
-      skillId: 'SK001',
-      teamId: 'T001',
-      teamName: '일반상담팀',
-      loginId: 'user1',
-      agentId: 'AG001',
-      agentName: '김상담',
-      consultMode: '일반상담'
-    },
-    { 
-      skillId: 'SK002',
-      teamId: 'T002',
-      teamName: 'VIP상담팀',
-      loginId: 'user2',
-      agentId: 'AG002',
-      agentName: '이상담',
-      consultMode: 'VIP상담'
-    }
-  ];
+  };
 
   const getRowClass = (row: any) => {
     return selectedSkill?.skillId === row.skillId ? 'bg-amber-50' : '';
   };
 
+  // 스킬 로우 클릭 시, 선택된 스킬의 skill_id와 일치하는 캠페인 API 응답의 campaign_id 목록을 이용해 전체 캠페인 리스트에서 필터링
   const handleSkillClick = ({ row }: { row: SkillRow }) => {
     setSelectedSkill(row);
     setSelectedCampaignRows(new Set());
     setSelectedAgentRows(new Set());
     
-    // 선택된 스킬에 해당하는 캠페인과 상담원 필터링
-    const relatedCampaigns = allCampaignRows.filter(campaign => campaign.skillId === row.skillId);
-    const relatedAgents = allAgentRows.filter(agent => agent.skillId === row.skillId);
-    
+    let relatedCampaigns: CampaignRow[] = [];
+    if (campaignData && campaignData.result_data) {
+      const skillCampaignEntry = campaignData.result_data.find(
+        (entry: any) => String(entry.skill_id) === row.skillId
+      );
+      const campaignIds: string[] = skillCampaignEntry ? skillCampaignEntry.campaign_id : [];
+      relatedCampaigns = allCampaigns.filter(campaign => campaignIds.includes(campaign.campaignId));
+    }
     setFilteredCampaigns(relatedCampaigns);
+    
+    // 상담원은 예제 데이터(allAgentRows)를 그대로 사용 (필요시 API 응답으로 대체)
+    const relatedAgents = allAgentRows.filter(agent => agent.skillId === row.skillId);
     setFilteredAgents(relatedAgents);
   };
 
@@ -177,7 +139,6 @@ const SkillEdit = () => {
       showAlert('스킬을 해제할 캠페인을 선택해주세요.');
       return;
     }
-
     showConfirm('선택한 캠페인의 스킬을 해제하시겠습니까?', () => {
       console.log('Unassign skill from campaigns:', Array.from(selectedCampaignRows));
     });
@@ -188,7 +149,6 @@ const SkillEdit = () => {
       showAlert('스킬을 해제할 상담원을 선택해주세요.');
       return;
     }
-
     showConfirm('선택한 상담원의 스킬을 해제하시겠습니까?', () => {
       console.log('Unassign skill from agents:', Array.from(selectedAgentRows));
     });
@@ -207,7 +167,6 @@ const SkillEdit = () => {
       showAlert('저장할 스킬을 선택해주세요.');
       return;
     }
-
     showConfirm('저장하시겠습니까?', () => {
       console.log('Save skill:', selectedSkill);
     });
@@ -218,7 +177,6 @@ const SkillEdit = () => {
       showAlert('삭제할 스킬을 선택해주세요.');
       return;
     }
-
     showConfirm(`선택된 열을 삭제 하시겠습니까?\n ※ 주의 : 삭제 시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해 주세요.`, () => {
       console.log('Delete skill:', selectedSkill);
     });
@@ -253,18 +211,170 @@ const SkillEdit = () => {
     setAlertState(prev => ({ ...prev, isOpen: false }));
   };
 
+  // 예제용 전체 상담원 데이터 (상세 그리드에서 사용)
+  const [allAgentRows] = useState<AgentRow[]>([
+    { 
+      skillId: 'SK001',
+      teamId: 'T001',
+      teamName: '일반상담팀',
+      loginId: 'user1',
+      agentId: 'AG001',
+      agentName: '김상담',
+      consultMode: '일반상담'
+    },
+    { 
+      skillId: 'SK002',
+      teamId: 'T002',
+      teamName: 'VIP상담팀',
+      loginId: 'user2',
+      agentId: 'AG002',
+      agentName: '이상담',
+      consultMode: 'VIP상담'
+    }
+  ]);
+
+  // 예제용 전체 캠페인 데이터 (캠페인 리스트 API를 통해 가져온 데이터를 변환하여 저장)
+  const [allCampaignsState, setAllCampaignsState] = useState<CampaignRow[]>([
+    { 
+      skillId: '', // 실제 할당 정보는 스킬 할당 캠페인 API(campaignData)에서 연결
+      campaignId: '100',
+      campaignName: '일반상담 캠페인',
+      mode: 'Progressive'
+    },
+    { 
+      skillId: '',
+      campaignId: '101',
+      campaignName: 'VIP상담 캠페인',
+      mode: 'Preview'
+    },
+    { 
+      skillId: '',
+      campaignId: '888',
+      campaignName: '고객상담 캠페인',
+      mode: 'Progressive'
+    },
+    { 
+      skillId: '',
+      campaignId: '1000',
+      campaignName: '신규 캠페인 A',
+      mode: 'Predictive Mode'
+    },
+    { 
+      skillId: '',
+      campaignId: '1001',
+      campaignName: '신규 캠페인 B',
+      mode: 'Power Mode'
+    }
+  ]);
+  // 저장할 전체 캠페인 리스트를 상태에 저장 (캠페인 리스트 API 호출 결과)
+  useEffect(() => {
+    setAllCampaigns(allCampaignsState);
+  }, [allCampaignsState]);
+
+  // API: 상담원 리스트와 스킬 리스트
+  const { mutate: fetchCounselorList, data: counselorData } = useApiForCounselorList({
+    onError: (error) => {
+      console.error('상담원 리스트 조회 실패:', error);
+      // showAlert('상담원 리스트를 불러오지 못했습니다.');
+    }
+  });
+  const { mutate: fetchSkillList, data: skillData } = useApiForSkillList({
+    onError: (error) => {
+      console.error('스킬 리스트 조회 실패:', error);
+      // showAlert('스킬 리스트를 불러오지 못했습니다.');
+    }
+  });
+  
+  // API: 스킬 할당 캠페인 리스트 조회
+  const [campaignData, setCampaignData] = useState<any>(null);
+  const { mutate: fetchSkillCampaignList } = useApiForSkillCampaignList({
+    onSuccess: (data) => {
+      setCampaignData(data);
+    }
+  });
+  
+  // API: 스킬 할당 상담원 리스트 조회
+  const [agentData, setAgentData] = useState<any>(null);
+  const { mutate: fetchSkillAgentList } = useApiForSkillAgentList({
+    onSuccess: (data) => {
+      setAgentData(data);
+    }
+  });
+
+  // API: 캠페인 리스트 조회
+  const { mutate: fetchCampaignList } = useApiForCampaignList({
+    onSuccess: (data) => {
+      // Convert API response to CampaignRow format
+      const campaigns = data.result_data.map((campaign: any) => ({
+        skillId: '',
+        campaignId: String(campaign.campaign_id),
+        campaignName: campaign.campaign_name,
+        mode: getDialModeText(campaign.dial_mode)
+      }));
+      setAllCampaigns(campaigns);
+    }
+  });
+  
+  // 컴포넌트 마운트 시 API 호출 (테넌트, 캠페인, 스킬, 할당 캠페인/상담원)
+  useEffect(() => {
+    fetchCounselorList({ tenantId: tenant_id, roleId: role_id });
+    fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
+    fetchSkillCampaignList();
+    fetchSkillAgentList();
+    fetchCampaignList();
+  }, [tenant_id, role_id, tenants, fetchCounselorList, fetchSkillList, fetchSkillCampaignList, fetchSkillAgentList, fetchCampaignList]);
+
+  // 상담원, 스킬, 캠페인, 상담원 API 응답 데이터를 통합하여 그리드에 표시할 행 구성
+  useEffect(() => {
+    if (
+      counselorData &&
+      counselorData.organizationList &&
+      skillData &&
+      skillData.result_data
+    ) {
+      const tenantMap: { [tenantId: string]: { centerName: string; tenantName: string } } = {};
+      counselorData.organizationList.forEach(org => {
+        const centerName = org.centerName;
+        org.tenantInfo.forEach(tenant => {
+          tenantMap[tenant.tenantId] = {
+            centerName,
+            tenantName: tenant.tenantName
+          };
+        });
+      });
+      
+      const campaignResultData = (campaignData && campaignData.result_data) || [];
+      const agentResultData = (agentData && agentData.result_data) || [];
+      
+      const skillRows: SkillRow[] = (skillData.result_data || []).map(skill => {
+        const tenantInfo = tenantMap[String(skill.tenant_id)] || { centerName: '', tenantName: '' };
+        const campaignEntry = campaignResultData.find((item: any) => String(item.skill_id) === String(skill.skill_id));
+        const agentEntry = agentResultData.find((item: any) => String(item.skill_id) === String(skill.skill_id));
+        return {
+          center: tenantInfo.centerName,
+          tenant: tenantInfo.tenantName,
+          skillId: String(skill.skill_id),
+          skillName: skill.skill_name,
+          description: skill.skill_description,
+          campaignCount: campaignEntry ? campaignEntry.campaign_id.length : 0,
+          agentCount: agentEntry ? agentEntry.agent_id.length : 0
+        };
+      });
+      setRows(skillRows);
+    }
+  }, [counselorData, skillData, campaignData, agentData]);
+
   return (
     <div className="flex">
       <div className="flex gap-8">
         <div className="w-[800px] flex flex-col gap-3">
-
           {/* 왼쪽 스킬 목록 그리드 */}
           <div>
-            <TitleWrap title="스킬 목록" totalCount={skillRows.length} />
+            <TitleWrap title="스킬 목록" totalCount={rows.length} />
             <div className="grid-custom-wrap h-[230px]">
-            <DataGrid
+              <DataGrid
                 columns={skillColumns}
-                rows={skillRows}
+                rows={rows}
                 className="grid-custom"
                 onCellClick={handleSkillClick}
                 rowKeyGetter={(row) => row.skillId}
@@ -289,7 +399,7 @@ const SkillEdit = () => {
               ]}
             />
             <div className="grid-custom-wrap h-[200px]">
-             <DataGrid
+              <DataGrid
                 columns={campaignColumns}
                 rows={filteredCampaigns}
                 className="grid-custom"
@@ -302,7 +412,6 @@ const SkillEdit = () => {
             </div>
           </div>
 
-        
           {/* 소속 상담원 목록 */}
           <div>
             <TitleWrap 
@@ -316,7 +425,7 @@ const SkillEdit = () => {
               ]}
             />
             <div className="grid-custom-wrap h-[200px]">
-            <DataGrid
+              <DataGrid
                 columns={agentColumns}
                 rows={filteredAgents}
                 className="grid-custom"
@@ -328,7 +437,6 @@ const SkillEdit = () => {
               />
             </div>
           </div>
-
         </div>
 
         {/* 오른쪽 상세 정보 */}
@@ -342,7 +450,6 @@ const SkillEdit = () => {
                 disabled
               />
             </div>
-
             <div className="flex items-center gap-2">
               <Label className="w-[8rem] min-w-[8rem]">테넌트</Label>
               <CustomInput 
@@ -351,7 +458,6 @@ const SkillEdit = () => {
                 disabled
               />
             </div>
-
             <div className="flex items-center gap-2">
               <Label className="w-[8rem] min-w-[8rem]">스킬아이디</Label>
               <CustomInput 
@@ -360,7 +466,6 @@ const SkillEdit = () => {
                 disabled
               />
             </div>
-
             <div className="flex items-center gap-2">
               <Label className="w-[8rem] min-w-[8rem]">스킬이름</Label>
               <CustomInput 
@@ -368,7 +473,6 @@ const SkillEdit = () => {
                 className="w-full"
               />
             </div>
-
             <div className="flex items-center gap-2">
               <Label className="w-[8rem] min-w-[8rem]">설명</Label>
               <CustomInput 
@@ -383,17 +487,20 @@ const SkillEdit = () => {
             <CommonButton onClick={handleSave}>저장</CommonButton>
           </div>
           <div className="mt-[20px] text-sm">
-              <ul className='space-y-1 notice-li'>
-                <li>• 스킬을 추가, 수정, 삭제할 수 있습니다.</li>
-                <li>• 사용 중인 스킬은 추가 및 삭제할 수 없습니다.</li>
-                <li>• 기능설명<br/>스킬 추가 = 키보드<br/>스킬 삭제 = 키보드 Delete<br/>다중 선택 =  Shift 또는 Ctrl 키를 이용하여 다중 선택 가능</li>
-                <li>• 단축키<br/>저장하기(Ctrl+S)<br/>삭제하기(Ctrl+D or Del)</li>
-              </ul>
-            </div>
+            <ul className='space-y-1 notice-li'>
+              <li>• 스킬을 추가, 수정, 삭제할 수 있습니다.</li>
+              <li>• 사용 중인 스킬은 추가 및 삭제할 수 없습니다.</li>
+              <li>
+                • 기능설명<br/>
+                스킬 추가 = 키보드<br/>
+                스킬 삭제 = 키보드 Delete<br/>
+                다중 선택 =  Shift 또는 Ctrl 키를 이용하여 다중 선택 가능
+              </li>
+              <li>• 단축키<br/>저장하기(Ctrl+S)<br/>삭제하기(Ctrl+D or Del)</li>
+            </ul>
+          </div>
         </div>
       </div>
-
-
       <CustomAlert
         isOpen={alertState.isOpen}
         message={alertState.message}

@@ -9,7 +9,7 @@ import CampaignModal from '../CampaignModal';
 import { useAuthStore, useMainStore } from '@/store';
 import { useApiForCounselorList } from '@/features/preferences/hooks/useApiForCounselorList';
 import { useApiForCreateMaxCall, useApiForMaxCallInitTimeList, useApiForMaxCallInitTimeUpdate, useApiForMaxCallList, useApiForUpdateMaxCall } from '@/features/preferences/hooks/useApiForMaxCall';
-import { useApiForCampaignAgentList } from '@/features/preferences/hooks/useApiForSkillMaster';
+import { useApiForCampaignAgentList } from '@/features/preferences/hooks/useApiForCampaignAgent';
 
 interface Row {
   center: string;
