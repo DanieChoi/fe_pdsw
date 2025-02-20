@@ -7,6 +7,7 @@ import { useTabStore } from '@/store/tabStore';
 import { useCallback } from 'react';
 import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { FolderContextMenu } from "./FolderContextMenuForTreeNode";
+import Image from "next/image";
 
 export function TreeNode({
   item,
@@ -70,7 +71,7 @@ export function TreeNode({
         <ContextMenu>
           <ContextMenuTrigger>
             <div
-              className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150
+              className={`flex items-center hover:bg-gray-100 px-2 py-1.5 cursor-pointer transition-colors duration-150
                 ${isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""}`}
               onClick={handleClick}
               style={{ paddingLeft: `${level * 16 + 8}px` }}
@@ -78,14 +79,15 @@ export function TreeNode({
               <div className="flex items-center w-full gap-2">
                 {hasChildren ? (
                   isExpanded ? (
-                    <img src="/tree-menu/minus_for_tree.png" alt="접기" className="h-4 w-4" />
+                    <Image src="/tree-menu/minus_for_tree.png" alt="접기" width={12} height={12} />
                   ) : (
-                    <img src="/tree-menu/plus_icon_for_tree.png" alt="펼치기" className="h-4 w-4" />
+                    <Image src="/tree-menu/plus_icon_for_tree.png" alt="펼치기" width={12} height={12} />
                   )
                 ) : (
                   <span className="w-4" />
                 )}
-                <img src="/tree-menu/tennant_office.png" alt="테넌트" className="h-4 w-4" />
+                <Image src="/tree-menu/tennant_office.png" alt="테넌트" width={14} height={12} />
+                
                 <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
                   {item.label}
                 </span>
@@ -103,7 +105,7 @@ export function TreeNode({
           onHandleCampaignCopy={onHandleCampaignCopy}
         >
           <div
-            className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150
+            className={`flex items-center hover:bg-gray-100 px-2 py-1.5 cursor-pointer transition-colors duration-150
               ${isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""}`}
             onClick={handleClick}
             onDoubleClick={handleDoubleClick}
@@ -112,15 +114,15 @@ export function TreeNode({
             <div className="flex items-center w-full gap-2">
               {hasChildren ? (
                 isExpanded ? (
-                  <img src="/tree-menu/minus_for_tree.png" alt="접기" className="h-4 w-4" />
+                  <Image src="/tree-menu/minus_for_tree.png" alt="접기" width={12} height={12} />
                 ) : (
-                  <img src="/tree-menu/plus_icon_for_tree.png" alt="펼치기" className="h-4 w-4" />
+                  <Image src="/tree-menu/plus_icon_for_tree.png" alt="펼치기" width={12} height={12} />
                 )
               ) : (
                 <span className="w-4" />
               )}
               {statusIcon ? (
-                <img src={statusIcon} alt="status" className="w-4 h-4" />
+                <Image src={statusIcon} alt="status" width={12} height={12} />
               ) : (
                 <FileText className="h-4 w-4 text-gray-400" />
               )}
