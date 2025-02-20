@@ -182,7 +182,7 @@ export function TreeNodeForCounselorListForSideBar({
               type === 'team' ? data.teamName : 
               data.groupName,
         tenantId: data.tenantId,
-        type: type
+        type: type as 'counselor' | 'team' | 'group'
       };
     
       return (
