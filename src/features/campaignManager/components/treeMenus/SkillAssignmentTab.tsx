@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -10,6 +10,7 @@ import { useAuthStore } from "@/store/authStore";
 import { CounselorSkill } from "../../types/typeForCounselorSkill";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
 import { useApiForGetRelatedInfoForAssignSkilToCounselor } from "@/features/preferences/hooks/useApiForGetRelatedInfoForAssignSkilToCounselor";
+import { X } from "lucide-react";
 
 export function SkillAssignmentTab() {
   const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
@@ -17,20 +18,13 @@ export function SkillAssignmentTab() {
   const activeTabKey = useTabStore((state) => state.activeTabKey);
   const userId = useAuthStore((state) => state.id);
   
-  // useCounselorFilterStore에서 상담원 정보와 블랜딩 종류 가져오기
   const selectedBlendKind = useCounselorFilterStore((state) => state.selectedBlendKind);
   const selectedCounselor = useCounselorFilterStore((state) => state.selectedCounselor);
 
-  console.log("📌 선택된 상담원 정보:", selectedCounselor);
-
-  // API 호출에 선택된 상담원 정보 사용
   const { assignedSkills, assignableSkills, isLoading, error } = useApiForGetRelatedInfoForAssignSkilToCounselor(
     selectedCounselor.counselorId ?? "",
     Number(selectedCounselor.tenantId)
   );
-
-  console.log("📌 할당 가능한 스킬 목록들 조회:", assignableSkills);
-  console.log("📌 상담원이 보유한 스킬 목록들 조회:", assignedSkills);
 
   useEffect(() => {
     if ((assignedSkills?.result_data ?? []).length > 0) {
@@ -51,59 +45,99 @@ export function SkillAssignmentTab() {
     }
   };
 
+  const handleConfirm = () => {
+    console.log("선택된 스킬 ID:", selectedSkills);
+    console.log("상담원 정보:", {
+      counselorId: selectedCounselor.counselorId,
+      counselorName: selectedCounselor.counselorName,
+      tenantId: selectedCounselor.tenantId
+    });
+  };
+
   if (error) {
     return (
-      <Card className="max-w-2xl mx-auto">
-        <CardContent className="pt-6">
-          <div className="text-red-500">Error: {error}</div>
-        </CardContent>
-      </Card>
+      <div className="fixed inset-0 flex items-center justify-center">
+        <Card className="w-[480px] relative">
+          <div className="p-6">
+            <div className="text-red-500">Error: {error}</div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center">
+        <Card className="w-[480px]">
+          <div className="p-6">Loading...</div>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <Card className="w-full max-w-[800px] mx-auto">
-      <CardHeader>
-        <CardTitle className="text-lg">상담원 스킬 목록</CardTitle>
-        <div className="text-sm text-gray-500">
-          <div>Tenant ID: {selectedCounselor.tenantId || "N/A"}</div>
-          <div>상담원 ID: {selectedCounselor.counselorId || "N/A"}</div>
-          <div>상담원 이름: {selectedCounselor.counselorName || "N/A"}</div>
-          <div>로그인 사용자 ID: {userId || "N/A"}</div>
+    <div className="fixed inset-0 flex items-center justify-center">
+      <Card className="w-[480px] relative bg-white shadow-lg">
+        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="text-lg font-semibold">상담원 스킬 할당</h2>
+          <button onClick={handleCancel} className="text-gray-500 hover:text-gray-700">
+            <X className="h-5 w-5" />
+          </button>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="overflow-x-auto">
-          <Table className="max-w-full w-full">
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-16 text-center">선택</TableHead>
-                {/* <TableHead className="w-20 text-center">아이디</TableHead> */}
-                <TableHead className="w-40 text-center">이름</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {assignableSkills?.result_data.map((skill: CounselorSkill) => (
-                <TableRow key={`${skill.tenant_id}-${skill.skill_id}`}>
-                  <TableCell className="text-center">
-                    <Checkbox
-                      checked={selectedSkills.includes(skill.skill_id)}
-                      onCheckedChange={() => handleSkillToggle(skill.skill_id)}
-                    />
-                  </TableCell>
-                  {/* <TableCell className="text-center">{skill.skill_id}</TableCell> */}
-                  <TableCell className="text-center">{skill.skill_name}</TableCell>
+        
+        <div className="p-4">
+          <div className="text-sm text-gray-600 mb-4 bg-gray-50 p-3 rounded">
+            상담원에게 스킬을 할당 할 수 있는 창입니다.<br />
+            상담원에게 할당할 스킬을 선택하시면 체크 후 확인 버튼을 누르시면 체크된 스킬들이 일괄 할당됩니다.<br />
+            (상담원에게 최대 10개 스킬까지만 할당 가능 합니다.)
+          </div>
+
+          <div className="max-h-[300px] overflow-y-auto border rounded">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-16 text-center">선택</TableHead>
+                  <TableHead className="w-16 text-center">아이디</TableHead>
+                  <TableHead className="text-center">이름</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {assignableSkills?.result_data.map((skill: CounselorSkill) => (
+                  <TableRow key={`${skill.tenant_id}-${skill.skill_id}`}>
+                    <TableCell className="text-center">
+                      <Checkbox
+                        checked={selectedSkills.includes(skill.skill_id)}
+                        onCheckedChange={() => handleSkillToggle(skill.skill_id)}
+                      />
+                    </TableCell>
+                    <TableCell className="text-center">{skill.skill_id}</TableCell>
+                    <TableCell className="text-center">{skill.skill_name}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={handleCancel}>
-            닫기
+
+        <div className="p-4 border-t border-gray-200 flex justify-center space-x-4">
+          
+        <Button 
+            onClick={handleConfirm}
+            className="w-24 h-10 text-base bg-blue-500 hover:bg-blue-600"
+          >
+            확인
+          </Button>
+
+          <Button 
+            variant="outline" 
+            onClick={handleCancel}
+            className="w-24 h-10 text-base"
+          >
+            취소
           </Button>
         </div>
-      </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 }

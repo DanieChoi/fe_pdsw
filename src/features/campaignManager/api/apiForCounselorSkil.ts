@@ -41,7 +41,7 @@ export async function assignSkillsToCounselor(
  * @param tenantId 테넌트 ID
  * @returns 할당 가능한 스킬 목록
  */
-export const apiForGetSkillListForCounselor = async (tenantId: number): Promise<CounselorSkillListResponse> => {
+export const getAssignableSkillsForCounselor = async (tenantId: number): Promise<CounselorSkillListResponse> => {
   const skillRequestData: CounselorSkillRequestData = {
     filter: {
       skill_id: { start: 1, end: 9999999 },
@@ -78,7 +78,7 @@ export const apiForGetSkillListForCounselor = async (tenantId: number): Promise<
  * @param counselorId 상담원 ID
  * @returns 상담원이 현재 보유한 스킬 목록
  */
-export const apiForGetSkillListByCounselorId = async (
+export const getAssignedSkillsForCounselor = async (
   counselorId: string
 ): Promise<CounselorSkillListResponse> => {
   console.log("📌 상담원 스킬 데이터 조회 시작:", counselorId);
@@ -118,8 +118,8 @@ export const apiForGetRelatedInfoForAssignSkilToCounselor = async (
 
   try {
     const [assignedSkills, assignableSkills] = await Promise.all([
-      apiForGetSkillListByCounselorId(counselorId), // 상담원이 보유한 스킬
-      apiForGetSkillListForCounselor(tenantId), // 할당 가능한 스킬 목록
+      getAssignedSkillsForCounselor(counselorId), // 상담원이 보유한 스킬
+      getAssignableSkillsForCounselor(tenantId), // 할당 가능한 스킬 목록
     ]);
 
     console.log("✅ 상담원이 보유한 스킬 목록:", assignedSkills);
