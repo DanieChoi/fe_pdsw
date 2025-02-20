@@ -131,3 +131,40 @@ export const apiForGetRelatedInfoForAssignSkilToCounselor = async (
     throw new Error("스킬 데이터를 가져오는 중 오류가 발생했습니다.");
   }
 };
+
+// 스킬을 가진 상담사 리스트에서 특정 상담사를 제외하는 api 요청 함수
+// skills/{skill_id}/agent-lis , apiForDeleteCounselorsForSpecificSkil
+/**
+ * 특정 스킬을 가진 상담사 목록에서 지정된 상담사들을 제외하는 API
+ * @param skillId 스킬 ID
+ * @param counselorIds 제외할 상담사 ID 배열
+ * @returns API 응답 결과
+ */
+export const apiForDeleteCounselorsForSpecificSkill = async (
+  skillId: number,
+  counselorIds: string[]
+): Promise<CounselorSkillAssignmentResponse> => {
+  console.log("📌 스킬에서 상담사 제외 시작");
+  console.log("🎯 대상 스킬 ID:", skillId);
+  console.log("🔗 제외할 상담사 목록:", counselorIds);
+
+  try {
+    const { data } = await axiosInstance.put<CounselorSkillAssignmentResponse>(
+      `skills/${skillId}/agent-list`,
+      {
+        request_data: {
+          agent_id: counselorIds
+        }
+      }
+    );
+
+    console.log("✅ 스킬을 가진 상담사 목록에서 특정 상담사들 제외 성공:", data);
+    return data;
+  } catch (error) {
+    console.error("❌ 스킬에서 상담사 제외 실패:", error);
+    const typedError = error as CounselorSkillApiError;
+    throw new Error(
+      typedError.response?.data?.result_msg || "스킬에서 상담사 제외 중 오류가 발생했습니다."
+    );
+  }
+};

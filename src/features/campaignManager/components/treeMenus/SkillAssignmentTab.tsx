@@ -34,9 +34,21 @@ export function SkillAssignmentTab() {
   }, [assignedSkills]);
 
   const handleSkillToggle = (skillId: number) => {
-    setSelectedSkills((prev) =>
-      prev.includes(skillId) ? prev.filter((id) => id !== skillId) : [...prev, skillId]
-    );
+    setSelectedSkills((prev) => {
+      const isCurrentlySelected = prev.includes(skillId);
+      
+      // 체크가 해제될 때 로그 출력
+      if (isCurrentlySelected) {
+        console.log("📌 체크 해제된 스킬 정보:", {
+          skillId: skillId,
+          counselorId: selectedCounselor.counselorId,
+        });
+      }
+
+      return isCurrentlySelected 
+        ? prev.filter(id => id !== skillId) 
+        : [...prev, skillId];
+    });
   };
 
   const handleCancel = () => {
@@ -49,14 +61,12 @@ export function SkillAssignmentTab() {
     console.log("선택된 스킬 ID:", selectedSkills);
     console.log("상담원 정보:", {
       counselorId: selectedCounselor.counselorId,
-      counselorName: selectedCounselor.counselorName,
-      tenantId: selectedCounselor.tenantId
     });
   };
 
   if (error) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center">
+      <div className="fixed top-[100px] left-[50px] z-50">
         <Card className="w-[480px] relative">
           <div className="p-6">
             <div className="text-red-500">Error: {error}</div>
@@ -68,7 +78,7 @@ export function SkillAssignmentTab() {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center">
+      <div className="fixed top-[100px] left-[50px] z-50">
         <Card className="w-[480px]">
           <div className="p-6">Loading...</div>
         </Card>
@@ -77,7 +87,7 @@ export function SkillAssignmentTab() {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center">
+    <div className="fixed top-[100px] left-[50px] z-50">
       <Card className="w-[480px] relative bg-white shadow-lg">
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-lg font-semibold">상담원 스킬 할당</h2>
@@ -87,7 +97,7 @@ export function SkillAssignmentTab() {
         </div>
         
         <div className="p-4">
-          <div className="text-sm text-gray-600 mb-4 bg-gray-50 p-3 rounded">
+          <div className="text-sm text-gray-600 mb-4">
             상담원에게 스킬을 할당 할 수 있는 창입니다.<br />
             상담원에게 할당할 스킬을 선택하시면 체크 후 확인 버튼을 누르시면 체크된 스킬들이 일괄 할당됩니다.<br />
             (상담원에게 최대 10개 스킬까지만 할당 가능 합니다.)
@@ -120,19 +130,17 @@ export function SkillAssignmentTab() {
           </div>
         </div>
 
-        <div className="p-4 border-t border-gray-200 flex justify-center space-x-4">
-          
-        <Button 
+        <div className="p-4 border-t border-gray-200 flex justify-center gap-2">
+          <Button 
             onClick={handleConfirm}
-            className="w-24 h-10 text-base bg-blue-500 hover:bg-blue-600"
+            className="px-8 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
           >
             확인
           </Button>
-
           <Button 
             variant="outline" 
             onClick={handleCancel}
-            className="w-24 h-10 text-base"
+            className="px-8 py-2 border border-gray-300 rounded"
           >
             취소
           </Button>
@@ -140,4 +148,6 @@ export function SkillAssignmentTab() {
       </Card>
     </div>
   );
+
 }
+
