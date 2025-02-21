@@ -5,7 +5,7 @@ export interface CounselorSkillRequestData {
       start: number;
       end: number;
     };
-    tenant_id: number[];
+    tenant_id?: number[];
   };
   sort: {
     skill_id: number;

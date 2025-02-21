@@ -22,6 +22,7 @@ import { SkillAssignmentTab } from "@/features/campaignManager/components/treeMe
 import BlackListCountPopup from "@/features/campaignManager/components/popups/BlackListCountPopup";
 import { TeamSkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/TeamSkillAssignmentTab";
 import { GroupSkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/GroupSkillAssignmentTab";
+import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCampaignTab";
 
 // 탭 ID별 실제 화면을 매핑하는 함수
 const renderContent = (tabId: number | null) => {
@@ -98,6 +99,16 @@ const renderContent = (tabId: number | null) => {
           </div>
         </div>
       );
+
+    case 603: // 스킬 옵션 설정 for 캠페인탭 필터
+      return (
+        <div className="flex justify-left w-full">
+          <div className="max-w-[500px] w-full">
+            <SkilFilterOptionPannelForCampaignTab />
+          </div>
+        </div>
+      );
+
 
     // case 602: // 그룹 스킬 할당 탭
     //   return (

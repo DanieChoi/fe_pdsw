@@ -35,7 +35,7 @@ export const useApiForGetRelatedInfoForAssignSkilToCounselor = (
                     tenantId
                 );
 
-                console.log("✅ 상담원이 보유한 스킬:", assignedSkills);
+                // console.log("✅ 상담원이 보유한 스킬:", assignedSkills);
                 console.log("✅ 상담원에게 할당 가능한 스킬:", assignableSkills);
 
                 setAssignedSkills(assignedSkills);

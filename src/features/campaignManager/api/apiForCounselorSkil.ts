@@ -42,10 +42,14 @@ export async function assignSkillsToCounselor(
  * @returns 할당 가능한 스킬 목록
  */
 export const getAssignableSkillsForCounselor = async (tenantId: number): Promise<CounselorSkillListResponse> => {
+
+  console.log("📌 상담원 할당 가능 스킬 목록 조회 시작:", tenantId);
+  console.log("🔗 테넌트 ID 타입:", typeof tenantId);
+
   const skillRequestData: CounselorSkillRequestData = {
     filter: {
       skill_id: { start: 1, end: 9999999 },
-      tenant_id: [tenantId],
+      // tenant_id: [tenantId],
     },
     sort: {
       skill_id: 0,
@@ -59,12 +63,17 @@ export const getAssignableSkillsForCounselor = async (tenantId: number): Promise
       skillRequestData
     );
 
-    if (data.result_code === 0 && data.result_msg === "Success") {
-      console.log("✅ 상담원 할당 가능 스킬 목록 조회 성공:", data);
-      return data;
-    } else {
-      throw new Error(`API Error: ${data.result_msg}`);
-    }
+    console.log("✅ 상담원 할당 가능 스킬 목록 조회 성공 ???????????????????????????? ", data);
+    
+
+    return data;
+
+    // if (data.result_code === 0 && data.result_msg === "Success") {
+    //   console.log("✅ 상담원 할당 가능 스킬 목록 조회 성공:", data);
+    //   return data;
+    // } else {
+    //   throw new Error(`API Error: ${data.result_msg}`);
+    // }
   } catch (error) {
     const typedError = error as CounselorSkillApiError;
     throw new Error(
@@ -81,7 +90,7 @@ export const getAssignableSkillsForCounselor = async (tenantId: number): Promise
 export const getAssignedSkillsForCounselor = async (
   counselorId: string
 ): Promise<CounselorSkillListResponse> => {
-  console.log("📌 상담원 스킬 데이터 조회 시작:", counselorId);
+  // console.log("📌 상담원 스킬 데이터 조회 시작:", counselorId);
 
   try {
     const { data } = await axiosInstance.post<CounselorSkillListResponse>(
@@ -93,7 +102,7 @@ export const getAssignedSkillsForCounselor = async (
       }
     );
 
-    console.log("✅ 상담원이 보유한 스킬 목록 조회 성공:", data);
+    // console.log("✅ 상담원이 보유한 스킬 목록 조회 성공:", data);
     return data;
   } catch (error) {
     const typedError = error as CounselorSkillApiError;
@@ -114,7 +123,7 @@ export const apiForGetRelatedInfoForAssignSkilToCounselor = async (
   counselorId: string,
   tenantId: number
 ): Promise<{ assignedSkills: CounselorSkillListResponse; assignableSkills: CounselorSkillListResponse }> => {
-  console.log("📌 상담원 스킬 데이터 조회 시작:", counselorId, tenantId);
+  // console.log("📌 상담원 스킬 데이터 조회 시작:", counselorId, tenantId);
 
   try {
     const [assignedSkills, assignableSkills] = await Promise.all([
@@ -122,8 +131,8 @@ export const apiForGetRelatedInfoForAssignSkilToCounselor = async (
       getAssignableSkillsForCounselor(tenantId), // 할당 가능한 스킬 목록
     ]);
 
-    console.log("✅ 상담원이 보유한 스킬 목록:", assignedSkills);
-    console.log("✅ 상담원에게 할당 가능한 스킬 목록:", assignableSkills);
+    // console.log("✅ 상담원이 보유한 스킬 목록:", assignedSkills);
+    // console.log("✅ 상담원에게 할당 가능한 스킬 목록:", assignableSkills);
 
     return { assignedSkills, assignableSkills };
   } catch (error) {

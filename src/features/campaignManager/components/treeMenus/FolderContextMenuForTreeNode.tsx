@@ -63,7 +63,24 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
     {
       id: 23,
       title: "선택한 스킬 보기",
-      handler: () => toggleMenu(23),
+      handler: () => {
+        toggleMenu(23);
+
+        // 603번 탭이 이미 열려있는지 확인하고 없으면 추가
+        if (!openedTabs.some((tab) => tab.id === 603)) {
+          addTab({
+            id: 603,
+            uniqueKey: "603",
+            title: "스킬 옵션 설정",
+            icon: "",
+            href: "",
+            content: null,
+          });
+        }
+
+        // 603번 탭을 활성화
+        setActiveTab(603, "603");
+      },
     },
   ];
 
@@ -75,7 +92,7 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
           onClick={menuItem.handler}
           className="cursor-pointer hover:bg-blue-50 focus:bg-blue-50 flex items-center px-2 h-6 text-gray-700"
         >
-          {/* 체크박스가 필요한 메뉴는 체크박스 표시, 아니면 동일 크기의 빈 자리 */}
+          {/* 체크박스가 필요한 메뉴는 체크박스 표시 */}
           {checkableMenuIds.includes(menuItem.id) ? (
             <span className="w-4 h-4 mr-2 flex justify-center items-center border border-gray-300 rounded-sm">
               {selectedMenus.includes(menuItem.id) && (

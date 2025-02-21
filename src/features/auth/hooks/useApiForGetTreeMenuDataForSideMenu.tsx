@@ -15,8 +15,8 @@ export function useApiForGetTreeMenuDataForSideMenu() {
   const query = useQuery<TabData[], Error>({
     queryKey: ["treeMenuDataForSideMenu"],
     queryFn: apiForGetTreeMenuDataForSideMenu,
-    staleTime: 5 * 60 * 1000, // 5분 캐싱
-    refetchOnWindowFocus: false,
+    // staleTime: 5 * 60 * 1000, // 5분 캐싱
+    // refetchOnWindowFocus: false,
   });
 
 

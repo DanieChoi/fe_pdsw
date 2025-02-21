@@ -134,7 +134,7 @@ export function TeamSkillAssignmentTab() {
 
   if (isLoading) {
     return (
-      <div className="fixed top-[100px] left-[50px] z-50">
+      <div className="">
         <Card className="w-[480px]">
           <div className="p-6">Loading...</div>
         </Card>
@@ -143,7 +143,7 @@ export function TeamSkillAssignmentTab() {
   }
 
   return (
-    <div className="fixed top-[100px] left-[50px] z-50">
+    <div className="">
       <Card className="w-[480px] relative bg-white shadow-lg">
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-lg font-semibold">팀 스킬 할당</h2>
