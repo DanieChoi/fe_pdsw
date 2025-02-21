@@ -1,4 +1,5 @@
-// src/features/listManager/types/listManagerIndex.ts
+// src/features/monitoring/types/monitoringIndex.ts
+
 // 캠페인진행정보 요청 
 export interface CampaignProgressInformationRequest {
   tenantId: number;
@@ -72,6 +73,41 @@ export interface CampaignProgressInformationResponse {
   message: string;
   progressInfoList: CampaignProgressInformationResponseDataType[];
 }
+
+// 캠페인 운영 이력 조회 요청 
+export interface CampaignHistoryRequest {
+  campaign_id: number[];
+  dial_kind: number[];
+}
+
+// 캠페인 운영 이력 조회 응답 데이터 타입
+export interface CampaignHistoryResponseDataType {
+  campaign_id: number;
+  campaign_sequence: number;
+  tenant_id: number;
+  campaign_name: string;
+  dial_kind: number;
+  delete_flag: number;
+  complete_flag: number;
+  start_date: string;
+  start_time: string;
+  end_time: string;
+  running_time: number;
+  list_count: number;
+  agent_count: number;
+  success_count: number;
+  failure_count: number;
+}
+
+// 캠페인 운영 이력 조회 응답
+export interface CampaignHistoryResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: CampaignHistoryResponseDataType[];
+}
+
 
 // 모니터링 API 에러 타입
 export interface MonitoringApiError {
