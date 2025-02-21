@@ -125,6 +125,7 @@ const RebroadcastSettingsPanel = () => {
     const [outgoingResultDisabled,setOutgoingResultDisabled ] = useState<boolean>(false);
     const [sequenceNumber, setSequenceNumber] = useState<number>(1);
     const [caseType, setCaseType] = useState<number>(0);
+    const [textType, setTextType] = useState<string>('');
 
     // 발신결과 체크박스 상태 관리
     const [selectedOutgoingResults, setSelectedOutgoingResults] = useState<{ [key: string]: boolean }>(initOutgoingResult);
@@ -318,6 +319,7 @@ const RebroadcastSettingsPanel = () => {
         //발신결과 disabled 설정.
         setOutgoingResultDisabled(false);   
 
+        setTextType('재발신 추가중');
         setRebroadcastList([...rebroadcastList, newRebroadcast]);
         resetAllStates();
     };
@@ -329,6 +331,7 @@ const RebroadcastSettingsPanel = () => {
               campaign_id: Number(campaignIdForUpdateFromSideMenu)
               , sequence_number: selectedRebroadcastId
             });
+            setTextType('');
         }
     };
 
@@ -406,7 +409,7 @@ const RebroadcastSettingsPanel = () => {
     //적용 버튼 클릭 이벤트.
     const handleApplyRebroadcast = () => {
         // 예약 모드에서 실제 데이터 처리
-        if (broadcastType === "reservation") {
+        if (broadcastType === "reservation") {            
             const selectedResults = Object.entries(selectedOutgoingResults)
                 .filter(([_, isSelected]) => isSelected)
                 .map(([key]) => key);
@@ -679,6 +682,7 @@ const RebroadcastSettingsPanel = () => {
             setReservationShouldShowAdd(true);
             setReservationShouldShowDelete(true);
 
+            setTextType('미실행');
         }
     });
     
@@ -754,7 +758,7 @@ const RebroadcastSettingsPanel = () => {
                 if( data.result_data.redial_count > 0){           
                     setAlertState({
                         isOpen: true,
-                        message: `캠페인 아이디 : ${campaignIdForUpdateFromSideMenu} 캠페인을 바로 시작하시겠습니까?`,
+                        message: `캠페인 아이디 : ${campaignIdForUpdateFromSideMenu} \n캠페인을 바로 시작하시겠습니까?`,
                         title: '재발신 적용',
                         type: '1',
                         onClose: handleCampaignCurrentRedial,
@@ -943,6 +947,9 @@ const RebroadcastSettingsPanel = () => {
                                 />
                                 <Label htmlFor="outgoing-type" className="text-sm">
                                     발신구분
+                                </Label>
+                                <Label className="text-sm">
+                                    {textType}
                                 </Label>
                             </div>
                             <div className={`border p-2 rounded py-[20px] px-[20px] flex flex-col gap-6 ${!outgoingTypeChecked ? "opacity-50 pointer-events-none" : ""}`} style={{ height: "calc(100% - 29px)" }}>

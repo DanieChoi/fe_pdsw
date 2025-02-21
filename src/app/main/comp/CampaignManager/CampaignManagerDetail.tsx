@@ -360,7 +360,7 @@ export default function CampaignDetail() {
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
-    if (selectedCampaign !== null) {
+    if ( typeof selectedCampaign !== 'undefined' && selectedCampaign !== null) {
       // setChangeYn(false);
       // setCampaignInfoChangeYn(true);
       setTempCampaignsInfo({
@@ -1168,19 +1168,35 @@ export default function CampaignDetail() {
             });
           } else {
             //캠페인관리 화면 닫기.
+            fetchMain({
+              session_key: '',
+              tenant_id: 0,
+            });
             removeTab(Number(activeTabId), activeTabKey + '');
           }
         } else {
           //캠페인관리 화면 닫기.
+          fetchMain({
+            session_key: '',
+            tenant_id: 0,
+          });
           removeTab(Number(activeTabId), activeTabKey + '');
         }
       } else {
         //캠페인관리 화면 닫기.
+        fetchMain({
+          session_key: '',
+          tenant_id: 0,
+        });
         removeTab(Number(activeTabId), activeTabKey + '');
       }
     },onError: (data) => {
       // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
       //캠페인관리 화면 닫기.
+      fetchMain({
+        session_key: '',
+        tenant_id: 0,
+      });
       removeTab(Number(activeTabId), activeTabKey + '');
     }
   });
@@ -1190,6 +1206,10 @@ export default function CampaignDetail() {
   const { mutate: fetchAutoRedialDelete } = useApiForAutoRedialDelete({
     onSuccess: (data) => {
       //캠페인관리 화면 닫기.
+      fetchMain({
+        session_key: '',
+        tenant_id: 0,
+      });
       removeTab(Number(activeTabId), activeTabKey + '');
     }
   });
