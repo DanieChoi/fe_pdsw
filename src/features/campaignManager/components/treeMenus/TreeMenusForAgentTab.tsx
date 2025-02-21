@@ -69,9 +69,7 @@ export function TreeMenusForAgentTab() {
     });
   };
 
-
   console.log("상담원 데이터 확인 : ", data);
-  
 
   if (isLoading) {
     return <div>로딩중...</div>;

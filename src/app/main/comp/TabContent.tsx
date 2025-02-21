@@ -109,14 +109,14 @@ const renderContent = (tabId: number | null) => {
         </div>
       );
 
-    case 602: // 그룹 스킬 할당 탭
-      return (
-        <div className="flex justify-left w-full">
-          <div className="max-w-[500px] w-full">
-            그룹 스킬 할당
-          </div>
-        </div>
-      );
+    // case 602: // 그룹 스킬 할당 탭
+    //   return (
+    //     <div className="flex justify-left w-full">
+    //       <div className="max-w-[500px] w-full">
+    //         그룹 스킬 할당
+    //       </div>
+    //     </div>
+    //   );
 
     default:
       return (
