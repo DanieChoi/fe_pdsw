@@ -1,4 +1,3 @@
-// src\features\campaignManager\components\treeMenus\ContextMenuForTreeNode.tsx
 "use client";
 
 import {
@@ -14,7 +13,7 @@ import {
 import { useTabStore } from "@/store/tabStore";
 import { 
   Edit, Copy, Activity, Trash2, Monitor, Settings, Search, List, Clock, History, 
-  UserCheck, Shield, RefreshCcw, AlertTriangle 
+  UserCheck, Shield, RefreshCcw, AlertTriangle, Check 
 } from "lucide-react";
 import { CampaignStatus } from "./CampaignContextMenuForTreeNode";
 import { useState } from "react";
@@ -56,9 +55,6 @@ export function ContextMenuForTreeNode({
   };
 
   const handleRebroadcastClick = () => {
-   // simulateHeaderMenuClick(5);
-
-    // 20번에 대해 add tab 예약 재발신
     addTab({
       id: 20,
       uniqueKey: '20',
@@ -67,12 +63,9 @@ export function ContextMenuForTreeNode({
       href: '',
       content: null,
     });
-
   };
 
   const handleMonitorClick = () => {
-    // simulateHeaderMenuClick(3);
-    // 상담원 상태 모니터 add tab 21
     addTab({
       id: 22,
       uniqueKey: '22',
@@ -83,17 +76,26 @@ export function ContextMenuForTreeNode({
     });
   };
 
-  const handleStartClick = () => {
+  const handleStartClick = (status: CampaignStatus) => {
     simulateHeaderMenuClick(14);
+    // Here you would typically update the campaign status via API
+    console.log(`Changing status to: ${status}`);
   };
 
   const handleBlacklistCountCheckClick = () => {
-    // 컨텍스트 메뉴를 명시적으로 닫음
     document.body.click();
-    // 약간의 딜레이 후 팝업을 엶
     setTimeout(() => {
       setIsBlacklistPopupOpen(true);
     }, 100);
+  };
+
+  // Function to render the checkbox based on current status
+  const renderStatusCheckbox = (currentStatus: CampaignStatus, targetStatus: CampaignStatus) => {
+    return currentStatus === targetStatus ? (
+      <Check className="mr-2 h-4 w-4 text-green-500" />
+    ) : (
+      <div className="w-4 h-4 mr-2 border rounded" />
+    );
   };
 
   return (
@@ -112,16 +114,16 @@ export function ContextMenuForTreeNode({
             시작구분
           </ContextMenuSubTrigger>
           <ContextMenuSubContent className="w-48">
-            <ContextMenuItem onClick={handleStartClick}>
-              <Clock className="mr-2 h-4 w-4" />
+            <ContextMenuItem onClick={() => handleStartClick('started')} className="flex items-center">
+              {renderStatusCheckbox(item.status, 'started')}
               시작
             </ContextMenuItem>
-            <ContextMenuItem onClick={handleStartClick}>
-              <List className="mr-2 h-4 w-4" />
+            <ContextMenuItem onClick={() => handleStartClick('pending')} className="flex items-center">
+              {renderStatusCheckbox(item.status, 'pending')}
               멈춤
             </ContextMenuItem>
-            <ContextMenuItem onClick={handleStartClick}>
-              <History className="mr-2 h-4 w-4" />
+            <ContextMenuItem onClick={() => handleStartClick('stopped')} className="flex items-center">
+              {renderStatusCheckbox(item.status, 'stopped')}
               중지
             </ContextMenuItem>
           </ContextMenuSubContent>
@@ -166,7 +168,6 @@ export function ContextMenuForTreeNode({
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
-    {/* 팝업은 컨텍스트 메뉴와 분리하여 최상위에 위치시킵니다 */}
     {isBlacklistPopupOpen && (
         <BlackListCountPopup
           campaignId={item.id}
