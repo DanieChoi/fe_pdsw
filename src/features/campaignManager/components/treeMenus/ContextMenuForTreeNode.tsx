@@ -15,9 +15,12 @@ import {
   Edit, Copy, Activity, Trash2, Monitor, Settings, Search, List, Clock, History, 
   UserCheck, Shield, RefreshCcw, AlertTriangle, Check 
 } from "lucide-react";
-import { CampaignStatus } from "./CampaignContextMenuForTreeNode";
 import { useState } from "react";
 import BlackListCountPopup from '@/features/campaignManager/components/popups/BlackListCountPopup';
+import { toast } from 'react-toastify';
+import { useApiForCampaignStatusUpdate } from "../../hooks/useApiForCampaignStatusUpdate";
+
+export type CampaignStatus = 'started' | 'pending' | 'stopped';
 
 interface ContextMenuForTreeNodeProps {
   children: React.ReactNode;
@@ -44,6 +47,49 @@ export function ContextMenuForTreeNode({
   const isFolder = item.type === "folder";
   const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab } = useTabStore();
   const [isBlacklistPopupOpen, setIsBlacklistPopupOpen] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState<CampaignStatus>(item.status);
+
+  const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
+    onSuccess: (data) => {
+      // if (String(data.result_code) === "0000") {
+      //   toast.success("캠페인 상태가 성공적으로 변경되었습니다.", {
+      //     position: "top-right",
+      //     autoClose: 3000,
+      //     hideProgressBar: false,
+      //     closeOnClick: true,
+      //     pauseOnHover: true,
+      //     draggable: true,
+      //   });
+      // } else {
+      //   toast.error(data.result_msg || "상태 변경 중 오류가 발생했습니다.", {
+      //     position: "top-right",
+      //     autoClose: 3000,
+      //     hideProgressBar: false,
+      //     closeOnClick: true,
+      //     pauseOnHover: true,
+      //     draggable: true,
+      //   });
+      // }
+      toast.success("캠페인 상태가 성공적으로 변경되었습니다.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    },
+    onError: (error) => {
+      toast.error(error.message || "상태 변경 중 오류가 발생했습니다.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    },
+  });
 
   const handleEditMenuClick = () => {
     simulateHeaderMenuClick(2);
@@ -76,10 +122,49 @@ export function ContextMenuForTreeNode({
     });
   };
 
-  const handleStartClick = (status: CampaignStatus) => {
-    simulateHeaderMenuClick(14);
-    // Here you would typically update the campaign status via API
-    console.log(`Changing status to: ${status}`);
+  const getStatusNumber = (status: CampaignStatus): number => {
+    switch (status) {
+      case 'started': return 1;
+      case 'pending': return 2;
+      case 'stopped': return 3;
+      default: return 0;
+    }
+  };
+  
+  const handleStartClick = async (status: CampaignStatus) => {
+    try {
+      console.log('Status change requested:', {
+        campaignId: item.id,
+        campaignName: item.label,
+        previousStatus: currentStatus,
+        newStatus: status
+      });
+  
+      // API 호출
+      await updateCampaignStatusMutation.mutateAsync({
+        campaign_id: Number(item.id),
+        campaign_status: getStatusNumber(status)
+      });
+  
+      // 로컬 상태 업데이트
+      setCurrentStatus(status);
+      simulateHeaderMenuClick(14);
+  
+      console.log('Status changed successfully:', {
+        campaignId: item.id,
+        campaignName: item.label,
+        status: status,
+        timestamp: new Date().toISOString()
+      });
+  
+    } catch (error) {
+      console.error('Error changing campaign status:', {
+        campaignId: item.id,
+        campaignName: item.label,
+        attemptedStatus: status,
+        error: error
+      });
+    }
   };
 
   const handleBlacklistCountCheckClick = () => {
@@ -89,12 +174,13 @@ export function ContextMenuForTreeNode({
     }, 100);
   };
 
-  // Function to render the checkbox based on current status
-  const renderStatusCheckbox = (currentStatus: CampaignStatus, targetStatus: CampaignStatus) => {
+  const renderStatusCheckbox = (targetStatus: CampaignStatus) => {
+    const isLoading = updateCampaignStatusMutation.isPending && currentStatus === targetStatus;
+    
     return currentStatus === targetStatus ? (
-      <Check className="mr-2 h-4 w-4 text-green-500" />
+      <Check className={`mr-2 h-4 w-4 text-green-500 ${isLoading ? 'opacity-50' : ''}`} />
     ) : (
-      <div className="w-4 h-4 mr-2 border rounded" />
+      <div className={`w-4 h-4 mr-2 border rounded ${isLoading ? 'opacity-50' : ''}`} />
     );
   };
 
@@ -114,16 +200,28 @@ export function ContextMenuForTreeNode({
             시작구분
           </ContextMenuSubTrigger>
           <ContextMenuSubContent className="w-48">
-            <ContextMenuItem onClick={() => handleStartClick('started')} className="flex items-center">
-              {renderStatusCheckbox(item.status, 'started')}
+            <ContextMenuItem 
+              onClick={() => handleStartClick('started')} 
+              className="flex items-center"
+              disabled={updateCampaignStatusMutation.isPending}
+            >
+              {renderStatusCheckbox('started')}
               시작
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => handleStartClick('pending')} className="flex items-center">
-              {renderStatusCheckbox(item.status, 'pending')}
+            <ContextMenuItem 
+              onClick={() => handleStartClick('pending')} 
+              className="flex items-center"
+              disabled={updateCampaignStatusMutation.isPending}
+            >
+              {renderStatusCheckbox('pending')}
               멈춤
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => handleStartClick('stopped')} className="flex items-center">
-              {renderStatusCheckbox(item.status, 'stopped')}
+            <ContextMenuItem 
+              onClick={() => handleStartClick('stopped')} 
+              className="flex items-center"
+              disabled={updateCampaignStatusMutation.isPending}
+            >
+              {renderStatusCheckbox('stopped')}
               중지
             </ContextMenuItem>
           </ContextMenuSubContent>
