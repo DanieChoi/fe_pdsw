@@ -208,7 +208,7 @@ export function TreeMenusForCampaigns() {
   }, [isLoading, error, treeData, expandNodes, originalItems]);
 
   if (isLoading) {
-    return <div className="p-4 min-h-[calc(100%-148px)]">Loading...</div>;
+    return <div className="p-4 flex-1">Loading...</div>;
   }
   if (error) {
     return <div className="p-4 text-red-600">{(error as Error).message}</div>;

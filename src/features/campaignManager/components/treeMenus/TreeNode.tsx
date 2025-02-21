@@ -365,7 +365,7 @@ export function TreeNode({
                     />
                   )
                 ) : (
-                  <span className="w-4" />
+                  <span className="w-3" />
                 )}
                 {getNodeIcon()}
                 <span className={clsx("text-sm", { "font-medium": isSelected })}>
@@ -420,7 +420,7 @@ export function TreeNode({
       )}
 
       {hasChildren && isExpanded && (
-        <div>
+        <div className="space-y-1">
           {item.children?.map((child: typeof item) => (
             <TreeNode
               key={child.id}

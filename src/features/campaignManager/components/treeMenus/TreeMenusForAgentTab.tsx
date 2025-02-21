@@ -76,7 +76,7 @@ export function TreeMenusForAgentTab() {
   }
 
   return (
-    <div className="flex-1 overflow-auto">
+    <div className="flex-1 overflow-auto tree-node">
       {data?.organizationList.map((org) => (
         <TreeNodeForCounselorListForSideBar
           key={`org-${org.centerId}`}
