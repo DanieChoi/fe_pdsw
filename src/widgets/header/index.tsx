@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { CommonButton } from "@/components/shared/CommonButton";
 import { Check, LayoutGrid } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -233,7 +233,7 @@ export default function Header() {
               :role_id === 6?'전체'
               :''})</span>
             </div>
-            <Button
+            <CommonButton
               variant="ghost"
               className="flex items-center space-x-1 text-sm text-white hover:bg-[#56CAD6]/20"
               onClick={handleLoginOut}
@@ -245,7 +245,7 @@ export default function Header() {
                 height={10}
                 priority
               />
-            </Button>
+            </CommonButton>
           </div>
         </div>
       </div>
@@ -260,18 +260,18 @@ export default function Header() {
 
                 return (
                   <div key={`menu-${item.id}`} className="menu-item">
-                    <Button
+                    <CommonButton
                       variant={isActive ? 'menuActive' : (isOpened ? 'menuOpened' : 'menu')}
                       size="none"
                       onClick={(e) => handleMenuClick(item, e)}
-                      className="relative p-2"
+                      className="relative py-1.5 px-2"
                     >
                       {/* {isActive && (
                         <div className="absolute top-1 right-1">
                           <Check className="w-3 h-3 text-[#fff]" />
                         </div>
                       )} */}
-                      <div className="flex items-center justify-center p-1">
+                      <div className="flex items-center justify-center">
                         <Image
                           src={item.icon}
                           alt={item.title}
@@ -288,7 +288,7 @@ export default function Header() {
                           </span>
                         )}
                       </div>
-                    </Button>
+                    </CommonButton>
                   </div>
                 );
               })}
@@ -296,16 +296,16 @@ export default function Header() {
             <div>
 
               <div className="flex items-center gap-2">
-                <Button
+                <CommonButton
                   variant="outline"
                   size="sm"
                   onClick={() => setIsSplitDialogOpen(true)}
-                  className="flex items-center gap-2 text-gray-600 hover:bg-gray-50"
+                  className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 border-gray-300"
                 >
                   {/* 화면 분할에 어울리는 아이콘 lucide icon*/}
                   <LayoutGrid size={16} />
-                  <span className="text-xs">화면 분할</span>
-                </Button>
+                  <span className="text-sm">화면 분할</span>
+                </CommonButton>
 
                 <SplitScreenDialog
                   isOpen={isSplitDialogOpen}

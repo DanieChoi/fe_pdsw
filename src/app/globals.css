@@ -148,7 +148,7 @@ input::placeholder {
 
 
 .header-padding{
-  padding: 10px 28px;
+  padding: 9px 28px;
 }
 
 /*laylout*/
@@ -294,6 +294,11 @@ input::placeholder {
   outline-offset: -1px;
 }
 .grid-custom .rdg-row .rdg-cell{
+  border-bottom: 1px solid #ebebeb;
+  text-align: center;
+  font-size: 13px;
+}
+.grid-custom.text-left .rdg-row .rdg-cell{
   border-bottom: 1px solid #ebebeb;
   text-align: center;
   font-size: 13px;
