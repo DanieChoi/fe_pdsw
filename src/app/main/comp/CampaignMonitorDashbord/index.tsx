@@ -38,6 +38,16 @@ const CampaignMonitorDashboard: React.FC = () => {
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
   const [campaignInfo, setCampaignInfo] = useState<MainDataResponse | null>(null);
   const [dataList, setDataList] = useState<CampaignProgressInformationResponseDataType[]>([]);
+  const [campaignIdList, setCampaignIdList ] = useState<number[]>([]);
+  const [usageTimePopupState, setUsageTimePopupState] = useState<{
+    campaignIdList: number[];
+    dialKindList: number[];
+    isOpen: boolean;
+  }>({
+    campaignIdList: [],
+    dialKindList: [],
+    isOpen: false,
+  });
 
   // 발신구분 데이터 (실제로는 API에서 받아올 데이터)
   const callList: CallItem[] = [
@@ -71,6 +81,7 @@ const CampaignMonitorDashboard: React.FC = () => {
       });
       const tempCampaign = campaigns.filter(data => data.campaign_id === 101)[0];
       setCampaignInfo( tempCampaign );
+      setCampaignIdList([101]);
   }, []);
   
   // useEffect(() => {
@@ -155,8 +166,13 @@ const CampaignMonitorDashboard: React.FC = () => {
 
         <div className="flex justify-end gap-2">
           <CommonButton 
-            onClick={() => setIsModalOpen(true)}
-            >
+            onClick={() => 
+              setUsageTimePopupState({
+                ...usageTimePopupState,
+                campaignIdList: campaignIdList,
+                dialKindList: [selectedCall?.reuseCnt || 0],
+                isOpen: true,
+              }) }>
             사용 시간 보기
           </CommonButton>
         </div>
@@ -169,8 +185,10 @@ const CampaignMonitorDashboard: React.FC = () => {
 
       {/* 사용 시간 팝업 */}
       <UsageTimePopup 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        campaignIdList={usageTimePopupState.campaignIdList}
+        dialKindList={usageTimePopupState.dialKindList}
+        isOpen={usageTimePopupState.isOpen}
+        onClose={() => setUsageTimePopupState((prev) => ({ ...prev, isOpen: false }))}
       />
 
     </div>
