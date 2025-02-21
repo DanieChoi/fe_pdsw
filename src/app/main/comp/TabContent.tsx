@@ -111,7 +111,7 @@ const renderContent = (tabId: number | null) => {
     default:
       return (
         <div className="flex items-center justify-center h-full text-gray-500">
-          알 수 없는 탭 ID입니다. (ID: {tabId})
+          탭을 선택해 주세요!
         </div>
       );
   }
