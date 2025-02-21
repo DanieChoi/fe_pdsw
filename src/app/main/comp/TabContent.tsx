@@ -80,16 +80,6 @@ const renderContent = (tabId: number | null) => {
           </div>
         </div>
       );
-    // case 601: // 팀 스킬 할당 탭
-    //   return (
-    //     <div className="flex justify-left w-full">
-    //       <div className="max-w-[500px] w-full">
-    //         팀 스킬 할당
-    //       </div>
-    //     </div>
-    //   );
-
-    // TabContent.tsx의 renderContent 함수 내부
 
     case 601: // 팀 스킬 할당 탭
       return (
