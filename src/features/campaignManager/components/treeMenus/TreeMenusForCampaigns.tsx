@@ -168,11 +168,11 @@ export function TreeMenusForCampaigns() {
 
   // 서버사이드 렌더링 시 기본 로딩 상태 반환
   if (!mounted) {
-    return <div className="p-4">Loading...</div>;
+    return <div className="p-4 min-h-[calc(100%-148px)]">Loading...</div>;
   }
 
   if (isLoading) {
-    return <div className="p-4">Loading...</div>;
+    return <div className="p-4 min-h-[calc(100%-148px)]">Loading...</div>;
   }
 
   if (error) {

@@ -23,7 +23,7 @@ export function TabActions({
   switch (tabId) {
     case 'campaign':
       return (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <FilterButtonForCampaign 
             onFilter={onFilter} 
             selectedFilter={selectedFilter}
@@ -36,7 +36,7 @@ export function TabActions({
       );
     case 'agent':
       return (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <SortButtonForAgent
             onSort={onSort}
             selectedSort={selectedSort}
@@ -45,7 +45,7 @@ export function TabActions({
       );
     case 'agent-group':
       return (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <FilterButtonForCounsellorGroup
             // onFilter={onFilter}
             // selectedFilter={selectedFilter}

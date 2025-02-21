@@ -4,8 +4,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
-import { Filter } from "lucide-react"
 import { FilterType } from '@/features/campaignManager/types/typeForSidebar2';
+import Image from 'next/image'
 
 interface FilterButtonForCampaignProps {
   onFilter?: (type: FilterType) => void;
@@ -25,9 +25,14 @@ export function FilterButtonForCampaign({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-6 px-2 text-xs font-normal">
+        <Button variant="ghost" size="sm" className="h-6 px-0 text-sm font-normal gap-1 text-[#888] hover:bg-transparent">
           필터
-          <Filter className="h-3 w-3 ml-1" />
+           <Image 
+              src={`/tree-menu/filter.png`} 
+              alt={`필터`} 
+              width={9} 
+              height={10} 
+            />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-28 p-1" align="end">

@@ -101,6 +101,10 @@
   }
 }
 
+.text-sm{
+  font-size: 13px;
+}
+
 .body-top{
   height: 100vh;
 }

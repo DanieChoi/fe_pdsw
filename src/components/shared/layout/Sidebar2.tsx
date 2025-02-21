@@ -132,6 +132,7 @@ import { TreeMenusForAgentTab } from "@/features/campaignManager/components/tree
 import { TreeMenusForAgentGroupTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentGroupTab";
 import { TabActions } from "./comp/TabActions";
 import { BottomTabsForSideMenu } from "./BottomTabsForSideMenu";
+import Image from 'next/image'
 
 interface SidebarWidthState {
   width: number;
@@ -139,12 +140,12 @@ interface SidebarWidthState {
 }
 
 export const useSidebarWidthStore = create<SidebarWidthState>((set) => ({
-  width: 330,
+  width: 240,
   setWidth: (width: number) => set({ width }),
 }));
 
 export default function SidebarContainer() {
-  const [width, setWidth] = useState(330);
+  const [width, setWidth] = useState(240);
   const [selectedTabId, setSelectedTabId] = useState<TabId>("campaign");
   const [isResizing, setIsResizing] = useState(false);
 
@@ -192,13 +193,23 @@ export default function SidebarContainer() {
     <div className="flex h-full bg-white border-r">
       <div className="flex flex-col w-full" style={{ width: `${width}px` }}>
         {/* 상단 헤더 */}
-        <div className="flex-none flex items-center justify-between p-2 bg-gray-50 px-3 border-b">
-          <div className="flex items-center gap-2 py-1.5">
-            <span className="text-sm text-gray-800 font-medium">
+        <div className="flex-none flex items-center justify-between py-1.5 px-[17px] border-b">
+          <div className="flex items-center gap-2">
+            <div className="text-sm text-[#444] font-medium flex gap-2 items-center">
+              <div>
+                {selectedTabId && (
+                  <Image 
+                    src={baseTabs.find((tab) => tab.id === selectedTabId)?.icon || "/tree-menu/campaign_icon_for_sidemenu.png"} 
+                    alt={baseTabs.find((tab) => tab.id === selectedTabId)?.label || "탭아이콘"} 
+                    width={baseTabs.find((tab) => tab.id === selectedTabId)?.iconWidth || 13} 
+                    height={baseTabs.find((tab) => tab.id === selectedTabId)?.iconHeight || 13} 
+                  />
+                )}
+              </div>
               {baseTabs.find((tab) => tab.id === selectedTabId)?.label}
-            </span>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <TabActions tabId={selectedTabId} />
           </div>
         </div>

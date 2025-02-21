@@ -53,7 +53,7 @@ export function BottomTabsForSideMenu({ selectedTabId, onTabChange }: BottomTabs
             ${
               selectedTabId === tab.id
                 ? "bg-[#F1FBFC] text-[#02AFBF]"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-800"
+                : "text-[#444] hover:bg-gray-50 hover:text-gray-800"
             }`}
           onClick={() => onTabChange(tab.id)}
         >

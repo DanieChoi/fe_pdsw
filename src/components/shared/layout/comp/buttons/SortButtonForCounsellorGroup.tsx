@@ -4,7 +4,7 @@ import {
     PopoverTrigger,
   } from "@/components/ui/popover"
   import { Button } from "@/components/ui/button"
-  import { SortAsc } from "lucide-react"
+  import Image from 'next/image'
   import { SortType } from '@/features/campaignManager/types/typeForSidebar2';
   
   interface Props {
@@ -26,9 +26,14 @@ import {
     return (
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-6 px-2 text-xs font-normal">
+          <Button variant="ghost" size="sm" className="h-6 px-0 text-sm font-normal gap-1 text-[#888] hover:bg-transparent">
             정렬
-            <SortAsc className="h-3 w-3 ml-1" />
+            <Image 
+                src={`/tree-menu/array.png`} 
+                alt={`정렬`} 
+                width={9} 
+                height={10} 
+              />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-32 p-1" align="end">
