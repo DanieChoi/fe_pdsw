@@ -53,6 +53,8 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
   useEffect(() => {
     if( typeof campaignId != 'undefined' && campaignId != '' ){
       setReadonly(true);
+    }else{
+      setReadonly(false);
     }
   }, [campaignId]);
 
