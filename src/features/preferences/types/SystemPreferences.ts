@@ -211,3 +211,65 @@ export interface MaxCallInitTimeUpdateResponse {
   result_code: number;
   result_msg: string;
 }
+
+export interface SkillListCredentials {
+  tenant_id_array: number[];
+}
+
+export interface SkillListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: SkillListDataResponse[];
+}
+
+export interface SkillListDataResponse {
+  tenant_id: number;
+  skill_id: number;
+  skill_name: string;
+  skill_description: string;
+}
+
+export interface SkillCampaignListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: SkillCampaignListDataResponse[];
+}
+
+export interface SkillCampaignListDataResponse {
+  skill_id: number;
+  tenant_id: number;
+  campaign_id: number[];
+}
+
+export interface SkillAgentListResponse {
+  result_code: number;
+  result_msg: string,
+  result_count: number;
+  total_count: number;
+  result_data: SkillAgentListDataResponse[];
+}
+
+export interface SkillAgentListDataResponse {
+  skill_id: number;
+  tenant_id: number;
+  agent_id: string[];
+}
+
+export interface CampaignListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: CampaignListDataResponse[];
+}
+
+export interface CampaignListDataResponse {
+  campaign_id: number;
+  campaign_name: string;
+  tenant_id: number;
+  dial_mode: number; // 캠페인 발신 모드 구분 1 : Power Mode, 2 : Progressive Mode, 3 : Predictive Mode, 5 : Preview Mode
+}

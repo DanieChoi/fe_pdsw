@@ -28,7 +28,25 @@ export default function Header() {
   const [alertState, setAlertState] = useState(errorMessage);
   const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
   const [isSplitDialogOpen, setIsSplitDialogOpen] = useState(false);
+  const openInNewWindow = () => {
+    // 현재 화면의 크기를 가져옵니다
+    const width = window.screen.width;
+    const height = window.screen.height;
+    
+    // 창을 화면 중앙에 위치시킵니다
+    const left = 0;  // 전체 화면이므로 0으로 설정
+    const top = 0;   // 전체 화면이므로 0으로 설정
 
+    const newWindow = window.open(
+      '/monitor',
+      'monitor-window',  
+      `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no`
+    );
+
+    if (newWindow) {
+      newWindow.focus();
+    }
+};
   const {
     setCampaigns,
     setTenants,
@@ -51,6 +69,11 @@ export default function Header() {
   } = useTabStore();
 
   const handleMenuClick = (item: MenuItem, event: React.MouseEvent<HTMLButtonElement>) => {
+    if (item.id === 3) {
+      openInNewWindow();
+      return;
+    }
+   
     if (event.ctrlKey) {
       duplicateTab(item.id);
     } else {

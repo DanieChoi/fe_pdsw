@@ -9,6 +9,7 @@ import {
 import { IContextMenuForTennantForCounselorTreeMenu } from "./ContextMenus/IContextMenuForTennantForCounselorTreeMenu";
 import { IContextMenuForGroupAndTeamAndCounselor } from "./ContextMenus/IContextMenuForGroupAndTeamAndCounselorProps";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
+import Image from "next/image";
 
 interface ExpandConfig {
   organization?: boolean;
@@ -141,22 +142,22 @@ export function TreeNodeForCounselorListForSideBar({
   const renderIcon = () => {
     switch (type) {
       case 'organization':
-        return <img src="/tree-menu/tennant_office.png" alt="테넌트" className="h-4 w-4" />;
+        return  <Image src="/tree-menu/organization.png" alt="조직" width={14} height={12} />;
       case 'tenant':
-        return <img src="/tree-menu/tennant_office.png" alt="테넌트" className="h-4 w-4" />;
+        return  <Image src="/tree-menu/tennant_office.png" alt="테넌트"width={14} height={12} />;
       case 'group':
-        return <img src="/tree-menu/group_icon_for_tree.png" alt="그룹" className="h-4 w-4" />;
+        return <Image src="/tree-menu/group_icon_for_tree.png" alt="그룹"width={15} height={12} />;
       case 'team':
-        return <img src="/tree-menu/team_icon_for_tree.png" alt="팀" className="h-4 w-4" />;
+        return <Image src="/tree-menu/team_icon_for_tree.png" alt="팀"width={14} height={12} />;
       case 'counselor':
         const blendKind = Number(data.blendKind);
         switch (blendKind) {
           case 1:
-            return <img src="/tree-menu/inbound_counselor.png" alt="인바운드" className="h-4 w-4" />;
+            return <Image src="/tree-menu/inbound_counselor.png" alt="인바운드"width={15} height={12} />;
           case 2:
-            return <img src="/tree-menu/outbound_counselor.png" alt="아웃바운드" className="h-4 w-4" />;
+            return <Image src="/tree-menu/outbound_counselor.png" alt="아웃바운드"width={15} height={12} />;
           case 3:
-            return <img src="/tree-menu/inbound_outbound_mix.png" alt="블렌드" className="h-4 w-4" />;
+            return <Image src="/tree-menu/inbound_outbound_mix.png" alt="블렌드"width={15} height={12} />;
           default:
             return <UserCircle2 className="h-4 w-4 text-gray-600" />;
         }
@@ -167,6 +168,7 @@ export function TreeNodeForCounselorListForSideBar({
     <div
       className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer
         ${isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""}`}
+        
       onClick={() => {
         onNodeSelect(id);
         if (hasChildren) onNodeToggle(id);
@@ -175,7 +177,8 @@ export function TreeNodeForCounselorListForSideBar({
         const counselors = getCounselorsForNode();
         console.log(`${type} 노드의 상담원 목록:`, counselors);
       }}
-      style={{ paddingLeft: `${level * 16 + 8}px` }}
+      style={{ paddingLeft: `${level * 16 + 8}px`,
+       }}
     >
       <div className="flex items-center w-full gap-2">
         {hasChildren ? (

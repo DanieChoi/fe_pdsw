@@ -541,7 +541,11 @@ html, body {
   background: #ebebeb;
   padding: 4px 0;
 }
-
+.out-wrap {
+  container-type: inline-size;
+  container-name: out-wrap;
+  height: 100%;
+}
 .out-call-responsive-container{
   flex-direction: column;
 }
@@ -556,19 +560,35 @@ html, body {
 }
 
 
-
-@media (max-width: 1300px) {
+/* 컨테이너 쿼리 사용 */
+@container out-wrap (max-width: 1300px) {
   .out-call-responsive-container {
     flex-direction: row !important;
+    min-height: 0;
   }
-
+  
   .out-call-responsive-left {
     width: 40% !important;
+    min-width: 40% !important;
+    flex: none;
     height: 100%;
   }
-
+  
   .out-call-responsive-right {
-    width: 60% !important;
-    height: 100%;
+    width: calc(60% - 20px);
+    min-width:calc(60% - 20px);
+    flex: none;
+    height: auto;
   }
+}
+
+
+/*드래그앤드랍*/
+.drag-over {
+  border: 2px dashed #55BEC8 !important;
+  opacity: 0.7;
+}
+
+.dragging {
+  opacity: 0.5;
 }
