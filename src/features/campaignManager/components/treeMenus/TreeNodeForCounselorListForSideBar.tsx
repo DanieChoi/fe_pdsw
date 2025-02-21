@@ -1,5 +1,5 @@
 "use client";
-
+import { useCallback } from 'react';
 import {
   ChevronRight,
   ChevronDown,
@@ -41,6 +41,7 @@ export function TreeNodeForCounselorListForSideBar({
   defaultExpanded
 }: ITreeNodeForCounselorListForSideBar) {
   const { selectedBlendKind } = useCounselorFilterStore();
+
 
   const getCounselorsForNode = () => {
     switch (type) {
@@ -139,6 +140,10 @@ export function TreeNodeForCounselorListForSideBar({
   const isExpanded = expandedNodes.has(id);
   const isSelected = selectedNodeId === id;
 
+  const handleContextMenu = useCallback(() => {
+    onNodeSelect(id);
+  }, [id, onNodeSelect]);
+
   const renderIcon = () => {
     switch (type) {
       case 'organization':
@@ -166,8 +171,8 @@ export function TreeNodeForCounselorListForSideBar({
 
   const renderNodeContent = () => (
     <div
-      className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer
-        ${isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""}`}
+    className={`flex items-center hover:bg-[#FFFAEE] px-2 py-0.5 cursor-pointer transition-colors duration-150 text-[#555]
+      ${isSelected ? "bg-[#FFFAEE]" : ""}`}
         
       onClick={() => {
         onNodeSelect(id);
@@ -177,18 +182,19 @@ export function TreeNodeForCounselorListForSideBar({
         const counselors = getCounselorsForNode();
         console.log(`${type} 노드의 상담원 목록:`, counselors);
       }}
+      onContextMenu={handleContextMenu}
       style={{ paddingLeft: `${level * 16 + 8}px`,
        }}
     >
       <div className="flex items-center w-full gap-2">
         {hasChildren ? (
           isExpanded ? (
-            <ChevronDown className="h-4 w-4 text-gray-500" />
+            <Image src="/tree-menu/minus_for_tree.png" alt="접기" width={12} height={12} />
           ) : (
-            <ChevronRight className="h-4 w-4 text-gray-500" />
+             <Image src="/tree-menu/plus_icon_for_tree.png" alt="펼치기" width={12} height={12} />
           )
         ) : (
-          <span className="w-4" />
+          <span className="w-3" />
         )}
         {renderIcon()}
         <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
@@ -247,7 +253,7 @@ export function TreeNodeForCounselorListForSideBar({
     <div className="select-none">
       {renderWithContextMenu(renderNodeContent())}
       {hasChildren && isExpanded && (
-        <div>
+        <div className="space-y-1">
           {children.map((child: any) => {
             let childId;
             switch (child.type) {

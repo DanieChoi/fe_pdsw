@@ -38,6 +38,11 @@ export function TreeNode({
     }
   }, [item.id, hasChildren, onNodeSelect, onNodeToggle]);
 
+  // 우클릭 시 노드 선택을 처리하는 함수
+  const handleContextMenu = useCallback(() => {
+    onNodeSelect(item.id);
+  }, [item.id, onNodeSelect]);
+
   const handleEdit = () => {
     console.log('Edit clicked:', { id: item.id, label: item.label, type: item.type });
   };
@@ -69,10 +74,10 @@ export function TreeNode({
     <div className="select-none">
       {item.type === "folder" ? (
         <ContextMenu>
-          <ContextMenuTrigger>
+          <ContextMenuTrigger onContextMenu={handleContextMenu}>
             <div
-              className={`flex items-center hover:bg-gray-100 px-2 py-1.5 cursor-pointer transition-colors duration-150
-                ${isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""}`}
+              className={`flex items-center hover:bg-[#FFFAEE] px-2 py-0.5 cursor-pointer transition-colors duration-150 text-[#555]
+                ${isSelected ? "bg-[#FFFAEE]" : ""}`}
               onClick={handleClick}
               style={{ paddingLeft: `${level * 16 + 8}px` }}
             >
@@ -84,9 +89,13 @@ export function TreeNode({
                     <Image src="/tree-menu/plus_icon_for_tree.png" alt="펼치기" width={12} height={12} />
                   )
                 ) : (
-                  <span className="w-4" />
+                  <span className="w-3" />
                 )}
-                <Image src="/tree-menu/tennant_office.png" alt="테넌트" width={14} height={12} />
+                 {level === 0 ? (
+                    <Image src="/tree-menu/organization.png" alt="조직" width={14} height={12} />
+                  ) : (
+                    <Image src="/tree-menu/folder.png" alt="그룹" width={14} height={12} />
+                  )}
                 
                 <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
                   {item.label}
@@ -105,10 +114,11 @@ export function TreeNode({
           onHandleCampaignCopy={onHandleCampaignCopy}
         >
           <div
-            className={`flex items-center hover:bg-gray-100 px-2 py-1.5 cursor-pointer transition-colors duration-150
-              ${isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""}`}
+            className={`flex items-center hover:bg-[#FFFAEE] px-2 py-0.5 cursor-pointer transition-colors duration-150 text-[#555]
+              ${isSelected ? "bg-[#FFFAEE]" : ""}`}
             onClick={handleClick}
             onDoubleClick={handleDoubleClick}
+            onContextMenu={handleContextMenu}
             style={{ paddingLeft: `${level * 16 + 8}px` }}
           >
             <div className="flex items-center w-full gap-2">
@@ -135,7 +145,7 @@ export function TreeNode({
       )}
 
       {hasChildren && isExpanded && (
-        <div>
+        <div className="space-y-1">
           {item.children?.map((child: typeof item) => (
             <TreeNode
               key={child.id}

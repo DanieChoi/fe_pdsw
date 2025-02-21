@@ -168,21 +168,21 @@ export function TreeMenusForCampaigns() {
 
   // 서버사이드 렌더링 시 기본 로딩 상태 반환
   if (!mounted) {
-    return <div className="p-4 min-h-[calc(100%-148px)]">Loading...</div>;
+    return <div className="p-4 flex-1">Loading...</div>;
   }
 
   if (isLoading) {
-    return <div className="p-4 min-h-[calc(100%-148px)]">Loading...</div>;
+    return <div className="p-4 flex-1">Loading...</div>;
   }
 
   if (error) {
-    return <div className="p-4 text-red-600">{error.message}</div>;
+    return <div className="p-4 text-red-600 flex-1">{error.message}</div>;
   }
 
   const items = treeData?.[0]?.items || [];
 
   return (
-    <div className="flex-1 overflow-auto">
+    <div className="flex-1 overflow-auto tree-node">
       {items.map((item: TreeItem) => (
         <TreeNode
           key={item.id}
