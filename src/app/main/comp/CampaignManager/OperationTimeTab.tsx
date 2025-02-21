@@ -8,11 +8,9 @@ import { CommonButton } from "@/components/shared/CommonButton";
 import DatePicker from "react-date-picker";
 import { Calendar as CalendarIcon } from "lucide-react";
 import Image from "next/image";
-import { useMainStore } from '@/store';
 import { OperationTimeParam } from './CampaignManagerDetail';
 import { CampaignScheDuleListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
-import { CampaignInfo } from './CampaignManagerDetail';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 
 type Column = {
@@ -84,7 +82,6 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
   const [endTime, setEndTime] = useState(""); // 종료시간
   const [tempCampaignSchedule, setTempCampaignSchedule] = useState<OperationTimeParam>(tempOperationTimeTab);
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
-  const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
 
   const handleSelectChange = (value:any, col:string) => {
     onCampaignScheduleChange({...tempCampaignSchedule
