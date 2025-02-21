@@ -19,6 +19,12 @@ const useCounselResultList = [
   {useCounselResultId:1, useCounselResultName: '사용'}
 ];
 
+const useMachineHandling = [
+  {id:1, name: '컬러링 판별후 사람만연결'},
+  {id:2, name: '컬러링 판별후 사람/ 기계음 연결'},
+  {id:3, name: '기계음/사람 무조건연결'},
+];
+
 const CampaignOutgoingMethodTab:OutgoingMethodTabParam = {
   changeYn: false,
   campaignInfoChangeYn: false,
@@ -50,19 +56,11 @@ type Props = {
 const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCampaignOutgoingMethodChange }) => {
   const { campaigns } = useMainStore();
   const [trunkAccessCode, setTrunkAccessCode] = useState("");
-  const [retryInterval] = useState("20");
   const [callGoal, setCallGoal] = useState("");
-  const [abandonmentTime, setAbandonmentTime] = useState("2");
-  const [machineHandling, setMachineHandling] = useState(
-    "컬러링 판별후 사람만연결"
-  );
   const [autoDial, setAutoDial] = useState("");
-  const [linkedCampaign, setLinkedCampaign] = useState("test1");
   const [dddNumber, setDddNumber] = useState("");
   const [maxRings] = useState("10");
   const [tokenId, setTokenId] = useState("");
-  const [consultationRegistration, setConsultationRegistration] =
-    useState("미사용");
   const [dialModeOption, setDialModeOption] = useState("default");
   const [ivrNo, setIvrNo] = useState("");
   const [limitRateEnabled, setLimitRateEnabled] = useState(false);
@@ -143,6 +141,13 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
       , changeYn: true
       , campaignInfoChangeYn: true
       , use_counsel_result: Number(value) 
+    });
+  };
+  const handleMachineHandling = (value:string) => {
+    onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+      , changeYn: true
+      , campaignInfoChangeYn: true
+      , detect_mode: Number(value) 
     });
   };
 
@@ -234,20 +239,16 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
           <div className="flex items-center gap-2 justify-between">
             <Label className="w-[8.3rem] min-w-[8.3rem]">기계음처리</Label>
             <Select
-              value={machineHandling}
-              onValueChange={setMachineHandling}
+              value={tempOutgoingMethodTab.detect_mode+''}
+              onValueChange={handleMachineHandling}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder={machineHandling} />
+                <SelectValue placeholder={tempOutgoingMethodTab.detect_mode} />
               </SelectTrigger>
               <SelectContent>
-                {[
-                  "컬러링 판별후 사람만연결",
-                  "컬러링 판별후 사람/ 기계음 연결",
-                  "기계음/사람 무조건연결",
-                ].map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
+                {useMachineHandling.map((option) => (
+                  <SelectItem key={option.id} value={option.id+''}>
+                    {option.name}
                   </SelectItem>
                 ))}
               </SelectContent>
