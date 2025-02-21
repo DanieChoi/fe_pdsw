@@ -262,7 +262,7 @@ export default function Header() {
                   <div key={`menu-${item.id}`} className="menu-item">
                     <CommonButton
                       variant={isActive ? 'menuActive' : (isOpened ? 'menuOpened' : 'menu')}
-                      size="none"
+                      size="default"
                       onClick={(e) => handleMenuClick(item, e)}
                       className="relative py-1.5 px-2"
                     >
