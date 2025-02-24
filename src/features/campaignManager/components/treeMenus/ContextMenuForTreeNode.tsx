@@ -19,6 +19,7 @@ import { useState } from "react";
 import BlackListCountPopup from '@/features/campaignManager/components/popups/BlackListCountPopup';
 import { toast } from 'react-toastify';
 import { useApiForCampaignStatusUpdate } from "../../hooks/useApiForCampaignStatusUpdate";
+import { useApiForCampaignBlacklistCount } from "@/features/listManager/hooks/useApiForCampaignBlacklistCount";
 
 export type CampaignStatus = 'started' | 'pending' | 'stopped';
 
@@ -167,11 +168,18 @@ export function ContextMenuForTreeNode({
     }
   };
 
+  //캠페인 블랙리스트 건수 조회 api 호출
+  const { mutate: fetchCampaignBlacklistCount } = useApiForCampaignBlacklistCount({
+    onSuccess: (data) => {
+      setTimeout(() => {
+        setIsBlacklistPopupOpen(true);
+      }, 100);
+    }
+  });
+
+  //캠페인 블랙리스트 건수 조회 클릭 이벤트.
   const handleBlacklistCountCheckClick = () => {
-    document.body.click();
-    setTimeout(() => {
-      setIsBlacklistPopupOpen(true);
-    }, 100);
+    fetchCampaignBlacklistCount(Number(item.id));
   };
 
   const renderStatusCheckbox = (targetStatus: CampaignStatus) => {
