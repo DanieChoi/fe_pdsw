@@ -55,31 +55,23 @@ type Props = {
 
 const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCampaignOutgoingMethodChange }) => {
   const { campaigns } = useMainStore();
-  const [trunkAccessCode, setTrunkAccessCode] = useState<string>("");
-  const [callGoal, setCallGoal] = useState<string>("");
-  const [autoDial, setAutoDial] = useState<string>("");
-  const [dddNumber, setDddNumber] = useState<string>("");
   const [maxRings] = useState<string>("10");
-  const [tokenId, setTokenId] = useState<string>("");
   const [dialModeOption, setDialModeOption] = useState<string>("default");
-  const [ivrNo, setIvrNo] = useState<string>("");
   const [limitRateRateEnabled, setLimitRateRateEnabled] = useState<boolean>(false);
   const [limitRateEnabled, setLimitRateEnabled] = useState<boolean>(false);
-  const [limitInitEnabled, setLimitInitEnabled] = useState<boolean>(false);
   const [limitExitInit, setLimitExitInit] = useState<boolean>(false);
   const [limitInit, setLimitInit] = useState<boolean>(false);
   const [limitRate, setLimitRate] = useState<string>("");  
   const [tempOutgoingMethodTab, setTempOutgoingMethodTab] = useState<OutgoingMethodTabParam>(CampaignOutgoingMethodTab);
+  const [tempCampaignId, setTempCampaignId ] = useState<number>(0);
 
   // 숫자만 입력되도록 제어하는 함수
   const handleNumericInput = (
     e: React.ChangeEvent<HTMLInputElement>,
-    setValue: React.Dispatch<React.SetStateAction<string>>,
     type: string
   ) => {
     const value = e.target.value;
     if (/^\d*$/.test(value)) {
-      setValue(value); // 숫자인 경우만 상태 업데이트
       if( type === 'setTrunkAccessCode'){
         onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
           , changeYn: true
@@ -174,7 +166,8 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
         ,dial_mode_option : campaignInfo.dial_mode_option
         ,user_option : campaignInfo.user_option
       }); 
-      if( !limitInitEnabled ){
+      if( tempCampaignId !== campaignInfo.campaign_id ){
+        setTempCampaignId(campaignInfo.campaign_id);
         setLimitRate(campaignInfo.user_option === ''?'':campaignInfo.user_option.split(',')[0].indexOf('limit') > -1?campaignInfo.user_option.split(',')[0].split('=')[1]:'');
         setLimitInit(campaignInfo.user_option === ''?false:campaignInfo.user_option.split(',')[0].indexOf('limit') > -1 && campaignInfo.user_option.split(',')[1] === '0'?true:false);
         setLimitRateEnabled(campaignInfo.user_option === ''?false:campaignInfo.user_option.split(',')[0].indexOf('limit') > -1?true:false);
@@ -194,7 +187,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
             <CustomInput
               type="text"
               value={tempOutgoingMethodTab.trunk_access_code}
-              onChange={(e) => handleNumericInput(e, setTrunkAccessCode,'setTrunkAccessCode')}
+              onChange={(e) => handleNumericInput(e, 'setTrunkAccessCode')}
             />
           </div>
 
@@ -217,7 +210,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
             <CustomInput
               type="text"
               value={tempOutgoingMethodTab.alarm_answer_count}
-              onChange={(e) => handleNumericInput(e, setCallGoal,'setCallGoal')}
+              onChange={(e) => handleNumericInput(e, 'setCallGoal')}
             />
           </div>
 
@@ -268,7 +261,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
             <CustomInput
               type="text"
               value={tempOutgoingMethodTab.auto_dial_interval}
-              onChange={(e) => handleNumericInput(e, setAutoDial,'setAutoDial')}
+              onChange={(e) => handleNumericInput(e, 'setAutoDial')}
             />
           </div>
         </div>
@@ -301,7 +294,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
             <CustomInput
               type="text"
               value={tempOutgoingMethodTab.DDD_code}
-              onChange={(e) => handleNumericInput(e, setDddNumber,'setDddNumber')}
+              onChange={(e) => handleNumericInput(e, 'setDddNumber')}
             />
           </div>
 
@@ -324,7 +317,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
             <CustomInput
               type="text"
               value={tempOutgoingMethodTab.token_id}
-              onChange={(e) => handleNumericInput(e, setTokenId,'setTokenId')}
+              onChange={(e) => handleNumericInput(e, 'setTokenId')}
             />
           </div>
 
@@ -357,7 +350,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
           <CustomInput
             type="text"
             value={tempOutgoingMethodTab.power_divert_queue}
-            onChange={(e) => handleNumericInput(e, setIvrNo,'setIvrNo')}
+            onChange={(e) => handleNumericInput(e, 'setIvrNo')}
           />
         </div>
         <div className="flex items-top gap-2 justify-between">
@@ -377,7 +370,6 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
               id="limit-rate"
               checked={limitRateEnabled} // 상태를 기반으로 체크 여부 결정
               onCheckedChange={(checked) => {
-                setLimitInitEnabled(true);
                 setLimitRateEnabled(checked as boolean);
                 setLimitRateRateEnabled(checked as boolean);
                 if (!checked) {
@@ -393,7 +385,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
             <CustomInput
               type="text"
               value={limitRate}
-              onChange={(e) => handleNumericInput(e, setLimitRate, 'setLimitRate')}
+              onChange={(e) => handleNumericInput(e, 'setLimitRate')}
               disabled={!limitRateRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
             />
             %
