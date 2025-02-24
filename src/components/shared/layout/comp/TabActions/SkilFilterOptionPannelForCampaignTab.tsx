@@ -100,7 +100,7 @@ const SkilFilterOptionPannelForCampaignTab = ({
         </Button>
       </div>
 
-      현재 스토어에 저장된 스킬 ID 목록 표시
+      {/* 현재 스토어에 저장된 스킬 ID 목록 표시
       <div className="mt-4 p-2 border rounded">
         <h3 className="font-semibold mb-2">Store에 저장된 스킬 ID:</h3>
         {skilIdsForCampaignTreeMenu.length > 0 ? (
@@ -112,7 +112,7 @@ const SkilFilterOptionPannelForCampaignTab = ({
         ) : (
           <p className="text-gray-500">현재 선택된 스킬이 없습니다.</p>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };
