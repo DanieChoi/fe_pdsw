@@ -24,6 +24,8 @@ const buttonVariants = cva(
           "bg-[#E5F3F3]/50 hover:bg-[#E5F3F3]/70 rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center text-[#333]",
         login: "w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm rounded-none font-16",
         customblue: "rounded-[3px] bg-[#51ADD4] text-white text-[13px]",
+        tabEtc: "bg-transparent hover:bg-[transparent] border-r border-t border-l border-[#ebebeb] px-[6px] h-[30px]",
+        tab: "h-[30px] border-t border-l border-r border-[#ebebeb]",
       },
       size: {
         default: "text-[13px] py-[3px] px-[6px]",

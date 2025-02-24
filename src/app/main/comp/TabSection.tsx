@@ -4,9 +4,10 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CommonButton } from "@/components/shared/CommonButton";
 import { useTabStore } from "@/store/tabStore";
 import DraggableTab from "./DraggableTab";
+import Image from "next/image";
 
 interface TabSectionProps {
   rowId: string;
@@ -99,9 +100,9 @@ const TabSection: React.FC<TabSectionProps> = ({
       `}
       style={{ width: `${width}%` }}
     >
-      <div className="flex items-center p-2">
-        <Button
-          variant="ghost"
+      <div className="flex items-center">
+        <CommonButton
+          variant="tabEtc"
           size="sm"
           onMouseDown={() => startScrolling("left")}
           onMouseUp={stopScrolling}
@@ -109,20 +110,21 @@ const TabSection: React.FC<TabSectionProps> = ({
           onTouchStart={() => startScrolling("left")}
           onTouchEnd={stopScrolling}
           className={`
-            p-1 rounded-full hover:bg-gray-100 flex-none
             ${isScrolling === "left" ? "bg-gray-100" : ""}
           `}
         >
-          <ChevronLeft
-            className={`h-4 w-4 ${
-              isScrolling === "left" ? "text-blue-600" : "text-gray-600"
-            }`}
+        
+           <Image
+            src="/header-menu/leftArrow.svg"
+            alt="left"
+            width={8}
+            height={8}
           />
-        </Button>
+        </CommonButton>
 
         <div
           ref={scrollContainerRef}
-          className="flex-1 flex gap-1 overflow-hidden scroll-smooth"
+          className="flex-1 flex overflow-hidden scroll-smooth"
         >
           {section.tabs.map((tab) => {
             const isActive = section.activeTabKey === tab.uniqueKey;
@@ -147,8 +149,8 @@ const TabSection: React.FC<TabSectionProps> = ({
           })}
         </div>
 
-        <Button
-          variant="ghost"
+        <CommonButton
+          variant="tabEtc"
           size="sm"
           onMouseDown={() => startScrolling("right")}
           onMouseUp={stopScrolling}
@@ -156,26 +158,31 @@ const TabSection: React.FC<TabSectionProps> = ({
           onTouchStart={() => startScrolling("right")}
           onTouchEnd={stopScrolling}
           className={`
-            p-1 rounded-full hover:bg-gray-100 flex-none
             ${isScrolling === "right" ? "bg-gray-100" : ""}
           `}
         >
-          <ChevronRight
-            className={`h-4 w-4 ${
-              isScrolling === "right" ? "text-blue-600" : "text-gray-600"
-            }`}
+          <Image
+            src="/header-menu/rightArrow.svg"
+            alt="right"
+            width={8}
+            height={8}
           />
-        </Button>
+        </CommonButton>
 
         {canRemove && row.sections.length > 1 && (
-          <Button
-            variant="ghost"
+          <CommonButton
+            variant="tabEtc"
             size="sm"
             onClick={() => removeSection(rowId, sectionId)}
-            className="ml-2 p-1 hover:bg-gray-100 rounded-full"
+            className=""
           >
-            <X className="h-4 w-4 text-gray-500 hover:text-gray-700" />
-          </Button>
+            <Image
+            src="/header-menu/tab_minus.svg"
+            alt="plus"
+            width={8}
+            height={8}
+          />
+          </CommonButton>
         )}
       </div>
     </div>

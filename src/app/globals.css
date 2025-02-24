@@ -134,7 +134,15 @@ input::placeholder {
   font-size: 16px;
 }
 
-
+.drag-tab{
+  border-left: 1px solid #ebebeb;
+  border-right: 1px solid #ebebeb;
+  border-top: 1px solid #ebebeb;
+  border-radius: 3px 3px 0 0;
+}
+.drag-tab+.drag-tab{
+  border-left: 0;
+}
 
 /*header*/
 
