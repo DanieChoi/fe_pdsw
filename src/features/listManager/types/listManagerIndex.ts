@@ -53,4 +53,17 @@ export interface DeleteResponse {
   result_msg: string;
 }
 
+// 캠페인 블랙 릭스트 건 수 조회 응답 데이터 타입
+export interface CampaignBlacklistCountResponseDataType {
+  campaign_id: string;
+  blacklist_count: number;
+}
+
+// 캠페인 블랙 릭스트 건 수 조회 응답 타입
+export interface CampaignBlacklistCountResponse {
+  result_code: number;
+  result_msg: string;
+  result_data: CampaignBlacklistCountResponseDataType;
+}
+
 
