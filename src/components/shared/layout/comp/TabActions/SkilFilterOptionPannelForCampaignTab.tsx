@@ -1,4 +1,5 @@
-// C:\nproject\fe_pdsw\src\app\main\comp\SkilFilterOptionPannelForCampaignTab.tsx
+// src\components\shared\layout\comp\TabActions\SkilFilterOptionPannelForCampaignTab.tsx
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -7,13 +8,21 @@ import { useAuthStore } from "@/store/authStore";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
+import { Popover } from "@/components/ui/popover";
+import { PopoverClose } from "@radix-ui/react-popover";
 
 interface Skill {
   skill_id: number;
   skill_name: string;
 }
 
-const SkilFilterOptionPannelForCampaignTab = () => {
+interface SkilFilterOptionPannelForCampaignTabProps {
+  shouldCloseOnConfirm?: boolean;
+}
+
+const SkilFilterOptionPannelForCampaignTab = ({
+  shouldCloseOnConfirm = false,
+}: SkilFilterOptionPannelForCampaignTabProps) => {
   const { tenant_id } = useAuthStore(); // 현재 로그인한 사용자의 tenant_id 가져오기
   console.log("🔥 tenant_id:", tenant_id);
 
@@ -75,15 +84,23 @@ const SkilFilterOptionPannelForCampaignTab = () => {
 
       {/* 확인/취소 버튼: 가운데 정렬 */}
       <div className="mt-4 flex justify-center gap-4">
-        <Button onClick={handleConfirm} className="bg-green-500 text-white">
-          확인
-        </Button>
+        {shouldCloseOnConfirm ? (
+          <PopoverClose asChild>
+            <Button onClick={handleConfirm} className="bg-green-500 text-white">
+              확인
+            </Button>
+          </PopoverClose>
+        ) : (
+          <Button onClick={handleConfirm} className="bg-green-500 text-white">
+            확인
+          </Button>
+        )}
         <Button onClick={() => setSelectedSkills([])} className="bg-red-500 text-white">
           취소
         </Button>
       </div>
 
-      {/* 현재 스토어에 저장된 스킬 ID 목록 표시 */}
+      현재 스토어에 저장된 스킬 ID 목록 표시
       <div className="mt-4 p-2 border rounded">
         <h3 className="font-semibold mb-2">Store에 저장된 스킬 ID:</h3>
         {skilIdsForCampaignTreeMenu.length > 0 ? (
@@ -101,4 +118,3 @@ const SkilFilterOptionPannelForCampaignTab = () => {
 };
 
 export default SkilFilterOptionPannelForCampaignTab;
-

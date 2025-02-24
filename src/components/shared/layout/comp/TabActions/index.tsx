@@ -4,6 +4,7 @@ import { SortButtonForCampaign } from '../buttons/SortButtonForCampaign';
 import { SortButtonForAgent } from '../buttons/SortButtonForAgent';
 import FilterButtonForCounsellorGroup from '../buttons/FilterButtonForCounsellorGroup';
 import SortButtonForCounsellorGroup from '../buttons/SortButtonForCounsellorGroup';
+import IButtonForFilterCampaignAboutCheckedSkils from './IButtonForFilterCampaignAboutCheckedSkils';
 
 interface TabActionsProps {
   tabId: string;
@@ -24,14 +25,15 @@ export function TabActions({
     case 'campaign':
       return (
         <div className="flex items-center gap-2">
-          <FilterButtonForCampaign 
+          {/* <FilterButtonForCampaign 
             onFilter={onFilter} 
             selectedFilter={selectedFilter}
           />
           <SortButtonForCampaign
             onSort={onSort}
             selectedSort={selectedSort}
-          />
+          /> */}
+          <IButtonForFilterCampaignAboutCheckedSkils />
         </div>
       );
     case 'agent':
