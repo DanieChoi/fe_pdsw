@@ -87,7 +87,6 @@ const { mutate: createCallLimitSetting } = useApiForCallLimitSettingCreate({
     fetchCallLimitSettingList({
       tenant_id_array: tenants.map(tenant => tenant.tenant_id)
     });
-    handleNew(); // 입력 필드 초기화
   },
   onError: (error) => {
     showAlert('저장에 실패했습니다: ' + error.message);
@@ -137,10 +136,16 @@ const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
       showAlert('모든 필드를 입력해주세요.');
       return;
     }
+
+    // 선택된 캠페인의 tenant_id 찾기
+    const selectedCampaign = campaigns?.find(camp => camp.campaign_id === Number(campaignId));
+    if (!selectedCampaign) {
+      return;
+    }
   
     const saveData = {
       campaign_id: Number(campaignId),
-      tenant_id: 1,  // 현재 고정값으로 사용
+      tenant_id: selectedCampaign.tenant_id,
       call_kind: 1,  // Callback으로 고정
       call_timeout: 0,
       max_call: Number(limitCount),
@@ -175,7 +180,27 @@ const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
   const handleCampaignSelect = (id: string, name: string) => {
     setCampaignId(id);
     setCampaignName(name);
+    // 선택된 캠페인의 제한건수가 있는지 체크
+    const matchingSetting = limitSettings.find(
+      (item) => item.campaign_id === Number(id)
+    );
+    if (matchingSetting) {
+      const limitStr = matchingSetting.max_call.toString();
+      setLimitCount(limitStr);
+      // 해당 캠페인이 이미 설정되어 있으면 그리드 로우도 선택
+      setSelectedRow({
+        campaign_id: id,
+        campaign_name: name,
+        limit_number: limitStr
+      });
+    } else {
+      // 제한건수가 없으면 입력 필드와 그리드 선택 모두 초기화
+      setLimitCount('');
+      setSelectedRow(null);
+    }
   };
+  
+  
 
   const getRowClass = (row: Row) => {
     return selectedRow?.campaign_id === row.campaign_id && 
