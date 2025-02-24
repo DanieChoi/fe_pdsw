@@ -134,6 +134,7 @@ import { TreeNode } from "./TreeNode";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { getStatusIcon } from "@/components/shared/layout/utils/utils";
 import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
+import { useMainStore } from '@/store';
 
 interface TreeState {
   selectedNodeId: string | undefined;
@@ -164,6 +165,7 @@ export function TreeMenusForCampaigns() {
   const { data: treeData, isLoading, error } = useApiForGetTreeMenuDataForSideMenu();
   const { selectedNodeId, expandedNodes, setSelectedNodeId, toggleNode, expandNodes } = useTreeStore();
   const { skilIdsForCampaignTreeMenu } = useSideMenuCampaignTabStore();
+  const { campaigns, tenants } = useMainStore();
 
   const selectedSkillIds = Array.isArray(skilIdsForCampaignTreeMenu)
     ? skilIdsForCampaignTreeMenu.map(id => Number(id))
