@@ -8,13 +8,12 @@ import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiF
 import { CommonButton } from "@/components/shared/CommonButton";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { useApiForCallingNumberUpdate } from '@/features/campaignManager/hooks/useApiForCallingNumberUpdate';
 import { useApiForCallingNumberInsert } from '@/features/campaignManager/hooks/useApiForCallingNumberInsert';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 
 type GridRow = MainDataResponse & {
-  calling_number: string;  // 필수 필드로 변경
+  calling_number: string;
 };
 
 function CampaignLayout() {
@@ -26,6 +25,7 @@ function CampaignLayout() {
   const [selectedCampaignId, setSelectedCampaignId] = useState('');
   const [selectedCampaignName, setSelectedCampaignName] = useState('');
   const [selectedCallingNumber, setSelectedCallingNumber] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
 
   const [alertState, setAlertState] = useState({
     isOpen: false,
@@ -38,34 +38,34 @@ function CampaignLayout() {
 
   const showConfirm = (message: string, onConfirm: () => void) => {
     setAlertState({
-        isOpen: true,
-        message,
-        title: '확인',
-        type: '2',
-        onConfirm: () => {
-            onConfirm();
-            closeAlert();
-        },
-        onCancel: closeAlert
+      isOpen: true,
+      message,
+      title: '확인',
+      type: '2',
+      onConfirm: () => {
+        onConfirm();
+        closeAlert();
+      },
+      onCancel: closeAlert
     });
-};
+  };
 
-const showAlert = (message: string) => {
-  setAlertState({
+  const showAlert = (message: string) => {
+    setAlertState({
       isOpen: true,
       message,
       title: '알림',
       type: '1',
       onConfirm: closeAlert,
       onCancel: () => {}
-  });
-};
+    });
+  };
 
-const closeAlert = () => {
+  const closeAlert = () => {
     setAlertState(prev => ({ ...prev, isOpen: false }));
-};
+  };
 
-  // 발신번호 조회
+    // 발신번호 조회
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
       setCallingNumbers(data.result_data);
@@ -73,16 +73,16 @@ const closeAlert = () => {
   });
 
   //캠페인 발신번호 추가 api 호출
-    const { mutate: fetchCallingNumberInsert } = useApiForCallingNumberInsert({
-      onSuccess: (data) => {
-        fetchCallingNumbers({
-          session_key: '',
-          tenant_id: 0,
-        });      
-      }
-    });
+  const { mutate: fetchCallingNumberInsert } = useApiForCallingNumberInsert({
+    onSuccess: (data) => {
+      fetchCallingNumbers({
+        session_key: '',
+        tenant_id: 0,
+      });      
+    }
+  });
 
-  // 발신번호 수정
+    // 발신번호 수정
   const { mutate: fetchCallingNumberUpdate } = useApiForCallingNumberUpdate({
     onSuccess: (data) => {
       fetchCallingNumbers({
@@ -99,7 +99,20 @@ const closeAlert = () => {
     });
   }, [fetchCallingNumbers]);
 
-  // 발신번호 업데이트 함수
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowDown') {
+        handleReset();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []); 
+
   const updateCallingNumber = (campaignId: number) => {
     const callingNumber = callingNumbers.find(
       num => num.campaign_id === campaignId
@@ -140,29 +153,13 @@ const closeAlert = () => {
     setSelectedCampaignId(args.row.campaign_id.toString());
     setSelectedCampaignName(args.row.campaign_name);
     updateCallingNumber(args.row.campaign_id);
+    setIsEditing(false); // 그리드 선택 시 편집 모드 비활성화
   };
 
   const getRowClass = (row: GridRow) => {
     return selectedRow?.campaign_id === row.campaign_id ? 'bg-[#FFFAEE]' : ''; 
   };
 
-  // 대상캠페인 Select 변경 핸들러
-  const handleCampaignIdChange = (value: string) => {
-    setSelectedCampaignId(value);
-    const campaign = campaigns.find(c => c.campaign_id.toString() === value);
-    if (campaign) {
-      const campaignWithCallingNumber: GridRow = {
-        ...campaign,
-        calling_number: callingNumbers.find(num => num.campaign_id === campaign.campaign_id)?.calling_number || ''
-      };
-      setSelectedCampaignName(campaign.campaign_name);
-      updateCallingNumber(campaign.campaign_id);
-      setSelectedRow(campaignWithCallingNumber);
-      setSelectedCampaign(campaign);
-    }
-  };
-
-  // 캠페인 모달에서 선택 시 핸들러
   const handleModalSelect = (campaignId: string, campaignName: string) => {
     setSelectedCampaignId(campaignId);
     setSelectedCampaignName(campaignName);
@@ -182,7 +179,6 @@ const closeAlert = () => {
 
   // 발신번호 저장 버튼 핸들러
   const handleSave = () => {
-    // 유효성 검사
     if (!selectedCampaignId) {
       showConfirm('대상캠페인을 선택해주세요.', () => {})
       return;
@@ -214,6 +210,7 @@ const closeAlert = () => {
     setSelectedCampaignId('');
     setSelectedCampaignName('');
     setSelectedCallingNumber('');
+    setIsEditing(true); // 신규 버튼 클릭 시 편집 모드 활성화
   };
 
   return (
@@ -238,29 +235,15 @@ const closeAlert = () => {
       {/* 오른쪽 섹션 */}
       <div className="w-[513px]">
         <div className="flex flex-col gap-2">
-          {/* 대상캠페인 영역 */}
           <div className="flex items-center gap-2">
             <Label className="w-[5rem] min-w-[5rem]">대상캠페인</Label>
-            <div className='w-[140px]'>
-              <Select
-                value={selectedCampaignId}
-                onValueChange={handleCampaignIdChange}
-              >
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  {campaigns.map(campaign => (
-                    <SelectItem 
-                      key={campaign.campaign_id} 
-                      value={campaign.campaign_id.toString()}
-                    >
-                      {campaign.campaign_id}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <CustomInput 
+              type="text" 
+              value={selectedCampaignId}
+              readOnly
+              disabled={!isEditing}
+              className="w-[140px]"
+            />
             <CommonButton 
               variant="outline" 
               size="sm"
@@ -273,6 +256,7 @@ const closeAlert = () => {
                 setSelectedCallingNumber('');
                 setIsModalOpen(true);
               }}
+              disabled={!isEditing}
             >
               캠페인조회
             </CommonButton>
@@ -280,6 +264,7 @@ const closeAlert = () => {
               type="text" 
               value={selectedCampaignName} 
               readOnly 
+              disabled={!isEditing}
               className=""
             />
           </div>
@@ -291,6 +276,7 @@ const closeAlert = () => {
               type="text" 
               value={selectedCallingNumber}
               onChange={(e) => setSelectedCallingNumber(e.target.value)}
+              readOnly={!selectedCampaignId}
               className=""
             />
           </div>
