@@ -17,8 +17,8 @@ export default function Footer({
       onMouseDown={startResizing}
     ></div>
 
-      <div className="flex-none py-[7px] px-[20px] border-b bg-white">
-        <span className="text-[13px]">현재 진행 상태</span>
+      <div className="flex-none pt-[5px] pb-[4px] px-[20px] border-b bg-white">
+        <span className="text-[13px] text-[#333]">현재 진행 상태</span>
       </div>
 
       <div className="flex-1 overflow-auto py-[7px] px-[20px]">

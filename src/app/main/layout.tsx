@@ -103,7 +103,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const width = useSidebarWidthStore(state => state.width); 
-  const [footerHeight, setFooterHeight] = useState(140);
+  const [footerHeight, setFooterHeight] = useState(136);
   const [isResizing, setIsResizing] = useState(false);
 
   const startResizing = () => {
@@ -118,7 +118,7 @@ export default function MainLayout({
     const mouseY = e.clientY;
     const headerHeight = 28;
     const minFooterHeight = 50;
-    const maxFooterHeight = windowHeight - headerHeight - 100;
+    const maxFooterHeight = windowHeight - headerHeight - 82;
 
     const newHeight = windowHeight - mouseY;
 
