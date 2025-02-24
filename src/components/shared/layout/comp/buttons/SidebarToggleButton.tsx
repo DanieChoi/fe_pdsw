@@ -12,7 +12,7 @@ export function SidebarToggleButton({ isOpen, onClick }: SidebarToggleButtonProp
   return (
     <button
       onClick={onClick}
-      className="absolute -right-0 top-20 w-7 h-9 flex items-center justify-center
+      className="absolute -right-0 top-25 w-7 h-9 flex items-center justify-center
                 bg-white border border-gray-300 rounded-lg shadow-sm
                 hover:bg-gray-100 hover:border-gray-400
                 transition-all duration-300 ease-in-out z-30"
