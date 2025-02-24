@@ -6,14 +6,16 @@ import { Label } from "@/components/ui/label";
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import TitleWrap from "@/components/shared/TitleWrap";
 import 'react-data-grid/lib/styles.css';
-import { useApiForCounselorList } from '@/features/preferences/hooks/useApiForCounselorList';
+import { useApiForCounselorAssignList, useApiForCounselorList } from '@/features/preferences/hooks/useApiForCounselorList';
 import { useApiForCampaignList, useApiForSkillAgentList, useApiForSkillCampaignList, useApiForSkillList } from '@/features/preferences/hooks/useApiForSkill';
 import { useAuthStore, useMainStore } from '@/store';
+import { CounselorAssignListResponse } from '@/features/preferences/types/SystemPreferences';
 
 // 메인 스킬 정보
 interface SkillRow {
   center: string;
   tenant: string;
+  tenantId: number;
   skillId: string;
   skillName: string;
   description: string;
@@ -89,6 +91,15 @@ const SkillEdit = () => {
     { key: 'agentName', name: '상담원 이름' },
     { key: 'consultMode', name: '상담모드' }
   ], []);
+
+  const getBlendKindText = (blendKind: string): string => {
+    switch (blendKind) {
+      case '1': return '인바운드';
+      case '2': return '아웃바운드';
+      case '3': return '블렌드';
+      default: return '일반상담';
+    }
+  };
 
   // 캠페인 발신 모드 변환 함수
   const getDialModeText = (dialMode: number): string => {
@@ -233,44 +244,6 @@ const SkillEdit = () => {
     }
   ]);
 
-  // 예제용 전체 캠페인 데이터 (캠페인 리스트 API를 통해 가져온 데이터를 변환하여 저장)
-  const [allCampaignsState, setAllCampaignsState] = useState<CampaignRow[]>([
-    { 
-      skillId: '', // 실제 할당 정보는 스킬 할당 캠페인 API(campaignData)에서 연결
-      campaignId: '100',
-      campaignName: '일반상담 캠페인',
-      mode: 'Progressive'
-    },
-    { 
-      skillId: '',
-      campaignId: '101',
-      campaignName: 'VIP상담 캠페인',
-      mode: 'Preview'
-    },
-    { 
-      skillId: '',
-      campaignId: '888',
-      campaignName: '고객상담 캠페인',
-      mode: 'Progressive'
-    },
-    { 
-      skillId: '',
-      campaignId: '1000',
-      campaignName: '신규 캠페인 A',
-      mode: 'Predictive Mode'
-    },
-    { 
-      skillId: '',
-      campaignId: '1001',
-      campaignName: '신규 캠페인 B',
-      mode: 'Power Mode'
-    }
-  ]);
-  // 저장할 전체 캠페인 리스트를 상태에 저장 (캠페인 리스트 API 호출 결과)
-  useEffect(() => {
-    setAllCampaigns(allCampaignsState);
-  }, [allCampaignsState]);
-
   // API: 상담원 리스트와 스킬 리스트
   const { mutate: fetchCounselorList, data: counselorData } = useApiForCounselorList({
     onError: (error) => {
@@ -315,6 +288,24 @@ const SkillEdit = () => {
     }
   });
   
+  // API: 스킬 할당 상담사 목록 가져오기
+  const { mutate: fetchCounselorAssignList } = useApiForCounselorAssignList({
+    onSuccess: (data: CounselorAssignListResponse) => {
+      if (data.skillAssignedCounselorList) {
+        const mappedAgents: AgentRow[] = data.skillAssignedCounselorList.map(counselor => ({
+          skillId: selectedSkill?.skillId || '',  
+          teamId: counselor.affiliationTeamId,
+          teamName: counselor.affiliationTeamName,
+          loginId: counselor.counselorId,
+          agentId: counselor.counselorEmplNum,
+          agentName: counselor.counselorname,
+          consultMode: getBlendKindText(counselor.blendKind)
+        }));
+        setFilteredAgents(mappedAgents);
+      }
+    }
+  });
+  
   // 컴포넌트 마운트 시 API 호출 (테넌트, 캠페인, 스킬, 할당 캠페인/상담원)
   useEffect(() => {
     fetchCounselorList({ tenantId: tenant_id, roleId: role_id });
@@ -322,7 +313,11 @@ const SkillEdit = () => {
     fetchSkillCampaignList();
     fetchSkillAgentList();
     fetchCampaignList();
-  }, [tenant_id, role_id, tenants, fetchCounselorList, fetchSkillList, fetchSkillCampaignList, fetchSkillAgentList, fetchCampaignList]);
+    fetchCounselorAssignList({
+      tenantId: selectedSkill ? selectedSkill.tenantId : tenant_id,
+      skillId: selectedSkill ? Number(selectedSkill.skillId) : 0
+    })
+  }, [tenant_id, role_id, tenants, fetchCounselorList, fetchSkillList, fetchSkillCampaignList, fetchSkillAgentList, fetchCampaignList, fetchCounselorAssignList, selectedSkill]);
 
   // 상담원, 스킬, 캠페인, 상담원 API 응답 데이터를 통합하여 그리드에 표시할 행 구성
   useEffect(() => {
@@ -353,6 +348,7 @@ const SkillEdit = () => {
         return {
           center: tenantInfo.centerName,
           tenant: tenantInfo.tenantName,
+          tenantId: skill.tenant_id,
           skillId: String(skill.skill_id),
           skillName: skill.skill_name,
           description: skill.skill_description,
@@ -494,7 +490,7 @@ const SkillEdit = () => {
                 • 기능설명<br/>
                 스킬 추가 = 키보드<br/>
                 스킬 삭제 = 키보드 Delete<br/>
-                다중 선택 =  Shift 또는 Ctrl 키를 이용하여 다중 선택 가능
+                다중 선택 = Shift 또는 Ctrl 키를 이용하여 다중 선택 가능
               </li>
               <li>• 단축키<br/>저장하기(Ctrl+S)<br/>삭제하기(Ctrl+D or Del)</li>
             </ul>
