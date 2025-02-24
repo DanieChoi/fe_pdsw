@@ -281,7 +281,7 @@ export default function Header() {
                         />
                       </div>
                       <div className="flex items-center">
-                        <span className="text-xs whitespace-nowrap text-[#333]">{item.title}</span>
+                        <span className={`text-xs whitespace-nowrap ${isActive ? 'text-white' : 'text-[#333]'}`}>{item.title}</span>
                         {count > 1 && (
                           <span className="ml-1 px-1.5 py-0.5 text-[10px] leading-none bg-[#E5F3F3] text-[#5BC2C1] rounded-full min-w-[16px] text-center">
                             {count}
