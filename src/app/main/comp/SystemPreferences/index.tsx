@@ -159,69 +159,6 @@ const SystemPreferences = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // 장비 선택 시 장비 상세내역 업데이트
-    useEffect(() => {
-        if (selectedDevice) {
-            setEquipmentNumber(selectedDevice.device_id);
-            setEquipmentName(selectedDevice.device_name);
-            setRefreshCycle(selectedDevice.channel_count.toString());
-            setMonitoringType(selectedDevice.usage === "사용" ? "oneTime" : "periodic");
-            setIsEditable(true);
-            
-            const selectedDeviceChannels = channelList.find(
-                channel => channel.device_id.toString() === selectedDevice.device_id
-            );
-
-            if (selectedDeviceChannels) {
-                const channels: ChannelRow[] = selectedDeviceChannels.channel_assign
-                    .map((assignValue, index) => ({
-                        channelNumber: index,
-                        channelName: `Channel No ${index}`,
-                        mode: getChannelMode(assignValue),
-                        assignValue: assignValue
-                    }));
-
-                setFilteredChannels(channels);
-                
-                // 이전에 선택된 채널 번호 확인
-                const prevChannelNumber = selectedChannel?.channelNumber;
-                if (prevChannelNumber !== undefined) {
-                    const existingChannel = channels.find(c => c.channelNumber === prevChannelNumber);
-                    if (existingChannel) {
-                        setSelectedChannel(existingChannel);
-                        setAllocationMode(selectedDeviceChannels.assign_kind.toString());
-                        setAllocationOutboundMode(existingChannel.assignValue.toString());
-                        return; // 첫 번째 채널 선택 방지
-                    }
-                }
-
-                // 첫 번째 채널 선택
-                if (channels.length > 0) {
-                    setSelectedChannel(channels[0]);
-                    setAllocationMode(selectedDeviceChannels.assign_kind.toString());
-                    setAllocationOutboundMode(channels[0].assignValue.toString());
-                } else {
-                    setSelectedChannel(null);
-                    setAllocationMode("");
-                    setAllocationOutboundMode("");
-                }
-            } else {
-                setFilteredChannels([]);
-                setSelectedChannel(null);
-                setAllocationMode("");
-                setAllocationOutboundMode("");
-            }
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedDevice, channelList]);
-
-    // 채널 선택 시 상세 정보 업데이트
-    useEffect(() => {
-        if (selectedChannel) {
-            setAllocationOutboundMode(selectedChannel.assignValue.toString());
-        }
-    }, [selectedChannel]);
-
     // 장비의 사용여부를 확인하는 함수
     const getDeviceUsage = (deviceId: number): string => {
         const deviceChannels = channelList.find(
@@ -234,20 +171,51 @@ const SystemPreferences = () => {
         return isAllZero ? "사용안함" : "사용";
     };
 
-    const getChannelMode = (assignValue: number): string => {
-        switch(assignValue) {
-            case 2147483647:
-                return "모든 캠페인사용";
-            case 0:
-                return "회선사용안함";
-            default: {
-                const campaign = campaigns.find(camp => camp.campaign_id === assignValue);
-                if (campaign) {
-                    return `ID[${campaign.campaign_id}] : ${campaign.campaign_name}`;
+    const getChannelMode = (assignValue: number, assignKind: number): string => {
+        if (assignKind === 1) {
+            // 캠페인으로 할당일 때 기존 로직
+            switch(assignValue) {
+                case 2147483647:
+                    return "모든 캠페인사용";
+                case 0:
+                    return "회선사용안함";
+                default: {
+                    const campaign = campaigns.find(camp => camp.campaign_id === assignValue);
+                    if (campaign) {
+                        return `ID[${campaign.campaign_id}] : ${campaign.campaign_name}`;
+                    }
+                    return "미할당";
                 }
-                return "미할당";
+            }
+        } else if (assignKind === 2) {
+            // 발신모드로 할당일 때 새로운 로직
+            switch(assignValue) {
+                case 0:
+                    return "회선사용안함";
+                case 2147483647:
+                    return "발신방법 모두사용";
+                case 1:
+                    return "Power Mode";
+                case 2:
+                    return "Progressive Mode";
+                case 3:
+                    return "Predictive Mode";
+                case 5:
+                    return "System Preview";
+                default:
+                    return "미할당";
+            }
+        } else if (assignKind === 3) {
+            switch(assignValue) {
+                case 0:
+                    return "회선사용안함";
+                case 2147483647:
+                    return "모든 그룹아이디 사용";
+                default:
+                    return "미할당";
             }
         }
+        return "미할당";
     };
 
     // 장비 목록 데이터 구성
@@ -330,49 +298,95 @@ const SystemPreferences = () => {
             channel_count: parseInt(refreshCycle)
         };
 
+        const handleApiResponse = (response: any) => {
+            if (response.result_code === -1) {
+                showConfirm('[LICENSE FULL] CIOD 접속 라이선스를 초과하였습니다.\n라이선스 문의 후 다시 시도하여 주십시오.', () => {});
+                return;
+            }
+            
+            if (selectedDevice) {
+                showConfirm('장비 정보가 성공적으로 수정되었습니다.', () => {});
+            } else {
+                showConfirm('새로운 장비 정보가 성공적으로 저장되었습니다.', () => {});
+            }
+        };
+
         if (selectedDevice) {
-            updateDevice(saveRequest);
-            showConfirm('장비 정보가 성공적으로 수정되었습니다.', () => {});
+            updateDevice(saveRequest, {
+                onSuccess: handleApiResponse
+            });
         } else {
-            createDevice(saveRequest);
-            showConfirm('새로운 장비 정보가 성공적으로 저장되었습니다.', () => {});
+            createDevice(saveRequest, {
+                onSuccess: handleApiResponse
+            });
         }
     };
 
     const handleChannelEdit = () => {
-        if (!selectedDevice || !selectedChannel) return;
+        if (!selectedDevice) return;
+        
         const deviceChannels = channelList.find(
             channel => channel.device_id.toString() === selectedDevice.device_id
         );
-
+    
         if (!deviceChannels) return;
-
-        const updatedChannelAssign = [...deviceChannels.channel_assign];
-        updatedChannelAssign[selectedChannel.channelNumber] = parseInt(allocationOutboundMode);
-
+    
+        let updatedChannelAssign: number[];
+    
+        // 할당모드가 변경되었는지 확인
+        if (deviceChannels.assign_kind.toString() !== allocationMode) {
+            // 할당모드가 변경된 경우 모든 채널을 0으로 설정
+            updatedChannelAssign = new Array(selectedDevice.channel_count).fill(0);
+        } else {
+            // 할당모드가 변경되지 않은 경우 기존 로직 유지
+            updatedChannelAssign = [...deviceChannels.channel_assign];
+            if (selectedChannel) {
+                updatedChannelAssign[selectedChannel.channelNumber] = parseInt(allocationOutboundMode);
+            }
+        }
+    
         const channelEditRequest = {
             device_id: parseInt(selectedDevice.device_id),
             assign_kind: parseInt(allocationMode),
             channel_count: selectedDevice.channel_count,
             channel_assign: updatedChannelAssign
         };
-
+    
         fetchChannelEdit(channelEditRequest);
         showConfirm('채널 정보가 성공적으로 수정되었습니다.', () => {});
     };
 
     const getAllocationOutboundModeOptions = () => {
-        const defaultOptions = [
-            { value: "2147483647", label: "모든 캠페인사용" },
-            { value: "0", label: "회선사용안함" },
-        ];
-        
-        const campaignOptions = campaigns.map(campaign => ({
-            value: campaign.campaign_id.toString(),
-            label: `ID[${campaign.campaign_id}] : ${campaign.campaign_name}`
-        }));
+        if (allocationMode === "1") {
+            // 캠페인으로 할당일 때 기존 옵션
+            const defaultOptions = [
+                { value: "2147483647", label: "모든 캠페인사용" },
+                { value: "0", label: "회선사용안함" },
+            ];
+            
+            const campaignOptions = campaigns.map(campaign => ({
+                value: campaign.campaign_id.toString(),
+                label: `ID[${campaign.campaign_id}] : ${campaign.campaign_name}`
+            }));
 
-        return [...defaultOptions, ...campaignOptions];
+            return [...defaultOptions, ...campaignOptions];
+        } else if (allocationMode === "2") {
+            // 발신모드로 할당일 때 새로운 옵션
+            return [
+                { value: "0", label: "회선사용안함" },
+                { value: "2147483647", label: "발신방법 모두사용" },
+                { value: "1", label: "Power Mode" },
+                { value: "2", label: "Progressive Mode" },
+                { value: "3", label: "Predictive Mode" },
+                { value: "5", label: "System Preview" }
+            ];
+        } else if (allocationMode === "3") {
+            return [
+                { value: "0", label: "회선사용안함" },
+                { value: "2147483647", label: "모든 그룹아이디 사용" }
+            ];
+        }
+        return [];
     };
 
     // 장비 목록용 rowClass 함수
@@ -384,6 +398,67 @@ const SystemPreferences = () => {
     const getChannelRowClass = (row: ChannelRow) => {
         return selectedChannel?.channelNumber === row.channelNumber ? 'bg-[#FFFAEE]' : '';
     };
+
+    // useEffect for handling channel selection and updates
+    useEffect(() => {
+        if (selectedDevice) {
+            setEquipmentNumber(selectedDevice.device_id);
+            setEquipmentName(selectedDevice.device_name);
+            setRefreshCycle(selectedDevice.channel_count.toString());
+            setMonitoringType(selectedDevice.usage === "사용" ? "oneTime" : "periodic");
+            setIsEditable(true);
+            
+            const selectedDeviceChannels = channelList.find(
+                channel => channel.device_id.toString() === selectedDevice.device_id
+            );
+
+            if (selectedDeviceChannels) {
+                const channels: ChannelRow[] = selectedDeviceChannels.channel_assign
+                    .map((assignValue, index) => ({
+                        channelNumber: index,
+                        channelName: `Channel No ${index}`,
+                        mode: getChannelMode(assignValue, selectedDeviceChannels.assign_kind),
+                        assignValue: assignValue
+                    }));
+
+                setFilteredChannels(channels);
+                setAllocationMode(selectedDeviceChannels.assign_kind.toString());
+                
+                // 이전에 선택된 채널 번호 확인
+                const prevChannelNumber = selectedChannel?.channelNumber;
+                if (prevChannelNumber !== undefined) {
+                    const existingChannel = channels.find(c => c.channelNumber === prevChannelNumber);
+                    if (existingChannel) {
+                        setSelectedChannel(existingChannel);
+                        setAllocationOutboundMode(existingChannel.assignValue.toString());
+                        return;
+                    }
+                }
+
+                // 첫 번째 채널 선택
+                if (channels.length > 0) {
+                    setSelectedChannel(channels[0]);
+                    setAllocationOutboundMode(channels[0].assignValue.toString());
+                } else {
+                    setSelectedChannel(null);
+                    setAllocationOutboundMode("");
+                }
+            } else {
+                setFilteredChannels([]);
+                setSelectedChannel(null);
+                setAllocationMode("");
+                setAllocationOutboundMode("");
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedDevice, channelList]);
+
+    // 채널 선택 시 상세 정보 업데이트
+    useEffect(() => {
+        if (selectedChannel) {
+            setAllocationOutboundMode(selectedChannel.assignValue.toString());
+        }
+    }, [selectedChannel]);
 
     return (
         <div className="space-y-5">
@@ -516,7 +591,7 @@ const SystemPreferences = () => {
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="할당발신모드 선택" />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent style={{ maxHeight: '300px', overflowY: 'auto' }}>
                                         {getAllocationOutboundModeOptions().map(option => (
                                             <SelectItem key={option.value} value={option.value}>
                                                 {option.label}
