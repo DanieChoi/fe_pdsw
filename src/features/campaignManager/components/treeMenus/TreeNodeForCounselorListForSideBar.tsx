@@ -506,7 +506,7 @@ export function TreeNodeForCounselorListForSideBar({
           <span className="w-3" />
         )}
         {renderIcon()}
-        <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
+        <span className={`text-sm text-555 ${isSelected ? "font-medium" : ""}`}>
           {label}
         </span>
       </div>

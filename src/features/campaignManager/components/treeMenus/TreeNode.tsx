@@ -359,7 +359,7 @@ export function TreeNode({
         <span className="w-3" />
       )}
       {getNodeIcon()}
-      <span className={clsx("text-sm", { "font-medium": isSelected })}>
+      <span className={clsx("text-sm text-555", { "font-medium": isSelected })}>
         {item.label}
       </span>
     </div>

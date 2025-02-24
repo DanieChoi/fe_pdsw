@@ -133,6 +133,9 @@ input::placeholder {
 .font-16{
   font-size: 16px;
 }
+.text-555{
+  color: #555;
+}
 
 .drag-tab{
   border-left: 1px solid #ebebeb;
@@ -153,6 +156,9 @@ input::placeholder {
   position: absolute;
   top:52px;
   right:-18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /*header*/
