@@ -90,13 +90,13 @@ const MainPage = () => {
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="flex flex-col h-full bg-white">
-        <div className="flex-none pt-[15px] pr-[35px] pl-[35px]">
+        <div className="flex-none pt-[15px] pr-[25px] pl-[35px]">
           {rows.map((row) => (
             <TabRow key={row.id} rowId={row.id} />
           ))}
         </div>
 
-        <div className="flex-1 overflow-auto py-[15px] px-[35px]">
+        <div className="flex-1 overflow-auto py-[15px] pl-[35px] pr-[25px]">
           <TabContent />
         </div>
       </div>

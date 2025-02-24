@@ -217,7 +217,7 @@ const TabContent = () => {
             return (
               <React.Fragment key={section.id}>
                 <div
-                  className="p-2 overflow-auto transition-all duration-75 ease-out"
+                  className="overflow-auto transition-all duration-75 ease-out"
                   style={{
                     width: `${section.width}%`,
                     border: sections.length === 2 ? '1px solid #bbb' : 'none'
