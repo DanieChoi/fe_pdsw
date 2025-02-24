@@ -153,6 +153,9 @@ input::placeholder {
   position: absolute;
   top:52px;
   right:-18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /*header*/

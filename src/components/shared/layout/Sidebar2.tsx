@@ -189,15 +189,13 @@ function SidebarToggleButton({ isOpen, onClick }: SidebarToggleButtonProps) {
   return (
     <button
       onClick={onClick}
-      className="absolute -right-0 top-[85px] w-7 h-9 flex items-center justify-center
-                bg-white border border-gray-300 rounded-lg shadow-sm
-                hover:bg-gray-100 hover:border-gray-400
+      className="sidebar-button
                 transition-all duration-300 ease-in-out z-30"
     >
       {isOpen ? (
-        <ChevronLeft className="w-4 h-4 text-gray-600" />
+        <ChevronLeft className="w-3 h-3 text-gray-600" />
       ) : (
-        <ChevronRight className="w-4 h-4 text-gray-600" />
+        <ChevronRight className="w-3 h-3 text-gray-600" />
       )}
     </button>
   );
@@ -274,8 +272,7 @@ export default function SidebarContainer() {
       <div 
         className="flex flex-col transition-all duration-300 ease-in-out relative"
         style={{ 
-          width: storeIsOpen ? `${storeWidth}px` : '30px',
-          minWidth: '30px'
+          width: storeIsOpen ? `${storeWidth}px` : '0',
         }}
       >
         {/* Main Content Area */}
