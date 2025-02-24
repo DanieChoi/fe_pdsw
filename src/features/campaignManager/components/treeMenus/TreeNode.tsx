@@ -260,6 +260,11 @@ export function TreeNode({
     }
   }, [item.id, hasChildren, onNodeSelect, onNodeToggle]);
 
+  // 우클릭 시 노드 선택을 처리하는 함수 추가
+  const handleContextMenu = useCallback(() => {
+    onNodeSelect(item.id);
+  }, [item.id, onNodeSelect]);
+
   const handleDoubleClick = useCallback(() => {
     if (item.type !== "campaign") return;
     simulateHeaderMenuClick(2);
@@ -270,26 +275,35 @@ export function TreeNode({
     return null;
   }
 
+  //
   const getNodeIcon = () => {
-    switch (item.type) {
-      case "folder":
-        return (
-          <Image
-            src="/tree-menu/tennant_office.png"
-            alt="폴더"
-            width={14}
-            height={12}
-          />
-        );
-      case "campaign":
-        return statusIcon ? (
-          <Image src={statusIcon} alt="status" width={12} height={12} />
-        ) : (
-          <FileText className="h-4 w-4 text-gray-400" />
-        );
-      default:
-        return <FileText className="h-4 w-4 text-gray-400" />;
+    if (item.type === "folder") {
+      return level === 0 ? (
+        <Image
+          src="/tree-menu/organization.png"
+          alt="조직"
+          width={14}
+          height={12}
+        />
+      ) : (
+        <Image
+          src="/tree-menu/folder.png"
+          alt="그룹"
+          width={14}
+          height={12}
+        />
+      );
     }
+    
+    if (item.type === "campaign") {
+      return statusIcon ? (
+        <Image src={statusIcon} alt="status" width={12} height={12} />
+      ) : (
+        <FileText className="h-4 w-4 text-gray-400" />
+      );
+    }
+    
+    return <FileText className="h-4 w-4 text-gray-400" />;
   };
 
   const handleEdit = () => {
@@ -316,9 +330,9 @@ export function TreeNode({
   };
 
   const nodeStyle = clsx(
-    "flex items-center hover:bg-gray-100 px-2 py-1.5 cursor-pointer transition-colors duration-150",
+    "flex items-center hover:bg-[#FFFAEE] px-2 py-0.5 cursor-pointer transition-colors duration-150",
     {
-      "bg-blue-50 text-blue-600 hover:bg-blue-100": isSelected,
+      "bg-[#FFFAEE]": isSelected,
     }
   );
 
@@ -359,6 +373,7 @@ export function TreeNode({
             <div
               className={nodeStyle}
               onClick={handleClick}
+              onContextMenu={handleContextMenu}
               style={{ paddingLeft: `${level * 16 + 8}px` }}
             >
               {nodeContent}
@@ -378,6 +393,7 @@ export function TreeNode({
             className={nodeStyle}
             onClick={handleClick}
             onDoubleClick={handleDoubleClick}
+            onContextMenu={handleContextMenu}
             style={{ paddingLeft: `${level * 16 + 8}px` }}
           >
             {nodeContent}

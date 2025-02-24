@@ -98,17 +98,17 @@ export function TreeMenusForCampaigns() {
   }, [isLoading, error, treeData, expandNodes, originalItems]);
 
   if (isLoading) {
-    return <div className="p-4 min-h-[calc(100%-148px)]">Loading...</div>;
+    return <div className="p-4 flex-1 min-h-[calc(100%-148px)]">Loading...</div>;
   }
   if (error) {
-    return <div className="p-4 text-red-600">{(error as Error).message}</div>;
+    return <div className="p-4 text-red-600 flex-1 min-h-[calc(100%-148px)]">{(error as Error).message}</div>;
   }
 
   console.log("원본 items:", originalItems);
   console.log("필터링된 items:", filteredItems);
 
   return (
-    <div className="flex-1 overflow-auto">
+    <div className="flex-1 overflow-auto tree-node">
       {filteredItems.map((item: TreeItem) => (
         <TreeNode
           key={item.id}
