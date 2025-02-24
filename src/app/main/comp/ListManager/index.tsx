@@ -259,8 +259,8 @@ const ListManager: React.FC = () => {
 
   // 모달 핸들러
   const handleFileFormatOpen = () => {    
-    setUploadedFiles([]);
-    setSendList([]);
+    // setUploadedFiles([]);
+    // setSendList([]);
     setIsFileFormatOpen(true);
   } 
   const handleFileFormatClose = () => setIsFileFormatOpen(false);
@@ -504,8 +504,9 @@ const ListManager: React.FC = () => {
     setSelectedFileName("");
     setTargetType("general");
     setSelectedFile(null);
-    setUploadedFiles([]);
-    setSendList([]);
+    // setUploadedFiles([]);
+    // setSendList([]);
+    setCampaignIdDisabled(false);
   };
 
   // 작업대상 올리기

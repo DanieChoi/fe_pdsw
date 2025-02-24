@@ -27,6 +27,26 @@ interface SendRow {
   TKDA: string;
 }
 
+const HeaderColumn : Column<SendRow>[] = [
+  { key: 'CSKE', name: '고객키(1)'},
+  { key: 'CSK2', name: '고객키(2)'},
+  { key: 'CSK3', name: '고객키(3)'},
+  { key: 'CSNA', name: '고객이름'},
+  { key: 'TNO1', name: '고객 전화번호(1)'},
+  { key: 'TNO2', name: '고객 전화번호(2)'},
+  { key: 'TNO3', name: '고객 전화번호(3)'},
+  { key: 'TNO4', name: '고객 전화번호(4)'},
+  { key: 'TNO5', name: '고객 전화번호(5)'},
+  { key: 'CSC1', name: '고객성향[1]'},
+  { key: 'CSC2', name: '고객성향[2]'},
+  { key: 'CSC3', name: '고객성향[3]'},
+  { key: 'CSC4', name: '고객성향[4]'},
+  { key: 'CSC5', name: '고객성향[5]'},
+  { key: 'CSC6', name: '고객성향[6]'},
+  { key: 'EMPLOYEEID', name: '고객성향[1]'},
+  { key: 'TKDA', name: '토큰데이터'},
+];
+
 interface DataProps {
   no: number;
   division: number;
@@ -47,7 +67,7 @@ const SenderList: React.FC<SenderListProps> = ({ headerData, _sendList }) => {
   // 목록 데이터 상태
   const [sendList, setSendList] = useState<SendRow[]>([]);
 
-  const [sendColumns, setSendColumns] = useState<Column<SendRow>[]>([]);
+  const [sendColumns, setSendColumns] = useState<Column<SendRow>[]>(HeaderColumn);
   
   // 행 클릭 핸들러
   const handleSendRowClick = ({ row }: CellClickArgs<SendRow>) => {
@@ -60,7 +80,7 @@ const SenderList: React.FC<SenderListProps> = ({ headerData, _sendList }) => {
   
   useEffect(() => {
     if( headerData.length > 0 ) {     
-      setSendColumns(headerData);
+      // setSendColumns(headerData);   
     }
     setSendList(_sendList);
   }, [headerData, _sendList]);
