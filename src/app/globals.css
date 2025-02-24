@@ -133,7 +133,17 @@ input::placeholder {
 .font-16{
   font-size: 16px;
 }
+
+
+
 /*header*/
+
+.header-top{
+  background-color: #55BEC8;
+  padding-left: 24px;
+  padding-right: 16px;
+}
+
 .menu-item{
   position: relative;
 }

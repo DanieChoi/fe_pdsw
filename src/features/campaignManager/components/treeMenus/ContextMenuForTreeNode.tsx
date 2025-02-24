@@ -148,7 +148,7 @@ export function ContextMenuForTreeNode({
   
       // 로컬 상태 업데이트
       setCurrentStatus(status);
-      simulateHeaderMenuClick(14);
+      // simulateHeaderMenuClick(14);
   
       console.log('Status changed successfully:', {
         campaignId: item.id,

@@ -205,8 +205,8 @@ export default function Header() {
 
   return (
     <div className="flex flex-col">
-      <div className="header-top bg-[#5BC2C1] h-[28px] flex items-center">
-        <div className="px-4 flex justify-between items-center w-full">
+      <div className="header-top h-[28px] flex items-center">
+        <div className="flex justify-between items-center w-full">
           <div className="flex items-center">
             <Image
               src="/header-menu/nexpds-logo.svg"
@@ -221,8 +221,8 @@ export default function Header() {
               <Image
                 src="/header-menu/top_pic.svg"
                 alt="사용자"
-                width={18}
-                height={18}
+                width={14}
+                height={14}
                 priority
               />
               <span>{id}({role_id === 1?'상담사'
@@ -241,8 +241,8 @@ export default function Header() {
               <Image
                 src="/header-menu/log-out.svg"
                 alt="로그아웃"
-                width={14}
-                height={10}
+                width={11}
+                height={12}
                 priority
               />
             </CommonButton>
@@ -252,7 +252,7 @@ export default function Header() {
       <header className="bg-white border-b">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between header-padding">
-            <nav className="flex overflow-x-auto gap-4">
+            <nav className="flex overflow-x-auto gap-3">
               {menuItems.map((item) => {
                 const count = getTabCountById(item.id);
                 const isActive = isActiveTab(item.id);
