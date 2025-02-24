@@ -41,6 +41,7 @@ import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSc
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 import { useApiForCampaignAgent } from '@/features/campaignManager/hooks/useApiForCampaignAgent';
+import { useApiForCallingListDelete } from '@/features/listManager/hooks/useApiForCallingListDelete';
 
 export interface TabItem {
   id: number;
@@ -1201,7 +1202,6 @@ export default function CampaignDetail() {
     }
   });
 
-
   //캠페인 재발신 스케줄링 정보 삭제 api 호출
   const { mutate: fetchAutoRedialDelete } = useApiForAutoRedialDelete({
     onSuccess: (data) => {
@@ -1293,7 +1293,7 @@ export default function CampaignDetail() {
     }
   };
 
-  //리스트 적용,리스트 삭제 버튼 이벤트
+  //리스트 적용 버튼 이벤트
   const handleListManager = () => {
     if (openedTabs.some(tab => tab.id === 7)) {
       setActiveTab(7, openedTabs.filter((data) => data.id === 7)[0].uniqueKey);
@@ -1305,6 +1305,38 @@ export default function CampaignDetail() {
         icon: '',
         href: '',
         content: null,
+      });
+    }
+  };
+  
+  // 발신리스트 업로드 취소 api 호출
+  const { mutate: fetchCallingListDelete } = useApiForCallingListDelete({
+    onSuccess: (data) => {   
+      setAlertState((prev) => ({ ...prev, isOpen: false }));
+    }
+  });
+
+  //리스트 삭제 버튼 이벤트
+  const handleListManagerDelete = () => {
+    if (selectedCampaign?.start_flag === 3) {
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '캠페인 아이디 : ' + tempCampaignManagerInfo.campaign_id
+          + '\n 캠페인 이름 : ' + tempCampaignManagerInfo.campaign_name
+          + '\n\n 발신리스트 삭제시 발신리스트와 캠페인 진행정보가 초기화 됩니다.'
+          + '\n 삭제된 발신리스트와 캠페인 진행정보는 복구가 불가능합니다.'
+          + '\n 발신리스트를 삭제하시겠습니까?',
+        onClose: () => fetchCallingListDelete(tempCampaignInfo.campaign_id),
+        onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    } else {
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '캠페인 삭제는 중지 상태에서만 가능합니다.',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+        onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
   };
@@ -1412,7 +1444,7 @@ export default function CampaignDetail() {
             { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
             { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
             { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
-            { label: "리스트 삭제", onClick: () => handleListManager(), variant: "customblue" },
+            { label: "리스트 삭제", onClick: () => handleListManagerDelete(), variant: "customblue" },
             { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
             { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
           ]}
