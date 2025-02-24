@@ -4,8 +4,8 @@
 import React from "react";
 import { useTabStore } from "@/store/tabStore";
 import TabSection from "./TabSection";
-import { Button } from "@/components/ui/button";
-import { Minus, Plus } from "lucide-react";
+import { CommonButton } from "@/components/shared/CommonButton";
+import Image from "next/image";
 
 interface TabRowProps {
   rowId: string;
@@ -22,10 +22,11 @@ const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
     if (row.sections.length === 1) {
       // 현재 행에 새로운 섹션 추가 (최대 2개)
       addSection(rowId);
-    } else if (row.sections.length === 2) {
-      // 만약 섹션이 이미 2개라면, 새 행 추가
-      addRow();
-    }
+    } 
+    // else if (row.sections.length === 2) {
+    //   // 만약 섹션이 이미 2개라면, 새 행 추가
+    //   addRow();
+    // }
   };
 
   // 행 삭제 핸들러
@@ -36,7 +37,7 @@ const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
   const canRemove = rowId !== "row-1"; // 예시로 첫 번째 행은 삭제 불가능
 
   return (
-    <div className="flex items-center min-h-[44px] w-full">
+    <div className="flex items-center min-h-[30px] w-full border-b border-[#ebebeb]">
       {/* 섹션들 (탭 목록 부분) */}
       <div className="flex-1 flex w-[calc(100%-46px)]">
         {row.sections.map((section, idx) => {
@@ -55,25 +56,33 @@ const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
       </div>
 
       {/* 행 우측의 +, - 버튼 */}
-      <div className="flex-none flex items-center gap-1 px-2">
-        <Button
-          variant="ghost"
+      <div className="flex-none flex items-center">
+        <CommonButton
+          variant="tabEtc"
           size="icon"
           onClick={handleSplitClick}
-          className="h-6 w-6 hover:bg-gray-100"
         >
-          <Plus className="h-4 w-4" />
-        </Button>
+          <Image
+              src="/header-menu/tab_plus.svg"
+              alt="plus"
+              width={8}
+              height={8}
+            />
+        </CommonButton>
 
         {canRemove && (
-          <Button
-            variant="ghost"
+          <CommonButton
+            variant="tabEtc"
             size="icon"
             onClick={handleRemoveRow}
-            className="h-6 w-6 hover:bg-red-100"
           >
-            <Minus className="h-4 w-4 text-red-500" />
-          </Button>
+            <Image
+              src="/header-menu/tab_minus.svg"
+              alt="minus"
+              width={8}
+              height={8}
+            />
+          </CommonButton>
         )}
       </div>
     </div>

@@ -6,7 +6,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { X } from "lucide-react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { CommonButton } from "@/components/shared/CommonButton";
 
 interface DraggableTabProps {
   id: number;
@@ -55,9 +55,8 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
       {...attributes}
       {...listeners}
       className={`
-        flex items-center gap-2 px-3 py-1.5 h-8
-        border border-gray-200 rounded-lg cursor-pointer
-        ${isActive ? "bg-[#56CAD6] text-white" : "bg-white hover:bg-gray-50"}
+        flex items-center gap-2 px-3 py-1.5 h-[30px] drag-tab cursor-pointer
+        ${isActive ? "bg-[#56CAD6] text-white" : "bg-white text-[#777]"}
       `}
       onClick={onSelect}
     >
@@ -71,18 +70,24 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
         />
       )} */}
       <span className="text-sm whitespace-nowrap">{title}</span>
-      <Button
+      <CommonButton
         variant="ghost"
         size="sm"
         onClick={(e) => {
           e.stopPropagation();
           onRemove();
         }}
-        className={`ml-1 p-0.5 h-5 w-5 rounded-full 
-          ${isActive ? "hover:bg-[#369ea9]" : "hover:bg-gray-200"}`}
+        className={`
+          p-0
+          ${isActive ? "hover:bg-[transparent]" : "hover:bg-[transparent]"}`}
       >
-        <X className="h-3 w-3" />
-      </Button>
+      <Image
+          src={isActive ? "/header-menu/maintap_colse_on.png" : "/header-menu/maintap_colse_off.png"}
+          alt="닫기"
+          width={8}
+          height={8}
+        />
+      </CommonButton>
     </div>
   );
 };
