@@ -144,6 +144,17 @@ input::placeholder {
   border-left: 0;
 }
 
+.sidebar-button{
+  border:1px solid #ebebeb;
+  border-left: 0;
+  border-radius: 0 3px 3px 0;
+  width:18px;
+  height: 40px;
+  position: absolute;
+  top:52px;
+  right:-18px;
+}
+
 /*header*/
 
 .header-top{
