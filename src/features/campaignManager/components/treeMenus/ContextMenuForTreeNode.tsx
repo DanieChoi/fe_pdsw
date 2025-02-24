@@ -49,6 +49,7 @@ export function ContextMenuForTreeNode({
   const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab } = useTabStore();
   const [isBlacklistPopupOpen, setIsBlacklistPopupOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<CampaignStatus>(item.status);
+  const [blackListCount, setBlackListCount] = useState<number>(0);
 
   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
     onSuccess: (data) => {
@@ -171,6 +172,7 @@ export function ContextMenuForTreeNode({
   //캠페인 블랙리스트 건수 조회 api 호출
   const { mutate: fetchCampaignBlacklistCount } = useApiForCampaignBlacklistCount({
     onSuccess: (data) => {
+      setBlackListCount(data.result_data.blacklist_count);
       setTimeout(() => {
         setIsBlacklistPopupOpen(true);
       }, 100);
@@ -277,6 +279,7 @@ export function ContextMenuForTreeNode({
     {isBlacklistPopupOpen && (
         <BlackListCountPopup
           campaignId={item.id}
+          blackListCount={blackListCount}
           isOpen={isBlacklistPopupOpen}
           onConfirm={() => setIsBlacklistPopupOpen(false)}
           onCancel={() => setIsBlacklistPopupOpen(false)}

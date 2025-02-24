@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 
 export interface BlackListCountPopupProps {
     campaignId?: string;
+    blackListCount?:number;
     isOpen?: boolean;
     onConfirm?: () => void;
     onCancel?: () => void;
@@ -12,6 +13,7 @@ export interface BlackListCountPopupProps {
 
 const BlackListCountPopup = ({
     campaignId,
+    blackListCount,
     isOpen = false,
     onConfirm = () => {},
     onCancel
@@ -52,7 +54,7 @@ const BlackListCountPopup = ({
                 {isLoading ? (
                     <span>로딩 중...</span>
                 ) : (
-                    <span>{mockData.blacklistCount.toLocaleString()}</span>
+                    <span>{blackListCount}</span>
                 )}
             </div>
             <div className="flex items-center gap-2 justify-between">
