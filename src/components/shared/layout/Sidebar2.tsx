@@ -1,3 +1,4 @@
+
 // "use client";
 
 // import { useState, useEffect } from "react";
@@ -20,7 +21,7 @@
 //   return (
 //     <button
 //       onClick={onClick}
-//       className="absolute -right-0 top-20 w-7 h-9 flex items-center justify-center
+//       className="absolute -right-0 top-[85px] w-7 h-9 flex items-center justify-center
 //                 bg-white border border-gray-300 rounded-lg shadow-sm
 //                 hover:bg-gray-100 hover:border-gray-400
 //                 transition-all duration-300 ease-in-out z-30"
@@ -49,7 +50,6 @@
 // }));
 
 // export default function SidebarContainer() {
-//   // zustand store에서 상태 가져오기
 //   const storeWidth = useSidebarWidthStore(state => state.width);
 //   const storeIsOpen = useSidebarWidthStore(state => state.isOpen);
 //   const setStoreWidth = useSidebarWidthStore(state => state.setWidth);
@@ -104,42 +104,48 @@
 //   return (
 //     <div className="flex h-full bg-white border-r relative">
 //       <div 
-//         className={`flex flex-col transition-all duration-300 ease-in-out`}
+//         className="flex flex-col transition-all duration-300 ease-in-out relative"
 //         style={{ 
 //           width: storeIsOpen ? `${storeWidth}px` : '30px',
 //           minWidth: '30px'
 //         }}
 //       >
-//         {/* 상단 헤더 */}
-//         <div className={`flex-none flex items-center justify-between py-1.5 px-[17px] border-b
-//                         ${!storeIsOpen ? 'opacity-0' : ''}`}>
-//           <div className="flex items-center gap-2">
-//             <div className="text-sm text-[#444] font-medium flex gap-2 items-center">
-//               <div>
-//                 {selectedTabId && (
-//                   <Image 
-//                     src={baseTabs.find((tab) => tab.id === selectedTabId)?.icon || "/tree-menu/campaign_icon_for_sidemenu.png"} 
-//                     alt={baseTabs.find((tab) => tab.id === selectedTabId)?.label || "탭아이콘"} 
-//                     width={baseTabs.find((tab) => tab.id === selectedTabId)?.iconWidth || 13} 
-//                     height={baseTabs.find((tab) => tab.id === selectedTabId)?.iconHeight || 13} 
-//                   />
-//                 )}
+//         {/* Main Content Area */}
+//         <div className="flex-1 relative flex flex-col min-h-0"> {/* min-h-0 추가 */}
+//           <div className={`absolute inset-0 flex flex-col transition-all duration-300 ease-in-out
+//                         ${!storeIsOpen ? 'invisible' : ''}`}>
+//             {/* 상단 헤더 */}
+//             <div className="flex-none flex items-center justify-between py-1.5 px-[17px] border-b">
+//               <div className="flex items-center gap-2">
+//                 <div className="text-sm text-[#444] font-medium flex gap-2 items-center">
+//                   <div>
+//                     {selectedTabId && (
+//                       <Image 
+//                         src={baseTabs.find((tab) => tab.id === selectedTabId)?.icon || "/tree-menu/campaign_icon_for_sidemenu.png"} 
+//                         alt={baseTabs.find((tab) => tab.id === selectedTabId)?.label || "탭아이콘"} 
+//                         width={baseTabs.find((tab) => tab.id === selectedTabId)?.iconWidth || 13} 
+//                         height={baseTabs.find((tab) => tab.id === selectedTabId)?.iconHeight || 13} 
+//                       />
+//                     )}
+//                   </div>
+//                   {baseTabs.find((tab) => tab.id === selectedTabId)?.label}
+//                 </div>
 //               </div>
-//               {baseTabs.find((tab) => tab.id === selectedTabId)?.label}
+//               <div className="flex items-center gap-2">
+//                 <TabActions tabId={selectedTabId} />
+//               </div>
+//             </div>
+
+//             {/* 트리메뉴 영역 */}
+//             <div className="flex-1 overflow-hidden min-h-0"> {/* min-h-0와 overflow-hidden 추가 */}
+//               {renderTreeMenu()}
 //             </div>
 //           </div>
-//           <div className="flex items-center gap-2">
-//             <TabActions tabId={selectedTabId} />
-//           </div>
 //         </div>
 
-//         {/* 트리메뉴 영역 */}
-//         <div className={`flex-1 ${!storeIsOpen ? 'opacity-0' : ''}`}>
-//           {renderTreeMenu()}
-//         </div>
-
-//         {/* 하단 탭 메뉴 */}
-//         <div className={`${!storeIsOpen ? 'opacity-0' : ''}`}>
+//         {/* 하단 탭 메뉴 - Always visible */}
+//         <div className={`flex-none transition-all duration-300 ease-in-out 
+//                       ${!storeIsOpen ? 'scale-x-[0.125] origin-left' : ''}`}>
 //           <BottomTabsForSideMenu
 //             selectedTabId={selectedTabId}
 //             onTabChange={setSelectedTabId}
@@ -189,9 +195,9 @@ function SidebarToggleButton({ isOpen, onClick }: SidebarToggleButtonProps) {
                 transition-all duration-300 ease-in-out z-30"
     >
       {isOpen ? (
-        <ChevronLeft className="w-5 h-5 text-gray-600" />
+        <ChevronLeft className="w-4 h-4 text-gray-600" />
       ) : (
-        <ChevronRight className="w-5 h-5 text-gray-600" />
+        <ChevronRight className="w-4 h-4 text-gray-600" />
       )}
     </button>
   );
@@ -273,7 +279,7 @@ export default function SidebarContainer() {
         }}
       >
         {/* Main Content Area */}
-        <div className="flex-1 relative flex flex-col min-h-0"> {/* min-h-0 추가 */}
+        <div className="flex-1 relative flex flex-col min-h-0">
           <div className={`absolute inset-0 flex flex-col transition-all duration-300 ease-in-out
                         ${!storeIsOpen ? 'invisible' : ''}`}>
             {/* 상단 헤더 */}
@@ -298,14 +304,16 @@ export default function SidebarContainer() {
               </div>
             </div>
 
-            {/* 트리메뉴 영역 */}
-            <div className="flex-1 overflow-hidden min-h-0"> {/* min-h-0와 overflow-hidden 추가 */}
-              {renderTreeMenu()}
+            {/* 트리메뉴 영역 - 스크롤 가능한 컨테이너 */}
+            <div className="flex-1 min-h-0 relative">
+              <div id="tree-menu-container" className="absolute inset-0 overflow-y-auto">
+                {renderTreeMenu()}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* 하단 탭 메뉴 - Always visible */}
+        {/* 하단 탭 메뉴 */}
         <div className={`flex-none transition-all duration-300 ease-in-out 
                       ${!storeIsOpen ? 'scale-x-[0.125] origin-left' : ''}`}>
           <BottomTabsForSideMenu

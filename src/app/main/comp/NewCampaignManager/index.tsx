@@ -79,8 +79,8 @@ const NewCampaignManager = ({tenantId}: Props) => {
 
   return (
     <div>
-      <div className='flex flex-col gap-4'>
-          <div className="flex gap-5">
+      <div className='flex flex-col gap-[15px]'>
+          <div className="flex gap-[30px]">
             <NewCampaignManagerDetail tenantId={tenantId}/>
           </div> 
         </div>

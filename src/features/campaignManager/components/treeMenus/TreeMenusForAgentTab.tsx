@@ -251,7 +251,7 @@ export function TreeMenusForAgentTab() {
           // 요소가 스크롤 영역의 중앙에 오도록 스크롤 위치 조정
           scrollContainer.scrollTop = (
             targetElement.offsetTop - 
-            scrollContainer.offsetTop - 
+            (scrollContainer as HTMLElement).offsetTop - 
             (scrollContainer.clientHeight / 2) + 
             (targetElement.clientHeight / 2)
           );

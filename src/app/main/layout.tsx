@@ -133,7 +133,7 @@ export default function MainLayout({
 
   // 사이드바 상태에 따른 main 영역 너비 계산
   const getMainWidth = () => {
-    return isOpen ? `calc(100% - ${width}px)` : 'calc(100% - 40px)';
+    return isOpen ? `calc(100% - ${width}px)` : '100%';
   };
 
   return (
