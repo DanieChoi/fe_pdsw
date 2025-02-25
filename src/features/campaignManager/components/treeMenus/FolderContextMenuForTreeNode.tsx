@@ -7,7 +7,7 @@ import {
 import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useTabStore } from "@/store/tabStore";
 import { Check } from "lucide-react";
-
+import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 export interface FolderContextMenuProps {
   item: {
     id: string;
@@ -90,7 +90,7 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
         <ContextMenuItem
           key={menuItem.id}
           onClick={menuItem.handler}
-          className="cursor-pointer hover:bg-blue-50 focus:bg-blue-50 flex items-center px-2 h-6 text-gray-700"
+          className="cursor-pointer hover:bg-[#F4F6F9] focus:bg-[#F4F6F9] flex items-center text-[#333] px-2 py-1.5"
         >
           {/* 체크박스가 필요한 메뉴는 체크박스 표시 */}
           {checkableMenuIds.includes(menuItem.id) ? (
