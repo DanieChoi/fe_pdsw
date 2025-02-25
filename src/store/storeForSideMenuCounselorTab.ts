@@ -1,3 +1,4 @@
+// // C:\nproject\fe_pdsw\src\store\storeForSideMenuCounselorTab.ts
 // "use client";
 
 // import { create } from 'zustand';
@@ -102,6 +103,13 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
 export type BlendKind = 1 | 2 | 3 | null; // 1: inbound, 2: outbound, 3: blend
+export type SortType = 'name' | 'id';
+export type SortDirection = 'asc' | 'desc';
+
+export interface SortOption {
+  type: SortType;
+  direction: SortDirection;
+}
 
 interface CounselorFilterState {
   selectedBlendKind: BlendKind;
@@ -111,11 +119,13 @@ interface CounselorFilterState {
     tenantId: string | null;
   };
   candidateMembersForSkilAssign: any[];
+  sortOption: SortOption;
   setSelectedBlendKind: (blendKind: BlendKind) => void;
   setSelectedCounselor: (counselorId: string, counselorName: string, tenantId: string) => void;
   setCandidateMembersForSkilAssign: (members: any[]) => void;
   resetFilter: () => void;
   getState: () => void;
+  setSortOption: (option: SortOption) => void;
 }
 
 export const useCounselorFilterStore = create<CounselorFilterState>()(
@@ -128,6 +138,7 @@ export const useCounselorFilterStore = create<CounselorFilterState>()(
         tenantId: null,
       },
       candidateMembersForSkilAssign: [],
+      sortOption: { type: 'name', direction: 'asc' },
 
       setSelectedBlendKind: (blendKind) => {
         set(
@@ -172,6 +183,7 @@ export const useCounselorFilterStore = create<CounselorFilterState>()(
               tenantId: null 
             },
             candidateMembersForSkilAssign: [],
+            sortOption: { type: 'name', direction: 'asc' },
           },
           false,
           'counselorFilter/resetFilter'
@@ -183,8 +195,14 @@ export const useCounselorFilterStore = create<CounselorFilterState>()(
         console.log('Current state:', {
           selectedBlendKind: get().selectedBlendKind,
           selectedCounselor: get().selectedCounselor,
-          candidateMembersForSkilAssign: get().candidateMembersForSkilAssign
+          candidateMembersForSkilAssign: get().candidateMembersForSkilAssign,
+          sortOption: get().sortOption,
         });
+      },
+
+      setSortOption: (option) => {
+        set({ sortOption: option }, false, 'counselorFilter/setSortOption');
+        console.log('Sort Option updated:', get().sortOption);
       }
     }),
     {
