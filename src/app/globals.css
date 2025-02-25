@@ -252,6 +252,8 @@ input::placeholder {
   text-align: left;
   padding: 0px 15px;
   border-bottom: 1px solid hsl(var(--border));
+  height: auto;
+  min-height: 36px;
 }
 .table-custom td{
   border-bottom: 1px solid hsl(var(--border));
@@ -308,10 +310,6 @@ input::placeholder {
 .tab-custom-wrap button{
   position: relative;
   z-index: 2;
-}
-
-.tab-custom-wrap>div button{
-  
 }
 
 
