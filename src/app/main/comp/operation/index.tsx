@@ -33,7 +33,7 @@ export default function OperationBoard() {
     { id: 'section3', title: '예약콜 제한 설정', content: <CallLimitSetting/> },
     { id: 'section4', title: '분배호수 제한 설정', content: <DistributionLimit/>},
     { id: 'section5', title: '스킬편집', content: <SkillEdit/> },
-    { id: 'section6', title: '상담 결과코드 설정', content: <ConsultResultSetting/> },
+    // { id: 'section6', title: '상담 결과코드 설정', content: <ConsultResultSetting/> },
     { id: 'section7', title: '서스팬드', content: <SuspendView/> },
   ]
 
