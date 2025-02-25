@@ -71,11 +71,11 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
 
   return (
     <div className="flex title-background justify-between">
-      <div className='flex gap-[40px] bp:gap-[10px] items-center'>
+      <div className='flex gap-[40px] gap-use-10 items-center'>
         <div className="flex items-center">
             <Label className="pr-[15px]">테넌트</Label>
             <Select defaultValue='all' value={tenantId} onValueChange={setTenantId}>
-                <SelectTrigger className="w-[180px] lg:w-[140px]">
+                <SelectTrigger className="w-[180px] w-use-140">
                 <SelectValue placeholder="테넌트" />
                 </SelectTrigger>
                 <SelectContent>
@@ -92,13 +92,13 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
           type="text" 
           value={campaignName}
           onChange={(e) => setCampaignName(e.target.value)}
-          className="w-[180px] bp:w-[140px]"
+          className="w-[180px] w-use-140"
         />
         </div>
         <div className="flex items-center">
             <Label className="pr-[15px]">다이얼 모드</Label>
             <Select defaultValue='all' value={dailMode} onValueChange={setDailMode}>
-                <SelectTrigger className="w-[180px] bp:w-[140px]">
+                <SelectTrigger className="w-[180px] w-use-140">
                 <SelectValue placeholder="다이얼 모드" />
                 </SelectTrigger>
                 <SelectContent>
@@ -112,7 +112,7 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
         <div className="flex items-center">
             <Label className="pr-[15px]">스킬</Label>
             <Select  defaultValue='all' value={skill} onValueChange={setSkill}>
-                <SelectTrigger className="w-[180px] bp:w-[140px]">
+                <SelectTrigger className="w-[180px] w-use-140">
                 <SelectValue placeholder="스킬" />
                 </SelectTrigger>
                 <SelectContent>
@@ -129,7 +129,7 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
             type="text" 
             value={callNumber}
             onChange={(e) => setCallNumber(e.target.value)}
-            className="w-[180px] bp:w-[140px]"
+            className="w-[180px] w-use-140"
           />
         </div>
       </div>

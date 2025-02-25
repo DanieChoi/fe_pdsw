@@ -343,6 +343,10 @@ input::placeholder {
   border-bottom: 1px solid #ebebeb;
   text-align: center;
   font-size: 13px;
+  color: #444;
+}
+.grid-custom.text-align-left .rdg-row .rdg-cell{
+  text-align: left;
 }
 .grid-custom.text-left .rdg-row .rdg-cell{
   border-bottom: 1px solid #ebebeb;
@@ -438,6 +442,12 @@ input::placeholder {
 .custom-calendar .react-date-picker__inputGroup{
   padding:0 10px;
 }
+
+.custom-calendar .react-date-picker__inputGroup__input{
+  font-size: 13px;
+  color: #333;
+}
+
 
 /* 캘린더 헤더 */
 .custom-calendar .react-calendar__navigation {
@@ -592,6 +602,8 @@ html, body {
   background: #ebebeb;
   padding: 4px 0;
 }
+
+/*발신진행정보*/
 .out-wrap {
   container-type: inline-size;
   container-name: out-wrap;
@@ -630,6 +642,20 @@ html, body {
     min-width:calc(60% - 20px);
     flex: none;
     height: auto;
+  }
+}
+
+
+.compaign-wrap {
+  container-type: inline-size; /* 너비 기준으로 컨테이너 쿼리 활성화 */
+}
+
+@container (max-width: 1500px) {
+  .gap-use-10 {
+    gap: 10px;
+  }
+  .w-use-140{
+    width: 140px;
   }
 }
 

@@ -180,8 +180,8 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
             columns={memoizedColumns} 
             rows={memoizedRows} 
             className="grid-custom" 
-            rowHeight={26}
-            headerRowHeight={26}
+            rowHeight={30}
+            headerRowHeight={30}
             onCellClick={handleCellClick}
             />
         </div>
@@ -196,8 +196,8 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
             rowKeyGetter={(row) => row.campaignGroupId}
             selectedRows={selectedCampaignGroups}
             onSelectedRowsChange={handleSelectedRowsChange}
-            rowHeight={26}
-            headerRowHeight={26}
+            rowHeight={30}
+            headerRowHeight={30}
             onCellClick={handleDownCellClick}
             />
         </div>

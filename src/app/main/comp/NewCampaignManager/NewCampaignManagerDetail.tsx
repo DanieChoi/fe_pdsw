@@ -914,9 +914,9 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
               { label: "생성 취소", onClick: () => handleCampaignClosed() },
           ]}
           />
-          <div className="grid grid-cols-3 gap-x-4 gap-y-2">
+          <div className="grid grid-cols-3 gap-x-[24px] gap-y-2">
           <div className='flex items-center gap-2'>
-            <Label className="w-[5.6rem] min-w-[5.6rem]">캠페인 아이디</Label>
+            <Label className="w-[90px] min-w-[90px]">캠페인 아이디</Label>
             <CustomInput 
               type="number" 
               value={tempCampaignInfo.campaign_id } 
@@ -927,7 +927,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
           </div>
 
           <div className='flex items-center gap-2'>
-            <Label className="w-[5.6rem] min-w-[5.6rem]">테넌트</Label>
+            <Label className="w-[74px] min-w-[74px]">테넌트</Label>
             <Select
               onValueChange={(value) => handleSelectChange(value, 'tenant')}
               value={tempCampaignInfo.tenant_id+'' || ''}
@@ -946,7 +946,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
           </div>
 
           <div className='flex items-center gap-2'>
-            <Label className="w-[5.6rem] min-w-[5.6rem]">캠페인명</Label>
+            <Label className="w-[74px] min-w-[74px]">캠페인명</Label>
             <CustomInput 
               value={tempCampaignInfo.campaign_name || ''} 
               onChange={(e) => handleInputData(e.target.value, 'campaign_name')}         
@@ -955,7 +955,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
           </div>
 
           <div className='flex items-center gap-2'>
-            <Label className="w-[5.6rem] min-w-[5.6rem]">다이얼 모드</Label>
+            <Label className="w-[90px] min-w-[90px]">다이얼 모드</Label>
             <Select
               onValueChange={(value) => handleSelectChange(value, 'dialMode')}
               value={tempCampaignInfo.dial_mode+''}
@@ -973,7 +973,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
             </Select>
           </div>
           <div className='flex items-center gap-2 relative'>
-            <Label className="w-[5.6rem] min-w-[5.6rem]">스킬</Label>
+            <Label className="w-[74px] min-w-[74px]">스킬</Label>
             <CustomInput value={inputSkills} className="w-full" readOnly />
             <button
                 className="absolute right-2 top-[52%] transform -translate-y-1/2">
@@ -988,13 +988,13 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
             </button>
           </div>
           <div className='flex items-center gap-2'>
-            <Label className="w-[5.6rem] min-w-[5.6rem]">발신번호</Label>
+            <Label className="w-[74px] min-w-[74px]">발신번호</Label>
             <CustomInput value={inputCallingNumber} className="w-full" 
               disabled={selectedCampaign !== null} readOnly
             />
           </div>
           <div className="flex items-center gap-2 col-span-3">
-            <Label className="w-[5.6rem] min-w-[5.6rem]">설명</Label>
+            <Label className="w-[90px] min-w-[90px]">설명</Label>
             <CustomInput value={tempCampaignInfo.campaign_desc || ''} className="w-full"          
               onChange={(e) => handleInputData(e.target.value, 'campaign_desc')} 
             /> 

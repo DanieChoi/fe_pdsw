@@ -83,7 +83,7 @@ const CampaignManager = ({campaignId}: Props) => {
   }, [tenants]);
 
   return (
-    <div>
+    <div className='compaign-wrap'>
       <div className='flex flex-col gap-[15px] limit-width'>
           <CampaignManagerHeader campaignId={campaignIdForUpdateFromSideMenu||''} onSearch={handleCampaignHeaderSearch}/>
           <div className="flex gap-[30px]">
