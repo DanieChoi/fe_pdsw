@@ -158,7 +158,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     console.log("event.data66 = ", data);
     //시간.
     const today = new Date();
-    const _time = today.getHours()+':'+today.getMinutes()+':'+today.getSeconds();
+    const _time = String(today.getHours()).padStart(2, '0')+':'+String(today.getMinutes()).padStart(2, '0')+':'+String(today.getSeconds()).padStart(2, '0');
     //타입.
     let _type = '';
     if( tempEventData['kind'] === 'event' ){
@@ -197,10 +197,36 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     //캠페인.
     else if( tempEventData['announce'] === '/pds/campaign' ){
       _message = '캠페인 '
+      let _start_flag = '';
+      if( tempEventData['data']['start_flag'] === 1){
+        _start_flag = '시작';
+      }else if( tempEventData['data']['start_flag'] === 2){
+        _start_flag = '멈춤';
+      }else if( tempEventData['data']['start_flag'] === 3){
+        _start_flag = '중지';
+      }
+      let _end_flag = '';
+      if( tempEventData['data']['end_flag'] === 1){
+        _end_flag = '진행중';
+      }else if( tempEventData['data']['end_flag'] === 2){
+        _end_flag = '완료';
+      }
       if( tempEventData['command'] === 'INSERT' ){
-        _message += '추가, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'] + ' , 동작상태 : , 완료구분 : ';
+        _message += '추가, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag;
       }else if( tempEventData['command'] === 'UPDATE' ){
-        _message += '수정, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'] + ' , 동작상태 : , 완료구분 : ';
+        _message += '수정, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag;
+      }else if( tempEventData['command'] === 'DELETE' ){
+        _message += '삭제, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag;
+      }
+      if( tempEventData['data']['start_flag'] === 3){
+        setFooterDataList((prev) => [
+          {
+            time: _time,
+            type: _type,
+            message: '캠페인 동작상태 변경, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag
+          },
+          ...prev
+        ]);
       }
     }
     //스킬.
@@ -221,6 +247,20 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
         _message += '삭제] 스킬 아이디 : ' + tempEventData['data']['skill_id'] + ' , 스킬 이름 : ' + tempEventData['data']['skill_name'];
       }else if( tempEventData['command'] === 'UPDATE' ){
         _message += '수정] 스킬 아이디 : ' + tempEventData['data']['skill_id'] + ' , 스킬 이름 : ' + tempEventData['data']['skill_name'];
+      }
+    }
+    //캠페인 요구스킬 수정
+    else if( tempEventData['announce'] === '/pds/campaign/skill' ){
+      _message = '캠페인 요구스킬 '
+      if( tempEventData['command'] === 'UPDATE' ){
+        _message += '수정, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'];
+      }
+    }
+    //캠페인수정>동작시간 추가
+    else if( tempEventData['announce'] === '/pds/campaign/schedule' ){
+      _message = '캠페인 스케쥴'
+      if( tempEventData['command'] === 'INSERT' ){
+        _message += '수정, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'];
       }
     }
     setFooterDataList((prev) => [
@@ -248,7 +288,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
         footerDataSet(event.data);
       }
     });
-  }, []);
+  }, [footerDataList]);
 
 
 
