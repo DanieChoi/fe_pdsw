@@ -295,14 +295,13 @@ export default function Header() {
             </nav>
             <div>
 
-              <div className="flex items-center gap-2">
+              {/* <div className="flex items-center gap-2">
                 <CommonButton
                   variant="outline"
                   size="sm"
                   onClick={() => setIsSplitDialogOpen(true)}
                   className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 border-gray-300"
                 >
-                  {/* 화면 분할에 어울리는 아이콘 lucide icon*/}
                   <LayoutGrid size={16} />
                   <span className="text-sm">화면 분할</span>
                 </CommonButton>
@@ -319,7 +318,7 @@ export default function Header() {
 
                 <SplitScreenDialog2 tabs={openedTabs}/>
 
-              </div>
+              </div> */}
 
             </div>
           </div>
