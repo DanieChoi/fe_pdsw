@@ -78,7 +78,7 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
           onRemove();
         }}
         className={`
-          p-0
+          p-0 min-w-[8px]
           ${isActive ? "hover:bg-[transparent]" : "hover:bg-[transparent]"}`}
       >
       <Image
