@@ -1533,7 +1533,7 @@ export default function CampaignDetail() {
             <CustomInput value={inputCallingNumber} className="w-full"
               disabled={selectedCampaign !== null} readOnly
             />
-            <CommonButton variant="outline" className='h-7' onClick={() =>
+            <CommonButton variant="outline" className='h-[24px]' onClick={() =>
               setCallingNumberPopupState({
                 ...callingNumberPopupState,
                 isOpen: true,

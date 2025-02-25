@@ -41,6 +41,7 @@ const TabsTrigger = React.forwardRef<
       "data-[state=active]:text-[#02AFBF]",
       "data-[state=active]:z-10",
       "hover:bg-white hover:text-[#02AFBF]",
+      "[&+button]:ml-[-1px]",
       className
     )}
     {...props}
@@ -55,7 +56,7 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       className
     )}
     {...props}

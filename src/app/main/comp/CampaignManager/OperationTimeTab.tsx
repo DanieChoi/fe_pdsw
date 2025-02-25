@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import DataGrid from "react-data-grid";
 import { CommonButton } from "@/components/shared/CommonButton";
 import DatePicker from "react-date-picker";
@@ -175,7 +175,7 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
                 value={ new Date(tempCampaignSchedule.start_date.substring(0,4)+'-'+ tempCampaignSchedule.start_date.substring(4,6)+'-'+ tempCampaignSchedule.start_date.substring(6,8)) }
                 format="yyyy-MM-dd"
                 className="w-full custom-calendar"
-                calendarIcon={<CalendarIcon className="mr-2 h-4 w-4" color="#989898" />}
+                calendarIcon={<CalendarIcon className="h-4 w-4" color="#989898" />}
                 clearIcon={null}
               />
             </div>
@@ -205,7 +205,7 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
                 value={new Date(tempCampaignSchedule.end_date.substring(0,4)+'-'+ tempCampaignSchedule.end_date.substring(4,6)+'-'+ tempCampaignSchedule.end_date.substring(6,8)) }
                 format="yyyy-MM-dd"
                 className="w-full custom-calendar"
-                calendarIcon={<CalendarIcon className="mr-2 h-4 w-4" color="#989898" />}
+                calendarIcon={<CalendarIcon className="h-4 w-4" color="#989898" />}
                 clearIcon={null}
               />
             </div>

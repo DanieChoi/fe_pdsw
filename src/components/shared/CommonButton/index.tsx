@@ -11,7 +11,7 @@ const buttonVariants = cva(
       variant: {
         default: "rounded-[3px] bg-[#56CAD6] text-white text-[13px] hover:bg-[#56CAD6]/90",
         destructive: "rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "rounded-[3px] border border-input bg-background  text-[#777] border-[#777]",
+        outline: "rounded-[3px] border border-input bg-background  text-[#777] border-[#a0a0a0]",
         secondary: "bg-[#B3B3B3] rounded-[3px] text-white items-center",
         ghost: "bg-transparent hover:bg-gray-100",
         link: "text-primary underline-offset-4 hover:underline",
