@@ -1,4 +1,3 @@
-// C:\nproject\fe_pdsw\src\app\main\comp\SkilFilterOptionPannelForCampaignTab.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -13,15 +12,14 @@ interface Skill {
   skill_name: string;
 }
 
-const SkilFilterOptionPannelForCampaignTab = () => {
-  const { tenant_id } = useAuthStore(); // 현재 로그인한 사용자의 tenant_id 가져오기
-  console.log("🔥 tenant_id:", tenant_id);
-
+// closePanel 콜백 추가
+const SkilFilterOptionPannelForCampaignTab = ({ closePanel }: { closePanel?: () => void }) => {
+  const { tenant_id } = useAuthStore();
+  
   // 할당 가능한 스킬 목록 가져오기
-  const { data: skills = [] as Skill[], isLoading, isError } = useAssignableSkills(tenant_id);
-  console.log("🔥 skills:", skills);
-
-  // zustand 스토어에서 skilIdsForCampaignTreeMenu(선택된 스킬 ID 목록) 가져오기
+  const { data: skills = [] as Skill[], isLoading, isError } = useAssignableSkills();
+  
+  // zustand 스토어에서 skilIdsForCampaignTreeMenu 가져오기
   const { skilIdsForCampaignTreeMenu, setSkilIdsForCampaignTreeMenu } = useSideMenuCampaignTabStore();
 
   // 로컬 상태로 체크 박스 선택 상태 관리
@@ -32,73 +30,77 @@ const SkilFilterOptionPannelForCampaignTab = () => {
     setSelectedSkills(skilIdsForCampaignTreeMenu);
   }, [skilIdsForCampaignTreeMenu]);
 
-  // 체크박스 변경 핸들러 (skill_id 기준)
+  // 체크박스 변경 핸들러
   const handleSkillChange = (skill_id: number) => {
     setSelectedSkills((prev) =>
       prev.includes(skill_id) ? prev.filter((id) => id !== skill_id) : [...prev, skill_id]
     );
   };
 
-  // 확인 버튼 → 선택한 스킬 ID를 zustand 스토어에 저장
+  // 확인 버튼 → 선택한 스킬 ID를 zustand 스토어에 저장하고 패널 닫기
   const handleConfirm = () => {
-    console.log("✅ 선택한 스킬 ID 목록:", selectedSkills);
     setSkilIdsForCampaignTreeMenu(selectedSkills);
+    if (closePanel) closePanel();
+  };
+
+  // 취소 버튼 → 로컬 상태 초기화하고 패널 닫기
+  const handleCancel = () => {
+    setSelectedSkills(skilIdsForCampaignTreeMenu); // 기존 값으로 복원
+    if (closePanel) closePanel();
   };
 
   return (
-    <div className="p-4 border rounded-lg">
-      <h2 className="text-lg font-semibold mb-4">스킬 필터 옵션</h2>
-
+    <div>
       {/* 로딩/에러 처리 */}
-      {isLoading && <p className="text-gray-500">로딩 중...</p>}
-      {isError && <p className="text-red-500">스킬 데이터를 불러오는 중 오류가 발생했습니다.</p>}
+      {isLoading && <p className="text-gray-500 text-center py-4">로딩 중...</p>}
+      {isError && <p className="text-red-500 text-center py-4">스킬 데이터를 불러오는 중 오류가 발생했습니다.</p>}
 
-      {/* 스킬 체크박스 목록 */}
-      <ul className="space-y-2">
-        {skills.length > 0 ? (
-          skills.map(({ skill_id, skill_name }: { skill_id: number; skill_name: string }) => (
-            <li key={skill_id} className="p-2 border rounded-lg flex items-center gap-2">
-              <Checkbox
-                id={`skill-${skill_id}`}
-                checked={selectedSkills.includes(skill_id)}
-                onCheckedChange={() => handleSkillChange(skill_id)}
-              />
-              <label htmlFor={`skill-${skill_id}`} className="cursor-pointer">
-                {skill_name}
-              </label>
-            </li>
-          ))
-        ) : (
-          !isLoading && <p className="text-gray-500">불러올 스킬이 없습니다.</p>
-        )}
-      </ul>
+      {!isLoading && !isError && (
+        <>
+          {/* 테이블 형태로 렌더링 */}
+          <div className="border rounded">
+            {/* 테이블 헤더 */}
+            <div className="grid grid-cols-3 bg-gray-100 p-2 text-sm font-medium">
+              <div className="text-center">선택</div>
+              <div className="text-center">아이디</div>
+              <div className="text-center">이름</div>
+            </div>
+            
+            {/* 테이블 바디 */}
+            <div className="max-h-[300px] overflow-y-auto">
+              {skills.length > 0 ? (
+                skills.map(({ skill_id, skill_name }) => (
+                  <div key={skill_id} className="grid grid-cols-3 p-2 border-t hover:bg-gray-50">
+                    <div className="flex justify-center items-center">
+                      <Checkbox
+                        id={`skill-${skill_id}`}
+                        checked={selectedSkills.includes(skill_id)}
+                        onCheckedChange={() => handleSkillChange(skill_id)}
+                      />
+                    </div>
+                    <div className="text-center">{skill_id}</div>
+                    <div className="text-center">{skill_name}</div>
+                  </div>
+                ))
+              ) : (
+                <div className="p-4 text-center text-gray-500">불러올 스킬이 없습니다.</div>
+              )}
+            </div>
+          </div>
 
-      {/* 확인/취소 버튼: 가운데 정렬 */}
-      <div className="mt-4 flex justify-center gap-4">
-        <Button onClick={handleConfirm} className="bg-green-500 text-white">
-          확인
-        </Button>
-        <Button onClick={() => setSelectedSkills([])} className="bg-red-500 text-white">
-          취소
-        </Button>
-      </div>
-
-      {/* 현재 스토어에 저장된 스킬 ID 목록 표시 */}
-      <div className="mt-4 p-2 border rounded">
-        <h3 className="font-semibold mb-2">Store에 저장된 스킬 ID:</h3>
-        {skilIdsForCampaignTreeMenu.length > 0 ? (
-          <ul className="list-disc pl-4">
-            {skilIdsForCampaignTreeMenu.map((id) => (
-              <li key={id}>{id}</li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-500">현재 선택된 스킬이 없습니다.</p>
-        )}
-      </div>
+          {/* 확인/취소 버튼 */}
+          <div className="mt-4 flex justify-end gap-2">
+            <Button onClick={handleCancel} variant="secondary">
+              취소
+            </Button>
+            <Button onClick={handleConfirm}>
+              확인
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
 export default SkilFilterOptionPannelForCampaignTab;
-

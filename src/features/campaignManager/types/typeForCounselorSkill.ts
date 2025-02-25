@@ -11,6 +11,10 @@ export interface CounselorSkillRequestData {
     skill_id: number;
     tenant_id: number;
   };
+  page: {
+    index: number,
+    items: number
+  }
 }
 
 export interface CounselorSkill {

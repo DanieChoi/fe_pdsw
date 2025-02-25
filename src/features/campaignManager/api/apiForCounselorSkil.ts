@@ -46,25 +46,36 @@ export const getAssignableSkillsForCounselor = async (tenantId: number): Promise
   console.log("📌 상담원 할당 가능 스킬 목록 조회 시작:", tenantId);
   console.log("🔗 테넌트 ID 타입:", typeof tenantId);
 
+  console.log("🔗 테넌트 ID for 캠페인 탭 헤더 :", tenantId);
+
+
   const skillRequestData: CounselorSkillRequestData = {
     filter: {
-      skill_id: { start: 1, end: 9999999 },
+      skill_id: { start: 1, end: 9999 },
       tenant_id: [tenantId],
     },
-    sort: {
-      skill_id: 0,
-      tenant_id: 0,
+    // sort: {
+    //   skill_id: 0,
+    //   tenant_id: 0,
+    // },
+    page: {
+      index: 1,
+      items: 10
     },
+    sort: {
+      skill_id: 1,
+      tenant_id: 10
+    }
   };
 
   try {
     const { data } = await axiosInstance.post<CounselorSkillListResponse>(
-      "/collections/skill",
+      "collections/skill",
       skillRequestData
     );
 
     console.log("✅ 상담원 할당 가능 스킬 목록 조회 성공 ???????????????????????????? ", data);
-    
+
 
     return data;
 

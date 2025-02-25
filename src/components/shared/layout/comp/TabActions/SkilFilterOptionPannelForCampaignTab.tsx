@@ -148,7 +148,7 @@ const SkilFilterOptionPannelForCampaignTab = ({
     console.log("🔥 tenant_id:", tenant_id);
 
     // 할당 가능한 스킬 목록 가져오기
-    const { data: skills = [] as Skill[], isLoading, isError } = useAssignableSkills(tenant_id);
+    const { data: skills = [] as Skill[], isLoading, isError } = useAssignableSkills();
     console.log("🔥 skills:", skills);
 
     // zustand 스토어에서 skilIdsForCampaignTreeMenu(선택된 스킬 ID 목록) 가져오기
@@ -181,7 +181,7 @@ const SkilFilterOptionPannelForCampaignTab = ({
 
             {/* 로딩/에러 처리 */}
             {isLoading && <p className="text-gray-500 text-sm">로딩 중...</p>}
-            {isError && <p className="text-red-500 text-sm">스킬 데이터를 불러오는 중 오류가 발생했습니다.</p>}
+            {isError && <p className="text-red-500 text-sm"></p>}
 
             {/* 스킬 체크박스 목록 */}
             <ul className="space-y-1">
