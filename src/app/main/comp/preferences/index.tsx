@@ -41,10 +41,10 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
      <div className="flex-col flex gap-5">
       <div>
         <TitleWrap title="화면표시" />
-        <Table>
+        <Table className='text-[#333]'>
           <tbody>
           <TableRow>
-            <TableHeader className="w-[12.5rem]">
+            <TableHeader className="w-[12.5rem] !pt-[6px] !pb-[5px]">
               <Label className="w-32">채널 할당 시 보여주는 캠페인</Label>
             </TableHeader>
             <TableCell className="w-[17rem]">
@@ -63,7 +63,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableHeader className="w-[12.5rem]">
+              <TableHeader className="w-[12.5rem] !py-[6px]">
                 <Label className="w-32">일람설정</Label>
               </TableHeader>
               <TableCell className="w-[17rem]">
@@ -87,10 +87,10 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
         </div> 
         <div>
         <TitleWrap title="통신" />
-        <Table>
+        <Table className='text-[#333]'>
           <tbody>
             <TableRow>
-              <TableHeader className="w-[12.5rem]">
+              <TableHeader className="w-[12.5rem] !pt-[6px] !pb-[5px]">
                 <Label className="w-32">통계 갱신주기</Label>
               </TableHeader>
               <TableCell className="w-[17rem]">
@@ -109,7 +109,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableHeader className="w-[12.5rem]">
+              <TableHeader className="w-[12.5rem] !py-[6px]">
                 <Label className="w-32">서버 접속시간</Label>
               </TableHeader>
               <TableCell className="w-[17rem]">
@@ -140,10 +140,10 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                 </div>
             </div>
         </div>
-        <Table>
+        <Table className='text-[#333]'>
           <tbody>
             <TableRow>
-              <TableHeader className="w-[12.5rem]">
+              <TableHeader className="w-[12.5rem] !py-[6px]">
                 <Label className="w-32">매시지 알림창</Label>
               </TableHeader>
               <TableCell className="w-[17rem]">
@@ -169,10 +169,10 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
         </div>
         <div>
         <TitleWrap title="로그" />
-        <Table>
+        <Table className='text-[#333]'>
            <tbody>
             <TableRow>
-              <TableHeader className="w-[12.5rem]">
+              <TableHeader className="w-[12.5rem] !py-[6px]">
                 <Label className="w-32">프로그램 로그설정</Label>
               </TableHeader>
               <TableCell className="w-[17rem]">
@@ -198,13 +198,13 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                 </div>
             </div>
         </div>
-        <Table>
+        <Table className='text-[#333]'>
           <tbody>
             <TableRow>
-              <TableHeader className="w-[12.5rem]">
+              <TableHeader className="w-[12.5rem] !pt-[6px] !pb-[5px]">
                 <Label className="w-32">발신업무시간</Label>
               </TableHeader>
-              <TableCell className="w-[15rem]">
+              <TableCell className="w-[17rem]">
                 <div className="flex items-center gap-2">
                   <Label>시작시간</Label>
                   <CustomInput
@@ -221,14 +221,14 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                 </div>
               </TableCell>
               <TableCell>
-                <span className="text-sm">해당 업무 시간에만 캠페인을 시작할 수 있씁니다.</span>
+                <span className="text-sm">해당 업무 시간에만 캠페인을 시작할 수 있습니다.</span>
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableHeader className="w-[12.5rem]">
+              <TableHeader className="w-[12.5rem] !py-[6px]">
                 <Label className="w-32">요일 설정</Label>
               </TableHeader>
-              <TableCell className="w-[17rem]">
+              <TableCell className="w-[17rem]" colSpan={2}>
                   <div className="flex gap-4">
                     {weekdays.map((day) => (
                       <div key={day} className="flex items-center gap-1">
