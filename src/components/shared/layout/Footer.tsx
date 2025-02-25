@@ -155,7 +155,6 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
   
   const footerDataSet = (data:string) => {
     const tempEventData = JSON.parse(data);
-    console.log("event.data66 = ", data);
     //시간.
     const today = new Date();
     const _time = String(today.getHours()).padStart(2, '0')+':'+String(today.getMinutes()).padStart(2, '0')+':'+String(today.getSeconds()).padStart(2, '0');
@@ -250,12 +249,12 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
       }
     }
     //캠페인 요구스킬 수정
-    else if( tempEventData['announce'] === '/pds/campaign/skill' ){
-      _message = '캠페인 요구스킬 '
-      if( tempEventData['command'] === 'UPDATE' ){
-        _message += '수정, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'];
-      }
-    }
+    // else if( tempEventData['announce'] === '/pds/campaign/skill' ){
+    //   _message = '캠페인 요구스킬 '
+    //   if( tempEventData['command'] === 'UPDATE' ){
+    //     _message += '수정, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name']||'';
+    //   }
+    // }
     //캠페인수정>동작시간 추가
     else if( tempEventData['announce'] === '/pds/campaign/schedule' ){
       _message = '캠페인 스케쥴'
@@ -275,6 +274,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
 
   useEffect(() => {
     //SSE 실시간 이벤트 구독
+    console.log("event.data99 = ");
     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;  
     const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
     let readyCheck = false;
@@ -289,8 +289,6 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
       }
     });
   }, [footerDataList]);
-
-
 
   return (
     <footer
