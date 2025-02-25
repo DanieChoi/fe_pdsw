@@ -40,9 +40,9 @@ export default function CampaignGroupManagerHeader({onSearch}:Props) {
 
   return (
     <div className="flex title-background justify-between">
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-[40px] items-center">
         <div className="flex items-center gap-1r">
-            <Label className="w-20 min-w-20">테넌트</Label>
+            <Label className="pr-[15px]">테넌트</Label>
             <Select defaultValue='all' value={tenantId} onValueChange={setTenantId}>
                 <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="테넌트" />
@@ -55,8 +55,8 @@ export default function CampaignGroupManagerHeader({onSearch}:Props) {
                 </SelectContent>
             </Select>
         </div>
-        <div className="flex items-center gap-1">
-          <Label className="w-20 min-w-20">캠페인 그룹명</Label>
+        <div className="flex items-center">
+          <Label className="pr-[15px]">캠페인 그룹명</Label>
           <CustomInput 
           type="text" 
           value={campaignGroupName}

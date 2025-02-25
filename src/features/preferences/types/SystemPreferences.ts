@@ -27,11 +27,11 @@ export interface DialingDeviceListDataResponse {
   
 // 다이얼링 장비 데이터 타입
 export interface DialingDeviceListResponse {
-result_code: number;
-result_msg: string;
-result_count: number;
-total_count: number;
-result_data: DialingDeviceListDataResponse[];
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: DialingDeviceListDataResponse[];
 }
 
 // 채널 리스트 데이터 타입
@@ -272,4 +272,26 @@ export interface CampaignListDataResponse {
   campaign_name: string;
   tenant_id: number;
   dial_mode: number; // 캠페인 발신 모드 구분 1 : Power Mode, 2 : Progressive Mode, 3 : Predictive Mode, 5 : Preview Mode
+}
+
+export interface CounselorAssignListCredentials {
+  tenantId: number;
+  skillId: number;
+}
+
+export interface CounselorAssignListResponse {
+  code: string;
+  message: string;
+  skillAssignedCounselorList: SkillAssignedCounselorListItem[];
+}
+
+export interface SkillAssignedCounselorListItem {
+  affiliationGroupId: string; //상담사 소속그룹ID
+  affiliationGroupName: string; //상담사 소속그룹명
+  affiliationTeamId: string; // 상담사 팀아이디
+  affiliationTeamName: string; // 상담사 팀이름
+  counselorEmplNum: string; //상담원아이디
+  counselorId: string; //상담사 로그인아이디
+  counselorname: string; //상담사 이름
+  blendKind: string; //블렌드 구분(인바운드: 1, 아웃바운드: 2, 블렌드: 3)
 }

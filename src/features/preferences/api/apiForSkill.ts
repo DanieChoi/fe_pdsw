@@ -35,6 +35,9 @@ export const fetchSkillList = async (credentials: SkillListCredentials): Promise
     }
 };
 
+// 스킬 마스터 신규 등록 API(POST)
+
+
 // 스킬 할당 캠페인 조회
 export const fetchskillCampaignList = async() : Promise<SkillCampaignListResponse> => {
     const skillCampaignListRequestData = {

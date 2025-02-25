@@ -55,27 +55,23 @@ type Props = {
 
 const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCampaignOutgoingMethodChange }) => {
   const { campaigns } = useMainStore();
-  const [trunkAccessCode, setTrunkAccessCode] = useState("");
-  const [callGoal, setCallGoal] = useState("");
-  const [autoDial, setAutoDial] = useState("");
-  const [dddNumber, setDddNumber] = useState("");
-  const [maxRings] = useState("10");
-  const [tokenId, setTokenId] = useState("");
-  const [dialModeOption, setDialModeOption] = useState("default");
-  const [ivrNo, setIvrNo] = useState("");
-  const [limitRateEnabled, setLimitRateEnabled] = useState(false);
-  const [limitRate, setLimitRate] = useState("");  
+  const [maxRings] = useState<string>("10");
+  const [dialModeOption, setDialModeOption] = useState<string>("default");
+  const [limitRateRateEnabled, setLimitRateRateEnabled] = useState<boolean>(false);
+  const [limitRateEnabled, setLimitRateEnabled] = useState<boolean>(false);
+  const [limitExitInit, setLimitExitInit] = useState<boolean>(false);
+  const [limitInit, setLimitInit] = useState<boolean>(false);
+  const [limitRate, setLimitRate] = useState<string>("");  
   const [tempOutgoingMethodTab, setTempOutgoingMethodTab] = useState<OutgoingMethodTabParam>(CampaignOutgoingMethodTab);
+  const [tempCampaignId, setTempCampaignId ] = useState<number>(0);
 
   // 숫자만 입력되도록 제어하는 함수
   const handleNumericInput = (
     e: React.ChangeEvent<HTMLInputElement>,
-    setValue: React.Dispatch<React.SetStateAction<string>>,
     type: string
   ) => {
     const value = e.target.value;
     if (/^\d*$/.test(value)) {
-      setValue(value); // 숫자인 경우만 상태 업데이트
       if( type === 'setTrunkAccessCode'){
         onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
           , changeYn: true
@@ -170,8 +166,12 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
         ,dial_mode_option : campaignInfo.dial_mode_option
         ,user_option : campaignInfo.user_option
       }); 
-      setLimitRate(campaignInfo.user_option === ''?'':campaignInfo.user_option.split(',')[0].indexOf('limit') > -1?campaignInfo.user_option.split(',')[0].split('=')[1]:'');
-      setLimitRateEnabled(campaignInfo.user_option === ''?false:campaignInfo.user_option.split(',')[0].indexOf('limit') > -1?true:false);
+      if( tempCampaignId !== campaignInfo.campaign_id ){
+        setTempCampaignId(campaignInfo.campaign_id);
+        setLimitRate(campaignInfo.user_option === ''?'':campaignInfo.user_option.split(',')[0].indexOf('limit') > -1?campaignInfo.user_option.split(',')[0].split('=')[1]:'');
+        setLimitInit(campaignInfo.user_option === ''?false:campaignInfo.user_option.split(',')[0].indexOf('limit') > -1 && campaignInfo.user_option.split(',')[1] === '0'?true:false);
+        setLimitRateEnabled(campaignInfo.user_option === ''?false:campaignInfo.user_option.split(',')[0].indexOf('limit') > -1?true:false);
+      }
     }
   }, [campaignInfo]);
 
@@ -187,7 +187,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
             <CustomInput
               type="text"
               value={tempOutgoingMethodTab.trunk_access_code}
-              onChange={(e) => handleNumericInput(e, setTrunkAccessCode,'setTrunkAccessCode')}
+              onChange={(e) => handleNumericInput(e, 'setTrunkAccessCode')}
             />
           </div>
 
@@ -210,7 +210,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
             <CustomInput
               type="text"
               value={tempOutgoingMethodTab.alarm_answer_count}
-              onChange={(e) => handleNumericInput(e, setCallGoal,'setCallGoal')}
+              onChange={(e) => handleNumericInput(e, 'setCallGoal')}
             />
           </div>
 
@@ -261,7 +261,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
             <CustomInput
               type="text"
               value={tempOutgoingMethodTab.auto_dial_interval}
-              onChange={(e) => handleNumericInput(e, setAutoDial,'setAutoDial')}
+              onChange={(e) => handleNumericInput(e, 'setAutoDial')}
             />
           </div>
         </div>
@@ -294,7 +294,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
             <CustomInput
               type="text"
               value={tempOutgoingMethodTab.DDD_code}
-              onChange={(e) => handleNumericInput(e, setDddNumber,'setDddNumber')}
+              onChange={(e) => handleNumericInput(e, 'setDddNumber')}
             />
           </div>
 
@@ -317,7 +317,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
             <CustomInput
               type="text"
               value={tempOutgoingMethodTab.token_id}
-              onChange={(e) => handleNumericInput(e, setTokenId,'setTokenId')}
+              onChange={(e) => handleNumericInput(e, 'setTokenId')}
             />
           </div>
 
@@ -345,15 +345,15 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
 
       {/* 연결 IVR NO 및 다이얼 모드 */}
       <div className="flex gap-[20px] mt-[0.5rem]">
-        <div className="flex items-center gap-2 justify-between">
+        <div className="flex items-top gap-2 justify-between">
           <Label className="w-[8.3rem] min-w-[8.3rem]">연결 IVR NO</Label>
           <CustomInput
             type="text"
             value={tempOutgoingMethodTab.power_divert_queue}
-            onChange={(e) => handleNumericInput(e, setIvrNo,'setIvrNo')}
+            onChange={(e) => handleNumericInput(e, 'setIvrNo')}
           />
         </div>
-        <div className="flex items-center gap-2 justify-between">
+        <div className="flex items-top gap-2 justify-between">
           <Label className="w-[8.3rem] min-w-[8.3rem]">다이얼 모드 옵션</Label>
           <Select value={dialModeOption} disabled>
             <SelectTrigger className="w-full">
@@ -364,28 +364,79 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
             </SelectContent>
           </Select>
         </div>
-        <div className="flex items-center gap-2 justify-between">
-        <CustomCheckbox
-            id="limit-rate"
-            checked={limitRateEnabled} // 상태를 기반으로 체크 여부 결정
-            onCheckedChange={(checked) => {
-              setLimitRateEnabled(checked as boolean);
-              if (!checked) {
-                // setLimitRate(""); // 비활성화 시 입력 값 초기화
-              }
-            }}
-          />
-          <Label htmlFor="limit-rate" className="w-[8.3rem] min-w-[8.3rem]">
-            제한 호수 비율
-          </Label>
-          <CustomInput
-            type="text"
-            value={limitRate}
-            onChange={(e) => handleNumericInput(e, setLimitRate,'setLimitRate')}
-            disabled={!limitRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
-          />
-          %
-       </div>
+        <div className="flex flex-col items-start gap-4">
+          <div className="flex items-center gap-2 justify-between">
+            <CustomCheckbox
+              id="limit-rate"
+              checked={limitRateEnabled} // 상태를 기반으로 체크 여부 결정
+              onCheckedChange={(checked) => {
+                setLimitRateEnabled(checked as boolean);
+                setLimitRateRateEnabled(checked as boolean);
+                if (!checked) {
+                  // setLimitRate(""); // 비활성화 시 입력 값 초기화
+                  setLimitInit(checked as boolean);
+                  setLimitExitInit(checked as boolean);
+                }
+              }}
+            />
+            <Label htmlFor="limit-rate" className="w-[8.3rem] min-w-[8.3rem]">
+              제한 호수 비율
+            </Label>
+            <CustomInput
+              type="text"
+              value={limitRate}
+              onChange={(e) => handleNumericInput(e, 'setLimitRate')}
+              disabled={!limitRateRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
+            />
+            %
+          </div>
+          <div className="flex items-center gap-2 justify-between">
+            <CustomCheckbox
+              id="limit-init"
+              checked={limitInit} // 상태를 기반으로 체크 여부 결정
+              onCheckedChange={(checked) => {
+                setLimitInit(checked as boolean);
+                setLimitRateRateEnabled(!checked as boolean);
+                if (checked) {
+                  setLimitRate("0"); // 비활성화 시 입력 값 초기화
+                  onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+                    , changeYn: true
+                    , campaignInfoChangeYn: true
+                    , user_option: 'limit=0'
+                  });
+                  setLimitExitInit(!checked as boolean);
+                }
+              }}
+              disabled={!limitRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
+            />
+            <Label htmlFor="limit-init" className="w-[8.3rem] min-w-[8.3rem]">
+              분배제한 고정 포함 초기화
+            </Label>
+          </div>
+          <div className="flex items-center gap-2 justify-between">
+            <CustomCheckbox
+              id="limit-exit-init"
+              checked={limitExitInit} // 상태를 기반으로 체크 여부 결정
+              onCheckedChange={(checked) => {
+                setLimitExitInit(checked as boolean);
+                setLimitRateRateEnabled(!checked as boolean);
+                if (checked) {
+                  setLimitRate(""); // 비활성화 시 입력 값 초기화
+                  onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+                    , changeYn: true
+                    , campaignInfoChangeYn: true
+                    , user_option: ''
+                  });
+                  setLimitInit(!checked as boolean);
+                }
+              }}
+              disabled={!limitRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
+            />
+            <Label htmlFor="limit-exit-init" className="w-[8.3rem] min-w-[8.3rem]">
+              분배제한 고정 제외 초기화
+            </Label>
+          </div>
+        </div>
       </div>
 
       {!newCampaignYn &&

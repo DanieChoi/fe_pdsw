@@ -70,66 +70,68 @@ export default function CampaignManagerHeader({campaignId,onSearch}:Props) {
   }, [tenantId, skills]);
 
   return (
-    <div className="grid grid-cols-6 gap-4 title-background">
-      <div className="flex items-center">
-          <Label className="w-20 min-w-20">테넌트</Label>
-          <Select defaultValue='all' value={tenantId} onValueChange={setTenantId}>
-              <SelectTrigger className="w-full">
-              <SelectValue placeholder="테넌트" />
-              </SelectTrigger>
-              <SelectContent>
-              <SelectItem value='all'>전체</SelectItem>
-              { tenants.map(option => (
-                <SelectItem key={option.tenant_id} value={option.tenant_id+''}>{option.tenant_name}</SelectItem>
-              )) }
-              </SelectContent>
-          </Select>
-      </div>
-      <div className="flex items-center">
-        <Label className="w-20 min-w-20">캠페인이름</Label>
-        <CustomInput 
-        type="text" 
-        value={campaignName}
-        onChange={(e) => setCampaignName(e.target.value)}
-        className="w-full"
-      />
-      </div>
-      <div className="flex items-center">
-          <Label className="w-20 min-w-20">다이얼 모드</Label>
-          <Select defaultValue='all' value={dailMode} onValueChange={setDailMode}>
-              <SelectTrigger className="w-full">
-              <SelectValue placeholder="다이얼 모드" />
-              </SelectTrigger>
-              <SelectContent>
-              <SelectItem value='all'>전체</SelectItem>
-              { dialModeList.map(option => (
-                <SelectItem key={option.dial_id} value={option.dial_id+''}>{option.dial_name}</SelectItem>
-              )) }
-              </SelectContent>
-          </Select>
-      </div>
-      <div className="flex items-center">
-          <Label className="w-20 min-w-20">스킬</Label>
-          <Select  defaultValue='all' value={skill} onValueChange={setSkill}>
-              <SelectTrigger className="w-full">
-              <SelectValue placeholder="스킬" />
-              </SelectTrigger>
-              <SelectContent>
-              <SelectItem value='all'>전체</SelectItem>
-              {tempSkills.map(option => (
-                <SelectItem key={option.skill_id} value={option.skill_id+''}>{option.skill_name}</SelectItem>
-              ))}
-              </SelectContent>
-          </Select>
-      </div>
-      <div className="flex items-center">
-        <Label className="w-20 min-w-20">발신번호</Label>
-        <CustomInput 
+    <div className="flex title-background justify-between">
+      <div className='flex gap-[40px] bp:gap-[10px] items-center'>
+        <div className="flex items-center">
+            <Label className="pr-[15px]">테넌트</Label>
+            <Select defaultValue='all' value={tenantId} onValueChange={setTenantId}>
+                <SelectTrigger className="w-[180px] lg:w-[140px]">
+                <SelectValue placeholder="테넌트" />
+                </SelectTrigger>
+                <SelectContent>
+                <SelectItem value='all'>전체</SelectItem>
+                { tenants.map(option => (
+                  <SelectItem key={option.tenant_id} value={option.tenant_id+''}>{option.tenant_name}</SelectItem>
+                )) }
+                </SelectContent>
+            </Select>
+        </div>
+        <div className="flex items-center">
+          <Label className="pr-[15px]">캠페인이름</Label>
+          <CustomInput 
           type="text" 
-          value={callNumber}
-          onChange={(e) => setCallNumber(e.target.value)}
-          className="w-full"
+          value={campaignName}
+          onChange={(e) => setCampaignName(e.target.value)}
+          className="w-[180px] bp:w-[140px]"
         />
+        </div>
+        <div className="flex items-center">
+            <Label className="pr-[15px]">다이얼 모드</Label>
+            <Select defaultValue='all' value={dailMode} onValueChange={setDailMode}>
+                <SelectTrigger className="w-[180px] bp:w-[140px]">
+                <SelectValue placeholder="다이얼 모드" />
+                </SelectTrigger>
+                <SelectContent>
+                <SelectItem value='all'>전체</SelectItem>
+                { dialModeList.map(option => (
+                  <SelectItem key={option.dial_id} value={option.dial_id+''}>{option.dial_name}</SelectItem>
+                )) }
+                </SelectContent>
+            </Select>
+        </div>
+        <div className="flex items-center">
+            <Label className="pr-[15px]">스킬</Label>
+            <Select  defaultValue='all' value={skill} onValueChange={setSkill}>
+                <SelectTrigger className="w-[180px] bp:w-[140px]">
+                <SelectValue placeholder="스킬" />
+                </SelectTrigger>
+                <SelectContent>
+                <SelectItem value='all'>전체</SelectItem>
+                {tempSkills.map(option => (
+                  <SelectItem key={option.skill_id} value={option.skill_id+''}>{option.skill_name}</SelectItem>
+                ))}
+                </SelectContent>
+            </Select>
+        </div>
+        <div className="flex items-center">
+          <Label className="pr-[15px]">발신번호</Label>
+          <CustomInput 
+            type="text" 
+            value={callNumber}
+            onChange={(e) => setCallNumber(e.target.value)}
+            className="w-[180px] bp:w-[140px]"
+          />
+        </div>
       </div>
         <div className="flex justify-end gap-2">
           {!readonly &&
