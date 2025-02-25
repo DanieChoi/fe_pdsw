@@ -127,6 +127,10 @@ export interface TabLayoutStore {
   // 화면 분할 관련 메서드 추가
   setSplitMode: (mode: boolean) => void;
   setSplitLayout: (layout: 'none' | 'vertical') => void;
+   
+  // 다른 탭 닫기 (현재 활성화된 탭 빼고 모두 닫기), 모든탭닫기
+   closeOtherTabs: (rowId: string, sectionId: string, exceptTabKey: string) => void;
+   closeAllTabs: (rowId: string, sectionId: string) => void;
 
 }
 
@@ -797,4 +801,97 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
       activeTabKey: uniqueKey,
     });
   },
+  // 다른 탭 닫기 (현재 활성화된 탭 빼고 모두 닫기)
+  closeOtherTabs: (rowId, sectionId, exceptTabKey) => 
+    set((state) => {
+      // 예외 탭 찾기
+      const row = state.rows.find(r => r.id === rowId);
+      if (!row) return state;
+  
+      const section = row.sections.find(s => s.id === sectionId);
+      if (!section) return state;
+  
+      const keepTab = section.tabs.find(tab => tab.uniqueKey === exceptTabKey);
+      if (!keepTab) return state;
+  
+      // 제거할 탭들의 uniqueKey 목록
+      const tabKeysToRemove = section.tabs
+        .filter(tab => tab.uniqueKey !== exceptTabKey)
+        .map(tab => tab.uniqueKey);
+  
+      // openedTabs에서 해당 탭들 필터링
+      const newOpenedTabs = state.openedTabs.filter(
+        tab => !tabKeysToRemove.includes(tab.uniqueKey)
+      );
+  
+      // 행 업데이트
+      const updatedRows = state.rows.map(row => {
+        if (row.id !== rowId) return row;
+  
+        return {
+          ...row,
+          sections: row.sections.map(sec => {
+            if (sec.id !== sectionId) return sec;
+  
+            return {
+              ...sec,
+              tabs: [keepTab],
+              activeTabKey: keepTab.uniqueKey
+            };
+          })
+        };
+      });
+  
+      return {
+        ...state,
+        openedTabs: newOpenedTabs,
+        rows: updatedRows
+      };
+    }),
+  
+  // 모든 탭 닫기 (디폴트 상태로 되돌리기)
+ closeAllTabs: (rowId, sectionId) =>
+  set((state) => {
+    // 행과 섹션 찾기
+    const row = state.rows.find(r => r.id === rowId);
+    if (!row) return state;
+
+    const section = row.sections.find(s => s.id === sectionId);
+    if (!section) return state;
+
+    // 제거할 탭들의 uniqueKey 목록
+    const tabKeysToRemove = section.tabs.map(tab => tab.uniqueKey);
+
+    // openedTabs에서 해당 탭들 필터링
+    const newOpenedTabs = state.openedTabs.filter(
+      tab => !tabKeysToRemove.includes(tab.uniqueKey)
+    );
+
+    // 행 업데이트 - 탭을 모두 비우고 activeTabKey를 null로 설정
+    const updatedRows = state.rows.map(row => {
+      if (row.id !== rowId) return row;
+
+      return {
+        ...row,
+        sections: row.sections.map(sec => {
+          if (sec.id !== sectionId) return sec;
+
+          return {
+            ...sec,
+            tabs: [], // 빈 배열로 설정
+            activeTabKey: null // null로 설정하여 디폴트 화면 표시
+          };
+        })
+      };
+    });
+
+    return {
+      ...state,
+      openedTabs: newOpenedTabs,
+      rows: updatedRows,
+      // 전역 activeTabId와 activeTabKey도 null로 설정
+      activeTabId: null,
+      activeTabKey: null
+    };
+  }),
 }));
