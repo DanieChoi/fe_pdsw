@@ -153,31 +153,6 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     }
   };
 
-  //SSE 실시간 이벤트 구독
-  console.log("단계 = ", process.env.NEXT_PUBLIC_API_URL);
-
-  const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-
-  const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
-
-  console.log("eventSource = ", eventSource);
-
-  eventSource.addEventListener("message", (event) => {
-    //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
-    console.log("event.data22 = ", event.data);
-    let readyCheck = false;
-    if( event.data === 'Connected!!'){
-      readyCheck = true;
-    }
-    if(readyCheck && event.data !== 'Connected!!'){
-      readyCheck = false;
-      console.log("event.data33 = ", event.data);
-    }else{
-      console.log("event.data44 = ", event.data);
-    }
-  });
-
-
   return (
     <footer
       // 2단(W) 모드면 fixed bottom-0, 1단(D) 모드면 relative
