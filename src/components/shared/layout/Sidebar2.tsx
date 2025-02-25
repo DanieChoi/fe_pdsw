@@ -123,7 +123,7 @@ export default function SidebarContainer() {
                         width={baseTabs.find((tab) => tab.id === selectedTabId)?.iconWidth || 13} 
                         height={baseTabs.find((tab) => tab.id === selectedTabId)?.iconHeight || 13} 
                       />
-                    )}
+                    )}i
                   </div>
                   {baseTabs.find((tab) => tab.id === selectedTabId)?.label}
                 </div>
@@ -135,7 +135,7 @@ export default function SidebarContainer() {
 
             {/* 트리메뉴 영역 - 스크롤 가능한 컨테이너 */}
             <div className="flex-1 min-h-0 relative">
-              <div id="tree-menu-container" className="absolute inset-0 overflow-y-auto">
+              <div id="tree-menu-contaner" className="absolute inset-0 overflow-y-auto">
                 {renderTreeMenu()}
               </div>
             </div>

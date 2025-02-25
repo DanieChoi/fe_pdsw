@@ -1,5 +1,5 @@
 import { SortType } from '@/features/campaignManager/types/typeForSidebar2';
-import { SortButtonForAgent } from '../buttons/SortButtonForAgent';
+import { SortButtonForAgent } from '../buttons/OptionButtonsForSideMenuAgentTab';
 
 interface AgentActionsProps {
   onSort: (type: SortType) => void;
