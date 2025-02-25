@@ -272,23 +272,23 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     ]);
   };
 
-  useEffect(() => {
-    //SSE 실시간 이벤트 구독
-    console.log("event.data99 = ");
-    const DOMAIN = process.env.NEXT_PUBLIC_API_URL;  
-    const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
-    let readyCheck = false;
-    eventSource.addEventListener("message", (event) => {
-      //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
-      if( event.data === 'Connected!!'){
-        readyCheck = true;
-      }
-      if(readyCheck && event.data !== 'Connected!!'){
-        readyCheck = false;
-        footerDataSet(event.data);
-      }
-    });
-  }, [footerDataList]);
+  // useEffect(() => {
+  //   //SSE 실시간 이벤트 구독
+  //   console.log("event.data99 = ");
+  //   const DOMAIN = process.env.NEXT_PUBLIC_API_URL;  
+  //   const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
+  //   let readyCheck = false;
+  //   eventSource.addEventListener("message", (event) => {
+  //     //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
+  //     if( event.data === 'Connected!!'){
+  //       readyCheck = true;
+  //     }
+  //     if(readyCheck && event.data !== 'Connected!!'){
+  //       readyCheck = false;
+  //       footerDataSet(event.data);
+  //     }
+  //   });
+  // }, []);
 
   return (
     <footer
