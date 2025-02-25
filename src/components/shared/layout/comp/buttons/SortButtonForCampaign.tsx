@@ -12,9 +12,9 @@ interface SortButtonForCampaignProps {
   selectedSort?: SortType;
 }
 
-const campaignSortOptions: Array<{ id: SortType; label: string }> = [
+const campaignSortOptions: Array<{ id: any; label: string }> = [
   { id: 'name', label: '이름으로 정렬' },
-  { id: 'status', label: '상태로 정렬' }, // 예시로 'status'로 변경
+  { id: 'id', label: '아이디로 정렬' }, // 예시로 'status'로 변경
 ];
 
 export function SortButtonForCampaign({ 

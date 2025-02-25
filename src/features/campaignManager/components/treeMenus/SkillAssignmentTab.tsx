@@ -162,7 +162,7 @@ export function SkillAssignmentTab() {
         <div className="p-4">
           <div className="text-sm text-gray-600 mb-4">
             상담원에게 스킬을 할당 할 수 있는 창입니다.<br />
-            상담원에게 할당할 스킬을 선택하시면 체크 후 확인 버튼을 누르시면 체크된 스킬들이 일괄 할당됩니다.<br />
+            체크 후 확인 버튼을 누르시면 체크된 스킬들이 일괄 할당됩니다.<br />
             (상담원에게 최대 10개 스킬까지만 할당 가능 합니다.)
           </div>
 
