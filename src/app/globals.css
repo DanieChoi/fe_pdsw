@@ -571,6 +571,7 @@ html, body {
 .notice-li>li{
   text-indent: -10px;
   padding-left: 10px;
+  color: #333;
 }
 
 .group:before{
