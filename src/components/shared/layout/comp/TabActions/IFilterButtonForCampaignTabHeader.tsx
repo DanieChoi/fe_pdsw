@@ -113,7 +113,7 @@ const IFilterButtonForCampaignTabHeader = () => {
   return (
     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="p-2" size={"sm"}>
+        <Button variant="ghost" className="p-2" size={"sm"}>
           <FilterIcon className="h-4 w-4 mr-1" />
           <span>필터</span>
         </Button>
