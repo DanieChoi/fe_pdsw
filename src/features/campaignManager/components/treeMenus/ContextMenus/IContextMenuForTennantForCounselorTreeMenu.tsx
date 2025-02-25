@@ -27,13 +27,13 @@ export function IContextMenuForTennantForCounselorTreeMenu({
   return (
     <ContextMenu>
       <ContextMenuTrigger>{children}</ContextMenuTrigger>
-      <ContextMenuContent className="w-56">
+      <ContextMenuContent className="w-[150px]">
         <ContextMenuSub>
           <ContextMenuSubTrigger>
             {/* <Users className="mr-2 h-4 w-4" /> */}
             상담원 보기
           </ContextMenuSubTrigger>
-          <ContextMenuSubContent className="w-56">
+          <ContextMenuSubContent className="w-[150px]">
             <ContextMenuItem onClick={() => {
               resetFilter();
               onViewHistory?.();

@@ -198,7 +198,7 @@ export function ContextMenuForTreeNode({
     <>
     <ContextMenu>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-      <ContextMenuContent className="w-56">
+      <ContextMenuContent className="w-[150px]">
         <ContextMenuItem onClick={handleEditMenuClick}>
           {/* <Edit className="mr-2 h-4 w-4" /> */}
           캠페인 수정
@@ -209,7 +209,7 @@ export function ContextMenuForTreeNode({
             {/* <Search className="mr-2 h-4 w-4" /> */}
             시작구분
           </ContextMenuSubTrigger>
-          <ContextMenuSubContent className="w-48">
+          <ContextMenuSubContent className="w-[150px]">
             <ContextMenuItem 
               onClick={() => handleStartClick('started')} 
               className="flex items-center"

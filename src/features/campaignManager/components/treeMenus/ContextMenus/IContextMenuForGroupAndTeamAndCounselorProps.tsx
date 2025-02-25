@@ -318,7 +318,7 @@ export function IContextMenuForGroupAndTeamAndCounselor({
   return (
     <ContextMenu>
       <ContextMenuTrigger>{children}</ContextMenuTrigger>
-      <ContextMenuContent className="w-56">
+      <ContextMenuContent className="w-[150px]">
         <ContextMenuItem onClick={openSkillAssignmentTab}>
           {/* <LayoutGrid className="mr-2 h-4 w-4" /> */}
           {getMenuItemTitle()}
