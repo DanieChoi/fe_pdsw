@@ -127,14 +127,14 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { TreeItem } from "@/features/campaignManager/types/typeForSidebar2";
 import { TreeNode } from "./TreeNode";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { getStatusIcon } from "@/components/shared/layout/utils/utils";
 import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
-import { useMainStore } from '@/store';
+import { useMainStore, useAuthStore } from '@/store';
 
 interface TreeState {
   selectedNodeId: string | undefined;
@@ -165,7 +165,8 @@ export function TreeMenusForCampaigns() {
   const { data: treeData, isLoading, error } = useApiForGetTreeMenuDataForSideMenu();
   const { selectedNodeId, expandedNodes, setSelectedNodeId, toggleNode, expandNodes } = useTreeStore();
   const { skilIdsForCampaignTreeMenu } = useSideMenuCampaignTabStore();
-  const { campaigns, tenants } = useMainStore();
+  const { tenant_id } = useAuthStore();
+  const [filteredItems,setFilteredItems] = useState<TreeItem[]>([]);
 
   const selectedSkillIds = Array.isArray(skilIdsForCampaignTreeMenu)
     ? skilIdsForCampaignTreeMenu.map(id => Number(id))
@@ -193,13 +194,19 @@ export function TreeMenusForCampaigns() {
     }, []);
   }
 
-  const originalItems = treeData?.[0]?.items || [];
-  const filteredItems =
-    selectedSkillIds.length > 0 ? filterTreeItems(originalItems) : originalItems;
+  // const originalItems = treeData?.[0]?.items || [];
+  // const filteredItems =
+  //   selectedSkillIds.length > 0 ? filterTreeItems(originalItems) : originalItems;
 
   useEffect(() => {
     if (!isLoading && !error && treeData && treeData.length > 0) {
-      const items = originalItems;
+      const items = treeData?.[0]?.items || [];
+      //로그인 상담원이 속한 테넌트의 캠페인만 표시한다.
+      if( tenant_id !== 0){
+        const tempList = items[0].children?.filter(data => data.id === tenant_id+'');
+        items[0].children = tempList;
+      }
+      setFilteredItems(selectedSkillIds.length > 0 ? filterTreeItems(items) : items);
       const newExpanded = new Set<string>();
 
       const expandUpToLevel = (nodes: TreeItem[], currentLevel: number, maxLevel: number) => {
@@ -216,7 +223,7 @@ export function TreeMenusForCampaigns() {
       expandUpToLevel(items, 0, 3);
       expandNodes(newExpanded);
     }
-  }, [isLoading, error, treeData, expandNodes, originalItems]);
+  }, [isLoading, error, treeData, expandNodes]);
 
   if (isLoading) {
     return <div className="p-4 h-full">Loading...</div>;
