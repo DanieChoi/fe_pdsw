@@ -158,7 +158,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     >
       {/* 푸터 높이 드래그 조절 핸들러 */}
       <div
-        className="group relative bg-[#FBFBFB] h-[1px] cursor-ns-resize hover:h-[1px] hover:bg-[#5BC2C1]"
+        className="group relative bg-[#FBFBFB] h-[1px] cursor-ns-resize hover:h-[1px] hover:bg-[#5BC2C1] before:content-[''] before:absolute before:bg-transparent"
         onMouseDown={startResizing}
       />
 

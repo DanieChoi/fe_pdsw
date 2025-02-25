@@ -24,7 +24,7 @@ const TitleWrap: React.FC<TitleWrapProps> = ({
   className,
 }) => {
   return (
-    <div className={`flex justify-between items-center mb-2 ${className || ""}`}>
+    <div className={`flex justify-between items-center mb-2 text-[#333] ${className || ""}`}>
       {/* 제목과 총 건수 */}
       <div className="flex items-center">
         <h2 className="text-sm">{title}</h2>

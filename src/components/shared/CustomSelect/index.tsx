@@ -4,6 +4,7 @@ import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 // Select 기본 루트
 const Select = SelectPrimitive.Root;
@@ -22,14 +23,19 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-[26px] w-full items-center justify-between whitespace-nowrap rounded-[3px] border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:text-[#aaa] disabled:bg-[#F4F4F4] [&>span]:line-clamp-1 border-[#ebebeb]",
+      "flex h-[26px] w-full items-center justify-between whitespace-nowrap rounded-[3px] border border-input bg-white px-[8px] py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:text-[#aaa] disabled:bg-[#F4F4F4] [&>span]:line-clamp-1 border-[#ebebeb] text-[#333]",
       className
     )}
     {...props}
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 opacity-50" />
+      <Image
+          src="/chevronDown.png"
+          alt="셀렉박스아이콘"
+          width={8}
+          height={4}
+        />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ));

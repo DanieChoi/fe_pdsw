@@ -310,6 +310,10 @@ input::placeholder {
   z-index: 2;
 }
 
+.tab-custom-wrap>div button{
+  
+}
+
 
 /*gird-custom*/
 .grid-custom-wrap{
@@ -440,14 +444,16 @@ input::placeholder {
 }
 
 .custom-calendar .react-date-picker__inputGroup{
-  padding:0 10px;
+  padding:0 8px;
 }
 
 .custom-calendar .react-date-picker__inputGroup__input{
   font-size: 13px;
   color: #333;
 }
-
+.custom-calendar .react-date-picker__button{
+  padding: 4px 8px;
+}
 
 /* 캘린더 헤더 */
 .custom-calendar .react-calendar__navigation {
