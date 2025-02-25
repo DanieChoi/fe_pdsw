@@ -125,13 +125,13 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
   }, [newCampaignYn,campaignSchedule,campaignInfo]);
 
   return (
-    <div className="py-5">
-      <div className="flex gap-5">
+    <div className="pt-[20px]">
+      <div className="flex gap-[30px]">
         <div className="w-[30%]">
-          <TitleWrap className="border-b border-gray-300 pb-1" title="선택" />
+          <TitleWrap className="border-b border-gray-300 pb-1 !text-[#444] !mb-3" title="선택" />
           <div className="flex flex-col gap-y-2">
-            <div className="flex items-center gap-2 justify-between">
-              <Label className="w-[5rem] min-w-[5rem]">시작</Label>
+            <div className="flex items-center gap-[10px] justify-between">
+              <Label className="w-[70px] min-w-[70px]">시작</Label>
               <Select value={campaignInfo.start_flag === 0?'2':campaignInfo.start_flag+''} onValueChange={(value) => handleSelectChange(value, 'startFlag')}
                 disabled={campaignInfo.start_flag === 0} >
                 <SelectTrigger>
@@ -145,13 +145,13 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
               </Select>
             </div>
 
-            <div className="flex items-center gap-2 justify-between">
-              <Label className="w-[5rem] min-w-[5rem]">종료구분</Label>
+            <div className="flex items-center gap-[10px] justify-between">
+              <Label className="w-[70px] min-w-[70px]">종료구분</Label>
               <CustomInput disabled={true} value={campaignInfo?.end_flag === 1?'진행 중':campaignInfo?.end_flag === 2?'완료':''}/>
             </div>
 
-            <div className="flex items-center gap-2 justify-between">
-              <Label className="w-[5rem] min-w-[5rem]">시작날짜</Label>
+            <div className="flex items-center gap-[10px] justify-between">
+              <Label className="w-[70px] min-w-[70px]">시작날짜</Label>
               <DatePicker
                 onChange={(value) => {
                   if (value instanceof Date || value === null) {
@@ -180,8 +180,8 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
               />
             </div>
 
-            <div className="flex items-center gap-2 justify-between">
-              <Label className="w-[5rem] min-w-[5rem]">종료날짜</Label>
+            <div className="flex items-center gap-[10px] justify-between">
+              <Label className="w-[70px] min-w-[70px]">종료날짜</Label>
               <DatePicker
                 onChange={(value) => {
                   if (value instanceof Date || value === null) {
@@ -213,12 +213,12 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
         </div>
 
         <div className="w-[70%]">
-          <TitleWrap className="border-b border-gray-300 pb-1" title="추가" />
-          <div className="flex gap-5">
+          <TitleWrap className="border-b border-gray-300 pb-1 !text-[#444] !mb-3" title="추가" />
+          <div className="flex gap-[20px]">
             <div className="w-[40%]">
               <div className="flex flex-col gap-y-2">
-                <div className="flex items-center gap-2 justify-between">
-                  <Label className="w-[5rem] min-w-[5rem]">시작시간</Label>
+                <div className="flex items-center gap-[10px] justify-between">
+                  <Label className="w-[70px] min-w-[70px]">시작시간</Label>
                   <CustomInput
                     type="text"
                     value={startTime}
@@ -226,8 +226,8 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
                     maxLength={4}
                   />
                 </div>
-                <div className="flex items-center gap-2 justify-between">
-                  <Label className="w-[5rem] min-w-[5rem]">종료시간</Label>
+                <div className="flex items-center gap-[10px] justify-between">
+                  <Label className="w-[70px] min-w-[70px]">종료시간</Label>
                   <CustomInput
                     type="text"
                     value={endTime}
@@ -296,8 +296,8 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
                   columns={columns} 
                   rows={tempData} 
                   className="grid-custom" 
-                  rowHeight={26}
-                  headerRowHeight={26}
+                  rowHeight={30}
+                  headerRowHeight={30}
                   />
               </div>
             </div>

@@ -163,9 +163,9 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
           <DataGrid 
             columns={columns} 
             rows={tempData} 
-            className="grid-custom" 
-            rowHeight={26}
-            headerRowHeight={26}
+            className="grid-custom text-align-left" 
+            rowHeight={30}
+            headerRowHeight={30}
             onCellClick={handleCellClick}
             />
         </div>

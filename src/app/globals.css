@@ -343,6 +343,10 @@ input::placeholder {
   border-bottom: 1px solid #ebebeb;
   text-align: center;
   font-size: 13px;
+  color: #444;
+}
+.grid-custom.text-align-left .rdg-row .rdg-cell{
+  text-align: left;
 }
 .grid-custom.text-left .rdg-row .rdg-cell{
   border-bottom: 1px solid #ebebeb;
@@ -438,6 +442,12 @@ input::placeholder {
 .custom-calendar .react-date-picker__inputGroup{
   padding:0 10px;
 }
+
+.custom-calendar .react-date-picker__inputGroup__input{
+  font-size: 13px;
+  color: #333;
+}
+
 
 /* 캘린더 헤더 */
 .custom-calendar .react-calendar__navigation {
