@@ -104,6 +104,13 @@
 
 import { useState, useEffect } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
+import { useAuthStore } from '@/store';
+
+type FooterDataType = {
+  time: string;
+  type: string;
+  message: string;
+};
 
 interface FooterProps {
   footerHeight: number;      // 열려 있을 때 푸터의 높이(px)
@@ -114,6 +121,9 @@ interface FooterProps {
 export default function Footer({ footerHeight, startResizing, onToggleDrawer }: FooterProps) {
   const [isExpanded, setIsExpanded] = useState(false);   // D(1단) / W(2단) 모드 토글
   const [isDrawerOpen, setIsDrawerOpen] = useState(true); // 푸터 열기/닫기 토글
+  const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
+  const { tenant_id } = useAuthStore();
+  // const { sse_data } = useStore();
 
   // 부모 컴포넌트에 열림/닫힘 상태 변경 알림
   useEffect(() => {
@@ -142,6 +152,31 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
       onToggleDrawer(newState);
     }
   };
+
+  //SSE 실시간 이벤트 구독
+  console.log("단계 = ", process.env.NEXT_PUBLIC_API_URL);
+
+  const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+
+  const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
+
+  console.log("eventSource = ", eventSource);
+
+  eventSource.addEventListener("message", (event) => {
+    //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
+    console.log("event.data22 = ", event.data);
+    let readyCheck = false;
+    if( event.data === 'Connected!!'){
+      readyCheck = true;
+    }
+    if(readyCheck && event.data !== 'Connected!!'){
+      readyCheck = false;
+      console.log("event.data33 = ", event.data);
+    }else{
+      console.log("event.data44 = ", event.data);
+    }
+  });
+
 
   return (
     <footer
