@@ -1,5 +1,5 @@
 import { SortType } from '@/features/campaignManager/types/typeForSidebar2';
-import { SortButtonForAgent } from '../buttons/OptionButtonsForSideMenuAgentTab';
+import SortButtonForAgent from '../buttons/OptionButtonsForSideMenuAgentTab';
 
 interface AgentActionsProps {
   onSort: (type: SortType) => void;
@@ -12,10 +12,7 @@ export function AgentActions({
 }: AgentActionsProps) {
   return (
     <div className="flex items-center gap-1">
-      <SortButtonForAgent 
-        onSort={onSort}
-        selectedSort={selectedSort}
-      />
+      <SortButtonForAgent />
     </div>
   );
 }
