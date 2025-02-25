@@ -5,9 +5,7 @@ import React from 'react';
 import { FilterIcon, SortAsc } from "lucide-react";
 import CommonButton from '@/components/shared/CommonButton';
 
-interface Props {}
-
-const OptionButtonsForSideMenuAgentTab = (props: Props) => {
+const OptionButtonsForSideMenuAgentTab = (props: object) => {
   return (
     <div className="flex gap-1">
       <CommonButton variant="ghost" size="sm" className="py-1 px-2 text-xs">
