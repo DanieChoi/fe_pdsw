@@ -198,18 +198,18 @@ export function ContextMenuForTreeNode({
     <>
     <ContextMenu>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-      <ContextMenuContent className="w-56">
+      <ContextMenuContent className="w-[150px]">
         <ContextMenuItem onClick={handleEditMenuClick}>
-          <Edit className="mr-2 h-4 w-4" />
+          {/* <Edit className="mr-2 h-4 w-4" /> */}
           캠페인 수정
         </ContextMenuItem>
         
         <ContextMenuSub>
           <ContextMenuSubTrigger>
-            <Search className="mr-2 h-4 w-4" />
+            {/* <Search className="mr-2 h-4 w-4" /> */}
             시작구분
           </ContextMenuSubTrigger>
-          <ContextMenuSubContent className="w-48">
+          <ContextMenuSubContent className="w-[150px]">
             <ContextMenuItem 
               onClick={() => handleStartClick('started')} 
               className="flex items-center"
@@ -238,40 +238,40 @@ export function ContextMenuForTreeNode({
         </ContextMenuSub>
 
         <ContextMenuItem onClick={handleProgressInfoClick}>
-          <Settings className="mr-2 h-4 w-4" />
+          {/* <Settings className="mr-2 h-4 w-4" /> */}
           캠페인 진행정보
         </ContextMenuItem>
 
         <ContextMenuSeparator />
 
         <ContextMenuItem onClick={handleRebroadcastClick}>
-          <RefreshCcw className="mr-2 h-4 w-4" />
+          {/* <RefreshCcw className="mr-2 h-4 w-4" /> */}
           재발신
         </ContextMenuItem>
 
         <ContextMenuSeparator />
 
-        <ContextMenuItem onClick={handleMonitorClick}>
-          <Monitor className="mr-2 h-4 w-4" />
-          상담원 상태 모니터
-        </ContextMenuItem>
-
         <ContextMenuItem onClick={onHandleCampaignCopy}>
-          <Copy className="mr-2 h-4 w-4" />
+          {/* <Copy className="mr-2 h-4 w-4" /> */}
           캠페인 복사
         </ContextMenuItem>
 
         {!isFolder && (
           <ContextMenuItem onClick={onDelete} className="text-red-500">
-            <Trash2 className="mr-2 h-4 w-4" />
+            {/* <Trash2 className="mr-2 h-4 w-4" /> */}
             캠페인 삭제
           </ContextMenuItem>
         )}
 
         <ContextMenuSeparator />
 
+        <ContextMenuItem onClick={handleMonitorClick}>
+          {/* <Monitor className="mr-2 h-4 w-4" /> */}
+          상담원 상태 모니터
+        </ContextMenuItem>
+        
         <ContextMenuItem onClick={handleBlacklistCountCheckClick}>
-          <AlertTriangle className="mr-2 h-4 w-4 text-yellow-500" />
+          {/* <AlertTriangle className="mr-2 h-4 w-4 text-yellow-500" /> */}
           블랙리스트 건수 조회
         </ContextMenuItem>
       </ContextMenuContent>

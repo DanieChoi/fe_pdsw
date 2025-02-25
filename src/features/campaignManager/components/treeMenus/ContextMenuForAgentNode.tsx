@@ -76,7 +76,7 @@ export function ContextMenuForAgentNode({
     <>
       <ContextMenu key={menuKey}>
         <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-        <ContextMenuContent className="w-56">
+        <ContextMenuContent className="w-[150px]">
           {isCounselor && (
             <>
               <ContextMenuItem onClick={handleSkillAssignment}>

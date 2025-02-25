@@ -139,7 +139,7 @@ export const CampaignContextMenu = ({
   };
   return (
     <>
-      <ContextMenuContent className="w-56">
+      <ContextMenuContent className="w-[150px]">
         <ContextMenuItem onClick={handleEditMenuClick}>
           <Edit className="mr-2 h-4 w-4" />
           캠페인 수정
