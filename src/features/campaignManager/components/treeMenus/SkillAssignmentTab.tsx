@@ -29,6 +29,7 @@ export function SkillAssignmentTab() {
     selectedCounselor.counselorId ?? "",
     Number(selectedCounselor.tenantId)
   );
+  // alert(selectedCounselor.tenantId);
 
   const deleteCounselorMutation = useApiForDeleteCounselorsForSpecificSkill(
     selectedCounselor.tenantId ?? "0"
