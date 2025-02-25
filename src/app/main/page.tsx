@@ -96,7 +96,7 @@ const MainPage = () => {
           ))}
         </div>
 
-        <div className="flex-1 overflow-auto py-[15px] pl-[35px] pr-[25px]">
+        <div className="flex-1 py-[15px] pl-[35px] pr-[25px]">
           <TabContent />
         </div>
       </div>

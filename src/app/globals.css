@@ -592,6 +592,8 @@ html, body {
   background: #ebebeb;
   padding: 4px 0;
 }
+
+/*발신진행정보*/
 .out-wrap {
   container-type: inline-size;
   container-name: out-wrap;
@@ -630,6 +632,20 @@ html, body {
     min-width:calc(60% - 20px);
     flex: none;
     height: auto;
+  }
+}
+
+
+.compaign-wrap {
+  container-type: inline-size; /* 너비 기준으로 컨테이너 쿼리 활성화 */
+}
+
+@container (max-width: 1500px) {
+  .gap-use-10 {
+    gap: 10px;
+  }
+  .w-use-140{
+    width: 140px;
   }
 }
 
