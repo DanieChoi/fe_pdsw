@@ -152,29 +152,100 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
       onToggleDrawer(newState);
     }
   };
+  
+  const footerDataSet = (data:string) => {
+    const tempEventData = JSON.parse(data);
+    console.log("event.data66 = ", data);
+    //시간.
+    const today = new Date();
+    const _time = today.getHours()+':'+today.getMinutes()+':'+today.getSeconds();
+    //타입.
+    let _type = '';
+    if( tempEventData['kind'] === 'event' ){
+      _type = 'Event';
+    }else if( tempEventData['kind'] === 'alram' ){
+      _type = 'Event';
+    }
+    //메시지.
+    let _message = '';
+    //운영설정>캠페인별 발신번호설정
+    if( tempEventData['announce'] === '/pds/campaign/calling-number' ){
+      _message = '캠페인 : '
+      if( tempEventData['command'] === 'INSERT' ){
+        _message += '[' + tempEventData['data']['campaign_id'] + '], 사용자 발신번호 설정 추가 성공';
+      }else if( tempEventData['command'] === 'DELETE' ){
+        _message += '[' + tempEventData['data']['campaign_id'] + '], 사용자 발신번호 설정 삭제 성공';
+      }else if( tempEventData['command'] === 'UPDATE' ){
+        _message += '[' + tempEventData['data']['campaign_id'] + '], 사용자 발신번호 설정 변경 성공';
+      }
+    }
+    //장비 사용, 장비 사용중지
+    else if( tempEventData['announce'] === 'dialing-device' ){
+      if( tempEventData['command'] === 'UPDATE' && tempEventData['data']['skill_id'] === 'run' ){
+        _message = 'CIDS 작동중';
+      }else if( tempEventData['command'] === 'UPDATE' && tempEventData['data']['skill_id'] === 'down' ){
+        _message = 'CIDS 작동중지';
+      }
+    }
+    //캠페인수정>콜페이싱 수정
+    else if( tempEventData['announce'] === '/pds/campaign/dial-speed' ){
+      _message = '[콜페이싱] '
+      if( tempEventData['command'] === 'UPDATE' ){
+        _message += '캠페인 아이디 ' + tempEventData['data']['campaign_id'] + ' , 현재 설정값 ' + tempEventData['data']['dial_speed'];
+      }
+    }
+    //캠페인.
+    else if( tempEventData['announce'] === '/pds/campaign' ){
+      _message = '캠페인 '
+      if( tempEventData['command'] === 'INSERT' ){
+        _message += '추가, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'] + ' , 동작상태 : , 완료구분 : ';
+      }else if( tempEventData['command'] === 'UPDATE' ){
+        _message += '수정, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'] + ' , 동작상태 : , 완료구분 : ';
+      }
+    }
+    //스킬.
+    else if( tempEventData['announce'] === '/pds/skill/agent-list' ){
+      _message = '[스킬 '
+      if( tempEventData['command'] === 'UPDATE' ){
+        _message += '추가] 스킬 아이디 : ' + tempEventData['data']['skill_id'] + ' , 상담원 아이디 : ' + tempEventData['data']['agent_id'];
+      }else if( tempEventData['command'] === 'DELETE' ){
+        _message += '해제] 스킬 아이디 : ' + tempEventData['data']['skill_id'] + ' , 상담원 아이디 : ' + tempEventData['data']['agent_id'];
+      }
+    }
+    //스킬편집
+    else if( tempEventData['announce'] === '/pds/skill' ){
+      _message = '[스킬 '
+      if( tempEventData['command'] === 'INSERT' ){
+        _message += '추가] 스킬 아이디 : ' + tempEventData['data']['skill_id'] + ' , 스킬 이름 : ' + tempEventData['data']['skill_name'];
+      }else if( tempEventData['command'] === 'DELETE' ){
+        _message += '삭제] 스킬 아이디 : ' + tempEventData['data']['skill_id'] + ' , 스킬 이름 : ' + tempEventData['data']['skill_name'];
+      }else if( tempEventData['command'] === 'UPDATE' ){
+        _message += '수정] 스킬 아이디 : ' + tempEventData['data']['skill_id'] + ' , 스킬 이름 : ' + tempEventData['data']['skill_name'];
+      }
+    }
+    setFooterDataList((prev) => [
+      {
+        time: _time,
+        type: _type,
+        message: _message
+      },
+      ...prev
+    ]);
+  };
 
   useEffect(() => {
     //SSE 실시간 이벤트 구독
-    console.log("단계 = ", process.env.NEXT_PUBLIC_API_URL);
-  
-    const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-  
+    const DOMAIN = process.env.NEXT_PUBLIC_API_URL;  
     const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
-  
-    console.log("eventSource = ", eventSource);
-  
+    let readyCheck = false;
     eventSource.addEventListener("message", (event) => {
       //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
-      console.log("event.data22 = ", event.data);
-      let readyCheck = false;
       if( event.data === 'Connected!!'){
         readyCheck = true;
       }
       if(readyCheck && event.data !== 'Connected!!'){
         readyCheck = false;
-        console.log("event.data33 = ", event.data);
-      }else{
-        console.log("event.data44 = ", event.data);
+        footerDataSet(event.data);
       }
     });
   }, []);
@@ -238,16 +309,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
           >
             <table className="w-full text-sm">
               <tbody>
-                {[
-                  { time: "17:56:27", type: "Event", message: "CIDS 작동 정지" },
-                  { time: "17:56:12", type: "Event", message: "CIDS 작동 정지" },
-                  {
-                    time: "17:56:27",
-                    type: "Event",
-                    message:
-                      "캠페인 통계데이터 분석, 캠페인:아이디-7, 캠페인언어=pds_web_only, 통계서버 : S-1",
-                  },
-                ].map((log, index) => (
+                {footerDataList.map((log, index) => (
                   <tr key={index}>
                     <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
                     <td className="whitespace-nowrap text-[13px] px-1">[{log.type}]</td>
@@ -263,10 +325,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
             <div className="w-1/2 overflow-auto py-[7px] px-[20px]">
               <table className="w-full text-sm">
                 <tbody>
-                  {[
-                    { time: "17:56:27", type: "System", message: "시스템 상태 정상" },
-                    { time: "17:56:12", type: "System", message: "메모리 사용량 45%" },
-                  ].map((log, index) => (
+                  {footerDataList.map((log, index) => (
                     <tr key={index}>
                       <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
                       <td className="whitespace-nowrap text-[13px] px-1">[{log.type}]</td>
