@@ -1,9 +1,10 @@
 // src/app/main/comp/TabRow.tsx
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useTabStore } from "@/store/tabStore";
 import TabSection from "./TabSection";
+import TabRowMenu from "./TabRowMenu";
 import { CommonButton } from "@/components/shared/CommonButton";
 import Image from "next/image";
 
@@ -13,6 +14,7 @@ interface TabRowProps {
 
 const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
   const { rows, addRow, addSection, removeRow } = useTabStore();
+  const [menuOpen, setMenuOpen] = useState(false); // 메뉴 열림/닫힘 상태
 
   const row = rows.find((r) => r.id === rowId);
   if (!row) return null;
@@ -32,6 +34,11 @@ const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
   // 행 삭제 핸들러
   const handleRemoveRow = () => {
     removeRow(rowId);
+  };
+
+  // 드롭다운 토글 처리
+  const handleDropdownToggle = () => {
+    setMenuOpen(!menuOpen);
   };
 
   const canRemove = rowId !== "row-1"; // 예시로 첫 번째 행은 삭제 불가능
@@ -69,6 +76,18 @@ const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
               height={8}
             />
         </CommonButton>
+        <CommonButton
+          variant="tabEtc"
+          size="icon"
+          onClick={handleDropdownToggle}
+        >
+          <Image
+              src="/header-menu/dropdown-toggle.png"
+              alt="dropdown-toggle"
+              width={3}
+              height={10}
+            />
+        </CommonButton>
 
         {canRemove && (
           <CommonButton
@@ -85,6 +104,12 @@ const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
           </CommonButton>
         )}
       </div>
+      {/* 드롭다운 메뉴 컴포넌트 */}
+      <TabRowMenu 
+        rowId={rowId} 
+        isOpen={menuOpen} 
+        onClose={() => setMenuOpen(false)} 
+      />
     </div>
   );
 };
