@@ -209,7 +209,7 @@ export function ContextMenuForTreeNode({
             {/* <Search className="mr-2 h-4 w-4" /> */}
             시작구분
           </ContextMenuSubTrigger>
-          <ContextMenuSubContent className="w-[150px]">
+          <ContextMenuSubContent className="w-[35px]">
             <ContextMenuItem 
               onClick={() => handleStartClick('started')} 
               className="flex items-center"
