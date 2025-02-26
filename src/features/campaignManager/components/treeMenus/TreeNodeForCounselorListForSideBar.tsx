@@ -916,7 +916,7 @@ export function TreeNodeForCounselorListForSideBar({
         members: counselors
       };
 
-      console.log(`ContextMenu 생성: ${type} ${contextMenuItem.name}, tenantId:`, currentTenantId);
+      // console.log(`ContextMenu 생성: ${type} ${contextMenuItem.name}, tenantId:`, currentTenantId);
 
       return (
         <IContextMenuForGroupAndTeamAndCounselor item={contextMenuItem}>

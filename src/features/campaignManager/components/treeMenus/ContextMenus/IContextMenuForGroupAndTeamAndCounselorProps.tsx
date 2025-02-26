@@ -386,12 +386,30 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       console.warn(`⚠️ 그룹에 멤버가 없습니다. ${item.name} (${item.id})`);
       return;
     }
-
+  
+    // 처리 전 원본 멤버 데이터 로깅
+    console.group("🔎 그룹 스킬 할당 - 멤버 데이터 처리 과정");
+    console.log("1️⃣ 원본 멤버 데이터:", item.members);
+    console.log("📊 멤버 수:", item.members.length);
+    
+    // 첫 번째 멤버의 구조 자세히 확인
+    if (item.members.length > 0) {
+      console.log("🔍 첫 번째 멤버 상세 구조:", JSON.stringify(item.members[0], null, 2));
+    }
+  
     // 멤버에게도 tenantId 전파하여 설정
     const membersWithTenantId = item.members.map(member => ({
       ...member,
       tenantId: item.tenantId
     }));
+    
+    // 처리 후 데이터 로깅
+    console.log("2️⃣ tenantId 추가 후 멤버 데이터:", membersWithTenantId);
+    console.log("📊 처리된 멤버 수:", membersWithTenantId.length);
+    
+    // 스토어 설정 전 최종 데이터 확인
+    console.log("3️⃣ 스토어에 설정할 최종 데이터:", membersWithTenantId);
+    console.groupEnd();
     
     logDebugInfo("그룹 스킬 할당", {
       groupId: item.id,
@@ -403,6 +421,15 @@ export function IContextMenuForGroupAndTeamAndCounselor({
     
     // 상담원 목록 설정
     setCandidateMembersForSkilAssign(membersWithTenantId);
+    
+    // 스토어에 실제로 저장된 데이터 확인 (비동기 처리 후)
+    setTimeout(() => {
+      const storeState = useCounselorFilterStore.getState();
+      console.group("🔄 스토어 상태 확인");
+      console.log("📋 candidateMembersForSkilAssign:", storeState.candidateMembersForSkilAssign);
+      console.log("📊 스토어에 저장된 멤버 수:", storeState.candidateMembersForSkilAssign.length);
+      console.groupEnd();
+    }, 100);
     
     // 기존 탭 정리
     clearExistingTabs(602);

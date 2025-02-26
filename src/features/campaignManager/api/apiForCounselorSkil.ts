@@ -198,8 +198,8 @@ export const apiForAddCounselorsForSpecificSkill = async (
   counselorIds: string[]
 ): Promise<CounselorSkillAssignmentResponse> => {
   console.log("📌 스킬에 상담사 추가 시작");
-  console.log("🎯 대상 스킬 ID:", skillId);
-  console.log("🔗 추가할 상담사 목록:", counselorIds);
+  console.log("🎯 대상 스킬 ID 11111111111111111111 :", skillId);
+  console.log("🔗 추가할 상담사 목록 22222222222222222222:", counselorIds);
 
   try {
     const { data } = await axiosInstance.post<CounselorSkillAssignmentResponse>(
