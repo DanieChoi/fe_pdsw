@@ -177,6 +177,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     // SSE 실시간 이벤트 구독
     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
     const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
+    console.log("footer event ready... ");
     
     const handleEvent = (event: MessageEvent) => {
       console.log("footer event.data = " + event.data );
