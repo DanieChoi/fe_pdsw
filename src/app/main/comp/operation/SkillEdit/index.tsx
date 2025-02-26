@@ -363,6 +363,7 @@ const SkillEdit = () => {
     });
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleNew = () => {
     setSelectedSkill({ ...initialSkillState, skillId: generateSkillId() });
     setEditableFields({
@@ -377,6 +378,7 @@ const SkillEdit = () => {
     setIsNewMode(true);
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleSave = () => {
     if (isNewMode && (!editableFields.skillName || !editableFields.description)) {
       showAlert('스킬 이름과 설명을 모두 입력해주세요.');
@@ -420,6 +422,7 @@ const SkillEdit = () => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleDelete = () => {
     if (!selectedSkill) {
       showAlert('삭제할 스킬을 선택해주세요.');
@@ -770,8 +773,7 @@ const SkillEdit = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown, true);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [alertState]);
+  }, [alertState, handleDelete, handleNew, handleSave]);
 
   return (
     <div className="flex">
