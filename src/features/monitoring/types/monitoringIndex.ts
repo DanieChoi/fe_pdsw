@@ -108,6 +108,21 @@ export interface CampaignHistoryResponse {
   result_data: CampaignHistoryResponseDataType[];
 }
 
+// 상담원 상태 모니터링 데이터 타입
+export interface AgentStateMonitoringListDataResponse {
+  counselorId: string;
+  counselorName: string;
+  statusCode: string;
+  statusTime: string;
+}
+
+// 상담원 상태 모니터링 응답 
+export interface AgentStateMonitoringListResponse {
+  code: number;
+  message: string;
+  counselorStatusList: AgentStateMonitoringListDataResponse[];
+}
+
 
 // 모니터링 API 에러 타입
 export interface MonitoringApiError {

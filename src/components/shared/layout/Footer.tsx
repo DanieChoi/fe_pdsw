@@ -125,14 +125,29 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     }
     //스킬.
     else if( announce === '/pds/skill/agent-list' ){
-      _message = '[스킬 '
-      if( command === 'UPDATE' ){
-        _message += '추가] 스킬 아이디 : ' + data['skill_id'] + ' , 상담원 아이디 : ' + data['agent_id'];
-      }else if( command === 'DELETE' ){
-        _message += '해제] 스킬 아이디 : ' + data['skill_id'] + ' , 상담원 아이디 : ' + data['agent_id'];
-      }else if( command === 'INSERT' ){
-        _message += '추가] 스킬 아이디 : ' + data['skill_id'] + ' , 상담원 아이디 : ' + data['agent_id'];
+      const tempAgentIdList = data['agent_id'];
+      const _skillId = data['skill_id'];
+      const tempFooterDataList:FooterDataType[] = [];
+      for( let i=0;i<tempAgentIdList.length;i++){
+        let __message = '[스킬 '
+        if( command === 'UPDATE' ){
+          __message += '추가] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
+        }else if( command === 'DELETE' ){
+          __message += '해제] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
+        }else if( command === 'INSERT' ){
+          __message += '추가] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
+        }
+        tempFooterDataList.push({
+          time: _time,
+          type: _type,
+          message: __message
+        });
       }
+      setFooterDataList((prev) => [
+        ...tempFooterDataList,
+        ...prev.slice(0, 9) // 상위 10개만 보이게.
+      ]);
+      _message = '';
     }
     //스킬편집
     else if( announce === '/pds/skill' ){
