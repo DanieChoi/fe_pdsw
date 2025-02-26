@@ -1,10 +1,6 @@
-import { useState, useEffect } from "react";
-<<<<<<< HEAD
+import { useState, useEffect, useCallback } from "react";
 import { ChevronUp, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
-=======
-import _ from 'lodash';
-import { ChevronUp, ChevronDown } from "lucide-react";
->>>>>>> 9a22ae9c266db19452f0c3baa482cb8b80775142
+import { isEqual } from 'lodash';
 import { useAuthStore } from '@/store';
 
 type FooterDataType = {
@@ -23,6 +19,10 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
   const [isExpanded, setIsExpanded] = useState(false);   // D(1단) / W(2단) 모드 토글
   const [isDrawerOpen, setIsDrawerOpen] = useState(true); // 푸터 열기/닫기 토글
   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
+  const [announce, setAnnounce] = useState<string>('');
+  const [command, setCommand] = useState<string>('');
+  const [data, setData] = useState<any>(null);
+  const [kind, setKind] = useState<string>('');
   const { tenant_id } = useAuthStore();
 
   // 부모 컴포넌트에 열림/닫힘 상태 변경 알림
@@ -53,7 +53,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     }
   };
   
-  const footerDataSet = (announce:string,command:string,data:any,kind:string, tempEventData:any) => {
+  const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, tempEventData: any): void => {
     //시간.
     const today = new Date();
     const _time = String(today.getHours()).padStart(2, '0')+':'+String(today.getMinutes()).padStart(2, '0')+':'+String(today.getSeconds()).padStart(2, '0');
@@ -173,12 +173,6 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     }
   };
 
-<<<<<<< HEAD
-=======
-  let data:any = {};
-  let announce:string = '';
-  let command:string = '';
-  let kind:string = '';
   useEffect(() => {
     // SSE 실시간 이벤트 구독
     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
@@ -191,14 +185,10 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
 
         if (
           announce !== tempEventData['announce'] ||
-          !_.isEqual(data, tempEventData.data) ||
-          !_.isEqual(data, tempEventData['data']) ||
+          !isEqual(data, tempEventData.data) ||
+          !isEqual(data, tempEventData['data']) ||
           kind !== tempEventData['kind']
         ) {
-          announce = tempEventData['announce'];
-          command = tempEventData['command'];
-          data = tempEventData['data'];
-          kind = tempEventData['kind'];
           
           footerDataSet(tempEventData['announce'], tempEventData['command'],tempEventData['data'],tempEventData['kind'], tempEventData);
         }
@@ -210,13 +200,12 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     // Cleanup on unmount to avoid multiple listeners
     return () => {
       eventSource.removeEventListener("message", handleEvent);
+      eventSource.close();
     };
   }, [tenant_id, footerDataSet, announce, command, data, kind]);
->>>>>>> 9a22ae9c266db19452f0c3baa482cb8b80775142
 
-  return (
-    <footer
-      // 2단(W) 모드면 fixed bottom-0, 1단(D) 모드면 relative
+    return (
+      <footer
       className={`
         border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col transition-all duration-300 ease-in-out
         ${isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative"}
