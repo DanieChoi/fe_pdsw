@@ -130,6 +130,8 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
         _message += '추가] 스킬 아이디 : ' + data['skill_id'] + ' , 상담원 아이디 : ' + data['agent_id'];
       }else if( command === 'DELETE' ){
         _message += '해제] 스킬 아이디 : ' + data['skill_id'] + ' , 상담원 아이디 : ' + data['agent_id'];
+      }else if( command === 'INSERT' ){
+        _message += '추가] 스킬 아이디 : ' + data['skill_id'] + ' , 상담원 아이디 : ' + data['agent_id'];
       }
     }
     //스킬편집
