@@ -164,7 +164,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
           type: _type,
           message: _message
         },
-        ...prev
+        ...prev.slice(0, 9) // 상위 10개만 보이게.
       ]);
     }
   }, [setFooterDataList]);
