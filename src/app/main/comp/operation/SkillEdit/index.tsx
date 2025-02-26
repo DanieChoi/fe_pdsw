@@ -55,6 +55,8 @@ const SkillEdit = () => {
   const [filteredCampaigns, setFilteredCampaigns] = useState<CampaignRow[]>([]);
   const [filteredAgents, setFilteredAgents] = useState<AgentRow[]>([]);
   const [allCampaigns, setAllCampaigns] = useState<CampaignRow[]>([]);
+  // 다중 선택 스킬 관리를 위한 상태 추가 (체크박스로 선택된 항목들)
+  const [selectedSkillRows, setSelectedSkillRows] = useState<Set<string>>(new Set());
 
   // 신규 등록을 위한 초기 상태
   const initialSkillState = {
@@ -89,6 +91,7 @@ const SkillEdit = () => {
 
   // 스킬 그리드 컬럼
   const skillColumns = useMemo(() => [
+    SelectColumn,
     { key: 'center', name: '센터' },
     { key: 'tenant', name: '테넌트' },
     { key: 'skillId', name: '스킬아이디' },
@@ -161,6 +164,7 @@ const SkillEdit = () => {
 
   // 스킬 로우 클릭 이벤트 핸들러
   const handleSkillClick = ({ row }: { row: SkillRow }) => {
+    // 이미 구현된 기존 코드 그대로 유지
     setSelectedSkill(row);
     setSelectedCampaignRows(new Set());
     setSelectedAgentRows(new Set());
@@ -193,6 +197,12 @@ const SkillEdit = () => {
       tenantId: row.tenantId,
       skillId: Number(row.skillId)
     });
+  };  
+
+  // 스킬 체크박스 선택 변경 이벤트 핸들러 (다중 선택)
+  const handleSkillSelectionChange = (selectedRows: Set<string>) => {
+    // 체크박스 선택 상태만 업데이트 (상세 정보는 변경하지 않음)
+    setSelectedSkillRows(selectedRows);
   };
 
   const handleCampaignSelectionChange = (selectedRows: Set<string>) => {
@@ -424,43 +434,119 @@ const SkillEdit = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleDelete = () => {
-    if (!selectedSkill) {
-      showAlert('삭제할 스킬을 선택해주세요.');
-      return;
-    }
-  
-    if (selectedSkill.campaignCount > 0 || selectedSkill.agentCount > 0) {
-      showAlert('사용 중인 스킬은 삭제할 수 없습니다.');
-      return;
-    }
-  
-    showConfirm('선택한 스킬을 삭제하시겠습니까?\n\n※주의 : 삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해주세요.', () => {
-      deleteSkill({ skill_id: Number(selectedSkill.skillId) }, {
-        onSuccess: () => {
-          // 스킬 리스트 새로고침
-          fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
-          
-          // 상세 정보 초기화
+    // 체크박스로 선택된 스킬이 있는 경우 다중 삭제 진행
+    if (selectedSkillRows.size > 0) {
+      // 선택된 스킬 ID 배열 생성
+      const selectedSkillIds = Array.from(selectedSkillRows);
+      
+      // 선택된 스킬 중 사용 중인 스킬이 있는지 확인
+      const inUseSkills = selectedSkillIds
+        .map(skillId => rows.find(row => row.skillId === skillId))
+        .filter(skill => skill && (skill.campaignCount > 0 || skill.agentCount > 0));
+      
+      if (inUseSkills.length > 0) {
+        // 사용 중인 스킬 이름들을 출력
+        const inUseSkillNames = inUseSkills.map(skill => skill?.skillName).join(', ');
+        showAlert(`다음 스킬은 사용 중이므로 삭제할 수 없습니다: ${inUseSkillNames}`);
+        return;
+      }
+      
+      // 확인 메시지
+      const confirmMessage = selectedSkillIds.length === 1
+        ? '선택한 스킬을 삭제하시겠습니까?\n\n※주의 : 삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해주세요.'
+        : `선택한 ${selectedSkillIds.length}개 스킬을 삭제하시겠습니까?\n\n※주의 : 삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해주세요.`;
+      
+      showConfirm(confirmMessage, async () => {
+        let successCount = 0;
+        let failCount = 0;
+        
+        // 각 스킬에 대해 API 호출
+        for (const skillId of selectedSkillIds) {
+          try {
+            await new Promise<void>((resolve, reject) => {
+              deleteSkill({ skill_id: Number(skillId) }, {
+                onSuccess: () => {
+                  successCount++;
+                  resolve();
+                },
+                onError: (error) => {
+                  failCount++;
+                  console.error(`스킬 ID ${skillId} 삭제 실패:`, error);
+                  reject(error);
+                }
+              });
+            });
+          } catch (error) {
+            console.error(`스킬 ID ${skillId} 삭제 중 오류:`, error);
+          }
+        }
+        
+        // 작업 완료 후 메시지 표시
+        if (failCount === 0) {
+          showAlert(`${successCount}개 스킬이 성공적으로 삭제되었습니다.`);
+        } else {
+          showAlert(`${successCount}개 삭제 성공, ${failCount}개 삭제 실패하였습니다.`);
+        }
+        
+        // 스킬 리스트 새로고침
+        fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
+        
+        // 체크박스 선택 초기화
+        setSelectedSkillRows(new Set());
+        
+        // 선택된 스킬이 삭제되었을 경우 상세 정보도 초기화
+        if (selectedSkill && selectedSkillIds.includes(selectedSkill.skillId)) {
           setSelectedSkill(null);
           setEditableFields({
             tenantId: tenant_id,
             skillName: '',
             description: ''
           });
-          
-          // 관련 데이터 초기화
           setFilteredCampaigns([]);
           setFilteredAgents([]);
           setSelectedCampaignRows(new Set());
           setSelectedAgentRows(new Set());
-          
-          showAlert('스킬이 성공적으로 삭제되었습니다.');
-        },
-        onError: (error) => {
-          showAlert(`삭제 실패: ${error.message}`);
         }
       });
-    });
+    } 
+    // 체크박스 선택이 없고 단일 로우 선택일 경우 기존 삭제 로직 사용
+    else if (selectedSkill) {
+      if (selectedSkill.campaignCount > 0 || selectedSkill.agentCount > 0) {
+        showAlert('사용 중인 스킬은 삭제할 수 없습니다.');
+        return;
+      }
+    
+      showConfirm('선택한 스킬을 삭제하시겠습니까?\n\n※주의 : 삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해주세요.', () => {
+        deleteSkill({ skill_id: Number(selectedSkill.skillId) }, {
+          onSuccess: () => {
+            // 스킬 리스트 새로고침
+            fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
+            
+            // 상세 정보 초기화
+            setSelectedSkill(null);
+            setEditableFields({
+              tenantId: tenant_id,
+              skillName: '',
+              description: ''
+            });
+            
+            // 관련 데이터 초기화
+            setFilteredCampaigns([]);
+            setFilteredAgents([]);
+            setSelectedCampaignRows(new Set());
+            setSelectedAgentRows(new Set());
+            
+            showAlert('스킬이 성공적으로 삭제되었습니다.');
+          },
+          onError: (error) => {
+            showAlert(`삭제 실패: ${error.message}`);
+          }
+        });
+      });
+    }
+    else {
+      showAlert('삭제할 스킬을 선택해주세요.');
+    }
   };
 
   const handleInputChange = (field: 'skillName' | 'description', value: string) => {
@@ -787,9 +873,17 @@ const SkillEdit = () => {
                 columns={skillColumns}
                 rows={rows}
                 className="grid-custom"
-                onCellClick={handleSkillClick}
+                // onCellClick={handleSkillClick}
+                onCellClick={(props) => {
+                  // SelectColumn을 클릭한 경우는 제외하고 로우 선택 처리
+                  if (props.column.key !== SelectColumn.key) {
+                    handleSkillClick(props);
+                  }
+                }}
                 rowKeyGetter={(row) => row.skillId}
-                selectedRows={selectedSkill ? new Set<string>([selectedSkill.skillId]) : new Set<string>()}
+                // selectedRows={selectedSkill ? new Set<string>([selectedSkill.skillId]) : new Set<string>()}
+                selectedRows={selectedSkillRows}
+                onSelectedRowsChange={handleSkillSelectionChange}
                 rowHeight={30}
                 headerRowHeight={30}
                 rowClass={getRowClass}
@@ -925,7 +1019,8 @@ const SkillEdit = () => {
                 • 기능설명<br/>
                 스킬 추가 = 키보드 ↓<br/>
                 스킬 삭제 = 키보드 Delete<br/>
-                다중 선택 = Shift 또는 Ctrl 키를 이용하여 다중 선택 가능
+                체크박스를 선택하여 다중 선택 가능(다중선택은 삭제만 가능)
+                {/* 다중 선택 = Shift 또는 Ctrl 키를 이용하여 다중 선택 가능 */}
               </li>
               <li>• 단축키<br/>저장하기(Ctrl+S)<br/>삭제하기(Ctrl+D or Del)</li>
             </ul>
