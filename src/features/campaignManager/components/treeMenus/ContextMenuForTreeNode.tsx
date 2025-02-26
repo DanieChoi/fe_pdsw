@@ -11,9 +11,9 @@ import {
   ContextMenuSeparator,
 } from "@/components/ui/context-menu";
 import { useTabStore } from "@/store/tabStore";
-import { 
-  Edit, Copy, Activity, Trash2, Monitor, Settings, Search, List, Clock, History, 
-  UserCheck, Shield, RefreshCcw, AlertTriangle, Check 
+import {
+  Edit, Copy, Activity, Trash2, Monitor, Settings, Search, List, Clock, History,
+  UserCheck, Shield, RefreshCcw, AlertTriangle, Check
 } from "lucide-react";
 import { useState } from "react";
 import BlackListCountPopup from '@/features/campaignManager/components/popups/BlackListCountPopup';
@@ -46,7 +46,7 @@ export function ContextMenuForTreeNode({
   onHandleCampaignCopy,
 }: ContextMenuForTreeNodeProps) {
   const isFolder = item.type === "folder";
-  const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab } = useTabStore();
+  const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab, addMultiTab } = useTabStore();
   const [isBlacklistPopupOpen, setIsBlacklistPopupOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<CampaignStatus>(item.status);
   const [blackListCount, setBlackListCount] = useState<number>(0);
@@ -98,8 +98,35 @@ export function ContextMenuForTreeNode({
     setCampaignIdForUpdateFromSideMenu(item.id);
   };
 
-  const handleProgressInfoClick = () => {
-    simulateHeaderMenuClick(21);
+  // const handleProgressInfoClick = () => {
+  //   // 고유한 키 생성 - 캠페인 ID와 타임스탬프 조합
+  //   const uniqueKey = `progress-info-${item.id}-${Date.now()}`;
+
+  //   addMultiTab({
+  //     id: 21,
+  //     uniqueKey: uniqueKey,
+  //     title: `캠페인 진행정보 - ${item.label} (${item.id})`,
+  //     icon: '',
+  //     href: '',
+  //     content: null,
+  //   });
+  // };
+
+  const handleProgressInfoClick = (campaignId: any, campaignName: string) => {
+    // 고유한 키 생성 - 캠페인 ID 포함
+    const uniqueKey = `progress-info-${campaignId}-${Date.now()}`;
+
+    // alert("캠페인 아이디 체크 " + campaignId);
+
+    addMultiTab({
+      id: 21,
+      uniqueKey: uniqueKey,
+      title: `캠페인 진행정보 - ${campaignName}`,
+      icon: '',
+      href: '',
+      content: null,
+      campaignId: campaignId  // 캠페인 ID 설정
+    });
   };
 
   const handleRebroadcastClick = () => {
@@ -132,7 +159,7 @@ export function ContextMenuForTreeNode({
       default: return 0;
     }
   };
-  
+
   const handleStartClick = async (status: CampaignStatus) => {
     try {
       console.log('Status change requested:', {
@@ -141,24 +168,24 @@ export function ContextMenuForTreeNode({
         previousStatus: currentStatus,
         newStatus: status
       });
-  
+
       // API 호출
       await updateCampaignStatusMutation.mutateAsync({
         campaign_id: Number(item.id),
         campaign_status: getStatusNumber(status)
       });
-  
+
       // 로컬 상태 업데이트
       setCurrentStatus(status);
       // simulateHeaderMenuClick(14);
-  
+
       console.log('Status changed successfully:', {
         campaignId: item.id,
         campaignName: item.label,
         status: status,
         timestamp: new Date().toISOString()
       });
-  
+
     } catch (error) {
       console.error('Error changing campaign status:', {
         campaignId: item.id,
@@ -186,7 +213,7 @@ export function ContextMenuForTreeNode({
 
   const renderStatusCheckbox = (targetStatus: CampaignStatus) => {
     const isLoading = updateCampaignStatusMutation.isPending && currentStatus === targetStatus;
-    
+
     return currentStatus === targetStatus ? (
       <Check className={`mr-2 h-4 w-4 text-green-500 ${isLoading ? 'opacity-50' : ''}`} />
     ) : (
@@ -196,87 +223,90 @@ export function ContextMenuForTreeNode({
 
   return (
     <>
-    <ContextMenu>
-      <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-      <ContextMenuContent className="w-[150px]">
-        <ContextMenuItem onClick={handleEditMenuClick}>
-          {/* <Edit className="mr-2 h-4 w-4" /> */}
-          캠페인 수정
-        </ContextMenuItem>
-        
-        <ContextMenuSub>
-          <ContextMenuSubTrigger>
-            {/* <Search className="mr-2 h-4 w-4" /> */}
-            시작구분
-          </ContextMenuSubTrigger>
-          <ContextMenuSubContent className="w-[35px]">
-            <ContextMenuItem 
-              onClick={() => handleStartClick('started')} 
-              className="flex items-center"
-              disabled={updateCampaignStatusMutation.isPending}
-            >
-              {renderStatusCheckbox('started')}
-              시작
-            </ContextMenuItem>
-            <ContextMenuItem 
-              onClick={() => handleStartClick('pending')} 
-              className="flex items-center"
-              disabled={updateCampaignStatusMutation.isPending}
-            >
-              {renderStatusCheckbox('pending')}
-              멈춤
-            </ContextMenuItem>
-            <ContextMenuItem 
-              onClick={() => handleStartClick('stopped')} 
-              className="flex items-center"
-              disabled={updateCampaignStatusMutation.isPending}
-            >
-              {renderStatusCheckbox('stopped')}
-              중지
-            </ContextMenuItem>
-          </ContextMenuSubContent>
-        </ContextMenuSub>
-
-        <ContextMenuItem onClick={handleProgressInfoClick}>
-          {/* <Settings className="mr-2 h-4 w-4" /> */}
-          캠페인 진행정보
-        </ContextMenuItem>
-
-        <ContextMenuSeparator />
-
-        <ContextMenuItem onClick={handleRebroadcastClick}>
-          {/* <RefreshCcw className="mr-2 h-4 w-4" /> */}
-          재발신
-        </ContextMenuItem>
-
-        <ContextMenuSeparator />
-
-        <ContextMenuItem onClick={onHandleCampaignCopy}>
-          {/* <Copy className="mr-2 h-4 w-4" /> */}
-          캠페인 복사
-        </ContextMenuItem>
-
-        {!isFolder && (
-          <ContextMenuItem onClick={onDelete} className="text-red-500">
-            {/* <Trash2 className="mr-2 h-4 w-4" /> */}
-            캠페인 삭제
+      <ContextMenu>
+        <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+        <ContextMenuContent className="w-[150px]">
+          <ContextMenuItem onClick={handleEditMenuClick}>
+            {/* <Edit className="mr-2 h-4 w-4" /> */}
+            캠페인 수정
           </ContextMenuItem>
-        )}
 
-        <ContextMenuSeparator />
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>
+              {/* <Search className="mr-2 h-4 w-4" /> */}
+              시작구분
+            </ContextMenuSubTrigger>
+            <ContextMenuSubContent className="w-[35px]">
+              <ContextMenuItem
+                onClick={() => handleStartClick('started')}
+                className="flex items-center"
+                disabled={updateCampaignStatusMutation.isPending}
+              >
+                {renderStatusCheckbox('started')}
+                시작
+              </ContextMenuItem>
+              <ContextMenuItem
+                onClick={() => handleStartClick('pending')}
+                className="flex items-center"
+                disabled={updateCampaignStatusMutation.isPending}
+              >
+                {renderStatusCheckbox('pending')}
+                멈춤
+              </ContextMenuItem>
+              <ContextMenuItem
+                onClick={() => handleStartClick('stopped')}
+                className="flex items-center"
+                disabled={updateCampaignStatusMutation.isPending}
+              >
+                {renderStatusCheckbox('stopped')}
+                중지
+              </ContextMenuItem>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
 
-        <ContextMenuItem onClick={handleMonitorClick}>
-          {/* <Monitor className="mr-2 h-4 w-4" /> */}
-          상담원 상태 모니터
-        </ContextMenuItem>
-        
-        <ContextMenuItem onClick={handleBlacklistCountCheckClick}>
-          {/* <AlertTriangle className="mr-2 h-4 w-4 text-yellow-500" /> */}
-          블랙리스트 건수 조회
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
-    {isBlacklistPopupOpen && (
+          {/* <ContextMenuItem onClick={handleProgressInfoClick}>
+          캠페인 진행정보
+        </ContextMenuItem> */}
+
+          <ContextMenuItem onClick={() => handleProgressInfoClick(item.id, item.label)}>
+            캠페인 진행정보
+          </ContextMenuItem>
+
+          <ContextMenuSeparator />
+
+          <ContextMenuItem onClick={handleRebroadcastClick}>
+            {/* <RefreshCcw className="mr-2 h-4 w-4" /> */}
+            재발신
+          </ContextMenuItem>
+
+          <ContextMenuSeparator />
+
+          <ContextMenuItem onClick={onHandleCampaignCopy}>
+            {/* <Copy className="mr-2 h-4 w-4" /> */}
+            캠페인 복사
+          </ContextMenuItem>
+
+          {!isFolder && (
+            <ContextMenuItem onClick={onDelete} className="text-red-500">
+              {/* <Trash2 className="mr-2 h-4 w-4" /> */}
+              캠페인 삭제
+            </ContextMenuItem>
+          )}
+
+          <ContextMenuSeparator />
+
+          <ContextMenuItem onClick={handleMonitorClick}>
+            {/* <Monitor className="mr-2 h-4 w-4" /> */}
+            상담원 상태 모니터
+          </ContextMenuItem>
+
+          <ContextMenuItem onClick={handleBlacklistCountCheckClick}>
+            {/* <AlertTriangle className="mr-2 h-4 w-4 text-yellow-500" /> */}
+            블랙리스트 건수 조회
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+      {isBlacklistPopupOpen && (
         <BlackListCountPopup
           campaignId={item.id}
           blackListCount={blackListCount}
