@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-custom";
 import Image from "next/image";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { Label } from "@/components/ui/label";
+import { useApiForAgentStateMonitoringList } from '@/features/monitoring/hooks/useApiForAgentStateMonitoringList';
 
 // 타입 정의
 interface AgentStatus {
@@ -46,7 +47,7 @@ const AgentStatusMonitoring: React.FC = () => {
   const [sortField, setSortField] = useState<SortField>('time');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
-  const [agentData] = useState<AgentData[]>([
+  const [agentData,setAgentData] = useState<AgentData[]>([
     { id: 1, status: 'waiting', agent: 'sktest001', name: '김상담', time: '00:00:12' },
     { id: 2, status: 'waiting', agent: 'sktest005', name: '이상담', time: '00:15:30' },
     { id: 3, status: 'processing', agent: 'sktest002', name: '박상담', time: '00:05:45' },
@@ -129,6 +130,40 @@ const AgentStatusMonitoring: React.FC = () => {
     { status: 'rest', bg: '!bg-[#F6F0FA]', text: '휴식', icon: '/rest.svg' }
   ];
 
+  //할당상담원 정보 조회
+  const { mutate: fetchAgentStateMonitoringList } = useApiForAgentStateMonitoringList({
+    onSuccess: (data) => {
+      if( data.counselorStatusList.length > 0 ){
+        const tempDataList: AgentData[] = data.counselorStatusList.map((item, index) => ({
+          id: index,
+          status: item.statusCode === '204' ? 'waiting' : item.statusCode === '205' ? 'processing' : item.statusCode === '206' ? 'afterProcessing' : 'rest',
+          agent: item.counselorId,
+          name: item.counselorName,
+          time: item.statusTime,
+        }));
+        
+        setAgentData(tempDataList);
+      }
+    }
+  });
+
+  useEffect(() => {
+    fetchAgentStateMonitoringList({
+      tenantId: 1,
+      campaignId: 100
+    });
+  }, []);
+  
+  // useEffect(() => {
+  //   if( campaigns && campaignIdForUpdateFromSideMenu && campaignIdForUpdateFromSideMenu !== '' ){
+  //     const tempCampaign = campaigns.filter(data => data.campaign_id === Number(campaignIdForUpdateFromSideMenu))[0];
+  //     setCampaignInfo( tempCampaign );
+  //     fetchAgentStateMonitoringList({
+  //       tenantId: tempCampaign.tenant_id,
+  //       campaignId: tempCampaign.campaign_id
+  //     });
+  //   }
+  // }, [campaignIdForUpdateFromSideMenu,campaigns]);
 
   return (
     <div className="w-full h-full flex flex-col  gap-4">
