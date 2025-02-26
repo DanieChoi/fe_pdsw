@@ -1,11 +1,9 @@
-
-// // 파일 경로: src/components/IFilterButtonForCampaignTabHeader.tsx
 // "use client";
 
-// import React, { useState } from "react";
+// import React, { useState, useEffect } from "react";
 // import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 // import CommonButton from "@/components/shared/CommonButton";
-// import { FilterIcon } from "lucide-react";
+// import { FilterIcon, CheckIcon } from "lucide-react";
 // import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCampaignTab";
 // import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
 
@@ -13,8 +11,13 @@
 //   const [showSkillFilter, setShowSkillFilter] = useState(false);
 //   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   
-//   // 스토어에서 선택된 스킬 ID 목록을 설정하는 함수 가져오기
-//   const { setSkilIdsForCampaignTreeMenu } = useSideMenuCampaignTabStore();
+//   // 스토어에서 선택된 스킬 ID 목록과 필터 모드를 가져오기
+//   const { 
+//     skilIdsForCampaignTreeMenu, 
+//     setSkilIdsForCampaignTreeMenu,
+//     filterMode,
+//     setFilterMode
+//   } = useSideMenuCampaignTabStore();
 
 //   // 선택 스킬로 보기 클릭 처리
 //   const handleSelectSkillsClick = () => {
@@ -26,10 +29,21 @@
 //     // 스토어의 선택된 스킬 ID 목록을 빈 배열로 설정 (체크박스 모두 해제 효과)
 //     setSkilIdsForCampaignTreeMenu([]);
     
+//     // 필터 모드를 'all'로 설정
+//     setFilterMode("all");
+    
 //     // 팝오버 닫기
 //     setShowSkillFilter(false);
 //     setIsPopoverOpen(false);
 //   };
+
+//   // 선택된 스킬이 있는지 확인하는 효과
+//   useEffect(() => {
+//     // 선택된 스킬이 있으면 필터 모드를 'skill'로 설정
+//     if (skilIdsForCampaignTreeMenu.length > 0) {
+//       setFilterMode("skill");
+//     }
+//   }, [skilIdsForCampaignTreeMenu, setFilterMode]);
 
 //   return (
 //     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
@@ -50,6 +64,9 @@
 //                 onClick={handleViewAllClick}
 //               >
 //                 <span>전체보기</span>
+//                 {filterMode === "all" && (
+//                   <CheckIcon className="h-4 w-4 text-blue-600" />
+//                 )}
 //               </CommonButton>
 //             </div>
 //             <div>
@@ -59,6 +76,9 @@
 //                 onClick={handleSelectSkillsClick}
 //               >
 //                 <span>선택 스킬로 보기</span>
+//                 {filterMode === "skill" && (
+//                   <CheckIcon className="h-4 w-4 text-blue-600" />
+//                 )}
 //               </CommonButton>
 //             </div>
 //           </div>
@@ -94,21 +114,40 @@
 import React, { useState, useEffect } from "react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import CommonButton from "@/components/shared/CommonButton";
-import { FilterIcon, CheckIcon } from "lucide-react";
+import { FilterIcon, CheckIcon, CheckSquare, Square } from "lucide-react";
 import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCampaignTab";
 import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
+import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
 
 const IFilterButtonForCampaignTabHeader = () => {
   const [showSkillFilter, setShowSkillFilter] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  
+  // 로컬에서 선택된 스킬 ID를 관리하기 위한 상태 추가
+  const [localSelectedSkills, setLocalSelectedSkills] = useState<number[]>([]);
+
   // 스토어에서 선택된 스킬 ID 목록과 필터 모드를 가져오기
-  const { 
-    skilIdsForCampaignTreeMenu, 
+  const {
+    skilIdsForCampaignTreeMenu,
     setSkilIdsForCampaignTreeMenu,
     filterMode,
     setFilterMode
   } = useSideMenuCampaignTabStore();
+  
+  // 할당 가능한 스킬 목록 가져오기
+  const { data: skills = [] } = useAssignableSkills();
+
+  // 현재 "전체 선택" 상태 확인 (로컬 상태 기준)
+  const allSkillIds = skills.map(skill => skill.skill_id);
+  const allSelected = allSkillIds.length > 0 && 
+    allSkillIds.every(id => localSelectedSkills.includes(id));
+  const someSelected = localSelectedSkills.length > 0 && !allSelected;
+  
+  // 팝오버가 열릴 때 스토어 값으로 로컬 상태 초기화
+  useEffect(() => {
+    if (isPopoverOpen) {
+      setLocalSelectedSkills([...skilIdsForCampaignTreeMenu]);
+    }
+  }, [isPopoverOpen, skilIdsForCampaignTreeMenu]);
 
   // 선택 스킬로 보기 클릭 처리
   const handleSelectSkillsClick = () => {
@@ -119,22 +158,43 @@ const IFilterButtonForCampaignTabHeader = () => {
   const handleViewAllClick = () => {
     // 스토어의 선택된 스킬 ID 목록을 빈 배열로 설정 (체크박스 모두 해제 효과)
     setSkilIdsForCampaignTreeMenu([]);
-    
+
     // 필터 모드를 'all'로 설정
     setFilterMode("all");
-    
+
     // 팝오버 닫기
     setShowSkillFilter(false);
     setIsPopoverOpen(false);
   };
 
-  // 선택된 스킬이 있는지 확인하는 효과
-  useEffect(() => {
-    // 선택된 스킬이 있으면 필터 모드를 'skill'로 설정
-    if (skilIdsForCampaignTreeMenu.length > 0) {
-      setFilterMode("skill");
+  // 확인 버튼 클릭 시 로컬 상태를 스토어에 반영하고 창 닫기
+  const handleConfirmClick = () => {
+    // 로컬 상태를 스토어에 반영
+    setSkilIdsForCampaignTreeMenu(localSelectedSkills);
+    
+    // 선택된 스킬이 있으면 필터 모드를 'skill'로, 없으면 'all'로 설정
+    setFilterMode(localSelectedSkills.length > 0 ? "skill" : "all");
+    
+    // 창 닫기
+    setShowSkillFilter(false);
+    setIsPopoverOpen(false);
+  };
+
+  // 전체 선택/해제 토글 기능 (로컬 상태만 변경)
+  const toggleAllSkills = () => {
+    if (allSelected) {
+      // 전체 해제
+      setLocalSelectedSkills([]);
+    } else {
+      // 전체 선택
+      setLocalSelectedSkills([...allSkillIds]);
     }
-  }, [skilIdsForCampaignTreeMenu, setFilterMode]);
+  };
+
+  // 자식 컴포넌트로 전달할 로컬 상태 관리 함수들
+  const handleLocalSkillChange = (skillIds: number[]) => {
+    setLocalSelectedSkills(skillIds);
+  };
 
   return (
     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
@@ -149,8 +209,8 @@ const IFilterButtonForCampaignTabHeader = () => {
           // 기본 필터 옵션 메뉴
           <div className="flex flex-col">
             <div className="border-b">
-              <CommonButton 
-                variant="ghost" 
+              <CommonButton
+                variant="ghost"
                 className="w-full justify-between py-2 px-3 text-sm text-gray-800 hover:bg-gray-100"
                 onClick={handleViewAllClick}
               >
@@ -161,8 +221,8 @@ const IFilterButtonForCampaignTabHeader = () => {
               </CommonButton>
             </div>
             <div>
-              <CommonButton 
-                variant="ghost" 
+              <CommonButton
+                variant="ghost"
                 className="w-full justify-between py-2 px-3 text-sm text-gray-800 hover:bg-gray-100"
                 onClick={handleSelectSkillsClick}
               >
@@ -175,22 +235,53 @@ const IFilterButtonForCampaignTabHeader = () => {
           </div>
         ) : (
           // 스킬 필터 패널
-          <div className="p-0 w-[500px]">
+          <div className="p-0 w-[300px]">
             <div className="border-b p-2 flex justify-between items-center">
-              <CommonButton 
-                variant="ghost" 
-                size="sm" 
+              <CommonButton
+                variant="ghost"
+                size="sm"
                 onClick={() => setShowSkillFilter(false)}
                 className="px-2 text-sm text-gray-800 hover:bg-gray-100"
               >
                 &lt; 뒤로
               </CommonButton>
               <span className="font-medium text-gray-900">스킬 선택</span>
-              <div className="w-10"></div> {/* 오른쪽 공간 맞추기 용 */}
+              <CommonButton
+                variant="ghost"
+                size="sm"
+                onClick={toggleAllSkills}
+                className="px-2 text-sm text-gray-800 hover:bg-gray-100 flex items-center"
+                title={allSelected ? "전체 해제" : "전체 선택"}
+              >
+                {allSelected ? (
+                  <>
+                    <CheckSquare className="h-4 w-4 text-blue-600" />
+                    <span className="ml-1 text-xs text-blue-600">모두 해제</span>
+                  </>
+                ) : someSelected ? (
+                  <>
+                    <div className="relative">
+                      <Square className="h-4 w-4" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-2 h-2 bg-blue-600"></div>
+                      </div>
+                    </div>
+                    <span className="ml-1 text-xs">전체 선택</span>
+                  </>
+                ) : (
+                  <>
+                    <Square className="h-4 w-4" />
+                    <span className="ml-1 text-xs">전체 선택</span>
+                  </>
+                )}
+              </CommonButton>
             </div>
-            <div className="p-4">
-              <SkilFilterOptionPannelForCampaignTab shouldCloseOnConfirm={true} />
-            </div>
+            <SkilFilterOptionPannelForCampaignTab
+              shouldCloseOnConfirm={true}
+              onConfirm={handleConfirmClick}
+              selectedSkills={localSelectedSkills}
+              onSelectedSkillsChange={handleLocalSkillChange}
+            />
           </div>
         )}
       </PopoverContent>

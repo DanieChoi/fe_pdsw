@@ -59,7 +59,7 @@ export const tabsData: TabData[] = [
   },
   {
     id: 'agent-group',
-    label: '상담원 그룹',
+    label: '캠페인인 그룹',
     items: [
       {
         id: 'group-list',

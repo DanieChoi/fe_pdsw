@@ -101,9 +101,9 @@ export default function SidebarContainer() {
 
   return (
     <div className="flex h-full bg-white border-r relative">
-      <div 
+      <div
         className="flex flex-col transition-all duration-300 ease-in-out relative"
-        style={{ 
+        style={{
           width: storeIsOpen ? `${storeWidth}px` : '0',
         }}
       >
@@ -117,18 +117,18 @@ export default function SidebarContainer() {
                 <div className="text-sm text-[#444] font-medium flex gap-2 items-center">
                   <div>
                     {selectedTabId && (
-                      <Image 
-                        src={baseTabs.find((tab) => tab.id === selectedTabId)?.icon || "/tree-menu/campaign_icon_for_sidemenu.png"} 
-                        alt={baseTabs.find((tab) => tab.id === selectedTabId)?.label || "탭아이콘"} 
-                        width={baseTabs.find((tab) => tab.id === selectedTabId)?.iconWidth || 13} 
-                        height={baseTabs.find((tab) => tab.id === selectedTabId)?.iconHeight || 13} 
+                      <Image
+                        src={baseTabs.find((tab) => tab.id === selectedTabId)?.icon || "/tree-menu/campaign_icon_for_sidemenu.png"}
+                        alt={baseTabs.find((tab) => tab.id === selectedTabId)?.label || "탭아이콘"}
+                        width={baseTabs.find((tab) => tab.id === selectedTabId)?.iconWidth || 13}
+                        height={baseTabs.find((tab) => tab.id === selectedTabId)?.iconHeight || 13}
                       />
-                    )}i
+                    )}
                   </div>
                   {baseTabs.find((tab) => tab.id === selectedTabId)?.label}
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-end w-full">
                 <TabActions tabId={selectedTabId} />
               </div>
             </div>

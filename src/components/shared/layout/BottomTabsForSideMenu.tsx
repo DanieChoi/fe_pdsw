@@ -32,12 +32,12 @@ const tabsConfig = [
   },
   {
     id: "agent-group" as TabId,
-    label: "상담원 그룹",
+    label: "캠페인 그룹",
     icons: {
       default: "/tree-menu/campain_group.png",
       selected: "/tree-menu/campain_group_selected.png"
     },
-    alt: "상담원 그룹 아이콘",
+    alt: "캠페인 그룹 아이콘",
     iconWidth: 12,
     iconHeight: 12
   }
