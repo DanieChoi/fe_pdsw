@@ -202,10 +202,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
 
     eventSource.addEventListener("message", handleEvent);
 
-    return () => {
-      eventSource.removeEventListener("message", handleEvent);
-    };
-  }, [tenant_id, footerDataSet, announce, command, data, kind]);
+  }, [tenant_id]);
 
     return (
       <footer
