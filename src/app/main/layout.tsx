@@ -108,7 +108,7 @@ export default function MainLayout({
 }) {
   const width = useSidebarWidthStore(state => state.width);
   const isOpen = useSidebarWidthStore(state => state.isOpen);
-  const [footerHeight, setFooterHeight] = useState(136);
+  const [footerHeight, setFooterHeight] = useState(111);
   const [isResizing, setIsResizing] = useState(false);
   const [isFooterOpen, setIsFooterOpen] = useState(true);
 
