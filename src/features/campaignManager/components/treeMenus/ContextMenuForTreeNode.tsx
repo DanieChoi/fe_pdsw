@@ -223,23 +223,11 @@ export function ContextMenuForTreeNode({
 
   const renderStatusCheckbox = (targetStatus: CampaignStatus) => {
     const isLoading = updateCampaignStatusMutation.isPending && currentStatus === targetStatus;
-<<<<<<< HEAD
 
     return currentStatus === targetStatus ? (
       <Check className={`mr-2 h-4 w-4 text-green-500 ${isLoading ? 'opacity-50' : ''}`} />
     ) : (
       <div className={`w-4 h-4 mr-2 border rounded ${isLoading ? 'opacity-50' : ''}`} />
-=======
-    const isChecked = currentStatus === targetStatus;
-    
-    return (
-      <CustomCheckbox 
-        checked={isChecked} 
-        disabled={isLoading} 
-        className="mr-2" 
-        onChange={() => {}} // 여기서는 변경 이벤트가 필요 없음 (클릭 이벤트는 부모 요소에서 처리)
-      />
->>>>>>> 7f23f72ee31f5f95a7bcc66ac5f7901f5b1c5f09
     );
   };
 
