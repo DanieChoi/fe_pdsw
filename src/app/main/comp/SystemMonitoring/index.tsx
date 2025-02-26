@@ -1,9 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-custom";
+import { useApiForSystemMonitoring } from "@/features/monitoring/hooks/useApiForSystemMonitoring";
 
 // 시스템 상태에 따른 타입 정의
 type SystemStatus = "normal" | "abnormal";
+
+// API 응답 타입 정의
+interface ApiResponse {
+  code: string;
+  message: string;
+  processStatusList: ProcessStatus[];
+}
+
+interface ProcessStatus {
+  name: string;
+  pid: number;
+  state: number; // 1: normal, 0: abnormal
+  time: string;
+}
 
 // 각 시스템의 데이터 타입 정의
 interface SystemData {
@@ -27,7 +42,6 @@ const statusStyles = {
     text: "비정상"
   }
 };
-
 
 // 개별 시스템 컴포넌트
 const SystemCard: React.FC<SystemCardProps> = ({ title, status, pdi, time }) => {
@@ -64,72 +78,35 @@ const SystemCard: React.FC<SystemCardProps> = ({ title, status, pdi, time }) => 
 };
 
 const SystemMonitoring: React.FC = () => {
-  // 시스템 데이터 정의
-  const systemsData: SystemData[] = [
-    {
-      id: 1,
-      title: "EXD db control",
-      status: "normal",
-      pdi: "801992",
-      time: "2025-01-23 17:16:58"
+  // 상태 관리 추가
+  const [systemsData, setSystemsData] = useState<SystemData[]>([]);
+
+  // API 호출 및 응답 처리
+  const { mutate: systemMonitoring } = useApiForSystemMonitoring({
+    onSuccess: (data: ApiResponse) => {
+      console.log("시스템모니터링", data);
+      
+      // API 응답 데이터를 컴포넌트 데이터 형식으로 변환
+      if (data && data.processStatusList && Array.isArray(data.processStatusList)) {
+        const formattedData: SystemData[] = data.processStatusList.map((item, index) => ({
+          id: index + 1,
+          title: item.name, // name을 title로 매핑
+          status: item.state === 1 ? "normal" : "abnormal", // state 1은 normal, 그 외는 abnormal
+          pdi: item.pid.toString(), // pid를 문자열로 변환하여 pdi에 매핑
+          time: item.time // time은 그대로 사용
+        }));
+        
+        setSystemsData(formattedData);
+      }
     },
-    {
-      id: 2,
-      title: "EXD assist",
-      status: "abnormal",
-      pdi: "801992",
-      time: "2025-01-23 17:16:58"
-    },
-    {
-      id: 3,
-      title: "EXDfr",
-      status: "normal",
-      pdi: "801992",
-      time: "2025-01-23 17:16:58"
-    },
-    {
-      id: 4,
-      title: "CampaignLoadaSort",
-      status: "abnormal",
-      pdi: "801992",
-      time: "2025-01-23 17:16:58"
-    },
-    {
-      id: 5,
-      title: "CCbridge2",
-      status: "normal",
-      pdi: "801992",
-      time: "2025-01-23 17:16:58"
-    },
-    {
-      id: 6,
-      title: "EXDfw",
-      status: "normal",
-      pdi: "801992",
-      time: "2025-01-23 17:16:58"
-    },
-    {
-      id: 7,
-      title: "EXD designer",
-      status: "normal",
-      pdi: "801992",
-      time: "2025-01-23 17:16:58"
-    },
-    {
-      id: 8,
-      title: "EXD callpacing",
-      status: "normal",
-      pdi: "801992",
-      time: "2025-01-23 17:16:58"
-    },
-    {
-      id: 9,
-      title: "EXD dialer",
-      status: "normal",
-      pdi: "801992",
-      time: "2025-01-23 17:16:58"
+    onError: (error) => {
+      console.error(error);
     }
-  ];
+  });
+
+  useEffect(() => {
+    systemMonitoring({}); // 시스템 모니터링 API 호출
+  }, [systemMonitoring]);
 
   return (
     <div className="w-full limit-width grid grid-cols-3 grid-rows-3 gap-[30px]">

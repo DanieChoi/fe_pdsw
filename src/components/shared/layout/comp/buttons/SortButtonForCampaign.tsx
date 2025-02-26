@@ -10,7 +10,7 @@ import {
 import CommonButton from "@/components/shared/CommonButton";
 import { SortAsc, Check } from "lucide-react";
 import { SortType } from '@/features/campaignManager/types/typeForSidebar2';
-
+import Image from 'next/image'
 interface SortButtonForCampaignProps {
   onSort?: (type: SortType) => void;
   selectedSort?: SortType;
@@ -28,13 +28,18 @@ export function SortButtonForCampaign({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <CommonButton
-          variant="ghost"
-          size="sm"
-          className="h-6 px-2 text-sm font-normal gap-1 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+      <CommonButton 
+          variant="ghost" 
+          size="sm" 
+          className="px-1.5 text-xs font-normal gap-[2px]  hover:bg-[transparent] text-[#888] !p-0"
         >
           정렬
-          <SortAsc className="w-4 h-4" />
+          <Image 
+            src={`/tree-menu/array.png`} 
+            alt={`정렬`} 
+            width={9} 
+            height={10} 
+          />
         </CommonButton>
       </PopoverTrigger>
       <PopoverContent className="w-32 p-1" align="end">

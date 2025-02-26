@@ -48,16 +48,16 @@ const AgentStatusMonitoring: React.FC = () => {
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   const [agentData,setAgentData] = useState<AgentData[]>([
-    { id: 1, status: 'waiting', agent: 'sktest001', name: '김상담', time: '00:00:12' },
-    { id: 2, status: 'waiting', agent: 'sktest005', name: '이상담', time: '00:15:30' },
-    { id: 3, status: 'processing', agent: 'sktest002', name: '박상담', time: '00:05:45' },
-    { id: 4, status: 'rest', agent: 'sktest008', name: '최상담', time: '00:30:00' },
-    { id: 5, status: 'waiting', agent: 'sktest003', name: '정상담', time: '00:02:20' },
-    { id: 6, status: 'processing', agent: 'sktest007', name: '강상담', time: '00:08:15' },
-    { id: 7, status: 'afterProcessing', agent: 'sktest004', name: '윤상담', time: '00:20:40' },
-    { id: 8, status: 'rest', agent: 'sktest009', name: '한상담', time: '00:45:10' },
-    { id: 9, status: 'afterProcessing', agent: 'sktest006', name: '조상담', time: '00:12:35' },
-    { id: 10, status: 'waiting', agent: 'sktest010', name: '신상담', time: '00:01:50' }
+    // { id: 1, status: 'waiting', agent: 'sktest001', name: '김상담', time: '00:00:12' },
+    // { id: 2, status: 'waiting', agent: 'sktest005', name: '이상담', time: '00:15:30' },
+    // { id: 3, status: 'processing', agent: 'sktest002', name: '박상담', time: '00:05:45' },
+    // { id: 4, status: 'rest', agent: 'sktest008', name: '최상담', time: '00:30:00' },
+    // { id: 5, status: 'waiting', agent: 'sktest003', name: '정상담', time: '00:02:20' },
+    // { id: 6, status: 'processing', agent: 'sktest007', name: '강상담', time: '00:08:15' },
+    // { id: 7, status: 'afterProcessing', agent: 'sktest004', name: '윤상담', time: '00:20:40' },
+    // { id: 8, status: 'rest', agent: 'sktest009', name: '한상담', time: '00:45:10' },
+    // { id: 9, status: 'afterProcessing', agent: 'sktest006', name: '조상담', time: '00:12:35' },
+    // { id: 10, status: 'waiting', agent: 'sktest010', name: '신상담', time: '00:01:50' }
   ]);
 
   const handleStatusChange = (status: keyof AgentStatus): void => {
@@ -130,6 +130,24 @@ const AgentStatusMonitoring: React.FC = () => {
     { status: 'rest', bg: '!bg-[#F6F0FA]', text: '휴식', icon: '/rest.svg' }
   ];
 
+  const getStatusTime = (time:number) => {
+    let returnValue = "00:00:00";
+    
+    if (time !== 0) {
+      const date = new Date(1970, 0, 1); // The month is 0-based in JavaScript (0 = January)
+      date.setSeconds(time);
+  
+      // Format the date to HH:mm:ss
+      const hours = String(date.getUTCHours()).padStart(2, '0');
+      const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+      const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+  
+      returnValue = `${hours}:${minutes}:${seconds}`;
+    }
+  
+    return returnValue;
+  }
+
   //할당상담원 정보 조회
   const { mutate: fetchAgentStateMonitoringList } = useApiForAgentStateMonitoringList({
     onSuccess: (data) => {
@@ -139,7 +157,7 @@ const AgentStatusMonitoring: React.FC = () => {
           status: item.statusCode === '204' ? 'waiting' : item.statusCode === '205' ? 'processing' : item.statusCode === '206' ? 'afterProcessing' : 'rest',
           agent: item.counselorId,
           name: item.counselorName,
-          time: item.statusTime,
+          time: getStatusTime(Number(item.statusTime||'0')),
         }));
         
         setAgentData(tempDataList);

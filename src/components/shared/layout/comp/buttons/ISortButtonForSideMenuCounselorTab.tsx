@@ -9,7 +9,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
-
+import Image from 'next/image'
 // 정렬 타입 정의
 type SortType = 'name' | 'id';
 type SortDirection = 'asc' | 'desc';
@@ -44,13 +44,18 @@ const ISortButtonForSideMenuCounselorTab = () => {
   return (
     <Popover open={isSortOpen} onOpenChange={setIsSortOpen}>
       <PopoverTrigger asChild>
-        <CommonButton 
+      <CommonButton 
           variant="ghost" 
           size="sm" 
-          className="py-1 px-2.5 text-xs border border-gray-200 rounded shadow-sm flex items-center"
+          className="text-xs font-normal gap-[2px]  hover:bg-[transparent] text-[#888] !p-0"
         >
-          <span className="font-medium mr-1">정렬</span>
-          <SortAsc className="w-3 h-3" />
+          정렬
+          <Image 
+            src={`/tree-menu/array.png`} 
+            alt={`정렬`} 
+            width={9} 
+            height={10} 
+          />
         </CommonButton>
       </PopoverTrigger>
       <PopoverContent className="w-44 p-0 rounded shadow" align="start">

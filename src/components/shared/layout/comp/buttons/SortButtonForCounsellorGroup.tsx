@@ -94,7 +94,7 @@ const SortButtonForCounsellorGroup = ({
         <CommonButton 
           variant="ghost" 
           size="sm" 
-          className="px-1.5 py-0.5 text-xs font-normal gap-0.5 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+          className="text-xs font-normal gap-[2px]  hover:bg-[transparent] text-[#888] !p-0"
         >
           정렬
           <Image 

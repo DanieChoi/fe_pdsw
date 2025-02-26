@@ -112,7 +112,7 @@ export default function SidebarContainer() {
           <div className={`absolute inset-0 flex flex-col transition-all duration-300 ease-in-out
                         ${!storeIsOpen ? 'invisible' : ''}`}>
             {/* 상단 헤더 */}
-            <div className="flex-none flex items-center justify-between py-1.5 px-[17px] border-b">
+            <div className="flex-none flex items-center justify-between py-1.5 px-[20px] border-b">
               <div className="flex items-center gap-2">
                 <div className="text-sm text-[#444] font-medium flex gap-2 items-center">
                   <div>
@@ -128,7 +128,7 @@ export default function SidebarContainer() {
                   {baseTabs.find((tab) => tab.id === selectedTabId)?.label}
                 </div>
               </div>
-              <div className="flex items-center justify-end w-full">
+              <div className="flex items-center justify-end ">
                 <TabActions tabId={selectedTabId} />
               </div>
             </div>
