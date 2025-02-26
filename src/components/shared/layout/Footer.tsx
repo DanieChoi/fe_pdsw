@@ -103,6 +103,7 @@
 // src/components/shared/layout/Footer.tsx
 
 import { useState, useEffect } from "react";
+import _ from 'lodash';
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { useAuthStore } from '@/store';
 
@@ -123,7 +124,6 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
   const [isDrawerOpen, setIsDrawerOpen] = useState(true); // 푸터 열기/닫기 토글
   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
   const { tenant_id } = useAuthStore();
-  // const { sse_data } = useStore();
 
   // 부모 컴포넌트에 열림/닫힘 상태 변경 알림
   useEffect(() => {
@@ -153,142 +153,163 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     }
   };
   
-  const footerDataSet = (data:string) => {
-    const tempEventData = JSON.parse(data);
+  const footerDataSet = (announce:string,command:string,data:any,kind:string, tempEventData:any) => {
     //시간.
     const today = new Date();
     const _time = String(today.getHours()).padStart(2, '0')+':'+String(today.getMinutes()).padStart(2, '0')+':'+String(today.getSeconds()).padStart(2, '0');
     //타입.
     let _type = '';
-    if( tempEventData['kind'] === 'event' ){
+    if( kind === 'event' ){
       _type = 'Event';
-    }else if( tempEventData['kind'] === 'alram' ){
+    }else if( kind === 'alram' ){
       _type = 'Event';
     }
     //메시지.
     let _message = '';
     //운영설정>캠페인별 발신번호설정
-    if( tempEventData['announce'] === '/pds/campaign/calling-number' ){
+    if( announce === '/pds/campaign/calling-number' ){
       _message = '캠페인 : '
-      if( tempEventData['command'] === 'INSERT' ){
-        _message += '[' + tempEventData['data']['campaign_id'] + '], 사용자 발신번호 설정 추가 성공';
-      }else if( tempEventData['command'] === 'DELETE' ){
-        _message += '[' + tempEventData['data']['campaign_id'] + '], 사용자 발신번호 설정 삭제 성공';
-      }else if( tempEventData['command'] === 'UPDATE' ){
-        _message += '[' + tempEventData['data']['campaign_id'] + '], 사용자 발신번호 설정 변경 성공';
+      if( command === 'INSERT' ){
+        _message += '[' + data['campaign_id'] + '], 사용자 발신번호 설정 추가 성공';
+      }else if( command === 'DELETE' ){
+        _message += '[' + data['campaign_id'] + '], 사용자 발신번호 설정 삭제 성공';
+      }else if( command === 'UPDATE' ){
+        _message += '[' + data['campaign_id'] + '], 사용자 발신번호 설정 변경 성공';
       }
     }
     //장비 사용, 장비 사용중지
-    else if( tempEventData['announce'] === 'dialing-device' ){
-      if( tempEventData['command'] === 'UPDATE' && tempEventData['data']['skill_id'] === 'run' ){
+    else if( announce === 'dialing-device' ){
+      if( command === 'UPDATE' && data['skill_id'] === 'run' ){
         _message = 'CIDS 작동중';
-      }else if( tempEventData['command'] === 'UPDATE' && tempEventData['data']['skill_id'] === 'down' ){
+      }else if( command === 'UPDATE' && data['skill_id'] === 'down' ){
         _message = 'CIDS 작동중지';
       }
     }
     //캠페인수정>콜페이싱 수정
-    else if( tempEventData['announce'] === '/pds/campaign/dial-speed' ){
+    else if( announce === '/pds/campaign/dial-speed' ){
       _message = '[콜페이싱] '
-      if( tempEventData['command'] === 'UPDATE' ){
-        _message += '캠페인 아이디 ' + tempEventData['data']['campaign_id'] + ' , 현재 설정값 ' + tempEventData['data']['dial_speed'];
+      if( command === 'UPDATE' ){
+        _message += '캠페인 아이디 ' + data['campaign_id'] + ' , 현재 설정값 ' + data['dial_speed'];
       }
     }
     //캠페인.
-    else if( tempEventData['announce'] === '/pds/campaign' ){
+    else if( announce === '/pds/campaign' ){
       _message = '캠페인 '
       let _start_flag = '';
-      if( tempEventData['data']['start_flag'] === 1){
+      if( data['start_flag'] === 1){
         _start_flag = '시작';
-      }else if( tempEventData['data']['start_flag'] === 2){
+      }else if( data['start_flag'] === 2){
         _start_flag = '멈춤';
-      }else if( tempEventData['data']['start_flag'] === 3){
+      }else if( data['start_flag'] === 3){
         _start_flag = '중지';
       }
       let _end_flag = '';
-      if( tempEventData['data']['end_flag'] === 1){
+      if( data['end_flag'] === 1){
         _end_flag = '진행중';
-      }else if( tempEventData['data']['end_flag'] === 2){
+      }else if( data['end_flag'] === 2){
         _end_flag = '완료';
       }
-      if( tempEventData['command'] === 'INSERT' ){
-        _message += '추가, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag;
-      }else if( tempEventData['command'] === 'UPDATE' ){
-        _message += '수정, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag;
-      }else if( tempEventData['command'] === 'DELETE' ){
-        _message += '삭제, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag;
+      if( command === 'INSERT' ){
+        _message += '추가, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag;
+      }else if( command === 'UPDATE' ){
+        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag;
+      }else if( command === 'DELETE' ){
+        _message += '삭제, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag;
       }
-      if( tempEventData['data']['start_flag'] === 3){
+      if( data['start_flag'] === 3){
         setFooterDataList((prev) => [
           {
             time: _time,
             type: _type,
-            message: '캠페인 동작상태 변경, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag
+            message: '캠페인 동작상태 변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag
           },
           ...prev
         ]);
       }
     }
     //스킬.
-    else if( tempEventData['announce'] === '/pds/skill/agent-list' ){
+    else if( announce === '/pds/skill/agent-list' ){
       _message = '[스킬 '
-      if( tempEventData['command'] === 'UPDATE' ){
-        _message += '추가] 스킬 아이디 : ' + tempEventData['data']['skill_id'] + ' , 상담원 아이디 : ' + tempEventData['data']['agent_id'];
-      }else if( tempEventData['command'] === 'DELETE' ){
-        _message += '해제] 스킬 아이디 : ' + tempEventData['data']['skill_id'] + ' , 상담원 아이디 : ' + tempEventData['data']['agent_id'];
+      if( command === 'UPDATE' ){
+        _message += '추가] 스킬 아이디 : ' + data['skill_id'] + ' , 상담원 아이디 : ' + data['agent_id'];
+      }else if( command === 'DELETE' ){
+        _message += '해제] 스킬 아이디 : ' + data['skill_id'] + ' , 상담원 아이디 : ' + data['agent_id'];
       }
     }
     //스킬편집
-    else if( tempEventData['announce'] === '/pds/skill' ){
+    else if( announce === '/pds/skill' ){
       _message = '[스킬 '
-      if( tempEventData['command'] === 'INSERT' ){
-        _message += '추가] 스킬 아이디 : ' + tempEventData['data']['skill_id'] + ' , 스킬 이름 : ' + tempEventData['data']['skill_name'];
-      }else if( tempEventData['command'] === 'DELETE' ){
-        _message += '삭제] 스킬 아이디 : ' + tempEventData['data']['skill_id'] + ' , 스킬 이름 : ' + tempEventData['data']['skill_name'];
-      }else if( tempEventData['command'] === 'UPDATE' ){
-        _message += '수정] 스킬 아이디 : ' + tempEventData['data']['skill_id'] + ' , 스킬 이름 : ' + tempEventData['data']['skill_name'];
+      if( command === 'INSERT' ){
+        _message += '추가] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
+      }else if( command === 'DELETE' ){
+        _message += '삭제] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
+      }else if( command === 'UPDATE' ){
+        _message += '수정] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
       }
     }
     //캠페인 요구스킬 수정
-    // else if( tempEventData['announce'] === '/pds/campaign/skill' ){
-    //   _message = '캠페인 요구스킬 '
-    //   if( tempEventData['command'] === 'UPDATE' ){
-    //     _message += '수정, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name']||'';
-    //   }
-    // }
-    //캠페인수정>동작시간 추가
-    else if( tempEventData['announce'] === '/pds/campaign/schedule' ){
-      _message = '캠페인 스케쥴'
-      if( tempEventData['command'] === 'INSERT' ){
-        _message += '수정, 캠페인 아이디 : ' + tempEventData['data']['campaign_id'] + ' , 캠페인 이름 : ' + tempEventData['data']['campaign_name'];
+    else if( announce === '/pds/campaign/skill' ){
+      _message = '캠페인 요구스킬 '
+      if( command === 'UPDATE' ){
+        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name']||'';
       }
     }
-    setFooterDataList((prev) => [
-      {
-        time: _time,
-        type: _type,
-        message: _message
-      },
-      ...prev
-    ]);
+    //캠페인수정>동작시간 추가
+    else if( announce === '/pds/campaign/schedule' ){
+      _message = '캠페인 스케쥴'
+      if( command === 'INSERT' ){
+        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'];
+      }
+    }
+    if( _message !== ''){
+      setFooterDataList((prev) => [
+        {
+          time: _time,
+          type: _type,
+          message: _message
+        },
+        ...prev
+      ]);
+    }
   };
 
-  // useEffect(() => {
-  //   //SSE 실시간 이벤트 구독
-  //   console.log("event.data99 = ");
-  //   const DOMAIN = process.env.NEXT_PUBLIC_API_URL;  
-  //   const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
-  //   let readyCheck = false;
-  //   eventSource.addEventListener("message", (event) => {
-  //     //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
-  //     if( event.data === 'Connected!!'){
-  //       readyCheck = true;
-  //     }
-  //     if(readyCheck && event.data !== 'Connected!!'){
-  //       readyCheck = false;
-  //       footerDataSet(event.data);
-  //     }
-  //   });
-  // }, []);
+  let data:any = {};
+  let announce:string = '';
+  let command:string = '';
+  let kind:string = '';
+  useEffect(() => {
+    // SSE 실시간 이벤트 구독
+    const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+    const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
+    
+    const handleEvent = (event: MessageEvent) => {
+      console.log("footer event.data = " + event.data );
+      if (event.data !== 'Connected!!') {
+        const tempEventData = JSON.parse(event.data);
+
+        if (
+          announce !== tempEventData['announce'] ||
+          !_.isEqual(data, tempEventData.data) ||
+          !_.isEqual(data, tempEventData['data']) ||
+          kind !== tempEventData['kind']
+        ) {
+          announce = tempEventData['announce'];
+          command = tempEventData['command'];
+          data = tempEventData['data'];
+          kind = tempEventData['kind'];
+          
+          footerDataSet(tempEventData['announce'], tempEventData['command'],tempEventData['data'],tempEventData['kind'], tempEventData);
+        }
+      }
+    };
+
+    eventSource.addEventListener("message", handleEvent);
+
+    // Cleanup on unmount to avoid multiple listeners
+    return () => {
+      eventSource.removeEventListener("message", handleEvent);
+    };
+  }, [tenant_id, footerDataSet, announce, command, data, kind]);
 
   return (
     <footer
