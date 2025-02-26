@@ -475,8 +475,8 @@ const SystemPreferences = () => {
                                 rowKeyGetter={(row) => row.device_id}
                                 onCellClick={handleEquipmentCellClick}
                                 selectedRows={selectedDevice ? new Set([selectedDevice.device_id]) : new Set()}
-                                rowHeight={26}
-                                headerRowHeight={26}
+                                rowHeight={30}
+                                headerRowHeight={30}
                                 rowClass={getEquipmentRowClass}
                             />
                         </div>
@@ -544,8 +544,8 @@ const SystemPreferences = () => {
                                 onCellClick={handleChannelCellClick}
                                 selectedRows={selectedChannel ? new Set([selectedChannel.channelNumber.toString()]) : new Set()}
                                 rowKeyGetter={(row) => row.channelNumber.toString()}
-                                rowHeight={26}
-                                headerRowHeight={26}
+                                rowHeight={30}
+                                headerRowHeight={30}
                                 rowClass={getChannelRowClass}
                             />
                         </div>

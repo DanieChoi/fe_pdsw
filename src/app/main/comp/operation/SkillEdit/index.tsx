@@ -375,8 +375,8 @@ const SkillEdit = () => {
                 onCellClick={handleSkillClick}
                 rowKeyGetter={(row) => row.skillId}
                 selectedRows={selectedSkill ? new Set<string>([selectedSkill.skillId]) : new Set<string>()}
-                rowHeight={26}
-                headerRowHeight={26}
+                rowHeight={30}
+                headerRowHeight={30}
                 rowClass={getRowClass}
               />
             </div>
@@ -402,8 +402,8 @@ const SkillEdit = () => {
                 rowKeyGetter={(row) => row.campaignId}
                 selectedRows={selectedCampaignRows}
                 onSelectedRowsChange={handleCampaignSelectionChange}
-                rowHeight={26}
-                headerRowHeight={26}
+                rowHeight={30}
+                headerRowHeight={30}
               />
             </div>
           </div>
@@ -428,8 +428,8 @@ const SkillEdit = () => {
                 rowKeyGetter={(row) => row.agentId}
                 selectedRows={selectedAgentRows}
                 onSelectedRowsChange={handleAgentSelectionChange}
-                rowHeight={26}
-                headerRowHeight={26}
+                rowHeight={30}
+                headerRowHeight={30}
               />
             </div>
           </div>

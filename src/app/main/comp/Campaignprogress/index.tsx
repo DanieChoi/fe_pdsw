@@ -521,8 +521,8 @@ export default function CampaignMonitorDashboard() {
           rows={flattenRows(filteredAndSortedData)}
           rowKeyGetter={rowKeyGetter}
           className="w-full h-auto grid-custom"
-          rowHeight={26}
-          headerRowHeight={26}
+          rowHeight={30}
+          headerRowHeight={30}
           rowClass={(row) => {
             if (row.level === 0 || row.level === 1) {
               return 'bg-[#fafafa]';

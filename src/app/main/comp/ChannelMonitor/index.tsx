@@ -214,8 +214,8 @@ const ChannelMonitor: React.FC = () => {
               columns={columns}
               rows={filteredData}
               className="grid-custom"
-              rowHeight={26}
-              headerRowHeight={26}
+              rowHeight={30}
+              headerRowHeight={30}
             />
           </div>
         </div>

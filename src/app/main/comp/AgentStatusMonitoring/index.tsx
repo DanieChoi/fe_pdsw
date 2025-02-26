@@ -230,7 +230,7 @@ const AgentStatusMonitoring: React.FC = () => {
             <tbody>
               {sortedAndFilteredAgents.map((agent) => (
                 <tr key={agent.id}>
-                  <td className="text-center text-sm border-b px-3 py-1">
+                  <td className="text-center text-sm border-b px-3 py-1 text-[#333]">
                     <div className={`flex items-center gap-2 justify-center ${getStatusColor(agent.status)}`}>
                       <Image 
                         src={`/${agent.status}.svg`} 
@@ -241,10 +241,10 @@ const AgentStatusMonitoring: React.FC = () => {
                       {getStatusText(agent.status)}
                     </div>
                   </td>
-                  <td className="text-center text-sm border-b px-3 py-1">{agent.agent}</td>
-                  <td className="text-center text-sm border-b px-3 py-1">{agent.name}</td>
-                  <td className="text-center text-sm border-b px-3 py-1">{agent.time}</td>
-                  <td className="text-center text-sm border-b px-3 py-1">({agentData.filter(a => a.status === agent.status).length}/{agentData.length})</td>
+                  <td className="text-center text-sm border-b px-3 py-1 text-[#333]">{agent.agent}</td>
+                  <td className="text-center text-sm border-b px-3 py-1 text-[#333]">{agent.name}</td>
+                  <td className="text-center text-sm border-b px-3 py-1 text-[#333]">{agent.time}</td>
+                  <td className="text-center text-sm border-b px-3 py-1 text-[#333]">({agentData.filter(a => a.status === agent.status).length}/{agentData.length})</td>
                 </tr>
               ))}
             </tbody>

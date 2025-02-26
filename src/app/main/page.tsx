@@ -96,7 +96,7 @@ const MainPage = () => {
           ))}
         </div>
 
-        <div className="flex-1 py-[15px] pl-[35px] pr-[25px]">
+        <div className="flex-1 py-[15px] pl-[35px] pr-[25px]" style={{ height: "calc(100% - 46px)" }}>
           <TabContent />
         </div>
       </div>
