@@ -171,7 +171,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
         ...prev
       ]);
     }
-  };
+  }, [setFooterDataList]);
 
   useEffect(() => {
     // SSE 실시간 이벤트 구독
