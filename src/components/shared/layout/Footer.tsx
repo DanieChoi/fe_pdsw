@@ -19,10 +19,6 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
   const [isExpanded, setIsExpanded] = useState(false);   // D(1단) / W(2단) 모드 토글
   const [isDrawerOpen, setIsDrawerOpen] = useState(true); // 푸터 열기/닫기 토글
   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
-  const [announce, setAnnounce] = useState<string>('');
-  const [command, setCommand] = useState<string>('');
-  const [data, setData] = useState<any>(null);
-  const [kind, setKind] = useState<string>('');
   const { tenant_id } = useAuthStore();
 
   // 부모 컴포넌트에 열림/닫힘 상태 변경 알림
@@ -173,6 +169,10 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     }
   }, [setFooterDataList]);
 
+  let data:any = {};
+  let announce:string = '';
+  let command:string = '';
+  let kind:string = '';
   useEffect(() => {
     // SSE 실시간 이벤트 구독
     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
@@ -190,6 +190,10 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
           !isEqual(data, tempEventData['data']) ||
           kind !== tempEventData['kind']
         ) {
+          announce = tempEventData['announce'];
+          command = tempEventData['command'];
+          data = tempEventData['data'];
+          kind = tempEventData['kind'];
           
           footerDataSet(tempEventData['announce'], tempEventData['command'],tempEventData['data'],tempEventData['kind'], tempEventData);
         }
@@ -198,10 +202,8 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
 
     eventSource.addEventListener("message", handleEvent);
 
-    // Cleanup on unmount to avoid multiple listeners
     return () => {
       eventSource.removeEventListener("message", handleEvent);
-      eventSource.close();
     };
   }, [tenant_id, footerDataSet, announce, command, data, kind]);
 
