@@ -118,6 +118,7 @@ import { FilterIcon, CheckIcon, CheckSquare, Square } from "lucide-react";
 import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCampaignTab";
 import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
+import Image from 'next/image'
 
 const IFilterButtonForCampaignTabHeader = () => {
   const [showSkillFilter, setShowSkillFilter] = useState(false);
@@ -199,9 +200,18 @@ const IFilterButtonForCampaignTabHeader = () => {
   return (
     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
       <PopoverTrigger asChild>
-        <CommonButton variant="ghost" size="sm" className="p-2 text-sm font-normal text-gray-700 hover:bg-gray-100 hover:text-gray-900">
-          <span>필터</span>
-          <FilterIcon className="h-4 w-4 ml-1" />
+        <CommonButton 
+          variant="ghost" 
+          size="sm" 
+          className="text-xs font-normal gap-[2px]  hover:bg-[transparent] text-[#888] !p-0"
+        >
+          필터
+          <Image 
+            src={`/tree-menu/filter.png`} 
+            alt={`필터`} 
+            width={9} 
+            height={10} 
+          />
         </CommonButton>
       </PopoverTrigger>
       <PopoverContent className="w-auto min-w-[200px] p-0" align="start">

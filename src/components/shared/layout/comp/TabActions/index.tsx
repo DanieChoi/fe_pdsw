@@ -142,7 +142,7 @@ export function TabActions({
   switch (tabId) {
     case 'campaign':
       return (
-        <div className="flex items-center gap-1 ml-auto">
+        <div className="flex items-center gap-[10px]">
           <IFilterButtonForCampaignTabHeader />
           <SortButtonForCampaign
             onSort={handleSort}
@@ -152,14 +152,14 @@ export function TabActions({
       );
     case 'agent':
       return (
-        <div className="flex items-center gap-1 ml-auto">
+        <div className="flex items-center gap-[10px]">
           <OptionButtonsForSideMenuAgentTab
           />
         </div>
       );
     case 'agent-group':
       return (
-        <div className="flex items-center gap-1 ml-auto">
+        <div className="flex items-center gap-[10px]">
           <IFilterButtonForCampaignTabHeader />
           <SortButtonForCounsellorGroup
             // onSort={onSort}
