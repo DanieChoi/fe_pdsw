@@ -513,8 +513,8 @@ const DistributionLimit = () => {
               onCellClick={handleCellClick}
               rowKeyGetter={(row) => row.agent_id}
               selectedRows={selectedRow ? new Set<string>([selectedRow.agent_id]) : new Set<string>()}
-              rowHeight={26}
-              headerRowHeight={26}
+              rowHeight={30}
+              headerRowHeight={30}
               rowClass={getRowClass}
             />
           </div>

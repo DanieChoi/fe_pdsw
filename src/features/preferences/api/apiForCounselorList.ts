@@ -1,5 +1,5 @@
 import { axiosRedisInstance } from "@/lib/axios";
-import { apiUrl, CounselorAssignListCredentials, CounselorListCredentials, CounselorAssignListResponse, GetCounselorListResponse } from "../types/SystemPreferences";
+import { CounselorAssignListCredentials, CounselorListCredentials, CounselorAssignListResponse, GetCounselorListResponse } from "../types/SystemPreferences";
 import { getCookie } from "@/lib/cookies";
 
 // 상담사 리스트 가져오기

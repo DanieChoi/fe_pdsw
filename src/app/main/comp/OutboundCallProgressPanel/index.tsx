@@ -327,8 +327,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
             columns={columns}
             rows={currentData.gridData}
             className="grid-custom"
-            rowHeight={26}
-            headerRowHeight={26}
+            rowHeight={30}
+            headerRowHeight={30}
           />
         </div>
       </div>

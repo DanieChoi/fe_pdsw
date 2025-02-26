@@ -295,3 +295,47 @@ export interface SkillAssignedCounselorListItem {
   counselorname: string; //상담사 이름
   blendKind: string; //블렌드 구분(인바운드: 1, 아웃바운드: 2, 블렌드: 3)
 }
+
+export interface  CreateSkillCredentials {
+  skill_id: number;
+  tenant_id: number;
+  skill_name: string;
+  skill_description: string;
+}
+
+export interface DeleteSkillCredentials {
+  skill_id: number;
+}
+
+export interface DeleteAgentSkillCredentials {
+  skill_id: number;
+  agent_id: string[];
+}
+
+// 캠페인스킬 수정 요청 데이터 타입
+export interface CampaignSkillUpdateRequest {
+  campaign_id: number;
+  skill_id: number[];
+}
+
+// 캠페인 요청 시 필요한 credentials 타입
+// export interface CampaignCredentials {
+//   session_key: string;
+//   tenant_id: number;
+// }
+
+// 캠페인스킬 데이터 타입
+export interface CampaignSkillDataResponse {
+  campaign_id: number;
+  tenant_id: number;
+  skill_id: [number];
+}
+
+// 캠페인스킬 데이터 타입
+export interface CampaignSkillListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: CampaignSkillDataResponse[];
+}

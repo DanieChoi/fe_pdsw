@@ -206,7 +206,7 @@ const TabContent = () => {
       {rows.map((row) => (
         <div
           key={row.id}
-          className="flex w-full flex-1 border-b last:border-b-0 relative"
+          className="flex w-full flex-1 border-b last:border-b-0 relative h-full"
         >
           {sections.map((section, index) => {
             const activeKey = section.activeTabKey;

@@ -202,8 +202,8 @@ const EditDescription = () => {
             onCellClick={handleCellClick}
             rowKeyGetter={(row) => row.id}
             selectedRows={selectedRow ? new Set([selectedRow.id]) : new Set()}
-            rowHeight={26}
-            headerRowHeight={26}
+            rowHeight={30}
+            headerRowHeight={30}
             rowClass={getRowClass}
           />
         </div>

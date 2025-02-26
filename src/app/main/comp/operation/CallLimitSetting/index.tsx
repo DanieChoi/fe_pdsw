@@ -218,8 +218,8 @@ const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
             onCellClick={handleCellClick}
             rowKeyGetter={(row) => row.campaign_id + row.limit_number}
             selectedRows={selectedRow ? new Set<string>([selectedRow.campaign_id.toString()]) : new Set<string>()}
-            rowHeight={26}
-            headerRowHeight={26}
+            rowHeight={30}
+            headerRowHeight={30}
             rowClass={getRowClass}
           />
         </div>

@@ -225,8 +225,8 @@ function CampaignLayout() {
             onCellClick={handleCellClick}
             rowKeyGetter={(row) => row.campaign_id}
             selectedRows={selectedRow ? new Set([selectedRow.campaign_id]) : new Set()}
-            rowHeight={26}
-            headerRowHeight={26}
+            rowHeight={30}
+            headerRowHeight={30}
             rowClass={getRowClass} 
           />
         </div>

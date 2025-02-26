@@ -96,8 +96,8 @@ const SenderList: React.FC<SenderListProps> = ({ headerData, _sendList }) => {
               columns={sendColumns}
               rows={sendList}
               className="grid-custom cursor-pointer"
-              rowHeight={26}
-              headerRowHeight={26}
+              rowHeight={30}
+              headerRowHeight={30}
               rowKeyGetter={(row) => row.id}
               rowClass={getSendRowClass}
               onCellClick={handleSendRowClick}

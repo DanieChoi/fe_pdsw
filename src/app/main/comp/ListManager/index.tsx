@@ -751,8 +751,8 @@ const ListManager: React.FC = () => {
                 columns={columns}
                 rows={uploadedFiles}
                 className="grid-custom cursor-pointer h-custom-important"
-                rowHeight={26}
-                headerRowHeight={26}
+                rowHeight={30}
+                headerRowHeight={30}
                 rowClass={getFileRowClass}
                 rowKeyGetter={(row) => row.id}
                 onCellClick={handleFileRowClick}
@@ -875,8 +875,8 @@ const ListManager: React.FC = () => {
               columns={progressColumns}
               rows={progressList}
               className="grid-custom cursor-pointer h-custom-important"
-              rowHeight={26}
-              headerRowHeight={26}
+              rowHeight={30}
+              headerRowHeight={30}
               rowKeyGetter={(row) => row.id}
               rowClass={getProgressRowClass}
               onCellClick={handleProgressRowClick}

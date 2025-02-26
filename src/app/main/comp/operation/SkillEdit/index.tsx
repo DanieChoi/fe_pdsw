@@ -7,9 +7,12 @@ import CustomAlert from '@/components/shared/layout/CustomAlert';
 import TitleWrap from "@/components/shared/TitleWrap";
 import 'react-data-grid/lib/styles.css';
 import { useApiForCounselorAssignList, useApiForCounselorList } from '@/features/preferences/hooks/useApiForCounselorList';
-import { useApiForCampaignList, useApiForSkillAgentList, useApiForSkillCampaignList, useApiForSkillList } from '@/features/preferences/hooks/useApiForSkill';
+import { useApiForCampaignList, useApiForCreateSkill, useApiForDeleteAgentSkill, useApiForDeleteSkill, useApiForSkillAgentList, useApiForSkillCampaignList, useApiForSkillList, useApiForUpdateSkill } from '@/features/preferences/hooks/useApiForSkill';
 import { useAuthStore, useMainStore } from '@/store';
 import { CounselorAssignListResponse } from '@/features/preferences/types/SystemPreferences';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
+import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 
 // 메인 스킬 정보
 interface SkillRow {
@@ -52,6 +55,28 @@ const SkillEdit = () => {
   const [filteredCampaigns, setFilteredCampaigns] = useState<CampaignRow[]>([]);
   const [filteredAgents, setFilteredAgents] = useState<AgentRow[]>([]);
   const [allCampaigns, setAllCampaigns] = useState<CampaignRow[]>([]);
+
+  // 신규 등록을 위한 초기 상태
+  const initialSkillState = {
+    center: '',
+    tenant: '',
+    tenantId: tenant_id,
+    skillId: '',
+    skillName: '',
+    description: '',
+    campaignCount: 0,
+    agentCount: 0
+  };
+
+  // 수정 가능한 필드들을 위한 상태
+  const [editableFields, setEditableFields] = useState({
+    tenantId: tenant_id,
+    skillName: '',
+    description: ''
+  });
+
+  // 새로운 스킬 생성 모드인지 여부
+  const [isNewMode, setIsNewMode] = useState(false);
   
   const [alertState, setAlertState] = useState({
     isOpen: false,
@@ -116,25 +141,58 @@ const SkillEdit = () => {
     return selectedSkill?.skillId === row.skillId ? 'bg-amber-50' : '';
   };
 
-  // 스킬 로우 클릭 시, 선택된 스킬의 skill_id와 일치하는 캠페인 API 응답의 campaign_id 목록을 이용해 전체 캠페인 리스트에서 필터링
+  // 스킬 ID 자동 생성 함수
+  const generateSkillId = () => {
+    // 스킬 ID가 없는 경우 기본값으로 1 사용
+    if (rows.length === 0) return "1";
+    
+    // 모든 스킬 ID를 숫자로 변환 (숫자가 아닌 경우 필터링)
+    const numericSkillIds = rows
+      .map(row => row.skillId)
+      .filter(id => /^\d+$/.test(id))  // 순수 숫자 형식만 필터링
+      .map(id => parseInt(id, 10));
+    
+    // 최대값 찾기
+    const maxSkillId = numericSkillIds.length > 0 ? Math.max(...numericSkillIds) : 0;
+    
+    // 최대값 + 1 반환
+    return String(maxSkillId + 1);
+  };
+
+  // 스킬 로우 클릭 이벤트 핸들러
   const handleSkillClick = ({ row }: { row: SkillRow }) => {
     setSelectedSkill(row);
     setSelectedCampaignRows(new Set());
     setSelectedAgentRows(new Set());
+    setEditableFields({
+      tenantId: row.tenantId,
+      skillName: row.skillName,
+      description: row.description
+    });
+    setIsNewMode(false);
     
-    let relatedCampaigns: CampaignRow[] = [];
-    if (campaignData && campaignData.result_data) {
-      const skillCampaignEntry = campaignData.result_data.find(
-        (entry: any) => String(entry.skill_id) === row.skillId
-      );
-      const campaignIds: string[] = skillCampaignEntry ? skillCampaignEntry.campaign_id : [];
-      relatedCampaigns = allCampaigns.filter(campaign => campaignIds.includes(campaign.campaignId));
-    }
-    setFilteredCampaigns(relatedCampaigns);
+    // 캠페인 데이터 불러오기
+    const loadCampaignData = () => {
+      if (campaignData && campaignData.result_data) {
+        const skillCampaignEntry = campaignData.result_data.find(
+          (entry: any) => String(entry.skill_id) === row.skillId
+        );
+        const campaignIds: string[] = skillCampaignEntry ? skillCampaignEntry.campaign_id : [];
+        const relatedCampaigns = allCampaigns.filter(campaign => campaignIds.includes(campaign.campaignId));
+        setFilteredCampaigns(relatedCampaigns);
+      } else {
+        // 캠페인 데이터가 아직 없는 경우 다시 불러오기
+        fetchSkillCampaignList();
+      }
+    };
     
-    // 상담원은 예제 데이터(allAgentRows)를 그대로 사용 (필요시 API 응답으로 대체)
-    const relatedAgents = allAgentRows.filter(agent => agent.skillId === row.skillId);
-    setFilteredAgents(relatedAgents);
+    loadCampaignData();
+    
+    // 상담원 불러오기
+    fetchCounselorAssignList({
+      tenantId: row.tenantId,
+      skillId: Number(row.skillId)
+    });
   };
 
   const handleCampaignSelectionChange = (selectedRows: Set<string>) => {
@@ -150,8 +208,106 @@ const SkillEdit = () => {
       showAlert('스킬을 해제할 캠페인을 선택해주세요.');
       return;
     }
-    showConfirm('선택한 캠페인의 스킬을 해제하시겠습니까?', () => {
-      console.log('Unassign skill from campaigns:', Array.from(selectedCampaignRows));
+    
+    if (!selectedSkill) {
+      showAlert('현재 선택된 스킬이 없습니다.');
+      return;
+    }
+    
+    const currentSkillId = parseInt(selectedSkill.skillId, 10);
+    
+    showConfirm('선택한 캠페인에서 현재 스킬을 해제하시겠습니까?', async () => {
+      // 선택된 캠페인 ID 배열 생성
+      const selectedCampaignIds = Array.from(selectedCampaignRows).map(campaignId => {
+        const campaign = filteredCampaigns.find(c => c.campaignId === campaignId);
+        return campaign ? parseInt(campaign.campaignId, 10) : 0;
+      }).filter(id => id !== 0);
+      
+      // 최신 캠페인 스킬 데이터 가져오기 위한 호출
+      campaignSkillList({
+        session_key: '',
+        tenant_id: tenant_id
+      }, {
+        onSuccess: async (data) => {
+          const campaignSkillData = data.result_data || [];
+          
+          // 진행 상태 추적
+          let successCount = 0;
+          let failCount = 0;
+          
+          // 각 캠페인에 대해 API 호출
+          for (const campaignId of selectedCampaignIds) {
+            try {
+              // 해당 캠페인의 스킬 데이터 찾기
+              const campaignSkillInfo = campaignSkillData.find(
+                (item) => item.campaign_id === campaignId
+              );
+              
+              if (!campaignSkillInfo) {
+                failCount++;
+                console.error(`캠페인 ID ${campaignId}의 스킬 정보를 찾을 수 없습니다.`);
+                continue;
+              }
+              
+              // 현재 선택된 스킬을 제외한 스킬 ID 배열
+              const remainingSkillIds = campaignSkillInfo.skill_id
+                .filter((skillId) => skillId !== currentSkillId);
+              
+              // 업데이트 API 호출
+              await new Promise((resolve) => {
+                campaignSkillUpdate({
+                  campaign_id: campaignId,
+                  skill_id: remainingSkillIds
+                }, {
+                  onSuccess: () => {
+                    successCount++;
+                    resolve(null);
+                  },
+                  onError: (error) => {
+                    failCount++;
+                    console.error(`캠페인 ID ${campaignId} 스킬 해제 실패:`, error);
+                    resolve(null);
+                  }
+                });
+              });
+            } catch (error) {
+              failCount++;
+              console.error(`캠페인 ID ${campaignId} 스킬 해제 오류:`, error);
+            }
+          }
+          
+          // 작업 완료 후 메시지 표시
+          if (failCount === 0) {
+            showAlert(`${successCount}개 캠페인에서 스킬이 성공적으로 해제되었습니다.`);
+          } else {
+            showAlert(`${successCount}개 성공, ${failCount}개 실패하였습니다.`);
+          }
+          
+          // 데이터 갱신
+          fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
+          fetchSkillCampaignList();
+          
+          // UI에서 선택된 캠페인 즉시 제거 (그리드 즉시 갱신)
+          const updatedCampaigns = filteredCampaigns.filter(
+            campaign => !selectedCampaignRows.has(campaign.campaignId)
+          );
+          setFilteredCampaigns(updatedCampaigns);
+          
+          // 선택 초기화
+          setSelectedCampaignRows(new Set());
+          
+          // 선택된 스킬의 캠페인 카운트 업데이트
+          if (selectedSkill) {
+            setSelectedSkill(prev => prev ? ({
+              ...prev,
+              campaignCount: prev.campaignCount - successCount
+            }) : prev);
+          }
+        },
+        onError: (error) => {
+          showAlert(`캠페인 스킬 정보 조회 실패: ${error.message}`);
+        }
+      });
     });
   };
 
@@ -160,37 +316,166 @@ const SkillEdit = () => {
       showAlert('스킬을 해제할 상담원을 선택해주세요.');
       return;
     }
-    showConfirm('선택한 상담원의 스킬을 해제하시겠습니까?', () => {
-      console.log('Unassign skill from agents:', Array.from(selectedAgentRows));
+  
+    // 선택된 상담원 ID 배열 생성
+    const selectedAgentIds = Array.from(selectedAgentRows).map(agentId => {
+      const agent = filteredAgents.find(agent => agent.agentId === agentId);
+      return agent ? agent.agentId : '';
+    }).filter(id => id !== ''); // 빈 ID 필터링
+  
+    // 실제로 API 호출하기 전에 확인 메시지 표시
+    showConfirm(`선택한 ${selectedAgentIds.length}명의 상담원 스킬을 해제하시겠습니까?`, () => {
+      // 먼저 UI 업데이트 - 이 부분이 중요!
+      if (selectedSkill) {
+        // 1. 소속상담원 목록에서 선택된 상담원들 제거
+        const updatedAgents = filteredAgents.filter(
+          agent => !selectedAgentRows.has(agent.agentId)
+        );
+        setFilteredAgents(updatedAgents);
+  
+        // 2. 스킬목록에서 소속상담원 수 갱신
+        const newAgentCount = selectedSkill.agentCount - selectedAgentIds.length;
+        
+        // 전체 스킬 목록 업데이트
+        setRows(prevRows => 
+          prevRows.map(row => 
+            row.skillId === selectedSkill.skillId 
+              ? { ...row, agentCount: newAgentCount } 
+              : row
+          )
+        );
+        
+        // 선택된 스킬 정보 업데이트
+        setSelectedSkill({
+          ...selectedSkill,
+          agentCount: newAgentCount
+        });
+      }
+      
+      // 선택 초기화
+      setSelectedAgentRows(new Set());
+      
+      // API 호출
+      deleteAgentSkill({
+        skill_id: Number(selectedSkill?.skillId || 0),
+        agent_id: selectedAgentIds
+      });
     });
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleNew = () => {
-    setSelectedSkill(null);
+    setSelectedSkill({ ...initialSkillState, skillId: generateSkillId() });
+    setEditableFields({
+      tenantId: tenant_id,
+      skillName: '',
+      description: ''
+    });
     setSelectedCampaignRows(new Set());
     setSelectedAgentRows(new Set());
     setFilteredCampaigns([]);
     setFilteredAgents([]);
+    setIsNewMode(true);
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleSave = () => {
-    if (!selectedSkill) {
-      showAlert('저장할 스킬을 선택해주세요.');
+    if (isNewMode && (!editableFields.skillName || !editableFields.description)) {
+      showAlert('스킬 이름과 설명을 모두 입력해주세요.');
       return;
     }
-    showConfirm('저장하시겠습니까?', () => {
-      console.log('Save skill:', selectedSkill);
-    });
+
+    const skillData = {
+      skill_id: Number(selectedSkill?.skillId),
+      tenant_id: editableFields.tenantId,
+      skill_name: editableFields.skillName,
+      skill_description: editableFields.description
+    };
+
+    const savedSkillId = String(selectedSkill?.skillId);
+
+    if (isNewMode) {
+      createSkill(skillData, {
+        onSuccess: () => {
+          fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
+          setTimeout(() => {
+            const newSkill = rows.find(r => r.skillId === savedSkillId);
+            if (newSkill) {
+              handleSkillClick({ row: newSkill });
+            }
+          }, 300);
+          setIsNewMode(false);
+        },
+        onError: (error) => {
+          showAlert(`저장 실패: ${error.message}`);
+        }
+      });
+    } else {
+      updateSkill(skillData, {
+        onSuccess: () => {
+          fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
+        },
+        onError: (error) => {
+          showAlert(`수정 실패: ${error.message}`);
+        }
+      });
+    }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleDelete = () => {
     if (!selectedSkill) {
       showAlert('삭제할 스킬을 선택해주세요.');
       return;
     }
-    showConfirm(`선택된 열을 삭제 하시겠습니까?\n ※ 주의 : 삭제 시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해 주세요.`, () => {
-      console.log('Delete skill:', selectedSkill);
+  
+    if (selectedSkill.campaignCount > 0 || selectedSkill.agentCount > 0) {
+      showAlert('사용 중인 스킬은 삭제할 수 없습니다.');
+      return;
+    }
+  
+    showConfirm('선택한 스킬을 삭제하시겠습니까?\n\n※주의 : 삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해주세요.', () => {
+      deleteSkill({ skill_id: Number(selectedSkill.skillId) }, {
+        onSuccess: () => {
+          // 스킬 리스트 새로고침
+          fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
+          
+          // 상세 정보 초기화
+          setSelectedSkill(null);
+          setEditableFields({
+            tenantId: tenant_id,
+            skillName: '',
+            description: ''
+          });
+          
+          // 관련 데이터 초기화
+          setFilteredCampaigns([]);
+          setFilteredAgents([]);
+          setSelectedCampaignRows(new Set());
+          setSelectedAgentRows(new Set());
+          
+          showAlert('스킬이 성공적으로 삭제되었습니다.');
+        },
+        onError: (error) => {
+          showAlert(`삭제 실패: ${error.message}`);
+        }
+      });
     });
+  };
+
+  const handleInputChange = (field: 'skillName' | 'description', value: string) => {
+    setEditableFields(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleTenantChange = (value: string) => {
+    const tenantId = parseInt(value, 10);
+    setEditableFields(prev => ({
+      ...prev,
+      tenantId
+    }));
   };
 
   const showAlert = (message: string) => {
@@ -198,7 +483,7 @@ const SkillEdit = () => {
       isOpen: true,
       message,
       title: '알림',
-      type: '1',
+      type: '2',
       onConfirm: closeAlert,
       onCancel: () => {}
     });
@@ -209,7 +494,7 @@ const SkillEdit = () => {
       isOpen: true,
       message,
       title: '확인',
-      type: '2',
+      type: '1',
       onConfirm: () => {
         onConfirm();
         closeAlert();
@@ -222,62 +507,37 @@ const SkillEdit = () => {
     setAlertState(prev => ({ ...prev, isOpen: false }));
   };
 
-  // 예제용 전체 상담원 데이터 (상세 그리드에서 사용)
-  const [allAgentRows] = useState<AgentRow[]>([
-    { 
-      skillId: 'SK001',
-      teamId: 'T001',
-      teamName: '일반상담팀',
-      loginId: 'user1',
-      agentId: 'AG001',
-      agentName: '김상담',
-      consultMode: '일반상담'
-    },
-    { 
-      skillId: 'SK002',
-      teamId: 'T002',
-      teamName: 'VIP상담팀',
-      loginId: 'user2',
-      agentId: 'AG002',
-      agentName: '이상담',
-      consultMode: 'VIP상담'
-    }
-  ]);
+  // API 상태 관리
+  const [campaignData, setCampaignData] = useState<any>(null);
+  const [agentData, setAgentData] = useState<any>(null);
 
-  // API: 상담원 리스트와 스킬 리스트
+  // API Hooks
   const { mutate: fetchCounselorList, data: counselorData } = useApiForCounselorList({
     onError: (error) => {
       console.error('상담원 리스트 조회 실패:', error);
-      // showAlert('상담원 리스트를 불러오지 못했습니다.');
     }
   });
+
   const { mutate: fetchSkillList, data: skillData } = useApiForSkillList({
     onError: (error) => {
       console.error('스킬 리스트 조회 실패:', error);
-      // showAlert('스킬 리스트를 불러오지 못했습니다.');
     }
   });
-  
-  // API: 스킬 할당 캠페인 리스트 조회
-  const [campaignData, setCampaignData] = useState<any>(null);
+
   const { mutate: fetchSkillCampaignList } = useApiForSkillCampaignList({
     onSuccess: (data) => {
       setCampaignData(data);
     }
   });
-  
-  // API: 스킬 할당 상담원 리스트 조회
-  const [agentData, setAgentData] = useState<any>(null);
+
   const { mutate: fetchSkillAgentList } = useApiForSkillAgentList({
     onSuccess: (data) => {
       setAgentData(data);
     }
   });
 
-  // API: 캠페인 리스트 조회
   const { mutate: fetchCampaignList } = useApiForCampaignList({
     onSuccess: (data) => {
-      // Convert API response to CampaignRow format
       const campaigns = data.result_data.map((campaign: any) => ({
         skillId: '',
         campaignId: String(campaign.campaign_id),
@@ -287,13 +547,12 @@ const SkillEdit = () => {
       setAllCampaigns(campaigns);
     }
   });
-  
-  // API: 스킬 할당 상담사 목록 가져오기
+
   const { mutate: fetchCounselorAssignList } = useApiForCounselorAssignList({
     onSuccess: (data: CounselorAssignListResponse) => {
       if (data.skillAssignedCounselorList) {
         const mappedAgents: AgentRow[] = data.skillAssignedCounselorList.map(counselor => ({
-          skillId: selectedSkill?.skillId || '',  
+          skillId: selectedSkill?.skillId || '',
           teamId: counselor.affiliationTeamId,
           teamName: counselor.affiliationTeamName,
           loginId: counselor.counselorId,
@@ -305,27 +564,123 @@ const SkillEdit = () => {
       }
     }
   });
-  
-  // 컴포넌트 마운트 시 API 호출 (테넌트, 캠페인, 스킬, 할당 캠페인/상담원)
+
+  const { mutate: createSkill } = useApiForCreateSkill({
+    onSuccess: () => {
+      showAlert('스킬이 성공적으로 추가되었습니다.');
+    },
+    onError: (error) => {
+      showAlert(`스킬 추가 실패: ${error.message}`);
+    }
+  });
+
+  const { mutate: updateSkill } = useApiForUpdateSkill({
+    onSuccess: () => {
+      showAlert('스킬이 성공적으로 수정되었습니다.');
+    },
+    onError: (error) => {
+      showAlert(`스킬 수정 실패: ${error.message}`);
+    }
+  });
+
+  const { mutate: deleteSkill } = useApiForDeleteSkill({
+    onSuccess: () => {
+      // showAlert('스킬이 성공적으로 삭제되었습니다.');
+    },
+    onError: (error) => {
+      showAlert(`스킬 삭제 실패: ${error.message}`);
+    }
+  })
+
+  const { mutate: deleteAgentSkill } = useApiForDeleteAgentSkill({
+    onSuccess: () => {
+      // API 성공 알림만 표시
+      showAlert('상담원 스킬이 성공적으로 해제되었습니다.');
+    },
+    onError: (error) => {
+      showAlert(`상담원 스킬 해제 실패: ${error.message}`);
+    }
+  });
+
+  // 캠페인스킬 조회
+  const { mutate: campaignSkillList } = useApiForCampaignSkill({
+    onSuccess: (data) => {
+      // console.log('캠페인스킬 조회 결과:', data);
+    }
+  })
+
+  const { mutate: campaignSkillUpdate } = useApiForCampaignSkillUpdate({
+  onSuccess: () => {
+    showAlert('캠페인 스킬 할당이 성공적으로 완료되었습니다.');
+  },
+  onError: (error) => {
+    showAlert(`캠페인 스킬 할당 실패: ${error.message}`);
+  }
+  })
+
+  // 테넌트 선택시 관련 센터 정보 가져오기
+  const getSelectedTenantCenterName = () => {
+    if (!counselorData?.organizationList || !selectedSkill) return '';
+    
+    // 선택된 테넌트 ID에 해당하는 센터 이름 찾기
+    for (const org of counselorData.organizationList) {
+      const tenant = org.tenantInfo.find(t => t.tenantId === String(editableFields.tenantId));
+      if (tenant) {
+        return org.centerName;
+      }
+    }
+    return '';
+  };
+
+  useEffect(() => {
+    if (campaignData && selectedSkill) {
+      // 캠페인 데이터가 업데이트되면 선택된 스킬의 캠페인 목록도 업데이트
+      const skillCampaignEntry = campaignData.result_data.find(
+        (entry: any) => String(entry.skill_id) === selectedSkill.skillId
+      );
+      const campaignIds: string[] = skillCampaignEntry ? skillCampaignEntry.campaign_id : [];
+      const relatedCampaigns = allCampaigns.filter(campaign => campaignIds.includes(campaign.campaignId));
+      setFilteredCampaigns(relatedCampaigns);
+    }
+  }, [campaignData, selectedSkill, allCampaigns]);
+
+  // 스킬 목록이 업데이트 될 때마다 현재 선택된 스킬의 상세 정보도 갱신하는 useEffect 추가
+  useEffect(() => {
+    if (selectedSkill && rows.length > 0) {
+      const updatedSkill = rows.find(row => row.skillId === selectedSkill.skillId);
+      if (updatedSkill) {
+        // 필요한 정보가 변경된 경우만 업데이트 (불필요한 리렌더링 방지)
+        if (updatedSkill.center !== selectedSkill.center || 
+            updatedSkill.tenant !== selectedSkill.tenant ||
+            updatedSkill.skillName !== selectedSkill.skillName ||
+            updatedSkill.description !== selectedSkill.description) {
+          setSelectedSkill(updatedSkill);
+          setEditableFields({
+            tenantId: updatedSkill.tenantId,
+            skillName: updatedSkill.skillName,
+            description: updatedSkill.description
+          });
+        }
+      }
+    }
+  }, [rows, selectedSkill]);
+
   useEffect(() => {
     fetchCounselorList({ tenantId: tenant_id, roleId: role_id });
     fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
     fetchSkillCampaignList();
     fetchSkillAgentList();
     fetchCampaignList();
-    fetchCounselorAssignList({
-      tenantId: selectedSkill ? selectedSkill.tenantId : tenant_id,
-      skillId: selectedSkill ? Number(selectedSkill.skillId) : 0
-    })
-  }, [tenant_id, role_id, tenants, fetchCounselorList, fetchSkillList, fetchSkillCampaignList, fetchSkillAgentList, fetchCampaignList, fetchCounselorAssignList, selectedSkill]);
+    campaignSkillList({
+      session_key: '',
+      tenant_id: tenant_id
+    });
+  }, [tenant_id, role_id, tenants, fetchCounselorList, fetchSkillList, fetchSkillCampaignList, fetchSkillAgentList, fetchCampaignList, campaignSkillList]);
 
-  // 상담원, 스킬, 캠페인, 상담원 API 응답 데이터를 통합하여 그리드에 표시할 행 구성
   useEffect(() => {
     if (
-      counselorData &&
-      counselorData.organizationList &&
-      skillData &&
-      skillData.result_data
+      counselorData?.organizationList &&
+      skillData?.result_data
     ) {
       const tenantMap: { [tenantId: string]: { centerName: string; tenantName: string } } = {};
       counselorData.organizationList.forEach(org => {
@@ -338,13 +693,14 @@ const SkillEdit = () => {
         });
       });
       
-      const campaignResultData = (campaignData && campaignData.result_data) || [];
-      const agentResultData = (agentData && agentData.result_data) || [];
+      const campaignResultData = (campaignData?.result_data) || [];
+      const agentResultData = (agentData?.result_data) || [];
       
-      const skillRows: SkillRow[] = (skillData.result_data || []).map(skill => {
+      const skillRows: SkillRow[] = skillData.result_data.map(skill => {
         const tenantInfo = tenantMap[String(skill.tenant_id)] || { centerName: '', tenantName: '' };
         const campaignEntry = campaignResultData.find((item: any) => String(item.skill_id) === String(skill.skill_id));
         const agentEntry = agentResultData.find((item: any) => String(item.skill_id) === String(skill.skill_id));
+        
         return {
           center: tenantInfo.centerName,
           tenant: tenantInfo.tenantName,
@@ -360,11 +716,70 @@ const SkillEdit = () => {
     }
   }, [counselorData, skillData, campaignData, agentData]);
 
+  // 키보드 이벤트 핸들러 추가
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (alertState.isOpen) {
+        // Enter 키: 확인 버튼 클릭
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          alertState.onConfirm();
+          return;
+        }
+        
+        // Esc 키: 취소 버튼 클릭 (type이 '1'인 경우에만)
+        if (event.key === 'Escape' && alertState.type === '1') {
+          event.preventDefault();
+          alertState.onCancel();
+          return;
+        }
+        
+        // 경고창이 열려 있을 때는 다른 단축키를 처리하지 않음
+        return;
+      }
+      
+      // Ctrl + S: 저장
+      if (event.ctrlKey && event.key === 's') {
+        event.preventDefault();
+        handleSave();
+      }
+      
+      // Ctrl + D 또는 Delete: 삭제
+      if ((event.ctrlKey && event.key === 'd') || event.key === 'Delete') {
+        event.preventDefault();
+        handleDelete();
+      }
+      
+      // 아래 화살표: 신규
+      if (event.key === 'ArrowDown' && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+        // 입력 필드에서는 아래 화살표가 정상 작동하도록 예외 처리
+        if (
+          document.activeElement?.tagName !== 'INPUT' && 
+          document.activeElement?.tagName !== 'SELECT' &&
+          document.activeElement?.tagName !== 'TEXTAREA'
+        ) {
+          // 이벤트의 기본 동작과 전파를 모두 차단
+          event.preventDefault();
+          event.stopPropagation();
+          handleNew();
+        }
+      }
+    };
+
+    // 캡처 단계에서 이벤트 리스너 등록 (이벤트 버블링보다 먼저 실행됨)
+    window.addEventListener('keydown', handleKeyDown, true);
+
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown, true);
+    };
+  }, [alertState, handleDelete, handleNew, handleSave]);
+
   return (
     <div className="flex">
       <div className="flex gap-8">
         <div className="w-[800px] flex flex-col gap-3">
-          {/* 왼쪽 스킬 목록 그리드 */}
+          {/* 스킬 목록 그리드 */}
           <div>
             <TitleWrap title="스킬 목록" totalCount={rows.length} />
             <div className="grid-custom-wrap h-[230px]">
@@ -375,8 +790,8 @@ const SkillEdit = () => {
                 onCellClick={handleSkillClick}
                 rowKeyGetter={(row) => row.skillId}
                 selectedRows={selectedSkill ? new Set<string>([selectedSkill.skillId]) : new Set<string>()}
-                rowHeight={26}
-                headerRowHeight={26}
+                rowHeight={30}
+                headerRowHeight={30}
                 rowClass={getRowClass}
               />
             </div>
@@ -402,8 +817,8 @@ const SkillEdit = () => {
                 rowKeyGetter={(row) => row.campaignId}
                 selectedRows={selectedCampaignRows}
                 onSelectedRowsChange={handleCampaignSelectionChange}
-                rowHeight={26}
-                headerRowHeight={26}
+                rowHeight={30}
+                headerRowHeight={30}
               />
             </div>
           </div>
@@ -428,8 +843,8 @@ const SkillEdit = () => {
                 rowKeyGetter={(row) => row.agentId}
                 selectedRows={selectedAgentRows}
                 onSelectedRowsChange={handleAgentSelectionChange}
-                rowHeight={26}
-                headerRowHeight={26}
+                rowHeight={30}
+                headerRowHeight={30}
               />
             </div>
           </div>
@@ -441,18 +856,36 @@ const SkillEdit = () => {
             <div className="flex items-center gap-2">
               <Label className="w-[8rem] min-w-[8rem]">상담센터</Label>
               <CustomInput 
-                value={selectedSkill?.center || ''}
+                value={isNewMode ? getSelectedTenantCenterName() : selectedSkill?.center || ''}
                 className="w-full"
                 disabled
               />
             </div>
             <div className="flex items-center gap-2">
               <Label className="w-[8rem] min-w-[8rem]">테넌트</Label>
-              <CustomInput 
-                value={selectedSkill?.tenant || ''}
-                className="w-full"
-                disabled
-              />
+              {isNewMode ? (
+                <Select 
+                  value={editableFields.tenantId ? String(editableFields.tenantId) : ''}
+                  onValueChange={handleTenantChange}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tenants.map((tenant) => (
+                      <SelectItem key={tenant.tenant_id} value={String(tenant.tenant_id)}>
+                        {tenant.tenant_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <CustomInput 
+                  value={selectedSkill?.tenant || ''}
+                  className="w-full"
+                  disabled
+                />
+              )}
             </div>
             <div className="flex items-center gap-2">
               <Label className="w-[8rem] min-w-[8rem]">스킬아이디</Label>
@@ -465,14 +898,16 @@ const SkillEdit = () => {
             <div className="flex items-center gap-2">
               <Label className="w-[8rem] min-w-[8rem]">스킬이름</Label>
               <CustomInput 
-                value={selectedSkill?.skillName || ''}
+                value={editableFields.skillName}
+                onChange={(e) => handleInputChange('skillName', e.target.value)}
                 className="w-full"
               />
             </div>
             <div className="flex items-center gap-2">
               <Label className="w-[8rem] min-w-[8rem]">설명</Label>
               <CustomInput 
-                value={selectedSkill?.description || ''}
+                value={editableFields.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
                 className="w-full"
               />
             </div>
@@ -488,7 +923,7 @@ const SkillEdit = () => {
               <li>• 사용 중인 스킬은 추가 및 삭제할 수 없습니다.</li>
               <li>
                 • 기능설명<br/>
-                스킬 추가 = 키보드<br/>
+                스킬 추가 = 키보드 ↓<br/>
                 스킬 삭제 = 키보드 Delete<br/>
                 다중 선택 = Shift 또는 Ctrl 키를 이용하여 다중 선택 가능
               </li>

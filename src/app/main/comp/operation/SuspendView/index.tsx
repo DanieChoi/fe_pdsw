@@ -88,8 +88,8 @@ const SuspendView = () => {
             columns={columns}
             rows={rows}
             className="grid-custom"
-            rowHeight={26}
-            headerRowHeight={26}
+            rowHeight={30}
+            headerRowHeight={30}
             rowKeyGetter={rowKeyGetter}
           />
         </div>
