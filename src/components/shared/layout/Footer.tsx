@@ -251,7 +251,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     else if( announce === '/pds/campaign/skill' ){
       _message = '캠페인 요구스킬 '
       if( command === 'UPDATE' ){
-        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name']||'';
+        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'];
       }
     }
     //캠페인수정>동작시간 추가
