@@ -53,25 +53,7 @@ export function ContextMenuForTreeNode({
 
   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
     onSuccess: (data) => {
-      // if (String(data.result_code) === "0000") {
-      //   toast.success("캠페인 상태가 성공적으로 변경되었습니다.", {
-      //     position: "top-right",
-      //     autoClose: 3000,
-      //     hideProgressBar: false,
-      //     closeOnClick: true,
-      //     pauseOnHover: true,
-      //     draggable: true,
-      //   });
-      // } else {
-      //   toast.error(data.result_msg || "상태 변경 중 오류가 발생했습니다.", {
-      //     position: "top-right",
-      //     autoClose: 3000,
-      //     hideProgressBar: false,
-      //     closeOnClick: true,
-      //     pauseOnHover: true,
-      //     draggable: true,
-      //   });
-      // }
+      
       toast.success("캠페인 상태가 성공적으로 변경되었습니다.", {
         position: "top-right",
         autoClose: 3000,
@@ -98,25 +80,9 @@ export function ContextMenuForTreeNode({
     setCampaignIdForUpdateFromSideMenu(item.id);
   };
 
-  // const handleProgressInfoClick = () => {
-  //   // 고유한 키 생성 - 캠페인 ID와 타임스탬프 조합
-  //   const uniqueKey = `progress-info-${item.id}-${Date.now()}`;
-
-  //   addMultiTab({
-  //     id: 21,
-  //     uniqueKey: uniqueKey,
-  //     title: `캠페인 진행정보 - ${item.label} (${item.id})`,
-  //     icon: '',
-  //     href: '',
-  //     content: null,
-  //   });
-  // };
 
   const handleProgressInfoClick = (campaignId: any, campaignName: string) => {
-    // 고유한 키 생성 - 캠페인 ID 포함
     const uniqueKey = `progress-info-${campaignId}-${Date.now()}`;
-
-    // alert("캠페인 아이디 체크 " + campaignId);
 
     addMultiTab({
       id: 21,
@@ -141,9 +107,11 @@ export function ContextMenuForTreeNode({
   };
 
   const handleMonitorClick = () => {
-    addTab({
+    const uniqueKey = `monitor-${Date.now()}`;
+    
+    addMultiTab({
       id: 22,
-      uniqueKey: '22',
+      uniqueKey: uniqueKey,
       title: '상담원 상태 모니터',
       icon: '',
       href: '',
@@ -211,16 +179,6 @@ export function ContextMenuForTreeNode({
     fetchCampaignBlacklistCount(Number(item.id));
   };
 
-  // const renderStatusCheckbox = (targetStatus: CampaignStatus) => {
-  //   const isLoading = updateCampaignStatusMutation.isPending && currentStatus === targetStatus;
-    
-  //   return currentStatus === targetStatus ? (
-  //     <Check className={`mr-2 h-4 w-4 text-green-500 ${isLoading ? 'opacity-50' : ''}`} />
-  //   ) : (
-  //     <div className={`w-4 h-4 mr-2 border rounded ${isLoading ? 'opacity-50' : ''}`} />
-  //   );
-  // };
-
   const renderStatusCheckbox = (targetStatus: CampaignStatus) => {
     const isLoading = updateCampaignStatusMutation.isPending && currentStatus === targetStatus;
 
@@ -274,9 +232,6 @@ export function ContextMenuForTreeNode({
             </ContextMenuSubContent>
           </ContextMenuSub>
 
-          {/* <ContextMenuItem onClick={handleProgressInfoClick}>
-          캠페인 진행정보
-        </ContextMenuItem> */}
 
           <ContextMenuItem onClick={() => handleProgressInfoClick(item.id, item.label)}>
             캠페인 진행정보
