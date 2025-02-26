@@ -20,7 +20,7 @@ import BlackListCountPopup from '@/features/campaignManager/components/popups/Bl
 import { toast } from 'react-toastify';
 import { useApiForCampaignStatusUpdate } from "../../hooks/useApiForCampaignStatusUpdate";
 import { useApiForCampaignBlacklistCount } from "@/features/listManager/hooks/useApiForCampaignBlacklistCount";
-
+import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 export type CampaignStatus = 'started' | 'pending' | 'stopped';
 
 interface ContextMenuForTreeNodeProps {
@@ -184,13 +184,27 @@ export function ContextMenuForTreeNode({
     fetchCampaignBlacklistCount(Number(item.id));
   };
 
+  // const renderStatusCheckbox = (targetStatus: CampaignStatus) => {
+  //   const isLoading = updateCampaignStatusMutation.isPending && currentStatus === targetStatus;
+    
+  //   return currentStatus === targetStatus ? (
+  //     <Check className={`mr-2 h-4 w-4 text-green-500 ${isLoading ? 'opacity-50' : ''}`} />
+  //   ) : (
+  //     <div className={`w-4 h-4 mr-2 border rounded ${isLoading ? 'opacity-50' : ''}`} />
+  //   );
+  // };
+
   const renderStatusCheckbox = (targetStatus: CampaignStatus) => {
     const isLoading = updateCampaignStatusMutation.isPending && currentStatus === targetStatus;
+    const isChecked = currentStatus === targetStatus;
     
-    return currentStatus === targetStatus ? (
-      <Check className={`mr-2 h-4 w-4 text-green-500 ${isLoading ? 'opacity-50' : ''}`} />
-    ) : (
-      <div className={`w-4 h-4 mr-2 border rounded ${isLoading ? 'opacity-50' : ''}`} />
+    return (
+      <CustomCheckbox 
+        checked={isChecked} 
+        disabled={isLoading} 
+        className="mr-2" 
+        onChange={() => {}} // 여기서는 변경 이벤트가 필요 없음 (클릭 이벤트는 부모 요소에서 처리)
+      />
     );
   };
 

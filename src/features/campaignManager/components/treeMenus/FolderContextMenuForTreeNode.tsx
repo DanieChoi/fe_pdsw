@@ -85,7 +85,7 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
   ];
 
   return (
-    <ContextMenuContent className="w-44 py-1 text-xs bg-white border border-gray-200 shadow-md">
+    <ContextMenuContent className="">
       {menuItems.map((menuItem) => (
         <ContextMenuItem
           key={menuItem.id}
@@ -94,11 +94,11 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
         >
           {/* 체크박스가 필요한 메뉴는 체크박스 표시 */}
           {checkableMenuIds.includes(menuItem.id) ? (
-            <span className="w-4 h-4 mr-2 flex justify-center items-center border border-gray-300 rounded-sm">
-              {selectedMenus.includes(menuItem.id) && (
-                <Check className="h-3 w-3 text-blue-600" />
-              )}
-            </span>
+             <CustomCheckbox
+             checked={selectedMenus.includes(menuItem.id)}
+             onChange={() => {}}
+             className="mr-2"
+           />
           ) : (
             <span className="w-4 h-4 mr-2" />
           )}
