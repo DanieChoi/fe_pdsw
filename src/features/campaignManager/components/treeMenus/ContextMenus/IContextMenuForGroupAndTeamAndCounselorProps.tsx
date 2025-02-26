@@ -530,13 +530,13 @@ export function IContextMenuForGroupAndTeamAndCounselor({
   return (
     <ContextMenu>
       <ContextMenuTrigger>{children}</ContextMenuTrigger>
-      <ContextMenuContent className="w-[180px]">
+      <ContextMenuContent className="w-[150px]">
         <ContextMenuItem onClick={openSkillAssignmentTab}>
-          <LayoutGrid className="mr-2 h-4 w-4" />
+          {/* <LayoutGrid className="mr-2 h-4 w-4" /> */}
           {getMenuItemTitle()}
         </ContextMenuItem>
         <ContextMenuItem onClick={handleSkillUnassignment}>
-          <Ban className="mr-2 h-4 w-4" />
+          {/* <Ban className="mr-2 h-4 w-4" /> */}
           스킬 할당 해제
         </ContextMenuItem>
       </ContextMenuContent>

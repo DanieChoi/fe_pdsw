@@ -232,7 +232,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
           {/* 모드 전환 버튼 - 아이콘으로 변경 */}
           <button
             onClick={toggleExpanded}
-            className="p-1 hover:bg-gray-100 rounded flex items-center"
+            className="flex items-center"
             title={isExpanded ? "default mode" : "wide mode"}
           >
             {isExpanded ? (
@@ -245,7 +245,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
           {/* 열기/닫기 버튼 */}
           <button 
             onClick={toggleDrawer} 
-            className="p-1 hover:bg-gray-100 rounded"
+            className=""
             title={isDrawerOpen ? "닫기" : "열기"}
           >
             {isDrawerOpen ? (
