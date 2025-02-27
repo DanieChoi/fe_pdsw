@@ -359,9 +359,12 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
     rest: false
   });
 
+  // 정렬 관련 상태
+  const [sortField, setSortField] = useState<SortField>('time');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   const [agentData, setAgentData] = useState<AgentData[]>([
+    // 초기 더미 데이터는 주석 처리
     // { id: 1, status: 'waiting', agent: 'sktest001', name: '김상담', time: '00:00:12' },
     // { id: 2, status: 'waiting', agent: 'sktest005', name: '이상담', time: '00:15:30' },
     // { id: 3, status: 'processing', agent: 'sktest002', name: '박상담', time: '00:05:45' },

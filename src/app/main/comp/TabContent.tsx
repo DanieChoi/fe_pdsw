@@ -277,7 +277,7 @@ import { TeamSkillAssignmentTab } from "@/features/campaignManager/components/tr
 import { GroupSkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/GroupSkillAssignmentTab";
 import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCampaignTab";
 
-// 탭 ID별 실제 화면을 매핑하는 함수
+// 탭 ID별 실제 화면을 매핑
 const renderContent = (tabId: number | null, campaignId?: string) => {
   switch (tabId) {
     case 1:
