@@ -309,9 +309,9 @@ export function TreeNode({
   const handleEdit = () => {
     console.log("Edit clicked:", { id: item.id, label: item.label, type: item.type });
   };
-  const handleDelete = () => {
-    console.log("Delete clicked:", { id: item.id, label: item.label, type: item.type });
-  };
+  // const handleDelete = () => {
+  //   console.log("Delete clicked:", { id: item.id, label: item.label, type: item.type });
+  // };
   const handleMonitor = () => {
     console.log("Monitor clicked:", { id: item.id, label: item.label, type: item.type });
   };
@@ -385,7 +385,7 @@ export function TreeNode({
         <ContextMenuForTreeNode
           item={item}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          // onDelete={handleDelete}
           onMonitor={handleMonitor}
           onHandleCampaignCopy={onHandleCampaignCopy}
         >

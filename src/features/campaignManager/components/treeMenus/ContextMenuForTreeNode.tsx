@@ -32,7 +32,7 @@ interface ContextMenuForTreeNodeProps {
     status: CampaignStatus;
   };
   onEdit: () => void;
-  onDelete: () => void;
+  // onDelete: () => void;
   onMonitor: () => void;
   onHandleCampaignCopy: () => void;
 }
@@ -41,7 +41,7 @@ export function ContextMenuForTreeNode({
   children,
   item,
   onEdit,
-  onDelete,
+  // onDelete,
   onMonitor,
   onHandleCampaignCopy,
 }: ContextMenuForTreeNodeProps) {
@@ -119,6 +119,23 @@ export function ContextMenuForTreeNode({
       campaignId: campaignId  // 캠페인 ID 설정
     });
   };
+
+  const onCampaignDelete = (campaignId: any, campaignName: string) => {
+    console.log('캠페인 삭제 클릭');
+    const uniqueKey = `monitor-${Date.now()}`;
+    
+    addTab({
+      id: 131,
+      uniqueKey: uniqueKey,
+      title: `상담원 삭제 - ${campaignName}`,
+      icon: '',
+      href: '',
+      content: null,
+      campaignId: campaignId,  // 캠페인 ID 설정
+      campaignName: campaignName
+    });
+
+  }
 
   const getStatusNumber = (status: CampaignStatus): number => {
     switch (status) {
@@ -251,9 +268,9 @@ export function ContextMenuForTreeNode({
             {/* <Copy className="mr-2 h-4 w-4" /> */}
             캠페인 복사
           </ContextMenuItem>
-
+          {/* () => onCampaignDelete(item.id, item.label) */}
           {!isFolder && (
-            <ContextMenuItem onClick={onDelete} className="text-red-500">
+            <ContextMenuItem onClick={() => onCampaignDelete(item.id, item.label)} className="text-red-500">
               {/* <Trash2 className="mr-2 h-4 w-4" /> */}
               캠페인 삭제
             </ContextMenuItem>

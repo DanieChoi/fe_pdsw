@@ -15,6 +15,7 @@ export interface TabItem {
   href: string;
   content: React.ReactNode;
   campaignId?: string;
+  campaignName?: string;
 }
 
 export interface TabSection {

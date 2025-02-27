@@ -276,9 +276,10 @@ import BlackListCountPopup from "@/features/campaignManager/components/popups/Bl
 import { TeamSkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/TeamSkillAssignmentTab";
 import { GroupSkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/GroupSkillAssignmentTab";
 import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCampaignTab";
+import CampaignDeletePanel from "@/widgets/sidebar/pannels/CampaignDeletePanel";
 
 // 탭 ID별 실제 화면을 매핑
-const renderContent = (tabId: number | null, campaignId?: string) => {
+const renderContent = (tabId: number | null, campaignId?: string, campaignName?: string) => {
   switch (tabId) {
     case 1:
       return <CampaignGroupManager />;
@@ -321,6 +322,10 @@ const renderContent = (tabId: number | null, campaignId?: string) => {
       return <>잘못된 스킬 할당 탭입니다.</>;
     case 130: // 캠페인 복사 화면 리턴
       return <CampaignClonePanel />;
+
+    case 131: // 캠페인 삭제 패널
+      return <CampaignDeletePanel campaignId={campaignId} campaignName={campaignName}/>
+
     case 501:
       return (
         <div className="flex justify-left w-full">
@@ -459,6 +464,7 @@ const TabContent = () => {
             const tabIdToRender = isActiveGlobal ? activeTabId : activeTab?.id ?? null;
             // 현재 활성화된 탭에서 campaignId 가져오기
             const campaignId = activeTab?.campaignId;
+            const campaignName = activeTab?.campaignName;
 
             return (
               <React.Fragment key={section.id}>
@@ -474,7 +480,7 @@ const TabContent = () => {
                     }
                   }}
                 >
-                  {renderContent(tabIdToRender, campaignId)}
+                  {renderContent(tabIdToRender, campaignId, campaignName)}
                 </div>
                 {index === 0 && sections.length === 2 && (
                   <div
