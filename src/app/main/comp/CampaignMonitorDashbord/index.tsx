@@ -332,6 +332,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
     
     if (numericCampaignId) {
       // API 호출
+      setDataList([]);
       fetchCampaignProgressInformation({
         tenantId: 1,
         campaignId: numericCampaignId
@@ -403,7 +404,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
           <div className="border rounded overflow-y-auto h-[calc(100%-20px)]">
             <table className="w-full text-sm border-collapse">
               <tbody>
-                {dataList.length > 0 ? dataList.map((item) => (
+                {dataList.length > 0 ? dataList.map((item, index) => (
                   <tr
                     key={item.reuseCnt}
                     onClick={() => setSelectedCall(item)}
@@ -412,7 +413,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
                     }`}
                   >
                     <td className="border-b border-r px-3 py-1">
-                      {item.reuseCnt === 1 ? '최초발신' : (item.reuseCnt - 1) + '번째 재발신'}
+                      {index === 0 ? '최초발신' : index + '번째 재발신'}
                     </td>
                   </tr>
                 )) : (
