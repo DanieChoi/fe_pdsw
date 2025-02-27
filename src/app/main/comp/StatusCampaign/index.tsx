@@ -3,8 +3,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
-import { useCampainManagerStore, useTabStore, useMainStore } from '@/store';
-import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { useCampainManagerStore, useMainStore } from '@/store';
+import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
 
 interface ChartDataItem {
   name: string;
@@ -15,9 +15,15 @@ interface ChartDataItem {
 // 나중에 실제 API 연동 시 사용할 데이터 타입
 interface DispatchStatusData {
   campaign_id: number;
+  campaign_name: string;
   dispatch_type: string;
   progress: number;
   success: number;
+}
+
+interface DispatchDataType {
+  dispatch_id: number;
+  dispatch_name: string;
 }
 
 const DISPATCH_TYPES = {
@@ -32,18 +38,25 @@ type DispatchType = typeof DISPATCH_TYPES[keyof typeof DISPATCH_TYPES];
 
 const StatusCampaign: React.FC = () => {
   const [selectedSkill, setSelectedSkill] = useState<string>('total');
-  const [selectedDispatch, setSelectedDispatch] = useState<DispatchType>(DISPATCH_TYPES.INITIAL);
+  const [selectedDispatch, setSelectedDispatch] = useState<string>('0');
   const { campaignSkills, setCampaignSkills } = useCampainManagerStore();
   const { campaigns } = useMainStore();
-  const { campaignIdForUpdateFromSideMenu } = useTabStore();
   const [skills, setSkills] = useState<any[]>([]);
   const [chartData, setChartData] = useState<ChartDataItem[]>([]);
-  const [campaignInfo, setCampaignInfo] = useState<MainDataResponse | null>(null);
+  const [campaignInfoList, setCampaignInfoList] = useState<DispatchStatusData[]>([]);
+  const [selectedCampaignId,setSelectedCampaignId ] = useState<number>(0);
+  const [selectedCampaignIdIndex,setSelectedCampaignIdIndex ] = useState<number>(0);
+  const [maxDispatchCount, setMaxDispatchCount ] = useState<number>(0);
+  const [dispatchTypeList, setDispatchTypeList ] = useState<DispatchDataType[]>([]);
 
   // 스킬 조회
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data);
+      fetchCampaignSkills({
+        session_key: '',
+        tenant_id: 0,
+      });
     }
   });
 
@@ -57,51 +70,82 @@ const StatusCampaign: React.FC = () => {
     }
   });
 
-  useEffect(() => {
-    fetchSkills({
-      tenant_id_array: []
-    });
-
-    fetchCampaignSkills({
-      session_key: '',
-      tenant_id: 0,
-    });
-  }, [fetchSkills, fetchCampaignSkills]);
+  // 캠페인 진행 정보 api 호출
+  const { mutate: fetchCampaignProgressInformation } = useApiForCampaignProgressInformation({
+    onSuccess: (data) => {  
+      const tempList = data.progressInfoList.sort((a, b) => a.reuseCnt - b.reuseCnt);
+      if( tempList.length > 0 ){
+        const tempDataList: DispatchStatusData[] = tempList.map((item, i) => ({
+          campaign_id: item.campId,
+          dispatch_type: i.toString(),
+          campaign_name: campaigns[selectedCampaignIdIndex].campaign_name,
+          progress: item.totLstCnt === 0 ? 0 : (item.nonTTCT / item.totLstCnt) * 100,
+          success: item.totLstCnt === 0 ? 0 : (item.scct / item.totLstCnt) * 100,
+        }));
+        setCampaignInfoList(prev => [...prev, ...tempDataList]);
+        if( maxDispatchCount < tempList.length ){
+          setMaxDispatchCount(tempList.length);
+        }
+      }
+      
+      const index = selectedCampaignIdIndex+1;
+      if( index < campaigns.length){
+        setSelectedCampaignId(campaigns[index].campaign_id);
+        setSelectedCampaignIdIndex(index);
+      }else{
+        const tempList = Array.from({ length: maxDispatchCount }, (_, i) => ({
+          dispatch_id: i,
+          dispatch_name: i === 0 ? '최초발신' : `${i}차재발신`
+        }));
+        setDispatchTypeList(tempList);
+        fetchSkills({
+          tenant_id_array: []
+        });
+      }
+    }
+  });
 
   // 테스트용 발신 상태 데이터 생성 함수 (나중에 API로 대체)
-  const generateDispatchStatusData = (campaignId: number) => ({
-    campaign_id: campaignId,
-    최초발신: { progress: Math.floor(Math.random() * 40 + 60), success: Math.floor(Math.random() * 30 + 50) },
-    '1차재발신': { progress: Math.floor(Math.random() * 40 + 60), success: Math.floor(Math.random() * 30 + 50) },
-    '2차재발신': { progress: Math.floor(Math.random() * 40 + 60), success: Math.floor(Math.random() * 30 + 50) },
-    '3차재발신': { progress: Math.floor(Math.random() * 40 + 60), success: Math.floor(Math.random() * 30 + 50) },
-    '4차재발신': { progress: Math.floor(Math.random() * 40 + 60), success: Math.floor(Math.random() * 30 + 50) }
-  });
+  const generateDispatchStatusData = (campaignId: number) => {
+    const tempDataList = campaignInfoList.filter(data => data.campaign_id === campaignId);
+    const temp: { [key: string]: any } = { campaign_id: campaignId };
+
+    for (let j = 0; j < maxDispatchCount; j++) {
+      const data = tempDataList[j] || { progress: 0, success: 0 };
+      temp[`dispatch${j}`] = { progress: data.progress, success: data.success };
+    }
+
+    return temp;
+  };
 
   // 차트 데이터 처리 함수
   const processDataForChart = (
     campaignSkillsData: any[], 
     currentSkill: string, 
-    dispatchType: DispatchType
+    dispatchType: string
   ) => {
-    let filteredCampaigns = campaignSkillsData;
+    let filteredCampaigns = campaignSkillsData.sort((a, b) => b.campaign_id - a.campaign_id);;
     
     // 스킬 필터링
     if (currentSkill !== 'total') {
       filteredCampaigns = campaignSkillsData.filter(campaign => 
         campaign.skill_id?.includes(Number(currentSkill))
       );
+    }else{
+      filteredCampaigns = campaigns.sort((a, b) => b.campaign_id - a.campaign_id);;
     }
 
     // 각 캠페인에 대해 발신 단계 데이터 생성
-    const processedData = filteredCampaigns.map(campaign => {
+    const processedData = filteredCampaigns.map((campaign, index: number) => {
       // 나중에 API에서 받아올 데이터 구조
       const statusData = generateDispatchStatusData(campaign.campaign_id);
+      const dispatchKey = `dispatch${dispatchType}` as keyof typeof statusData;
+      const campaignName = campaigns.filter(data => data.campaign_id === campaign.campaign_id)[0].campaign_name;
 
       return {
-        name: `Campaign ${campaign.campaign_id}`,
-        progress: statusData[dispatchType].progress,
-        success: statusData[dispatchType].success
+        name: `[${campaign.campaign_id}]${campaignName}`,
+        progress: typeof statusData[dispatchKey] === 'object' ? statusData[dispatchKey].progress : 0,
+        success: typeof statusData[dispatchKey] === 'object' ? statusData[dispatchKey].success : 0,
       };
     });
     
@@ -128,11 +172,21 @@ const StatusCampaign: React.FC = () => {
   const chartHeight = Math.max(chartData.length * itemHeight + 100, 300);
 
   useEffect(() => {
-    if( campaigns && campaignIdForUpdateFromSideMenu && campaignIdForUpdateFromSideMenu !== '' ){
-      const tempCampaign = campaigns.filter(data => data.campaign_id === Number(campaignIdForUpdateFromSideMenu))[0];
-      setCampaignInfo( tempCampaign );
+    if( selectedCampaignId > 0 ){      
+      fetchCampaignProgressInformation({
+        tenantId: campaigns[selectedCampaignIdIndex].tenant_id,
+        campaignId: selectedCampaignId
+      });
     }
-  }, [campaignIdForUpdateFromSideMenu,campaigns]);
+  }, [selectedCampaignId,selectedCampaignIdIndex]);
+
+  useEffect(() => {
+    if( campaigns.length > 0 ){
+      setSelectedCampaignId(campaigns[0].campaign_id);
+      setSelectedCampaignIdIndex(0);
+      setCampaignInfoList([]);
+    }
+  }, [campaigns]);
 
   return (
     <div className="">
@@ -156,11 +210,9 @@ const StatusCampaign: React.FC = () => {
             <SelectValue placeholder="최초발신"/>
           </SelectTrigger>
           <SelectContent>
-            {Object.values(DISPATCH_TYPES).map(type => (
-              <SelectItem key={type} value={type}>
-                {type}
-              </SelectItem>
-            ))}
+            { dispatchTypeList.map(option => (
+              <SelectItem key={option.dispatch_id} value={option.dispatch_id+''}>{option.dispatch_name}</SelectItem>
+            )) }
           </SelectContent>
         </Select>
       </div>
@@ -193,8 +245,8 @@ const StatusCampaign: React.FC = () => {
                 fontSize: '14px'
               }}
             />
-            <Bar dataKey="progress" fill="#4AD3C8" name="진행률" />
             <Bar dataKey="success" fill="#FF8DA0" name="성공률" />
+            <Bar dataKey="progress" fill="#4AD3C8" name="진행률" />
           </BarChart>
         </ResponsiveContainer>
       </div>
