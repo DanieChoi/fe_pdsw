@@ -84,7 +84,7 @@ const SystemMonitoring: React.FC = () => {
   // API 호출 및 응답 처리
   const { mutate: systemMonitoring } = useApiForSystemMonitoring({
     onSuccess: (data: ApiResponse) => {
-      console.log("시스템모니터링", data);
+      // console.log("시스템모니터링", data);
       
       // API 응답 데이터를 컴포넌트 데이터 형식으로 변환
       if (data && data.processStatusList && Array.isArray(data.processStatusList)) {
