@@ -610,7 +610,7 @@ const DistributionLimit = () => {
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
-              <CommonButton onClick={handleNew}>신규</CommonButton>
+              {/* <CommonButton onClick={handleNew}>신규</CommonButton> */}
               <CommonButton onClick={handleSave}>저장</CommonButton>
             </div>
 
