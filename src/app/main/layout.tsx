@@ -97,7 +97,7 @@ import Sidebar from '@/components/shared/layout/Sidebar';
 import '@/app/globals.css';
 import Header from '@/widgets/header';
 import Sidebar2 from '@/components/shared/layout/Sidebar2';
-import { useSidebarWidthStore } from '@/components/shared/layout/Sidebar2';
+import { useSidebarWidthStore } from '@/store/useSidebarWidthStore';
 
 const inter = Inter({ subsets: ['latin'] });
 

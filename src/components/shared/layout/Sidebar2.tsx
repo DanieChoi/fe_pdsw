@@ -1,8 +1,174 @@
 
+// "use client";
+
+// import { useState, useEffect } from "react";
+// import { create } from "zustand";
+// import { baseTabs, TabId } from "@/features/campaignManager/components/data/baseTabs";
+// import { TreeMenusForCampaigns } from "@/features/campaignManager/components/treeMenus/TreeMenusForCampaigns";
+// import { TreeMenusForAgentTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentTab";
+// import { TreeMenusForAgentGroupTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentGroupTab";
+// import { TabActions } from "./comp/TabActions";
+// import { BottomTabsForSideMenu } from "./BottomTabsForSideMenu";
+// import Image from 'next/image';
+// import { ChevronLeft, ChevronRight } from "lucide-react";
+
+// interface SidebarToggleButtonProps {
+//   isOpen: boolean;
+//   onClick: () => void;
+// }
+
+// function SidebarToggleButton({ isOpen, onClick }: SidebarToggleButtonProps) {
+//   return (
+//     <button
+//       onClick={onClick}
+//       className="sidebar-button
+//                 transition-all duration-300 ease-in-out z-30"
+//     >
+//       {isOpen ? (
+//         <ChevronLeft className="w-3 h-3 text-gray-600" />
+//       ) : (
+//         <ChevronRight className="w-3 h-3 text-gray-600" />
+//       )}
+//     </button>
+//   );
+// }
+
+// interface SidebarWidthState {
+//   width: number;
+//   isOpen: boolean;
+//   setWidth: (width: number) => void;
+//   setIsOpen: (isOpen: boolean) => void;
+// }
+
+// export const useSidebarWidthStore = create<SidebarWidthState>((set) => ({
+//   width: 240,
+//   isOpen: true,
+//   setWidth: (width: number) => set({ width }),
+//   setIsOpen: (isOpen: boolean) => set({ isOpen }),
+// }));
+
+// export default function SidebarContainer() {
+//   const storeWidth = useSidebarWidthStore(state => state.width);
+//   const storeIsOpen = useSidebarWidthStore(state => state.isOpen);
+//   const setStoreWidth = useSidebarWidthStore(state => state.setWidth);
+//   const setStoreIsOpen = useSidebarWidthStore(state => state.setIsOpen);
+
+//   const [selectedTabId, setSelectedTabId] = useState<TabId>("campaign");
+//   const [isResizing, setIsResizing] = useState(false);
+
+//   const handleResizeStart = () => {
+//     setIsResizing(true);
+//   };
+
+//   const handleMouseMove = (e: MouseEvent) => {
+//     if (!isResizing) return;
+//     const newWidth = e.clientX;
+//     const clampedWidth = Math.max(200, Math.min(600, newWidth));
+//     setStoreWidth(clampedWidth);
+//   };
+
+//   const handleMouseUp = () => {
+//     setIsResizing(false);
+//   };
+
+//   const toggleSidebar = () => {
+//     setStoreIsOpen(!storeIsOpen);
+//   };
+
+//   useEffect(() => {
+//     if (isResizing) {
+//       window.addEventListener("mousemove", handleMouseMove);
+//       window.addEventListener("mouseup", handleMouseUp);
+//     }
+//     return () => {
+//       window.removeEventListener("mousemove", handleMouseMove);
+//       window.removeEventListener("mouseup", handleMouseUp);
+//     };
+//   }, [isResizing]);
+
+//   const renderTreeMenu = () => {
+//     switch (selectedTabId) {
+//       case "campaign":
+//         return <TreeMenusForCampaigns />;
+//       case "agent":
+//         return <TreeMenusForAgentTab />;
+//       case "agent-group":
+//         return <TreeMenusForAgentGroupTab />;
+//       default:
+//         return null;
+//     }
+//   };
+
+//   return (
+//     <div className="flex h-full bg-white border-r relative">
+//       <div
+//         className="flex flex-col transition-all duration-300 ease-in-out relative"
+//         style={{
+//           width: storeIsOpen ? `${storeWidth}px` : '0',
+//         }}
+//       >
+//         {/* Main Content Area */}
+//         <div className="flex-1 relative flex flex-col min-h-0">
+//           <div className={`absolute inset-0 flex flex-col transition-all duration-300 ease-in-out
+//                         ${!storeIsOpen ? 'invisible' : ''}`}>
+//             {/* 상단 헤더 */}
+//             <div className="flex-none flex items-center justify-between py-1.5 px-[20px] border-b">
+//               <div className="flex items-center gap-2">
+//                 <div className="text-sm text-[#444] font-medium flex gap-2 items-center">
+//                   <div>
+//                     {selectedTabId && (
+//                       <Image
+//                         src={baseTabs.find((tab) => tab.id === selectedTabId)?.icon || "/tree-menu/campaign_icon_for_sidemenu.png"}
+//                         alt={baseTabs.find((tab) => tab.id === selectedTabId)?.label || "탭아이콘"}
+//                         width={baseTabs.find((tab) => tab.id === selectedTabId)?.iconWidth || 13}
+//                         height={baseTabs.find((tab) => tab.id === selectedTabId)?.iconHeight || 13}
+//                       />
+//                     )}
+//                   </div>
+//                   {baseTabs.find((tab) => tab.id === selectedTabId)?.label}
+//                 </div>
+//               </div>
+//               <div className="flex items-center justify-end ">
+//                 <TabActions tabId={selectedTabId} />
+//               </div>
+//             </div>
+
+//             {/* 트리메뉴 영역 - 스크롤 가능한 컨테이너 */}
+//             <div className="flex-1 min-h-0 relative">
+//               <div id="tree-menu-contaner" className="absolute inset-0 overflow-y-auto">
+//                 {renderTreeMenu()}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* 하단 탭 메뉴 */}
+//         <div className={`flex-none transition-all duration-300 ease-in-out 
+//                       ${!storeIsOpen ? 'scale-x-[0.125] origin-left' : ''}`}>
+//           <BottomTabsForSideMenu
+//             selectedTabId={selectedTabId}
+//             onTabChange={setSelectedTabId}
+//           />
+//         </div>
+//       </div>
+
+//       {/* 토글 버튼 */}
+//       <SidebarToggleButton isOpen={storeIsOpen} onClick={toggleSidebar} />
+
+//       {/* 리사이즈 핸들 */}
+//       {storeIsOpen && (
+//         <div
+//           className="w-[1px] cursor-col-resize bg-[#FBFBFB] hover:bg-[#5BC2C1] active:bg-[#5BC2C1] group_col"
+//           onMouseDown={handleResizeStart}
+//         />
+//       )}
+//     </div>
+//   );
+// }
+
 "use client";
 
 import { useState, useEffect } from "react";
-import { create } from "zustand";
 import { baseTabs, TabId } from "@/features/campaignManager/components/data/baseTabs";
 import { TreeMenusForCampaigns } from "@/features/campaignManager/components/treeMenus/TreeMenusForCampaigns";
 import { TreeMenusForAgentTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentTab";
@@ -11,6 +177,7 @@ import { TabActions } from "./comp/TabActions";
 import { BottomTabsForSideMenu } from "./BottomTabsForSideMenu";
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useSidebarWidthStore } from "@/store/useSidebarWidthStore"; // 경로 조정 필요
 
 interface SidebarToggleButtonProps {
   isOpen: boolean;
@@ -21,8 +188,7 @@ function SidebarToggleButton({ isOpen, onClick }: SidebarToggleButtonProps) {
   return (
     <button
       onClick={onClick}
-      className="sidebar-button
-                transition-all duration-300 ease-in-out z-30"
+      className="sidebar-button transition-all duration-300 ease-in-out z-30"
     >
       {isOpen ? (
         <ChevronLeft className="w-3 h-3 text-gray-600" />
@@ -33,28 +199,26 @@ function SidebarToggleButton({ isOpen, onClick }: SidebarToggleButtonProps) {
   );
 }
 
-interface SidebarWidthState {
-  width: number;
-  isOpen: boolean;
-  setWidth: (width: number) => void;
-  setIsOpen: (isOpen: boolean) => void;
-}
-
-export const useSidebarWidthStore = create<SidebarWidthState>((set) => ({
-  width: 240,
-  isOpen: true,
-  setWidth: (width: number) => set({ width }),
-  setIsOpen: (isOpen: boolean) => set({ isOpen }),
-}));
-
 export default function SidebarContainer() {
-  const storeWidth = useSidebarWidthStore(state => state.width);
-  const storeIsOpen = useSidebarWidthStore(state => state.isOpen);
-  const setStoreWidth = useSidebarWidthStore(state => state.setWidth);
-  const setStoreIsOpen = useSidebarWidthStore(state => state.setIsOpen);
+  // 스토어에서 값과 액션 가져오기
+  const {
+    width,
+    isOpen,
+    minWidth,
+    maxWidth,
+    currentTabId,
+    setWidth,
+    setIsOpen,
+    setCurrentTabId
+  } = useSidebarWidthStore();
 
-  const [selectedTabId, setSelectedTabId] = useState<TabId>("campaign");
+  const [selectedTabId, setSelectedTabId] = useState<TabId>(currentTabId || "campaign");
   const [isResizing, setIsResizing] = useState(false);
+
+  // 탭 변경 시 스토어에 현재 탭 ID 업데이트
+  useEffect(() => {
+    setCurrentTabId(selectedTabId);
+  }, [selectedTabId, setCurrentTabId]);
 
   const handleResizeStart = () => {
     setIsResizing(true);
@@ -63,8 +227,12 @@ export default function SidebarContainer() {
   const handleMouseMove = (e: MouseEvent) => {
     if (!isResizing) return;
     const newWidth = e.clientX;
-    const clampedWidth = Math.max(200, Math.min(600, newWidth));
-    setStoreWidth(clampedWidth);
+    const clampedWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
+    
+    // 전역 너비 및 현재 탭의 너비 업데이트
+    setWidth(clampedWidth);
+    // 현재 탭의 너비도 저장
+    useSidebarWidthStore.getState().setTabWidth(selectedTabId, clampedWidth);
   };
 
   const handleMouseUp = () => {
@@ -72,9 +240,15 @@ export default function SidebarContainer() {
   };
 
   const toggleSidebar = () => {
-    setStoreIsOpen(!storeIsOpen);
+    setIsOpen(!isOpen);
   };
 
+  // 탭 변경 핸들러
+  const handleTabChange = (tabId: TabId) => {
+    setSelectedTabId(tabId);
+  };
+
+  // 마우스 이벤트 리스너
   useEffect(() => {
     if (isResizing) {
       window.addEventListener("mousemove", handleMouseMove);
@@ -100,17 +274,17 @@ export default function SidebarContainer() {
   };
 
   return (
-    <div className="flex h-full bg-white border-r relative">
+    <div className="flex h-full bg-white border-r relative sidebar-container">
       <div
         className="flex flex-col transition-all duration-300 ease-in-out relative"
         style={{
-          width: storeIsOpen ? `${storeWidth}px` : '0',
+          width: isOpen ? `${width}px` : '0',
         }}
       >
         {/* Main Content Area */}
         <div className="flex-1 relative flex flex-col min-h-0">
           <div className={`absolute inset-0 flex flex-col transition-all duration-300 ease-in-out
-                        ${!storeIsOpen ? 'invisible' : ''}`}>
+                        ${!isOpen ? 'invisible' : ''}`}>
             {/* 상단 헤더 */}
             <div className="flex-none flex items-center justify-between py-1.5 px-[20px] border-b">
               <div className="flex items-center gap-2">
@@ -128,14 +302,14 @@ export default function SidebarContainer() {
                   {baseTabs.find((tab) => tab.id === selectedTabId)?.label}
                 </div>
               </div>
-              <div className="flex items-center justify-end ">
+              <div className="flex items-center justify-end">
                 <TabActions tabId={selectedTabId} />
               </div>
             </div>
 
             {/* 트리메뉴 영역 - 스크롤 가능한 컨테이너 */}
             <div className="flex-1 min-h-0 relative">
-              <div id="tree-menu-contaner" className="absolute inset-0 overflow-y-auto">
+              <div id="tree-menu-container" className="absolute inset-0 overflow-y-auto">
                 {renderTreeMenu()}
               </div>
             </div>
@@ -144,19 +318,19 @@ export default function SidebarContainer() {
 
         {/* 하단 탭 메뉴 */}
         <div className={`flex-none transition-all duration-300 ease-in-out 
-                      ${!storeIsOpen ? 'scale-x-[0.125] origin-left' : ''}`}>
+                      ${!isOpen ? 'scale-x-[0.125] origin-left' : ''}`}>
           <BottomTabsForSideMenu
             selectedTabId={selectedTabId}
-            onTabChange={setSelectedTabId}
+            onTabChange={handleTabChange}
           />
         </div>
       </div>
 
       {/* 토글 버튼 */}
-      <SidebarToggleButton isOpen={storeIsOpen} onClick={toggleSidebar} />
+      <SidebarToggleButton isOpen={isOpen} onClick={toggleSidebar} />
 
       {/* 리사이즈 핸들 */}
-      {storeIsOpen && (
+      {isOpen && (
         <div
           className="w-[1px] cursor-col-resize bg-[#FBFBFB] hover:bg-[#5BC2C1] active:bg-[#5BC2C1] group_col"
           onMouseDown={handleResizeStart}

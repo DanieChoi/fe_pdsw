@@ -9,16 +9,17 @@ import { SearchBarForSideMenuForCounselorTab } from "./searchbar/SearchBarForSid
 import { findCounselorInfo } from "./searchbar/utilsForSideMenuForCounselorTab";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
 import { toast } from "react-toastify";
+import { Button } from "@/components/ui/button";
 
 export function TreeMenusForAgentTab() {
   const { tenant_id, role_id } = useAuthStore();
   const { data, isLoading } = useApiForSidebarCounselor(
-    tenant_id.toString(), 
+    tenant_id.toString(),
     role_id.toString()
   );
 
   console.log("데이터 로드 완료 - 상담원 탭:", data);
-  
+
   const [searchTerm, setSearchTerm] = useState("");
   const setSelectedCounselor = useCounselorFilterStore(state => state.setSelectedCounselor);
 
@@ -37,22 +38,22 @@ export function TreeMenusForAgentTab() {
   useEffect(() => {
     if (data?.organizationList) {
       const initialExpanded = new Set<string>();
-      
+
       data.organizationList.forEach(org => {
         if (defaultExpanded.organization) {
           initialExpanded.add(`org-${org.centerId}`);
         }
-        
+
         org.tenantInfo?.forEach(tenant => {
           if (defaultExpanded.tenant) {
             initialExpanded.add(`tenant-${tenant.tenantId}`);
           }
-          
+
           tenant.groupInfo?.forEach(group => {
             if (defaultExpanded.group) {
               initialExpanded.add(`group-${group.groupId}`);
             }
-            
+
             group.teamInfo?.forEach(team => {
               if (defaultExpanded.team) {
                 initialExpanded.add(`team-${team.teamId}`);
@@ -61,7 +62,7 @@ export function TreeMenusForAgentTab() {
           });
         });
       });
-      
+
       setExpandedNodes(initialExpanded);
     }
   }, [data]);
@@ -80,11 +81,11 @@ export function TreeMenusForAgentTab() {
 
   const handleSearch = () => {
     if (!searchTerm.trim() || !data?.organizationList) return;
-  
+
     const counselorInfo = findCounselorInfo(data.organizationList, searchTerm);
     if (counselorInfo) {
       console.log("검색된 상담원 정보:", counselorInfo);
-      
+
       // 상담원 선택 상태 업데이트
       setSelectedNodeId(counselorInfo.counselorId);
       setSelectedCounselor(
@@ -92,28 +93,28 @@ export function TreeMenusForAgentTab() {
         counselorInfo.counselorName,
         counselorInfo.tenantId
       );
-  
+
       // 경로상의 모든 노드 확장
       const newExpanded = new Set(expandedNodes);
       counselorInfo.paths.forEach(path => newExpanded.add(path));
       setExpandedNodes(newExpanded);
-  
+
       // DOM 업데이트를 위한 짧은 지연 후 스크롤 실행
       setTimeout(() => {
         // 트리 메뉴의 스크롤 컨테이너 찾기
         const scrollContainer = document.querySelector('.tree-node');
         const targetElement = document.getElementById(`counselor-${counselorInfo.counselorId}`);
-        
+
         if (scrollContainer && targetElement) {
           // 스크롤 컨테이너 내에서 요소의 위치 계산
           const containerRect = scrollContainer.getBoundingClientRect();
           const elementRect = targetElement.getBoundingClientRect();
-          
+
           // 요소가 스크롤 영역의 중앙에 오도록 스크롤 위치 조정
           scrollContainer.scrollTop = (
-            targetElement.offsetTop - 
-            (scrollContainer as HTMLElement).offsetTop - 
-            (scrollContainer.clientHeight / 2) + 
+            targetElement.offsetTop -
+            (scrollContainer as HTMLElement).offsetTop -
+            (scrollContainer.clientHeight / 2) +
             (targetElement.clientHeight / 2)
           );
         }
@@ -135,21 +136,27 @@ export function TreeMenusForAgentTab() {
         onChange={setSearchTerm}
         onSearch={handleSearch}
       />
-      <div className="flex-1 overflow-y-auto min-h-0 tree-node">
-        {data?.organizationList.map((org) => (
-          <TreeNodeForCounselorListForSideBar
-            key={`org-${org.centerId}`}
-            data={org}
-            type="organization"
-            level={0}
-            expandedNodes={expandedNodes}
-            selectedNodeId={selectedNodeId}
-            onNodeToggle={handleNodeToggle}
-            onNodeSelect={setSelectedNodeId}
-            defaultExpanded={defaultExpanded}
+
+      <div className="flex overflow-y-auto min-h-0 tree-node">
+        <div>
+          {data?.organizationList.map((org) => (
+            <TreeNodeForCounselorListForSideBar
+              key={`org-${org.centerId}`}
+              data={org}
+              type="organization"
+              level={0}
+              expandedNodes={expandedNodes}
+              selectedNodeId={selectedNodeId}
+              onNodeToggle={handleNodeToggle}
+              onNodeSelect={setSelectedNodeId}
+              defaultExpanded={defaultExpanded}
             // Organization 레벨에서는 parentTenantId가 필요 없음
-          />
-        ))}
+            />
+          ))}
+        </div>
+        <div>
+          <Button>메뉴 버튼</Button>
+        </div>
       </div>
     </div>
   );
