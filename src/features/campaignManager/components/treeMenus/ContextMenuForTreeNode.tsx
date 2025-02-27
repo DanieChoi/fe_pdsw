@@ -106,16 +106,17 @@ export function ContextMenuForTreeNode({
     });
   };
 
-  const handleMonitorClick = () => {
+  const handleMonitorClick = (campaignId: any, campaignName: string) => {
     const uniqueKey = `monitor-${Date.now()}`;
     
     addMultiTab({
       id: 22,
       uniqueKey: uniqueKey,
-      title: '상담원 상태 모니터',
+      title: `상담원 상태 모니터 - ${campaignName}`,
       icon: '',
       href: '',
       content: null,
+      campaignId: campaignId  // 캠페인 ID 설정
     });
   };
 
@@ -260,8 +261,7 @@ export function ContextMenuForTreeNode({
 
           <ContextMenuSeparator />
 
-          <ContextMenuItem onClick={handleMonitorClick}>
-            {/* <Monitor className="mr-2 h-4 w-4" /> */}
+          <ContextMenuItem onClick={() => handleMonitorClick(item.id, item.label)}>
             상담원 상태 모니터
           </ContextMenuItem>
 
