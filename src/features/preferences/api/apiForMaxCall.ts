@@ -68,7 +68,7 @@ export const updateMaxCall = async (credentials: CreateMaxCallRequest): Promise<
             {
                 agent_id: credentials.agent_id,
                 max_call: credentials.max_call,
-                fix_fleg: credentials.fix_flag
+                fix_flag: credentials.fix_flag
             }
         ]
     };
