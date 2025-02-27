@@ -8,6 +8,7 @@ import { TreeNodeForCounselorListForSideBar } from "./TreeNodeForCounselorListFo
 import { SearchBarForSideMenuForCounselorTab } from "./searchbar/SearchBarForSideMenuForCounselorTab";
 import { findCounselorInfo } from "./searchbar/utilsForSideMenuForCounselorTab";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
+import { toast } from "react-toastify";
 
 export function TreeMenusForAgentTab() {
   const { tenant_id, role_id } = useAuthStore();
@@ -118,6 +119,7 @@ export function TreeMenusForAgentTab() {
         }
       }, 100);
     } else {
+      toast.error("상담원을 찾을 수 없습니다.");
       console.log("상담원을 찾을 수 없습니다:", searchTerm);
     }
   };

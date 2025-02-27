@@ -584,21 +584,21 @@ const getValidCounselorIds = () => {
           </div>
 
           {/* 디버깅 버튼 */}
-          <div className="mb-2">
+          {/* <div className="mb-2">
             <button
               onClick={toggleRawData}
               className="text-xs text-blue-500 underline"
             >
               {showRawData ? '원본 데이터 숨기기' : '원본 데이터 보기 (디버깅용)'}
             </button>
-          </div>
+          </div> */}
 
           {/* 디버깅용 Raw 데이터 표시 */}
-          {showRawData && (
+          {/* {showRawData && (
             <div className="mb-4 overflow-auto max-h-[150px] text-xs border rounded p-2 bg-gray-50 whitespace-pre">
               {JSON.stringify(candidateMembersForSkilAssign, null, 2)}
             </div>
-          )}
+          )} */}
 
           {/* 상담원 목록 표시 */}
           <div className="mb-4">

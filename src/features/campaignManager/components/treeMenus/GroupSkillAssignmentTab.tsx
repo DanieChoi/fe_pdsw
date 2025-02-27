@@ -322,7 +322,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
           </div>
 
           {/* 디버깅 버튼 - 개발 환경에서만 표시 */}
-          {process.env.NODE_ENV === 'development' && (
+          {/* {process.env.NODE_ENV === 'development' && (
             <div className="mb-2">
               <button
                 onClick={toggleRawData}
@@ -331,7 +331,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
                 {showRawData ? '원본 데이터 숨기기' : '원본 데이터 보기 (디버깅용)'}
               </button>
             </div>
-          )}
+          )} */}
 
           {/* 디버깅용 Raw 데이터 표시 */}
           {showRawData && (

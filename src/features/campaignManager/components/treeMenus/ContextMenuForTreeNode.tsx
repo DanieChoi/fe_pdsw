@@ -13,7 +13,8 @@ import {
 import { useTabStore } from "@/store/tabStore";
 import {
   Edit, Copy, Activity, Trash2, Monitor, Settings, Search, List, Clock, History,
-  UserCheck, Shield, RefreshCcw, AlertTriangle, Check
+  UserCheck, Shield, RefreshCcw, AlertTriangle, Check,
+  ChevronRight
 } from "lucide-react";
 import { useState } from "react";
 import BlackListCountPopup from '@/features/campaignManager/components/popups/BlackListCountPopup';
@@ -21,6 +22,7 @@ import { toast } from 'react-toastify';
 import { useApiForCampaignStatusUpdate } from "../../hooks/useApiForCampaignStatusUpdate";
 import { useApiForCampaignBlacklistCount } from "@/features/listManager/hooks/useApiForCampaignBlacklistCount";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
+import { Separator } from "@radix-ui/react-select";
 export type CampaignStatus = 'started' | 'pending' | 'stopped';
 
 interface ContextMenuForTreeNodeProps {
@@ -121,10 +123,10 @@ export function ContextMenuForTreeNode({
   };
 
   const onCampaignDelete = (status: string, campaignId: any, campaignName: string) => {
-    console.log('캠페인 삭제 클릭 : ' , status);
+    console.log('캠페인 삭제 클릭 : ', status);
     const uniqueKey = `monitor-${Date.now()}`;
 
-    if(status !== 'stopped') {
+    if (status !== 'stopped') {
       toast.error("캠페인이 중지 상태일 때만 삭제할 수 있습니다.", {
         position: "top-center",
         autoClose: 3000,
@@ -229,9 +231,8 @@ export function ContextMenuForTreeNode({
             캠페인 수정
           </ContextMenuItem>
 
-          <ContextMenuSub>
+          {/* <ContextMenuSub>
             <ContextMenuSubTrigger>
-              {/* <Search className="mr-2 h-4 w-4" /> */}
               시작구분
             </ContextMenuSubTrigger>
             <ContextMenuSubContent className="w-[35px]">
@@ -260,8 +261,50 @@ export function ContextMenuForTreeNode({
                 중지
               </ContextMenuItem>
             </ContextMenuSubContent>
-          </ContextMenuSub>
+          </ContextMenuSub> */}
+          <ContextMenuSub>
+            <ContextMenuSubTrigger className="flex items-center text-sm font-medium px-2 py-1.5 hover:bg-gray-50 rounded">
+              시작구분
+            </ContextMenuSubTrigger>
+            <ContextMenuSubContent className="min-w-[80px] p-1 rounded-md border border-gray-200 shadow-md bg-white">
+              <ContextMenuItem
+                onClick={() => handleStartClick('started')}
+                className="flex items-center text-sm px-3 py-1.5 hover:bg-blue-50 rounded-sm"
+                disabled={updateCampaignStatusMutation.isPending}
+              >
+                <div className="w-4 h-4 mr-2 flex-shrink-0">
+                  {renderStatusCheckbox('started')}
+                </div>
+                <span>시작</span>
+              </ContextMenuItem>
 
+              <Separator className="my-1 h-px bg-gray-100" />
+
+              <ContextMenuItem
+                onClick={() => handleStartClick('pending')}
+                className="flex items-center text-sm px-3 py-1.5 hover:bg-blue-50 rounded-sm"
+                disabled={updateCampaignStatusMutation.isPending}
+              >
+                <div className="w-4 h-4 mr-2 flex-shrink-0">
+                  {renderStatusCheckbox('pending')}
+                </div>
+                <span>멈춤</span>
+              </ContextMenuItem>
+
+              <Separator className="my-1 h-px bg-gray-100" />
+
+              <ContextMenuItem
+                onClick={() => handleStartClick('stopped')}
+                className="flex items-center text-sm px-3 py-1.5 hover:bg-blue-50 rounded-sm"
+                disabled={updateCampaignStatusMutation.isPending}
+              >
+                <div className="w-4 h-4 mr-2 flex-shrink-0">
+                  {renderStatusCheckbox('stopped')}
+                </div>
+                <span>중지</span>
+              </ContextMenuItem>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
 
           <ContextMenuItem onClick={() => handleProgressInfoClick(item.id, item.label)}>
             캠페인 진행정보
