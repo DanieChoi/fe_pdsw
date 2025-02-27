@@ -359,8 +359,6 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
     rest: false
   });
 
-  // 정렬 관련 상태
-  const [sortField, setSortField] = useState<SortField>('time');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   const [agentData, setAgentData] = useState<AgentData[]>([
