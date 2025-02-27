@@ -314,7 +314,7 @@ const renderContent = (tabId: number | null, campaignId?: string) => {
       // 캠페인 ID를 props로 전달
       return <CampaignMonitorDashbord campaignId={campaignId} />;
     case 22:
-      return <AgentStatusMonitoring campaignId={campaignId} />;
+      return <AgentStatusMonitoring campaignId={Number(campaignId)} />;
     case 23:
       return <SystemMonitoring />;
     case 100:

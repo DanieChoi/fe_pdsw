@@ -347,7 +347,7 @@ type SortField = 'time' | 'agent' | 'name' | 'status';
 type SortDirection = 'asc' | 'desc';
 
 interface AgentStatusMonitoringProps {
-  campaignId?: string;
+  campaignId?: number;
 }
 
 const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignId }) => {
