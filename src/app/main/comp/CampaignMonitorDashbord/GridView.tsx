@@ -209,7 +209,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                     <Label>진행률(%)</Label>
                   </TableHeader>
                   <TableCell className="text-center text-sm">
-                  {(selectedCall?.totDialCnt || 0) === 0?0:(selectedCall?.totLstCnt || 0)/(selectedCall?.totDialCnt || 0)*100 }
+                  {(selectedCall?.totLstCnt || 0) === 0?0:(selectedCall?.nonTTCT || 0)/(selectedCall?.totLstCnt || 0)*100 }
                   </TableCell>
                   <TableHeader className="w-[160px]">
                     <Label>리스트 대비 성공률 (%)</Label>
