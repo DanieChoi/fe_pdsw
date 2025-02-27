@@ -87,6 +87,7 @@ const DistributionLimit = () => {
       setSelectedCampaignName(campaign.campaign_name);
       setSelectedCampaign(campaign);
     }
+    handleNew();
   };
 
   // 캠페인 모달에서 선택 시 핸들러
@@ -97,6 +98,7 @@ const DistributionLimit = () => {
     if (campaign) {
       setSelectedCampaign(campaign);
     }
+    handleNew();
   };
 
   // 필터링된 rows를 계산하는 함수
@@ -215,7 +217,7 @@ const DistributionLimit = () => {
                 ...row,
                 max_dist: maxCallInfo.max_call.toString(),
                 current_resp: maxCallInfo.answered_call.toString(),
-                fix_flag: maxCallInfo.fix_flag === 1 ? 'Y' : 'N'
+                fix_flag: maxCallInfo.fix_flag === 1 ? 'Y' : 'N'  
               };
             }
             // 매칭되는 정보가 없으면 기존 row 반환
@@ -325,23 +327,23 @@ const DistributionLimit = () => {
       showAlert('필수 필드를 입력해주세요.');
       return;
     }
-
+  
     const maxDist = parseInt(formData.maxDist);
     if (isNaN(maxDist) || maxDist < 0) {
       showAlert('최대 분배호수는 0 이상의 숫자로 입력해주세요.');
       return;
     }
-
+  
     const saveData = {
       campaign_id: parseInt(selectedCampaignId),
       agent_id: formData.agentId,
       max_call: maxDist,
       fix_flag: formData.fix_flag === 'Y' ? 1 : 0
     };
-
+  
     const existingRow = rows.find(row => row.agent_id === formData.agentId);
     const isUpdate = existingRow && existingRow.max_dist !== '0';
-
+  
     showConfirm(`${isUpdate ? '수정' : '신규 등록'}하시겠습니까?`, () => {
       if (isUpdate) {
         updateMaxCallMutation(saveData, {
