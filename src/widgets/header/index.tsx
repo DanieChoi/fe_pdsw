@@ -48,6 +48,7 @@ export default function Header() {
     }
 };
   const {
+    tenants,
     setCampaigns,
     setTenants,
     setCounselers,
@@ -143,10 +144,10 @@ export default function Header() {
         // fetchSkills({
         //   tenant_id_array: tempTenantIdArray
         // });
-        fetchMain({
-          session_key: _sessionKey,
-          tenant_id: _tenantId
-        });
+        // fetchMain({
+        //   session_key: _sessionKey,
+        //   tenant_id: _tenantId
+        // });
       }
     },
     onError: (error) => {
@@ -162,6 +163,15 @@ export default function Header() {
       }
     }
   });
+  
+  useEffect(() => {
+    if( tenants.length > 0 ){
+      fetchMain({
+        session_key: _sessionKey,
+        tenant_id: _tenantId
+      });
+    }
+  }, [tenants]);
 
   useEffect(() => {
     // console.log('Fetching tenants with:', { _sessionKey, _tenantId });
