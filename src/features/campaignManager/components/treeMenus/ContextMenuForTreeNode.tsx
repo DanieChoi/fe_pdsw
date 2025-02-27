@@ -53,9 +53,9 @@ export function ContextMenuForTreeNode({
 
   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
     onSuccess: (data) => {
-      
+
       toast.success("캠페인 상태가 성공적으로 변경되었습니다.", {
-        position: "top-right",
+        position: "top-center",
         autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
@@ -65,7 +65,7 @@ export function ContextMenuForTreeNode({
     },
     onError: (error) => {
       toast.error(error.message || "상태 변경 중 오류가 발생했습니다.", {
-        position: "top-right",
+        position: "top-center",
         autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
@@ -108,7 +108,7 @@ export function ContextMenuForTreeNode({
 
   const handleMonitorClick = (campaignId: any, campaignName: string) => {
     const uniqueKey = `monitor-${Date.now()}`;
-    
+
     addMultiTab({
       id: 22,
       uniqueKey: uniqueKey,
@@ -120,10 +120,22 @@ export function ContextMenuForTreeNode({
     });
   };
 
-  const onCampaignDelete = (campaignId: any, campaignName: string) => {
-    console.log('캠페인 삭제 클릭');
+  const onCampaignDelete = (status: string, campaignId: any, campaignName: string) => {
+    console.log('캠페인 삭제 클릭 : ' , status);
     const uniqueKey = `monitor-${Date.now()}`;
-    
+
+    if(status !== 'stopped') {
+      toast.error("캠페인이 중지 상태일 때만 삭제할 수 있습니다.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      return;
+    }
+
     addTab({
       id: 131,
       uniqueKey: uniqueKey,
@@ -270,7 +282,7 @@ export function ContextMenuForTreeNode({
           </ContextMenuItem>
           {/* () => onCampaignDelete(item.id, item.label) */}
           {!isFolder && (
-            <ContextMenuItem onClick={() => onCampaignDelete(item.id, item.label)} className="text-red-500">
+            <ContextMenuItem onClick={() => onCampaignDelete(item.status, item.id, item.label)} className="text-red-500">
               {/* <Trash2 className="mr-2 h-4 w-4" /> */}
               캠페인 삭제
             </ContextMenuItem>

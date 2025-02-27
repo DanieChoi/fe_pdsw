@@ -318,6 +318,7 @@ export interface NotificationTabParam {
   supervisor_phone: string;
 }
 
+
 export default function CampaignDetail() {
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
