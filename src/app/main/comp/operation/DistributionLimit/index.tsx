@@ -98,7 +98,7 @@ const DistributionLimit = () => {
     if (campaign) {
       setSelectedCampaign(campaign);
     }
-    handleNew();
+    handleNew(); 
   };
 
   // 필터링된 rows를 계산하는 함수
