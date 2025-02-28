@@ -1,7 +1,7 @@
 // "use client";
 
 // import { Search } from 'lucide-react';
-// import { KeyboardEvent, useState, useEffect, useRef } from 'react';
+// import { KeyboardEvent, useState, useEffect, useRef, MouseEvent as ReactMouseEvent } from 'react';
 
 // interface Counselor {
 //   counselorId: string;
@@ -30,11 +30,20 @@
 //   const [showSuggestions, setShowSuggestions] = useState(false);
 //   const suggestionRef = useRef<HTMLDivElement>(null);
 //   const inputRef = useRef<HTMLInputElement>(null);
+//   // 검색 완료 또는 항목 선택 완료 후 상태를 추적하는 변수 추가
+//   const [recentlySelected, setRecentlySelected] = useState(false);
 
 //   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
 //     if (e.key === 'Enter') {
+//       e.preventDefault();
+//       e.stopPropagation();
 //       onSearch();
 //       setShowSuggestions(false);
+//       setRecentlySelected(true);
+//       // 검색 후 포커스를 제거하여 제안이 다시 나타나지 않도록 함
+//       if (inputRef.current) {
+//         inputRef.current.blur();
+//       }
 //     } else if (e.key === 'Escape') {
 //       setShowSuggestions(false);
 //     }
@@ -42,9 +51,16 @@
 
 //   // 입력값이 변경될 때마다 자동완성 목록 업데이트
 //   useEffect(() => {
+//     // 최근에 선택했으면 제안 표시 안함
+//     if (recentlySelected) {
+//       setRecentlySelected(false);
+//       return;
+//     }
+    
 //     if (value.length >= 2 && counselors.length > 0) {
 //       const filtered = counselors.filter(counselor => 
-//         counselor.counselorName.toLowerCase().includes(value.toLowerCase())
+//         counselor.counselorName.toLowerCase().includes(value.toLowerCase()) && 
+//         counselor.counselorName.toLowerCase() !== value.toLowerCase() // 정확히 일치하는 항목은 제외
 //       );
 //       setSuggestions(filtered);
 //       setShowSuggestions(filtered.length > 0);
@@ -52,11 +68,11 @@
 //       setSuggestions([]);
 //       setShowSuggestions(false);
 //     }
-//   }, [value, counselors]);
+//   }, [value, counselors, recentlySelected]);
 
 //   // 외부 클릭 시 자동완성 닫기
 //   useEffect(() => {
-//     const handleClickOutside = (event: MouseEvent) => {
+//     const handleClickOutside = (event: globalThis.MouseEvent) => {
 //       if (
 //         suggestionRef.current && 
 //         !suggestionRef.current.contains(event.target as Node) &&
@@ -76,8 +92,13 @@
 //   const handleSuggestionClick = (counselor: Counselor) => {
 //     onChange(counselor.counselorName);
 //     setShowSuggestions(false);
+//     setRecentlySelected(true);
 //     if (onSelectCounselor) {
 //       onSelectCounselor(counselor.counselorId, counselor.counselorName, counselor.tenantId);
+//     }
+//     // 선택 후 포커스를 제거하여 제안이 다시 나타나지 않도록 함
+//     if (inputRef.current) {
+//       inputRef.current.blur();
 //     }
 //   };
 
@@ -90,7 +111,12 @@
 //           value={value}
 //           onChange={(e) => onChange(e.target.value)}
 //           onKeyDown={handleKeyDown}
-//           onFocus={() => value.length >= 2 && suggestions.length > 0 && setShowSuggestions(true)}
+//           onFocus={() => {
+//             // 최근에 선택한 경우가 아닐 때만 제안 표시
+//             if (!recentlySelected && value.length >= 2 && suggestions.length > 0) {
+//               setShowSuggestions(true);
+//             }
+//           }}
 //           placeholder={placeholder}
 //           className="w-full pl-2 pr-7 py-1 text-xs border rounded focus:outline-none focus:border-[#5BC2C1]"
 //         />
@@ -98,6 +124,11 @@
 //           onClick={() => {
 //             onSearch();
 //             setShowSuggestions(false);
+//             setRecentlySelected(true);
+//             // 검색 후 포커스를 제거
+//             if (inputRef.current) {
+//               inputRef.current.blur();
+//             }
 //           }}
 //           className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
 //         >
@@ -156,21 +187,44 @@ export function SearchBarForSideMenuForCounselorTab({
 }: SearchBarProps) {
   const [suggestions, setSuggestions] = useState<Counselor[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const suggestionRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   // 검색 완료 또는 항목 선택 완료 후 상태를 추적하는 변수 추가
   const [recentlySelected, setRecentlySelected] = useState(false);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'ArrowDown') {
       e.preventDefault();
-      e.stopPropagation();
-      onSearch();
-      setShowSuggestions(false);
-      setRecentlySelected(true);
-      // 검색 후 포커스를 제거하여 제안이 다시 나타나지 않도록 함
-      if (inputRef.current) {
-        inputRef.current.blur();
+      if (!showSuggestions && suggestions.length > 0) {
+        setShowSuggestions(true);
+        setHighlightedIndex(0);
+      } else {
+        setHighlightedIndex((prev) => {
+          const nextIndex = prev + 1 >= suggestions.length ? 0 : prev + 1;
+          return nextIndex;
+        });
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex((prev) => {
+        const nextIndex = prev - 1 < 0 ? suggestions.length - 1 : prev - 1;
+        return nextIndex;
+      });
+    } else if (e.key === 'Enter') {
+      if (showSuggestions && highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleSuggestionClick(suggestions[highlightedIndex]);
+      } else {
+        e.preventDefault();
+        e.stopPropagation();
+        onSearch();
+        setShowSuggestions(false);
+        setRecentlySelected(true);
+        if (inputRef.current) {
+          inputRef.current.blur();
+        }
       }
     } else if (e.key === 'Escape') {
       setShowSuggestions(false);
@@ -179,7 +233,6 @@ export function SearchBarForSideMenuForCounselorTab({
 
   // 입력값이 변경될 때마다 자동완성 목록 업데이트
   useEffect(() => {
-    // 최근에 선택했으면 제안 표시 안함
     if (recentlySelected) {
       setRecentlySelected(false);
       return;
@@ -192,9 +245,11 @@ export function SearchBarForSideMenuForCounselorTab({
       );
       setSuggestions(filtered);
       setShowSuggestions(filtered.length > 0);
+      setHighlightedIndex(filtered.length > 0 ? 0 : -1);
     } else {
       setSuggestions([]);
       setShowSuggestions(false);
+      setHighlightedIndex(-1);
     }
   }, [value, counselors, recentlySelected]);
 
@@ -224,7 +279,6 @@ export function SearchBarForSideMenuForCounselorTab({
     if (onSelectCounselor) {
       onSelectCounselor(counselor.counselorId, counselor.counselorName, counselor.tenantId);
     }
-    // 선택 후 포커스를 제거하여 제안이 다시 나타나지 않도록 함
     if (inputRef.current) {
       inputRef.current.blur();
     }
@@ -240,7 +294,6 @@ export function SearchBarForSideMenuForCounselorTab({
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => {
-            // 최근에 선택한 경우가 아닐 때만 제안 표시
             if (!recentlySelected && value.length >= 2 && suggestions.length > 0) {
               setShowSuggestions(true);
             }
@@ -253,7 +306,6 @@ export function SearchBarForSideMenuForCounselorTab({
             onSearch();
             setShowSuggestions(false);
             setRecentlySelected(true);
-            // 검색 후 포커스를 제거
             if (inputRef.current) {
               inputRef.current.blur();
             }
@@ -269,10 +321,12 @@ export function SearchBarForSideMenuForCounselorTab({
             ref={suggestionRef}
             className="absolute z-10 w-full mt-1 bg-white border rounded shadow-lg max-h-40 overflow-y-auto"
           >
-            {suggestions.map((counselor) => (
+            {suggestions.map((counselor, index) => (
               <div
                 key={counselor.counselorId}
-                className="px-2 py-1 text-xs hover:bg-gray-100 cursor-pointer"
+                className={`px-2 py-1 text-xs cursor-pointer ${
+                  index === highlightedIndex ? "bg-gray-200" : "hover:bg-gray-100"
+                }`}
                 onClick={() => handleSuggestionClick(counselor)}
               >
                 {counselor.counselorName}
