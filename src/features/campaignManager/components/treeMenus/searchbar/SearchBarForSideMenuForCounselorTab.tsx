@@ -1,45 +1,173 @@
-// src\features\campaignManager\components\treeMenus\searchbar\SearchBarForSideMenuForCounselorTab.tsx
+// // src\features\campaignManager\components\treeMenus\searchbar\SearchBarForSideMenuForCounselorTab.tsx
+// "use client";
+
+// import { Search } from 'lucide-react';
+// import { KeyboardEvent } from 'react';
+
+// interface SearchBarProps {
+//   value: string;
+//   onChange: (value: string) => void;
+//   onSearch: () => void;
+//   placeholder?: string;
+// }
+
+// export function SearchBarForSideMenuForCounselorTab({ 
+//   value, 
+//   onChange, 
+//   onSearch,
+//   placeholder = "상담원"
+// }: SearchBarProps) {
+//   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+//     if (e.key === 'Enter') {
+//       onSearch();
+//     }
+//   };
+
+//   return (
+//     <div className="flex items-center gap-2 px-2 py-1.5 border-b">
+//       <div className="relative flex-1">
+//         <input
+//           type="text"
+//           value={value}
+//           onChange={(e) => onChange(e.target.value)}
+//           onKeyDown={handleKeyDown}
+//           placeholder={placeholder}
+//           className="w-full pl-2 pr-8 py-1 text-sm border rounded focus:outline-none focus:border-[#5BC2C1]"
+//         />
+//         <button 
+//           onClick={onSearch}
+//           className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+//         >
+//           <Search size={16} />
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
 "use client";
 
 import { Search } from 'lucide-react';
-import { KeyboardEvent } from 'react';
+import { KeyboardEvent, useState, useEffect, useRef } from 'react';
+
+interface Counselor {
+  counselorId: string;
+  counselorName: string;
+  tenantId: string;
+}
 
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
   onSearch: () => void;
   placeholder?: string;
+  counselors?: Counselor[]; // 전체 상담원 목록 받기
+  onSelectCounselor?: (counselorId: string, counselorName: string, tenantId: string) => void;
 }
 
 export function SearchBarForSideMenuForCounselorTab({ 
   value, 
   onChange, 
   onSearch,
-  placeholder = "상담원"
+  placeholder = "상담원",
+  counselors = [],
+  onSelectCounselor
 }: SearchBarProps) {
+  const [suggestions, setSuggestions] = useState<Counselor[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const suggestionRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       onSearch();
+      setShowSuggestions(false);
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+    }
+  };
+
+  // 입력값이 변경될 때마다 자동완성 목록 업데이트
+  useEffect(() => {
+    if (value.length >= 2 && counselors.length > 0) {
+      const filtered = counselors.filter(counselor => 
+        counselor.counselorName.toLowerCase().includes(value.toLowerCase())
+      );
+      setSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [value, counselors]);
+
+  // 외부 클릭 시 자동완성 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        suggestionRef.current && 
+        !suggestionRef.current.contains(event.target as Node) &&
+        inputRef.current && 
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleSuggestionClick = (counselor: Counselor) => {
+    onChange(counselor.counselorName);
+    setShowSuggestions(false);
+    if (onSelectCounselor) {
+      onSelectCounselor(counselor.counselorId, counselor.counselorName, counselor.tenantId);
     }
   };
 
   return (
-    <div className="flex items-center gap-2 px-2 py-1.5 border-b">
-      <div className="relative flex-1">
+    <div className="w-full py-1 px-1">
+      <div className="relative w-full">
         <input
+          ref={inputRef}
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
+          onFocus={() => value.length >= 2 && suggestions.length > 0 && setShowSuggestions(true)}
           placeholder={placeholder}
-          className="w-full pl-2 pr-8 py-1 text-sm border rounded focus:outline-none focus:border-[#5BC2C1]"
+          className="w-full pl-2 pr-7 py-1 text-xs border rounded focus:outline-none focus:border-[#5BC2C1]"
         />
         <button 
-          onClick={onSearch}
+          onClick={() => {
+            onSearch();
+            setShowSuggestions(false);
+          }}
           className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
         >
-          <Search size={16} />
+          <Search size={14} />
         </button>
+        
+        {/* 자동완성 드롭다운 */}
+        {showSuggestions && (
+          <div 
+            ref={suggestionRef}
+            className="absolute z-10 w-full mt-1 bg-white border rounded shadow-lg max-h-40 overflow-y-auto"
+          >
+            {suggestions.map((counselor) => (
+              <div
+                key={counselor.counselorId}
+                className="px-2 py-1 text-xs hover:bg-gray-100 cursor-pointer"
+                onClick={() => handleSuggestionClick(counselor)}
+              >
+                {counselor.counselorName}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -27,14 +27,14 @@ export function CounselorTreeLevelSelector({
         <Button 
           variant="outline" 
           size="sm"
-          className="text-xs py-1 h-8 ml-auto flex items-center gap-1"
+          className="text-xs py-1 h-7 flex items-center gap-1"
         >
           {/* <Layers size={14} /> */}
-          level
+          lev 
           <ChevronDown size={14} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-36 p-1" align="end">
+      <PopoverContent className="w-32 p-1" align="end">
         <div className="flex flex-col gap-1">
           <Button 
             variant="ghost" 
