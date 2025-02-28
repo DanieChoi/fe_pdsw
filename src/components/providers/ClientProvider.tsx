@@ -32,7 +32,7 @@ export default function ClientProvider({ children }: { children: React.ReactNode
       />
 
       {/* React Query 개발자 도구 */}
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
   );
 }
