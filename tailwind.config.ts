@@ -67,6 +67,7 @@ export default {
 		  },
 		  maxWidth: {
 			'modal': '800px',  // 이렇게 하면 max-w-modal로 사용 가능
+			'modal-lm': '620px',
 			'modal-lg': '1024px',
 			'modal-sm': '480px',
 		  }

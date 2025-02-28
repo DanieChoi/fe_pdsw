@@ -14,6 +14,8 @@ import { useApiForCampaignProgressInformation } from '@/features/monitoring/hook
 import { CampaignProgressInformationResponseDataType } from '@/features/monitoring/types/monitoringIndex';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
+// 모달
+import ColumnSet from './ColumnSet';
 
 interface CampaignData {
   id: string;
@@ -276,6 +278,7 @@ export default function Campaignprogress() {
   const [campaignInfoList, setCampaignInfoList] = useState<DispatchStatusDataType[]>([]);
   const [skills, setSkills] = useState<any[]>([]);
   const { campaignSkills, setCampaignSkills } = useCampainManagerStore();
+  const [isColumnSetOpen, setIsColumnSetOpen] = useState(false);
 
   // 캠페인 ID 목록 생성
   // const campaignOptions = useMemo(() => {
@@ -654,6 +657,8 @@ export default function Campaignprogress() {
     }
   }, [campaigns]);
 
+
+
   return (
     <div className="limit-width">
       <TitleWrap
@@ -720,7 +725,7 @@ export default function Campaignprogress() {
         </div>
         <div className="flex justify-end gap-2">
           <CommonButton variant="secondary">엑셀로 저장</CommonButton>
-          <CommonButton variant="secondary">칼럼 설정</CommonButton>
+          <CommonButton variant="secondary" onClick={() => setIsColumnSetOpen(true)}>칼럼 설정</CommonButton>
         </div>
       </div>
       <div className="h-[500px] w-full grid-custom-wrap">
@@ -741,6 +746,12 @@ export default function Campaignprogress() {
           }}
         />
       </div>
+      <ColumnSet
+          isOpen={isColumnSetOpen}
+          onClose={() => setIsColumnSetOpen(false)}
+          onConfirm={() => setIsColumnSetOpen(false)}
+          columns={columns}
+        />
     </div>
   );
 }
