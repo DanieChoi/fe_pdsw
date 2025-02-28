@@ -43,7 +43,7 @@ export function CounselorTreeLevelSelector({
             className="text-xs py-0.5 h-7 justify-start"
           >
             <Image src="/tree-menu/organization.png" alt="조직" width={14} height={12} className="mr-1" />
-            1. 조직직
+            1. 조직
           </Button>
           <Button 
             variant="ghost" 
