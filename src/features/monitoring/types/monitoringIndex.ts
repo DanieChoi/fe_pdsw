@@ -34,12 +34,12 @@ export interface CampaignProgressInformationResponseDataType {
   totDialCnt: number;                 //총 발신 건수
   acct: number;                       //기계음 실패 건수
   scct: number;                       //발신 성공 건수
-  overDial: number;                   //Over Dial
+  overDial: number;                   //대기 상담원 없음
   nonTTCT: number;                    //순수 발신 건수
   campListQuery: string;              //List Query
   tect: number;                       //전화번호 오류 건수
   blackList: number;                  //통화방지 리스트
-  abct: number;                       //포기 분배 실패
+  abct: number;                       //상담원 연결 실패
   retryCall: number;                  //재시도 콜(현재 버퍼에 남은 Call 중 재시도 할 Call수)
   dialingCall: number;                //발신 중인 콜
   nonServiceCnt: number;              //고객 최대시간 초과

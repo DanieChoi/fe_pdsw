@@ -298,7 +298,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                         </TableRow>
                         <TableRow>
                           <TableHeader className="w-[170px]"><Label>대기 상담원 없음</Label></TableHeader>
-                          <TableCell className="text-center text-sm">{selectedCall?.noAgentCnt||0}</TableCell>
+                          <TableCell className="text-center text-sm">{selectedCall?.overDial||0}</TableCell>
                         </TableRow>
                         <TableRow>
                           <TableHeader className="w-[170px]"><Label>상담원 연결</Label></TableHeader>
@@ -418,11 +418,11 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                         </TableRow>
                         <TableRow>
                           <TableHeader className="w-[200px]"><Label>블랙리스트</Label></TableHeader>
-                          <TableCell className="text-center text-sm">{selectedCall?.nogaddBL || 0}</TableCell>
+                          <TableCell className="text-center text-sm">{selectedCall?.blackList || 0}</TableCell>
                         </TableRow>
                         <TableRow>
                           <TableHeader className="w-[200px]"><Label>실시간 리스트 삭제</Label></TableHeader>
-                          <TableCell className="text-center text-sm">{selectedCall?.deleteBeforeDial || 0}</TableCell>
+                          <TableCell className="text-center text-sm">{selectedCall?.nogdeleteGL || 0}</TableCell>
                         </TableRow>
                         <TableRow>
                           <TableHeader className="w-[200px]"><Label>스케줄 설정 실패</Label></TableHeader>
@@ -451,6 +451,10 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                         <TableRow>
                           <TableHeader className="w-[200px]"><Label>발신확인 전 상담원 상태 변경</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.nogautoDialNoReady || 0}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableHeader className="w-[200px]"><Label>발신확인 전 상담원 모드 변경</Label></TableHeader>
+                          <TableCell className="text-center text-sm">{selectedCall?.nogautoPopFailMode || 0}</TableCell>
                         </TableRow>
                         <TableRow>
                           <TableHeader className="w-[200px]"><Label>지정 상담원 정보 미입력</Label></TableHeader>
