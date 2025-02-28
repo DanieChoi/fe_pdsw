@@ -20,12 +20,18 @@ interface Row {
   max_dist: string;
   current_resp: string;
   fix_flag: string;
+  isGroupHeader?: boolean;  // 그룹 헤더인지 여부
+  isExpanded?: boolean;     // 확장 상태
+  level?: number;           // 깊이 레벨 (0: 센터, 1: 그룹, 2: 파트, 3: 상담원)
+  parentId?: string;       // 부모 ID
 }
 
 const DistributionLimit = () => {
   const { tenant_id, role_id } = useAuthStore();
   const { campaigns, setSelectedCampaign } = useMainStore();
-  const [rows, setRows] = useState<Row[]>([]);
+  const [rawRows, setRawRows] = useState<Row[]>([]);
+  const [displayRows, setDisplayRows] = useState<Row[]>([]);
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   const [selectedRow, setSelectedRow] = useState<Row | null>(null);
   const [selectedCampaignId, setSelectedCampaignId] = useState('');
   const [selectedCampaignName, setSelectedCampaignName] = useState('');
@@ -106,7 +112,8 @@ const DistributionLimit = () => {
     switch (viewFilter) {
       case 'remaining':
         // 잔여 호수가 남은 상담원 (최대 분배호수 > 현재 응답호수)
-        return rows.filter(row => {
+        return rawRows.filter(row => {
+          if (row.isGroupHeader) return false;
           const maxDist = parseInt(row.max_dist);
           const currentResp = parseInt(row.current_resp);
           return maxDist > currentResp && (maxDist > 0 || currentResp > 0);
@@ -114,7 +121,8 @@ const DistributionLimit = () => {
       
       case 'no-remaining':
         // 잔여 호수가 없는 상담원 (최대 분배호수 = 현재 응답호수)
-        return rows.filter(row => {
+        return rawRows.filter(row => {
+          if (row.isGroupHeader) return false;
           const maxDist = parseInt(row.max_dist);
           const currentResp = parseInt(row.current_resp);
           return maxDist === currentResp && (maxDist > 0 || currentResp > 0);
@@ -122,7 +130,8 @@ const DistributionLimit = () => {
       
       case 'no-limit':
         // 최대 분배호수가 설정되지 않은 상담원 (데이터가 없거나 둘 다 0인 경우)
-        return rows.filter(row => {
+        return rawRows.filter(row => {
+          if (row.isGroupHeader) return false;
           const maxDist = parseInt(row.max_dist);
           const currentResp = parseInt(row.current_resp);
           return maxDist === 0 && currentResp === 0;
@@ -130,7 +139,8 @@ const DistributionLimit = () => {
       
       case 'has-limit':
         // 최대 분배호수가 설정된 상담원 (최대 분배호수나 현재 응답호수 중 하나라도 값이 있는 경우)
-        return rows.filter(row => {
+        return rawRows.filter(row => {
+          if (row.isGroupHeader) return false;
           const maxDist = parseInt(row.max_dist);
           const currentResp = parseInt(row.current_resp);
           return maxDist > 0 || currentResp > 0;
@@ -138,9 +148,136 @@ const DistributionLimit = () => {
       
       default:
         // 전체 상담원
-        return rows;
+        return rawRows;
     }
-  }, [rows, viewFilter]);
+  }, [rawRows, viewFilter]);
+
+  // 행의 키 생성 함수
+  const getRowKey = (row: Row): string => {
+    if (row.level === 0) return row.center;
+    if (row.level === 1) return `${row.parentId}-${row.group}`;
+    if (row.level === 2) return `${row.parentId}-${row.part}`;
+    return `agent-${row.agent_id}`;
+  };
+
+  // 계층 구조를 처리하여 표시할 rows 생성
+  useEffect(() => {
+    if (filteredRows.length === 0) {
+      setDisplayRows([]);
+      return;
+    }
+
+    // 데이터를 계층 구조로 변환
+    const centers = new Set<string>();
+    const groups = new Map<string, Set<string>>();
+    const parts = new Map<string, Set<string>>();
+    
+    // 유니크한 센터, 그룹, 파트 수집
+    filteredRows.forEach(row => {
+      if (!row.isGroupHeader) {
+        centers.add(row.center);
+        
+        const centerKey = row.center;
+        if (!groups.has(centerKey)) {
+          groups.set(centerKey, new Set());
+        }
+        groups.get(centerKey)?.add(row.group);
+        
+        const groupKey = `${row.center}-${row.group}`;
+        if (!parts.has(groupKey)) {
+          parts.set(groupKey, new Set());
+        }
+        parts.get(groupKey)?.add(row.part);
+      }
+    });
+
+    const hierarchicalRows: Row[] = [];
+
+    // 센터 레벨 추가
+    [...centers].sort().forEach(center => {
+      const isExpanded = expandedGroups[center] !== false; // 기본적으로 확장
+
+      hierarchicalRows.push({
+        center: center,
+        group: '',
+        part: '',
+        agent_id: '',
+        agent_name: '',
+        max_dist: '',
+        current_resp: '',
+        fix_flag: '',
+        isGroupHeader: true,
+        isExpanded: isExpanded,
+        level: 0,
+      });
+
+      if (isExpanded && groups.has(center)) {
+        // 그룹 레벨 추가
+        [...groups.get(center)!].sort().forEach(group => {
+          const groupParentId = center;
+          const groupKey = `${center}-${group}`;
+          const isGroupExpanded = expandedGroups[groupKey] !== false; // 기본적으로 확장
+
+          hierarchicalRows.push({
+            center: '',
+            group: group,
+            part: '',
+            agent_id: '',
+            agent_name: '',
+            max_dist: '',
+            current_resp: '',
+            fix_flag: '',
+            isGroupHeader: true,
+            isExpanded: isGroupExpanded,
+            level: 1,
+            parentId: groupParentId,
+          });
+
+          if (isGroupExpanded && parts.has(`${center}-${group}`)) {
+            // 파트 레벨 추가 
+            [...parts.get(`${center}-${group}`)!].sort().forEach(part => {
+              const partParentId = groupKey;
+              const partKey = `${groupKey}-${part}`;
+              const isPartExpanded = expandedGroups[partKey] !== false; // 기본적으로 확장
+
+              hierarchicalRows.push({
+                center: '',
+                group: '',
+                part: part,
+                agent_id: '',
+                agent_name: '',
+                max_dist: '',
+                current_resp: '',
+                fix_flag: '',
+                isGroupHeader: true,
+                isExpanded: isPartExpanded,
+                level: 2,
+                parentId: partParentId,
+              });
+
+              if (isPartExpanded) {
+                // 에이전트 추가
+                const agentsInPart = filteredRows.filter(
+                  row => !row.isGroupHeader && row.center === center && row.group === group && row.part === part
+                );
+                
+                // 에이전트 정렬
+                agentsInPart.sort((a, b) => a.agent_id.localeCompare(b.agent_id)).forEach(agent => {
+                  hierarchicalRows.push({
+                    ...agent,
+                    level: 3,
+                    parentId: partKey
+                  });
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+
+    setDisplayRows(hierarchicalRows);
+  }, [filteredRows, expandedGroups]);
 
   // 캠페인별 상담원 목록 조회
   const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
@@ -191,14 +328,14 @@ const DistributionLimit = () => {
           });
         });
         
-        setRows(counselorRows);
+        setRawRows(counselorRows);
       } else {
-        setRows([]);
+        setRawRows([]);
       }
     },
     onError: (error) => {
       console.error('상담원 목록 조회 실패:', error);
-      setRows([]);
+      setRawRows([]);
     }
   });
 
@@ -206,7 +343,7 @@ const DistributionLimit = () => {
   const { mutate: fetchMaxCallList } = useApiForMaxCallList({
     onSuccess: (maxCallResponse) => {
       if (maxCallResponse?.result_data) {
-        setRows(prevRows => {
+        setRawRows(prevRows => {
           return prevRows.map(row => {
             const maxCallInfo = maxCallResponse.result_data.find(
               call => call.agent_id === row.agent_id
@@ -263,7 +400,7 @@ const DistributionLimit = () => {
       });
     } else {
       setCampaignAgents([]);
-      setRows([]);
+      setRawRows([]);
     }
   }, [selectedCampaignId, fetchCampaignAgentList, fetchMaxCallInitTimeList]);
   
@@ -279,12 +416,12 @@ const DistributionLimit = () => {
 
   // 캠페인이 선택되고 상담원 목록이 로드된 후에 분배호수 제한 설정 조회
   useEffect(() => {
-    if (selectedCampaignId && rows.length > 0) {
+    if (selectedCampaignId && rawRows.length > 0) {
       fetchMaxCallList({
         campaign_id: [Number(selectedCampaignId)]
       });
     }
-  }, [selectedCampaignId, rows.length, fetchMaxCallList]);
+  }, [selectedCampaignId, rawRows.length, fetchMaxCallList]);
   
 
   const [isTimeSettingOpen, setIsTimeSettingOpen] = useState(false);
@@ -341,7 +478,7 @@ const DistributionLimit = () => {
       fix_flag: formData.fix_flag === 'Y' ? 1 : 0
     };
   
-    const existingRow = rows.find(row => row.agent_id === formData.agentId);
+    const existingRow = rawRows.find(row => row.agent_id === formData.agentId);
     const isUpdate = existingRow && existingRow.max_dist !== '0';
   
     showConfirm(`${isUpdate ? '수정' : '신규 등록'}하시겠습니까?`, () => {
@@ -381,29 +518,133 @@ const DistributionLimit = () => {
     });
   };
 
+  // 그룹 토글 핸들러
+  const toggleGroupExpansion = (row: Row) => {
+    if (row.isGroupHeader) {
+      const key = getRowKey(row);
+      setExpandedGroups(prev => ({
+        ...prev,
+        [key]: !(prev[key] !== false)
+      }));
+    }
+  };
+
   const columns = useMemo(() => [
-    { key: 'center', name: '상담센터' },
-    { key: 'group', name: '상담그룹' },
-    { key: 'part', name: '상담파트' },
-    { key: 'agent_id', name: '상담원 아이디' },
-    { key: 'agent_name', name: '상담원 이름' },
-    { key: 'max_dist', name: '최대 분배호수' },
-    { key: 'current_resp', name: '현재 응답호수' },
-    { key: 'fix_flag', name: '호수 고정' }
+    { 
+      key: 'center', 
+      name: '상담센터',
+      formatter: ({ row }: { row: Row }) => {
+        if (row.level === 0) {
+          // 센터 레벨
+          const icon = row.isExpanded ? '-' : '+';
+          return (
+            <div 
+              className="flex items-center cursor-pointer" 
+              onClick={() => toggleGroupExpansion(row)}
+            >
+              <span className="mr-1">{icon}</span>
+              <span className="font-medium">{row.center}</span>
+            </div>
+          );
+        } else if (row.level === 1) {
+          // 그룹 레벨
+          const icon = row.isExpanded ? '-' : '+';
+          return (
+            <div 
+              className="flex items-center cursor-pointer pl-4" 
+              onClick={() => toggleGroupExpansion(row)}
+            >
+              <span className="mr-1">{icon}</span>
+              <span className="font-medium">{row.group}</span>
+            </div>
+          );
+        } else if (row.level === 2) {
+          // 파트 레벨
+          const icon = row.isExpanded ? '-' : '+';
+          return (
+            <div 
+              className="flex items-center cursor-pointer pl-8" 
+              onClick={() => toggleGroupExpansion(row)}
+            >
+              <span className="mr-1">{icon}</span>
+              <span className="font-medium">{row.part}</span>
+            </div>
+          );
+        } else {
+          // 상담원 레벨 (이 열에서는 빈 값)
+          return <div className="pl-12"></div>;
+        }
+      }
+    },
+    { 
+      key: 'group', 
+      name: '상담그룹',
+      formatter: ({ row }: { row: Row }) => {
+        return row.level === 3 ? row.group : '';
+      }
+    },
+    { 
+      key: 'part', 
+      name: '상담파트',
+      formatter: ({ row }: { row: Row }) => {
+        return row.level === 3 ? row.part : '';
+      }
+    },
+    { 
+      key: 'agent_id', 
+      name: '상담원 아이디',
+      formatter: ({ row }: { row: Row }) => {
+        return row.level === 3 ? row.agent_id : '';
+      }
+    },
+    { 
+      key: 'agent_name', 
+      name: '상담원 이름',
+      formatter: ({ row }: { row: Row }) => {
+        return row.level === 3 ? row.agent_name : '';
+      }
+    },
+    { 
+      key: 'max_dist', 
+      name: '최대 분배호수',
+      formatter: ({ row }: { row: Row }) => {
+        return row.level === 3 ? row.max_dist : '';
+      }
+    },
+    { 
+      key: 'current_resp', 
+      name: '현재 응답호수',
+      formatter: ({ row }: { row: Row }) => {
+        return row.level === 3 ? row.current_resp : '';
+      }
+    },
+    { 
+      key: 'fix_flag', 
+      name: '호수 고정',
+      formatter: ({ row }: { row: Row }) => {
+        return row.level === 3 ? row.fix_flag : '';
+      }
+    }
   ], []);
   
   const handleCellClick = ({ row }: { row: Row }) => {
-    setSelectedRow(row);
-    setFormData({
-      center: row.center,
-      group: row.group,
-      part: row.part,
-      agentId: row.agent_id,
-      agentName: row.agent_name,
-      maxDist: row.max_dist,
-      currentResp: row.current_resp,
-      fix_flag: row.fix_flag
-    });
+    // 상담원 행만 선택 가능
+    if (row.level === 3) {
+      setSelectedRow(row);
+      setFormData({
+        center: row.center,
+        group: row.group,
+        part: row.part,
+        agentId: row.agent_id,
+        agentName: row.agent_name,
+        maxDist: row.max_dist,
+        currentResp: row.current_resp,
+        fix_flag: row.fix_flag
+      });
+    } else if (row.isGroupHeader) {
+      // 헤더 행 클릭 시 토글
+      toggleGroupExpansion(row);
+    }
   };
 
   const handleNew = () => {
@@ -416,7 +657,7 @@ const DistributionLimit = () => {
       agentName: '',
       maxDist: '',
       currentResp: '',
-      fix_flag: 'all'
+      fix_flag: 'N'
     });
   };
 
@@ -425,7 +666,12 @@ const DistributionLimit = () => {
   };
 
   const getRowClass = (row: Row) => {
-    return selectedRow?.agent_id === row.agent_id ? 'bg-[#FFFAEE]' : '';
+    // 선택된 행은 강조 표시
+    if (selectedRow && row.level === 3 && row.agent_id === selectedRow.agent_id) {
+      return 'bg-[#FFFAEE]';
+    }
+    
+    return '';
   };
 
   return (
@@ -441,7 +687,6 @@ const DistributionLimit = () => {
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="캠페인선택" />
               </SelectTrigger>
-              {/* 스크롤이 없어서 셀렉트 값이 다 안보여서 스크롤 추가 */}
               <SelectContent style={{ maxHeight: '300px', overflowY: 'auto' }}> 
                 {campaigns.map(campaign => (
                   <SelectItem 
@@ -479,7 +724,6 @@ const DistributionLimit = () => {
         <div className="flex gap-2">
           <CommonButton onClick={() => setIsTimeSettingOpen(true)}>초기화시간 변경</CommonButton>
           <CommonButton onClick={() => setIsTimeRemoveOpen(true)}>초기화시간 설정해제</CommonButton>
-          {/* <CommonButton onClick={handleSave}>적용</CommonButton> */}
         </div>
       </div>
 
@@ -510,11 +754,11 @@ const DistributionLimit = () => {
           <div className='grid-custom-wrap h-[400px]'>
             <DataGrid
               columns={columns}
-              rows={filteredRows} 
+              rows={displayRows} 
               className="grid-custom"
               onCellClick={handleCellClick}
-              rowKeyGetter={(row) => row.agent_id}
-              selectedRows={selectedRow ? new Set<string>([selectedRow.agent_id]) : new Set<string>()}
+              rowKeyGetter={getRowKey}
+              selectedRows={selectedRow ? new Set<string>([getRowKey(selectedRow)]) : new Set<string>()}
               rowHeight={30}
               headerRowHeight={30}
               rowClass={getRowClass}
@@ -610,7 +854,6 @@ const DistributionLimit = () => {
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
-              {/* <CommonButton onClick={handleNew}>신규</CommonButton> */}
               <CommonButton onClick={handleSave}>저장</CommonButton>
             </div>
 
