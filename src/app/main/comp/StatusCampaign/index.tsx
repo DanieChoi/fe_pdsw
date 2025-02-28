@@ -124,7 +124,7 @@ const StatusCampaign: React.FC = () => {
     currentSkill: string, 
     dispatchType: string
   ) => {
-    let filteredCampaigns = campaignSkillsData.sort((a, b) => b.campaign_id - a.campaign_id);;
+    let filteredCampaigns = campaignSkillsData.sort((a, b) => b.campaign_id - a.campaign_id);
     
     // 스킬 필터링
     if (currentSkill !== 'total') {
@@ -132,12 +132,12 @@ const StatusCampaign: React.FC = () => {
         campaign.skill_id?.includes(Number(currentSkill))
       );
     }else{
-      filteredCampaigns = campaigns.sort((a, b) => b.campaign_id - a.campaign_id);;
+      filteredCampaigns = campaigns.sort((a, b) => b.campaign_id - a.campaign_id);
     }
 
     // 각 캠페인에 대해 발신 단계 데이터 생성
     const processedData = filteredCampaigns.map((campaign, index: number) => {
-      // 나중에 API에서 받아올 데이터 구조
+      // API에서 받아올 데이터 구조
       const statusData = generateDispatchStatusData(campaign.campaign_id);
       const dispatchKey = `dispatch${dispatchType}` as keyof typeof statusData;
       const campaignName = campaigns.filter(data => data.campaign_id === campaign.campaign_id)[0].campaign_name;
