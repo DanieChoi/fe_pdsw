@@ -129,7 +129,7 @@
 "use client";
 
 import { Search } from 'lucide-react';
-import { KeyboardEvent, useState, useEffect, useRef, MouseEvent } from 'react';
+import { KeyboardEvent, useState, useEffect, useRef, MouseEvent as ReactMouseEvent } from 'react';
 
 interface Counselor {
   counselorId: string;
@@ -200,7 +200,7 @@ export function SearchBarForSideMenuForCounselorTab({
 
   // 외부 클릭 시 자동완성 닫기
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: globalThis.MouseEvent) => {
       if (
         suggestionRef.current && 
         !suggestionRef.current.contains(event.target as Node) &&
