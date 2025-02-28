@@ -231,7 +231,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
             </TableRow>
             <TableRow>
               <TableCell className="text-sm !text-center">
-                {selectedCall?.noAgentCnt||0}
+                {selectedCall?.overDial||0}
               </TableCell>
               <TableCell className="text-sm !text-center">
                 {selectedCall?.agentConnect||0}
