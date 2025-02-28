@@ -107,102 +107,82 @@ interface SidebarWidthState {
 }
 
 export const useSidebarWidthStore = create<SidebarWidthState>((set, get) => {
-  // 값 변경 여부 체크하는 헬퍼 함수 (불필요한 렌더링 방지)
+  // 헬퍼 함수: 변경된 값만 업데이트하여 불필요한 렌더링 방지
   const updateIfChanged = (stateUpdater: (state: SidebarWidthState) => Partial<SidebarWidthState>) => {
     const state = get();
     const updates = stateUpdater(state);
-    
-    // 변경된 값이 있는지 확인 (얕은 비교)
     const hasChanges = Object.entries(updates).some(
       ([key, value]) => state[key as keyof SidebarWidthState] !== value
     );
-    
-    // 변경된 값이 있을 때만 상태 업데이트
     if (hasChanges) {
       set(updates);
     }
   };
 
   return {
-    // 상태
+    // 초기 상태
     width: 240,
     isOpen: true,
     minWidth: 200,
     maxWidth: 400,
     currentTabId: "campaign",
     tabWidths: {
-      "campaign": 240,   // 캠페인 탭 - 좁은 너비
-      "agent": 320,      // 상담원 탭 - 넓은 너비
-      "agent-group": 280 // 그룹 탭 - 중간 너비
+      "campaign": 240,
+      "agent": 320,
+      "agent-group": 280,
     },
     isResizing: false,
     
-    // 액션
-    setWidth: (width: number) => updateIfChanged(state => {
+    // 액션들
+    setWidth: (width: number) => updateIfChanged((state) => {
       const clampedWidth = Math.max(state.minWidth, Math.min(state.maxWidth, width));
       if (state.width === clampedWidth) return {};
       return { width: clampedWidth };
     }),
     
-    setIsOpen: (isOpen: boolean) => updateIfChanged(state => {
+    setIsOpen: (isOpen: boolean) => updateIfChanged((state) => {
       if (state.isOpen === isOpen) return {};
       return { isOpen };
     }),
     
-    setMinWidth: (minWidth: number) => updateIfChanged(state => {
+    setMinWidth: (minWidth: number) => updateIfChanged((state) => {
       if (state.minWidth === minWidth) return {};
       return { minWidth };
     }),
     
-    setMaxWidth: (maxWidth: number) => updateIfChanged(state => {
+    setMaxWidth: (maxWidth: number) => updateIfChanged((state) => {
       if (state.maxWidth === maxWidth) return {};
       return { maxWidth };
     }),
     
-    setIsResizing: (isResizing: boolean) => updateIfChanged(state => {
+    setIsResizing: (isResizing: boolean) => updateIfChanged((state) => {
       if (state.isResizing === isResizing) return {};
       return { isResizing };
     }),
     
-    setTabWidth: (tabId: TabId, width: number) => updateIfChanged(state => {
+    setTabWidth: (tabId: TabId, width: number) => updateIfChanged((state) => {
       const clampedWidth = Math.max(state.minWidth, Math.min(state.maxWidth, width));
-      
-      // 해당 탭의 너비가 변경되지 않았으면 업데이트 안함
       if (state.tabWidths[tabId] === clampedWidth) {
         return {};
       }
-      
       const newTabWidths = { ...state.tabWidths, [tabId]: clampedWidth };
-      
-      // 현재 선택된 탭이면 전역 너비도 업데이트, 아니면 탭 너비만 업데이트
       if (state.currentTabId === tabId) {
-        return { 
-          tabWidths: newTabWidths, 
-          width: clampedWidth 
-        };
+        return { tabWidths: newTabWidths, width: clampedWidth };
       } else {
         return { tabWidths: newTabWidths };
       }
     }),
     
-    setCurrentTabId: (tabId: TabId) => updateIfChanged(state => {
-      // 같은 탭 선택이면 변경 안함
-      if (state.currentTabId === tabId) {
-        return {};
-      }
-      
-      // 해당 탭의 저장된 너비 가져오기
+    setCurrentTabId: (tabId: TabId) => updateIfChanged((state) => {
+      if (state.currentTabId === tabId) return {};
       const tabWidth = state.tabWidths[tabId] || state.width;
-      return { 
-        currentTabId: tabId,
-        width: tabWidth
-      };
+      return { currentTabId: tabId, width: tabWidth };
     }),
     
     getTabWidth: (tabId: TabId) => {
       const state = get();
       const width = state.tabWidths[tabId] || state.width;
       return Math.max(state.minWidth, Math.min(state.maxWidth, width));
-    }
+    },
   };
 });
