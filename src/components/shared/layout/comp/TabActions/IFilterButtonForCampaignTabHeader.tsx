@@ -114,7 +114,7 @@
 import React, { useState, useEffect } from "react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import CommonButton from "@/components/shared/CommonButton";
-import { FilterIcon, CheckIcon, CheckSquare, Square } from "lucide-react";
+import { Check, CheckIcon, CheckSquare, Square } from "lucide-react";
 import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCampaignTab";
 import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
@@ -214,77 +214,79 @@ const IFilterButtonForCampaignTabHeader = () => {
           />
         </CommonButton>
       </PopoverTrigger>
-      <PopoverContent className="w-auto min-w-[200px] p-0" align="start">
+      <PopoverContent className="w-auto min-w-[150px] p-0 py-[10px] px-[12px] rounded-[3px] border border-[#333]" align="start">
         {!showSkillFilter ? (
           // 기본 필터 옵션 메뉴
           <div className="flex flex-col">
-            <div className="border-b">
+            <div className="">
               <CommonButton
                 variant="ghost"
-                className="w-full justify-between py-2 px-3 text-sm text-gray-800 hover:bg-gray-100"
+                className="w-full justify-between rounded-[3px] px-[6px] py-[4px] text-sm text-[#333] hover:bg-[#F4F6F9]"
                 onClick={handleViewAllClick}
               >
                 <span>전체보기</span>
                 {filterMode === "all" && (
-                  <CheckIcon className="h-4 w-4 text-blue-600" />
+                  <CheckIcon className="h-4 w-4 text-[#333]" />
                 )}
               </CommonButton>
             </div>
             <div>
               <CommonButton
                 variant="ghost"
-                className="w-full justify-between py-2 px-3 text-sm text-gray-800 hover:bg-gray-100"
+                className="w-full justify-between rounded-[3px] px-[6px] py-[4px] text-sm text-[#333] hover:bg-[#F4F6F9]"
                 onClick={handleSelectSkillsClick}
               >
                 <span>선택 스킬로 보기</span>
                 {filterMode === "skill" && (
-                  <CheckIcon className="h-4 w-4 text-blue-600" />
+                  <CheckIcon className="h-4 w-4 text-[#333]" />
                 )}
               </CommonButton>
             </div>
           </div>
         ) : (
           // 스킬 필터 패널
-          <div className="p-0 w-[300px]">
-            <div className="border-b p-2 flex justify-between items-center">
+          <div className="p-0 w-[150px]">
+            <div className="flex items-center gap-3">
               <CommonButton
                 variant="ghost"
-                size="sm"
                 onClick={() => setShowSkillFilter(false)}
-                className="px-2 text-sm text-gray-800 hover:bg-gray-100"
+                className="text-sm text-[#333] !p-0"
               >
                 &lt; 뒤로
               </CommonButton>
-              <span className="font-medium text-gray-900">스킬 선택</span>
+              <span className="text-sm text-[#333]">스킬 선택</span>
+            </div>
+            <div className="mt-[12px] mb-[1px] hover:bg-[#F4F6F9]">
               <CommonButton
-                variant="ghost"
-                size="sm"
-                onClick={toggleAllSkills}
-                className="px-2 text-sm text-gray-800 hover:bg-gray-100 flex items-center"
-                title={allSelected ? "전체 해제" : "전체 선택"}
-              >
-                {allSelected ? (
-                  <>
-                    <CheckSquare className="h-4 w-4 text-blue-600" />
-                    <span className="ml-1 text-xs text-blue-600">모두 해제</span>
-                  </>
-                ) : someSelected ? (
-                  <>
-                    <div className="relative">
-                      <Square className="h-4 w-4" />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-2 h-2 bg-blue-600"></div>
+                  variant="ghost"
+                  onClick={toggleAllSkills}
+                  className="text-sm text-[#333] flex items-center !px-[6px] !py-[3px]"
+                  title={allSelected ? "전체 해제" : "전체 선택"}
+                >
+                  {allSelected ? (
+                    <>
+                      <div className="h-4 w-4 shrink-0 rounded-none border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:text-black border-[#000] data-[state=checked]:border-primary bg-[#fff] flex justify-center items-center">
+                          <Check className="h-4 w-4" />
                       </div>
-                    </div>
-                    <span className="ml-1 text-xs">전체 선택</span>
-                  </>
-                ) : (
-                  <>
-                    <Square className="h-4 w-4" />
-                    <span className="ml-1 text-xs">전체 선택</span>
-                  </>
-                )}
-              </CommonButton>
+                      <span className="ml-1 text-sm">모두 해제</span>
+                    </>
+                  ) : someSelected ? (
+                    <>
+                      <div className="relative">
+                        <div className="h-4 w-4 shrink-0 rounded-none border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:text-black border-[#b6b6b6] data-[state=checked]:border-primary bg-[#fff] flex justify-center items-center">
+                          <div className="h-3 w-3 bg-[#333]"></div>
+                        </div>
+                      </div>
+                      <span className="ml-1 text-sm">전체 선택</span>
+                    </>
+                  ) : (
+                    <>
+                        <div className="h-4 w-4 shrink-0 rounded-none border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:text-black border-[#b6b6b6] data-[state=checked]:border-primary bg-[#fff]">
+                        </div>
+                      <span className="ml-1 text-sm">전체 선택</span>
+                    </>
+                  )}
+                </CommonButton>
             </div>
             <SkilFilterOptionPannelForCampaignTab
               shouldCloseOnConfirm={true}

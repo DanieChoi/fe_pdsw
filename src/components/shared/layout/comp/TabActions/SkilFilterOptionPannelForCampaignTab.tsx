@@ -121,9 +121,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import CommonButton from "@/components/shared/CommonButton";
 import { useAuthStore } from "@/store/authStore";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
 import { Popover } from "@/components/ui/popover";
@@ -211,24 +211,24 @@ const SkilFilterOptionPannelForCampaignTab = ({
     };
 
     return (
-        <div className="p-2">
+        <div className="">
             {/* 로딩/에러 처리 */}
             {isLoading && <p className="text-gray-500 text-sm">로딩 중...</p>}
             {isError && <p className="text-red-500 text-sm">스킬 정보를 불러오는데 실패했습니다</p>}
 
             {/* 스킬 체크박스 컨테이너 */}
-            <div className="border rounded-lg p-2">
+            <div className="">
                 {/* 스킬 체크박스 목록 */}
-                <ul className="space-y-1 max-h-60 overflow-y-auto">
+                <ul className="space-y-1 max-h-60 overflow-y-auto ">
                     {skills.length > 0 ? (
                         skills.map(({ skill_id, skill_name }: { skill_id: number; skill_name: string }) => (
-                            <li key={skill_id} className="p-1 border rounded-md flex items-center gap-2 border-gray-200">
-                                <Checkbox
+                            <li key={skill_id} className="px-[6px] py-[3px] flex items-center gap-2 border-gray-200 hover:bg-[#F4F6F9]">
+                                <CustomCheckbox
                                     id={`skill-${skill_id}`}
                                     checked={selectedSkills.includes(skill_id)}
                                     onCheckedChange={() => handleSkillChange(skill_id)}
                                 />
-                                <label htmlFor={`skill-${skill_id}`} className="cursor-pointer text-sm">
+                                <label htmlFor={`skill-${skill_id}`} className="cursor-pointer text-sm text-[#333]">
                                     {skill_name}
                                 </label>
                             </li>
@@ -239,22 +239,22 @@ const SkilFilterOptionPannelForCampaignTab = ({
                 </ul>
 
                 {/* 확인/취소 버튼: 가운데 정렬 */}
-                <div className="mt-2 flex justify-center gap-2">
+                <div className="mt-2 flex justify-end gap-2">
                     {shouldCloseOnConfirm ? (
                         <PopoverClose asChild>
-                            <Button onClick={handleConfirm} variant="outline" size="sm">
+                            <CommonButton onClick={handleConfirm} size="sm">
                                 확인
-                            </Button>
+                            </CommonButton>
                         </PopoverClose>
                     ) : (
-                        <Button onClick={handleConfirm} variant="outline" size="sm">
+                        <CommonButton onClick={handleConfirm} size="sm">
                             확인
-                        </Button>
+                        </CommonButton>
                     )}
                     <PopoverClose asChild>
-                        <Button onClick={handleCancel} variant="outline" size="sm" className="text-gray-500">
+                        <CommonButton onClick={handleCancel} variant="outline" size="sm" className="text-gray-500">
                             취소
-                        </Button>
+                        </CommonButton>
                     </PopoverClose>
                 </div>
             </div>
