@@ -568,9 +568,9 @@ export function ContextMenuForTreeNode({
     <>
       <ContextMenu>
         <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-        <ContextMenuContent className="w-[180px] py-1 rounded-md shadow-md">
+        <ContextMenuContent className="w-[150px]">
           <ContextMenuItem onClick={handleEditMenuClick} className="flex items-center text-sm">
-            <Edit className="mr-2 h-4 w-4 text-gray-500" />
+            {/* <Edit className="mr-2 h-4 w-4 text-gray-500" /> */}
             캠페인 수정
           </ContextMenuItem>
 
@@ -582,7 +582,7 @@ export function ContextMenuForTreeNode({
                 preventCloseRef.current = false;
               }}
             >
-              <Search className="mr-2 h-4 w-4 text-gray-500" />
+              {/* <Search className="mr-2 h-4 w-4 text-gray-500" /> */}
               <span className="flex items-center">
                 시작구분: 
                 <span className="ml-1 flex items-center">
@@ -649,7 +649,7 @@ export function ContextMenuForTreeNode({
             onClick={() => handleProgressInfoClick(item.id, item.label)}
             className="flex items-center text-sm"
           >
-            <Settings className="mr-2 h-4 w-4 text-gray-500" />
+            {/* <Settings className="mr-2 h-4 w-4 text-gray-500" /> */}
             캠페인 진행정보
           </ContextMenuItem>
 
@@ -659,7 +659,7 @@ export function ContextMenuForTreeNode({
             onClick={handleRebroadcastClick}
             className="flex items-center text-sm"
           >
-            <RefreshCcw className="mr-2 h-4 w-4 text-gray-500" />
+            {/* <RefreshCcw className="mr-2 h-4 w-4 text-gray-500" /> */}
             재발신
           </ContextMenuItem>
 
@@ -669,7 +669,7 @@ export function ContextMenuForTreeNode({
             onClick={onHandleCampaignCopy}
             className="flex items-center text-sm"
           >
-            <Copy className="mr-2 h-4 w-4 text-gray-500" />
+            {/* <Copy className="mr-2 h-4 w-4 text-gray-500" /> */}
             캠페인 복사
           </ContextMenuItem>
           
@@ -678,7 +678,7 @@ export function ContextMenuForTreeNode({
               onClick={() => onCampaignDelete(currentStatus, item.id, item.label)} 
               className="flex items-center text-sm text-red-500"
             >
-              <Trash2 className="mr-2 h-4 w-4" />
+              {/* <Trash2 className="mr-2 h-4 w-4" /> */}
               캠페인 삭제
             </ContextMenuItem>
           )}
@@ -689,7 +689,7 @@ export function ContextMenuForTreeNode({
             onClick={() => handleMonitorClick(item.id, item.label)}
             className="flex items-center text-sm"
           >
-            <Activity className="mr-2 h-4 w-4 text-gray-500" />
+            {/* <Activity className="mr-2 h-4 w-4 text-gray-500" /> */}
             상담원 상태 모니터
           </ContextMenuItem>
 
@@ -697,7 +697,7 @@ export function ContextMenuForTreeNode({
             onClick={handleBlacklistCountCheckClick}
             className="flex items-center text-sm"
           >
-            <Shield className="mr-2 h-4 w-4 text-gray-500" />
+            {/* <Shield className="mr-2 h-4 w-4 text-gray-500" /> */}
             블랙리스트 건수 조회
           </ContextMenuItem>
         </ContextMenuContent>
