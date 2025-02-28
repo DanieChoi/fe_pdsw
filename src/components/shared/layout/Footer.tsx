@@ -347,11 +347,17 @@ type FooterDataType = {
 interface FooterProps {
   footerHeight: number; // 열려 있을 때 푸터 높이(px)
   onToggleDrawer?: (isOpen: boolean) => void; // 열림/닫힘 상태 전달
+  onResizeHeight?: (height: number) => void; // 새로 추가: 높이 변경 콜백
+  onResizeStart?: () => void; // 리사이징 시작 알림
+  onResizeEnd?: (height: number) => void; // 리사이징 종료 알림
 }
 
 export default function Footer({
   footerHeight,
   onToggleDrawer,
+  onResizeHeight,
+  onResizeStart,
+  onResizeEnd,
 }: FooterProps) {
   // SSE 로그 목록
   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
@@ -371,10 +377,12 @@ export default function Footer({
   // 예시) AuthStore 에서 tenant_id
   const { tenant_id } = useAuthStore();
 
-  // footerHeight prop이 바뀌면 내부 상태 갱신
+  // footerHeight prop이 바뀌면 내부 상태 갱신 (부모->자식 동기화)
   useEffect(() => {
-    setResizableHeight(footerHeight);
-  }, [footerHeight]);
+    if (!isResizing) { // 리사이징 중에는 상태 업데이트 방지
+      setResizableHeight(footerHeight);
+    }
+  }, [footerHeight, isResizing]);
 
   // 푸터 열림/닫힘 상태를 부모로 알림
   useEffect(() => {
@@ -488,20 +496,38 @@ export default function Footer({
   };
 
   // 리사이즈 시작
-  const onResizeStart = () => {
+  const onResizeStartHandler = () => {
     setIsResizing(true);
+    onResizeStart?.(); // 부모에게 알림
   };
 
-  // 리사이즈 종료
-  const onResizeStop: ResizeCallback = (
+  // 리사이즈 중
+  const onResizeHandler: ResizeCallback = (
     event,
     direction: ResizeDirection,
     elementRef: HTMLElement,
     delta: NumberSize
   ) => {
-    setIsResizing(false);
+    // 리사이즈 중에는 내부 상태만 업데이트
+    const newHeight = resizableHeight + delta.height;
+    
+    // 리사이즈 중에 부모에게 실시간으로 높이 변경 알림
+    onResizeHeight?.(newHeight);
+  };
+
+  // 리사이즈 종료
+  const onResizeStopHandler: ResizeCallback = (
+    event,
+    direction: ResizeDirection,
+    elementRef: HTMLElement,
+    delta: NumberSize
+  ) => {
     const newHeight = resizableHeight + delta.height;
     setResizableHeight(newHeight);
+    setIsResizing(false);
+    
+    // 부모에게 최종 높이 알림
+    onResizeEnd?.(newHeight);
   };
 
   // 열려 있으면 resizableHeight, 닫혀 있으면 32
@@ -509,21 +535,15 @@ export default function Footer({
 
   return (
     <div
-      // 기존처럼, 와이드 모드면 fixed, 아니면 relative
       className={`
         text-sm text-gray-600 bg-[#FBFBFB] flex flex-col
-        transition-all duration-300 ease-in-out
         ${isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative"}
       `}
-      style={{
-        // 이 div가 ReResizable의 container가 됨
-        // height는 아래 Resizable이 제어 → 100% 차지
-      }}
     >
       <Resizable
         size={{ width: "100%", height: finalHeight }}
         enable={{
-          top: true, // 위쪽에서 드래그
+          top: true,
           right: false,
           bottom: false,
           left: false,
@@ -533,16 +553,15 @@ export default function Footer({
           topLeft: false,
         }}
         minHeight={32}
-        onResizeStart={onResizeStart}
-        onResizeStop={onResizeStop}
-        // 리사이즈 중에는 트랜지션 off
+        onResizeStart={onResizeStartHandler}
+        onResize={onResizeHandler}
+        onResizeStop={onResizeStopHandler}
         style={{
           transition: isResizing ? "none" : "height 0.3s ease-in-out",
-          backgroundColor: "#FBFBFB", // 원래 색
+          backgroundColor: "#FBFBFB",
           display: "flex",
           flexDirection: "column",
         }}
-        // 상단 핸들 (1px), 호버 시 #5BC2C1
         handleComponent={{
           top: (
             <div
