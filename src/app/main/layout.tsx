@@ -176,7 +176,6 @@ export default function MainLayout({
             >
               <Footer 
                 footerHeight={footerHeight} 
-                startResizing={startResizing}
                 onToggleDrawer={toggleFooter}
               />
             </div>
