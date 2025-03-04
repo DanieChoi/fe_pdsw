@@ -49,7 +49,8 @@ export const loginApi = {
 
       // const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
 
-      // const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
+      // // const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
+      // const eventSource = new EventSource(`http://10.10.30.228:4000/api/v1/notification/${tenant_id}/subscribe`);
 
       // console.log("eventSource = ", eventSource);
 
