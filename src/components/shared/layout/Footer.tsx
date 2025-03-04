@@ -78,9 +78,9 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     }
     //장비 사용, 장비 사용중지
     else if( announce === 'dialing-device' ){
-      if( command === 'UPDATE' && data['skill_id'] === 'run' ){
+      if( command === 'UPDATE' && data['device_status'] === 'run' ){
         _message = 'CIDS 작동중';
-      }else if( command === 'UPDATE' && data['skill_id'] === 'down' ){
+      }else if( command === 'UPDATE' && data['device_status'] === 'down' ){
         _message = 'CIDS 작동중지';
       }
     }
@@ -192,19 +192,15 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
   // SSE 구독
   useEffect(() => {
     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-    const eventSource = new EventSource(
-      `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
-    );
-    // const eventSource = new EventSource(`http://10.10.30.228:4000/api/v1/notification/${tenant_id}/subscribe`);
-    console.log("footer event ready... ");
+    const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
 
     let data: any = {};
     let announce = "";
     let command = "";
     let kind = "";
 
-    const handleEvent = (event: MessageEvent) => {
-      console.log("event = ", event.data);
+    eventSource.onmessage = (event) => {
+      console.log("footer sse event = ", event.data);
       if (event.data !== "Connected!!") {
         const tempEventData = JSON.parse(event.data);
         if (
@@ -228,13 +224,61 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
         }
       }
     };
-    eventSource.addEventListener("message", handleEvent);
+
+    eventSource.onerror = (error) => {
+      console.error('EventSource failed:', error);
+    };
 
     return () => {
-      eventSource.removeEventListener("message", handleEvent);
-      eventSource.close();
+      eventSource.close(); // 컴포넌트가 언마운트될 때 SSE 연결 종료
     };
   }, [tenant_id]);
+
+  // useEffect(() => {
+  //   const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+  //   const eventSource = new EventSource(
+  //     `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
+  //   );
+  //   // const eventSource = new EventSource(`http://10.10.30.228:4000/api/v1/notification/${tenant_id}/subscribe`);
+  //   console.log("footer event ready... ");
+
+  //   let data: any = {};
+  //   let announce = "";
+  //   let command = "";
+  //   let kind = "";
+
+  //   const handleEvent = (event: MessageEvent) => {
+  //     console.log("event44 = ", event.data);
+  //     if (event.data !== "Connected!!") {
+  //       const tempEventData = JSON.parse(event.data);
+  //       if (
+  //         announce !== tempEventData["announce"] ||
+  //         !isEqual(data, tempEventData.data) ||
+  //         !isEqual(data, tempEventData["data"]) ||
+  //         kind !== tempEventData["kind"]
+  //       ) {
+  //         announce = tempEventData["announce"];
+  //         command = tempEventData["command"];
+  //         data = tempEventData["data"];
+  //         kind = tempEventData["kind"];
+
+  //         footerDataSet(
+  //           tempEventData["announce"],
+  //           tempEventData["command"],
+  //           tempEventData["data"],
+  //           tempEventData["kind"],
+  //           tempEventData
+  //         );
+  //       }
+  //     }
+  //   };
+  //   eventSource.addEventListener("message", handleEvent);
+
+  //   // return () => {
+  //   //   eventSource.removeEventListener("message", handleEvent);
+  //   //   eventSource.close();
+  //   // };
+  // }, [tenant_id]);
   
     return (
       <footer
