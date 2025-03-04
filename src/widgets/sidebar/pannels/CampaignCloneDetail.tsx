@@ -1019,9 +1019,23 @@ export default function CampaignDetail() {
     }
   });
   
+  // useEffect(() => {
+  //   if( campaigns ){
+  //     setSelectedCampaign(campaigns.filter(data => data.campaign_id === Number(campaignIdForCopyCampaign))[0]);
+  //   }
+  // }, [campaigns, campaignIdForCopyCampaign]);
+
   useEffect(() => {
-    if( campaigns ){
-      setSelectedCampaign(campaigns.filter(data => data.campaign_id === Number(campaignIdForCopyCampaign))[0]);
+    if (campaigns && campaigns.length > 0 && campaignIdForCopyCampaign) {
+      // Make sure both values are numbers for comparison
+      const campaignId = Number(campaignIdForCopyCampaign);
+      const foundCampaign = campaigns.find(data => data.campaign_id === campaignId);
+      
+      if (foundCampaign) {
+        setSelectedCampaign(foundCampaign);
+      } else {
+        console.error(`Campaign with ID ${campaignId} not found in campaigns array:`, campaigns);
+      }
     }
   }, [campaigns, campaignIdForCopyCampaign]);
 

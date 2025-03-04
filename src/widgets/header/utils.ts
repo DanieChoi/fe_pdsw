@@ -10,13 +10,13 @@ export const simulateMenuClick = (
     addTab, 
     removeTab, 
     openedTabs, 
-    duplicateTab,
+    // duplicateTab,
     setActiveTab,
     setCampaignIdForUpdateFromSideMenu 
   } = useTabStore.getState();
 
   if (options.ctrlKey) {
-    duplicateTab(item.id);
+    // duplicateTab(item.id);
   } else {
     // 해당 아이템의 이전 탭들을 모두 찾아서 제거
     const existingTabs = openedTabs.filter(tab => tab.id === item.id);

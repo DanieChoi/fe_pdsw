@@ -1127,87 +1127,45 @@
 // //   },
 // // }));
 
-// // src/store/tabStore.ts
+// src/store/tabStore.ts
 // "use client";
 
 // import { create } from "zustand";
 // import { v4 as uuidv4 } from "uuid";
+// import React from "react";
 
-// // ------------------------------
-// // 신버전 탭 인터페이스
-// // ------------------------------
-// export interface NewTabItem {
-//   id: string;            // 내부적으로 고유 식별자 (string)
-//   tabId: number | null;  // 메뉴 식별자 (예: 1,2,3)
-//   title: string;         // 탭 이름
+// /* ─────────────────────────────────────────────
+//    [구버전] OldTabItem 정의
+//    ───────────────────────────────────────────── */
+// export interface OldTabItem {
+//   id: number;                // 예) 7, 8, 9...
+//   uniqueKey: string;         // "7", "7-xxx" 등
+//   title: string;
+//   icon: string;
+//   href: string;
+//   content: React.ReactNode;
 //   campaignId?: string;
 //   campaignName?: string;
 // }
 
-// // 분할 영역(Area)
+// /* ─────────────────────────────────────────────
+//     (신버전) NewTabItem / TabArea / SplitMode
+//    ───────────────────────────────────────────── */
+// export interface NewTabItem {
+//   id: string;            // 내부적으로 고유 식별자 (UUID)
+//   tabId: number | null;  // 구버전 id(메뉴 식별자)
+//   title: string;         // 탭 표시 이름
+//   campaignId?: string;
+//   campaignName?: string;
+// }
+
 // export interface TabArea {
-//   id: string;                // 영역 ID
-//   tabs: NewTabItem[];        // 이 영역에 표시되는 탭 목록
-//   activeTabId: string | null; // 현재 활성 탭(위 NewTabItem.id)
+//   id: string;
+//   tabs: NewTabItem[];
+//   activeTabId: string | null;
 // }
 
-// export type SplitMode = "none" | "split"; // 'none' = 1영역, 'split' = 2~4영역
-
-// interface TabStoreState {
-//   // 모든 탭 (중복 없이)
-//   allTabs: NewTabItem[];
-
-//   // 분할 영역들
-//   areas: TabArea[];
-//   areaWidths: number[]; // 각 영역 가로폭 (%)
-//   splitMode: SplitMode; // 현재 분할 모드
-//   activeTabGlobalId: string | null; // 전역 활성 탭 ID
-
-//   // ---------------------------
-//   // 기본 메서드
-//   // ---------------------------
-//   /** 새 탭 열기 */
-//   openTabV2: (
-//     tabId: number,
-//     title: string,
-//     options?: { campaignId?: string; campaignName?: string }
-//   ) => void;
-
-//   /** 탭 닫기 */
-//   closeTabV2: (tabUuid: string) => void;
-
-//   /** 탭 활성화 */
-//   activateTabV2: (tabUuid: string) => void;
-
-//   /** 탭 복제 (Ctrl+클릭 등) */
-//   duplicateTabV2: (tabUuid: string) => void;
-
-//   // ---------------------------
-//   // 멀티분할 메서드
-//   // ---------------------------
-//   /** 화면 분할 개수 설정: 1~4 */
-//   splitTabAreaV2: (count: number) => void;
-
-//   /** 특정 영역 닫기 */
-//   closeAreaV2: (areaId: string) => void;
-
-//   /** 특정 탭을 다른 영역으로 이동 */
-//   moveTabToAreaV2: (tabUuid: string, targetAreaId: string) => void;
-
-//   /** 영역 내 탭 순서 재정렬 */
-//   reorderTabsV2: (areaId: string, fromIndex: number, toIndex: number) => void;
-
-//   /** 영역 사이 리사이즈 */
-//   resizeAreasV2: (areaIndex: number, deltaWidth: number) => void;
-
-//   // ---------------------------
-//   // 헤더에서 사용할 탭 개수 세기
-//   // => "menuId" 별로 현재 열려 있는 탭 수
-//   // ---------------------------
-//   getTabCountByIdV2: (menuId: number) => number;
-// }
-
-// const MIN_AREA_WIDTH = 10;
+// export type SplitMode = "none" | "split";
 
 // function createEmptyArea(): TabArea {
 //   return {
@@ -1217,157 +1175,297 @@
 //   };
 // }
 
+// /* ────────────────────────────────────────────
+//     구버전 + 신버전 통합 인터페이스
+//    ──────────────────────────────────────────── */
+// interface TabStoreState {
+//   // ────── [구버전 호환 필드] ──────
+//   openedTabs: OldTabItem[];  // 예전 컴포넌트에서 참조
+//   activeTabId: number | null;
+//   activeTabKey: string | null;
+
+//   campaignIdForUpdateFromSideMenu: string | null;
+//   setCampaignIdForUpdateFromSideMenu: (id: string | null) => void;
+
+//   // 구버전 메서드 래퍼
+//   addTab: (tab: OldTabItem) => void;
+//   removeTab: (tabId: number, uniqueKey: string) => void;
+//   setActiveTab: (tabId: number, uniqueKey: string) => void;
+
+//   // ────── [신버전 필드] ──────
+//   allTabs: NewTabItem[];           // 중복없이 관리
+//   areas: TabArea[];
+//   areaWidths: number[];
+//   splitMode: SplitMode;
+//   activeTabGlobalId: string | null;
+
+//   // 신버전 메서드
+//   openTabV2: (
+//     tabId: number,
+//     title: string,
+//     options?: { campaignId?: string; campaignName?: string }
+//   ) => void;
+//   closeTabV2: (tabUuid: string) => void;
+//   activateTabV2: (tabUuid: string) => void;
+//   duplicateTabV2: (tabUuid: string) => void;
+
+//   splitTabAreaV2: (count: number) => void;
+//   closeAreaV2: (areaId: string) => void;
+//   moveTabToAreaV2: (tabUuid: string, targetAreaId: string) => void;
+//   reorderTabsV2: (areaId: string, fromIndex: number, toIndex: number) => void;
+//   resizeAreasV2: (areaIndex: number, deltaWidth: number) => void;
+
+//   getTabCountByIdV2: (menuId: number) => number;
+// }
+
+// /* ─────────────────────────────────────────
+//     Zustand Store 구현
+//    ───────────────────────────────────────── */
+// const MIN_AREA_WIDTH = 10;
+
 // export const useTabStore = create<TabStoreState>((set, get) => ({
-//   // 초기 상태
+//   /* ───────── [구버전 초기 값] ───────── */
+//   openedTabs: [],
+//   activeTabId: null,
+//   activeTabKey: null,
+
+//   campaignIdForUpdateFromSideMenu: null,
+//   setCampaignIdForUpdateFromSideMenu: (id) => {
+//     set({ campaignIdForUpdateFromSideMenu: id });
+//   },
+
+//   /* ───────── [신버전 초기 값] ───────── */
 //   allTabs: [],
 //   areas: [createEmptyArea()],
 //   areaWidths: [100],
 //   splitMode: "none",
 //   activeTabGlobalId: null,
 
-//   /** 새 탭 열기 */
+//   /* ──────────────────────────
+//       구버전 메서드 래퍼
+//      ────────────────────────── */
+
+//   /** 구버전 addTab: (tab: OldTabItem) */
+//   addTab: (oldTab) => {
+//     // 1) 구버전 openedTabs에 추가
+//     set((state) => {
+//       // 중복 체크
+//       const exists = state.openedTabs.some(
+//         (x) => x.id === oldTab.id && x.uniqueKey === oldTab.uniqueKey
+//       );
+//       if (exists) {
+//         return state; // 중복이면 그대로
+//       }
+//       const newOpened = [...state.openedTabs, oldTab];
+//       return { ...state, openedTabs: newOpened };
+//     });
+
+//     // 2) 신버전 openTabV2로도 등록
+//     //    tabId = oldTab.id, title = oldTab.uniqueKey (혹은 oldTab.title?)
+//     const newTitle = oldTab.title || oldTab.uniqueKey;
+//     get().openTabV2(oldTab.id, newTitle, {
+//       campaignId: oldTab.campaignId,
+//       campaignName: oldTab.campaignName,
+//     });
+//   },
+
+//   /** 구버전 removeTab: (tabId, uniqueKey) */
+//   removeTab: (tabId, uniqueKey) => {
+//     // 1) 구버전 openedTabs에서 제거
+//     set((state) => {
+//       const newTabs = state.openedTabs.filter(
+//         (t) => !(t.id === tabId && t.uniqueKey === uniqueKey)
+//       );
+//       return { ...state, openedTabs: newTabs };
+//     });
+//     // 2) 신버전 allTabs 중 (tabId===, title===) 찾아 closeTabV2
+//     const st = get();
+//     const found = st.allTabs.find(
+//       (t) => t.tabId === tabId && t.title === uniqueKey
+//     );
+//     if (found) {
+//       st.closeTabV2(found.id);
+//     }
+//   },
+
+//   /** 구버전 setActiveTab: (tabId, uniqueKey) */
+//   setActiveTab: (tabId, uniqueKey) => {
+//     // 1) 구버전 상태 activeTabId/activeTabKey 갱신
+//     set({
+//       activeTabId: tabId,
+//       activeTabKey: uniqueKey,
+//     });
+//     // 2) 신버전 탭 찾기 + activateTabV2
+//     const st = get();
+//     const found = st.allTabs.find(
+//       (t) => t.tabId === tabId && t.title === uniqueKey
+//     );
+//     if (found) {
+//       st.activateTabV2(found.id);
+//     }
+//   },
+
+//   /* ──────────────────────────
+//       신버전 메서드들
+//      ────────────────────────── */
+
+//   /** 새 탭 열기 (분할) */
 //   openTabV2: (tabId, title, options) => {
 //     const { allTabs, areas } = get();
-//     // 새 탭 생성
-//     const newTabUUID = uuidv4();
+//     const newTabUuid = uuidv4();
 //     const newTab: NewTabItem = {
-//       id: newTabUUID,
+//       id: newTabUuid,
 //       tabId,
 //       title,
 //       campaignId: options?.campaignId,
 //       campaignName: options?.campaignName,
 //     };
 
-//     // allTabs에 추가
-//     const updatedAllTabs = [...allTabs, newTab];
+//     const updatedAll = [...allTabs, newTab];
 
-//     // 첫 번째 영역에 탭 삽입
+//     // 첫 영역에 삽입
 //     const firstArea = areas[0];
-//     const updatedFirstArea = {
+//     const updatedFirst = {
 //       ...firstArea,
 //       tabs: [...firstArea.tabs, newTab],
-//       activeTabId: newTabUUID,
+//       activeTabId: newTabUuid,
 //     };
 
-//     const updatedAreas = [updatedFirstArea, ...areas.slice(1)];
+//     const updatedAreas = [updatedFirst, ...areas.slice(1)];
 
 //     set({
-//       allTabs: updatedAllTabs,
+//       allTabs: updatedAll,
 //       areas: updatedAreas,
-//       activeTabGlobalId: newTabUUID,
+//       activeTabGlobalId: newTabUuid,
 //     });
 //   },
 
 //   /** 탭 닫기 */
 //   closeTabV2: (tabUuid) => {
 //     const { allTabs, areas, activeTabGlobalId } = get();
+//     // allTabs 제거
+//     const newAll = allTabs.filter((t) => t.id !== tabUuid);
 
-//     // allTabs에서 제거
-//     const newAllTabs = allTabs.filter((t) => t.id !== tabUuid);
-
-//     // 각 영역에서 제거
+//     // 영역들에서 제거
 //     const newAreas = areas.map((area) => {
-//       const hasTab = area.tabs.some((t) => t.id === tabUuid);
-//       if (!hasTab) return area;
-//       const filteredTabs = area.tabs.filter((t) => t.id !== tabUuid);
-//       let newActiveId = area.activeTabId;
-//       if (newActiveId === tabUuid) {
-//         newActiveId = filteredTabs.length
-//           ? filteredTabs[filteredTabs.length - 1].id
-//           : null;
+//       if (!area.tabs.some((x) => x.id === tabUuid)) return area;
+//       const filtered = area.tabs.filter((x) => x.id !== tabUuid);
+//       let newActive = area.activeTabId;
+//       if (newActive === tabUuid) {
+//         newActive = filtered.length ? filtered[filtered.length - 1].id : null;
 //       }
-//       return {
-//         ...area,
-//         tabs: filteredTabs,
-//         activeTabId: newActiveId,
-//       };
+//       return { ...area, tabs: filtered, activeTabId: newActive };
 //     });
 
-//     // 전역 활성 탭 재설정
-//     let newGlobalActive = activeTabGlobalId;
+//     let newGlobal = activeTabGlobalId;
 //     if (activeTabGlobalId === tabUuid) {
-//       const stillOpen = newAreas.flatMap((a) => a.tabs);
-//       newGlobalActive = stillOpen.length ? stillOpen[stillOpen.length - 1].id : null;
+//       const remainTabs = newAreas.flatMap((a) => a.tabs);
+//       newGlobal = remainTabs.length ? remainTabs[remainTabs.length - 1].id : null;
 //     }
 
-//     set({
-//       allTabs: newAllTabs,
-//       areas: newAreas,
-//       activeTabGlobalId: newGlobalActive,
+//     // 3) 구버전 openedTabs에도 반영 (tabId, title)에 해당하는 항목 제거
+//     let oldTabId: number | null = null;
+//     let oldKey: string | null = null;
+//     const closedItem = allTabs.find((x) => x.id === tabUuid);
+//     if (closedItem) {
+//       oldTabId = closedItem.tabId;
+//       oldKey = closedItem.title;
+//     }
+
+//     set((state) => {
+//       let newOpened = state.openedTabs;
+//       if (oldTabId !== null && oldKey !== null) {
+//         newOpened = state.openedTabs.filter(
+//           (o) => !(o.id === oldTabId && o.uniqueKey === oldKey)
+//         );
+//       }
+//       return {
+//         ...state,
+//         allTabs: newAll,
+//         areas: newAreas,
+//         activeTabGlobalId: newGlobal,
+//         openedTabs: newOpened,
+//       };
 //     });
 //   },
 
 //   /** 탭 활성화 */
 //   activateTabV2: (tabUuid) => {
-//     const { areas } = get();
-//     let foundIndex = -1;
-//     for (let i = 0; i < areas.length; i++) {
-//       if (areas[i].tabs.some((t) => t.id === tabUuid)) {
-//         foundIndex = i;
-//         break;
-//       }
-//     }
-//     if (foundIndex === -1) return; // 못 찾으면 무시
+//     const { areas, activeTabGlobalId } = get();
+//     const idx = areas.findIndex((a) => a.tabs.some((t) => t.id === tabUuid));
+//     if (idx === -1) return;
 
-//     const targetArea = areas[foundIndex];
-//     const updatedArea = {
-//       ...targetArea,
-//       activeTabId: tabUuid,
-//     };
-
+//     const area = areas[idx];
+//     const updatedArea = { ...area, activeTabId: tabUuid };
 //     const newAreas = [...areas];
-//     newAreas[foundIndex] = updatedArea;
+//     newAreas[idx] = updatedArea;
+
+//     // 구버전 openedTabs도 activeTabId, activeTabKey 반영
+//     // (이미 setActiveTab으로 할 수도 있으나 안전상)
+//     const found = get().allTabs.find((t) => t.id === tabUuid);
 
 //     set({
 //       areas: newAreas,
 //       activeTabGlobalId: tabUuid,
+//       activeTabId: found?.tabId ?? null,
+//       activeTabKey: found?.title ?? null,
 //     });
 //   },
 
 //   /** 탭 복제 */
 //   duplicateTabV2: (tabUuid) => {
 //     const { allTabs, areas } = get();
-//     const original = allTabs.find((t) => t.id === tabUuid);
-//     if (!original) return;
+//     const orig = allTabs.find((x) => x.id === tabUuid);
+//     if (!orig) return;
+//     const dupId = uuidv4();
+//     const duplicated: NewTabItem = { ...orig, id: dupId };
 
-//     // 복제
-//     const newId = uuidv4();
-//     const duplicated: NewTabItem = {
-//       ...original,
-//       id: newId,
-//     };
-
-//     // allTabs에 추가
 //     const updatedAll = [...allTabs, duplicated];
 
-//     // 어느 영역에 있는지 찾은 뒤, 그 영역에 붙여넣기
-//     const updatedAreas = [...areas];
-//     for (let i = 0; i < updatedAreas.length; i++) {
-//       if (updatedAreas[i].tabs.some((t) => t.id === tabUuid)) {
-//         // 추가
-//         const newTabs = [...updatedAreas[i].tabs, duplicated];
-//         updatedAreas[i] = {
-//           ...updatedAreas[i],
-//           tabs: newTabs,
-//           activeTabId: newId,
+//     const newAreas = areas.map((area) => {
+//       if (area.tabs.some((x) => x.id === tabUuid)) {
+//         return {
+//           ...area,
+//           tabs: [...area.tabs, duplicated],
+//           activeTabId: dupId,
 //         };
-//         break;
 //       }
-//     }
+//       return area;
+//     });
 
-//     set({
-//       allTabs: updatedAll,
-//       areas: updatedAreas,
-//       activeTabGlobalId: newId,
+//     // 구버전 openedTabs에도 하나 추가
+//     //  → oldTabId = orig.tabId, uniqueKey = ??? 
+//     //     (일단 뒤에 '-dup' 같은걸 붙이거나 timestamp 등 임의)
+//     const newUniqueKey = orig.title + "-dup";
+//     const newOldTab: OldTabItem = {
+//       id: orig.tabId ?? 0,
+//       uniqueKey: newUniqueKey,
+//       title: orig.title,
+//       icon: "",
+//       href: "",
+//       content: null,
+//       campaignId: orig.campaignId,
+//       campaignName: orig.campaignName,
+//     };
+
+//     set((state) => {
+//       return {
+//         ...state,
+//         allTabs: updatedAll,
+//         areas: newAreas,
+//         activeTabGlobalId: dupId,
+//         openedTabs: [...state.openedTabs, newOldTab],
+//         activeTabId: orig.tabId ?? 0,
+//         activeTabKey: orig.title ?? null,
+//       };
 //     });
 //   },
 
-//   /** 화면 분할 개수 설정 */
+//   /** 전체 분할 개수 설정 */
 //   splitTabAreaV2: (count) => {
 //     if (count < 1) return;
 //     const { allTabs } = get();
 
-//     // 1영역
 //     if (count === 1) {
 //       set({
 //         areas: [
@@ -1384,7 +1482,6 @@
 //       return;
 //     }
 
-//     // 2~4영역
 //     const newAreas: TabArea[] = [];
 //     const firstArea: TabArea = {
 //       id: uuidv4(),
@@ -1392,13 +1489,12 @@
 //       activeTabId: allTabs.length ? allTabs[allTabs.length - 1].id : null,
 //     };
 //     newAreas.push(firstArea);
-
 //     for (let i = 1; i < count; i++) {
 //       newAreas.push(createEmptyArea());
 //     }
 
-//     const equalWidth = 100 / count;
-//     const widths = Array(count).fill(equalWidth);
+//     const eqWidth = 100 / count;
+//     const widths = Array(count).fill(eqWidth);
 
 //     set({
 //       areas: newAreas,
@@ -1410,88 +1506,90 @@
 
 //   /** 특정 영역 닫기 */
 //   closeAreaV2: (areaId) => {
-//     const { areas, areaWidths, activeTabGlobalId, allTabs } = get();
+//     const { areas, areaWidths, activeTabGlobalId, allTabs, openedTabs } = get();
 //     if (areas.length <= 1) return;
 
 //     const idx = areas.findIndex((a) => a.id === areaId);
 //     if (idx === -1) return;
 
-//     // 닫히는 영역 탭들
-//     const closedTabs = areas[idx].tabs.map((t) => t.id);
+//     // 닫히는 영역의 탭들
+//     const removed = areas[idx].tabs.map((x) => x.id);
 //     // allTabs에서도 제거
-//     const newAll = allTabs.filter((t) => !closedTabs.includes(t.id));
+//     const newAll = allTabs.filter((t) => !removed.includes(t.id));
 
-//     // 남은 영역
+//     // openedTabs에서도 제거
+//     // ( oldTabId=??? (t.tabId) && oldTabKey=???(t.title) )
+//     let newOpened = [...openedTabs];
+//     areas[idx].tabs.forEach((closing) => {
+//       const oldId = closing.tabId ?? 0;
+//       const oldTitle = closing.title;
+//       newOpened = newOpened.filter(
+//         (o) => !(o.id === oldId && o.uniqueKey === oldTitle)
+//       );
+//     });
+
 //     const remain = areas.filter((a) => a.id !== areaId);
 
-//     // 너비 재분배
-//     const closedWidth = areaWidths[idx];
+//     const closedW = areaWidths[idx];
 //     let newWidths = [...areaWidths];
 //     newWidths.splice(idx, 1);
 //     if (newWidths.length === 1) {
 //       newWidths[0] = 100;
 //     } else {
-//       const addEach = closedWidth / newWidths.length;
+//       const addEach = closedW / newWidths.length;
 //       newWidths = newWidths.map((w) => w + addEach);
 //     }
 
-//     // 활성 탭 다시 선택
 //     let newActive = activeTabGlobalId;
-//     if (closedTabs.includes(activeTabGlobalId || "")) {
-//       const stillOpen = remain.flatMap((r) => r.tabs);
-//       newActive = stillOpen.length ? stillOpen[stillOpen.length - 1].id : null;
+//     if (removed.includes(activeTabGlobalId || "")) {
+//       const still = remain.flatMap((r) => r.tabs);
+//       newActive = still.length ? still[still.length - 1].id : null;
 //     }
 
-//     const newSplitMode = remain.length > 1 ? "split" : "none";
+//     const newMode = remain.length > 1 ? "split" : "none";
 
 //     set({
 //       allTabs: newAll,
+//       openedTabs: newOpened,
 //       areas: remain,
 //       areaWidths: newWidths,
-//       splitMode: newSplitMode,
+//       splitMode: newMode,
 //       activeTabGlobalId: newActive,
 //     });
 //   },
 
 //   /** 탭을 다른 영역으로 이동 */
 //   moveTabToAreaV2: (tabUuid, targetAreaId) => {
-//     const { areas } = get();
+//     const { areas, allTabs, openedTabs } = get();
 //     let sourceIdx = -1;
 //     let foundTab: NewTabItem | null = null;
 
 //     for (let i = 0; i < areas.length; i++) {
-//       if (areas[i].tabs.some((t) => t.id === tabUuid)) {
+//       const area = areas[i];
+//       const t = area.tabs.find((x) => x.id === tabUuid);
+//       if (t) {
 //         sourceIdx = i;
-//         foundTab = areas[i].tabs.find((t) => t.id === tabUuid) || null;
+//         foundTab = t;
 //         break;
 //       }
 //     }
 //     if (!foundTab) return;
 //     if (areas[sourceIdx].id === targetAreaId) return;
 
-//     // 소스 영역
-//     const sourceArea = areas[sourceIdx];
-//     const newSourceTabs = sourceArea.tabs.filter((t) => t.id !== tabUuid);
-//     let newSourceActive = sourceArea.activeTabId;
-//     if (newSourceActive === tabUuid) {
-//       newSourceActive = newSourceTabs.length
-//         ? newSourceTabs[newSourceTabs.length - 1].id
-//         : null;
+//     const srcArea = areas[sourceIdx];
+//     const filtered = srcArea.tabs.filter((t) => t.id !== tabUuid);
+//     let newSrcActive = srcArea.activeTabId;
+//     if (newSrcActive === tabUuid) {
+//       newSrcActive = filtered.length ? filtered[filtered.length - 1].id : null;
 //     }
-//     const updatedSource = {
-//       ...sourceArea,
-//       tabs: newSourceTabs,
-//       activeTabId: newSourceActive,
-//     };
+//     const updatedSource = { ...srcArea, tabs: filtered, activeTabId: newSrcActive };
 
-//     // 타겟 영역
 //     const targetIdx = areas.findIndex((a) => a.id === targetAreaId);
 //     if (targetIdx === -1) return;
-//     const targetArea = areas[targetIdx];
-//     const newTargetTabs = [...targetArea.tabs, foundTab];
+//     const tgtArea = areas[targetIdx];
 //     const updatedTarget = {
-//       ...targetArea,
-//       tabs: newTargetTabs,
+//       ...tgtArea,
+//       tabs: [...tgtArea.tabs, foundTab],
 //       activeTabId: foundTab.id,
 //     };
 
@@ -1499,44 +1597,38 @@
 //     newAreas[sourceIdx] = updatedSource;
 //     newAreas[targetIdx] = updatedTarget;
 
+//     // openedTabs는 그대로 (어느 영역에 있든 동일)
 //     set({
 //       areas: newAreas,
 //       activeTabGlobalId: foundTab.id,
 //     });
 //   },
 
-//   /** 영역 내 탭 재정렬 */
+//   /** 영역 내 탭 순서 재정렬 */
 //   reorderTabsV2: (areaId, fromIndex, toIndex) => {
 //     const { areas } = get();
 //     const idx = areas.findIndex((a) => a.id === areaId);
 //     if (idx === -1) return;
 
 //     const area = areas[idx];
-//     if (fromIndex === toIndex) return;
-
 //     const newTabs = [...area.tabs];
-//     const [moved] = newTabs.splice(fromIndex, 1);
-//     newTabs.splice(toIndex, 0, moved);
+//     const [removed] = newTabs.splice(fromIndex, 1);
+//     newTabs.splice(toIndex, 0, removed);
 
+//     const updatedArea = { ...area, tabs: newTabs };
 //     const newAreas = [...areas];
-//     newAreas[idx] = {
-//       ...area,
-//       tabs: newTabs,
-//     };
-
+//     newAreas[idx] = updatedArea;
 //     set({ areas: newAreas });
 //   },
 
-//   /** 영역 사이 리사이즈 */
 //   resizeAreasV2: (areaIndex, deltaWidth) => {
 //     const { areaWidths } = get();
 //     if (areaIndex < 0 || areaIndex >= areaWidths.length - 1) return;
 
-//     const leftWidth = areaWidths[areaIndex];
-//     const rightWidth = areaWidths[areaIndex + 1];
-
-//     const newLeft = leftWidth + deltaWidth;
-//     const newRight = rightWidth - deltaWidth;
+//     const left = areaWidths[areaIndex];
+//     const right = areaWidths[areaIndex + 1];
+//     const newLeft = left + deltaWidth;
+//     const newRight = right - deltaWidth;
 //     if (newLeft < MIN_AREA_WIDTH || newRight < MIN_AREA_WIDTH) {
 //       return;
 //     }
@@ -1544,34 +1636,46 @@
 //     const newArr = [...areaWidths];
 //     newArr[areaIndex] = newLeft;
 //     newArr[areaIndex + 1] = newRight;
-
 //     set({ areaWidths: newArr });
 //   },
 
-//   /** menuId별 탭 개수 계산 */
-//   getTabCountByIdV2: (menuId: number) => {
+//   getTabCountByIdV2: (menuId) => {
 //     const { allTabs } = get();
-//     // allTabs 중 tabId === menuId 인 것 카운트
 //     return allTabs.filter((t) => t.tabId === menuId).length;
 //   },
 // }));
 
-// src/store/tabStore.ts
 "use client";
 
 import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
+import React from "react";
 
-// 새탭
-export interface NewTabItem {
-  id: string;             // 고유 UUID
-  tabId: number | null;   // 실제 기능(메뉴) 식별자
+/* ─────────────────────────────────────────────
+   [구버전] OldTabItem 정의
+   ───────────────────────────────────────────── */
+export interface OldTabItem {
+  id: number;                // 예) 7, 8, 9...
+  uniqueKey: string;         // "7", "7-xxx" 등
   title: string;
+  icon: string;
+  href: string;
+  content: React.ReactNode;
   campaignId?: string;
   campaignName?: string;
 }
 
-// 분할 영역
+/* ─────────────────────────────────────────────
+    (신버전) NewTabItem / TabArea / SplitMode
+   ───────────────────────────────────────────── */
+export interface NewTabItem {
+  id: string;            // 내부적으로 고유 식별자 (UUID)
+  tabId: number | null;  // 구버전 id(메뉴 식별자)
+  title: string;         // 탭 표시 이름
+  campaignId?: string;
+  campaignName?: string;
+}
+
 export interface TabArea {
   id: string;
   tabs: NewTabItem[];
@@ -1580,6 +1684,7 @@ export interface TabArea {
 
 export type SplitMode = "none" | "split";
 
+/* '빈' 영역 생성 헬퍼 */
 function createEmptyArea(): TabArea {
   return {
     id: uuidv4(),
@@ -1588,19 +1693,52 @@ function createEmptyArea(): TabArea {
   };
 }
 
+/* ─────────────────────────────────────────────
+    스토어 인터페이스 (통합)
+   ───────────────────────────────────────────── */
 interface TabStoreState {
-  // 전체 탭
+  // ────── [구버전 호환 필드] ──────
+  openedTabs: OldTabItem[];  
+  activeTabId: number | null;
+  activeTabKey: string | null;
+
+  
+  // 추가: 캠페인 복사용 필드
+  campaignIdForCopyCampaign: string | null;
+  setCampaignIdForCopyCampaign: (id: string | null) => void;
+
+  campaignIdForUpdateFromSideMenu: string | null;
+  setCampaignIdForUpdateFromSideMenu: (id: string | null) => void;
+
+
+  // ★ 추가: 상담원 스킬 할당 정보
+  counselorSkillAssignmentInfo: {
+    tenantId: string | null;
+    counselorId: string | null;
+    counselorName: string | null;
+  } | null;
+  setCounselorSkillAssignmentInfo: (info: {
+    tenantId: string | null;
+    counselorId: string | null;
+    counselorName: string | null;
+  } | null) => void;
+
+  // campaignIdForUpdateFromSideMenu: string | null;
+  // setCampaignIdForUpdateFromSideMenu: (id: string | null) => void;
+
+  // 구버전 메서드 래퍼
+  addTab: (tab: OldTabItem) => void;
+  removeTab: (tabId: number, uniqueKey: string) => void;
+  setActiveTab: (tabId: number, uniqueKey: string) => void;
+
+  // ────── [신버전 필드] ──────
   allTabs: NewTabItem[];
-  // 여러 영역
   areas: TabArea[];
-  // 영역 너비 (%)
   areaWidths: number[];
-  // 스플릿 상태
   splitMode: SplitMode;
-  // 전역 활성 탭
   activeTabGlobalId: string | null;
 
-  // 기본 메서드
+  // 신버전 메서드
   openTabV2: (
     tabId: number,
     title: string,
@@ -1610,39 +1748,140 @@ interface TabStoreState {
   activateTabV2: (tabUuid: string) => void;
   duplicateTabV2: (tabUuid: string) => void;
 
-  // 멀티 스플릿 관련
   splitTabAreaV2: (count: number) => void;
   closeAreaV2: (areaId: string) => void;
   moveTabToAreaV2: (tabUuid: string, targetAreaId: string) => void;
   reorderTabsV2: (areaId: string, fromIndex: number, toIndex: number) => void;
   resizeAreasV2: (areaIndex: number, deltaWidth: number) => void;
 
-  // 메서드
   getTabCountByIdV2: (menuId: number) => number;
 }
+
+/* ─────────────────────────────────────────
+    Zustand Store 구현
+   ───────────────────────────────────────── */
 
 const MIN_AREA_WIDTH = 10;
 
 export const useTabStore = create<TabStoreState>((set, get) => ({
-  // 초기 상태
+  /* ───────── [구버전 초기 값] ───────── */
+  openedTabs: [],
+  activeTabId: null,
+  activeTabKey: null,
+
+  campaignIdForUpdateFromSideMenu: null,
+  setCampaignIdForUpdateFromSideMenu: (id) => set({ campaignIdForUpdateFromSideMenu: id }),
+
+  campaignIdForCopyCampaign: null,
+  setCampaignIdForCopyCampaign: (id) => set({ campaignIdForCopyCampaign: id }),
+
+  // ★ 추가: 상담원 스킬 할당 정보 (초기 null)
+  counselorSkillAssignmentInfo: {
+    tenantId: null,
+    counselorId: null,
+    counselorName: null,
+  },
+  setCounselorSkillAssignmentInfo: (info) => {
+    set({
+      counselorSkillAssignmentInfo: info ?? {
+        tenantId: null,
+        counselorId: null,
+        counselorName: null,
+      },
+    });
+  },
+
+  // campaignIdForUpdateFromSideMenu: null,
+  // setCampaignIdForUpdateFromSideMenu: (id) => {
+  //   set({ campaignIdForUpdateFromSideMenu: id });
+  // },
+
+  /* ───────── [신버전 초기 값] ───────── */
   allTabs: [],
   areas: [createEmptyArea()],
   areaWidths: [100],
   splitMode: "none",
   activeTabGlobalId: null,
 
-  /** 새 탭 열기 */
+  /* ──────────────────────────
+      구버전 메서드 래퍼
+     ────────────────────────── */
+
+  /** 구버전 addTab: (tab: OldTabItem) */
+  addTab: (oldTab) => {
+    // 1) 구버전 openedTabs에 추가
+    set((state) => {
+      // 중복 체크
+      const exists = state.openedTabs.some(
+        (x) => x.id === oldTab.id && x.uniqueKey === oldTab.uniqueKey
+      );
+      if (exists) {
+        return state; // 중복이면 그대로
+      }
+      const newOpened = [...state.openedTabs, oldTab];
+      return { ...state, openedTabs: newOpened };
+    });
+
+    // 2) 신버전 openTabV2로도 등록
+    const newTitle = oldTab.title || oldTab.uniqueKey;
+    get().openTabV2(oldTab.id, newTitle, {
+      campaignId: oldTab.campaignId,
+      campaignName: oldTab.campaignName,
+    });
+  },
+
+  /** 구버전 removeTab: (tabId, uniqueKey) */
+  removeTab: (tabId, uniqueKey) => {
+    // 1) 구버전 openedTabs에서 제거
+    set((state) => {
+      const newTabs = state.openedTabs.filter(
+        (t) => !(t.id === tabId && t.uniqueKey === uniqueKey)
+      );
+      return { ...state, openedTabs: newTabs };
+    });
+    // 2) 신버전 allTabs 중 (tabId===, title===) 찾아 closeTabV2
+    const st = get();
+    const found = st.allTabs.find(
+      (t) => t.tabId === tabId && t.title === uniqueKey
+    );
+    if (found) {
+      st.closeTabV2(found.id);
+    }
+  },
+
+  /** 구버전 setActiveTab: (tabId, uniqueKey) */
+  setActiveTab: (tabId, uniqueKey) => {
+    // 1) 구버전 상태 activeTabId/activeTabKey 갱신
+    set({
+      activeTabId: tabId,
+      activeTabKey: uniqueKey,
+    });
+    // 2) 신버전 탭 찾기 + activateTabV2
+    const st = get();
+    const found = st.allTabs.find(
+      (t) => t.tabId === tabId && t.title === uniqueKey
+    );
+    if (found) {
+      st.activateTabV2(found.id);
+    }
+  },
+
+  /* ──────────────────────────
+      신버전 메서드들
+     ────────────────────────── */
+
+  /** 새 탭 열기 (분할) */
   openTabV2: (tabId, title, options) => {
     const { allTabs, areas } = get();
-    const newTabId = uuidv4();
+    const newTabUuid = uuidv4();
     const newTab: NewTabItem = {
-      id: newTabId,
+      id: newTabUuid,
       tabId,
       title,
       campaignId: options?.campaignId,
       campaignName: options?.campaignName,
     };
-    // allTabs에 추가
+
     const updatedAll = [...allTabs, newTab];
 
     // 첫 영역에 삽입
@@ -1650,24 +1889,25 @@ export const useTabStore = create<TabStoreState>((set, get) => ({
     const updatedFirst = {
       ...firstArea,
       tabs: [...firstArea.tabs, newTab],
-      activeTabId: newTabId,
+      activeTabId: newTabUuid,
     };
+
     const updatedAreas = [updatedFirst, ...areas.slice(1)];
 
     set({
       allTabs: updatedAll,
       areas: updatedAreas,
-      activeTabGlobalId: newTabId,
-      // 분할 여부는 기존 상태 유지
+      activeTabGlobalId: newTabUuid,
     });
   },
 
   /** 탭 닫기 */
   closeTabV2: (tabUuid) => {
     const { allTabs, areas, activeTabGlobalId } = get();
+    // allTabs 제거
     const newAll = allTabs.filter((t) => t.id !== tabUuid);
 
-    // 각 영역에서 해당 탭 제거
+    // 영역들에서 제거
     const newAreas = areas.map((area) => {
       if (!area.tabs.some((x) => x.id === tabUuid)) return area;
       const filtered = area.tabs.filter((x) => x.id !== tabUuid);
@@ -1675,73 +1915,107 @@ export const useTabStore = create<TabStoreState>((set, get) => ({
       if (newActive === tabUuid) {
         newActive = filtered.length ? filtered[filtered.length - 1].id : null;
       }
-      return {
-        ...area,
-        tabs: filtered,
-        activeTabId: newActive,
-      };
+      return { ...area, tabs: filtered, activeTabId: newActive };
     });
 
-    // 글로벌 활성 탭 갱신
     let newGlobal = activeTabGlobalId;
     if (activeTabGlobalId === tabUuid) {
-      const stillOpen = newAreas.flatMap((a) => a.tabs);
-      newGlobal = stillOpen.length ? stillOpen[stillOpen.length - 1].id : null;
+      const remainTabs = newAreas.flatMap((a) => a.tabs);
+      newGlobal = remainTabs.length ? remainTabs[remainTabs.length - 1].id : null;
     }
 
-    set({
-      allTabs: newAll,
-      areas: newAreas,
-      activeTabGlobalId: newGlobal,
+    // 3) 구버전 openedTabs에도 반영 (tabId, title)에 해당하는 항목 제거
+    let oldTabId: number | null = null;
+    let oldKey: string | null = null;
+    const closedItem = allTabs.find((x) => x.id === tabUuid);
+    if (closedItem) {
+      oldTabId = closedItem.tabId;
+      oldKey = closedItem.title;
+    }
+
+    set((state) => {
+      let newOpened = state.openedTabs;
+      if (oldTabId !== null && oldKey !== null) {
+        newOpened = state.openedTabs.filter(
+          (o) => !(o.id === oldTabId && o.uniqueKey === oldKey)
+        );
+      }
+      return {
+        ...state,
+        allTabs: newAll,
+        areas: newAreas,
+        activeTabGlobalId: newGlobal,
+        openedTabs: newOpened,
+      };
     });
   },
 
   /** 탭 활성화 */
   activateTabV2: (tabUuid) => {
-    const { areas } = get();
-    // 어느 영역에 있는지 찾기
+    const { areas, activeTabGlobalId } = get();
     const idx = areas.findIndex((a) => a.tabs.some((t) => t.id === tabUuid));
     if (idx === -1) return;
 
     const area = areas[idx];
     const updatedArea = { ...area, activeTabId: tabUuid };
-    const newArr = [...areas];
-    newArr[idx] = updatedArea;
+    const newAreas = [...areas];
+    newAreas[idx] = updatedArea;
+
+    // 구버전 openedTabs도 activeTabId, activeTabKey 반영
+    const found = get().allTabs.find((t) => t.id === tabUuid);
 
     set({
-      areas: newArr,
+      areas: newAreas,
       activeTabGlobalId: tabUuid,
+      activeTabId: found?.tabId ?? null,
+      activeTabKey: found?.title ?? null,
     });
   },
 
   /** 탭 복제 */
   duplicateTabV2: (tabUuid) => {
     const { allTabs, areas } = get();
-    const original = allTabs.find((t) => t.id === tabUuid);
-    if (!original) return;
-
+    const orig = allTabs.find((x) => x.id === tabUuid);
+    if (!orig) return;
     const dupId = uuidv4();
-    const duplicated: NewTabItem = {
-      ...original,
-      id: dupId,
-    };
+    const duplicated: NewTabItem = { ...orig, id: dupId };
 
     const updatedAll = [...allTabs, duplicated];
 
-    // 같은 영역에 붙여넣기
     const newAreas = areas.map((area) => {
-      if (!area.tabs.some((x) => x.id === tabUuid)) return area;
-      return {
-        ...area,
-        tabs: [...area.tabs, duplicated],
-        activeTabId: dupId,
-      };
+      if (area.tabs.some((x) => x.id === tabUuid)) {
+        return {
+          ...area,
+          tabs: [...area.tabs, duplicated],
+          activeTabId: dupId,
+        };
+      }
+      return area;
     });
 
-    set({
-      allTabs: updatedAll,
-      areas: newAreas,
-      activeTabGlobalId: dupId,
+    // 구버전 openedTabs에도 하나 추가
+    const newUniqueKey = orig.title + "-dup";
+    const newOldTab: OldTabItem = {
+      id: orig.tabId ?? 0,
+      uniqueKey: newUniqueKey,
+      title: orig.title,
+      icon: "",
+      href: "",
+      content: null,
+      campaignId: orig.campaignId,
+      campaignName: orig.campaignName,
+    };
+
+    set((state) => {
+      return {
+        ...state,
+        allTabs: updatedAll,
+        areas: newAreas,
+        activeTabGlobalId: dupId,
+        openedTabs: [...state.openedTabs, newOldTab],
+        activeTabId: orig.tabId ?? 0,
+        activeTabKey: orig.title ?? null,
+      };
     });
   },
 
@@ -1751,7 +2025,6 @@ export const useTabStore = create<TabStoreState>((set, get) => ({
     const { allTabs } = get();
 
     if (count === 1) {
-      // 모두 합쳐서 1개 영역으로
       set({
         areas: [
           {
@@ -1769,9 +2042,7 @@ export const useTabStore = create<TabStoreState>((set, get) => ({
       return;
     }
 
-    // 2~4
     const newAreas: TabArea[] = [];
-    // 첫 영역에 모든 탭
     const firstArea: TabArea = {
       id: uuidv4(),
       tabs: [...allTabs],
@@ -1781,6 +2052,7 @@ export const useTabStore = create<TabStoreState>((set, get) => ({
     for (let i = 1; i < count; i++) {
       newAreas.push(createEmptyArea());
     }
+
     const eqWidth = 100 / count;
     const widths = Array(count).fill(eqWidth);
 
@@ -1794,23 +2066,33 @@ export const useTabStore = create<TabStoreState>((set, get) => ({
     });
   },
 
-  /** 영역 닫기 */
+  /** 특정 영역 닫기 */
   closeAreaV2: (areaId) => {
-    const { areas, areaWidths, allTabs, activeTabGlobalId } = get();
-    if (areas.length <= 1) return; // 1개 이하이면 닫지 않음
+    const { areas, areaWidths, activeTabGlobalId, allTabs, openedTabs } = get();
+    if (areas.length <= 1) return;
 
     const idx = areas.findIndex((a) => a.id === areaId);
     if (idx === -1) return;
 
-    // 닫힐 영역의 탭들
-    const removedTabs = areas[idx].tabs.map((t) => t.id);
+    // 닫히는 영역 탭
+    const removed = areas[idx].tabs.map((x) => x.id);
+    // allTabs에서 제거
+    const newAll = allTabs.filter((t) => !removed.includes(t.id));
 
-    // allTabs에서도 제거
-    const newAllTabs = allTabs.filter((t) => !removedTabs.includes(t.id));
+    // openedTabs에서도 제거
+    let newOpened = [...openedTabs];
+    areas[idx].tabs.forEach((closing) => {
+      const oldId = closing.tabId ?? 0;
+      const oldTitle = closing.title;
+      newOpened = newOpened.filter(
+        (o) => !(o.id === oldId && o.uniqueKey === oldTitle)
+      );
+    });
 
-    // 영역 삭제
+    // 남은 영역
     const remain = areas.filter((a) => a.id !== areaId);
-    // 너비 재분배
+
+    // 너비 재조정
     const closedW = areaWidths[idx];
     let newWidths = [...areaWidths];
     newWidths.splice(idx, 1);
@@ -1821,19 +2103,17 @@ export const useTabStore = create<TabStoreState>((set, get) => ({
       newWidths = newWidths.map((w) => w + addEach);
     }
 
-    // 활성 탭 재설정
     let newActive = activeTabGlobalId;
-    if (removedTabs.includes(activeTabGlobalId || "")) {
-      // 지워진 탭이었다면, 남은 탭 중 마지막을 활성화
+    if (removed.includes(activeTabGlobalId || "")) {
       const still = remain.flatMap((r) => r.tabs);
       newActive = still.length ? still[still.length - 1].id : null;
     }
 
-    // 분할 모드 재설정
     const newMode = remain.length > 1 ? "split" : "none";
 
     set({
-      allTabs: newAllTabs,
+      allTabs: newAll,
+      openedTabs: newOpened,
       areas: remain,
       areaWidths: newWidths,
       splitMode: newMode,
@@ -1843,11 +2123,10 @@ export const useTabStore = create<TabStoreState>((set, get) => ({
 
   /** 탭을 다른 영역으로 이동 */
   moveTabToAreaV2: (tabUuid, targetAreaId) => {
-    const { areas, activeTabGlobalId } = get();
-
-    // 우선 소스 찾기
+    const { areas, allTabs, openedTabs } = get();
     let sourceIdx = -1;
     let foundTab: NewTabItem | null = null;
+
     for (let i = 0; i < areas.length; i++) {
       const area = areas[i];
       const t = area.tabs.find((x) => x.id === tabUuid);
@@ -1858,39 +2137,32 @@ export const useTabStore = create<TabStoreState>((set, get) => ({
       }
     }
     if (!foundTab) return;
-    // 이미 같은 영역이면 무시
     if (areas[sourceIdx].id === targetAreaId) return;
 
-    // 소스 영역에서 제거
+    // 소스에서 제거
     const srcArea = areas[sourceIdx];
-    const filteredTabs = srcArea.tabs.filter((t) => t.id !== tabUuid);
+    const filtered = srcArea.tabs.filter((t) => t.id !== tabUuid);
     let newSrcActive = srcArea.activeTabId;
     if (newSrcActive === tabUuid) {
-      newSrcActive = filteredTabs.length
-        ? filteredTabs[filteredTabs.length - 1].id
-        : null;
+      newSrcActive = filtered.length ? filtered[filtered.length - 1].id : null;
     }
-    const updatedSource = {
-      ...srcArea,
-      tabs: filteredTabs,
-      activeTabId: newSrcActive,
-    };
+    const updatedSource = { ...srcArea, tabs: filtered, activeTabId: newSrcActive };
 
-    // 타겟 영역에 추가
+    // 타겟에 추가
     const targetIdx = areas.findIndex((a) => a.id === targetAreaId);
     if (targetIdx === -1) return;
     const tgtArea = areas[targetIdx];
-    const newTgtTabs = [...tgtArea.tabs, foundTab];
     const updatedTarget = {
       ...tgtArea,
-      tabs: newTgtTabs,
-      activeTabId: foundTab.id, // 새 탭 활성화
+      tabs: [...tgtArea.tabs, foundTab],
+      activeTabId: foundTab.id,
     };
 
     const newAreas = [...areas];
     newAreas[sourceIdx] = updatedSource;
     newAreas[targetIdx] = updatedTarget;
 
+    // openedTabs는 변경 없음
     set({
       areas: newAreas,
       activeTabGlobalId: foundTab.id,
@@ -1908,13 +2180,14 @@ export const useTabStore = create<TabStoreState>((set, get) => ({
     const [removed] = newTabs.splice(fromIndex, 1);
     newTabs.splice(toIndex, 0, removed);
 
-    const updated = { ...area, tabs: newTabs };
+    const updatedArea = { ...area, tabs: newTabs };
     const newAreas = [...areas];
-    newAreas[idx] = updated;
+    newAreas[idx] = updatedArea;
+
     set({ areas: newAreas });
   },
 
-  /** 영역 리사이즈 */
+  /** 영역 사이 리사이즈 */
   resizeAreasV2: (areaIndex, deltaWidth) => {
     const { areaWidths } = get();
     if (areaIndex < 0 || areaIndex >= areaWidths.length - 1) return;
@@ -1937,4 +2210,8 @@ export const useTabStore = create<TabStoreState>((set, get) => ({
     const { allTabs } = get();
     return allTabs.filter((t) => t.tabId === menuId).length;
   },
+  
 }));
+
+
+

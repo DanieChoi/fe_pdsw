@@ -2,8 +2,17 @@
 
 import { useState } from "react";
 import { ChevronRight, ChevronDown, MoreVertical } from "lucide-react";
-import { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem } from "@/components/ui/context-menu";
-import { useTabStore } from '@/store/tabStore';
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuSeparator,
+} from "@/components/ui/context-menu";
+import { useTabStore } from "@/store/tabStore";
 
 interface TreeNode {
   id: string;
@@ -54,10 +63,12 @@ function TreeView({ data }: { data: TreeNode[] }) {
 function TreeNodeItem({ node }: { node: TreeNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const hasChildren = node.children && node.children.length > 0;
-  const { simulateHeaderMenuClick } = useTabStore();
+  // 신버전에서는 simulateHeaderMenuClick 대신 openTabV2 사용
+  const { openTabV2 } = useTabStore();
 
   const handleCounselorInfo = () => {
-    simulateHeaderMenuClick(6); // 발신진행상태 메뉴 클릭
+    // 상담원 정보 탭 열기 (tabId 6 예시)
+    openTabV2(6, "상담원 Info", { campaignId: node.id });
   };
 
   return (
@@ -71,7 +82,11 @@ function TreeNodeItem({ node }: { node: TreeNode }) {
             <div className="flex items-center space-x-2">
               {hasChildren && (
                 <span className="w-4 h-4">
-                  {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                  {isOpen ? (
+                    <ChevronDown size={16} />
+                  ) : (
+                    <ChevronRight size={16} />
+                  )}
                 </span>
               )}
               <span className={node.type === "team" ? "font-semibold text-blue-600" : "text-gray-700"}>
@@ -85,13 +100,21 @@ function TreeNodeItem({ node }: { node: TreeNode }) {
         <ContextMenuContent className="w-40 bg-white shadow-md border rounded-md">
           {node.type === "team" ? (
             <>
-              <ContextMenuItem onClick={() => console.log(`팀 수정: ${node.name}`)}>팀 수정</ContextMenuItem>
-              <ContextMenuItem onClick={() => console.log(`팀 상태 변경: ${node.name}`)}>팀 상태 변경</ContextMenuItem>
+              <ContextMenuItem onClick={() => console.log(`팀 수정: ${node.name}`)}>
+                팀 수정
+              </ContextMenuItem>
+              <ContextMenuItem onClick={() => console.log(`팀 상태 변경: ${node.name}`)}>
+                팀 상태 변경
+              </ContextMenuItem>
             </>
           ) : (
             <>
-              <ContextMenuItem onClick={() => console.log(`상담 시작: ${node.name}`)}>상담 시작</ContextMenuItem>
-              <ContextMenuItem onClick={() => console.log(`상담 중지: ${node.name}`)}>상담 중지</ContextMenuItem>
+              <ContextMenuItem onClick={() => console.log(`상담 시작: ${node.name}`)}>
+                상담 시작
+              </ContextMenuItem>
+              <ContextMenuItem onClick={() => console.log(`상담 중지: ${node.name}`)}>
+                상담 중지
+              </ContextMenuItem>
               <ContextMenuItem onClick={handleCounselorInfo}>
                 상담원 Info
               </ContextMenuItem>

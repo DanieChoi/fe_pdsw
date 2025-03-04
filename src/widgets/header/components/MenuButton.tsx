@@ -10,11 +10,11 @@ interface MenuButtonProps {
 }
 
 const MenuButton: React.FC<MenuButtonProps> = ({ item }) => {
-  const { addTab, openedTabs, duplicateTab, activeTabId } = useTabStore();
+  const { addTab, openedTabs, activeTabId } = useTabStore();
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.ctrlKey && openedTabs.some(tab => tab.id === item.id)) {
-      duplicateTab(item.id);
+      // duplicateTab(item.id);
     } else if (!openedTabs.some(tab => tab.id === item.id)) {
       addTab({ ...item, uniqueKey: item.uniqueKey ?? '', content: item.content ?? null });
     }

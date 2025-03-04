@@ -1,4 +1,3 @@
-
 "use client";
 
 import { TreeNodeProps } from "@/components/shared/layout/SidebarPresenter";
@@ -22,14 +21,12 @@ export function TreeNode({
   onNodeSelect,
 }: TreeNodeProps) {
   const { skilIdsForCampaignTreeMenu } = useSideMenuCampaignTabStore();
-  const {
-    simulateHeaderMenuClick,
-    setCampaignIdForUpdateFromSideMenu,
-    setCampaignIdForCopyCampaign,
-    addTab,
-  } = useTabStore();
+  // 신버젼에서는 simulateHeaderMenuClick, setCampaignIdForCopyCampaign 대신 openTabV2 사용
+  // const { setCampaignIdForUpdateFromSideMenu, openTabV2, addTab } = useTabStore();
+  const { setCampaignIdForUpdateFromSideMenu, openTabV2, addTab, setCampaignIdForCopyCampaign } = useTabStore();
 
-  // 캠페인 타입일 경우 hasChildren은 항상 false로 처리
+
+  // 캠페인 타입일 경우 hasChildren은 항상 false 처리
   const hasChildren = item.type === "campaign" ? false : (item.children && item.children.length > 0);
   const isExpanded = expandedNodes.has(item.id);
   const isSelected = selectedNodeId === item.id;
@@ -42,22 +39,21 @@ export function TreeNode({
     }
   }, [item.id, hasChildren, onNodeSelect, onNodeToggle]);
 
-  // 우클릭 시 노드 선택을 처리하는 함수 추가
+  // 우클릭 시 노드 선택
   const handleContextMenu = useCallback(() => {
     onNodeSelect(item.id);
   }, [item.id, onNodeSelect]);
 
+  // 더블 클릭 시 캠페인 수정 탭을 여는 동작 (신버젼 openTabV2 사용)
   const handleDoubleClick = useCallback(() => {
     if (item.type !== "campaign") return;
-    simulateHeaderMenuClick(2);
-    setCampaignIdForUpdateFromSideMenu(item.id);
-  }, [item, simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu]);
+    openTabV2(2, "캠페인 수정", { campaignId: item.id, campaignName: item.label });
+  }, [item, openTabV2]);
 
   if (item.visible === false) {
     return null;
   }
 
-  //
   const getNodeIcon = () => {
     if (item.type === "folder") {
       return level === 0 ? (
@@ -91,25 +87,37 @@ export function TreeNode({
   const handleEdit = () => {
     console.log("Edit clicked:", { id: item.id, label: item.label, type: item.type });
   };
-  // const handleDelete = () => {
-  //   console.log("Delete clicked:", { id: item.id, label: item.label, type: item.type });
-  // };
+
   const handleMonitor = () => {
     console.log("Monitor clicked:", { id: item.id, label: item.label, type: item.type });
   };
+
+  // 캠페인 복사 시 openTabV2를 사용
+  // const onHandleCampaignCopy = () => {
+  //   console.log("Copy clicked:", { id: item.id, label: item.label, type: item.type });
+  //   openTabV2(130, "캠페인 복사", { campaignId: item.id });
+  // };
+
+  // const onHandleCampaignCopy = () => {
+  //   console.log("Copy clicked:", { id: item.id, label: item.label, type: item.type });
+  //   // openTabV2(130, "캠페인 복사", { campaignId: item.id });
+  //   openTabV2(130, "캠페인 복사", {
+  //     campaignId: item.id,
+  //     campaignName: item.label,
+  //   });
+    
+  // };
   const onHandleCampaignCopy = () => {
     console.log("Copy clicked:", { id: item.id, label: item.label, type: item.type });
-    setCampaignIdForUpdateFromSideMenu(item.id);
-    setCampaignIdForCopyCampaign(item.id);
-    addTab({
-      id: 130,
-      uniqueKey: "130",
-      title: "캠페인 복사",
-      icon: "",
-      href: "",
-      content: null,
+    // Set the campaign ID for copying
+    setCampaignIdForCopyCampaign(item.id.toString());
+    
+    // Then open the tab
+    openTabV2(130, "캠페인 복사", {
+      campaignId: item.id,
+      campaignName: item.label,
     });
-  };
+  }
 
   const nodeStyle = clsx(
     "flex items-center hover:bg-[#FFFAEE] px-2 py-0.5 cursor-pointer transition-colors duration-150",
@@ -118,7 +126,6 @@ export function TreeNode({
     }
   );
 
-  // 공통된 노드 내용 컴포넌트
   const nodeContent = (
     <div className="flex items-center w-full gap-2">
       {hasChildren ? (
@@ -167,7 +174,6 @@ export function TreeNode({
         <ContextMenuForTreeNode
           item={item}
           onEdit={handleEdit}
-          // onDelete={handleDelete}
           onMonitor={handleMonitor}
           onHandleCampaignCopy={onHandleCampaignCopy}
         >
