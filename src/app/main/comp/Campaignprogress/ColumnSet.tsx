@@ -9,6 +9,77 @@ export interface ColumnSetProps {
   columns: any[];
 }
 
+interface ColumnSettingItem {
+  key: string;
+  name: string;
+  renderCell?: any;
+}
+
+const HeaderColumn : ColumnSettingItem[] = [
+  { key: 'campId', name: '캠페인아이디'},
+  { key: 'campaignName', name: '캠페인이름'},
+  { key: 'strFlag', name: '발신구분',renderCell: ({ row }: { row: { level?: number,strFlag?: string } }) => (row.level === 3 ? row.strFlag : '')},
+  { key: 'startFlag', name: '시작구분'},
+  { key: 'endFlag', name: '완료구분'},
+  { key: 'progressRate', name: '진행률(%)',renderCell: ({ row }: { row: { level?: number,progressRate?: number } }) => (row.level === 3 ? `${row.progressRate}%` : '')},
+  { key: 'successRateList', name: '리스트 대비 성공률(%)',renderCell: ({ row }: { row: { level?: number,successRateList?: number } }) => (row.level === 3 ? `${row.successRateList}%` : '')},
+  { key: 'totLstCnt', name: '총 리스트 건수',renderCell: ({ row }: { row: { level?: number,totLstCnt?: number } }) => (row.level === 3 ? row.totLstCnt : '')},
+  { key: 'nonTTCT', name: '순수발신 건수',renderCell: ({ row }: { row: { level?: number,nonTTCT?: number } }) => (row.level === 3 ? row.nonTTCT : '')},
+  { key: 'nonSendCount', name: '미발신 건수',renderCell: ({ row }: { row: { level?: number,nonSendCount?: number } }) => (row.level === 3 ? row.nonSendCount : '')},
+  { key: 'successRateSend', name: '발신 대비 성공률(%)',renderCell: ({ row }: { row: { level?: number,successRateSend?: number } }) => (row.level === 3 ? `${row.successRateSend}%` : '')},
+  { key: 'totDialCnt', name: '총 발신 건수',renderCell: ({ row }: { row: { level?: number,totDialCnt?: number } }) => (row.level === 3 ? row.totDialCnt : '')},
+  { key: 'dialAttemptCnt', name: '발신 시도 건수',renderCell: ({ row }: { row: { level?: number,dialAttemptCnt?: number } }) => (row.level === 3 ? row.dialAttemptCnt : '')},
+  { key: 'scct', name: '발신 성공 건수',renderCell: ({ row }: { row: { level?: number,scct?: number } }) => (row.level === 3 ? row.scct : '')},
+  { key: 'failSendCount', name: '발신 실패 건수',renderCell: ({ row }: { row: { level?: number,failSendCount?: number } }) => (row.level === 3 ? row.failSendCount : '')},
+  { key: 'overDial', name: '대기 상담원 없음',renderCell: ({ row }: { row: { level?: number,overDial?: number } }) => (row.level === 3 ? row.overDial : '')},
+  { key: 'agentConnect', name: '상담원 연결',renderCell: ({ row }: { row: { level?: number,agentConnect?: number } }) => (row.level === 3 ? row.agentConnect : '')},
+  { key: 'abct', name: '상담원 연결 실패',renderCell: ({ row }: { row: { level?: number,abct?: number } }) => (row.level === 3 ? row.abct : '')},
+  { key: 'agentNoAnswerCnt', name: '상담원 무응답',renderCell: ({ row }: { row: { level?: number,agentNoAnswerCnt?: number } }) => (row.level === 3 ? row.agentNoAnswerCnt : '')},
+  { key: 'agentBusyCnt', name: '상담원 통화중',renderCell: ({ row }: { row: { level?: number,agentBusyCnt?: number } }) => (row.level === 3 ? row.agentBusyCnt : '')},
+  { key: 'agentDropCnt', name: '상담원 바로 끊음',renderCell: ({ row }: { row: { level?: number,agentDropCnt?: number } }) => (row.level === 3 ? row.agentDropCnt : '')},
+  { key: 'customerDropCnt', name: '고객 포기',renderCell: ({ row }: { row: { level?: number,customerDropCnt?: number } }) => (row.level === 3 ? row.customerDropCnt : '')},
+  { key: 'nonServiceCnt', name: '고객 최대 대기시간 초과',renderCell: ({ row }: { row: { level?: number,nonServiceCnt?: number } }) => (row.level === 3 ? row.nonServiceCnt : '')},
+  { key: 'noAgentCnt', name: '멘트 청취후 상담원 연결안함',renderCell: ({ row }: { row: { level?: number,noAgentCnt?: number } }) => (row.level === 3 ? row.noAgentCnt : '')},
+  { key: 'buct', name: '통화중 실패',renderCell: ({ row }: { row: { level?: number,buct?: number } }) => (row.level === 3 ? row.buct : '')},
+  { key: 'nact', name: '무응답 실패',renderCell: ({ row }: { row: { level?: number,nact?: number } }) => (row.level === 3 ? row.nact : '')},
+  { key: 'fact', name: '팩스/모뎀 실패',renderCell: ({ row }: { row: { level?: number,fact?: number } }) => (row.level === 3 ? row.fact : '')},
+  { key: 'etct', name: '기타 실패',renderCell: ({ row }: { row: { level?: number,etct?: number } }) => (row.level === 3 ? row.etct : '')},
+  { key: 'tect', name: '전화번호 오류 실패',renderCell: ({ row }: { row: { level?: number,tect?: number } }) => (row.level === 3 ? row.tect : '')},
+  { key: 'lineStopCnt', name: '회선 오류 실패',renderCell: ({ row }: { row: { level?: number,lineStopCnt?: number } }) => (row.level === 3 ? row.lineStopCnt : '')},
+  { key: 'customerOnHookCnt', name: '고객 바로 끊음 실패',renderCell: ({ row }: { row: { level?: number,customerOnHookCnt?: number } }) => (row.level === 3 ? row.customerOnHookCnt : '')},
+  { key: 'detectSilenceCnt', name: '통화음 없음 실패',renderCell: ({ row }: { row: { level?: number,detectSilenceCnt?: number } }) => (row.level === 3 ? row.detectSilenceCnt : '')},
+  { key: 'dialToneSilence', name: '다이얼톤 없음 실패',renderCell: ({ row }: { row: { level?: number,dialToneSilence?: number } }) => (row.level === 3 ? row.dialToneSilence : '')},
+  { key: 'acct', name: '기계음 실패',renderCell: ({ row }: { row: { level?: number,acct?: number } }) => (row.level === 3 ? row.acct : '')},
+  { key: 'nogblockTime', name: '스케쥴 대기(발신가능)',renderCell: ({ row }: { row: { level?: number,nogblockTime?: number } }) => (row.level === 3 ? row.nogblockTime : '')},
+  { key: 'blackList', name: '블랙리스트',renderCell: ({ row }: { row: { level?: number,blackList?: number } }) => (row.level === 3 ? row.blackList : '')},
+  { key: 'nogdeleteGL', name: '실시간 리스트 삭제',renderCell: ({ row }: { row: { level?: number,nogdeleteGL?: number } }) => (row.level === 3 ? row.nogdeleteGL : '')},
+  { key: 'nogtimeContradictory', name: '스케쥴 설정 실패',renderCell: ({ row }: { row: { level?: number,nogtimeContradictory?: number } }) => (row.level === 3 ? row.nogtimeContradictory : '')},
+  { key: 'nogtimeOutCallback', name: '콜백 타임아웃',renderCell: ({ row }: { row: { level?: number,nogtimeOutCallback?: number } }) => (row.level === 3 ? row.nogtimeOutCallback : '')},
+  { key: 'nogautoPopNotDial', name: '팝업후 상담원 미발신 선택',renderCell: ({ row }: { row: { level?: number,nogautoPopNotDial?: number } }) => (row.level === 3 ? row.nogautoPopNotDial : '')},
+  { key: 'nogautoPopNoAnswer', name: '팝업후 발신 여부 미선택',renderCell: ({ row }: { row: { level?: number,nogautoPopNoAnswer?: number } }) => (row.level === 3 ? row.nogautoPopNoAnswer : '')},
+  { key: 'nogautoPopNoReady', name: '팝업후 상담원 상태 변경',renderCell: ({ row }: { row: { level?: number,nogautoPopNoReady?: number } }) => (row.level === 3 ? row.nogautoPopNoReady : '')},
+  { key: 'nogautoPopFailMode', name: '팝업후 상담원 모드 변경',renderCell: ({ row }: { row: { level?: number,nogautoPopFailMode?: number } }) => (row.level === 3 ? row.nogautoPopFailMode : '')},
+  { key: 'nogautoDialNoReady', name: '발신 확인전 상담원 상태 변경',renderCell: ({ row }: { row: { level?: number,nogautoDialNoReady?: number } }) => (row.level === 3 ? row.nogautoDialNoReady : '')},
+  { key: 'nogautoPopFailMode', name: '발신 확인전 상담원 모드 변경',renderCell: ({ row }: { row: { level?: number,nogautoPopFailMode?: number } }) => (row.level === 3 ? row.nogautoPopFailMode : '')},
+  { key: 'nogautoNoEmployeeId', name: '지정 상담원 정보 미입력',renderCell: ({ row }: { row: { level?: number,nogautoNoEmployeeId?: number } }) => (row.level === 3 ? row.nogautoNoEmployeeId : '')}
+];
+
+export const defaultColumnsData: ColumnSettingItem[] = [
+  { key: 'strFlag', name: '발신구분',renderCell: ({ row }: { row: { level?: number,strFlag?: string } }) => (row.level === 3 ? row.strFlag : '')},
+  { key: 'startFlag', name: '시작구분'},
+  { key: 'endFlag', name: '완료구분'},
+  { key: 'progressRate', name: '진행률(%)',renderCell: ({ row }: { row: { level?: number,progressRate?: number } }) => (row.level === 3 ? `${row.progressRate}%` : '')},
+  { key: 'successRateList', name: '리스트 대비 성공률(%)',renderCell: ({ row }: { row: { level?: number,successRateList?: number } }) => (row.level === 3 ? `${row.successRateList}%` : '')},
+  { key: 'totLstCnt', name: '총 리스트 건수',renderCell: ({ row }: { row: { level?: number,totLstCnt?: number } }) => (row.level === 3 ? row.totLstCnt : '')},
+  { key: 'nonTTCT', name: '순수발신 건수',renderCell: ({ row }: { row: { level?: number,nonTTCT?: number } }) => (row.level === 3 ? row.nonTTCT : '')},
+  { key: 'nonSendCount', name: '미발신 건수',renderCell: ({ row }: { row: { level?: number,nonSendCount?: number } }) => (row.level === 3 ? row.nonSendCount : '')},
+  { key: 'successRateSend', name: '발신 대비 성공률(%)',renderCell: ({ row }: { row: { level?: number,successRateSend?: number } }) => (row.level === 3 ? `${row.successRateSend}%` : '')},
+  { key: 'totDialCnt', name: '총 발신 건수',renderCell: ({ row }: { row: { level?: number,totDialCnt?: number } }) => (row.level === 3 ? row.totDialCnt : '')},
+  { key: 'dialAttemptCnt', name: '발신 시도 건수',renderCell: ({ row }: { row: { level?: number,dialAttemptCnt?: number } }) => (row.level === 3 ? row.dialAttemptCnt : '')},
+  { key: 'scct', name: '발신 성공 건수',renderCell: ({ row }: { row: { level?: number,scct?: number } }) => (row.level === 3 ? row.scct : '')},
+  { key: 'failSendCount', name: '발신 실패 건수',renderCell: ({ row }: { row: { level?: number,failSendCount?: number } }) => (row.level === 3 ? row.failSendCount : '')},
+]
+
 const DEFAULT_SELECTED_KEYS = [
   'senderType', 'start_flag', '완료구분', '진행률', '리스트대비성공률', 
   '총리스트건수', '순수발신건수', '미발신건수', '발신대비성공률', '총발신건수',
@@ -17,7 +88,7 @@ const DEFAULT_SELECTED_KEYS = [
 
 const ColumnSet: React.FC<ColumnSetProps> = ({ isOpen, onConfirm, onClose, columns }) => {
   // 전체 컬럼 목록
-  const [allColumns, setAllColumns] = useState<any[]>([]);
+  const [allColumns, setAllColumns] = useState<any[]>(HeaderColumn);
   
   // 선택된 컬럼 목록 (오른쪽)
   const [rightItems, setRightItems] = useState<any[]>([]);
@@ -32,50 +103,8 @@ const ColumnSet: React.FC<ColumnSetProps> = ({ isOpen, onConfirm, onClose, colum
   useEffect(() => {
     if (isOpen) {
       
-      // 모든 가능한 컬럼
-      const columnsData = [
-        ...columns,
-        { key: 'campaignId', name: '캠페인 아이디' },
-        { key: 'dialAttempt', name: '발신 시도 건수' },
-        { key: 'dialSuccess', name: '발신 성공 건수' },
-        { key: 'dialFail', name: '발신 실패 건수' },
-        { key: 'noAgent', name: '대기 상담원 없음' },
-        { key: 'agentConnect', name: '상담원 연결' },
-        { key: 'agentConnectFail', name: '상담원 연결 실패' },
-        { key: 'agentNoResponse', name: '상담원 무응답' },
-        { key: 'agentBusy', name: '상담원 통화중' },
-        { key: 'agentHangup', name: '상담원 바로 끊음' },
-        { key: 'customerGiveup', name: '고객포기' },
-        { key: 'customerWaitTimeout', name: '고객 최대 대기시간 초과' },
-        { key: 'noAgentAfterListen', name: '멘트 청취후 상담원 연결안함' },
-        { key: 'failBusy', name: '통화중 실패' },
-        { key: 'failNoResponse', name: '무응답 실패' },
-        { key: 'failFax', name: '팩스/모뎀 실패' },
-        { key: 'failOther', name: '기타 실패' },
-        { key: 'failPhoneError', name: '전화번호 오류 실패' },
-        { key: 'failLineError', name: '회선 오류 실패' },
-        { key: 'failCustomerHangup', name: '고객바로 끊음 실패' },
-        { key: 'failNoSound', name: '통화음 없음 실패' },
-        { key: 'failNoDialtone', name: '다이얼톤 없음 실패' },
-        { key: 'failMachineSound', name: '기계음 실패' },
-        { key: 'scheduleWait', name: '스케줄 대기(발신가능)' },
-        { key: 'blacklist', name: '블랙리스트' },
-        { key: 'realtimeListDelete', name: '실시간 리스트 삭제' },
-        { key: 'scheduleSettingFail', name: '스케줄 설정실패' },
-        { key: 'callbackTimeout', name: '콜백 타임아웃' },
-        { key: 'noDialSelectedByAgent', name: '팝업후 상담원 미발신 선택' },
-        { key: 'popupNoDialSelect', name: '팝업후 발신 여부 미선택' },
-        { key: 'popupAgentStateChange', name: '팝업후 상담원 상태 변경' },
-        { key: 'popupAgentModeChange', name: '팝업후 상담원 모드 변경' },
-        { key: 'agentStateChangeBeforeDial', name: '발신 확인전 상담원 상태 변경' },
-        { key: 'agentModeChangeBeforeDial', name: '발신 확인전 상담원 모드 변경' },
-        { key: 'noAgentInfo', name: '지정 상담원 정보 미입력' }
-      ];
-      
-      setAllColumns(columnsData);
-      
       // 기본 선택된 항목 (오른쪽에 표시)
-      const selectedItems = columnsData.filter(col => DEFAULT_SELECTED_KEYS.includes(col.key));
+      const selectedItems = allColumns.filter(col => columns.includes(col.key));
       setRightItems(selectedItems);
       
       // 선택 상태 초기화
