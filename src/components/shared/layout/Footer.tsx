@@ -11,7 +11,7 @@ type FooterDataType = {
 
 interface FooterProps {
   footerHeight: number;      // 열려 있을 때 푸터의 높이(px)
-  startResizing: () => void; // 드래그로 푸터 높이를 조절하기 위한 함수
+  startResizing?: () => void; // 드래그로 푸터 높이를 조절하기 위한 함수
   onToggleDrawer?: (isOpen: boolean) => void; // 부모 컴포넌트에 열림/닫힘 상태 전달
   onResizeHeight ? : any;
   onResizeStart ? : any;
