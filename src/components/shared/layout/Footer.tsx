@@ -448,8 +448,8 @@ export default function Footer({
     let command = "";
     let kind = "";
 
-    eventSource.addEventListener("message", (event) => {
-      console.log("eventSource = ", eventSource);
+    const handleEvent = (event: MessageEvent) => {
+      console.log("event = ", event.data);
       if (event.data !== "Connected!!") {
         const tempEventData = JSON.parse(event.data);
         if (
@@ -472,7 +472,13 @@ export default function Footer({
           );
         }
       }
-    });
+    };
+    eventSource.addEventListener("message", handleEvent);
+
+    return () => {
+      eventSource.removeEventListener("message", handleEvent);
+      eventSource.close();
+    };
   }, [tenant_id, footerDataSet]);
 
   /** 열림/닫힘 토글 */

@@ -117,7 +117,7 @@ const initDispatchStatusData:DispatchStatusDataType = {
 };
 
 export default function Campaignprogress() {
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set(['center-1', 'task-124752']));
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set(['center-1']));
   const [selectedCampaign, setSelectedCampaign] = useState<string>('전체보기');
   const [selectedSkill, setSelectedSkill] = useState<string>('total');
   const [selectedStatus, setSelectedStatus] = useState<string>('전체');
@@ -187,7 +187,7 @@ export default function Campaignprogress() {
     return result;
   };
 
-  const _columns: Column<TreeRow>[] = [
+  const headercolumns: Column<TreeRow>[] = [
     {
       key: 'campaignName',
       name: '캠페인 이름',
@@ -229,45 +229,8 @@ export default function Campaignprogress() {
         );
       }
     },
-    { key: 'strFlag', name: '발신구분', width: 100 },
-    { key: 'startFlag', name: '시작구분', width: 100 },
-    { key: 'endFlag', name: '완료구분', width: 100 },
-    {
-      key: 'progressRate',
-      name: '진행률(%)',
-      renderCell: ({ row }) => (row.progressRate ? `${row.progressRate}%` : '')
-    },
-    {
-      key: 'successRateList',
-      name: '리스트 대비 성공률(%)',
-      renderCell: ({ row }) => (row.successRateList ? `${row.successRateList}%` : '')
-    },
-    {
-      key: 'successRateSend',
-      name: '발신 대비 성공률(%)',
-      renderCell: ({ row }) => (row.successRateSend ? `${row.successRateSend}%` : '')
-    },
-    {
-      key: 'totLstCnt',
-      name: '총 리스트 건수',
-      renderCell: ({ row }) => row.totLstCnt || ''
-    },
-    {
-      key: 'nonTTCT',
-      name: '순수발신 건수',
-      renderCell: ({ row }) => row.nonTTCT || ''
-    },
-    {
-      key: 'nonSendCount',
-      name: '미발신건수',
-      renderCell: ({ row }) => row.nonSendCount || ''
-    },
-    {
-      key: 'totDialCnt',
-      name: '총발신건수',
-      renderCell: ({ row }) => row.totDialCnt || ''
-    }
   ];
+  const [_columns, _setColumns] = useState<Column<TreeRow>[]>(headercolumns);
 
   const getFilteredData = (data: TreeRow[]): TreeRow[] => {
     const filterRow = (row: TreeRow): TreeRow | null => {
@@ -342,13 +305,15 @@ export default function Campaignprogress() {
   };
 
   const toggleRowExpand = (rowId: string) => {
-    const newExpandedRows = new Set(expandedRows);
-    if (expandedRows.has(rowId)) {
-      newExpandedRows.delete(rowId);
-    } else {
-      newExpandedRows.add(rowId);
-    }
-    setExpandedRows(newExpandedRows);
+    setExpandedRows(prevExpandedRows => {
+      const newExpandedRows = new Set(prevExpandedRows);
+      if (newExpandedRows.has(rowId)) {
+        newExpandedRows.delete(rowId);
+      } else {
+        newExpandedRows.add(rowId);
+      }
+      return newExpandedRows;
+    });
   };
 
   function flattenRows(rows: TreeRow[]): TreeRow[] {
@@ -521,12 +486,35 @@ export default function Campaignprogress() {
 
   const filteredAndSortedData = useMemo(() => {
     const filteredData = getFilteredData(initData);
+    
+    const expandedData = filteredData.map(group => ({
+      ...group,
+      children: group.children?.map(team => ({
+        ...team,
+        children: team.children?.map(counselor => ({
+          ...counselor,
+          expanded: true  // Marking the counselors as expanded
+        }))
+      }))
+    }));
+    const expandedRowIds = new Set<string>();
+    expandedData.forEach(group => {
+      expandedRowIds.add(group.id);
+      group.children?.forEach(team => {
+        expandedRowIds.add(team.id);
+        team.children?.forEach(counselor => {
+          expandedRowIds.add(counselor.id);
+        });
+      });
+    });
+    setExpandedRows(expandedRowIds);
+
     return getSortedData(filteredData);
   }, [selectedCampaign, selectedSkill, selectedStatus, isSortAscending,initData]);
 
   useEffect(() => {
     if( columns.length > 0 ){
-      
+      _setColumns([...headercolumns, ...columns]);
     }
   }, [columns]);
 

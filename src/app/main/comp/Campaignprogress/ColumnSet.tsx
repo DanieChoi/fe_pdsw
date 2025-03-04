@@ -16,8 +16,8 @@ export interface ColumnSettingItem {
 }
 
 const HeaderColumn : ColumnSettingItem[] = [
-  { key: 'campId', name: '캠페인아이디'},
-  { key: 'campaignName', name: '캠페인이름'},
+  { key: 'campId', name: '캠페인아이디',renderCell: ({ row }: { row: { level?: number,campId?: number } }) => (row.level === 3 ? row.campId : '')},
+  { key: 'campaignName', name: '캠페인이름',renderCell: ({ row }: { row: { level?: number,campaignName?: string } }) => (row.level === 3 ? row.campaignName : '')},
   { key: 'strFlag', name: '발신구분',renderCell: ({ row }: { row: { level?: number,strFlag?: string } }) => (row.level === 3 ? row.strFlag : '')},
   { key: 'startFlag', name: '시작구분'},
   { key: 'endFlag', name: '완료구분'},
@@ -170,7 +170,7 @@ const ColumnSet: React.FC<ColumnSetProps> = ({ isOpen, onConfirm, onClose, colum
     e.preventDefault();
     e.stopPropagation();
     
-    if (selectedRightIndex !== null) {
+    if (selectedRightIndex !== null && defaultColumnsData.filter(data => data.key === rightItems[selectedRightIndex].key).length === 0) {
       // 선택된 항목 제거
       const newRightItems = [...rightItems];
       const removedItem = newRightItems.splice(selectedRightIndex, 1)[0];
