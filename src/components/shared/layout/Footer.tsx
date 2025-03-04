@@ -436,50 +436,44 @@ export default function Footer({
   );
 
   // SSE 구독
-  // useEffect(() => {
-  //   const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-  //   const eventSource = new EventSource(
-  //     `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
-  //   );
-  //   console.log("footer event ready... ");
+  useEffect(() => {
+    const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+    const eventSource = new EventSource(
+      `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
+    );
+    console.log("footer event ready... ");
 
-  //   let data: any = {};
-  //   let announce = "";
-  //   let command = "";
-  //   let kind = "";
+    let data: any = {};
+    let announce = "";
+    let command = "";
+    let kind = "";
 
-  //   const handleEvent = (event: MessageEvent) => {
-  //     if (event.data !== "Connected!!") {
-  //       const tempEventData = JSON.parse(event.data);
-  //       if (
-  //         announce !== tempEventData["announce"] ||
-  //         !isEqual(data, tempEventData.data) ||
-  //         !isEqual(data, tempEventData["data"]) ||
-  //         kind !== tempEventData["kind"]
-  //       ) {
-  //         announce = tempEventData["announce"];
-  //         command = tempEventData["command"];
-  //         data = tempEventData["data"];
-  //         kind = tempEventData["kind"];
+    eventSource.addEventListener("message", (event) => {
+      console.log("eventSource = ", eventSource);
+      if (event.data !== "Connected!!") {
+        const tempEventData = JSON.parse(event.data);
+        if (
+          announce !== tempEventData["announce"] ||
+          !isEqual(data, tempEventData.data) ||
+          !isEqual(data, tempEventData["data"]) ||
+          kind !== tempEventData["kind"]
+        ) {
+          announce = tempEventData["announce"];
+          command = tempEventData["command"];
+          data = tempEventData["data"];
+          kind = tempEventData["kind"];
 
-  //         footerDataSet(
-  //           tempEventData["announce"],
-  //           tempEventData["command"],
-  //           tempEventData["data"],
-  //           tempEventData["kind"],
-  //           tempEventData
-  //         );
-  //       }
-  //     }
-  //   };
-
-  //   eventSource.addEventListener("message", handleEvent);
-
-  //   return () => {
-  //     eventSource.removeEventListener("message", handleEvent);
-  //     eventSource.close();
-  //   };
-  // }, [tenant_id, footerDataSet]);
+          footerDataSet(
+            tempEventData["announce"],
+            tempEventData["command"],
+            tempEventData["data"],
+            tempEventData["kind"],
+            tempEventData
+          );
+        }
+      }
+    });
+  }, [tenant_id, footerDataSet]);
 
   /** 열림/닫힘 토글 */
   const toggleDrawer = () => {

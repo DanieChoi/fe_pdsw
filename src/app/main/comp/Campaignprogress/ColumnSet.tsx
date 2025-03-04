@@ -4,12 +4,12 @@ import CustomAlert from "@/components/shared/layout/CustomAlert";
 
 export interface ColumnSetProps {
   isOpen: boolean;
-  onConfirm: (selectedColumns: any[]) => void;
+  onConfirm: (data: ColumnSettingItem[]) => void;
   onClose: () => void;
   columns: any[];
 }
 
-interface ColumnSettingItem {
+export interface ColumnSettingItem {
   key: string;
   name: string;
   renderCell?: any;
@@ -88,10 +88,10 @@ const DEFAULT_SELECTED_KEYS = [
 
 const ColumnSet: React.FC<ColumnSetProps> = ({ isOpen, onConfirm, onClose, columns }) => {
   // 전체 컬럼 목록
-  const [allColumns, setAllColumns] = useState<any[]>(HeaderColumn);
+  const [allColumns, setAllColumns] = useState<ColumnSettingItem[]>(HeaderColumn);
   
   // 선택된 컬럼 목록 (오른쪽)
-  const [rightItems, setRightItems] = useState<any[]>([]);
+  const [rightItems, setRightItems] = useState<ColumnSettingItem[]>([]);
   
   // 선택된 항목
   const [selectedLeftKey, setSelectedLeftKey] = useState<string | null>(null);
@@ -104,8 +104,8 @@ const ColumnSet: React.FC<ColumnSetProps> = ({ isOpen, onConfirm, onClose, colum
     if (isOpen) {
       
       // 기본 선택된 항목 (오른쪽에 표시)
-      const selectedItems = allColumns.filter(col => columns.includes(col.key));
-      setRightItems(selectedItems);
+      // const selectedItems = allColumns.filter(col => columns.some(data => data.key === col.key));
+      setRightItems(columns);
       
       // 선택 상태 초기화
       setSelectedLeftKey(null);
@@ -220,25 +220,19 @@ const ColumnSet: React.FC<ColumnSetProps> = ({ isOpen, onConfirm, onClose, colum
   }, [rightItems, selectedRightIndex]);
 
   // 기본 설정 적용
-  const handleDefaultSetting = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
+  const handleDefaultSetting = () => {
     // 기본 선택된 항목 (오른쪽에 표시)
-    const defaultSelectedItems = allColumns.filter(col => DEFAULT_SELECTED_KEYS.includes(col.key));
-    setRightItems(defaultSelectedItems);
+    setRightItems(defaultColumnsData);
     
     // 선택 상태 초기화
     setSelectedLeftKey(null);
-    setSelectedRightIndex(null);
-    
-  }, [allColumns]);
+    setSelectedRightIndex(null);    
+  };
 
   // 확인 버튼 클릭
-  const handleConfirm = useCallback(() => {
+  const handleConfirm = () => {
     onConfirm(rightItems);
-    onClose();
-  }, [rightItems, onConfirm, onClose]);
+  };
 
   if (!isOpen) return null;
 
@@ -314,7 +308,7 @@ const ColumnSet: React.FC<ColumnSetProps> = ({ isOpen, onConfirm, onClose, colum
                 title="선택된 컬럼"
                 buttons={[
                   { label: "기본설정", 
-                    onClick: () => handleDefaultSetting(null as any), 
+                    onClick: () => handleDefaultSetting(), 
                     variant: "secondary" },
                 ]}
               />
