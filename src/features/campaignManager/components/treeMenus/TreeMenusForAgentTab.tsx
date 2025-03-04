@@ -454,7 +454,7 @@ export function TreeMenusForAgentTab() {
             onSelectCounselor={selectCounselor}
           />
         </div>
-        <div className="pr-1">
+        <div className="py-1 px-1">
           <CounselorTreeLevelSelector
             onExpandToLevel={expandToLevel}
             onToggleAllNodes={toggleAllNodes}

@@ -42,14 +42,14 @@ export function SortButtonForCampaign({
           />
         </CommonButton>
       </PopoverTrigger>
-      <PopoverContent className="w-32 p-1" align="end">
+      <PopoverContent className="w-auto min-w-[150px] p-0 py-[10px] px-[12px] rounded-[3px] border border-[#333]" align="end">
         <div className="flex flex-col">
           {campaignSortOptions.map((option) => (
             <button
               key={option.id}
               onClick={() => onSort?.(option.id)}
-              className={`flex items-center justify-between text-left px-2 py-1.5 text-xs hover:bg-gray-100 rounded
-                ${selectedSort === option.id ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-800'}`}
+              className={`flex items-center justify-between rounded-[3px] px-[6px] py-[4px] text-sm text-[#333] hover:bg-[#F4F6F9]
+                ${selectedSort === option.id ? 'bg-[#F4F6F9] text-[#333] font-medium' : 'text-[#333]'}`}
             >
               {option.label}
               {selectedSort === option.id && <Check className="w-4 h-4" />}
