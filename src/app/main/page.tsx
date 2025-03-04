@@ -1,123 +1,24 @@
 // src/app/main/MainPage.tsx
 "use client";
 
-import React from "react";
-import {
-  DndContext,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
+import React, { useEffect } from "react";
 import { useTabStore } from "@/store/tabStore";
-import TabContent from "./comp/TabContent";
-import TabRow from "./comp/TabRow";
-import DraggableTab from "./comp/DraggableTab";
+import TabContainer from "./comp/TabContainer";
 
-interface ActiveTabState {
-  id: number;
-  uniqueKey: string;
-  title: string;
-  icon: string;
-}
+export default function MainPage() {
+  const { splitTabAreaV2 } = useTabStore();
 
-const MainPage = () => {
-  const [activeTab, setActiveTab] = React.useState<ActiveTabState | null>(null);
-
-  const {
-    rows,
-    openedTabs,
-    activeTabId,
-    activeTabKey,
-    moveTabToSection,
-    moveTabToGroup,
-    setActiveTab: setGlobalActiveTab, // 전역 activeTab 설정 함수
-  } = useTabStore();
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  );
-
-  const handleDragStart = (event: DragStartEvent) => {
-    const { active } = event;
-    const isTab = active.data.current?.type === "tab";
-    if (!isTab) return;
-
-    const tabId = active.data.current?.id;
-    const uniqueKey = active.data.current?.uniqueKey;
-
-    const tab = openedTabs.find((t) => t.id === tabId && t.uniqueKey === uniqueKey);
-    if (tab) {
-      setActiveTab({
-        id: tab.id,
-        uniqueKey: tab.uniqueKey,
-        title: tab.title,
-        icon: tab.icon,
-      });
-    }
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over) return;
-
-    const isTab = active.data.current?.type === "tab";
-    if (!isTab) return;
-
-    const tabId = active.data.current?.id;
-    const uniqueKey = active.data.current?.uniqueKey;
-    const overType = over.data.current?.type;
-
-    if (overType === "section") {
-      const targetRowId = over.data.current?.rowId;
-      const targetSectionId = over.data.current?.sectionId;
-      if (targetRowId && targetSectionId) {
-        moveTabToSection(tabId, targetRowId, targetSectionId, uniqueKey);
-      }
-    } else if (overType === "group") {
-      moveTabToGroup(tabId, over.data.current?.id);
-    }
-
-    setActiveTab(null);
-  };
+  // 처음 페이지 로드 시, 3분할로 설정 (원하면 4로 변경 가능)
+  useEffect(() => {
+    splitTabAreaV2(1); 
+    // 만약 4분할을 원하면 splitTabAreaV2(4);
+  }, [splitTabAreaV2]);
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="flex flex-col h-full bg-white">
-        <div className="flex-none pt-[15px] pr-[25px] pl-[35px]">
-          {rows.map((row) => (
-            <TabRow key={row.id} rowId={row.id} />
-          ))}
-        </div>
-
-        <div className="flex-1 py-[15px] pl-[35px] pr-[25px]" style={{ height: "calc(100% - 46px)" }}>
-          <TabContent />
-        </div>
-      </div>
-
-      <DragOverlay>
-        {activeTab ? (
-          <DraggableTab
-            id={activeTab.id}
-            uniqueKey={activeTab.uniqueKey}
-            title={activeTab.title}
-            //icon={activeTab.icon}
-            isActive={activeTab.id === activeTabId && activeTab.uniqueKey === activeTabKey}
-            onRemove={() => {}}
-            onSelect={() => setGlobalActiveTab(activeTab.id, activeTab.uniqueKey)}
-            rowId=""
-            sectionId=""
-          />
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+    <div className="flex flex-col w-full h-full">
+      {/* TabContainer는 useTabStore의 areas/areaWidths/activeTabGlobalId 등을 활용하여
+          다중 분할 UI, 탭 이동, 순서 교체 등을 처리합니다. */}
+      <TabContainer />
+    </div>
   );
-};
-
-export default MainPage;
+}

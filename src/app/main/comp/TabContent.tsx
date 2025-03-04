@@ -1,3 +1,5 @@
+  
+
 // import React, { useState, useCallback, useRef, useEffect } from "react";
 // import { useTabStore } from "@/store/tabStore";
 // import PreferencesBoard from "./preferences";
@@ -23,9 +25,10 @@
 // import { TeamSkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/TeamSkillAssignmentTab";
 // import { GroupSkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/GroupSkillAssignmentTab";
 // import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCampaignTab";
+// import CampaignDeletePanel from "@/widgets/sidebar/pannels/CampaignDeletePanel";
 
-// // 탭 ID별 실제 화면을 매핑하는 함수
-// const renderContent = (tabId: number | null) => {
+// // 탭 ID별 실제 화면을 매핑
+// const renderContent = (tabId: number | null, campaignId?: string, campaignName?: string) => {
 //   switch (tabId) {
 //     case 1:
 //       return <CampaignGroupManager />;
@@ -58,15 +61,20 @@
 //     case 20:
 //       return <RebroadcastSettingsPanel />;
 //     case 21:
-//       return <CampaignMonitorDashbord />;
+//       // 캠페인 ID를 props로 전달
+//       return <CampaignMonitorDashbord campaignId={campaignId} />;
 //     case 22:
-//       return <AgentStatusMonitoring />;
+//       return <AgentStatusMonitoring campaignId={Number(campaignId)} />;
 //     case 23:
 //       return <SystemMonitoring />;
 //     case 100:
 //       return <>잘못된 스킬 할당 탭입니다.</>;
 //     case 130: // 캠페인 복사 화면 리턴
 //       return <CampaignClonePanel />;
+
+//     case 131: // 캠페인 삭제 패널
+//       return <CampaignDeletePanel campaignId={campaignId} campaignName={campaignName}/>
+
 //     case 501:
 //       return (
 //         <div className="flex justify-left w-full">
@@ -108,16 +116,6 @@
 //           </div>
 //         </div>
 //       );
-
-
-//     // case 602: // 그룹 스킬 할당 탭
-//     //   return (
-//     //     <div className="flex justify-left w-full">
-//     //       <div className="max-w-[500px] w-full">
-//     //         그룹 스킬 할당
-//     //       </div>
-//     //     </div>
-//     //   );
 
 //     default:
 //       return (
@@ -213,6 +211,9 @@
 //             const activeTab = section.tabs.find((t) => t.uniqueKey === activeKey);
 //             const isActiveGlobal = activeTabId === activeTab?.id && activeTabKey === activeTab?.uniqueKey;
 //             const tabIdToRender = isActiveGlobal ? activeTabId : activeTab?.id ?? null;
+//             // 현재 활성화된 탭에서 campaignId 가져오기
+//             const campaignId = activeTab?.campaignId;
+//             const campaignName = activeTab?.campaignName;
 
 //             return (
 //               <React.Fragment key={section.id}>
@@ -228,7 +229,7 @@
 //                     }
 //                   }}
 //                 >
-//                   {renderContent(tabIdToRender)}
+//                   {renderContent(tabIdToRender, campaignId, campaignName)}
 //                 </div>
 //                 {index === 0 && sections.length === 2 && (
 //                   <div
@@ -251,8 +252,13 @@
 
 // export default TabContent;
 
-import React, { useState, useCallback, useRef, useEffect } from "react";
-import { useTabStore } from "@/store/tabStore";
+// src/app/main/TabContainer/TabContent.tsx
+"use client";
+
+import React from "react";
+import { TabArea, useTabStore } from "@/store/tabStore";
+
+// ============== 기존 import ==============
 import PreferencesBoard from "./preferences";
 import SystemPreferences from "./SystemPreferences";
 import Campaignprogress from "./Campaignprogress";
@@ -278,8 +284,18 @@ import { GroupSkillAssignmentTab } from "@/features/campaignManager/components/t
 import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCampaignTab";
 import CampaignDeletePanel from "@/widgets/sidebar/pannels/CampaignDeletePanel";
 
-// 탭 ID별 실제 화면을 매핑
-const renderContent = (tabId: number | null, campaignId?: string, campaignName?: string) => {
+// ========================================
+
+/**
+ * "구" 코드에서 사용하던 탭ID -> 화면 매핑 함수.
+ * tabId가 없으면 기본 화면, 
+ * tabId가 있으면 해당 컴포넌트 렌더링.
+ */
+function renderContent(
+  tabId: number | null,
+  campaignId?: string,
+  campaignName?: string
+) {
   switch (tabId) {
     case 1:
       return <CampaignGroupManager />;
@@ -311,6 +327,7 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
       return <StatusCampaign />;
     case 20:
       return <RebroadcastSettingsPanel />;
+
     case 21:
       // 캠페인 ID를 props로 전달
       return <CampaignMonitorDashbord campaignId={campaignId} />;
@@ -318,13 +335,22 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
       return <AgentStatusMonitoring campaignId={Number(campaignId)} />;
     case 23:
       return <SystemMonitoring />;
+
     case 100:
       return <>잘못된 스킬 할당 탭입니다.</>;
-    case 130: // 캠페인 복사 화면 리턴
+
+    case 130:
+      // 캠페인 복사 화면
       return <CampaignClonePanel />;
 
-    case 131: // 캠페인 삭제 패널
-      return <CampaignDeletePanel campaignId={campaignId} campaignName={campaignName}/>
+    case 131:
+      // 캠페인 삭제 패널
+      return (
+        <CampaignDeletePanel
+          campaignId={campaignId}
+          campaignName={campaignName}
+        />
+      );
 
     case 501:
       return (
@@ -332,7 +358,9 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
           <BlackListCountPopup />
         </div>
       );
-    case 600: // 상담원 스킬 할당 탭
+
+    case 600:
+      // 상담원 스킬 할당 탭
       return (
         <div className="flex justify-left w-full">
           <div className="max-w-[500px] w-full">
@@ -341,7 +369,8 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
         </div>
       );
 
-    case 601: // 팀 스킬 할당 탭
+    case 601:
+      // 팀 스킬 할당 탭
       return (
         <div className="flex justify-left w-full">
           <div className="max-w-[500px] w-full">
@@ -350,7 +379,8 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
         </div>
       );
 
-    case 602: // 그룹 스킬 할당 탭
+    case 602:
+      // 그룹 스킬 할당 탭
       return (
         <div className="flex justify-left w-full">
           <div className="max-w-[500px] w-full">
@@ -359,7 +389,8 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
         </div>
       );
 
-    case 603: // 스킬 옵션 설정 for 캠페인탭 필터
+    case 603:
+      // 스킬 옵션 설정 for 캠페인탭 필터
       return (
         <div className="flex justify-left w-full">
           <div className="max-w-[500px] w-full">
@@ -375,130 +406,42 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
         </div>
       );
   }
-};
+}
 
-const TabContent = () => {
-  const { rows, activeTabId, activeTabKey, setActiveTab } = useTabStore();
-  const [isDragging, setIsDragging] = useState(false);
-  const dragRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const widthsRef = useRef({ left: 50, right: 50 });
-  const startXRef = useRef(0);
-  const [sections, setSections] = useState(rows[0]?.sections || []);
+/**
+ * 새 코드: TabArea 구조를 props로 받아,
+ * area.activeTabId를 찾아 실제 tabId와 campaignId를 얻고,
+ * renderContent 함수로 컴포넌트 결정
+ */
+export default function TabContent({ area }: { area: TabArea }) {
+  const { allTabs } = useTabStore();
 
-  // Performance optimization using requestAnimationFrame
-  const updateWidths = useCallback((leftWidth: number) => {
-    const clampedLeft = Math.max(20, Math.min(80, leftWidth));
-    const right = 100 - clampedLeft;
+  // 이 영역의 활성 탭이 없으면 => 아무것도 표시하지 않음
+  if (!area.activeTabId) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-gray-400">
+        탭을 선택하세요
+      </div>
+    );
+  }
 
-    requestAnimationFrame(() => {
-      if (sections.length === 2) {
-        const newSections = [...sections];
-        newSections[0] = { ...newSections[0], width: clampedLeft };
-        newSections[1] = { ...newSections[1], width: right };
-        setSections(newSections);
-        widthsRef.current = { left: clampedLeft, right };
-      }
-    });
-  }, [sections]);
+  // 전역 allTabs에서 해당 id 찾기
+  const found = allTabs.find((t) => t.id === area.activeTabId);
+  if (!found) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-gray-400">
+        탭 정보가 없습니다
+      </div>
+    );
+  }
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (!containerRef.current) return;
+  // store에 저장된 tabId(숫자), campaignId, campaignName 등 가져오기
+  const { tabId, campaignId, campaignName } = found;
 
-    setIsDragging(true);
-    startXRef.current = e.clientX;
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none'; // Prevent text selection while dragging
-  }, []);
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isDragging || !containerRef.current) return;
-
-    const container = containerRef.current.getBoundingClientRect();
-    const deltaX = e.clientX - startXRef.current;
-    const containerWidth = container.width;
-
-    // Calculate new width based on delta movement
-    const deltaPercentage = (deltaX / containerWidth) * 100;
-    const newLeftWidth = widthsRef.current.left + deltaPercentage;
-
-    updateWidths(newLeftWidth);
-    startXRef.current = e.clientX;
-  }, [isDragging, updateWidths]);
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-    document.body.style.cursor = 'default';
-    document.body.style.userSelect = 'auto';
-  }, []);
-
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-      window.addEventListener('mouseleave', handleMouseUp);
-    }
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('mouseleave', handleMouseUp);
-    };
-  }, [isDragging, handleMouseMove, handleMouseUp]);
-
-  // Update sections when rows change
-  useEffect(() => {
-    setSections(rows[0]?.sections || []);
-  }, [rows]);
-
+  // 위의 switch문으로 실제 컴포넌트 렌더
   return (
-    <div ref={containerRef} className="flex flex-col w-full h-full overflow-auto bg-white">
-      {rows.map((row) => (
-        <div
-          key={row.id}
-          className="flex w-full flex-1 border-b last:border-b-0 relative h-full"
-        >
-          {sections.map((section, index) => {
-            const activeKey = section.activeTabKey;
-            const activeTab = section.tabs.find((t) => t.uniqueKey === activeKey);
-            const isActiveGlobal = activeTabId === activeTab?.id && activeTabKey === activeTab?.uniqueKey;
-            const tabIdToRender = isActiveGlobal ? activeTabId : activeTab?.id ?? null;
-            // 현재 활성화된 탭에서 campaignId 가져오기
-            const campaignId = activeTab?.campaignId;
-            const campaignName = activeTab?.campaignName;
-
-            return (
-              <React.Fragment key={section.id}>
-                <div
-                  className={`overflow-auto transition-all duration-75 ease-out ${sections.length === 2 ? 'p-2' : ''}`}
-                  style={{
-                    width: `${section.width}%`,
-                    border: sections.length === 2 ? '1px solid #bbb' : 'none'
-                  }}
-                  onClick={() => {
-                    if (activeTab) {
-                      setActiveTab(activeTab.id, activeTab.uniqueKey);
-                    }
-                  }}
-                >
-                  {renderContent(tabIdToRender, campaignId, campaignName)}
-                </div>
-                {index === 0 && sections.length === 2 && (
-                  <div
-                    ref={dragRef}
-                    className="w-1 bg-gray-200 hover:bg-[#55BEC8] active:bg-[#55BEC8] cursor-col-resize select-none"
-                    onMouseDown={handleMouseDown}
-                    style={{
-                      touchAction: 'none',
-                    }}
-                  />
-                )}
-              </React.Fragment>
-            );
-          })}
-        </div>
-      ))}
+    <div className="flex-1 overflow-auto">
+      {renderContent(tabId, campaignId, campaignName)}
     </div>
   );
-};
-
-export default TabContent;
+}

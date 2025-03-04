@@ -3,10 +3,9 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { useDroppable } from "@dnd-kit/core";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { CommonButton } from "@/components/shared/CommonButton";
 import { useTabStore } from "@/store/tabStore";
 import DraggableTab from "./DraggableTab";
+import { CommonButton } from "@/components/shared/CommonButton";
 import Image from "next/image";
 
 interface TabSectionProps {
@@ -17,13 +16,13 @@ interface TabSectionProps {
   showDivider?: boolean;
 }
 
-const TabSection: React.FC<TabSectionProps> = ({
+export default function TabSection({
   rowId,
   sectionId,
   width,
   canRemove = true,
   showDivider = false,
-}) => {
+}: TabSectionProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isScrolling, setIsScrolling] = useState<"left" | "right" | null>(null);
@@ -41,7 +40,7 @@ const TabSection: React.FC<TabSectionProps> = ({
     rows,
     removeTab,
     removeSection,
-    setSectionActiveTab, // 새로 사용할 함수
+    setSectionActiveTab,
   } = useTabStore();
 
   useEffect(() => {
@@ -59,7 +58,6 @@ const TabSection: React.FC<TabSectionProps> = ({
       direction === "left"
         ? scrollContainerRef.current.scrollLeft - scrollAmount
         : scrollContainerRef.current.scrollLeft + scrollAmount;
-
     scrollContainerRef.current.scrollTo({
       left: newLeft,
       behavior: "smooth",
@@ -83,7 +81,6 @@ const TabSection: React.FC<TabSectionProps> = ({
     setIsScrolling(null);
   };
 
-  // 현재 섹션 찾기
   const row = rows.find((r) => r.id === rowId);
   if (!row) return null;
   const section = row.sections.find((s) => s.id === sectionId);
@@ -92,12 +89,9 @@ const TabSection: React.FC<TabSectionProps> = ({
   return (
     <div
       ref={setNodeRef}
-      className={`
-        flex-none h-full relative
-        transition-colors duration-200
-        ${isOver ? "bg-gray-100" : "bg-white"}
-        ${showDivider ? "border-r border-gray-200" : ""}
-      `}
+      className={`flex-none h-full relative transition-colors duration-200 ${
+        isOver ? "bg-gray-100" : "bg-white"
+      } ${showDivider ? "border-r border-gray-200" : ""}`}
       style={{ width: `${width}%` }}
     >
       <div className="flex items-center">
@@ -109,23 +103,11 @@ const TabSection: React.FC<TabSectionProps> = ({
           onMouseLeave={stopScrolling}
           onTouchStart={() => startScrolling("left")}
           onTouchEnd={stopScrolling}
-          className={`
-            ${isScrolling === "left" ? "bg-gray-100" : ""}
-          `}
         >
-        
-           <Image
-            src="/header-menu/leftArrow.svg"
-            alt="left"
-            width={8}
-            height={8}
-          />
+          <Image src="/header-menu/leftArrow.svg" alt="left" width={8} height={8} />
         </CommonButton>
 
-        <div
-          ref={scrollContainerRef}
-          className="flex-1 flex overflow-hidden scroll-smooth"
-        >
+        <div ref={scrollContainerRef} className="flex-1 flex overflow-hidden scroll-smooth">
           {section.tabs.map((tab) => {
             const isActive = section.activeTabKey === tab.uniqueKey;
             return (
@@ -134,15 +116,10 @@ const TabSection: React.FC<TabSectionProps> = ({
                 id={tab.id}
                 uniqueKey={tab.uniqueKey}
                 title={tab.title}
-                //icon={tab.icon}
                 isActive={isActive}
-                // 탭 제거
                 onRemove={() => removeTab(tab.id, tab.uniqueKey)}
-                // 탭 선택 => 섹션 단위 활성화
-                onSelect={() =>
-                  setSectionActiveTab(rowId, sectionId, tab.uniqueKey)
-                }
-                rowId={rowId} // Draggable 시 필요
+                onSelect={() => setSectionActiveTab(rowId, sectionId, tab.uniqueKey)}
+                rowId={rowId}
                 sectionId={sectionId}
               />
             );
@@ -157,16 +134,8 @@ const TabSection: React.FC<TabSectionProps> = ({
           onMouseLeave={stopScrolling}
           onTouchStart={() => startScrolling("right")}
           onTouchEnd={stopScrolling}
-          className={`
-            ${isScrolling === "right" ? "bg-gray-100" : ""}
-          `}
         >
-          <Image
-            src="/header-menu/rightArrow.svg"
-            alt="right"
-            width={8}
-            height={8}
-          />
+          <Image src="/header-menu/rightArrow.svg" alt="right" width={8} height={8} />
         </CommonButton>
 
         {canRemove && row.sections.length > 1 && (
@@ -174,19 +143,11 @@ const TabSection: React.FC<TabSectionProps> = ({
             variant="tabEtc"
             size="sm"
             onClick={() => removeSection(rowId, sectionId)}
-            className=""
           >
-            <Image
-            src="/header-menu/tab_minus.svg"
-            alt="plus"
-            width={8}
-            height={8}
-          />
+            <Image src="/header-menu/tab_minus.svg" alt="minus" width={8} height={8} />
           </CommonButton>
         )}
       </div>
     </div>
   );
-};
-
-export default TabSection;
+}

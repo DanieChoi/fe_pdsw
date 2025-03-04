@@ -1,223 +1,444 @@
-import { CommonButton } from "@/components/shared/CommonButton";
-import { Check, LayoutGrid } from 'lucide-react'
-import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { useTabStore } from '@/store/tabStore'
-import Cookies from 'js-cookie'
-import { MenuItem, menuItems } from '@/widgets/header/model/menuItems'
-import React, { useState, useEffect } from 'react'
-import { useAuthStore, useMainStore } from '@/store';
-import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
-import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
-import useApiForFetchCounselorList from '@/features/campaignManager/hooks/useApiForFetchCounselorList';
-import CustomAlert from '@/components/shared/layout/CustomAlert';
-import { SplitScreenDialog } from './ui/SplitScreenDialog'
-import SplitScreenDialog2 from './ui/SplitScreenDialog2'
+// import { CommonButton } from "@/components/shared/CommonButton";
+// import { Check, LayoutGrid } from 'lucide-react'
+// import Image from 'next/image'
+// import { useRouter } from 'next/navigation'
+// import { useTabStore } from '@/store/tabStore'
+// import Cookies from 'js-cookie'
+// import { MenuItem, menuItems } from '@/widgets/header/model/menuItems'
+// import React, { useState, useEffect } from 'react'
+// import { useAuthStore, useMainStore } from '@/store';
+// import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
+// import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
+// import useApiForFetchCounselorList from '@/features/campaignManager/hooks/useApiForFetchCounselorList';
+// import CustomAlert from '@/components/shared/layout/CustomAlert';
+// import { SplitScreenDialog } from './ui/SplitScreenDialog'
+// import SplitScreenDialog2 from './ui/SplitScreenDialog2'
 
-const errorMessage = {
+// const errorMessage = {
+//   isOpen: false,
+//   message: '',
+//   title: '로그인',
+//   type: '0',
+// };
+
+// export default function Header() {
+//   const router = useRouter();
+//   const _sessionKey = Cookies.get('session_key') || '';
+//   const _tenantId = Number(Cookies.get('tenant_id'));
+//   const [alertState, setAlertState] = useState(errorMessage);
+//   const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
+//   const [isSplitDialogOpen, setIsSplitDialogOpen] = useState(false);
+//   const openInNewWindow = () => {
+//     // 현재 화면의 크기를 가져옵니다
+//     const width = window.screen.width;
+//     const height = window.screen.height;
+    
+//     // 창을 화면 중앙에 위치시킵니다
+//     const left = 0;  // 전체 화면이므로 0으로 설정
+//     const top = 0;   // 전체 화면이므로 0으로 설정
+
+//     const newWindow = window.open(
+//       '/monitor',
+//       'monitor-window',  
+//       `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no`
+//     );
+
+//     if (newWindow) {
+//       newWindow.focus();
+//     }
+// };
+//   const {
+//     tenants,
+//     setCampaigns,
+//     setTenants,
+//     setCounselers,
+//   } = useMainStore();
+
+//   const {
+//     addTab,
+//     removeTab,
+//     openedTabs,
+//     duplicateTab,
+//     activeTabId,
+//     activeTabKey,
+//     getTabCountById,
+//     rows,
+//     tabGroups,
+//     setActiveTab,
+//     openCampaignManagerForUpdate,
+//     setCampaignIdForUpdateFromSideMenu
+//   } = useTabStore();
+
+//   const handleMenuClick = (item: MenuItem, event: React.MouseEvent<HTMLButtonElement>) => {
+//     if (item.id === 3) {
+//       openInNewWindow();
+//       return;
+//     }
+   
+//     if (event.ctrlKey) {
+//       duplicateTab(item.id);
+//     } else {
+//       // 해당 아이템의 이전 탭들을 모두 찾아서 제거
+//       const existingTabs = openedTabs.filter(tab => tab.id === item.id);
+//       existingTabs.forEach(tab => {
+//         removeTab(tab.id, tab.uniqueKey);
+//       });
+
+//       // 새로운 탭 추가
+//       const newTabKey = `${item.id}-${Date.now()}`;
+//       const newTab = {
+//         ...item,
+//         uniqueKey: newTabKey,
+//         content: item.content || null
+//       };
+//       addTab(newTab);
+
+//       // 탭을 추가한 후 활성 탭 설정
+//       setActiveTab(item.id, newTabKey);
+//     }
+
+//     setCampaignIdForUpdateFromSideMenu(null);
+//   };
+
+
+//   const isTabOpened = (itemId: number) => {
+//     const existingTabs = openedTabs.filter(tab => tab.id === itemId);
+//     return existingTabs.length > 0;
+//   };
+
+//   const isActiveTab = (itemId: number) => {
+//     return openedTabs.some(
+//       tab => tab.id === itemId && tab.id === activeTabId && tab.uniqueKey === activeTabKey
+//     );
+//   };
+
+//   const handleLoginOut = () => {
+//     Cookies.remove('session_key');
+//     router.push('/login');
+//   }
+
+//   // authStore 에서 tenant_id, role_id 가져오기
+//   const tenant_id = useAuthStore((state) => state.tenant_id);
+//   const role_id = useAuthStore((state) => state.role_id);
+//   const id = useAuthStore((state) => state.id);
+//   //상담사 역할 ID(1: 상담사, 2: 파트매니저, 3: 그룹매니저, 4: 테넌트메니저, 5: 시스템 메니저, 6: 전체)
+
+//   const { mutate: fetchTenants } = useApiForTenants({
+//     onSuccess: (data) => {
+//       console.log('Tenants API response:', data);
+//       if (data.result_code === 5) {
+//         setAlertState({
+//           ...errorMessage,
+//           isOpen: true,
+//           message: '로그인 정보가 없습니다.',
+//         });
+//         Cookies.remove('session_key');
+//         router.push('/login');
+//       } else {
+//         if( tenant_id === 0){
+//           setTenants(data.result_data);
+//         }else{
+//           setTenants(data.result_data.filter(data=>data.tenant_id === tenant_id));
+//         }
+//         // const tempTenantIdArray = data.result_data.map(tenant => Number(tenant.tenant_id));
+//         // fetchSkills({
+//         //   tenant_id_array: tempTenantIdArray
+//         // });
+//         // fetchMain({
+//         //   session_key: _sessionKey,
+//         //   tenant_id: _tenantId
+//         // });
+//       }
+//     },
+//     onError: (error) => {
+//       console.error('Tenants API error:', error);
+//       if (error.message.split('||')[0] === '5') {
+//         setAlertState({
+//           ...errorMessage,
+//           isOpen: true,
+//           message: '로그인 정보가 없습니다.',
+//         });
+//         Cookies.remove('session_key');
+//         router.push('/login');
+//       }
+//     }
+//   });
+  
+//   useEffect(() => {
+//     if( tenants.length > 0 ){
+//       fetchMain({
+//         session_key: _sessionKey,
+//         tenant_id: _tenantId
+//       });
+//     }
+//   }, [tenants]);
+
+//   useEffect(() => {
+//     // console.log('Fetching tenants with:', { _sessionKey, _tenantId });
+//     fetchTenants({
+//       session_key: _sessionKey,
+//       tenant_id: _tenantId,
+//     });
+//   }, [fetchTenants, _sessionKey, _tenantId]);
+
+//   const { mutate: fetchMain } = useApiForMain({
+//     onSuccess: (data) => {
+//       // console.log('Main API response:', data);
+//       // setCampaigns(data.result_data);
+//       if( tenant_id === 0){
+//         setCampaigns(data.result_data);
+//       }else{
+//         setCampaigns(data.result_data.filter(data=>data.tenant_id === tenant_id));
+//       }
+//       setShouldFetchCounselors(true);  // 이 시점에 상담사 목록 조회 활성화
+
+//     }
+//   });
+
+//   const { data: counselorListData } = useApiForFetchCounselorList({
+//     credentials: {
+//       // 필요한 credentials 정보
+//       session_key: _sessionKey,
+//       tenant_id: tenant_id,
+//       roleId: role_id
+//     },
+//     // enabled: shouldFetchCounselors,  // fetchMain 완료 후에만 실행
+//   });
+
+//   // console.log('counselorListData at header :', counselorListData);
+
+//   useEffect(() => {
+//     if (counselorListData) {
+//       setCounselers(counselorListData.result_data);
+//     }
+//   }, [counselorListData]);
+
+//   return (
+//     <div className="flex flex-col">
+//       <div className="header-top h-[28px] flex items-center">
+//         <div className="flex justify-between items-center w-full">
+//           <div className="flex items-center">
+//             <Image
+//               src="/header-menu/nexpds-logo.svg"
+//               alt="NEXPDS"
+//               width={66}
+//               height={11}
+//               priority
+//             />
+//           </div>
+//           <div className="flex items-center space-x-4 text-white text-sm">
+//             <div className='flex items-center space-x-1'>
+//               <Image
+//                 src="/header-menu/top_pic.svg"
+//                 alt="사용자"
+//                 width={14}
+//                 height={14}
+//                 priority
+//               />
+//               <span>{id}({role_id === 1?'상담사'
+//               :role_id === 2?'파트매니저'
+//               :role_id === 3?'그룹매니저'
+//               :role_id === 4?'테넌트메니저'
+//               :role_id === 5?'시스템 메니저'
+//               :role_id === 6?'전체'
+//               :''})</span>
+//             </div>
+//             <CommonButton
+//               variant="ghost"
+//               className="flex items-center space-x-1 text-sm text-white hover:bg-[#56CAD6]/20"
+//               onClick={handleLoginOut}
+//             >
+//               <Image
+//                 src="/header-menu/log-out.svg"
+//                 alt="로그아웃"
+//                 width={11}
+//                 height={12}
+//                 priority
+//               />
+//             </CommonButton>
+//           </div>
+//         </div>
+//       </div>
+//       <header className="bg-white border-b">
+//         <div className="flex flex-col gap-4">
+//           <div className="flex items-center justify-between header-padding">
+//             <nav className="flex overflow-x-auto gap-3">
+//               {menuItems.map((item) => {
+//                 const count = getTabCountById(item.id);
+//                 const isActive = isActiveTab(item.id);
+//                 const isOpened = isTabOpened(item.id);
+
+//                 return (
+//                   <div key={`menu-${item.id}`} className="menu-item">
+//                     <CommonButton
+//                       variant={isActive ? 'menuActive' : (isOpened ? 'menuOpened' : 'menu')}
+//                       size="default"
+//                       onClick={(e) => handleMenuClick(item, e)}
+//                       className="relative py-1.5 px-2"
+//                     >
+//                       {/* {isActive && (
+//                         <div className="absolute top-1 right-1">
+//                           <Check className="w-3 h-3 text-[#fff]" />
+//                         </div>
+//                       )} */}
+//                       <div className="flex items-center justify-center">
+//                         <Image
+//                           src={item.icon}
+//                           alt={item.title}
+//                           width={32}
+//                           height={32}
+//                           className="object-contain"
+//                         />
+//                       </div>
+//                       <div className="flex items-center">
+//                         <span className={`text-xs whitespace-nowrap ${isActive ? 'text-white' : 'text-[#333]'}`}>{item.title}</span>
+//                         {count > 1 && (
+//                           <span className="ml-1 px-1.5 py-0.5 text-[10px] leading-none bg-[#E5F3F3] text-[#5BC2C1] rounded-full min-w-[16px] text-center">
+//                             {count}
+//                           </span>
+//                         )}
+//                       </div>
+//                     </CommonButton>
+//                   </div>
+//                 );
+//               })}
+//             </nav>
+//             <div>
+
+//               {/* <div className="flex items-center gap-2">
+//                 <CommonButton
+//                   variant="outline"
+//                   size="sm"
+//                   onClick={() => setIsSplitDialogOpen(true)}
+//                   className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 border-gray-300"
+//                 >
+//                   <LayoutGrid size={16} />
+//                   <span className="text-sm">화면 분할</span>
+//                 </CommonButton>
+
+//                 <SplitScreenDialog
+//                   isOpen={isSplitDialogOpen}
+//                   onClose={() => setIsSplitDialogOpen(false)}
+//                   tabs={openedTabs}
+//                   onApply={() => {
+//                     // 여기에 화면 분할 적용 로직 추가
+//                     setIsSplitDialogOpen(false);
+//                   }}
+//                 />
+
+//                 <SplitScreenDialog2 tabs={openedTabs}/>
+
+//               </div> */}
+
+//             </div>
+//           </div>
+
+
+//         </div>
+//       </header>
+//       <CustomAlert
+//         message={alertState.message}
+//         title={alertState.title}
+//         type={alertState.type}
+//         isOpen={alertState.isOpen}
+//         onClose={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
+//       />
+//     </div>
+//   );
+// }
+
+// src/widgets/header/index.tsx
+"use client";
+
+import { CommonButton } from "@/components/shared/CommonButton";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { menuItems, MenuItem } from "@/widgets/header/model/menuItems";
+import React, { useState } from "react";
+import Image from "next/image";
+import { useAuthStore } from "@/store";
+import CustomAlert from "@/components/shared/layout/CustomAlert";
+import { useTabStore } from "@/store/tabStore";
+
+interface ErrorMessage {
+  isOpen: boolean;
+  message: string;
+  title: string;
+  type: string;
+}
+
+const defaultErrorMessage: ErrorMessage = {
   isOpen: false,
-  message: '',
-  title: '로그인',
-  type: '0',
+  message: "",
+  title: "로그인",
+  type: "0",
 };
 
 export default function Header() {
   const router = useRouter();
-  const _sessionKey = Cookies.get('session_key') || '';
-  const _tenantId = Number(Cookies.get('tenant_id'));
-  const [alertState, setAlertState] = useState(errorMessage);
-  const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
-  const [isSplitDialogOpen, setIsSplitDialogOpen] = useState(false);
-  const openInNewWindow = () => {
-    // 현재 화면의 크기를 가져옵니다
-    const width = window.screen.width;
-    const height = window.screen.height;
-    
-    // 창을 화면 중앙에 위치시킵니다
-    const left = 0;  // 전체 화면이므로 0으로 설정
-    const top = 0;   // 전체 화면이므로 0으로 설정
-
-    const newWindow = window.open(
-      '/monitor',
-      'monitor-window',  
-      `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no`
-    );
-
-    if (newWindow) {
-      newWindow.focus();
-    }
-};
   const {
-    tenants,
-    setCampaigns,
-    setTenants,
-    setCounselers,
-  } = useMainStore();
-
-  const {
-    addTab,
-    removeTab,
-    openedTabs,
-    duplicateTab,
-    activeTabId,
-    activeTabKey,
-    getTabCountById,
-    rows,
-    tabGroups,
-    setActiveTab,
-    openCampaignManagerForUpdate,
-    setCampaignIdForUpdateFromSideMenu
+    openTabV2,
+    closeTabV2,
+    duplicateTabV2,
+    getTabCountByIdV2,
+    activeTabGlobalId,
+    allTabs,
   } = useTabStore();
 
-  const handleMenuClick = (item: MenuItem, event: React.MouseEvent<HTMLButtonElement>) => {
-    if (item.id === 3) {
-      openInNewWindow();
-      return;
-    }
-   
-    if (event.ctrlKey) {
-      duplicateTab(item.id);
-    } else {
-      // 해당 아이템의 이전 탭들을 모두 찾아서 제거
-      const existingTabs = openedTabs.filter(tab => tab.id === item.id);
-      existingTabs.forEach(tab => {
-        removeTab(tab.id, tab.uniqueKey);
-      });
+  const id = useAuthStore((s) => s.id);
+  const role_id = useAuthStore((s) => s.role_id);
 
-      // 새로운 탭 추가
-      const newTabKey = `${item.id}-${Date.now()}`;
-      const newTab = {
-        ...item,
-        uniqueKey: newTabKey,
-        content: item.content || null
-      };
-      addTab(newTab);
-
-      // 탭을 추가한 후 활성 탭 설정
-      setActiveTab(item.id, newTabKey);
-    }
-
-    setCampaignIdForUpdateFromSideMenu(null);
-  };
-
-
-  const isTabOpened = (itemId: number) => {
-    const existingTabs = openedTabs.filter(tab => tab.id === itemId);
-    return existingTabs.length > 0;
-  };
-
-  const isActiveTab = (itemId: number) => {
-    return openedTabs.some(
-      tab => tab.id === itemId && tab.id === activeTabId && tab.uniqueKey === activeTabKey
-    );
-  };
+  const [alertState, setAlertState] = useState<ErrorMessage>(defaultErrorMessage);
 
   const handleLoginOut = () => {
-    Cookies.remove('session_key');
-    router.push('/login');
-  }
+    Cookies.remove("session_key");
+    router.push("/login");
+  };
 
-  // authStore 에서 tenant_id, role_id 가져오기
-  const tenant_id = useAuthStore((state) => state.tenant_id);
-  const role_id = useAuthStore((state) => state.role_id);
-  const id = useAuthStore((state) => state.id);
-  //상담사 역할 ID(1: 상담사, 2: 파트매니저, 3: 그룹매니저, 4: 테넌트메니저, 5: 시스템 메니저, 6: 전체)
+  // 메뉴 클릭 => 새 탭 열기 (신버전)
+  const handleMenuClick = (item: MenuItem, e: React.MouseEvent) => {
+    e.preventDefault();
 
-  const { mutate: fetchTenants } = useApiForTenants({
-    onSuccess: (data) => {
-      console.log('Tenants API response:', data);
-      if (data.result_code === 5) {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: '로그인 정보가 없습니다.',
-        });
-        Cookies.remove('session_key');
-        router.push('/login');
-      } else {
-        if( tenant_id === 0){
-          setTenants(data.result_data);
-        }else{
-          setTenants(data.result_data.filter(data=>data.tenant_id === tenant_id));
-        }
-        // const tempTenantIdArray = data.result_data.map(tenant => Number(tenant.tenant_id));
-        // fetchSkills({
-        //   tenant_id_array: tempTenantIdArray
-        // });
-        // fetchMain({
-        //   session_key: _sessionKey,
-        //   tenant_id: _tenantId
-        // });
+    // ctrl+클릭 => 복제
+    if (e.ctrlKey) {
+      const lastSameMenuTab = [...allTabs]
+        .filter((t) => t.tabId === item.id)
+        .pop();
+      if (lastSameMenuTab) {
+        duplicateTabV2(lastSameMenuTab.id);
       }
-    },
-    onError: (error) => {
-      console.error('Tenants API error:', error);
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: '로그인 정보가 없습니다.',
-        });
-        Cookies.remove('session_key');
-        router.push('/login');
-      }
+      return;
     }
-  });
-  
-  useEffect(() => {
-    if( tenants.length > 0 ){
-      fetchMain({
-        session_key: _sessionKey,
-        tenant_id: _tenantId
-      });
-    }
-  }, [tenants]);
 
-  useEffect(() => {
-    // console.log('Fetching tenants with:', { _sessionKey, _tenantId });
-    fetchTenants({
-      session_key: _sessionKey,
-      tenant_id: _tenantId,
+    // 이미 열려있는 해당 menuId 탭 전부 닫기
+    const sameTabs = allTabs.filter((t) => t.tabId === item.id);
+    sameTabs.forEach((tab) => {
+      closeTabV2(tab.id);
     });
-  }, [fetchTenants, _sessionKey, _tenantId]);
 
-  const { mutate: fetchMain } = useApiForMain({
-    onSuccess: (data) => {
-      // console.log('Main API response:', data);
-      // setCampaigns(data.result_data);
-      if( tenant_id === 0){
-        setCampaigns(data.result_data);
-      }else{
-        setCampaigns(data.result_data.filter(data=>data.tenant_id === tenant_id));
-      }
-      setShouldFetchCounselors(true);  // 이 시점에 상담사 목록 조회 활성화
+    // 새 탭 열기
+    openTabV2(item.id, item.title);
+  };
 
-    }
-  });
+  const isActiveTab = (menuId: number) => {
+    const activeTab = allTabs.find((t) => t.id === activeTabGlobalId);
+    if (!activeTab) return false;
+    return activeTab.tabId === menuId;
+  };
 
-  const { data: counselorListData } = useApiForFetchCounselorList({
-    credentials: {
-      // 필요한 credentials 정보
-      session_key: _sessionKey,
-      tenant_id: tenant_id,
-      roleId: role_id
-    },
-    // enabled: shouldFetchCounselors,  // fetchMain 완료 후에만 실행
-  });
+  const isTabOpened = (menuId: number) => {
+    return allTabs.some((t) => t.tabId === menuId);
+  };
 
-  // console.log('counselorListData at header :', counselorListData);
-
-  useEffect(() => {
-    if (counselorListData) {
-      setCounselers(counselorListData.result_data);
-    }
-  }, [counselorListData]);
+  const getTabCount = (menuId: number) => {
+    return getTabCountByIdV2(menuId);
+  };
 
   return (
     <div className="flex flex-col">
-      <div className="header-top h-[28px] flex items-center">
-        <div className="flex justify-between items-center w-full">
-          <div className="flex items-center">
+      <div className="header-top h-[28px] flex items-center bg-[#333] text-white">
+        <div className="flex justify-between items-center w-full px-2">
+          <div>
             <Image
               src="/header-menu/nexpds-logo.svg"
               alt="NEXPDS"
@@ -226,8 +447,8 @@ export default function Header() {
               priority
             />
           </div>
-          <div className="flex items-center space-x-4 text-white text-sm">
-            <div className='flex items-center space-x-1'>
+          <div className="flex items-center space-x-4 text-sm">
+            <div className="flex items-center space-x-1">
               <Image
                 src="/header-menu/top_pic.svg"
                 alt="사용자"
@@ -235,13 +456,23 @@ export default function Header() {
                 height={14}
                 priority
               />
-              <span>{id}({role_id === 1?'상담사'
-              :role_id === 2?'파트매니저'
-              :role_id === 3?'그룹매니저'
-              :role_id === 4?'테넌트메니저'
-              :role_id === 5?'시스템 메니저'
-              :role_id === 6?'전체'
-              :''})</span>
+              <span>
+                {id}(
+                {role_id === 1
+                  ? "상담사"
+                  : role_id === 2
+                  ? "파트매니저"
+                  : role_id === 3
+                  ? "그룹매니저"
+                  : role_id === 4
+                  ? "테넌트메니저"
+                  : role_id === 5
+                  ? "시스템 메니저"
+                  : role_id === 6
+                  ? "전체"
+                  : ""}
+                )
+              </span>
             </div>
             <CommonButton
               variant="ghost"
@@ -259,83 +490,51 @@ export default function Header() {
           </div>
         </div>
       </div>
+
       <header className="bg-white border-b">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between header-padding">
-            <nav className="flex overflow-x-auto gap-3">
-              {menuItems.map((item) => {
-                const count = getTabCountById(item.id);
-                const isActive = isActiveTab(item.id);
-                const isOpened = isTabOpened(item.id);
+        <div className="flex items-center gap-3 px-2 py-2">
+          {menuItems.map((item) => {
+            const opened = isTabOpened(item.id);
+            const active = isActiveTab(item.id);
+            const count = getTabCount(item.id);
 
-                return (
-                  <div key={`menu-${item.id}`} className="menu-item">
-                    <CommonButton
-                      variant={isActive ? 'menuActive' : (isOpened ? 'menuOpened' : 'menu')}
-                      size="default"
-                      onClick={(e) => handleMenuClick(item, e)}
-                      className="relative py-1.5 px-2"
-                    >
-                      {/* {isActive && (
-                        <div className="absolute top-1 right-1">
-                          <Check className="w-3 h-3 text-[#fff]" />
-                        </div>
-                      )} */}
-                      <div className="flex items-center justify-center">
-                        <Image
-                          src={item.icon}
-                          alt={item.title}
-                          width={32}
-                          height={32}
-                          className="object-contain"
-                        />
-                      </div>
-                      <div className="flex items-center">
-                        <span className={`text-xs whitespace-nowrap ${isActive ? 'text-white' : 'text-[#333]'}`}>{item.title}</span>
-                        {count > 1 && (
-                          <span className="ml-1 px-1.5 py-0.5 text-[10px] leading-none bg-[#E5F3F3] text-[#5BC2C1] rounded-full min-w-[16px] text-center">
-                            {count}
-                          </span>
-                        )}
-                      </div>
-                    </CommonButton>
-                  </div>
-                );
-              })}
-            </nav>
-            <div>
-
-              {/* <div className="flex items-center gap-2">
-                <CommonButton
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsSplitDialogOpen(true)}
-                  className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 border-gray-300"
-                >
-                  <LayoutGrid size={16} />
-                  <span className="text-sm">화면 분할</span>
-                </CommonButton>
-
-                <SplitScreenDialog
-                  isOpen={isSplitDialogOpen}
-                  onClose={() => setIsSplitDialogOpen(false)}
-                  tabs={openedTabs}
-                  onApply={() => {
-                    // 여기에 화면 분할 적용 로직 추가
-                    setIsSplitDialogOpen(false);
-                  }}
-                />
-
-                <SplitScreenDialog2 tabs={openedTabs}/>
-
-              </div> */}
-
-            </div>
-          </div>
-
-
+            return (
+              <CommonButton
+                key={item.id}
+                variant={active ? "menuActive" : opened ? "menuOpened" : "menu"}
+                size="default"
+                onClick={(e) => handleMenuClick(item, e)}
+                className="relative py-1.5 px-2"
+              >
+                <div className="flex items-center justify-center">
+                  <Image
+                    src={item.icon}
+                    alt={item.title}
+                    width={32}
+                    height={32}
+                    className="object-contain"
+                  />
+                </div>
+                <div className="flex items-center">
+                  <span
+                    className={`text-xs whitespace-nowrap ${
+                      active ? "text-white" : "text-[#333]"
+                    }`}
+                  >
+                    {item.title}
+                  </span>
+                  {count > 1 && (
+                    <span className="ml-1 px-1.5 py-0.5 text-[10px] leading-none bg-[#E5F3F3] text-[#5BC2C1] rounded-full min-w-[16px] text-center">
+                      {count}
+                    </span>
+                  )}
+                </div>
+              </CommonButton>
+            );
+          })}
         </div>
       </header>
+
       <CustomAlert
         message={alertState.message}
         title={alertState.title}
