@@ -9,14 +9,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { CommonButton } from "@/components/shared/CommonButton";
 import Image from "next/image";
-import { useMainStore, useCampainManagerStore, useAuthStore } from '@/store';
+import { useMainStore, useCampainManagerStore } from '@/store';
 import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
 import { CampaignProgressInformationResponseDataType } from '@/features/monitoring/types/monitoringIndex';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 import * as XLSX from 'xlsx';
 // 모달
-import ColumnSet, { defaultColumnsData } from './ColumnSet';
+import ColumnSet, { defaultColumnsData,ColumnSettingItem } from './ColumnSet';
 
 interface TreeRow extends DispatchStatusDataType {
   parentId?: string;
@@ -123,7 +123,6 @@ export default function Campaignprogress() {
   const [selectedStatus, setSelectedStatus] = useState<string>('전체');
   const [isSortAscending, setIsSortAscending] = useState<boolean>(true);
   const { campaigns } = useMainStore();
-  const { tenant_id } = useAuthStore();
   const [selectedCampaignId,setSelectedCampaignId ] = useState<number>(0);
   const [selectedCampaignIdIndex,setSelectedCampaignIdIndex ] = useState<number>(0);
   const [maxDispatchCount, setMaxDispatchCount ] = useState<number>(0);
@@ -403,18 +402,11 @@ export default function Campaignprogress() {
     XLSX.writeFile(wb, "CampaignProgress.xlsx");
   };
   //컬럼 설정 확인 이벤트.
-  const handleColumnSetConfirm = (data:any[]) => {
+  const handleColumnSetConfirm = (data:ColumnSettingItem[]) => {
+    setColumns(data);
     setIsColumnSetOpen(false)
-    // setDelimiter(data.delimiter);
-    // setOriginaldataYn(data.originDataSaveYn);
-    // setHeaderColumnData(data.datalist);
-    // const tempList: Column<SendRow>[] = data.datalist.map((tempData) => ({
-    //   key: tempData.field,
-    //   name: tempData.name
-    // }));  
-    // setSendColumns(tempList);
   };
-  
+  const handleColumnSetClose = () => setIsColumnSetOpen(false);  
 
   // 차트 데이터 처리 함수
   const processDataForGrid = (
@@ -533,6 +525,12 @@ export default function Campaignprogress() {
   }, [selectedCampaign, selectedSkill, selectedStatus, isSortAscending,initData]);
 
   useEffect(() => {
+    if( columns.length > 0 ){
+      
+    }
+  }, [columns]);
+
+  useEffect(() => {
     if( selectedCampaignId > 0 ){      
       fetchCampaignProgressInformation({
         tenantId: campaigns[selectedCampaignIdIndex].tenant_id,
@@ -639,9 +637,9 @@ export default function Campaignprogress() {
       </div>
       <ColumnSet
           isOpen={isColumnSetOpen}
-          onClose={() => setIsColumnSetOpen(false)}
-          onConfirm={() => handleColumnSetConfirm}
-          columns={_columns}
+          onClose={handleColumnSetClose}
+          onConfirm={handleColumnSetConfirm}
+          columns={columns}
         />
     </div>
   );
