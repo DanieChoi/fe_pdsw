@@ -47,16 +47,16 @@ export const loginApi = {
 
       // console.log("단계 = ", process.env.NEXT_PUBLIC_API_URL);
 
-      // const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+      const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
 
-      // const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
+      const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
 
-      // console.log("eventSource22 = ", eventSource);
+      console.log("login eventSource = ", eventSource);
 
-      // eventSource.addEventListener("message", (event) => {
-      //   //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
-      //   console.log("event22 = ", event.data);
-      // });
+      eventSource.addEventListener("message", (event) => {
+        //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
+        console.log("login event = ", event.data);
+      });
 
       // 사용자 정보 전역 상태 저장
       const userInfo: UserInfoData = {
