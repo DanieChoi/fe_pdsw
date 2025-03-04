@@ -264,6 +264,20 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
               onChange={(e) => handleNumericInput(e, 'setAutoDial')}
             />
           </div>
+           
+          {/* 다이얼 모드 옵션 */}
+          <div className="flex items-center gap-2 justify-between">
+          <Label className="w-[8.3rem] min-w-[8.3rem]">다이얼 모드 옵션</Label>
+          <Select value={dialModeOption} disabled>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={dialModeOption} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="default">default</SelectItem>
+            </SelectContent>
+          </Select>
+          </div>
+
         </div>
 
         <div className="w-[50%] flex flex-col gap-y-2">
@@ -340,102 +354,92 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
               </SelectContent>
             </Select>
           </div>
-        </div>
-      </div>
 
-      {/* 연결 IVR NO 및 다이얼 모드 */}
-      <div className="flex gap-[20px] mt-[0.5rem]">
-        <div className="flex items-top gap-2 justify-between">
-          <Label className="w-[8.3rem] min-w-[8.3rem]">연결 IVR NO</Label>
-          <CustomInput
-            type="text"
-            value={tempOutgoingMethodTab.power_divert_queue}
-            onChange={(e) => handleNumericInput(e, 'setIvrNo')}
-          />
-        </div>
-        <div className="flex items-top gap-2 justify-between">
-          <Label className="w-[8.3rem] min-w-[8.3rem]">다이얼 모드 옵션</Label>
-          <Select value={dialModeOption} disabled>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder={dialModeOption} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="default">default</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex flex-col items-start gap-4">
-          <div className="flex items-center gap-2 justify-between">
-            <CustomCheckbox
-              id="limit-rate"
-              checked={limitRateEnabled} // 상태를 기반으로 체크 여부 결정
-              onCheckedChange={(checked) => {
-                setLimitRateEnabled(checked as boolean);
-                setLimitRateRateEnabled(checked as boolean);
-                if (!checked) {
-                  // setLimitRate(""); // 비활성화 시 입력 값 초기화
-                  setLimitInit(checked as boolean);
-                  setLimitExitInit(checked as boolean);
-                }
-              }}
-            />
-            <Label htmlFor="limit-rate" className="w-[8.3rem] min-w-[8.3rem]">
-              제한 호수 비율
-            </Label>
+          {/* 연결 IVR NO  */}
+            <div className="flex items-center gap-2 justify-between">
+            <Label className="w-[8.3rem] min-w-[8.3rem]">연결 IVR NO</Label>
             <CustomInput
               type="text"
-              value={limitRate}
-              onChange={(e) => handleNumericInput(e, 'setLimitRate')}
-              disabled={!limitRateRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
+              value={tempOutgoingMethodTab.power_divert_queue}
+              onChange={(e) => handleNumericInput(e, 'setIvrNo')}
             />
-            %
           </div>
-          <div className="flex items-center gap-2 justify-between">
-            <CustomCheckbox
-              id="limit-init"
-              checked={limitInit} // 상태를 기반으로 체크 여부 결정
-              onCheckedChange={(checked) => {
-                setLimitInit(checked as boolean);
-                setLimitRateRateEnabled(!checked as boolean);
-                if (checked) {
-                  setLimitRate("0"); // 비활성화 시 입력 값 초기화
-                  onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
-                    , changeYn: true
-                    , campaignInfoChangeYn: true
-                    , user_option: 'limit=0'
-                  });
-                  setLimitExitInit(!checked as boolean);
-                }
-              }}
-              disabled={!limitRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
-            />
-            <Label htmlFor="limit-init" className="w-[8.3rem] min-w-[8.3rem]">
-              분배제한 고정 포함 초기화
-            </Label>
+
+                 
+        <div className="flex flex-col items-start gap-4">
+            <div className="flex items-center gap-2 justify-between">
+              <CustomCheckbox
+                id="limit-rate"
+                checked={limitRateEnabled} // 상태를 기반으로 체크 여부 결정
+                onCheckedChange={(checked) => {
+                  setLimitRateEnabled(checked as boolean);
+                  setLimitRateRateEnabled(checked as boolean);
+                  if (!checked) {
+                    // setLimitRate(""); // 비활성화 시 입력 값 초기화
+                    setLimitInit(checked as boolean);
+                    setLimitExitInit(checked as boolean);
+                  }
+                }}
+              />
+              <Label htmlFor="limit-rate" className="w-[108px] min-w-[108px]">
+                제한 호수 비율
+              </Label>
+              <CustomInput
+                type="text"
+                value={limitRate}
+                onChange={(e) => handleNumericInput(e, 'setLimitRate')}
+                disabled={!limitRateRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
+              />
+              %
+            </div>
+            <div className="flex items-center gap-2 justify-between">
+              <CustomCheckbox
+                id="limit-init"
+                checked={limitInit} // 상태를 기반으로 체크 여부 결정
+                onCheckedChange={(checked) => {
+                  setLimitInit(checked as boolean);
+                  setLimitRateRateEnabled(!checked as boolean);
+                  if (checked) {
+                    setLimitRate("0"); // 비활성화 시 입력 값 초기화
+                    onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+                      , changeYn: true
+                      , campaignInfoChangeYn: true
+                      , user_option: 'limit=0'
+                    });
+                    setLimitExitInit(!checked as boolean);
+                  }
+                }}
+                disabled={!limitRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
+              />
+              <Label htmlFor="limit-init" className="">
+                분배제한 고정 포함 초기화
+              </Label>
+            </div>
+            <div className="flex items-center gap-2 justify-between">
+              <CustomCheckbox
+                id="limit-exit-init"
+                checked={limitExitInit} // 상태를 기반으로 체크 여부 결정
+                onCheckedChange={(checked) => {
+                  setLimitExitInit(checked as boolean);
+                  setLimitRateRateEnabled(!checked as boolean);
+                  if (checked) {
+                    setLimitRate(""); // 비활성화 시 입력 값 초기화
+                    onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+                      , changeYn: true
+                      , campaignInfoChangeYn: true
+                      , user_option: ''
+                    });
+                    setLimitInit(!checked as boolean);
+                  }
+                }}
+                disabled={!limitRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
+              />
+              <Label htmlFor="limit-exit-init" className="">
+                분배제한 고정 제외 초기화
+              </Label>
+            </div>
           </div>
-          <div className="flex items-center gap-2 justify-between">
-            <CustomCheckbox
-              id="limit-exit-init"
-              checked={limitExitInit} // 상태를 기반으로 체크 여부 결정
-              onCheckedChange={(checked) => {
-                setLimitExitInit(checked as boolean);
-                setLimitRateRateEnabled(!checked as boolean);
-                if (checked) {
-                  setLimitRate(""); // 비활성화 시 입력 값 초기화
-                  onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
-                    , changeYn: true
-                    , campaignInfoChangeYn: true
-                    , user_option: ''
-                  });
-                  setLimitInit(!checked as boolean);
-                }
-              }}
-              disabled={!limitRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
-            />
-            <Label htmlFor="limit-exit-init" className="w-[8.3rem] min-w-[8.3rem]">
-              분배제한 고정 제외 초기화
-            </Label>
-          </div>
+
         </div>
       </div>
 

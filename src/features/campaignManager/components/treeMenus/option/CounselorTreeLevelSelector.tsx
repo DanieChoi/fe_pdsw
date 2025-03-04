@@ -25,22 +25,22 @@ export function CounselorTreeLevelSelector({
     <Popover>
       <PopoverTrigger asChild>
         <Button 
-          variant="outline" 
+          variant="ghost" 
           size="sm"
-          className="text-xs py-1 h-7 flex items-center gap-1"
+          className="text-xs py-1 !px-2 flex items-center gap-1 border-[#ebebeb] border rounded-[3px] text-[#888] h-[26px] "
         >
           {/* <Layers size={14} /> */}
           lev 
           <ChevronDown size={14} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-32 p-1" align="end">
-        <div className="flex flex-col gap-1">
+      <PopoverContent className="w-auto min-w-[150px] p-0 py-[10px] px-[12px] rounded-[3px] border border-[#333]" align="end">
+        <div className="flex flex-col space-y-[2px]">
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={() => onExpandToLevel(1)}
-            className="text-xs py-0.5 h-7 justify-start"
+            className="text-sm rounded-[3px] px-[6px] py-[4px] justify-start h-[26px]"
           >
             <Image src="/tree-menu/organization.png" alt="조직" width={14} height={12} className="mr-1" />
             1. 조직
@@ -49,7 +49,7 @@ export function CounselorTreeLevelSelector({
             variant="ghost" 
             size="sm" 
             onClick={() => onExpandToLevel(2)}
-            className="text-xs py-0.5 h-7 justify-start"
+            className="text-sm rounded-[3px] px-[6px] py-[4px] justify-start h-[26px]"
           >
             <Image src="/tree-menu/tennant_office.png" alt="테넌트" width={14} height={12} className="mr-1" />
             2. 테넌트
@@ -58,7 +58,7 @@ export function CounselorTreeLevelSelector({
             variant="ghost" 
             size="sm" 
             onClick={() => onExpandToLevel(3)}
-            className="text-xs py-0.5 h-7 justify-start"
+            className="text-sm rounded-[3px] px-[6px] py-[4px] justify-start h-[26px]"
           >
             <Image src="/tree-menu/group_icon_for_tree.png" alt="그룹" width={15} height={12} className="mr-1" />
             3. 그룹
@@ -67,7 +67,7 @@ export function CounselorTreeLevelSelector({
             variant="ghost" 
             size="sm" 
             onClick={() => onExpandToLevel(4)}
-            className="text-xs py-0.5 h-7 justify-start"
+            className="text-sm rounded-[3px] px-[6px] py-[4px] justify-start h-[26px]"
           >
             <Image src="/tree-menu/team_icon_for_tree.png" alt="팀" width={14} height={12} className="mr-1" />
             4. 팀
@@ -77,7 +77,7 @@ export function CounselorTreeLevelSelector({
             variant="ghost" 
             size="sm" 
             onClick={() => onToggleAllNodes(true)}
-            className="text-xs py-0.5 h-7 justify-start"
+            className="text-sm rounded-[3px] px-[6px] py-[4px] justify-start h-[26px]"
           >
             <Layers size={14} className="mr-1" />
             전체
@@ -86,7 +86,7 @@ export function CounselorTreeLevelSelector({
             variant="ghost" 
             size="sm" 
             onClick={() => onToggleAllNodes(false)}
-            className="text-xs py-0.5 h-7 justify-start"
+            className="text-sm rounded-[3px] px-[6px] py-[4px] justify-start h-[26px]"
           >
             <Layers size={14} className="mr-1" />
             닫기

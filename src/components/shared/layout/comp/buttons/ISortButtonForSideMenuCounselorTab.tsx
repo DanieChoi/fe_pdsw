@@ -58,11 +58,11 @@ const ISortButtonForSideMenuCounselorTab = () => {
           />
         </CommonButton>
       </PopoverTrigger>
-      <PopoverContent className="w-44 p-0 rounded shadow" align="start">
-        <div className="py-0.5">
+      <PopoverContent className="w-auto min-w-[150px] p-0 py-[10px] px-[12px] rounded-[3px] border border-[#333]" align="start">
+        <div className="">
           {/* 이름순 정렬 옵션 */}
           <div
-            className="flex items-center px-2 py-1.5 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
+            className="flex items-center hover:bg-[#F4F6F9] cursor-pointer rounded-[3px] px-[6px] py-[4px] "
             onClick={() => handleSortSelect('name')}
           >
             <div className="flex-1 text-sm">이름순</div>
@@ -70,8 +70,8 @@ const ISortButtonForSideMenuCounselorTab = () => {
               <button
                 className={`p-1 rounded ${
                   sortOption.type === 'name' && sortOption.direction === 'asc'
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-400 hover:text-gray-600'
+                    ? 'bg-[#F4F6F9] text-[333]'
+                    : 'text-gray-400 hover:text-[333]'
                 }`}
                 onClick={(e) => handleSortDirectionSelect('name', 'asc', e)}
               >
@@ -80,8 +80,8 @@ const ISortButtonForSideMenuCounselorTab = () => {
               <button
                 className={`p-1 rounded ${
                   sortOption.type === 'name' && sortOption.direction === 'desc'
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-400 hover:text-gray-600'
+                    ? 'bg-[#F4F6F9] text-[333]'
+                    : 'text-gray-400 hover:text-[333]'
                 }`}
                 onClick={(e) => handleSortDirectionSelect('name', 'desc', e)}
               >
@@ -92,7 +92,7 @@ const ISortButtonForSideMenuCounselorTab = () => {
           
           {/* 아이디순 정렬 옵션 */}
           <div
-            className="flex items-center px-2 py-1.5 hover:bg-gray-50 cursor-pointer"
+            className="flex items-center hover:bg-[#F4F6F9] cursor-pointer rounded-[3px] px-[6px] py-[4px]"
             onClick={() => handleSortSelect('id')}
           >
             <div className="flex-1 text-sm">아이디순</div>
@@ -100,8 +100,8 @@ const ISortButtonForSideMenuCounselorTab = () => {
               <button
                 className={`p-1 rounded ${
                   sortOption.type === 'id' && sortOption.direction === 'asc'
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-400 hover:text-gray-600'
+                    ? 'bg-[#F4F6F9] text-[333]'
+                    : 'text-gray-400 hover:text-[333]'
                 }`}
                 onClick={(e) => handleSortDirectionSelect('id', 'asc', e)}
               >
@@ -110,8 +110,8 @@ const ISortButtonForSideMenuCounselorTab = () => {
               <button
                 className={`p-1 rounded ${
                   sortOption.type === 'id' && sortOption.direction === 'desc'
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-400 hover:text-gray-600'
+                    ? 'bg-[#F4F6F9] text-[333]'
+                    : 'text-gray-400 hover:text-[333]'
                 }`}
                 onClick={(e) => handleSortDirectionSelect('id', 'desc', e)}
               >
