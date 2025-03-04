@@ -190,65 +190,17 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
   }, [setFooterDataList]);
 
   // SSE 구독
-  useEffect(() => {
-    const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-    const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
-
-    let data: any = {};
-    let announce = "";
-    let command = "";
-    let kind = "";
-
-    eventSource.onmessage = (event) => {
-      console.log("footer sse event = ", event.data);
-      if (event.data !== "Connected!!") {
-        const tempEventData = JSON.parse(event.data);
-        if (
-          announce !== tempEventData["announce"] ||
-          !isEqual(data, tempEventData.data) ||
-          !isEqual(data, tempEventData["data"]) ||
-          kind !== tempEventData["kind"]
-        ) {
-          announce = tempEventData["announce"];
-          command = tempEventData["command"];
-          data = tempEventData["data"];
-          kind = tempEventData["kind"];
-
-          footerDataSet(
-            tempEventData["announce"],
-            tempEventData["command"],
-            tempEventData["data"],
-            tempEventData["kind"],
-            tempEventData
-          );
-        }
-      }
-    };
-
-    eventSource.onerror = (error) => {
-      console.error('EventSource failed:', error);
-    };
-
-    return () => {
-      eventSource.close(); // 컴포넌트가 언마운트될 때 SSE 연결 종료
-    };
-  }, [tenant_id]);
-
   // useEffect(() => {
   //   const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-  //   const eventSource = new EventSource(
-  //     `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
-  //   );
-  //   // const eventSource = new EventSource(`http://10.10.30.228:4000/api/v1/notification/${tenant_id}/subscribe`);
-  //   console.log("footer event ready... ");
+  //   const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
 
   //   let data: any = {};
   //   let announce = "";
   //   let command = "";
   //   let kind = "";
 
-  //   const handleEvent = (event: MessageEvent) => {
-  //     console.log("event44 = ", event.data);
+  //   eventSource.addEventListener ("message", (event) => {
+  //     console.log("footer sse event = ", event.data);
   //     if (event.data !== "Connected!!") {
   //       const tempEventData = JSON.parse(event.data);
   //       if (
@@ -271,14 +223,62 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
   //         );
   //       }
   //     }
-  //   };
-  //   eventSource.addEventListener("message", handleEvent);
+  //   });
 
-  //   // return () => {
-  //   //   eventSource.removeEventListener("message", handleEvent);
-  //   //   eventSource.close();
-  //   // };
+  //   eventSource.onerror = (error) => {
+  //     console.error('EventSource failed:', error);
+  //   };
+
+  //   return () => {
+  //     eventSource.close(); // 컴포넌트가 언마운트될 때 SSE 연결 종료
+  //   };
   // }, [tenant_id]);
+
+  useEffect(() => {
+    const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+    const eventSource = new EventSource(
+      `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
+    );
+    console.log("footer event ready... ");
+
+    let data: any = {};
+    let announce = "";
+    let command = "";
+    let kind = "";
+
+    eventSource.addEventListener("message", (event) => {
+      //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
+      console.log("footer sse event = ", event.data);
+      if (event.data !== "Connected!!") {
+        const tempEventData = JSON.parse(event.data);
+        if (
+          announce !== tempEventData["announce"] ||
+          !isEqual(data, tempEventData.data) ||
+          !isEqual(data, tempEventData["data"]) ||
+          kind !== tempEventData["kind"]
+        ) {
+          announce = tempEventData["announce"];
+          command = tempEventData["command"];
+          data = tempEventData["data"];
+          kind = tempEventData["kind"];
+
+          footerDataSet(
+            tempEventData["announce"],
+            tempEventData["command"],
+            tempEventData["data"],
+            tempEventData["kind"],
+            tempEventData
+          );
+        }
+    }});
+    
+    eventSource.onerror = (error) => {
+      console.error('footer sse event failed:', error);
+    };
+    return () => {
+      eventSource.close();
+    };
+  }, [tenant_id]);
   
     return (
       <footer
