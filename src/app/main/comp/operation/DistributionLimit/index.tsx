@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import DataGrid from "react-data-grid";
-import { ChevronRight, ChevronDown } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { CustomInput } from "@/components/shared/CustomInput";
@@ -93,7 +92,6 @@ const DistributionLimit = () => {
     const result: Row[] = [];
     
     agentData.forEach((agent) => {
-      // Find or create center
       let center = result.find(c => c.center === agent.center);
       if (!center) {
         center = {
@@ -113,7 +111,6 @@ const DistributionLimit = () => {
         result.push(center);
       }
 
-      // Find or create group under this center
       let group = center.children?.find(g => g.group === agent.group);
       if (!group) {
         group = {
@@ -135,13 +132,11 @@ const DistributionLimit = () => {
         center.children?.push(group);
       }
 
-      // Find or create part under this group
       let part = group.children?.find(p => p.part === agent.part);
       if (!part) {
         part = {
           id: `part-${agent.center}-${agent.group}-${agent.part}`,
           parentId: group.id,
-          // Keep center and group values
           center: agent.center,
           group: agent.group,
           part: agent.part,
@@ -157,7 +152,6 @@ const DistributionLimit = () => {
         group.children?.push(part);
       }
 
-      // Add agent under this part
       part.children?.push({
         id: `agent-${agent.agent_id}`,
         parentId: part.id,
@@ -173,7 +167,6 @@ const DistributionLimit = () => {
       });
     });
 
-    // Sort each level
     result.sort((a, b) => a.center.localeCompare(b.center));
     result.forEach(center => {
       center.children?.sort((a, b) => a.group.localeCompare(b.group));
@@ -188,7 +181,6 @@ const DistributionLimit = () => {
     return result;
   };
 
-  // Flatten tree data to rows for DataGrid with filtering applied
   const flattenRows = (rows: Row[]): Row[] => {
     let flat: Row[] = [];
     if (rows.length > 0) {
