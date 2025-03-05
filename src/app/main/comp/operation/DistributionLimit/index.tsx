@@ -87,7 +87,6 @@ const DistributionLimit = () => {
     });
   };
 
-  // Transform flat agent data to hierarchical tree structure
   const transformToTreeData = (agentData: Row[]) => {
     const result: Row[] = [];
     
