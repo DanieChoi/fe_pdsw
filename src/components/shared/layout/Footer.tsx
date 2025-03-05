@@ -193,7 +193,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
   useEffect(() => {
     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
     const eventSource = new EventSource(
-      `http://10.10.30.228:4000/api/v1/notification/${tenant_id}/subscribe`
+      `http://10.10.30.228/api/v1/notification/${tenant_id}/subscribe`
     );
     
     let data: any = {};
