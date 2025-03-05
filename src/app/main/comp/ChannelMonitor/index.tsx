@@ -3,6 +3,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import DataGrid from 'react-data-grid';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import 'react-data-grid/lib/styles.css';
+import { useApiForChannelStateMonitoringList } from '@/features/monitoring/hooks/useApiForChannelStateMonitoringList';
 
 type ChannelStatus = 'IDLE' | 'BUSY' | 'NONE';
 
@@ -37,6 +38,7 @@ const ChannelMonitor: React.FC = () => {
   const [firstSelect, setFirstSelect] = useState<FilterMode>('전체');
   const [secondSelect, setSecondSelect] = useState<string>('');
   const [thirdSelect, setThirdSelect] = useState<string>('상태전체');
+  const [channelData, setChannelData] = useState<ChannelData[]>([]);
   const [filteredData, setFilteredData] = useState<ChannelData[]>(INITIAL_DATA);
 
   // 첫 번째 Select의 옵션
@@ -46,7 +48,7 @@ const ChannelMonitor: React.FC = () => {
   const getSecondSelectOptions = () => {
     switch (firstSelect) {
       case '장비번호':
-        return ['전체장비', '[1]IPPDS1', '[2]IPPDS3'];
+        return ['전체장비', '[1]IPPDS-148'];
       case '캠페인 모드':
         return ['전체캠페인', '회선사용안함', '모든캠페인사용'];
       case '발신 모드':
@@ -62,31 +64,32 @@ const ChannelMonitor: React.FC = () => {
 
   // 필터링 로직
   useEffect(() => {
-    let newData = [...INITIAL_DATA];
-
-    if (firstSelect !== '전체') {
-      if (secondSelect && secondSelect !== '전체장비' && 
-          secondSelect !== '전체캠페인' && secondSelect !== '전체발신모드') {
-        switch (firstSelect) {
-          case '장비번호':
-            newData = newData.filter(item => item.equipmentNo === secondSelect);
-            break;
-          case '캠페인 모드':
-            newData = newData.filter(item => item.campaignMode === secondSelect);
-            break;
-          case '발신 모드':
-            newData = newData.filter(item => item.callMode === secondSelect);
-            break;
+    let newData:ChannelData[] = channelData;
+    if( channelData.length > 0 ){
+      if (firstSelect !== '전체') {
+        if (secondSelect && secondSelect !== '전체장비' && 
+            secondSelect !== '전체캠페인' && secondSelect !== '전체발신모드') {
+          switch (firstSelect) {
+            case '장비번호':
+              // newData = channelData.filter(item => item.equipmentNo === secondSelect);
+              break;
+            case '캠페인 모드':
+              newData = channelData.filter(item => item.campaignMode === secondSelect);
+              break;
+            case '발신 모드':
+              newData = channelData.filter(item => item.callMode === secondSelect);
+              break;
+          }
         }
       }
-    }
 
-    if (thirdSelect !== '상태전체') {
-      newData = newData.filter(item => item.status === thirdSelect);
-    }
+      if (thirdSelect !== '상태전체') {
+        newData = newData.filter(item => item.status === thirdSelect);
+      }
 
-    setFilteredData(newData);
-  }, [firstSelect, secondSelect, thirdSelect]);
+      setFilteredData(newData);
+    }
+  }, [firstSelect, secondSelect, thirdSelect, channelData]);
 
   // 상태별 카운트 계산
   const statusCounts = filteredData.reduce((acc, curr) => {
@@ -96,7 +99,7 @@ const ChannelMonitor: React.FC = () => {
 
   // 도넛 차트 데이터 준비
   const chartData = Object.entries(statusCounts).map(([name, value]) => ({
-    name,
+    name: name + ':' + value,
     value: (value / filteredData.length) * 100
   }));
 
@@ -124,8 +127,35 @@ const ChannelMonitor: React.FC = () => {
   // 첫 번째 Select 변경 시 두 번째 Select 초기화
   const handleFirstSelectChange = (value: FilterMode) => {
     setFirstSelect(value);
-    setSecondSelect('');
+    if( value === '발신 모드'){
+      setSecondSelect('전체발신모드');
+    }else if( value === '캠페인 모드'){
+      setSecondSelect('전체캠페인');
+    }else if( value === '장비번호'){
+      setSecondSelect('전체장비');
+    }
   };
+
+  // 채널 모니터링 api 호출
+  const { mutate: fetchChannelStateMonitoringList } = useApiForChannelStateMonitoringList({
+    onSuccess: (data) => {  
+      const dataList = data.dialerChannelStatusList.sort((a, b) => parseInt(a.id) - parseInt(b.id))
+      .map(item => ({
+        CIDSNO: '1',
+        CHNO: `CH${item.id}`,
+        status: item.state === '0' ? 'NONE' : item.state === '1' ? 'IDLE' : 'BUSY' as ChannelStatus,
+        equipmentNo: '[1]]IPPDS-148',
+        campaignMode: item.assign_kind === '1' ? '모든캠페인사용' : '회선사용안함',
+        callMode: ''
+      }));
+
+      setChannelData(dataList);      
+    }
+  });
+
+  useEffect(() => {    
+    fetchChannelStateMonitoringList({deviceId:0});
+  }, []);
 
   return (
     <div className="h-full">
@@ -152,7 +182,7 @@ const ChannelMonitor: React.FC = () => {
                   {chartData.map((entry, index) => (
                     <Cell 
                       key={`cell-${index}`} 
-                      fill={COLORS[entry.name as ChannelStatus]} 
+                      fill={COLORS[entry.name.split(':')[0] as ChannelStatus]} 
                     />
                   ))}
                 </Pie>
