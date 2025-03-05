@@ -181,32 +181,16 @@ const DistributionLimit = () => {
   };
 
   const flattenRows = (rows: Row[]): Row[] => {
-    let flat: Row[] = [];
-    if (rows.length > 0) {
-      rows.forEach((row) => {
-        const isExpanded = expandedRows.has(row.id);
-        
-        // 상위 노드(level < 3)는 무조건 표시
-        if (row.level < 3) {
-          // 자식 노드가 있는지 확인하여 hasChildren 속성 업데이트
-          const hasChildren = row.children && row.children.length > 0;
-          flat.push({ ...row, isExpanded, hasChildren });
-          
-          // 확장된 경우에만 자식 노드 추가
-          if (hasChildren && isExpanded) {
-            if (row.children) {
-              flat = flat.concat(flattenRows(row.children));
-            }
-          }
-        } 
-        // 말단 노드(level === 3, 상담원)는 필터 조건에 따라 표시
-        else {
+    const getVisibleAgents = (nodes: Row[]): Row[] => {
+      let visibleAgents: Row[] = [];
+      
+      nodes.forEach(node => {
+        if (node.level === 3) {
           let shouldInclude = true;
           
-          // 필터링 조건 적용
           if (viewFilter !== 'all') {
-            const maxDist = parseInt(row.max_dist || '0');
-            const currentResp = parseInt(row.current_resp || '0');
+            const maxDist = parseInt(node.max_dist || '0');
+            const currentResp = parseInt(node.current_resp || '0');
             
             switch (viewFilter) {
               case 'remaining':
@@ -229,12 +213,95 @@ const DistributionLimit = () => {
           }
           
           if (shouldInclude) {
-            flat.push({ ...row, isExpanded });
+            visibleAgents.push(node);
+          }
+        } else if (node.children) {
+          visibleAgents = visibleAgents.concat(getVisibleAgents(node.children));
+        }
+      });
+      
+      return visibleAgents;
+    };
+  
+    const visibleAgents = getVisibleAgents(rows);
+    
+    const parentsWithVisibleChildren = new Set<string>();
+    
+    visibleAgents.forEach(agent => {
+      if (agent.parentId) parentsWithVisibleChildren.add(agent.parentId);
+      
+      const partParentId = rows.find(center => 
+        center.children?.some(group => 
+          group.children?.some(part => part.id === agent.parentId)
+        )
+      )?.children?.find(group => 
+        group.children?.some(part => part.id === agent.parentId)
+      )?.id;
+      
+      if (partParentId) parentsWithVisibleChildren.add(partParentId);
+      
+      const groupParentId = rows.find(center => 
+        center.children?.some(group => group.id === partParentId)
+      )?.id;
+      
+      if (groupParentId) parentsWithVisibleChildren.add(groupParentId);
+    });
+    
+    const flatten = (nodes: Row[]): Row[] => {
+      let flat: Row[] = [];
+      
+      nodes.forEach(node => {
+        const isExpanded = expandedRows.has(node.id);
+        const hasChildren = node.children && node.children.length > 0;
+        
+        if (node.level < 3) {
+          if (viewFilter !== 'all' && !parentsWithVisibleChildren.has(node.id) && !visibleAgents.some(agent => agent.id === node.id)) {
+            return;
+          }
+          
+          flat.push({ ...node, isExpanded, hasChildren });
+          
+          if (hasChildren && isExpanded) {
+            flat = flat.concat(flatten(node.children!));
+          }
+        } 
+        else {
+          let shouldInclude = true;
+          
+          if (viewFilter !== 'all') {
+            const maxDist = parseInt(node.max_dist || '0');
+            const currentResp = parseInt(node.current_resp || '0');
+            
+            switch (viewFilter) {
+              case 'remaining':
+                // 잔여 호수가 남은 상담원 (최대 분배호수 > 현재 응답호수)
+                shouldInclude = maxDist > currentResp && (maxDist > 0 || currentResp > 0);
+                break;
+              case 'no-remaining':
+                // 잔여 호수가 없는 상담원 (최대 분배호수 = 현재 응답호수)
+                shouldInclude = maxDist === currentResp && (maxDist > 0 || currentResp > 0);
+                break;
+              case 'no-limit':
+                // 최대 분배호수가 설정되지 않은 상담원 (데이터가 없거나 둘 다 0인 경우)
+                shouldInclude = maxDist === 0 && currentResp === 0;
+                break;
+              case 'has-limit':
+                // 최대 분배호수가 설정된 상담원 (최대 분배호수나 현재 응답호수 중 하나라도 값이 있는 경우)
+                shouldInclude = maxDist > 0 || currentResp > 0;
+                break;
+            }
+          }
+          
+          if (shouldInclude) {
+            flat.push({ ...node, isExpanded });
           }
         }
       });
-    }
-    return flat;
+      
+      return flat;
+    };
+  
+    return flatten(rows);
   };
 
   // Apply filter to raw agent data - 필터는 최종 표시 시 적용
@@ -820,7 +887,7 @@ const DistributionLimit = () => {
             disabled={true}
           />
           <div className="text-sm">
-            응답호수 초기화 시간: {initTime === "9999" ? "없음" : `${initTime.slice(0, 2)}:${initTime.slice(2)}`}
+            응답호수 초기화 시간 : {initTime === "9999" ? "없음" : `${initTime.slice(0, 2)}:${initTime.slice(2)}`}
           </div>
         </div>
         <div className="flex gap-2">
@@ -836,7 +903,7 @@ const DistributionLimit = () => {
               <div className="text-sm">할당 상담원 목록</div>
             </div>
             <div className="flex items-center gap-2">
-              <Label className="w-20 min-w-20">보기설정</Label>
+              <Label className="w-12 min-w-12">보기설정</Label>
               <Select 
                 value={viewFilter}
                 onValueChange={setViewFilter}
@@ -958,7 +1025,7 @@ const DistributionLimit = () => {
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
-              <CommonButton onClick={handleNew}>신규</CommonButton>
+              {/* <CommonButton onClick={handleNew}>신규</CommonButton> */}
               <CommonButton onClick={handleSave}>저장</CommonButton>
             </div>
 
