@@ -195,16 +195,15 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     const eventSource = new EventSource(
       `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
     );
-    // const eventSource = new EventSource(`http://10.10.30.228:4000/api/v1/notification/${tenant_id}/subscribe`);
-    console.log("footer event ready... ");
-
+    
     let data: any = {};
     let announce = "";
     let command = "";
     let kind = "";
 
-    const handleEvent = (event: MessageEvent) => {
-      console.log("event = ", event.data);
+    eventSource.addEventListener("message", (event) => {
+      //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
+      console.log("footer sse event = ", event.data);
       if (event.data !== "Connected!!") {
         const tempEventData = JSON.parse(event.data);
         if (
@@ -227,11 +226,8 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
           );
         }
       }
-    };
-    eventSource.addEventListener("message", handleEvent);
-
+    });
     return () => {
-      eventSource.removeEventListener("message", handleEvent);
       eventSource.close();
     };
   }, [tenant_id]);

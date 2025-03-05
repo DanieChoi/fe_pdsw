@@ -24,6 +24,7 @@ interface TreeRow extends DispatchStatusDataType {
   level: number;
   hasChildren?: boolean;
   children?: TreeRow[];
+  [key: string]: any;
 }
 
 // 실제 API 연동 시 사용할 데이터 타입
@@ -351,20 +352,62 @@ export default function Campaignprogress() {
       processDataForGrid(campaignSkills,selectedCampaign, selectedSkill, value);
     }
   };
+  const createExcelData = (list:TreeRow[],_columns:Column<TreeRow>[], hasChildren:boolean) => {
+    let rtnList:any[] = [];
+    for( let i=0;i<list.length;i++){
+      let tempData:any[] = [];
+      if( typeof list[i].children !== 'undefined'){
+        if( list[i].id === 'center-center-1' ){
+          tempData = ['센터: NEXUS(1센터)','',''];
+          for(let j=0;j<_columns.length;j++){
+            tempData.push('');
+          }
+        }else if( list[i].id.indexOf('tenant') > -1 ){
+          tempData = ['','테넌트: '+ list[i].id.split('-')[1],''];
+          for(let j=0;j<_columns.length;j++){
+            tempData.push('');
+          }
+        }else if( list[i].id.indexOf('campaign') > -1 ){
+          tempData = ['','','캠페인 아이디: '+ list[i].id.split('-')[1]];
+          for(let j=0;j<_columns.length;j++){
+            tempData.push('');
+          }
+        }
+        const childData = createExcelData(list[i].children || [], _columns, true);
+        rtnList.push(tempData);
+        rtnList = rtnList.concat(childData); 
+      }else{
+        const rowData = _columns.map(col => {
+          return col.key in list[i] ? list[i][col.key] : ''; // Make sure it returns a value for each column
+        });
+        rtnList.push(['', '','', ...rowData]);
+      }
+    }
+
+    return rtnList;
+  };
   // 엑셀다운로드
   const handleExcelDownload = () => {
-    // Flatten the rows if necessary
-    const dataToExport = flattenRows(filteredAndSortedData);
-    
-    // Create a new worksheet
-    const ws = XLSX.utils.json_to_sheet(dataToExport);
-    
-    // Create a new workbook and append the worksheet
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "DataGrid");
+    // Convert rows to a format suitable for Excel
+    const wsData = filteredAndSortedData.map(row => {
+      // Map the row data to the appropriate columns
+      return _columns.map(col => row[col.key]); // assuming each row has keys matching the column's 'key'
+    });
+    const tempList = createExcelData(filteredAndSortedData,_columns,true);
 
-    // Trigger the download
-    XLSX.writeFile(wb, "CampaignProgress.xlsx");
+    // Add the headers
+    // const headers = _columns.map(col => col.name);
+    const headers = ['센터', '테넌트', '캠페인 아이디', ..._columns.map(col => col.name)];
+
+    // Create the worksheet
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...tempList]);
+
+    // Create the workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+    // Export the file
+    XLSX.writeFile(wb, 'CampaignProgress.xlsx');
   };
   //컬럼 설정 확인 이벤트.
   const handleColumnSetConfirm = (data:ColumnSettingItem[]) => {
