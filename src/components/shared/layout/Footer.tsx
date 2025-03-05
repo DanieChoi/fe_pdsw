@@ -78,9 +78,9 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     }
     //장비 사용, 장비 사용중지
     else if( announce === 'dialing-device' ){
-      if( command === 'UPDATE' && data['skill_id'] === 'run' ){
+      if( command === 'UPDATE' && data['device_status'] === 'run' ){
         _message = 'CIDS 작동중';
-      }else if( command === 'UPDATE' && data['skill_id'] === 'down' ){
+      }else if( command === 'UPDATE' && data['device_status'] === 'down' ){
         _message = 'CIDS 작동중지';
       }
     }

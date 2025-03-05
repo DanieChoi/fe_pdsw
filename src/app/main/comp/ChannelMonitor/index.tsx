@@ -14,9 +14,10 @@ interface ChannelData {
   equipmentNo?: string;
   campaignMode?: string;
   callMode?: string;
+  channelGroupMode?:string;
 }
 
-type FilterMode = '전체' | '장비번호' | '캠페인 모드' | '발신 모드';
+type FilterMode = '전체' | '장비번호' | '캠페인 모드' | '발신 모드' | '채널 그룹 모드';
 
 const COLORS = {
   IDLE: '#4AD3C8',
@@ -34,6 +35,31 @@ const INITIAL_DATA: ChannelData[] = Array(20).fill(null).map((_, index) => ({
   callMode: ['power mode', 'progressive mode', 'predictive mode', 'system preview'][Math.floor(Math.random() * 4)]
 }));
 
+const secondModeAll = [
+  {key:' ', name: '선택'},
+];
+
+const secondModeEquipment = [
+  {key:' ', name: '전체장비'},
+  {key:'[1]IPPDS-148', name: '[1]IPPDS-148'},
+];
+
+const secondModeCampaign = [
+  {key:' ', name: '전체캠페인'},
+  {key:'회선사용안함', name: '회선사용안함'},
+  {key:'모든캠페인사용', name: '모든캠페인사용'},
+];
+
+const secondModeSender = [
+  {key:' ', name: '전체발신모드'},
+  {key:'회선사용안함', name: '회선사용안함'},
+  {key:'발신방법모두사용', name: '발신방법모두사용'},
+  {key:'power mode', name: 'power mode'},
+  {key:'progressive mode', name: 'progressive mode'},
+  {key:'predictive mode', name: 'predictive mode'},
+  {key:'system preview', name: 'system preview'}
+];
+
 const ChannelMonitor: React.FC = () => {
   const [firstSelect, setFirstSelect] = useState<FilterMode>('전체');
   const [secondSelect, setSecondSelect] = useState<string>('');
@@ -42,20 +68,19 @@ const ChannelMonitor: React.FC = () => {
   const [filteredData, setFilteredData] = useState<ChannelData[]>(INITIAL_DATA);
 
   // 첫 번째 Select의 옵션
-  const firstSelectOptions = ['전체', '장비번호', '캠페인 모드', '발신 모드'];
+  const firstSelectOptions = ['전체', '장비번호', '캠페인 모드', '발신 모드', '채널 그룹 모드'];
 
   // 두 번째 Select의 옵션 (첫 번째 선택에 따라 동적 변경)
   const getSecondSelectOptions = () => {
     switch (firstSelect) {
       case '장비번호':
-        return ['전체장비', '[1]IPPDS-148'];
+        return secondModeEquipment;
       case '캠페인 모드':
-        return ['전체캠페인', '회선사용안함', '모든캠페인사용'];
+        return secondModeCampaign;
       case '발신 모드':
-        return ['전체발신모드', '회선사용안함', '발신방법모두사용', 'power mode', 
-                'progressive mode', 'predictive mode', 'system preview'];
+        return secondModeSender;
       default:
-        return [];
+        return secondModeAll;
     }
   };
 
@@ -67,8 +92,7 @@ const ChannelMonitor: React.FC = () => {
     let newData:ChannelData[] = channelData;
     if( channelData.length > 0 ){
       if (firstSelect !== '전체') {
-        if (secondSelect && secondSelect !== '전체장비' && 
-            secondSelect !== '전체캠페인' && secondSelect !== '전체발신모드') {
+        if (secondSelect && secondSelect !== ' ') {
           switch (firstSelect) {
             case '장비번호':
               // newData = channelData.filter(item => item.equipmentNo === secondSelect);
@@ -80,6 +104,10 @@ const ChannelMonitor: React.FC = () => {
               newData = channelData.filter(item => item.callMode === secondSelect);
               break;
           }
+        }else if(firstSelect === '발신 모드'){
+          newData = channelData.filter(item => item.callMode === secondSelect);
+        }else if(firstSelect === '채널 그룹 모드'){
+          newData = channelData.filter(item => item.channelGroupMode === secondSelect);
         }
       }
 
@@ -127,13 +155,7 @@ const ChannelMonitor: React.FC = () => {
   // 첫 번째 Select 변경 시 두 번째 Select 초기화
   const handleFirstSelectChange = (value: FilterMode) => {
     setFirstSelect(value);
-    if( value === '발신 모드'){
-      setSecondSelect('전체발신모드');
-    }else if( value === '캠페인 모드'){
-      setSecondSelect('전체캠페인');
-    }else if( value === '장비번호'){
-      setSecondSelect('전체장비');
-    }
+    setSecondSelect(' ');
   };
 
   // 채널 모니터링 api 호출
@@ -146,7 +168,8 @@ const ChannelMonitor: React.FC = () => {
         status: item.state === '0' ? 'NONE' : item.state === '1' ? 'IDLE' : 'BUSY' as ChannelStatus,
         equipmentNo: '[1]]IPPDS-148',
         campaignMode: item.assign_kind === '1' ? '모든캠페인사용' : '회선사용안함',
-        callMode: ''
+        callMode: '',
+        channelGroupMode: ''
       }));
 
       setChannelData(dataList);      
@@ -217,14 +240,36 @@ const ChannelMonitor: React.FC = () => {
             <Select 
               disabled={firstSelect === '전체'}
               onValueChange={setSecondSelect}
+              value={secondSelect}
             >
               <SelectTrigger className="w-40">
                 <SelectValue placeholder={secondSelect || "선택"} />
               </SelectTrigger>
               <SelectContent>
-                {getSecondSelectOptions().map(option => (
-                  <SelectItem key={option} value={option}>{option}</SelectItem>
-                ))}
+                {firstSelect === '장비번호'?
+                  secondModeEquipment.map(option => (
+                    <SelectItem key={option.key} value={option.key}>{option.name}</SelectItem>
+                  ))
+                  :
+                  firstSelect === '캠페인 모드'?
+                  secondModeCampaign.map(option => (
+                    <SelectItem key={option.key} value={option.key}>{option.name}</SelectItem>
+                  ))
+                  :
+                  firstSelect === '발신 모드'?
+                  secondModeSender.map(option => (
+                    <SelectItem key={option.key} value={option.key}>{option.name}</SelectItem>
+                  ))
+                  :
+                  firstSelect === '채널 그룹 모드'?
+                  secondModeCampaign.map(option => (
+                    <SelectItem key={option.key} value={option.key}>{option.name}</SelectItem>
+                  ))
+                  :
+                  secondModeAll.map(option => (
+                    <SelectItem key={option.key} value={option.key}>{option.name}</SelectItem>
+                  ))
+                }
               </SelectContent>
             </Select>
 
