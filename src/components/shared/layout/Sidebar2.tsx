@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -10,7 +9,7 @@ import { TabActions } from "./comp/TabActions";
 import { BottomTabsForSideMenu } from "./BottomTabsForSideMenu";
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { create } from "zustand";
+import { useSidebarWidthStore } from "@/store/useSidebarWidthStore";
 
 interface SidebarToggleButtonProps {
   isOpen: boolean;
@@ -33,51 +32,22 @@ function SidebarToggleButton({ isOpen, onClick }: SidebarToggleButtonProps) {
   );
 }
 
-interface SidebarWidthState {
-  width: number;
-  isOpen: boolean;
-  tabWidths: Record<TabId, number>;
-  currentTabId: TabId | null;
-  setWidth: (width: number) => void;
-  setIsOpen: (isOpen: boolean) => void;
-  setTabWidth: (tabId: TabId, width: number) => void;
-  setCurrentTabId: (tabId: TabId) => void;
-}
-
-export const useSidebarWidthStore = create<SidebarWidthState>((set) => ({
-  width: 240,
-  isOpen: true,
-  tabWidths: {
-    "campaign": 240,
-    "agent": 320,
-    "agent-group": 280
-  },
-  currentTabId: "campaign",
-  setWidth: (width: number) => set({ width }),
-  setIsOpen: (isOpen: boolean) => set({ isOpen }),
-  setTabWidth: (tabId: TabId, width: number) => set(state => ({
-    tabWidths: {
-      ...state.tabWidths,
-      [tabId]: width
-    },
-    width: state.currentTabId === tabId ? width : state.width
-  })),
-  setCurrentTabId: (tabId: TabId) => set(state => ({
-    currentTabId: tabId,
-    width: state.tabWidths[tabId] || state.width
-  }))
-}));
-
 export default function SidebarContainer() {
   const storeWidth = useSidebarWidthStore(state => state.width);
   const storeIsOpen = useSidebarWidthStore(state => state.isOpen);
+  const minWidth = useSidebarWidthStore(state => state.minWidth);
+  const maxWidth = useSidebarWidthStore(state => state.maxWidth);
+  const isResizing = useSidebarWidthStore(state => state.isResizing);
   const setStoreWidth = useSidebarWidthStore(state => state.setWidth);
   const setStoreIsOpen = useSidebarWidthStore(state => state.setIsOpen);
   const setTabWidth = useSidebarWidthStore(state => state.setTabWidth);
   const setCurrentTabId = useSidebarWidthStore(state => state.setCurrentTabId);
+  const setIsResizing = useSidebarWidthStore(state => state.setIsResizing);
 
   const [selectedTabId, setSelectedTabId] = useState<TabId>("campaign");
-  const [isResizing, setIsResizing] = useState(false);
+  
+  // 로컬 리사이징 상태 추가 (이중 안전장치)
+  const [localResizing, setLocalResizing] = useState(false);
   
   // 성능 최적화를 위한 refs
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -97,16 +67,19 @@ export default function SidebarContainer() {
       sidebarRef.current.style.transition = 'none';
     }
     
+    // 로컬 상태와 글로벌 상태 모두 업데이트
+    setLocalResizing(true);
     setIsResizing(true);
     lastWidthRef.current = storeWidth;
   };
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (!isResizing) return;
+    // 로컬 상태로 리사이징 여부 확인
+    if (!localResizing) return;
     
     // DOM 직접 조작 (상태 업데이트 없이)
     const newWidth = e.clientX;
-    const clampedWidth = Math.max(200, Math.min(600, newWidth));
+    const clampedWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
     
     if (sidebarRef.current) {
       sidebarRef.current.style.width = `${clampedWidth}px`;
@@ -123,21 +96,24 @@ export default function SidebarContainer() {
   };
 
   const handleMouseUp = () => {
-    if (!isResizing) return;
+    // 로컬 상태로 리사이징 여부 확인
+    if (!localResizing) return;
     
     // 트랜지션 효과 복원
     if (sidebarRef.current) {
       sidebarRef.current.style.transition = '';
       
       // 마지막 너비 계산
-      const currentWidth = parseInt(sidebarRef.current.style.width, 10);
-      const clampedWidth = Math.max(200, Math.min(600, currentWidth));
+      const currentWidth = parseInt(sidebarRef.current.style.width, 10) || storeWidth;
+      const clampedWidth = Math.max(minWidth, Math.min(maxWidth, currentWidth));
       
       // 상태 업데이트 및 현재 탭에 너비 저장
       setStoreWidth(clampedWidth);
       setTabWidth(selectedTabId, clampedWidth);
     }
     
+    // 로컬 상태와 글로벌 상태 모두 업데이트
+    setLocalResizing(false);
     setIsResizing(false);
     
     // 디바운스 타임아웃 정리
@@ -151,8 +127,9 @@ export default function SidebarContainer() {
     setStoreIsOpen(!storeIsOpen);
   };
 
+  // 리사이징 이벤트 리스너 관리 - 로컬 상태 기반
   useEffect(() => {
-    if (isResizing) {
+    if (localResizing) {
       window.addEventListener("mousemove", handleMouseMove);
       window.addEventListener("mouseup", handleMouseUp);
       // 텍스트 선택 방지
@@ -166,7 +143,7 @@ export default function SidebarContainer() {
       window.removeEventListener("mouseup", handleMouseUp);
       document.body.style.userSelect = '';
     };
-  }, [isResizing]);
+  }, [localResizing]); // 로컬 상태를 의존성으로 사용
 
   const renderTreeMenu = () => {
     switch (selectedTabId) {
