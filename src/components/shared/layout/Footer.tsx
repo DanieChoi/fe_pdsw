@@ -329,6 +329,7 @@ export default function Footer({ footerHeight, startResizing, onToggleDrawer }: 
     </footer>
   );
 }
+//
 
 // "use client";
 
