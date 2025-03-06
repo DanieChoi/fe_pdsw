@@ -19,7 +19,6 @@ export function useApiForGetTreeMenuDataForSideMenu() {
     // refetchOnWindowFocus: false,
   });
 
-
   return {
     ...query,
   };

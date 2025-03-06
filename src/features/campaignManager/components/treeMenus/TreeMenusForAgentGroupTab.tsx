@@ -1,112 +1,127 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronRight, ChevronDown, MoreVertical } from "lucide-react";
-import { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem } from "@/components/ui/context-menu";
-import { useTabStore } from '@/store/tabStore';
+import { useState, useEffect } from "react";
+import { 
+  useApiForCombinedDataForSideMenuForCampaignTab,
+  useApiForSideMenuTreeData
+} from "@/features/preferences/hooks/useApiForCampaignGroupList";
+import { TreeNode } from "@/features/campaignManager/types/typeForCampaignGroupForSideBar";
+import { TreeNodeForSideBarCampaignGroupTab } from "./TreeNodeForSideBarCampaignGroupTab";
 
-interface TreeNode {
-  id: string;
-  name: string;
-  type: "team" | "agent";
-  children?: TreeNode[];
-}
-
+// 샘플 트리 데이터
 const sampleTreeData: TreeNode[] = [
   {
-    id: "team-1",
-    name: "팀 A",
-    type: "team",
+    id: "tenant-1",
+    name: "테넌트 A",
+    type: "tenant",
     children: [
-      { id: "agent-1", name: "상담원 A1", type: "agent" },
-      { id: "agent-2", name: "상담원 A2", type: "agent" },
+      { id: "group-1", name: "그룹 A1", type: "group" },
+      { id: "group-2", name: "그룹 A2", type: "group" },
     ],
   },
   {
-    id: "team-2",
-    name: "팀 B",
-    type: "team",
+    id: "tenant-2",
+    name: "테넌트 B",
+    type: "tenant",
     children: [
-      { id: "agent-3", name: "상담원 B1", type: "agent" },
-      { id: "agent-4", name: "상담원 B2", type: "agent" },
+      { id: "group-3", name: "그룹 B1", type: "group" },
+      { id: "group-4", name: "그룹 B2", type: "group" },
     ],
   },
 ];
 
 export function TreeMenusForAgentGroupTab() {
-  return (
-    <div className="flex-1 overflow-auto p-4 text-gray-600">
-      <TreeView data={sampleTreeData} />
-    </div>
-  );
-}
+  // 상태 관리
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(["tenant-1", "tenant-2"]));
+  const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();
+  
+  // tenant_id는 실제 환경에서는 context나 store에서 가져올 수 있습니다
+  const tenant_id = 2; // 예시 테넌트 ID
+  
+  // 통합 데이터 가져오기
+  const { data: combinedData, isLoading: isLoadingCombined, error: errorCombined } = 
+    useApiForCombinedDataForSideMenuForCampaignTab(tenant_id);
+    
+  // 트리 구조 데이터 가져오기
+  const { data: treeData, isLoading: isLoadingTree, error: errorTree } = 
+    useApiForSideMenuTreeData(tenant_id);
 
-function TreeView({ data }: { data: TreeNode[] }) {
-  return (
-    <ul className="space-y-1">
-      {data.map((node) => (
-        <TreeNodeItem key={node.id} node={node} />
-      ))}
-    </ul>
-  );
-}
-
-function TreeNodeItem({ node }: { node: TreeNode }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const hasChildren = node.children && node.children.length > 0;
-  const { simulateHeaderMenuClick } = useTabStore();
-
-  const handleCounselorInfo = () => {
-    simulateHeaderMenuClick(6); // 발신진행상태 메뉴 클릭
+  // 노드 확장/축소 토글
+  const handleNodeToggle = (nodeId: string) => {
+    setExpandedNodes(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(nodeId)) {
+        newSet.delete(nodeId);
+      } else {
+        newSet.add(nodeId);
+      }
+      return newSet;
+    });
   };
 
+  // 노드 선택
+  const handleNodeSelect = (nodeId: string) => {
+    setSelectedNodeId(nodeId);
+  };
+
+  // 통합 데이터 로드 시 콘솔에 로그 출력
+  useEffect(() => {
+    if (combinedData) {
+      console.log("==== 통합 데이터 조회 결과 ====");
+      console.log("테넌트 목록:", combinedData.tenantData);
+      console.log("캠페인 그룹 목록:", combinedData.campaignGroupData);
+    }
+  }, [combinedData]);
+
+  // 트리 데이터 로드 시 콘솔에 로그 출력
+  useEffect(() => {
+    if (treeData) {
+      console.log("==== 변환된 트리 구조 데이터 ====");
+      console.log("트리 데이터:", treeData);
+      
+      // 첫 번째 테넌트 노드를 자동으로 확장
+      if (treeData.length > 0) {
+        setExpandedNodes(prev => {
+          const newSet = new Set(prev);
+          newSet.add(treeData[0].id);
+          return newSet;
+        });
+      }
+    }
+  }, [treeData]);
+
+  // 로딩 및 에러 상태 처리
+  if (isLoadingCombined || isLoadingTree) {
+    return <div className="flex justify-center items-center h-full">데이터 로딩 중...</div>;
+  }
+
+  if (errorCombined || errorTree) {
+    return <div className="text-red-500 p-4">데이터 로드 에러</div>;
+  }
+
+  // 실제 데이터 또는 샘플 데이터 사용
+  const displayData = treeData || sampleTreeData;
+
   return (
-    <li className="ml-2">
-      <ContextMenu>
-        <ContextMenuTrigger asChild>
-          <div
-            className="flex items-center justify-between space-x-2 cursor-pointer hover:bg-gray-100 p-1 rounded"
-            onClick={() => hasChildren && setIsOpen(!isOpen)}
-          >
-            <div className="flex items-center space-x-2">
-              {hasChildren && (
-                <span className="w-4 h-4">
-                  {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </span>
-              )}
-              <span className={node.type === "team" ? "font-semibold text-blue-600" : "text-gray-700"}>
-                {node.name}
-              </span>
-            </div>
-            <MoreVertical size={16} className="text-gray-400 hover:text-gray-600" />
-          </div>
-        </ContextMenuTrigger>
-
-        <ContextMenuContent className="w-40 bg-white shadow-md border rounded-md">
-          {node.type === "team" ? (
-            <>
-              <ContextMenuItem onClick={() => console.log(`팀 수정: ${node.name}`)}>팀 수정</ContextMenuItem>
-              <ContextMenuItem onClick={() => console.log(`팀 상태 변경: ${node.name}`)}>팀 상태 변경</ContextMenuItem>
-            </>
-          ) : (
-            <>
-              <ContextMenuItem onClick={() => console.log(`상담 시작: ${node.name}`)}>상담 시작</ContextMenuItem>
-              <ContextMenuItem onClick={() => console.log(`상담 중지: ${node.name}`)}>상담 중지</ContextMenuItem>
-              <ContextMenuItem onClick={handleCounselorInfo}>
-                상담원 Info
-              </ContextMenuItem>
-            </>
-          )}
-        </ContextMenuContent>
-      </ContextMenu>
-
-      {hasChildren && isOpen && (
-        <ul className="ml-4 border-l border-gray-300 pl-2 space-y-1">
-          {node.children?.map((child) => (
-            <TreeNodeItem key={child.id} node={child} />
-          ))}
-        </ul>
-      )}
-    </li>
+    <div className="flex-1 overflow-auto p-4">
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold">캠페인 그룹 관리</h2>
+        <p className="text-sm text-gray-500">테넌트와 그룹을 관리할 수 있습니다.</p>
+      </div>
+      
+      <div className="space-y-1">
+        {displayData.map((node) => (
+          <TreeNodeForSideBarCampaignGroupTab
+            key={node.id}
+            node={node}
+            level={0}
+            expandedNodes={expandedNodes}
+            selectedNodeId={selectedNodeId}
+            onNodeToggle={handleNodeToggle}
+            onNodeSelect={handleNodeSelect}
+          />
+        ))}
+      </div>
+    </div>
   );
 }

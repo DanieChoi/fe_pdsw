@@ -4,10 +4,8 @@ export interface TenantItem {
   tenant_name: string;
 }
 
-// types/typeForSidebar2.ts
 
 // types/typeForSidebar2.ts
-
 export interface TreeItem {
   id: string;
   label: string;

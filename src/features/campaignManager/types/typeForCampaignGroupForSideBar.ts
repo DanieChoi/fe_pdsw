@@ -1,0 +1,41 @@
+// src/features/campaignManager/types/typeForCampaignGroupForSideBar.ts
+
+export interface AddCampaignGroupCredentials {
+    group_id: string;
+    tenant_id: number;
+    group_name: string;
+}
+
+export interface SuccessResponse {
+    result_code: string;
+    result_msg: string;
+}
+
+// API 응답의 전체 구조
+export interface CampaignGroupApiResponse {
+    result_code: number;
+    result_msg: string;
+    result_count: number;
+    result_data: CampaignGroupItem[];
+}
+
+export interface CampaignGroupItem {
+    tenant_id: number;
+    group_id: number;
+    group_name: string;
+}
+
+// 트리 메뉴 구조를 위한 타입 정의
+export interface TreeNode {
+    id: string;
+    name: string;
+    type: "root" | "tenant" | "group";
+    children?: TreeNode[];
+    tenant_id?: number;
+    group_id?: number;
+}
+
+// 통합 데이터 변환 후 사이드바 트리 메뉴에 사용할 데이터 타입
+export interface SideMenuTreeData {
+    items: TreeNode[];
+}

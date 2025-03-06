@@ -233,9 +233,12 @@ import { toast } from "react-toastify";
 export function SkillAssignmentTab() {
   const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
   const [initialSkills, setInitialSkills] = useState<number[]>([]);
-  const removeTab = useTabStore((state) => state.removeTab);
-  const activeTabKey = useTabStore((state) => state.activeTabKey);
+  // const removeTab = useTabStore((state) => state.removeTab);
+  // const activeTabKey = useTabStore((state) => state.activeTabKey);
   const userId = useAuthStore((state) => state.id);
+
+  const { removeTab, activeTabKey, closeAllTabs, rows } = useTabStore();
+
 
   const selectedBlendKind = useCounselorFilterStore((state) => state.selectedBlendKind);
   const selectedCounselor = useCounselorFilterStore((state) => state.selectedCounselor);
@@ -307,13 +310,32 @@ export function SkillAssignmentTab() {
     });
   };
 
+  // const handleCancel = () => {
+  //   if (activeTabKey) {
+  //     removeTab(600, activeTabKey);
+  //     removeTab(601, activeTabKey);
+  //     removeTab(602, activeTabKey);
+  //   } else {
+  //     alert('activeTabKey is not found');
+  //   }
+  // };
+
   const handleCancel = () => {
     if (activeTabKey) {
-      removeTab(600, activeTabKey);
-      removeTab(601, activeTabKey);
-      removeTab(602, activeTabKey);
+      const [firstRow] = rows;
+      if (firstRow) {
+        const [firstSection] = firstRow.sections;
+        if (firstSection) {
+          closeAllTabs(firstRow.id, firstSection.id);
+          return;
+        }
+      }
+      removeTab(500, activeTabKey);
+    } else {
+      alert('activeTabKey is not found');
     }
   };
+
 
   const handleConfirm = () => {
     const skillsToAdd = selectedSkills.filter(skillId => !initialSkills.includes(skillId));
@@ -411,12 +433,12 @@ export function SkillAssignmentTab() {
         </div>
 
         <div className="p-4 border-t border-gray-200 flex justify-center gap-2">
-          <Button
+          {/* <Button
             onClick={handleConfirm}
             className="px-8 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
           >
             확인
-          </Button>
+          </Button> */}
           <Button
             variant="outline"
             onClick={handleCancel}
