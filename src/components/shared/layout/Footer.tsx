@@ -207,88 +207,139 @@ export default function Footer({
     if( role_id !== 4){
       tenantData = 0;
     }
-
     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-    console.log(`Connecting to SSE endpoint: ${DOMAIN}/api/v1/notification/${tenantData}/subscribe`);
+    const eventSource = new EventSource(
+      `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
+    );
     
-    let eventSource: EventSource | null = null;
-    
-    try {
-      eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenantData}/subscribe`, {
-        withCredentials: true // 인증이 필요한 경우 활성화
-      });
-      
-      let data: any = {};
-      let announce = "";
-      let command = "";
-      let kind = "";
+    let data: any = {};
+    let announce = "";
+    let command = "";
+    let kind = "";
 
-      // 연결 성공 시
-      eventSource.onopen = () => {
-        console.log("SSE connection established successfully");
-      };
+    eventSource.addEventListener("message", (event) => {
+      //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
+      console.log("footer sse event = ", event.data);
+      if (event.data !== "Connected!!") {
+        const tempEventData = JSON.parse(event.data);
+        if (
+          announce !== tempEventData["announce"] ||
+          !isEqual(data, tempEventData.data) ||
+          !isEqual(data, tempEventData["data"]) ||
+          kind !== tempEventData["kind"]
+        ) {
+          announce = tempEventData["announce"];
+          command = tempEventData["command"];
+          data = tempEventData["data"];
+          kind = tempEventData["kind"];
 
-      eventSource.onmessage = (event) => {
-        console.log("footer sse event = ", event.data);
-        try {
-          if (event.data !== "Connected!!") {
-            const tempEventData = JSON.parse(event.data);
-            if (
-              announce !== tempEventData["announce"] ||
-              !isEqual(data, tempEventData.data) ||
-              !isEqual(data, tempEventData["data"]) ||
-              kind !== tempEventData["kind"]
-            ) {
-              announce = tempEventData["announce"];
-              command = tempEventData["command"];
-              data = tempEventData["data"];
-              kind = tempEventData["kind"];
-
-              footerDataSet(
-                tempEventData["announce"],
-                tempEventData["command"],
-                tempEventData["data"],
-                tempEventData["kind"],
-                tempEventData
-              );
-            }
-          }
-        } catch (parseError) {
-          console.error('Error parsing SSE data:', parseError, event.data);
+          footerDataSet(
+            tempEventData["announce"],
+            tempEventData["command"],
+            tempEventData["data"],
+            tempEventData["kind"],
+            tempEventData
+          );
         }
-      };
-
-      // 에러 발생 시 재연결 시도
-      eventSource.onerror = (error) => {
-        console.error('EventSource failed:', error);
-        
-        // 연결 상태 확인
-        if (eventSource && eventSource.readyState === EventSource.CLOSED) {
-          console.log('Connection was closed. Attempting to reconnect in 5 seconds...');
-          
-          // 기존 연결 닫기
-          eventSource.close();
-          
-          // 5초 후 재연결 시도
-          setTimeout(() => {
-            console.log('Reconnecting to SSE...');
-            // 컴포넌트가 아직 마운트되어 있는지 확인 필요
-            // 이 부분은 실제 구현에서 안전장치 추가 필요
-          }, 5000);
-        }
-      };
-    } catch (connectionError) {
-      console.error('Error setting up EventSource:', connectionError);
-    }
-
-    // 클린업 함수
-    return () => {
-      if (eventSource) {
-        console.log('Closing SSE connection due to component unmount');
-        eventSource.close();
       }
+    });
+    return () => {
+      eventSource.close();
     };
-  }, [tenant_id,role_id, footerDataSet]);
+  }, [tenant_id, role_id]);
+
+  // SSE 구독
+  // useEffect(() => {
+  //   if ( role_id < 4 ) {
+  //     console.log("No tenant ID available, skipping SSE connection");
+  //     return;
+  //   }
+  //   let tenantData = tenant_id;
+  //   if( role_id !== 4){
+  //     tenantData = 0;
+  //   }
+
+  //   const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+  //   console.log(`Connecting to SSE endpoint: ${DOMAIN}/api/v1/notification/${tenantData}/subscribe`);
+    
+  //   let eventSource: EventSource | null = null;
+    
+  //   try {
+  //     eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenantData}/subscribe`, {
+  //       withCredentials: true // 인증이 필요한 경우 활성화
+  //     });
+      
+  //     let data: any = {};
+  //     let announce = "";
+  //     let command = "";
+  //     let kind = "";
+
+  //     // 연결 성공 시
+  //     eventSource.onopen = () => {
+  //       console.log("SSE connection established successfully");
+  //     };
+
+  //     eventSource.onmessage = (event) => {
+  //       console.log("footer sse event = ", event.data);
+  //       try {
+  //         if (event.data !== "Connected!!") {
+  //           const tempEventData = JSON.parse(event.data);
+  //           if (
+  //             announce !== tempEventData["announce"] ||
+  //             !isEqual(data, tempEventData.data) ||
+  //             !isEqual(data, tempEventData["data"]) ||
+  //             kind !== tempEventData["kind"]
+  //           ) {
+  //             announce = tempEventData["announce"];
+  //             command = tempEventData["command"];
+  //             data = tempEventData["data"];
+  //             kind = tempEventData["kind"];
+
+  //             footerDataSet(
+  //               tempEventData["announce"],
+  //               tempEventData["command"],
+  //               tempEventData["data"],
+  //               tempEventData["kind"],
+  //               tempEventData
+  //             );
+  //           }
+  //         }
+  //       } catch (parseError) {
+  //         console.error('Error parsing SSE data:', parseError, event.data);
+  //       }
+  //     };
+
+  //     // 에러 발생 시 재연결 시도
+  //     eventSource.onerror = (error) => {
+  //       console.error('EventSource failed:', error);
+        
+  //       // 연결 상태 확인
+  //       if (eventSource && eventSource.readyState === EventSource.CLOSED) {
+  //         console.log('Connection was closed. Attempting to reconnect in 5 seconds...');
+          
+  //         // 기존 연결 닫기
+  //         eventSource.close();
+          
+  //         // 5초 후 재연결 시도
+  //         setTimeout(() => {
+  //           console.log('Reconnecting to SSE...');
+  //           // 컴포넌트가 아직 마운트되어 있는지 확인 필요
+  //           // 이 부분은 실제 구현에서 안전장치 추가 필요
+  //         }, 5000);
+  //       }
+  //     };
+  //   } catch (connectionError) {
+  //     console.error('Error setting up EventSource:', connectionError);
+  //   }
+
+  //   // 클린업 함수
+  //   return () => {
+  //     if (eventSource) {
+  //       console.log('Closing SSE connection due to component unmount');
+  //       eventSource.close();
+  //     }
+  //   };
+  // }, [tenant_id,role_id, footerDataSet]);
 
   // 높이 변경 핸들러
   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
