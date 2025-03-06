@@ -12,7 +12,7 @@ export const fetchCampaigns = async (credentials: MainCredentials): Promise<Main
       },
     },
     sort: {
-      campaign_id: 1,
+      campaign_id: 0,
     },
     page: {
       index: 1,
