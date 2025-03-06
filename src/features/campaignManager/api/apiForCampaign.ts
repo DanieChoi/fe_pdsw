@@ -15,7 +15,7 @@ export const apiForGetCampaignList = async (): Promise<CampaignListResponse> => 
             },
         },
         sort: {
-            campaign_id: 1,
+            campaign_id: 0,
         },
         page: {
             index: 1,

@@ -11,7 +11,7 @@ export const apiForGetTenantList = async (): Promise<TenantListResponse> => {
       },
     },
     sort: {
-      tenant_id: 1,
+      tenant_id: 0,
     },
     page: {
       index: 1,
