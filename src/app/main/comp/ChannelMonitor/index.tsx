@@ -25,16 +25,6 @@ const COLORS = {
   NONE: '#D398FF'
 };
 
-// 초기 데이터에 추가 필드 포함
-const INITIAL_DATA: ChannelData[] = Array(20).fill(null).map((_, index) => ({
-  CIDSNO: '1',
-  CHNO: `CH${index}`,
-  status: ['IDLE', 'BUSY', 'NONE'][Math.floor(Math.random() * 3)] as ChannelStatus,
-  equipmentNo: `[${Math.floor(Math.random() * 2) + 1}]IPPDS${Math.floor(Math.random() * 2) + 1}`,
-  campaignMode: ['회선사용안함', '모든캠페인사용'][Math.floor(Math.random() * 2)],
-  callMode: ['power mode', 'progressive mode', 'predictive mode', 'system preview'][Math.floor(Math.random() * 4)]
-}));
-
 const secondModeAll = [
   {key:' ', name: '선택'},
 ];
@@ -52,12 +42,12 @@ const secondModeCampaign = [
 
 const secondModeSender = [
   {key:' ', name: '전체발신모드'},
-  {key:'회선사용안함', name: '회선사용안함'},
+  {key:'0', name: '회선사용안함'},
   {key:'발신방법모두사용', name: '발신방법모두사용'},
-  {key:'power mode', name: 'power mode'},
-  {key:'progressive mode', name: 'progressive mode'},
-  {key:'predictive mode', name: 'predictive mode'},
-  {key:'system preview', name: 'system preview'}
+  {key:'1', name: 'power mode'},
+  {key:'2', name: 'progressive mode'},
+  {key:'3', name: 'predictive mode'},
+  {key:'5', name: 'system preview'}
 ];
 
 const ChannelMonitor: React.FC = () => {
@@ -65,7 +55,7 @@ const ChannelMonitor: React.FC = () => {
   const [secondSelect, setSecondSelect] = useState<string>('');
   const [thirdSelect, setThirdSelect] = useState<string>('상태전체');
   const [channelData, setChannelData] = useState<ChannelData[]>([]);
-  const [filteredData, setFilteredData] = useState<ChannelData[]>(INITIAL_DATA);
+  const [filteredData, setFilteredData] = useState<ChannelData[]>([]);
 
   // 첫 번째 Select의 옵션
   const firstSelectOptions = ['전체', '장비번호', '캠페인 모드', '발신 모드', '채널 그룹 모드'];
@@ -167,9 +157,9 @@ const ChannelMonitor: React.FC = () => {
         CHNO: `CH${item.id}`,
         status: item.state === '0' ? 'NONE' : item.state === '1' ? 'IDLE' : 'BUSY' as ChannelStatus,
         equipmentNo: '[1]]IPPDS-148',
-        campaignMode: item.assign_kind === '1' ? '모든캠페인사용' : '회선사용안함',
-        callMode: '',
-        channelGroupMode: ''
+        campaignMode: item.assign_kind === '1' ? item.dial_mode === '2147483647' ? '모든캠페인사용' : item.dial_mode === '0' ?'회선사용안함':'' : '', 
+        callMode: item.assign_kind === '2' ?item.dial_mode === '2147483647' ? '발신방법모두사용':item.dial_mode:'',
+        channelGroupMode: item.assign_kind === '3' ? item.dial_mode === '2147483647' ? '모든캠페인사용' : item.dial_mode === '0' ?'회선사용안함':'' : ''
       }));
 
       setChannelData(dataList);      
