@@ -531,10 +531,10 @@ export default function Footer({
 
   // SSE 구독
   useEffect(() => {
-    if (!tenant_id) {
-      console.log("No tenant ID available, skipping SSE connection");
-      return;
-    }
+    // if (!tenant_id) {
+    //   console.log("No tenant ID available, skipping SSE connection");
+    //   return;
+    // }
 
     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
     console.log(`Connecting to SSE endpoint: ${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
