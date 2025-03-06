@@ -23,8 +23,11 @@ const errorMessage = {
 
 export default function Header() {
   const router = useRouter();
-  const _sessionKey = Cookies.get('session_key') || '';
+  // const _sessionKey = Cookies.get('session_key') || '';
   const _tenantId = Number(Cookies.get('tenant_id'));
+
+  const { id, tenant_id, session_key: _sessionKey, role_id } = useAuthStore();
+
   const [alertState, setAlertState] = useState(errorMessage);
   const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
   const [isSplitDialogOpen, setIsSplitDialogOpen] = useState(false);
@@ -118,11 +121,12 @@ export default function Header() {
   }
 
   // authStore 에서 tenant_id, role_id 가져오기
-  const tenant_id = useAuthStore((state) => state.tenant_id);
-  const role_id = useAuthStore((state) => state.role_id);
-  const id = useAuthStore((state) => state.id);
+  // const tenant_id = useAuthStore((state) => state.tenant_id);
+  // const role_id = useAuthStore((state) => state.role_id);
+  // const id = useAuthStore((state) => state.id);
   //상담사 역할 ID(1: 상담사, 2: 파트매니저, 3: 그룹매니저, 4: 테넌트메니저, 5: 시스템 메니저, 6: 전체)
 
+  // tofix  로그인 안했을때 미리 실행되서 에러 발생
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
       console.log('Tenants API response:', data);
