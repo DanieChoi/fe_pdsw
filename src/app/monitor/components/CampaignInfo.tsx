@@ -52,7 +52,7 @@ const CampaignInfo = ({
             <SelectTrigger className="w-40 w-use-140">
               <SelectValue placeholder="캠페인들"/>
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent style={{ maxHeight: '300px', overflowY: 'auto' }}>
               {campaigns.map(campaign => (
                 <SelectItem key={campaign.id} value={campaign.id}>
                   {campaign.name}

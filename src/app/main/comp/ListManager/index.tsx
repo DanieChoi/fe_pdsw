@@ -784,7 +784,7 @@ const ListManager: React.FC = () => {
                   <SelectTrigger className="w-[300px]">
                     <SelectValue placeholder="대상캠페인" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent  style={{ maxHeight: '300px', overflowY: 'auto' }}>
                     <SelectItem key='0' value='0'>-선택-</SelectItem>
                     {campaigns.map(option => (
                       <SelectItem key={option.campaign_id} value={option.campaign_id.toString()}>
