@@ -18,6 +18,7 @@ const CampaignManager = ({campaignId}: Props) => {
   
   const { tenants } = useMainStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
+  const [_campaignId, _setCampaignId] = useState<string>('');
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
   
@@ -82,12 +83,22 @@ const CampaignManager = ({campaignId}: Props) => {
     }
   }, [tenants]);
 
+  useEffect(() => {
+    console.log('campaignIdForUpdateFromSideMenu:',campaignIdForUpdateFromSideMenu);
+    console.log('campaignId:',campaignId);
+    if( typeof campaignId === 'undefined' ){
+      _setCampaignId(campaignIdForUpdateFromSideMenu||'');
+    }else{
+      _setCampaignId(campaignId);
+    }
+  }, [campaignIdForUpdateFromSideMenu,campaignId]);
+
   return (
     <div className='compaign-wrap'>
       <div className='flex flex-col gap-[15px] limit-width'>
-          <CampaignManagerHeader campaignId={campaignIdForUpdateFromSideMenu||''} onSearch={handleCampaignHeaderSearch}/>
+          <CampaignManagerHeader campaignId={_campaignId} onSearch={handleCampaignHeaderSearch}/>
           <div className="flex gap-[30px]">
-            <CampaignManagerList campaignId={campaignIdForUpdateFromSideMenu||''} campaignHeaderSearchParam={campaignHeaderSearchParam}/>
+            <CampaignManagerList campaignId={_campaignId} campaignHeaderSearchParam={campaignHeaderSearchParam}/>
             <CampaignManagerDetail />
           </div>
         </div>
