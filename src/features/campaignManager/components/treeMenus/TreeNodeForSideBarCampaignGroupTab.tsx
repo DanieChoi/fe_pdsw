@@ -10,9 +10,10 @@ import {
   UserCircle2
 } from "lucide-react";
 import Image from "next/image";
-import { useCallback } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem } from "@/components/ui/context-menu";
 import { TreeNode } from "@/features/campaignManager/types/typeForCampaignGroupForSideBar";
+import AddCampaignGroupDialog from "./dialog/AddCampaignGroupDialog";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -31,12 +32,59 @@ export function TreeNodeForSideBarCampaignGroupTab({
   onNodeToggle,
   onNodeSelect,
 }: TreeNodeProps) {
+  // 다이얼로그 상태 추가
+  const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
+  // 컨텍스트 메뉴 상태 제어
+  const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
+  
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedNodes.has(node.id);
   const isSelected = selectedNodeId === node.id;
 
+  // 컨텍스트 메뉴 닫기 헬퍼 함수
+  const closeContextMenu = useCallback(() => {
+    setIsContextMenuOpen(false);
+  }, []);
+
+  // 다이얼로그 관련 핸들러
+  const handleOpenAddGroupDialog = useCallback((e?: React.MouseEvent | Event) => {
+    // 이벤트 전파 방지
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    // 메뉴 닫기
+    closeContextMenu();
+    
+    // 지연 후 다이얼로그 열기
+    setTimeout(() => {
+      setIsAddGroupDialogOpen(true);
+    }, 10);
+  }, [closeContextMenu]);
+
+  const handleCloseAddGroupDialog = useCallback((e?: React.MouseEvent | React.KeyboardEvent | Event) => {
+    // 이벤트 전파 방지
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    setIsAddGroupDialogOpen(false);
+  }, []);
+
+  const handleAddGroup = useCallback((groupName: string, groupCode: string) => {
+    console.log("새 그룹 추가:", {
+      tenantId: node.id,
+      tenantName: node.name,
+      groupName,
+      groupCode
+    });
+    // 여기서 API 호출을 통해 그룹을 추가할 수 있습니다
+  }, [node.id, node.name]);
+
   // 타입에 따른 아이콘 렌더링
-  const renderIcon = () => {
+  const renderIcon = useCallback(() => {
     switch (node.type?.toLowerCase()) {
       case "root":
         return <Image src="/tree-menu/organization.png" alt="조직" width={14} height={12} />;
@@ -47,7 +95,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       default:
         return <Building className="h-4 w-4 text-gray-500" />;
     }
-  };
+  }, [node.type]);
 
   // 클릭 핸들러 (노드 선택 + 확장/축소)
   const handleClick = useCallback(() => {
@@ -57,30 +105,43 @@ export function TreeNodeForSideBarCampaignGroupTab({
     }
   }, [node.id, hasChildren, onNodeSelect, onNodeToggle]);
 
+  // ESC 키 이벤트 핸들러 - 컨텍스트 메뉴를 강제로 닫기 위한 이벤트
+  useEffect(() => {
+    const handleEscKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isContextMenuOpen) {
+        closeContextMenu();
+      }
+    };
+
+    window.addEventListener('keydown', handleEscKey);
+    return () => {
+      window.removeEventListener('keydown', handleEscKey);
+    };
+  }, [isContextMenuOpen, closeContextMenu]);
+
   // 노드 타입에 따른 메뉴 항목 렌더링
-  const renderMenuItems = () => {
+  const renderMenuItems = useCallback(() => {
     switch (node.type) {
-      case "root":
-        return (
-          <>
-            {/* <ContextMenuItem onClick={() => console.log(`조직 정보: ${node.name}`)}>
-              조직 정보
-            </ContextMenuItem>
-            <ContextMenuItem onClick={() => console.log(`조직 설정: ${node.name}`)}>
-              조직 설정
-            </ContextMenuItem> */}
-          </>
-        );
       case "tenant":
         return (
           <>
-            {/* <ContextMenuItem onClick={() => console.log(`테넌트 정보: ${node.name}`)}>
-              테넌트 정보
-            </ContextMenuItem>
-            <ContextMenuItem onClick={() => console.log(`테넌트 설정: ${node.name}`)}>
-              테넌트 설정
-            </ContextMenuItem> */}
-            <ContextMenuItem onClick={() => console.log(`그룹 추가: ${node.name}`)}>
+            <ContextMenuItem 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // 컨텍스트 메뉴 즉시 닫기
+                closeContextMenu();
+                
+                // ESC 키 이벤트를 발생시켜 메뉴를 강제로 닫음
+                document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+                
+                // 지연 후 다이얼로그 열기
+                setTimeout(() => {
+                  handleOpenAddGroupDialog();
+                }, 10);
+              }}
+            >
               캠페인 그룹 추가
             </ContextMenuItem>
           </>
@@ -88,13 +149,52 @@ export function TreeNodeForSideBarCampaignGroupTab({
       case "group":
         return (
           <>
-            <ContextMenuItem onClick={() => console.log(`그룹 수정: ${node.name}`)}>
+            <ContextMenuItem 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // 컨텍스트 메뉴 즉시 닫기
+                closeContextMenu();
+                
+                // ESC 키 이벤트를 발생시켜 메뉴를 강제로 닫음
+                document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+                
+                console.log(`그룹 수정: ${node.name}`);
+              }}
+            >
               그룹 수정
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => console.log(`그룹 삭제: ${node.name}`)}>
+            <ContextMenuItem 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // 컨텍스트 메뉴 즉시 닫기
+                closeContextMenu();
+                
+                // ESC 키 이벤트를 발생시켜 메뉴를 강제로 닫음
+                document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+                
+                console.log(`그룹 삭제: ${node.name}`);
+              }}
+            >
               그룹 삭제
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => console.log(`그룹 상세 정보: ${node.name}`)}>
+            <ContextMenuItem 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // 컨텍스트 메뉴 즉시 닫기
+                closeContextMenu();
+                
+                // ESC 키 이벤트를 발생시켜 메뉴를 강제로 닫음
+                document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+                
+                console.log(`그룹 상세 정보: ${node.name}`);
+              }}
+            >
               그룹 상세 정보
             </ContextMenuItem>
           </>
@@ -102,11 +202,14 @@ export function TreeNodeForSideBarCampaignGroupTab({
       default:
         return null;
     }
-  };
+  }, [node.name, node.type, closeContextMenu, handleOpenAddGroupDialog]);
 
   return (
     <div className="select-none">
-      <ContextMenu>
+      <ContextMenu 
+        open={isContextMenuOpen}
+        onOpenChange={setIsContextMenuOpen}
+      >
         <ContextMenuTrigger asChild>
           <div
             className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150
@@ -137,7 +240,21 @@ export function TreeNodeForSideBarCampaignGroupTab({
           </div>
         </ContextMenuTrigger>
 
-        <ContextMenuContent className="w-40 bg-white shadow-md border rounded-md">
+        <ContextMenuContent 
+          className="w-40 bg-white shadow-md border rounded-md"
+          onEscapeKeyDown={(e) => {
+            e.preventDefault();
+            closeContextMenu();
+          }}
+          onPointerDownOutside={(e) => {
+            e.preventDefault();
+            closeContextMenu();
+          }}
+          onInteractOutside={(e) => {
+            e.preventDefault();
+            closeContextMenu();
+          }}
+        >
           {renderMenuItems()}
         </ContextMenuContent>
       </ContextMenu>
@@ -158,6 +275,15 @@ export function TreeNodeForSideBarCampaignGroupTab({
           ))}
         </div>
       )}
+
+      {/* 다이얼로그 컴포넌트 */}
+      <AddCampaignGroupDialog
+        isOpen={isAddGroupDialogOpen}
+        onClose={handleCloseAddGroupDialog}
+        tenantId={node.id}
+        tenantName={node.name}
+        onAddGroup={handleAddGroup}
+      />
     </div>
   );
 }
