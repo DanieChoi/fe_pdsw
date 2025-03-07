@@ -206,8 +206,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
   return (
     <div className="select-none">
-      <ContextMenu 
-        open={isContextMenuOpen}
+      <ContextMenu
         onOpenChange={setIsContextMenuOpen}
       >
         <ContextMenuTrigger asChild>
