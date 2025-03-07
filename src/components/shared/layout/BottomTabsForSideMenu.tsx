@@ -31,7 +31,7 @@ const tabsConfig = [
     iconHeight: 14
   },
   {
-    id: "agent-group" as TabId,
+    id: "campaign-group" as TabId,
     label: "캠페인 그룹",
     icons: {
       default: "/tree-menu/campain_group.png",

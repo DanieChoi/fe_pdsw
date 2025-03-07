@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { baseTabs, TabId } from "@/features/campaignManager/components/data/baseTabs";
 import { TreeMenusForCampaigns } from "@/features/campaignManager/components/treeMenus/TreeMenusForCampaigns";
 import { TreeMenusForAgentTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentTab";
-import { TreeMenusForAgentGroupTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentGroupTab";
+import { TreeMenusForCampaignGroupTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentGroupTab";
 import { TabActions } from "./comp/TabActions";
 import { BottomTabsForSideMenu } from "./BottomTabsForSideMenu";
 import Image from 'next/image';
@@ -151,8 +151,8 @@ export default function SidebarContainer() {
         return <TreeMenusForCampaigns />;
       case "agent":
         return <TreeMenusForAgentTab />;
-      case "agent-group":
-        return <TreeMenusForAgentGroupTab />;
+      case "campaign-group":
+        return <TreeMenusForCampaignGroupTab />;
       default:
         return null;
     }

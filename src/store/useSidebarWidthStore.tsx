@@ -38,7 +38,7 @@
 //   tabWidths: {
 //     "campaign": 240,   // 캠페인 탭 - 좁은 너비
 //     "agent": 320,      // 상담원 탭 - 넓은 너비
-//     "agent-group": 280 // 그룹 탭 - 중간 너비
+//     "campaign-group": 280 // 그룹 탭 - 중간 너비
 //   },
   
 //   // 기존 액션
@@ -129,7 +129,7 @@ export const useSidebarWidthStore = create<SidebarWidthState>((set, get) => {
     tabWidths: {
       "campaign": 240,
       "agent": 320,
-      "agent-group": 280,
+      "campaign-group": 280,
     },
     isResizing: false,
     

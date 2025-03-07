@@ -30,7 +30,7 @@ const sampleTreeData: TreeNode[] = [
   },
 ];
 
-export function TreeMenusForAgentGroupTab() {
+export function TreeMenusForCampaignGroupTab() {
   // 상태 관리
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(["tenant-1", "tenant-2"]));
   const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();

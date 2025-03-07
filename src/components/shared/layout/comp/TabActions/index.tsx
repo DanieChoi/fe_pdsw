@@ -54,7 +54,7 @@ export function TabActions({
           />
         </div>
       );
-    case 'agent-group':
+    case 'campaign-group':
       return (
         <div className="flex items-center gap-[10px]">
           <IFilterButtonForCampaignTabHeader />

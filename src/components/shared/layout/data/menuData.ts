@@ -58,7 +58,7 @@ export const tabsData: TabData[] = [
     ]
   },
   {
-    id: 'agent-group',
+    id: 'campaign-group',
     label: '캠페인인 그룹',
     items: [
       {
@@ -107,7 +107,7 @@ export const agentTab: TabData = {
 };
 
 export const agentGroupTab: TabData = {
-  id: 'agent-group',
+  id: 'campaign-group',
   label: '상담원 그룹',
   items: [
     {
