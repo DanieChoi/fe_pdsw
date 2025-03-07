@@ -12,6 +12,8 @@ import CampaignManager from '@/app/main/comp/CampaignManager';
 import RebroadcastSettingsPanel from '@/app/main/comp/RebroadcastSettingsPanel';
 import SkillListPopup from '@/components/shared/layout/SkillListPopup';
 import CampaignInfo from './components/CampaignInfo';
+import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
+import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 
 
 // 타입 정의
@@ -43,6 +45,7 @@ interface Campaign {
   name: string;
   skills?: string[];
   endTime?: string;
+  startFlag?: string;
   stats?: {
     waiting: number;
     firstCall: number;
@@ -54,7 +57,6 @@ interface Campaign {
 
 
 const MonitorPage = () => {
-
 
    // 인증 관련 상태
    const { tenant_id } = useAuthStore();
@@ -98,6 +100,9 @@ const MonitorPage = () => {
   const [selectedCampaign, setSelectedCampaign] = useState<string>('');
   const [campaignStatus, setCampaignStatus] = useState<CampaignStatus>('멈춤');
   const [callPacing, setCallPacing] = useState<number>(100);
+  const [_campaigns, _setCampaigns] = useState<Campaign[]>([]);
+  const [campaignList, setCampaignList ] = useState<any[]>([]);
+  const [campaignSkillList, setCampaignSkillList ] = useState<any[]>([]);
 
   // 섹션 상태
   const [sections, setSections] = useState<Section[]>([
@@ -135,15 +140,15 @@ const MonitorPage = () => {
 
    // 첫 캠페인 자동 선택 로직
    useEffect(() => {
-    if (campaigns.length > 0 && !selectedCampaign) {
-      const firstCampaign = campaigns[0];
+    if (_campaigns.length > 0 && !selectedCampaign) {
+      const firstCampaign = _campaigns[0];
       setSelectedCampaign(firstCampaign.id);
       handleCampaignSelect(firstCampaign.id);
     }
-  }, [campaigns]);
+  }, [_campaigns]);
 
    // 현재 선택된 캠페인 정보
-   const currentCampaign = campaigns.find(c => c.id === selectedCampaign);
+   const currentCampaign = _campaigns.find(c => c.id === selectedCampaign);
 
    // 캠페인 데이터 통합 관리 핸들러
    const handleCampaignDataUpdate = useCallback((campaignId: string, data: any) => {
@@ -337,7 +342,7 @@ const MonitorPage = () => {
             selectedCampaign={selectedCampaign}
             campaignStatus={campaignStatus}
             callPacing={callPacing}
-            campaigns={campaigns}
+            campaigns={_campaigns}
             onCampaignSelect={handleCampaignSelect}
             onStatusChange={handleStatusChange}
             onCallPacingChange={handleCallPacingChange}
@@ -359,7 +364,7 @@ const MonitorPage = () => {
           />
         );
       case 'agent-status':
-        return <AgentStatusMonitoring />;
+        return <AgentStatusMonitoring campaignId={Number(selectedCampaign)} _campaigns={campaignList}/>;
       case 'channel-monitor':
         return <ChannelMonitor />;
       case 'campaign-progress':
@@ -369,7 +374,7 @@ const MonitorPage = () => {
     }
   }, [
     currentCampaign, selectedCampaign, campaignStatus, callPacing, 
-    campaigns, handleCampaignSelect, handleStatusChange, 
+    _campaigns, handleCampaignSelect, handleStatusChange, 
     handleCallPacingChange, handleCallPacingApply, 
     handleCampaignDataUpdate
   ]);
@@ -402,6 +407,70 @@ const renderTopRow = () => {
     const positions = ['top-left', 'top-middle', 'top-right'];
     return positions.indexOf(a.position) - positions.indexOf(b.position);
   });
+
+  // 캠페인스킬 조회
+  const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
+    onSuccess: (data) => {
+      setCampaignSkillList( data.result_data);
+    }
+  });
+  // 캠페인 목록 조회
+  const { mutate: fetchMain } = useApiForMain({
+    onSuccess: (data) => {
+      fetchCampaignSkills({
+        session_key: '',
+        tenant_id: 0,
+      });
+      if( tenant_id === 0){
+        setCampaignList( data.result_data);
+      }else{
+        setCampaignList(data.result_data.filter(data=>data.tenant_id === tenant_id));
+      }
+    }
+  });
+  
+  useEffect(() => {
+    if( campaignList.length > 0 ){
+      let updatedCampaigns = [];
+      if( campaignSkillList.length === 0 ){
+        updatedCampaigns = campaignList.map((data) => ({
+          id: data.campaign_id,
+          name: `[${data.campaign_id}]${data.campaign_name}`,
+          skills: [],
+          endTime: '',
+          startFlag: data.start_flag
+        }));
+      }else{
+        updatedCampaigns = campaignList.map((data) => ({
+          id: data.campaign_id,
+          name: `[${data.campaign_id}]${data.campaign_name}`,
+          skills: campaignSkillList.filter((skill) => skill.campaign_id === data.campaign_id)
+              .map((data) => data.skill_id)
+              .join(',').split(','),
+          endTime: '',
+          startFlag: data.start_flag
+        }));
+      }      
+      _setCampaigns(updatedCampaigns);
+      if( selectedCampaign === '' ){
+        setSelectedCampaign(updatedCampaigns[0].id);
+      }
+    }
+  }, [campaignList,campaignSkillList]);
+
+  useEffect(() => {     
+    fetchMain({
+      session_key: '',
+      tenant_id: tenant_id,
+    });
+    const interval = setInterval(() => {           
+      fetchMain({
+        session_key: '',
+        tenant_id: tenant_id,
+      });
+    }, 30000);  
+    return () => clearInterval(interval);
+  }, [tenant_id]);
 
   return topSections.map((section, index) => {
     const isNotLast = index < topSections.length - 1;

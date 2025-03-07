@@ -37,9 +37,10 @@ type SortDirection = 'asc' | 'desc';
 
 interface AgentStatusMonitoringProps {
   campaignId?: number;
+  _campaigns?: any[];
 }
 
-const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignId }) => {
+const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignId,_campaigns }) => {
   // 상태 관리
   const [selectedStatuses, setSelectedStatuses] = useState<AgentStatus>({
     waiting: true,
@@ -181,27 +182,47 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
 
   useEffect(() => {
     if (counter>0) {
-      const tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
-      if (tenantId) {
-        fetchAgentStateMonitoringList({
-          tenantId: tenantId,
-          campaignId: Number(campaignId)
-        });
+      if( campaigns.length > 0) {
+        const tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
+        if (tenantId) {
+          fetchAgentStateMonitoringList({
+            tenantId: tenantId,
+            campaignId: Number(campaignId)
+          });
+        }
+      }else if((_campaigns ?? []).length > 0) {
+        const tenantId = (_campaigns ?? []).find(data => data.campaign_id === Number(campaignId))?.tenant_id;
+        if (tenantId) {
+          fetchAgentStateMonitoringList({
+            tenantId: tenantId,
+            campaignId: Number(campaignId)
+          });
+        }
       }
     }
-  }, [counter]);
+  }, [counter,campaigns,_campaigns]);
 
   useEffect(() => {
     if (campaignId) {
-      const tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
-      if (tenantId) {
-        fetchAgentStateMonitoringList({
-          tenantId: tenantId,
-          campaignId: Number(campaignId)
-        });
+      if( campaigns.length > 0) {
+        const tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
+        if (tenantId) {
+          fetchAgentStateMonitoringList({
+            tenantId: tenantId,
+            campaignId: Number(campaignId)
+          });
+        }
+      }else if((_campaigns ?? []).length > 0) {
+        const tenantId = (_campaigns ?? []).find(data => data.campaign_id === Number(campaignId))?.tenant_id;
+        if (tenantId) {
+          fetchAgentStateMonitoringList({
+            tenantId: tenantId,
+            campaignId: Number(campaignId)
+          });
+        }
       }
     }
-  }, [campaignId,campaigns]);
+  }, [campaignId,campaigns,_campaigns]);
 
   return (
     <div className="w-full h-full flex flex-col gap-4">
