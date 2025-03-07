@@ -46,6 +46,7 @@ interface Campaign {
   skills?: string[];
   endTime?: string;
   startFlag?: string;
+  callPacing?: number;
   stats?: {
     waiting: number;
     firstCall: number;
@@ -368,7 +369,7 @@ const MonitorPage = () => {
       case 'channel-monitor':
         return <ChannelMonitor />;
       case 'campaign-progress':
-        return <CampaignMonitorDashbord />;
+        return <CampaignMonitorDashbord campaignId={selectedCampaign} _campaigns={campaignList} />;
       default:
         return null;
     }

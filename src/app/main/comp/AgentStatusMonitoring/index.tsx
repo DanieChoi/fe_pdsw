@@ -187,20 +187,12 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
         if (tenantId) {
           fetchAgentStateMonitoringList({
             tenantId: tenantId,
-            campaignId: Number(campaignId)
-          });
-        }
-      }else if((_campaigns ?? []).length > 0) {
-        const tenantId = (_campaigns ?? []).find(data => data.campaign_id === Number(campaignId))?.tenant_id;
-        if (tenantId) {
-          fetchAgentStateMonitoringList({
-            tenantId: tenantId,
-            campaignId: Number(campaignId)
+          campaignId: Number(campaignId)
           });
         }
       }
     }
-  }, [counter,campaigns,_campaigns]);
+  }, [counter]);
 
   useEffect(() => {
     if (campaignId) {
