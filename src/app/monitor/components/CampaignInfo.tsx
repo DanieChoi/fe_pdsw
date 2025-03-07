@@ -49,7 +49,7 @@ const CampaignInfo = ({
         </div>
         <div className='flex justify-between items-center'>
           <Select value={selectedCampaign} onValueChange={onCampaignSelect}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-40 w-use-140">
               <SelectValue placeholder="캠페인들"/>
             </SelectTrigger>
             <SelectContent>
