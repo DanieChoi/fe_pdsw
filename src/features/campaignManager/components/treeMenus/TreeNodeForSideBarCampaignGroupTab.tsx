@@ -63,25 +63,25 @@ export function TreeNodeForSideBarCampaignGroupTab({
       case "root":
         return (
           <>
-            <ContextMenuItem onClick={() => console.log(`조직 정보: ${node.name}`)}>
+            {/* <ContextMenuItem onClick={() => console.log(`조직 정보: ${node.name}`)}>
               조직 정보
             </ContextMenuItem>
             <ContextMenuItem onClick={() => console.log(`조직 설정: ${node.name}`)}>
               조직 설정
-            </ContextMenuItem>
+            </ContextMenuItem> */}
           </>
         );
       case "tenant":
         return (
           <>
-            <ContextMenuItem onClick={() => console.log(`테넌트 정보: ${node.name}`)}>
+            {/* <ContextMenuItem onClick={() => console.log(`테넌트 정보: ${node.name}`)}>
               테넌트 정보
             </ContextMenuItem>
             <ContextMenuItem onClick={() => console.log(`테넌트 설정: ${node.name}`)}>
               테넌트 설정
-            </ContextMenuItem>
+            </ContextMenuItem> */}
             <ContextMenuItem onClick={() => console.log(`그룹 추가: ${node.name}`)}>
-              그룹 추가
+              캠페인 그룹 추가
             </ContextMenuItem>
           </>
         );
