@@ -37,10 +37,9 @@ type SortDirection = 'asc' | 'desc';
 
 interface AgentStatusMonitoringProps {
   campaignId?: number;
-  _campaigns?: any[];
 }
 
-const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignId,_campaigns }) => {
+const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignId }) => {
   // 상태 관리
   const [selectedStatuses, setSelectedStatuses] = useState<AgentStatus>({
     waiting: true,
@@ -181,48 +180,28 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   });
 
   useEffect(() => {
-    if (counter>0) {
-      if( campaigns.length > 0) {
-        const tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
-        if (tenantId) {
-          fetchAgentStateMonitoringList({
-            tenantId: tenantId,
-            campaignId: Number(campaignId)
-          });
-        }
-      }else if((_campaigns ?? []).length > 0) {
-        const tenantId = (_campaigns ?? []).find(data => data.campaign_id === Number(campaignId))?.tenant_id;
-        if (tenantId) {
-          fetchAgentStateMonitoringList({
-            tenantId: tenantId,
-            campaignId: Number(campaignId)
-          });
-        }
+    if (counter>0 && campaigns.length > 0) {
+      const tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
+      if (tenantId) {
+        fetchAgentStateMonitoringList({
+          tenantId: tenantId,
+          campaignId: Number(campaignId)
+        });
       }
     }
-  }, [counter,campaigns,_campaigns]);
+  }, [counter]);
 
   useEffect(() => {
-    if (campaignId) {
-      if( campaigns.length > 0) {
-        const tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
-        if (tenantId) {
-          fetchAgentStateMonitoringList({
-            tenantId: tenantId,
-            campaignId: Number(campaignId)
-          });
-        }
-      }else if((_campaigns ?? []).length > 0) {
-        const tenantId = (_campaigns ?? []).find(data => data.campaign_id === Number(campaignId))?.tenant_id;
-        if (tenantId) {
-          fetchAgentStateMonitoringList({
-            tenantId: tenantId,
-            campaignId: Number(campaignId)
-          });
-        }
+    if (campaignId && campaigns.length > 0) {
+      const tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
+      if (tenantId) {
+        fetchAgentStateMonitoringList({
+          tenantId: tenantId,
+          campaignId: Number(campaignId)
+        });
       }
     }
-  }, [campaignId,campaigns,_campaigns]);
+  }, [campaignId,campaigns]);
 
   return (
     <div className="w-full h-full flex flex-col gap-4">

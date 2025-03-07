@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { useAuthStore } from '@/store';
+import { useAuthStore, useMainStore, useCampainManagerStore } from '@/store';
 import ChannelMonitor from '@/app/main/comp/ChannelMonitor';
 import AgentStatusMonitoring from '@/app/main/comp/AgentStatusMonitoring';
 import OutboundCallProgressPanel from '@/app/main/comp/OutboundCallProgressPanel';
@@ -14,6 +14,7 @@ import SkillListPopup from '@/components/shared/layout/SkillListPopup';
 import CampaignInfo from './components/CampaignInfo';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
+import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 
 
 // 타입 정의
@@ -43,10 +44,11 @@ type CampaignStatus = '시작' | '멈춤' | '중지';
 interface Campaign {
   id: string;
   name: string;
-  skills?: string[];
+  skills?: number[];
   endTime?: string;
   startFlag?: string;
   callPacing?: number;
+  tenant_id?: number;
   stats?: {
     waiting: number;
     firstCall: number;
@@ -55,9 +57,25 @@ interface Campaign {
   };
 }
 
+const initData : Campaign = {
+  id: '',
+  name: '',
+  skills: [],
+  endTime: '',
+  startFlag: '',
+  callPacing: 0,
+  tenant_id: 0,
+  stats: {
+    waiting: 0,
+    firstCall: 0,
+    retryCall: 0,
+    distributing: 0
+  }
+};
 
 
 const MonitorPage = () => {
+  const { tenants, setTenants, campaigns, setCampaigns } = useMainStore();
 
    // 인증 관련 상태
    const { tenant_id } = useAuthStore();
@@ -83,20 +101,20 @@ const MonitorPage = () => {
    
 
   // 캠페인 관련 상태(가짜 데이터)
-  const [campaigns] = useState<Campaign[]>([
-    { 
-      id: '1', 
-      name: '캠페인 1',
-      skills: ['1', '2'],
-      endTime: '02:24:20'
-    },
-    { 
-      id: '2', 
-      name: '캠페인 2',
-      skills: ['3', '4'],
-      endTime: '03:15:30'
-    },
-  ]);
+  // const [campaigns] = useState<Campaign[]>([
+  //   { 
+  //     id: '1', 
+  //     name: '캠페인 1',
+  //     skills: ['1', '2'],
+  //     endTime: '02:24:20'
+  //   },
+  //   { 
+  //     id: '2', 
+  //     name: '캠페인 2',
+  //     skills: ['3', '4'],
+  //     endTime: '03:15:30'
+  //   },
+  // ]);
 
   const [selectedCampaign, setSelectedCampaign] = useState<string>('');
   const [campaignStatus, setCampaignStatus] = useState<CampaignStatus>('멈춤');
@@ -149,7 +167,7 @@ const MonitorPage = () => {
   }, [_campaigns]);
 
    // 현재 선택된 캠페인 정보
-   const currentCampaign = _campaigns.find(c => c.id === selectedCampaign);
+  const [currentCampaign, setCurrentCampaign] = useState<Campaign>(initData);
 
    // 캠페인 데이터 통합 관리 핸들러
    const handleCampaignDataUpdate = useCallback((campaignId: string, data: any) => {
@@ -365,11 +383,11 @@ const MonitorPage = () => {
           />
         );
       case 'agent-status':
-        return <AgentStatusMonitoring campaignId={Number(selectedCampaign)} _campaigns={campaignList}/>;
+        return <AgentStatusMonitoring campaignId={Number(selectedCampaign)} />;
       case 'channel-monitor':
         return <ChannelMonitor />;
       case 'campaign-progress':
-        return <CampaignMonitorDashbord campaignId={selectedCampaign} _campaigns={campaignList} />;
+        return <CampaignMonitorDashbord campaignId={selectedCampaign} />;
       default:
         return null;
     }
@@ -413,40 +431,54 @@ const MonitorPage = () => {
       });
       if( tenant_id === 0){
         setCampaignList( data.result_data);
+        setCampaigns(data.result_data);
       }else{
         setCampaignList(data.result_data.filter(data=>data.tenant_id === tenant_id));
+        setCampaigns(data.result_data.filter(data=>data.tenant_id === tenant_id));
       }
     }
   });
   
-  useEffect(() => {
-    if( campaignList.length > 0 ){
-      let updatedCampaigns = [];
-      if( campaignSkillList.length === 0 ){
-        updatedCampaigns = campaignList.map((data) => ({
-          id: data.campaign_id,
-          name: `[${data.campaign_id}]${data.campaign_name}`,
-          skills: [],
-          endTime: '',
-          startFlag: data.start_flag
-        }));
+  const { mutate: fetchTenants } = useApiForTenants({
+    onSuccess: (data) => {
+      if( tenant_id === 0){
+        setTenants(data.result_data);
       }else{
-        updatedCampaigns = campaignList.map((data) => ({
+        setTenants(data.result_data.filter(data=>data.tenant_id === tenant_id));
+      }
+    }
+  });
+  
+  useEffect(() => {     
+    if( selectedCampaign !== '' ){
+      setCurrentCampaign(_campaigns.find(c => c.id === selectedCampaign)||initData);
+    }
+  }, [selectedCampaign]);
+
+  useEffect(() => {
+    if( campaignList.length > 0 && campaignSkillList.length > 0 ){
+      const updatedCampaigns:Campaign[] = campaignList.map((data) => ({
           id: data.campaign_id,
           name: `[${data.campaign_id}]${data.campaign_name}`,
           skills: campaignSkillList.filter((skill) => skill.campaign_id === data.campaign_id)
-              .map((data) => data.skill_id)
-              .join(',').split(','),
+              .map((data) => data.skill_id),
           endTime: '',
-          startFlag: data.start_flag
+          startFlag: data.start_flag,
+          tenant_id: data.tenant_id,
         }));
+        if( selectedCampaign === '' ){
+          setSelectedCampaign(updatedCampaigns[0].id);
+        }
+        _setCampaigns(updatedCampaigns);
       }      
-      _setCampaigns(updatedCampaigns);
-      if( selectedCampaign === '' ){
-        setSelectedCampaign(updatedCampaigns[0].id);
-      }
-    }
+
   }, [campaignList,campaignSkillList]);
+  
+  useEffect(() => {     
+    if( campaigns.length === 0 ){
+      
+    }
+  }, [campaigns]);
 
   useEffect(() => {     
     fetchMain({
@@ -461,6 +493,15 @@ const MonitorPage = () => {
     }, 30000);  
     return () => clearInterval(interval);
   }, [tenant_id]);
+  
+  useEffect(() => {     
+    if( tenants.length === 0 ){
+      fetchTenants({
+        session_key: '',
+        tenant_id: tenant_id,
+      });
+    }
+  }, [tenants]);
 
  
 const renderTopRow = () => {
@@ -589,8 +630,8 @@ const renderBottomRow = () => {
         {/* 스킬 리스트 팝업 */}
         <SkillListPopup 
           isOpen={isSkillPopupOpen}
-          param={currentCampaign?.skills?.map(Number) || []}
-          tenantId={tenant_id}
+          param={currentCampaign.skills || []}
+          tenantId={Number(currentCampaign.tenant_id)}
           type="1" 
           onConfirm={handleSkillConfirm}
           onCancle={handleSkillPopupClose}

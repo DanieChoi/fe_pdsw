@@ -8,7 +8,7 @@ import Image from "next/image";
 interface Campaign {
   id: string;
   name: string;
-  skills?: string[];
+  skills?: number[];
   endTime?: string;
 }
 
@@ -50,7 +50,7 @@ const CampaignInfo = ({
         <div className='flex justify-between items-center'>
           <Select value={selectedCampaign} onValueChange={onCampaignSelect}>
             <SelectTrigger className="w-40 w-use-140">
-              <SelectValue placeholder="캠페인들"/>
+              <SelectValue placeholder=" "/>
             </SelectTrigger>
             <SelectContent style={{ maxHeight: '300px', overflowY: 'auto' }}>
               {campaigns.map(campaign => (

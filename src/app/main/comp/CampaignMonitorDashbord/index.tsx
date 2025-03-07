@@ -20,12 +20,11 @@ interface CallItem {
 
 interface CampaignMonitorDashboardProps {
   campaignId?: string; // props로 캠페인 ID 직접 받기
-  _campaigns?: any[];
 }
 
 type ViewType = "gridView" | "chartView";
 
-const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ campaignId, _campaigns }) => {
+const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ campaignId }) => {
   // 상태 추가
   const [viewType, setViewType] = useState<ViewType>("gridView");
   const [selectedCall, setSelectedCall] = useState<CampaignProgressInformationResponseDataType | null>(null);
@@ -58,9 +57,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
     onSuccess: (data) => {  
       const tempList = data.progressInfoList.sort((a, b) => a.reuseCnt - b.reuseCnt);
       setDataList(tempList);
-      if (tempList.length > 0) {
-        setSelectedCall(tempList[0]);
-      }
+      setSelectedCall(tempList[0]);
       console.log("API 응답 데이터:", tempList);
     }
   });
@@ -80,14 +77,6 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
       // 캠페인 정보 찾기
       if (campaigns && campaigns.length > 0) {
         const tempCampaign = campaigns.find(data => data.campaign_id === numericCampaignId);
-        console.log("찾은 캠페인 정보:", tempCampaign);
-        
-        if (tempCampaign) {
-          setCampaignInfo(tempCampaign);
-          setCampaignIdList([numericCampaignId]);
-        }
-      }else if( _campaigns && _campaigns.length > 0){
-        const tempCampaign = _campaigns.find(data => data.campaign_id === numericCampaignId);
         console.log("찾은 캠페인 정보:", tempCampaign);
         
         if (tempCampaign) {
