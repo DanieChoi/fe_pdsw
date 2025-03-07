@@ -410,68 +410,68 @@ const renderTopRow = () => {
   });
 
   // 캠페인스킬 조회
-  const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
-    onSuccess: (data) => {
-      setCampaignSkillList( data.result_data);
-    }
-  });
+  // const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
+  //   onSuccess: (data) => {
+  //     setCampaignSkillList( data.result_data);
+  //   }
+  // });
   // 캠페인 목록 조회
-  const { mutate: fetchMain } = useApiForMain({
-    onSuccess: (data) => {
-      fetchCampaignSkills({
-        session_key: '',
-        tenant_id: 0,
-      });
-      if( tenant_id === 0){
-        setCampaignList( data.result_data);
-      }else{
-        setCampaignList(data.result_data.filter(data=>data.tenant_id === tenant_id));
-      }
-    }
-  });
+  // const { mutate: fetchMain } = useApiForMain({
+  //   onSuccess: (data) => {
+  //     fetchCampaignSkills({
+  //       session_key: '',
+  //       tenant_id: 0,
+  //     });
+  //     if( tenant_id === 0){
+  //       setCampaignList( data.result_data);
+  //     }else{
+  //       setCampaignList(data.result_data.filter(data=>data.tenant_id === tenant_id));
+  //     }
+  //   }
+  // });
   
-  useEffect(() => {
-    if( campaignList.length > 0 ){
-      let updatedCampaigns = [];
-      if( campaignSkillList.length === 0 ){
-        updatedCampaigns = campaignList.map((data) => ({
-          id: data.campaign_id,
-          name: `[${data.campaign_id}]${data.campaign_name}`,
-          skills: [],
-          endTime: '',
-          startFlag: data.start_flag
-        }));
-      }else{
-        updatedCampaigns = campaignList.map((data) => ({
-          id: data.campaign_id,
-          name: `[${data.campaign_id}]${data.campaign_name}`,
-          skills: campaignSkillList.filter((skill) => skill.campaign_id === data.campaign_id)
-              .map((data) => data.skill_id)
-              .join(',').split(','),
-          endTime: '',
-          startFlag: data.start_flag
-        }));
-      }      
-      _setCampaigns(updatedCampaigns);
-      if( selectedCampaign === '' ){
-        setSelectedCampaign(updatedCampaigns[0].id);
-      }
-    }
-  }, [campaignList,campaignSkillList]);
+  // useEffect(() => {
+  //   if( campaignList.length > 0 ){
+  //     let updatedCampaigns = [];
+  //     if( campaignSkillList.length === 0 ){
+  //       updatedCampaigns = campaignList.map((data) => ({
+  //         id: data.campaign_id,
+  //         name: `[${data.campaign_id}]${data.campaign_name}`,
+  //         skills: [],
+  //         endTime: '',
+  //         startFlag: data.start_flag
+  //       }));
+  //     }else{
+  //       updatedCampaigns = campaignList.map((data) => ({
+  //         id: data.campaign_id,
+  //         name: `[${data.campaign_id}]${data.campaign_name}`,
+  //         skills: campaignSkillList.filter((skill) => skill.campaign_id === data.campaign_id)
+  //             .map((data) => data.skill_id)
+  //             .join(',').split(','),
+  //         endTime: '',
+  //         startFlag: data.start_flag
+  //       }));
+  //     }      
+  //     _setCampaigns(updatedCampaigns);
+  //     if( selectedCampaign === '' ){
+  //       setSelectedCampaign(updatedCampaigns[0].id);
+  //     }
+  //   }
+  // }, [campaignList,campaignSkillList]);
 
-  useEffect(() => {     
-    fetchMain({
-      session_key: '',
-      tenant_id: tenant_id,
-    });
-    const interval = setInterval(() => {           
-      fetchMain({
-        session_key: '',
-        tenant_id: tenant_id,
-      });
-    }, 30000);  
-    return () => clearInterval(interval);
-  }, [tenant_id]);
+  // useEffect(() => {     
+  //   fetchMain({
+  //     session_key: '',
+  //     tenant_id: tenant_id,
+  //   });
+  //   const interval = setInterval(() => {           
+  //     fetchMain({
+  //       session_key: '',
+  //       tenant_id: tenant_id,
+  //     });
+  //   }, 30000);  
+  //   return () => clearInterval(interval);
+  // }, [tenant_id]);
 
   return topSections.map((section, index) => {
     const isNotLast = index < topSections.length - 1;
