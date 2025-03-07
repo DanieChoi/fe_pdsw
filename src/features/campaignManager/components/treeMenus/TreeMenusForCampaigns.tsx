@@ -184,8 +184,8 @@ import { TreeNode } from "./TreeNode";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { getStatusIcon } from "@/components/shared/layout/utils/utils";
 import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
-import { useSortStore } from "@/components/shared/layout/comp/TabActions";
 import { useSidebarWidthStore } from "@/store/useSidebarWidthStore"; // 경로 조정 필요
+import { useSortStore } from "@/store/storeForSideBarCampaignSort";
 
 interface TreeState {
   selectedNodeId: string | undefined;
