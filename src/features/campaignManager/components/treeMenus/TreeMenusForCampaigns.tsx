@@ -179,13 +179,13 @@
 
 import { useEffect, useRef } from "react";
 import { create } from "zustand";
-import { SortType, TreeItem } from "@/features/campaignManager/types/typeForSidebar2";
+import { TreeItem } from "@/features/campaignManager/types/typeForSidebar2";
 import { TreeNode } from "./TreeNode";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { getStatusIcon } from "@/components/shared/layout/utils/utils";
 import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useSidebarWidthStore } from "@/store/useSidebarWidthStore"; // 경로 조정 필요
-import { useSortStore } from "@/store/storeForSideBarCampaignSort";
+import { SortOption, useSortStore } from "@/store/storeForSideBarCampaignSort";
 
 interface TreeState {
   selectedNodeId: string | undefined;
@@ -252,40 +252,47 @@ export function TreeMenusForCampaigns() {
     }, []);
   }
 
-  // 정렬 로직
-  function sortCampaignsWithinFolder(items: TreeItem[], sortType: SortType): TreeItem[] {
-    return items.map(item => {
-      if (item.type === "folder" && item.children) {
-        const campaignChildren = item.children.filter(child => child.type === "campaign");
-        const otherChildren = item.children.filter(child => child.type !== "campaign");
-        
-        let sortedCampaigns: TreeItem[];
-        
-        if (sortType === "name") {
-          sortedCampaigns = [...campaignChildren].sort((a, b) => 
-            a.label.localeCompare(b.label, 'ko')
-          );
-        } else if (sortType === "department") {
-          sortedCampaigns = [...campaignChildren].sort((a, b) => {
-            const aId = Number(a.id) || 0;
-            const bId = Number(b.id) || 0;
-            return aId - bId;
-          });
-        } else {
-          sortedCampaigns = campaignChildren;
-        }
-        
-        return {
-          ...item,
-          children: [
-            ...sortedCampaigns,
-            ...sortCampaignsWithinFolder(otherChildren, sortType)
-          ]
-        };
+// 정렬 로직
+function sortCampaignsWithinFolder(items: TreeItem[], sortOption: SortOption): TreeItem[] {
+  return items.map(item => {
+    if (item.type === "folder" && item.children) {
+      const campaignChildren = item.children.filter(child => child.type === "campaign");
+      const otherChildren = item.children.filter(child => child.type !== "campaign");
+      
+      let sortedCampaigns: TreeItem[];
+      
+      // Get sort type and direction from sortOption
+      const { type: sortType, direction } = sortOption;
+      // Set the sorting factor based on direction
+      const sortFactor = direction === 'asc' ? 1 : -1;
+      
+      if (sortType === "name") {
+        // 이름으로 정렬 (방향 적용)
+        sortedCampaigns = [...campaignChildren].sort((a, b) => 
+          sortFactor * a.label.localeCompare(b.label, 'ko')
+        );
+      } else if (sortType === "id") {  // Just use "id" since that's in your type definition
+        // ID로 정렬 (방향 적용)
+        sortedCampaigns = [...campaignChildren].sort((a, b) => {
+          const aId = Number(a.id) || 0;
+          const bId = Number(b.id) || 0;
+          return sortFactor * (aId - bId);
+        });
+      } else {
+        sortedCampaigns = campaignChildren;
       }
-      return item;
-    });
-  }
+      
+      return {
+        ...item,
+        children: [
+          ...sortedCampaigns,
+          ...sortCampaignsWithinFolder(otherChildren, sortOption)
+        ]
+      };
+    }
+    return item;
+  });
+}
 
   // 트리 너비 측정 함수
   const measureTreeWidth = () => {
