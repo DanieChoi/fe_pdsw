@@ -30,17 +30,25 @@ const columns: Column[] = [
 const downColumns = [
     SelectColumn,
   { key: "no", name: "NO." },
-  { key: "tenantName", name: "테넌트" },
-  { key: "campaignGroupId", name: "캠페인 그룹 아이디" },
   { key: "campaignGroupName", name: "캠페인 그룹명" },
+  { key: "campaignId", name: "캠페인 아이디" },
+  { key: "campaignName", name: "캠페인명" },
 ];
 
-interface DataProps {
+export interface DataProps {
   no: number;
   tenantId: number;
   tenantName: string;
   campaignGroupId: number;
   campaignGroupName: string;
+}
+
+export interface downDataProps {
+  no: number;
+  campaignGroupId: number;
+  campaignGroupName: string;
+  campaignId: number;
+  campaignName: string;
 }
 
 const rows: Row[] = [
@@ -50,21 +58,22 @@ const rows: Row[] = [
 type Props = {
   campaignId?: string;
   campaignGroupHeaderSearchParam?: CampaignGroupHeaderSearch;
+  campaignGroupList?: DataProps[];
+  groupCampaignListData?: downDataProps[];
+  onGroupSelect: (id: string) => void;
 }
 
-export default function CampaignGroupManagerList({campaignId,campaignGroupHeaderSearchParam}: Props) {
+export default function CampaignGroupManagerList({campaignId,campaignGroupHeaderSearchParam,campaignGroupList,groupCampaignListData
+    ,onGroupSelect}: Props) {
   const { tenants, campaigns, selectedCampaign , setSelectedCampaign } = useMainStore();
   const [selectedCampaignGroups, setSelectedCampaignGroups] = useState<Set<number>>(new Set([]));
   const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>([]);
-  const [tempData, setTempData] = useState<DataProps[]>([]);
   const [tempDownData, setTempDownData] = useState<DataProps[]>([]);
-  const [tenantId, setTenantId] = useState<number>(-1);
   const [tempTenants, setTempTenants] = useState<TenantListDataResponse[]>([]);
   const memoizedColumns = useMemo(() => columns, [columns]);
-  const memoizedRows = useMemo(() => tempData, [tempData]);
-  const memoizedDownDataRows = useMemo(() => tempDownData, [tempDownData]);
-  
-  
+  const memoizedRows = useMemo(() => campaignGroupList || [], [campaignGroupList]);
+  const memoizedDownDataRows = useMemo(() => groupCampaignListData || [], [groupCampaignListData]);
+    
   // 캠페인 소속 상담사 리스트 요청
   const { mutate: fetchCampaignAgents } = useApiForCampaignAgent({
     onSuccess: (data) => {
@@ -83,18 +92,18 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
     }
   }, [tenants]);
 
-  useEffect(() => {
-    if( campaigns && tenantId > -1 ){
-      setTempCampaigns(campaigns.filter((campaign) => campaign.tenant_id === Number(tenantId)));
-    }else{
-      setTempCampaigns(campaigns);
-    }
-    if( tempCampaigns.length > 0 ){
-      setSelectedCampaign(tempCampaigns[0]);
-    }else{
-      setSelectedCampaign(null);
-    }
-  }, [campaigns, tenantId]);
+  // useEffect(() => {
+  //   if( campaigns && tenantId > -1 ){
+  //     setTempCampaigns(campaigns.filter((campaign) => campaign.tenant_id === Number(tenantId)));
+  //   }else{
+  //     setTempCampaigns(campaigns);
+  //   }
+  //   if( tempCampaigns.length > 0 ){
+  //     setSelectedCampaign(tempCampaigns[0]);
+  //   }else{
+  //     setSelectedCampaign(null);
+  //   }
+  // }, [campaigns, tenantId]);
 
   useEffect(() => {
     if( tempCampaigns.length > 0 ){
@@ -137,30 +146,30 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
     }
   }, [campaignGroupHeaderSearchParam, tenants]);
 
-  useEffect(() => {
-    if( tempTenants.length > 0 ){      
-      setTempData([]);
-      tempTenants.map((data, index) => {
-        setTempData((prev) => [
-          ...prev,
-          {
-            no: index + 1,
-            tenantId: data.tenant_id,
-            tenantName: data.tenant_name,
-            campaignGroupId: data.tenant_id,
-            campaignGroupName: data.tenant_name,
-          }
-        ]);
-      });
-      setTenantId(tempTenants[0].tenant_id);
-    }
-  }, [tempTenants]);
+  // useEffect(() => {
+  //   if( tempTenants.length > 0 ){      
+  //     setTempData([]);
+  //     tempTenants.map((data, index) => {
+  //       setTempData((prev) => [
+  //         ...prev,
+  //         {
+  //           no: index + 1,
+  //           tenantId: data.tenant_id,
+  //           tenantName: data.tenant_name,
+  //           campaignGroupId: data.tenant_id,
+  //           campaignGroupName: data.tenant_name,
+  //         }
+  //       ]);
+  //     });
+  //     setTenantId(tempTenants[0].tenant_id);
+  //   }
+  // }, [tempTenants]);
 
   const handleCellClick = ({ row }: CellClickArgs<Row>) => {
-    setTenantId(row.tenantId);
+    onGroupSelect(row.campaignGroupId.toString());
   };
-  const handleDownCellClick = ({ row }: CellClickArgs<Row>) => {
-    setSelectedCampaign(tempCampaigns.filter((campaign) => campaign.campaign_id === Number(row.campaignGroupId))[0]);
+  const handleDownCellClick = ({ row }: CellClickArgs<downDataProps>) => {
+    // setSelectedCampaign(tempCampaigns.filter((campaign) => campaign.campaign_id === Number(row.campaignGroupId))[0]);
   };
 
   const handleSelectedRowsChange = (newSelection: Set<number>) => {
@@ -173,7 +182,7 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
 
   return (
     <div className="w-[40%] shrink-0">
-      <TitleWrap title="캠페인 그룹 검색목록" totalCount={tempTenants.length} />
+      <TitleWrap title="캠페인 그룹 검색목록" totalCount={memoizedRows.length} />
       <div className="overflow-x-auto">
         <div className="grid-custom-wrap h-[200px]">
           <DataGrid 

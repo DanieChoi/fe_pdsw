@@ -4,12 +4,14 @@ import {
     apiForCampaignGroupList, 
     apiForCombinedTenantAndCampaignGroup,
     apiForCombinedDataForSideMenu,
-    transformToTreeData
+    transformToTreeData,
+    apiForCampaignGroupCampaignList
 } from '../api/apiForCampaignGroup';
 import { 
     CampaignGroupApiResponse,
     TreeNode,
-    SideMenuTreeData
+    SideMenuTreeData,
+    CampaignGroupGampaignListApiResponse
 } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
 import { TenantListResponse } from '@/features/campaignManager/types/typeForTenant';
 
@@ -98,6 +100,23 @@ export function useApiForCampaignGroupList(
     return useQuery<CampaignGroupApiResponse, CombinedDataError>({
         queryKey: ['campaignGroupsOnly', tenant_id.toString()],
         queryFn: () => apiForCampaignGroupList(tenant_id),
+        enabled,
+        staleTime: 1000 * 60 * 5,
+        retry: 1,
+        refetchOnWindowFocus: false,
+    });
+}
+
+/**
+ * 캠페인 그룹 소속 캠페인 목록만 가져오는 React Query 훅 (기존 코드와의 호환성 유지)
+ */
+export function useApiForCampaignGroupCampaignList(
+    group_id: number,
+    enabled: boolean = true
+): UseQueryResult<CampaignGroupGampaignListApiResponse, CombinedDataError> {
+    return useQuery<CampaignGroupGampaignListApiResponse, CombinedDataError>({
+        queryKey: ['campaignGroupCampaignListsOnly', group_id.toString()],
+        queryFn: () => apiForCampaignGroupCampaignList(group_id),
         enabled,
         staleTime: 1000 * 60 * 5,
         retry: 1,
