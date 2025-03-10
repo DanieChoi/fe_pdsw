@@ -150,6 +150,9 @@ export const apiForCreateCampaignGroup = async (
         },
     };
     
+    console.log("Create campaign group request data:", request_data);
+    
+
     try {
         // group_id를 URL에 포함시킴
         const { data } = await axiosInstance.post<SuccessResponse>(
@@ -161,11 +164,9 @@ export const apiForCreateCampaignGroup = async (
         if (error.response?.status === 401) {
             throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
         }
-        throw new Error(
-            error.response?.data?.result_code +
-            "||" +
-            error.response?.data?.result_msg ||
-            "데이터 가져오기 실패"
-        );
+
+        console.log("error ", error);
+        
+        throw error;
     }
 };

@@ -90,12 +90,12 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
   const handleAddGroup = useCallback((groupName: string, groupCode: string) => {
     console.log("새 그룹 추가:", {
-      tenantId: node.id,
+      tenantId: node.tenant_id, // node.id 대신 node.tenant_id 사용
       tenantName: node.name,
       groupName,
       groupCode,
     });
-  }, [node.id, node.name]);
+  }, [node.tenant_id, node.name]); // 의존성 배열 수정
 
   // 아이콘 렌더링
   const renderIcon = useCallback(() => {
@@ -237,7 +237,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       <AddCampaignGroupDialog
         isOpen={isAddGroupDialogOpen}
         onClose={handleCloseAddGroupDialog}
-        tenantId={node.id}
+        tenantId={node.tenant_id} // node.id 대신 node.tenant_id 사용
         tenantName={node.name}
         onAddGroup={handleAddGroup}
       />

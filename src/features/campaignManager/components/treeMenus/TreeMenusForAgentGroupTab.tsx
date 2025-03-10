@@ -39,8 +39,8 @@ export function TreeMenusForCampaignGroupTab() {
   const tenant_id = 2; // 예시 테넌트 ID
   
   // 통합 데이터 가져오기
-  const { data: combinedData, isLoading: isLoadingCombined, error: errorCombined } = 
-    useApiForCombinedDataForSideMenuForCampaignTab(tenant_id);
+  // const { data: combinedData, isLoading: isLoadingCombined, error: errorCombined } = 
+  //   useApiForCombinedDataForSideMenuForCampaignTab(tenant_id);
     
   // 트리 구조 데이터 가져오기
   const { data: treeData, isLoading: isLoadingTree, error: errorTree } = 
@@ -59,19 +59,14 @@ export function TreeMenusForCampaignGroupTab() {
     });
   };
 
+  console.log("treeData : ", treeData);
+  
+
   // 노드 선택
   const handleNodeSelect = (nodeId: string) => {
     setSelectedNodeId(nodeId);
   };
 
-  // 통합 데이터 로드 시 콘솔에 로그 출력
-  useEffect(() => {
-    if (combinedData) {
-      console.log("==== 통합 데이터 조회 결과 ====");
-      console.log("테넌트 목록:", combinedData.tenantData);
-      console.log("캠페인 그룹 목록:", combinedData.campaignGroupData);
-    }
-  }, [combinedData]);
 
   // 트리 데이터 로드 시 콘솔에 로그 출력
   useEffect(() => {
@@ -89,15 +84,6 @@ export function TreeMenusForCampaignGroupTab() {
       }
     }
   }, [treeData]);
-
-  // 로딩 및 에러 상태 처리
-  if (isLoadingCombined || isLoadingTree) {
-    return <div className="flex justify-center items-center h-full">데이터 로딩 중...</div>;
-  }
-
-  if (errorCombined || errorTree) {
-    return <div className="text-red-500 p-4">데이터 로드 에러</div>;
-  }
 
   // 실제 데이터 또는 샘플 데이터 사용
   const displayData = treeData || sampleTreeData;

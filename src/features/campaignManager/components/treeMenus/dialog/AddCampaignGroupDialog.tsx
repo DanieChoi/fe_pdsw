@@ -1,3 +1,5 @@
+// src/components/AddCampaignGroupDialog.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -5,13 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDialogForSideMenu";
+import { useApiForCreateCampaignGroup } from "@/features/preferences/hooks/useApiForCreateCampaignGroup";
+import { toast } from "react-toastify";
 
 interface AddCampaignGroupDialogProps {
   isOpen: boolean;
   onClose: (e?: React.MouseEvent | React.KeyboardEvent | Event) => void;
-  tenantId: string;
+  tenantId: number; // string에서 number로 변경
   tenantName: string;
-  onAddGroup: (groupName: string, groupCode: string) => void;
+  onAddGroup?: (groupName: string, groupCode: string) => void;
 }
 
 export function AddCampaignGroupDialog({
@@ -32,22 +36,43 @@ export function AddCampaignGroupDialog({
     }
   }, [isOpen]);
 
+  // 캠페인 그룹 생성 API 호출 훅 사용
+  const { mutate, isPending } = useApiForCreateCampaignGroup({
+    onSuccess: (data, variables, context) => {
+      console.log("캠페인 그룹 생성 성공:", data);
+      toast.success("캠페인 그룹이 추가되었습니다.");
+      // onAddGroup 콜백이 존재하면 호출 (추가적인 작업이 필요할 경우)
+      if (onAddGroup) {
+        onAddGroup(groupName, groupId);
+      }
+      handleClose();
+    },
+    onError: (error, variables, context) => {
+      console.error("캠페인 그룹 생성 실패:", error);
+      // 필요시 에러 메시지를 사용자에게 보여줄 수 있습니다.
+      alert(error.message || "캠페인 그룹 생성에 실패하였습니다.");
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    e.stopPropagation(); // 이벤트 전파 방지 추가
+    e.stopPropagation(); // 이벤트 전파 방지
     
-    if (groupName.trim()) {
-      onAddGroup(groupName, groupId);
-      handleClose();
+    if (groupName.trim() && groupId.trim()) {
+      // 훅을 통해 API 호출 (tenantId는 이미 number 타입이므로 변환 불필요)
+      mutate({
+        group_id: groupId,
+        tenant_id: tenantId, // Number() 변환 제거
+        group_name: groupName,
+      });
     }
   };
 
   const handleClose = (e?: React.MouseEvent | React.KeyboardEvent | Event) => {
     if (e) {
       e.preventDefault();
-      e.stopPropagation(); // 이벤트 전파 방지 추가
+      e.stopPropagation(); // 이벤트 전파 방지
     }
-    
     onClose(e);
   };
 
@@ -98,15 +123,16 @@ export function AddCampaignGroupDialog({
               variant="outline" 
               onClick={handleClose}
               onPointerDown={stopPropagation}
+              disabled={isPending}
             >
               취소
             </Button>
             <Button 
               type="submit" 
-              disabled={!groupName.trim()}
+              disabled={isPending || !groupName.trim() || !groupId.trim()}
               onPointerDown={stopPropagation}
             >
-              그룹 추가
+              {isPending ? "생성 중..." : "그룹 추가"}
             </Button>
           </div>
         </div>
