@@ -25,6 +25,22 @@ export interface CampaignGroupItem {
     group_name: string;
 }
 
+// 캠페인 그룹 소속 캠페인 목록 API 응답의 전체 구조
+export interface CampaignGroupGampaignListApiResponse {
+    result_code: number;
+    result_msg: string;
+    result_count: number;
+    result_data: CampaignGroupGampaignListItem[];
+}
+
+export interface CampaignGroupGampaignListItem {
+    tenant_id: number;
+    group_id: number;
+    group_name: string;
+    campaign_id: number;
+    campaign_name: string;
+}
+
 // 트리 메뉴 구조를 위한 타입 정의
 export interface TreeNode {
     id: string;
