@@ -51,7 +51,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   // 디버깅용 로그 추가
   useEffect(() => {
     if (node.type === "group" && hasChildren) {
-      console.log(`그룹 노드 ${node.name}에 캠페인 ${node.children.length}개 있음, 확장 상태: ${isExpanded}`);
+      console.log(`그룹 노드 ${node.name}에 캠페인 ${node.children?.length}개 있음, 확장 상태: ${isExpanded}`);
     }
   }, [node, hasChildren, isExpanded]);
 

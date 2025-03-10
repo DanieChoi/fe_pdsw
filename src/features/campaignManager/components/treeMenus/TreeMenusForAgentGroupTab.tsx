@@ -179,7 +179,7 @@ export function TreeMenusForCampaignGroupTab() {
       </div>
       
       {/* 테넌트/그룹/캠페인 통계 표시 */}
-      <div className="grid grid-cols-3 gap-4 mb-4">
+      {/* <div className="grid grid-cols-3 gap-4 mb-4">
         <div className="bg-blue-50 p-3 rounded-md">
           <div className="text-sm text-blue-600 font-medium">테넌트</div>
           <div className="text-xl font-bold">{countNodesByType(displayData, "tenant")}</div>
@@ -192,7 +192,7 @@ export function TreeMenusForCampaignGroupTab() {
           <div className="text-sm text-green-600 font-medium">캠페인</div>
           <div className="text-xl font-bold">{countNodesByType(displayData, "campaign")}</div>
         </div>
-      </div>
+      </div> */}
       
       <div className="space-y-1 border rounded-md p-2">
         {displayData.map((node) => (

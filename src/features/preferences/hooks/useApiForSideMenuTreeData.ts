@@ -7,6 +7,8 @@ import {
 import { 
     CampaignGroupApiResponse,
     TreeNode,
+    CampaignGroupGampaignListApiResponse,
+    ExtendedCombinedData,
 } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
 import { TenantListResponse } from '@/features/campaignManager/types/typeForTenant';
 
@@ -26,7 +28,6 @@ interface CombinedDataError {
 
 /**
  * 트리 메뉴용 데이터를 가져오는 React Query 훅 
- * CombinedData를 TreeNode[] 구조로 변환
  */
 export function useApiForSideMenuTreeData(
     tenant_id: number,
@@ -35,13 +36,13 @@ export function useApiForSideMenuTreeData(
 
     console.log("tenant_id at 사이드 메뉴 호출 : ", tenant_id);
 
-    return useQuery<CombinedData, CombinedDataError, TreeNode[]>({
+    return useQuery<ExtendedCombinedData, CombinedDataError, TreeNode[]>({
         queryKey: ['sideMenuTreeData', tenant_id],
-        queryFn: () => apiForCombinedTenantAndCampaignGroup(tenant_id),
+        queryFn: () => apiForCombinedTenantAndCampaignGroup(tenant_id) as Promise<ExtendedCombinedData>,
         select: (data) => transformToTreeData(data),
         enabled,
         staleTime: 1000 * 60 * 5,
         retry: 1,
         refetchOnWindowFocus: false,
     });
-}
+}   
