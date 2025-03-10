@@ -125,7 +125,7 @@ const SkillEdit = () => {
       case '1': return '인바운드';
       case '2': return '아웃바운드';
       case '3': return '블렌드';
-      default: return '일반상담';
+      default: return 'Unknown';
     }
   };
 
@@ -164,7 +164,6 @@ const SkillEdit = () => {
 
   // 스킬 로우 클릭 이벤트 핸들러
   const handleSkillClick = ({ row }: { row: SkillRow }) => {
-    // 이미 구현된 기존 코드 그대로 유지
     setSelectedSkill(row);
     setSelectedCampaignRows(new Set());
     setSelectedAgentRows(new Set());
@@ -887,6 +886,7 @@ const SkillEdit = () => {
                 rowHeight={30}
                 headerRowHeight={30}
                 rowClass={getRowClass}
+                enableVirtualization={false}
               />
             </div>
           </div>
@@ -913,6 +913,7 @@ const SkillEdit = () => {
                 onSelectedRowsChange={handleCampaignSelectionChange}
                 rowHeight={30}
                 headerRowHeight={30}
+                enableVirtualization={false}
               />
             </div>
           </div>
@@ -939,6 +940,7 @@ const SkillEdit = () => {
                 onSelectedRowsChange={handleAgentSelectionChange}
                 rowHeight={30}
                 headerRowHeight={30}
+                enableVirtualization={false}
               />
             </div>
           </div>

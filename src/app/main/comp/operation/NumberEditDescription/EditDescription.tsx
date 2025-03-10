@@ -6,7 +6,6 @@ import { CommonButton } from "@/components/shared/CommonButton";
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useCampainManagerStore } from '@/store';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
-import { fetchPhoneDescriptionUpdate } from '../../../../../features/campaignManager/api/mainPhoneDescriptionUpdate';
 import { useApiForPhoneDescriptionUpdate } from '@/features/campaignManager/hooks/useApiForPhoneDescriptionUpdate';
 import { useApiForPhoneDescriptionInsert } from '@/features/campaignManager/hooks/useApiForPhoneDescriptionInsert';
 
@@ -205,6 +204,7 @@ const EditDescription = () => {
             rowHeight={30}
             headerRowHeight={30}
             rowClass={getRowClass}
+            enableVirtualization={false}
           />
         </div>
       </div>

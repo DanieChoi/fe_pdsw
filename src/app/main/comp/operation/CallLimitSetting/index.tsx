@@ -221,6 +221,7 @@ const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
             rowHeight={30}
             headerRowHeight={30}
             rowClass={getRowClass}
+            enableVirtualization={false}
           />
         </div>
       </div>

@@ -478,6 +478,7 @@ const SystemPreferences = () => {
                                 rowHeight={30}
                                 headerRowHeight={30}
                                 rowClass={getEquipmentRowClass}
+                                enableVirtualization={false}
                             />
                         </div>
                     </div>

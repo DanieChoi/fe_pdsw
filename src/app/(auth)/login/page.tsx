@@ -66,6 +66,20 @@ export default function LoginPage() {
           title: '로그인',
           type: '2',
         });
+      }else if( e.message === 'Password is wrong.'){
+        setAlertState({
+          isOpen: true,
+          message: '접근권한이 없습니다.',
+          title: '로그인',
+          type: '2',
+        });
+      }else if( e.message === 'Device is unknown.'){
+        setAlertState({
+          isOpen: true,
+          message: '접근권한이 없습니다.',
+          title: '로그인',
+          type: '2',
+        });
       }else{
         setAlertState({
           isOpen: true,
