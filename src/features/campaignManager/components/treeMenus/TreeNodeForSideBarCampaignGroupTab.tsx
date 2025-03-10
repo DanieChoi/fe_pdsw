@@ -4,6 +4,9 @@ import {
   ChevronRight,
   ChevronDown,
   Building,
+  MessageSquare,
+  FileText,
+  BarChart3
 } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useState, useEffect, useRef } from "react";
@@ -44,6 +47,13 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedNodes.has(node.id);
   const isSelected = selectedNodeId === node.id;
+
+  // 디버깅용 로그 추가
+  useEffect(() => {
+    if (node.type === "group" && hasChildren) {
+      console.log(`그룹 노드 ${node.name}에 캠페인 ${node.children.length}개 있음, 확장 상태: ${isExpanded}`);
+    }
+  }, [node, hasChildren, isExpanded]);
 
   // 컨텍스트 메뉴 강제 닫기 함수
   const forceCloseContextMenu = useCallback(() => {
@@ -106,6 +116,8 @@ export function TreeNodeForSideBarCampaignGroupTab({
         return <Image src="/tree-menu/tennant_office.png" alt="테넌트" width={14} height={12} />;
       case "group":
         return <Image src="/tree-menu/group_icon_for_tree.png" alt="그룹" width={15} height={12} />;
+      case "campaign":
+        return <MessageSquare className="h-4 w-4 text-green-600" />;
       default:
         return <Building className="h-4 w-4 text-gray-500" />;
     }
@@ -114,10 +126,13 @@ export function TreeNodeForSideBarCampaignGroupTab({
   // 노드 클릭 시 선택 및 확장/축소 처리
   const handleClick = useCallback(() => {
     onNodeSelect(node.id);
+    
+    // 무조건 확장/축소 토글 (자식이 있는 모든 노드 타입에 대해)
     if (hasChildren) {
+      console.log(`노드 클릭 (타입: ${node.type}, ID: ${node.id}), 자식 수: ${node.children?.length}`);
       onNodeToggle(node.id);
     }
-  }, [node.id, hasChildren, onNodeSelect, onNodeToggle]);
+  }, [node.id, node.type, hasChildren, node.children?.length, onNodeSelect, onNodeToggle]);
 
   // 컨텍스트 메뉴 상태 변경 처리
   const handleContextMenuOpenChange = useCallback((open: boolean) => {
@@ -177,18 +192,60 @@ export function TreeNodeForSideBarCampaignGroupTab({
         </>
       );
     }
+    if (node.type === "campaign") {
+      return (
+        <>
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 상세 보기: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 상세 보기
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 통계: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center"
+          >
+            <BarChart3 className="mr-2 h-4 w-4" />
+            캠페인 통계
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`SMS 테스트 발송: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center"
+          >
+            <MessageSquare className="mr-2 h-4 w-4" />
+            SMS 테스트 발송
+          </ContextMenuItem>
+        </>
+      );
+    }
     return null;
-  }, [node.type, node.name, handleMenuItemClick]);
+  }, [node.type, node.name, node.campaign_id, handleMenuItemClick, setIsAddGroupDialogOpen]);
+
+  // 노드의 스타일 결정
+  const getNodeStyle = useCallback(() => {
+    let baseStyle = `flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150`;
+    
+    // 선택된 노드는 배경색 변경
+    if (isSelected) {
+      baseStyle += " bg-blue-50 text-blue-600 hover:bg-blue-100";
+    }
+    
+    // 노드 타입에 따라 추가 스타일 적용
+    if (node.type === "campaign") {
+      baseStyle += isSelected ? "" : " text-green-600"; // 캠페인 노드에 초록색 텍스트 적용 (선택된 경우 제외)
+    }
+    
+    return baseStyle;
+  }, [isSelected, node.type]);
 
   return (
-    <div className="select-none">
+    <div className="select-none" data-node-type={node.type} data-node-id={node.id}>
       <ContextMenu onOpenChange={handleContextMenuOpenChange}>
         <ContextMenuTrigger asChild>
           <div
             ref={contextMenuTriggerRef}
-            className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150 ${
-              isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""
-            }`}
+            className={getNodeStyle()}
             onClick={handleClick}
             style={{ paddingLeft: `${level * 16 + 8}px` }}
           >
@@ -205,12 +262,17 @@ export function TreeNodeForSideBarCampaignGroupTab({
               {renderIcon()}
               <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
                 {node.name}
+                {node.type === "campaign" && node.campaign_id && (
+                  <span className="ml-1 text-xs text-gray-500">
+                    (ID: {node.campaign_id})
+                  </span>
+                )}
               </span>
             </div>
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent 
-          className="w-40 bg-white shadow-md border rounded-md"
+          className="w-48 bg-white shadow-md border rounded-md"
           onClick={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
         >
@@ -218,8 +280,9 @@ export function TreeNodeForSideBarCampaignGroupTab({
         </ContextMenuContent>
       </ContextMenu>
 
+      {/* 확장된 상태일 때만 자식 노드 렌더링 */}
       {hasChildren && isExpanded && (
-        <div>
+        <div className="children-container">
           {node.children?.map((child) => (
             <TreeNodeForSideBarCampaignGroupTab
               key={child.id}

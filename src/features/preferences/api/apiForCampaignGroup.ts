@@ -1,12 +1,14 @@
 // src/features/campaignManager/api/apiForCampaignGroup.ts
 import { axiosInstance } from "@/lib/axios";
-import { 
-    AddCampaignGroupCredentials, 
-    CampaignGroupApiResponse, 
+import {
+    AddCampaignGroupCredentials,
+    CampaignGroupApiResponse,
     SuccessResponse,
     TreeNode,
     SideMenuTreeData,
-    CampaignGroupGampaignListApiResponse
+    CampaignGroupGampaignListApiResponse,
+    GetCampaignListForCampaignGroupRequest,
+    ExtendedCombinedData
 } from "@/features/campaignManager/types/typeForCampaignGroupForSideBar";
 import { TenantListResponse } from "@/features/campaignManager/types/typeForTenant";
 import { apiForGetTenantList } from "@/features/campaignManager/api/apiForTennants";
@@ -21,34 +23,91 @@ interface CombinedData {
  * @param tenant_id 테넌트 ID (캠페인 그룹 조회에 사용)
  * @returns Promise<CombinedData> 테넌트와 캠페인 그룹 데이터를 포함한 객체
  */
+// export const apiForCombinedTenantAndCampaignGroup = async (
+//     tenant_id: number
+// ): Promise<CombinedData> => {
+//     try {
+//         // Promise.all을 사용하여 두 API를 병렬로 호출
+//         const [tenantData, campaignGroupData] = await Promise.all([
+//             apiForGetTenantList(),
+//             apiForCampaignGroupList(tenant_id)
+//         ]);
+
+//         console.log("Combined API for tenant data:", tenantData);
+//         console.log("Combined API for campaign group data:", campaignGroupData);
+
+//         return {
+//             tenantData,
+//             campaignGroupData
+//         };
+//     } catch (error: any) {
+//         console.error("Combined API call failed:", error);
+
+//         // 에러 객체에 custom 속성 추가
+//         const enhancedError = new Error(
+//             error.message || "테넌트 및 캠페인 그룹 데이터를 가져오는데 실패했습니다."
+//         );
+
+//         // 원본 에러 정보 유지
+//         (enhancedError as any).originalError = error;
+
+//         throw enhancedError;
+//     }
+// };
+
+// src/features/campaignManager/api/apiForCampaignGroup.ts 수정
+
+/**
+ * 테넌트 목록, 캠페인 그룹 목록, 캠페인 목록을 동시에 가져오는 API 함수
+ * @param tenant_id 테넌트 ID (캠페인 그룹 조회에 사용)
+ * @returns Promise<ExtendedCombinedData> 테넌트, 캠페인 그룹, 캠페인 데이터를 포함한 객체
+ */
 export const apiForCombinedTenantAndCampaignGroup = async (
     tenant_id: number
-): Promise<CombinedData> => {
+): Promise<ExtendedCombinedData> => {
     try {
-        // Promise.all을 사용하여 두 API를 병렬로 호출
-        const [tenantData, campaignGroupData] = await Promise.all([
+        // Promise.all을 사용하여 세 API를 병렬로 호출
+        const [tenantData, campaignGroupData, campaignData] = await Promise.all([
             apiForGetTenantList(),
-            apiForCampaignGroupList(tenant_id)
+            apiForCampaignGroupList(tenant_id),
+            apiForCampaignListForCampaignGroup({
+                filter: {
+                    group_id: [],
+                    campaign_id: {
+                        start: 1,
+                        end: 100
+                    }
+                },  // 모든 캠페인 그룹의 캠페인 가져오기
+                sort: {
+                    campaign_id: 1  // 캠페인 ID 기준 오름차순 정렬
+                },
+                page: {
+                    index: 1,
+                    items: 10  // 최대한 많은 아이템 가져오기
+                }
+            })
         ]);
-        
+
         console.log("Combined API for tenant data:", tenantData);
         console.log("Combined API for campaign group data:", campaignGroupData);
-        
+        console.log("Combined API for campaign data:", campaignData);
+
         return {
             tenantData,
-            campaignGroupData
+            campaignGroupData,
+            campaignData
         };
     } catch (error: any) {
         console.error("Combined API call failed:", error);
-        
+
         // 에러 객체에 custom 속성 추가
         const enhancedError = new Error(
-            error.message || "테넌트 및 캠페인 그룹 데이터를 가져오는데 실패했습니다."
+            error.message || "테넌트, 캠페인 그룹, 캠페인 데이터를 가져오는데 실패했습니다."
         );
-        
+
         // 원본 에러 정보 유지
         (enhancedError as any).originalError = error;
-        
+
         throw enhancedError;
     }
 };
@@ -58,40 +117,56 @@ export const apiForCombinedTenantAndCampaignGroup = async (
  * @param request 필터, 정렬, 페이징 정보가 포함된 요청 객체
  * @returns 캠페인 그룹별 캠페인 목록
  */
-// export const apiForCampaignListForCampaignGroup = async (
-//     request: GetCampaignListForCampaignGroupRequest
-//   ): Promise<CampaignGroupGampaignListApiResponse> => {
-//     try {
-//       const { data } = await axiosInstance.post<CampaignGroupGampaignListApiResponse>(
-//         'collections/campaign-group-list',
-//         request
-//       );
-//       return data;
-//     } catch (error: any) {
-//       if (error.response?.status === 401) {
-//         throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
-//       }
-//       throw new Error(
-//         `${error.response?.data?.result_code || ''}||${error.response?.data?.result_msg || '데이터 가져오기 실패'}`
-//       );
-//     }
-//   };
+export const apiForCampaignListForCampaignGroup = async (
+    request: GetCampaignListForCampaignGroupRequest
+): Promise<CampaignGroupGampaignListApiResponse> => {
+    try {
+        const { data } = await axiosInstance.post<CampaignGroupGampaignListApiResponse>(
+            'collections/campaign-group-list',
+            request
+        );
+
+        console.log("Campaign list for campaign group ???????????????? :", data);
+        
+
+        return data.result_data ? data : { 
+            result_data: [],
+            result_code: 0,
+            result_msg: "No data",
+            result_count: 0
+        };
+    } catch (error: any) {
+        if (error.response?.status === 401) {
+            throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
+        }
+        throw new Error(
+            `${error.response?.data?.result_code || ''}||${error.response?.data?.result_msg || '데이터 가져오기 실패'}`
+        );
+    }
+};
 
 /**
  * API 응답 데이터를 트리 구조로 변환하는 함수
  * @param combinedData 통합 API 응답 데이터
  * @returns 트리 구조의 데이터
  */
-export const transformToTreeData = (combinedData: CombinedData): TreeNode[] => {
-    const { tenantData, campaignGroupData } = combinedData;
-    
+// src/features/campaignManager/api/apiForCampaignGroup.ts 수정
+
+/**
+ * API 응답 데이터를 트리 구조로 변환하는 함수 (캠페인 포함)
+ * @param combinedData 통합 API 응답 데이터
+ * @returns 트리 구조의 데이터
+ */
+export const transformToTreeData = (combinedData: ExtendedCombinedData): TreeNode[] => {
+    const { tenantData, campaignGroupData, campaignData } = combinedData;
+
     if (!tenantData?.result_data) {
         return [];
     }
-    
+
     // 테넌트별 그룹 매핑
     const groupsByTenant: Record<number, typeof campaignGroupData.result_data> = {};
-    
+
     if (campaignGroupData?.result_data) {
         campaignGroupData.result_data.forEach(group => {
             if (!groupsByTenant[group.tenant_id]) {
@@ -100,8 +175,20 @@ export const transformToTreeData = (combinedData: CombinedData): TreeNode[] => {
             groupsByTenant[group.tenant_id].push(group);
         });
     }
-    
-    // 테넌트 노드 생성 (그룹 포함)
+
+    // 그룹별 캠페인 매핑
+    const campaignsByGroup: Record<number, typeof campaignData.result_data> = {};
+
+    if (campaignData?.result_data) {
+        campaignData.result_data.forEach(campaign => {
+            if (!campaignsByGroup[campaign.group_id]) {
+                campaignsByGroup[campaign.group_id] = [];
+            }
+            campaignsByGroup[campaign.group_id].push(campaign);
+        });
+    }
+
+    // 테넌트 노드 생성 (그룹과 캠페인 포함)
     const tenantNodes = tenantData.result_data.map(tenant => ({
         id: `tenant-${tenant.tenant_id}`,
         name: `[${tenant.tenant_id}]${tenant.tenant_name}`,
@@ -112,10 +199,18 @@ export const transformToTreeData = (combinedData: CombinedData): TreeNode[] => {
             name: group.group_name,
             type: "group" as const,
             tenant_id: group.tenant_id,
-            group_id: group.group_id
+            group_id: group.group_id,
+            children: (campaignsByGroup[group.group_id] || []).map(campaign => ({
+                id: `campaign-${campaign.campaign_id}-${group.group_id}-${campaign.campaign_name}`,
+                name: campaign.campaign_name,
+                type: "campaign" as const,
+                tenant_id: campaign.tenant_id,
+                group_id: campaign.group_id,
+                campaign_id: campaign.campaign_id
+            }))
         }))
     }));
-    
+
     // 최상위 NEXUS 노드에 테넌트 노드를 자식으로 추가
     return [{
         id: "nexus-root",
@@ -130,9 +225,9 @@ export const transformToTreeData = (combinedData: CombinedData): TreeNode[] => {
  * @param combinedData 통합 API 응답 데이터
  * @returns 사이드 메뉴용 트리 데이터
  */
-export const apiForCombinedDataForSideMenu = (combinedData: CombinedData): SideMenuTreeData => {
+export const apiForCombinedDataForSideMenu = (combinedData: ExtendedCombinedData): SideMenuTreeData => {
     const treeData = transformToTreeData(combinedData);
-    
+
     return {
         items: treeData
     };
@@ -147,7 +242,7 @@ export const apiForCampaignGroupList = async (
             tenant_id: tenant_id
         }
     };
-    
+
     try {
         const { data } = await axiosInstance.post<CampaignGroupApiResponse>(
             `collections/campaign-group`,
@@ -174,9 +269,9 @@ export const apiForCreateCampaignGroup = async (
             group_name: credentials.group_name,
         },
     };
-    
+
     console.log("Create campaign group request data:", request_data);
-    
+
 
     try {
         // group_id를 URL에 포함시킴
@@ -191,7 +286,7 @@ export const apiForCreateCampaignGroup = async (
         }
 
         console.log("error ", error);
-        
+
         throw error;
     }
 };
@@ -212,7 +307,7 @@ export const apiForCampaignGroupCampaignList = async (
             items: 99999
         }
     };
-    
+
     try {
         const { data } = await axiosInstance.post<CampaignGroupGampaignListApiResponse>(
             `collections/campaign-group-list`,

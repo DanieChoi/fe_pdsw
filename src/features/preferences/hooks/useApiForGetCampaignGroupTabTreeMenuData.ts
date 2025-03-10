@@ -5,20 +5,17 @@ import {
     apiForCombinedTenantAndCampaignGroup,
     apiForCombinedDataForSideMenu,
     transformToTreeData,
-    apiForCampaignGroupCampaignList
+    apiForCampaignGroupCampaignList,
+    apiForCampaignListForCampaignGroup
 } from '../api/apiForCampaignGroup';
 import { 
     CampaignGroupApiResponse,
     TreeNode,
     SideMenuTreeData,
-    CampaignGroupGampaignListApiResponse
+    CampaignGroupGampaignListApiResponse,
+    ExtendedCombinedData
 } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
 import { TenantListResponse } from '@/features/campaignManager/types/typeForTenant';
-
-interface CombinedData {
-    tenantData: TenantListResponse;
-    campaignGroupData: CampaignGroupApiResponse;
-}
 
 // 에러 타입 정의
 interface CombinedDataError {
@@ -29,14 +26,19 @@ interface CombinedDataError {
     result_msg?: string;
 }
 
+/**
+ * 트리 구조 데이터를 가져오는 React Query 훅
+ * @param tenant_id 테넌트 ID
+ * @param enabled 쿼리 활성화 여부 (기본값: true)
+ * @returns 트리 구조의 데이터
+ */
 export function useApiForGetCampaignGroupTabTreeMenuData(
     tenant_id: number,
     enabled: boolean = true
 ): UseQueryResult<TreeNode[], CombinedDataError> {
-
     console.log("tenant_id at 사이드 메뉴 호출 : ", tenant_id);
 
-    return useQuery<CombinedData, CombinedDataError, TreeNode[]>({
+    return useQuery<ExtendedCombinedData, CombinedDataError, TreeNode[]>({
         queryKey: ['sideMenuTreeData', tenant_id],
         queryFn: () => apiForCombinedTenantAndCampaignGroup(tenant_id),
         select: (data) => transformToTreeData(data),
