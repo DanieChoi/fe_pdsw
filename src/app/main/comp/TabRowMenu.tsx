@@ -64,8 +64,8 @@ const TabRowMenu: React.FC<TabRowMenuProps> = ({ rowId, isOpen, onClose }) => {
   return (
     <div 
       ref={menuRef}
-      className="absolute p-2 right-[25px] z-20 mt-1 w-[150px] rounded-[3px] shadow-lg bg-white ring-1 ring-black ring-opacity-5"
-      style={{ top: '40px' }}
+      className="absolute p-2 right-[0px] z-20 mt-1 w-[150px] rounded-[3px] shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+      style={{ top: '27px' }}
     >
       <div className="">
         <button
