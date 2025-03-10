@@ -184,11 +184,11 @@ export function TreeNodeForSideBarCampaignGroupTab({
           >
             그룹 삭제
           </ContextMenuItem>
-          <ContextMenuItem
+          {/* <ContextMenuItem
             onClick={(e) => handleMenuItemClick(e, () => console.log(`그룹 상세 정보: ${node.name}`))}
           >
             그룹 상세 정보
-          </ContextMenuItem>
+          </ContextMenuItem> */}
         </>
       );
     }
@@ -209,13 +209,13 @@ export function TreeNodeForSideBarCampaignGroupTab({
             <BarChart3 className="mr-2 h-4 w-4" />
             캠페인 통계
           </ContextMenuItem>
-          <ContextMenuItem
+          {/* <ContextMenuItem
             onClick={(e) => handleMenuItemClick(e, () => console.log(`SMS 테스트 발송: ${node.name} (ID: ${node.campaign_id})`))}
             className="flex items-center"
           >
             <MessageSquare className="mr-2 h-4 w-4" />
             SMS 테스트 발송
-          </ContextMenuItem>
+          </ContextMenuItem> */}
         </>
       );
     }
