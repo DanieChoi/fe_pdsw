@@ -19,9 +19,11 @@ const CommonDialogForSideMenu = ({
   description,
   children,
 }: CommonDialogForSideMenuProps) => {
-  // 모든 클릭 이벤트 전파 방지
-  const stopPropagation = useCallback((e: React.UIEvent) => {
-    e.stopPropagation();
+  // 모든 클릭 이벤트 전파 방지 - React.UIEvent 대신에 any 타입 사용
+  const stopPropagation = useCallback((e: any) => {
+    if (e && e.stopPropagation) {
+      e.stopPropagation();
+    }
   }, []);
 
   // 다이얼로그 상태 변경 핸들러 - 메모이제이션
