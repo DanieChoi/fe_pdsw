@@ -32,36 +32,28 @@ export function AddCampaignGroupDialog({
     }
   }, [isOpen]);
 
-  // 이벤트 전파를 확실히 방지하는 제출 핸들러
-  const handleSubmit = (e?: React.MouseEvent | React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    e.stopPropagation(); // 이벤트 전파 방지 추가
     
     if (groupName.trim()) {
-      onAddGroup(groupName, groupId || "");
+      onAddGroup(groupName, groupId);
       handleClose();
     }
   };
 
-  // 닫기 핸들러를 내부에서 관리
   const handleClose = (e?: React.MouseEvent | React.KeyboardEvent | Event) => {
     if (e) {
       e.preventDefault();
-      e.stopPropagation();
+      e.stopPropagation(); // 이벤트 전파 방지 추가
     }
     
-    // setTimeout으로 이벤트 루프 분리
-    setTimeout(() => {
-      onClose();
-    }, 0);
+    onClose(e);
   };
 
-  // 입력 폼 변경 핸들러
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
+  // 모든 인풋에 이벤트 전파 방지 적용
+  const stopPropagation = (e: React.UIEvent) => {
     e.stopPropagation();
-    setter(e.target.value);
   };
 
   return (
@@ -71,30 +63,31 @@ export function AddCampaignGroupDialog({
       title="그룹 추가"
       description="새로운 캠페인 그룹을 등록합니다."
     >
-      {/* form 태그로 감싸고 onSubmit 핸들러 추가 */}
-      <form onSubmit={handleSubmit} onClick={e => e.stopPropagation()}>
+      <form onSubmit={handleSubmit} onClick={stopPropagation} onPointerDown={stopPropagation}>
         <div className="space-y-4">
           {/* 그룹 아이디 */}
           <div className="flex flex-col space-y-1">
-            <Label htmlFor="groupId" onClick={e => e.stopPropagation()}>캠페인 그룹 아이디</Label>
+            <Label htmlFor="groupId">캠페인 그룹 아이디</Label>
             <Input
               id="groupId"
               value={groupId}
-              onChange={e => handleChange(e, setGroupId)}
-              onClick={e => e.stopPropagation()}
+              onChange={(e) => setGroupId(e.target.value)}
               placeholder="그룹 아이디를 입력하세요"
+              onClick={stopPropagation}
+              onPointerDown={stopPropagation}
             />
           </div>
 
           {/* 그룹명 */}
           <div className="flex flex-col space-y-1">
-            <Label htmlFor="groupName" onClick={e => e.stopPropagation()}>캠페인 그룹명</Label>
+            <Label htmlFor="groupName">캠페인 그룹명</Label>
             <Input
               id="groupName"
               value={groupName}
-              onChange={e => handleChange(e, setGroupName)}
-              onClick={e => e.stopPropagation()}
+              onChange={(e) => setGroupName(e.target.value)}
               placeholder="그룹명을 입력하세요"
+              onClick={stopPropagation}
+              onPointerDown={stopPropagation}
             />
           </div>
 
@@ -103,22 +96,15 @@ export function AddCampaignGroupDialog({
             <Button 
               type="button" 
               variant="outline" 
-              onClick={e => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleClose(e);
-              }}
+              onClick={handleClose}
+              onPointerDown={stopPropagation}
             >
               취소
             </Button>
             <Button 
-              type="submit"
-              onClick={e => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleSubmit(e);
-              }}
+              type="submit" 
               disabled={!groupName.trim()}
+              onPointerDown={stopPropagation}
             >
               그룹 추가
             </Button>
