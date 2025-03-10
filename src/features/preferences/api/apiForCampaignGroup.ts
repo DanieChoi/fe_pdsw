@@ -5,7 +5,8 @@ import {
     CampaignGroupApiResponse, 
     SuccessResponse,
     TreeNode,
-    SideMenuTreeData
+    SideMenuTreeData,
+    CampaignGroupGampaignListApiResponse
 } from "@/features/campaignManager/types/typeForCampaignGroupForSideBar";
 import { TenantListResponse } from "@/features/campaignManager/types/typeForTenant";
 import { apiForGetTenantList } from "@/features/campaignManager/api/apiForTennants";
@@ -166,6 +167,39 @@ export const apiForCreateCampaignGroup = async (
             "||" +
             error.response?.data?.result_msg ||
             "데이터 가져오기 실패"
+        );
+    }
+};
+
+// 캠페인 그룹 소속 캠페인 목록을 가져오는 API
+export const apiForCampaignGroupCampaignList = async (
+    group_id: number
+): Promise<CampaignGroupGampaignListApiResponse> => {
+    const request_data = {
+        request_data: {
+            group_id: [group_id]
+        },
+        sort: {
+            campaign_id: 0
+        },
+        page: {
+            index: 1,
+            items: 99999
+        }
+    };
+    
+    try {
+        const { data } = await axiosInstance.post<CampaignGroupGampaignListApiResponse>(
+            `collections/campaign-group-list`,
+            request_data
+        );
+        return data;
+    } catch (error: any) {
+        if (error.response?.status === 401) {
+            throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
+        }
+        throw new Error(
+            `${error.response?.data?.result_code || ''}||${error.response?.data?.result_msg || '데이터 가져오기 실패'}`
         );
     }
 };
