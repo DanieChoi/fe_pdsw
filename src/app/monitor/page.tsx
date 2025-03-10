@@ -15,6 +15,7 @@ import CampaignInfo from './components/CampaignInfo';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
+import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 
 
 // 타입 정의
@@ -46,7 +47,7 @@ interface Campaign {
   name: string;
   skills?: number[];
   endTime?: string;
-  startFlag?: string;
+  startFlag?: number;
   callPacing?: number;
   tenant_id?: number;
   stats?: {
@@ -62,7 +63,7 @@ const initData : Campaign = {
   name: '',
   skills: [],
   endTime: '',
-  startFlag: '',
+  startFlag: 0,
   callPacing: 0,
   tenant_id: 0,
   stats: {
@@ -76,6 +77,7 @@ const initData : Campaign = {
 
 const MonitorPage = () => {
   const { tenants, setTenants, campaigns, setCampaigns } = useMainStore();
+  const { skills, setSkills } = useCampainManagerStore();
 
    // 인증 관련 상태
    const { tenant_id } = useAuthStore();
@@ -420,6 +422,12 @@ const MonitorPage = () => {
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
       setCampaignSkillList( data.result_data);
+      if( skills.length === 0 ){      
+        const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id); 
+        fetchSkills({
+          tenant_id_array: tempTenantIdArray
+        });   
+      }
     }
   });
   // 캠페인 목록 조회
@@ -449,9 +457,18 @@ const MonitorPage = () => {
     }
   });
   
+  // 스킬 조회
+  const { mutate: fetchSkills } = useApiForSkills({
+    onSuccess: (data) => {
+      setSkills(data.result_data);
+    }
+  });
+
   useEffect(() => {     
     if( selectedCampaign !== '' ){
-      setCurrentCampaign(_campaigns.find(c => c.id === selectedCampaign)||initData);
+      const tempCampaign = _campaigns.find(c => c.id === selectedCampaign)||initData;
+      setCurrentCampaign(tempCampaign);
+      setCampaignStatus(tempCampaign.startFlag === 1 ? '시작' : tempCampaign.startFlag === 2 ? '멈춤' : '중지');
     }
   }, [selectedCampaign]);
 
@@ -461,7 +478,7 @@ const MonitorPage = () => {
           id: data.campaign_id,
           name: `[${data.campaign_id}]${data.campaign_name}`,
           skills: campaignSkillList.filter((skill) => skill.campaign_id === data.campaign_id)
-              .map((data) => data.skill_id),
+              .map((data) => data.skill_id).join(',').split(',').map((data) => Number(data)),
           endTime: '',
           startFlag: data.start_flag,
           tenant_id: data.tenant_id,
@@ -474,12 +491,6 @@ const MonitorPage = () => {
 
   }, [campaignList,campaignSkillList]);
   
-  useEffect(() => {     
-    if( campaigns.length === 0 ){
-      
-    }
-  }, [campaigns]);
-
   useEffect(() => {     
     fetchMain({
       session_key: '',
