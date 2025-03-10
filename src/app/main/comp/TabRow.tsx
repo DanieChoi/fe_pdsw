@@ -44,7 +44,7 @@ const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
   const canRemove = rowId !== "row-1"; // 예시로 첫 번째 행은 삭제 불가능
 
   return (
-    <div className="flex items-center min-h-[30px] w-full border-b border-[#ebebeb]">
+    <div className="flex items-center min-h-[30px] w-full border-b border-[#ebebeb] relative">
       {/* 섹션들 (탭 목록 부분) */}
       <div className="flex-1 flex w-[calc(100%-46px)]">
         {row.sections.map((section, idx) => {

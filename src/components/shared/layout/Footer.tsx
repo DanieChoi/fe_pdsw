@@ -281,7 +281,7 @@ export default function Footer({
         topLeft: false
       }}
       className={`
-        border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col transition-all duration-300 ease-in-out
+        border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col transition-all duration-300 ease-in-out group relative h-[1px] before:content-[''] before:absolute hover:before:bg-[#5BC2C1]
         ${isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative"}
       `}
       onResizeStart={onResizeStart}
