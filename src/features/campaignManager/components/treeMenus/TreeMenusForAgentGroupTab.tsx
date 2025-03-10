@@ -173,10 +173,10 @@ export function TreeMenusForCampaignGroupTab() {
 
   return (
     <div className="flex-1 overflow-auto p-4">
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <h2 className="text-lg font-semibold">캠페인 그룹 관리</h2>
         <p className="text-sm text-gray-500">테넌트, 캠페인 그룹, 캠페인을 관리할 수 있습니다.</p>
-      </div>
+      </div> */}
       
       {/* 테넌트/그룹/캠페인 통계 표시 */}
       {/* <div className="grid grid-cols-3 gap-4 mb-4">
