@@ -73,13 +73,13 @@ const CampaignInfo = ({
             {campaignStatus}
           </div>
           <div className='flex gap-2'>
-            <button type="button" onClick={() => onStatusChange('시작')}>
+            <button type="button" onClick={() => onStatusChange('시작')} disabled={campaignStatus === '시작'}>
               <Image src="/sidebar-menu/tree_play.svg" alt="시작" width={16} height={16} />
             </button>
-            <button type="button" onClick={() => onStatusChange('멈춤')}>
+            <button type="button" onClick={() => onStatusChange('멈춤')} disabled={campaignStatus === '멈춤'}>
               <Image src="/sidebar-menu/tree_pause2.svg" alt="멈춤" width={16} height={16} />
             </button>
-            <button type="button" onClick={() => onStatusChange('중지')}>
+            <button type="button" onClick={() => onStatusChange('중지')} disabled={campaignStatus === '중지'}>
               <Image src="/sidebar-menu/tree_stop.svg" alt="중지" width={16} height={16} />
             </button>
           </div>
