@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import DataGrid from "react-data-grid";
+import 'react-data-grid/lib/styles.css';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { CustomInput } from "@/components/shared/CustomInput";
@@ -41,6 +42,7 @@ const DistributionLimit = () => {
   const [initTime, setInitTime] = useState<string>('없음');
   const [viewFilter, setViewFilter] = useState('all');
   const [rawAgentData, setRawAgentData] = useState<Row[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     center: '',
@@ -357,6 +359,13 @@ const DistributionLimit = () => {
   
   // 캠페인 ID Select 변경 핸들러
   const handleCampaignIdChange = (value: string) => {
+    setIsLoading(true); // 로딩 시작
+
+    // 상태 초기화 추가
+    setRawAgentData([]);  // 기존 에이전트 데이터 초기화
+    setCampaignAgents([]); // 캠페인 에이전트 초기화
+    setTreeData([]); // 트리 데이터 초기화
+    
     setSelectedCampaignId(value);
     const campaign = campaigns.find(c => c.campaign_id.toString() === value);
     if (campaign) {
@@ -462,6 +471,7 @@ const DistributionLimit = () => {
           });
         });
       }
+      setIsLoading(false); // 로딩 완료
     },
     onError: (error) => {
       console.error('운영설정 분배호수 제한 설정 리스트 조회 실패:', error);
@@ -684,7 +694,7 @@ const DistributionLimit = () => {
     { 
       key: 'center', 
       name: '센터',
-      width: 150, 
+      width: 140, 
       renderCell: ({ row }: { row: Row }) => {
         const indent = row.level * 20;
         const hasToggle = row.hasChildren;
@@ -933,6 +943,7 @@ const DistributionLimit = () => {
               headerRowHeight={30}
               rowClass={getRowClass}
               selectedRows={selectedRow ? new Set<string>([selectedRow.id]) : new Set<string>()}
+              enableVirtualization={false}
             />
           </div>
         </div>
