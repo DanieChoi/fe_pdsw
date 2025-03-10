@@ -60,10 +60,11 @@ type Props = {
   campaignGroupList?: DataProps[];
   groupCampaignListData?: downDataProps[];
   onGroupSelect: (id: string) => void;
+  onCampaignSelect: (id: string) => void;
 }
 
 export default function CampaignGroupManagerList({campaignId,campaignGroupHeaderSearchParam,campaignGroupList,groupCampaignListData
-    ,onGroupSelect}: Props) {
+    ,onGroupSelect,onCampaignSelect}: Props) {
   const { campaigns, selectedCampaign , setSelectedCampaign } = useMainStore();
   const [selectedCampaignGroups, setSelectedCampaignGroups] = useState<Set<number>>(new Set([]));
   const [tempCampaigns, setTempCampaigns] = useState<DataProps[]>([]);
@@ -116,7 +117,7 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
     onGroupSelect(row.campaignGroupId.toString());
   };
   const handleDownCellClick = ({ row }: CellClickArgs<downDataProps>) => {
-    // setSelectedCampaign(tempCampaigns.filter((campaign) => campaign.campaign_id === Number(row.campaignGroupId))[0]);
+    onCampaignSelect(row.campaignId.toString());
   };
 
   const handleSelectedRowsChange = (newSelection: Set<number>) => {

@@ -30,6 +30,7 @@ import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSc
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 import CampaignTab from '@/app/main/comp/CampaignManager/CampaignTab';
+import {DataProps,downDataProps} from './CampaignGroupManagerList';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
@@ -130,7 +131,7 @@ export const CampaignInfo: MainDataResponse = {
   service_code: 0,
   start_flag: 0,
   end_flag: 0,
-  dial_mode: 0,
+  dial_mode: 1,
   callback_kind: 0,
   delete_flag: 0,
   list_count: 0,
@@ -138,14 +139,14 @@ export const CampaignInfo: MainDataResponse = {
   next_campaign: 0,
   token_id: 0,
   phone_order: '',
-  phone_dial_try: [],
-  dial_try_interval: 0,
+  phone_dial_try: [0,0,0,0,0],
+  dial_try_interval: 20,
   trunk_access_code: '',
   DDD_code: '',
   power_divert_queue: 0,
   max_ring: 0,
   detect_mode: 0,
-  auto_dial_interval: 0,
+  auto_dial_interval: 30,
   creation_user: '',
   creation_time: '',
   creation_ip: '',
@@ -153,17 +154,23 @@ export const CampaignInfo: MainDataResponse = {
   update_time: '',
   update_ip: '',
   dial_phone_id: 0,
-  tenant_id: 0,
+  tenant_id: -1,
   alarm_answer_count: 0,
   dial_speed: 0,
   parent_campaign: 0,
-  overdial_abandon_time: 0,
-  list_alarm_count: 0,
+  overdial_abandon_time: 2,
+  list_alarm_count: 100,
   supervisor_phone: '',
   reuse_count: 0,
   use_counsel_result: 0,
   use_list_alarm: 0,
-  redial_strategy: [],
+  redial_strategy: [
+    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0"
+],
   dial_mode_option: 0,
   user_option: '',  
 }
@@ -230,11 +237,12 @@ export interface AdditionalInfoTabParam {
   onClosed: boolean;
 }
 
+const today = new Date();
 const CampaignScheduleInfo: CampaignScheDuleListDataResponse = {
   campaign_id: 0,
   tenant_id: 0,
-  start_date: '',
-  end_date: '',
+  start_date: today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2),
+  end_date: today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2),
   start_time: [],
   end_time: []
 }
@@ -278,7 +286,12 @@ export interface NotificationTabParam {
   supervisor_phone: string;
 }
 
-export default function CampaignGroupManagerDetail() {
+type Props = {
+  groupInfo: DataProps;
+  campaignId: number;
+}
+
+export default function CampaignGroupManagerDetail({groupInfo, campaignId}: Props) {
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
@@ -293,12 +306,13 @@ export default function CampaignGroupManagerDetail() {
   const [campaignScheduleChangeYn, setCampaignScheduleChangeYn] = useState<boolean>(false); // 캠페인 스케줄 변경여부
   const [campaignDialSpeedChangeYn, setCampaignDialSpeedChangeYn] = useState<boolean>(false); // 캠페인 발신속도 변경여부
   const [campaignSaveYn, setCampaignSaveYn] = useState<boolean>(false); // 캠페인 저장여부
-  const { tenants
+  const { tenants, campaigns
     , setCampaigns
     , selectedCampaign
     , setSelectedCampaign
   } = useMainStore();
-  const { removeTab, activeTabId, activeTabKey } = useTabStore();
+  const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab
+    , campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
   const [ inputSkills, setInputSkills ] = useState('');
   const [ inputCallingNumber, setInputCallingNumber ] = useState('');
@@ -318,7 +332,7 @@ export default function CampaignGroupManagerDetail() {
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
-    if( typeof selectedCampaign !== 'undefined' && selectedCampaign !== null ){
+    if( typeof selectedCampaign !== 'undefined' && selectedCampaign !== null && campaignId > 0 ){
       setChangeYn(false);
       setCampaignInfoChangeYn(false);
       setTempCampaignsInfo({...tempCampaignInfo,
@@ -461,7 +475,19 @@ export default function CampaignGroupManagerDetail() {
         });
       }
     }
-  }, [selectedCampaign,campaignSkills,callingNumbers,schedules]);
+  }, [selectedCampaign,campaignSkills,callingNumbers,schedules,campaignId]);
+
+  useEffect(() => {
+    if( campaignId > 0){
+      setSelectedCampaign(campaigns.filter((campaign) => campaign.campaign_id === campaignId)[0]);
+    }else{
+      setSelectedCampaign(null);
+      setTempCampaignsInfo({...CampaignInfo});
+      setInputSkills('');
+      setInputCallingNumber('');
+      setTempCampaignSchedule({...CampaignScheduleInfo});
+    }
+  }, [campaignId]);
 
   //input data change
   const handleInputData = (value:any, col:string) => {
@@ -980,6 +1006,26 @@ export default function CampaignGroupManagerDetail() {
     }
   });
 
+  //재발신 버튼 이벤트
+  const handleRebroadcast = () => {
+    // openRebroadcastSettings('20','재발신 설정');
+    if( campaignIdForUpdateFromSideMenu == null || campaignIdForUpdateFromSideMenu === ''){
+      setCampaignIdForUpdateFromSideMenu(tempCampaignInfo.campaign_id+'');
+    }
+    if (openedTabs.some(tab => tab.id === 20)) {
+      setActiveTab(20, openedTabs.filter((data) => data.id === 20)[0].uniqueKey);
+    } else if (!openedTabs.some(tab => tab.id === 20)) {
+      addTab({
+        id: 20,
+        uniqueKey: '20',
+        title: '재발신 설정',
+        icon: '',
+        href: '',
+        content: null,
+      });
+    }
+  };
+
   return (
     <div className='flex flex-col gap-5 w-[60%] overflow-auto'>
       <div>
@@ -990,7 +1036,7 @@ export default function CampaignGroupManagerDetail() {
               { label: "새 캠페인 그룹", onClick: () => console.log("") },
               { label: "일괄 저장", onClick: () => handleCampaignSave(),},
               { label: "일괄 삭제", onClick: () => console.log("") },
-              { label: "재발신", onClick: () => console.log(""), variant: "customblue"},
+              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
           ]}
           />
           <div className="grid grid-cols-3 gap-x-[26px] gap-y-2">
@@ -998,10 +1044,10 @@ export default function CampaignGroupManagerDetail() {
             <Label className="w-[90px] min-w-[90px]">그룹 아이디</Label>
             <CustomInput 
               type="number" 
-              value={tempCampaignInfo.campaign_id } 
+              value={groupInfo.campaignGroupId === 0?'':groupInfo.campaignGroupId+''} 
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
               className="" 
-              disabled={selectedCampaign !== null}
+              disabled={true}
             />
           </div>
 
@@ -1009,7 +1055,8 @@ export default function CampaignGroupManagerDetail() {
             <Label className="w-[74px] min-w-[74px]">테넌트</Label>
             <Select
               onValueChange={(value) => handleSelectChange(value, 'tenant')}
-              value={tempCampaignInfo.tenant_id+'' || ''}
+              value={groupInfo.tenantId+'' || ''}
+              disabled={true}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="테넌트를 선택하세요" />
@@ -1027,10 +1074,10 @@ export default function CampaignGroupManagerDetail() {
           <div className='flex items-center gap-2'>
             <Label className="w-[74px] min-w-[74px]">그룹 이름</Label>
             <CustomInput 
-              value={tempCampaignInfo.campaign_name || ''} 
+              value={groupInfo.campaignGroupName || ''} 
               onChange={(e) => handleInputData(e.target.value, 'campaign_name')}         
               className="" 
-              readOnly
+              disabled={true}
             />
           </div>
 
@@ -1071,6 +1118,7 @@ export default function CampaignGroupManagerDetail() {
                   /> 
             </button>
           </div>
+          {selectedCampaign !== null?
           <div className='flex items-center gap-2'>
             <Label className="w-[74px] min-w-[74px]">발신번호</Label>
             <CustomInput value={inputCallingNumber} className="w-full" 
@@ -1082,17 +1130,19 @@ export default function CampaignGroupManagerDetail() {
               })
             }>발신번호 변경</CommonButton>
           </div>
+          :''}
           <div className="flex items-center gap-2 col-span-3">
             <Label className="w-[90px] min-w-[90px]">설명</Label>
-            <CustomInput value={tempCampaignInfo.campaign_desc || ''} className="w-full"          
+            <CustomInput value={selectedCampaign !== null?'[정보표시기준 : ' + selectedCampaign?.campaign_id + '번 캠페인]' || '':''} className="w-full"          
               onChange={(e) => handleInputData(e.target.value, 'campaign_desc')} 
+              disabled={true}
             /> 
           </div>
         </div>
       </div>
       <div>
         <CampaignTab campaignSchedule={tempCampaignSchedule}
-          newCampaignYn={false}
+          newCampaignYn={true}
           campaignInfo={tempCampaignInfo}
           campaignDialSpeedInfo={tempCampaignDialSpeedInfoParam}
           onCampaignOutgoingOrderChange={(value) => handleCampaignOutgoingOrderChange(value)}
