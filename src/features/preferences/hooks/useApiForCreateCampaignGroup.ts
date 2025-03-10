@@ -26,7 +26,6 @@ export function useApiForCreateCampaignGroup(
       apiForCreateCampaignGroup(credentials),
     onSuccess: (data, variables, context) => {
 
-
       console.log("data:", data);
       console.log("variables:", variables);
       
