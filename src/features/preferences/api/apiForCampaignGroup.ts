@@ -54,6 +54,30 @@ export const apiForCombinedTenantAndCampaignGroup = async (
 };
 
 /**
+ * 캠페인 그룹에 속한 캠페인 목록을 가져오는 API
+ * @param request 필터, 정렬, 페이징 정보가 포함된 요청 객체
+ * @returns 캠페인 그룹별 캠페인 목록
+ */
+// export const apiForCampaignListForCampaignGroup = async (
+//     request: GetCampaignListForCampaignGroupRequest
+//   ): Promise<CampaignGroupGampaignListApiResponse> => {
+//     try {
+//       const { data } = await axiosInstance.post<CampaignGroupGampaignListApiResponse>(
+//         'collections/campaign-group-list',
+//         request
+//       );
+//       return data;
+//     } catch (error: any) {
+//       if (error.response?.status === 401) {
+//         throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
+//       }
+//       throw new Error(
+//         `${error.response?.data?.result_code || ''}||${error.response?.data?.result_msg || '데이터 가져오기 실패'}`
+//       );
+//     }
+//   };
+
+/**
  * API 응답 데이터를 트리 구조로 변환하는 함수
  * @param combinedData 통합 API 응답 데이터
  * @returns 트리 구조의 데이터

@@ -7,6 +7,7 @@ import {
 } from "@/features/preferences/hooks/useApiForCampaignGroupList";
 import { TreeNode } from "@/features/campaignManager/types/typeForCampaignGroupForSideBar";
 import { TreeNodeForSideBarCampaignGroupTab } from "./TreeNodeForSideBarCampaignGroupTab";
+import { useApiForGetCampaignGroupTabTreeMenuData } from "@/features/preferences/hooks/useApiForGetCampaignGroupTabTreeMenuData";
 
 // 샘플 트리 데이터
 const sampleTreeData: TreeNode[] = [
@@ -44,7 +45,8 @@ export function TreeMenusForCampaignGroupTab() {
     
   // 트리 구조 데이터 가져오기
   const { data: treeData, isLoading: isLoadingTree, error: errorTree } = 
-    useApiForSideMenuTreeData(tenant_id);
+    // useApiForSideMenuTreeData(tenant_id);
+    useApiForGetCampaignGroupTabTreeMenuData(tenant_id);
 
   // 노드 확장/축소 토글
   const handleNodeToggle = (nodeId: string) => {
