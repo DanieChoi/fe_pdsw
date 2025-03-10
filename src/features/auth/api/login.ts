@@ -45,6 +45,11 @@ export const loginApi = {
         tenant_id = data.tenant_id;
       }
 
+      // 로그인 안되게 수정
+      if (data.role_id == 1 || data.role_id == 2 || data.role_id == 3) {
+        throw new Error('접근권한이 없습니다.');
+      }
+
       // console.log("단계 = ", process.env.NEXT_PUBLIC_API_URL);
 
       // const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
