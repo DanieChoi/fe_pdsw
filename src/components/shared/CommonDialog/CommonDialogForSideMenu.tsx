@@ -3,7 +3,7 @@
 import React, { ReactNode, useCallback } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { cn } from "@/lib/utils"; // shadcn-ui 설치 시 생성된 유틸, 없다면 제거
+import { cn } from "@/lib/utils";
 
 interface CommonDialogForSideMenuProps {
   isOpen: boolean;
@@ -20,40 +20,27 @@ const CommonDialogForSideMenu = ({
   description,
   children,
 }: CommonDialogForSideMenuProps) => {
-  // 모든 이벤트 전파 방지 함수
   const stopPropagation = useCallback((e: React.UIEvent) => {
     e.stopPropagation();
   }, []);
 
-  // 다이얼로그 상태 변경 핸들러
+  // onOpenChange 시 바로 닫지 않고 onClose를 직접 호출
   const handleOpenChange = useCallback((open: boolean) => {
     if (!open) {
-      // 약간의 지연을 주어 이벤트 루프 분리
-      setTimeout(() => {
-        onClose();
-      }, 50);
+      onClose();
     }
   }, [onClose]);
 
-  // 오버레이 클릭 핸들러
+  // 오버레이 클릭 시 다이얼로그 닫기
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    
-    // 약간의 지연을 주어 이벤트 루프 분리
-    setTimeout(() => {
-      onClose(e);
-    }, 50);
+    onClose(e);
   }, [onClose]);
 
-  // 닫기 버튼 클릭 핸들러
   const handleCloseClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    // 약간의 지연을 주어 이벤트 루프 분리
-    setTimeout(() => {
-      onClose(e);
-    }, 50);
+    onClose(e);
   }, [onClose]);
 
   return (
@@ -78,17 +65,10 @@ const CommonDialogForSideMenu = ({
           )}
           onClick={stopPropagation}
           onPointerDown={stopPropagation}
-          onPointerDownOutside={(e) => {
-            e.preventDefault();
-            handleOverlayClick(e as unknown as React.MouseEvent);
-          }}
+          // onPointerDownOutside, onInteractOutside 제거하여 외부 이벤트에 의한 닫힘 방지
           onEscapeKeyDown={(e) => {
             e.preventDefault();
             onClose(e);
-          }}
-          onInteractOutside={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
           }}
         >
           {/* 타이틀 */}
