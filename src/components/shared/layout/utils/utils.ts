@@ -121,7 +121,7 @@ export const sortTreeItemsForSidebar = (items: TreeItem[], type: SortType): Tree
 //   }
 // };
 
-
+// \nproject\fe_pdsw\src\components\shared\layout\utils\utils.ts
 export const getStatusIcon = (status?: string) => {
     switch (status) {
       case 'started':

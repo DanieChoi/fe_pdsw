@@ -13,50 +13,6 @@ import {
 import { TenantListResponse } from "@/features/campaignManager/types/typeForTenant";
 import { apiForGetTenantList } from "@/features/campaignManager/api/apiForTennants";
 
-interface CombinedData {
-    tenantData: TenantListResponse;
-    campaignGroupData: CampaignGroupApiResponse;
-}
-
-/**
- * 테넌트 목록과 캠페인 그룹 목록을 동시에 가져오는 API 함수
- * @param tenant_id 테넌트 ID (캠페인 그룹 조회에 사용)
- * @returns Promise<CombinedData> 테넌트와 캠페인 그룹 데이터를 포함한 객체
- */
-// export const apiForCombinedTenantAndCampaignGroup = async (
-//     tenant_id: number
-// ): Promise<CombinedData> => {
-//     try {
-//         // Promise.all을 사용하여 두 API를 병렬로 호출
-//         const [tenantData, campaignGroupData] = await Promise.all([
-//             apiForGetTenantList(),
-//             apiForCampaignGroupList(tenant_id)
-//         ]);
-
-//         console.log("Combined API for tenant data:", tenantData);
-//         console.log("Combined API for campaign group data:", campaignGroupData);
-
-//         return {
-//             tenantData,
-//             campaignGroupData
-//         };
-//     } catch (error: any) {
-//         console.error("Combined API call failed:", error);
-
-//         // 에러 객체에 custom 속성 추가
-//         const enhancedError = new Error(
-//             error.message || "테넌트 및 캠페인 그룹 데이터를 가져오는데 실패했습니다."
-//         );
-
-//         // 원본 에러 정보 유지
-//         (enhancedError as any).originalError = error;
-
-//         throw enhancedError;
-//     }
-// };
-
-// src/features/campaignManager/api/apiForCampaignGroup.ts 수정
-
 /**
  * 테넌트 목록, 캠페인 그룹 목록, 캠페인 목록을 동시에 가져오는 API 함수
  * @param tenant_id 테넌트 ID (캠페인 그룹 조회에 사용)
@@ -188,6 +144,14 @@ export const transformToTreeData = (combinedData: ExtendedCombinedData): TreeNod
         });
     }
 
+    // start_flag를 상태 문자열로 변환하는 함수
+    const getStatusFromFlag = (start_flag?: number): string => {
+        if (start_flag === 1) return 'started';  // 시작된 상태
+        if (start_flag === 2) return 'pending';  // 대기 상태
+        if (start_flag === 3) return 'stopped';  // 종료된 상태
+        return 'unknown';
+    };
+
     // 테넌트 노드 생성 (그룹과 캠페인 포함)
     const tenantNodes = tenantData.result_data.map(tenant => ({
         id: `tenant-${tenant.tenant_id}`,
@@ -206,7 +170,9 @@ export const transformToTreeData = (combinedData: ExtendedCombinedData): TreeNod
                 type: "campaign" as const,
                 tenant_id: campaign.tenant_id,
                 group_id: campaign.group_id,
-                campaign_id: campaign.campaign_id
+                campaign_id: campaign.campaign_id,
+                start_flag: campaign.start_flag,                      // 추가: 원본 start_flag 값
+                status: getStatusFromFlag(campaign.start_flag)        // 추가: 상태 문자열
             }))
         }))
     }));

@@ -31,6 +31,19 @@ interface TreeNodeProps {
   onNodeSelect: (nodeId: string) => void;
 }
 
+const getStatusIcon = (status?: string) => {
+  switch (status) {
+    case 'started':
+      return '/sidebar-menu/tree_play.svg';
+    case 'pending':
+      return '/sidebar-menu/tree_pause.svg';
+    case 'stopped':
+      return '/sidebar-menu/tree_stop.svg';
+    default:
+      return null;
+  }
+};
+
 export function TreeNodeForSideBarCampaignGroupTab({
   node,
   level,
@@ -123,7 +136,8 @@ export function TreeNodeForSideBarCampaignGroupTab({
       case "group":
         return <Image src="/tree-menu/group_icon_for_tree.png" alt="그룹" width={15} height={12} />;
       case "campaign":
-        return <Briefcase className="h-4 w-4 text-green-600" />;
+        // 캠페인 노드일 경우, 기본 아이콘 반환
+        return <span></span>;
       default:
         return <Building className="h-4 w-4 text-gray-500" />;
     }
@@ -365,6 +379,20 @@ export function TreeNodeForSideBarCampaignGroupTab({
                 <span className="w-4" />
               )}
               {renderIcon()}
+              
+              {/* 캠페인 노드인 경우 상태 아이콘 표시 */}
+              {node.type === "campaign" && node.status && getStatusIcon(node.status) && (
+                <div className="flex-shrink-0 w-4 h-4 relative">
+                  <Image 
+                    src={getStatusIcon(node.status) || ""}
+                    alt={node.status || "상태"}
+                    width={16}
+                    height={16}
+                    className="object-contain"
+                  />
+                </div>
+              )}
+              
               <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
                 {node.name}
                 {node.type === "campaign" && node.campaign_id && (
