@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/context-menu";
 import { TreeNode } from "@/features/campaignManager/types/typeForCampaignGroupForSideBar";
 import AddCampaignGroupDialog from "./dialog/AddCampaignGroupDialog";
+import { useTabStore } from "@/store/tabStore";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -46,6 +47,9 @@ export function TreeNodeForSideBarCampaignGroupTab({
   // ContextMenu를 강제로 닫기 위한 이벤트를 트리거하는 ref
   const contextMenuTriggerRef = useRef<HTMLDivElement>(null);
 
+  // useTabStore 훅에서 addTab 함수 가져오기
+  const { addTab } = useTabStore();
+
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedNodes.has(node.id);
   const isSelected = selectedNodeId === node.id;
@@ -60,10 +64,10 @@ export function TreeNodeForSideBarCampaignGroupTab({
   // 컨텍스트 메뉴 강제 닫기 함수
   const forceCloseContextMenu = useCallback(() => {
     setIsContextMenuOpen(false);
-    
+
     // 강제로 ESC 키 이벤트를 발생시켜 메뉴 닫기
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
-    
+
     // 트리거 요소 밖으로 클릭 이벤트 시뮬레이션
     if (contextMenuTriggerRef.current) {
       const clickEvent = new MouseEvent('click', {
@@ -79,10 +83,10 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const handleOpenAddGroupDialog = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     // 메뉴 강제 닫기
     forceCloseContextMenu();
-    
+
     // 약간의 지연 후 다이얼로그 열기
     setTimeout(() => {
       setIsAddGroupDialogOpen(true);
@@ -128,7 +132,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   // 노드 클릭 시 선택 및 확장/축소 처리
   const handleClick = useCallback(() => {
     onNodeSelect(node.id);
-    
+
     // 무조건 확장/축소 토글 (자식이 있는 모든 노드 타입에 대해)
     if (hasChildren) {
       console.log(`노드 클릭 (타입: ${node.type}, ID: ${node.id}), 자식 수: ${node.children?.length}`);
@@ -149,10 +153,10 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const handleMenuItemClick = useCallback((e: React.MouseEvent, action: () => void) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     // 메뉴 강제 닫기
     forceCloseContextMenu();
-    
+
     // 약간의 지연 후 액션 실행
     setTimeout(() => {
       action();
@@ -163,7 +167,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const renderMenuItems = useCallback(() => {
     if (node.type === "tenant") {
       return (
-        <ContextMenuItem 
+        <ContextMenuItem
           onClick={(e) => handleMenuItemClick(e, () => {
             console.log(`캠페인 그룹 추가: ${node.name}`);
             setIsAddGroupDialogOpen(true);
@@ -177,7 +181,23 @@ export function TreeNodeForSideBarCampaignGroupTab({
       return (
         <>
           <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 수정: ${node.name}`))}
+            onClick={(e) => handleMenuItemClick(e, () => {
+              console.log(`캠페인 그룹 일괄 수정: ${node.name}`);
+              // 탭 스토어에서 새 탭 추가 함수를 가져와서 호출
+              // 여기에 탭 스토어의 addTab 함수를 import하고 사용해야 함
+              // 예: addTab({ id: 700, title: `캠페인 그룹 일괄 수정: ${node.name}`, groupId: node.id, groupName: node.name });
+
+              // useTabStore에서 addTab 함수를 가져와 사용
+              addTab({
+                id: 700,
+                title: `캠페인 그룹 일괄 수정: ${node.name}`,
+                uniqueKey: `groupBulkUpdate_${node.id}`,
+                params: {
+                  groupId: node.id,
+                  groupName: node.name
+                }
+              });
+            })}
             className="flex items-center whitespace-nowrap"
           >
             <FileText className="mr-2 h-4 w-4" />
@@ -310,17 +330,17 @@ export function TreeNodeForSideBarCampaignGroupTab({
   // 노드의 스타일 결정
   const getNodeStyle = useCallback(() => {
     let baseStyle = `flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150`;
-    
+
     // 선택된 노드는 배경색 변경
     if (isSelected) {
       baseStyle += " bg-blue-50 text-blue-600 hover:bg-blue-100";
     }
-    
+
     // 노드 타입에 따라 추가 스타일 적용
     if (node.type === "campaign") {
       baseStyle += isSelected ? "" : " text-green-600"; // 캠페인 노드에 초록색 텍스트 적용 (선택된 경우 제외)
     }
-    
+
     return baseStyle;
   }, [isSelected, node.type]);
 

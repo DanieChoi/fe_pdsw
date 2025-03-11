@@ -11,11 +11,12 @@ export interface TabItem {
   id: number;
   uniqueKey: string;
   title: string;
-  icon: string;
-  href: string;
-  content: React.ReactNode;
+  icon?: string | any
+  href?: string;
+  content?: React.ReactNode;
   campaignId?: string;
   campaignName?: string;
+  params?: any; 
 }
 
 export interface TabSection {

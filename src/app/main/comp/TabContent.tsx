@@ -25,9 +25,10 @@ import { TeamSkillAssignmentTab } from "@/features/campaignManager/components/tr
 import { GroupSkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/GroupSkillAssignmentTab";
 import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCampaignTab";
 import CampaignDeletePanel from "@/widgets/sidebar/pannels/CampaignDeletePanel";
+import CampaignGroupBulkUpdatePanel from "./CampaignGroupBulkUpdatePanel";
 
 // 탭 ID별 실제 화면을 매핑
-const renderContent = (tabId: number | null, campaignId?: string, campaignName?: string) => {
+const renderContent = (tabId: number | null, campaignId?: string, campaignName?: string, params?: any) => {
   switch (tabId) {
     case 1:
       return <CampaignGroupManager />;
@@ -116,7 +117,18 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
         </div>
       );
 
-    
+    case 700:
+      return (
+        <div className="flex justify-left w-full">
+          <div className="max-w-[1000px] w-full">
+            {/* <CampaignGroupBulkUpdatePanel /> */}
+            <CampaignGroupBulkUpdatePanel 
+              groupId={params?.groupId} 
+              groupName={params?.groupName} 
+            />
+          </div>
+        </div>
+      )
 
 
     default:
