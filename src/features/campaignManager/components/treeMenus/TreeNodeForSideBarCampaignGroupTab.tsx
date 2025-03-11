@@ -6,7 +6,8 @@ import {
   Building,
   MessageSquare,
   FileText,
-  BarChart3
+  BarChart3,
+  Megaphone
 } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useState, useEffect, useRef } from "react";
@@ -117,7 +118,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       case "group":
         return <Image src="/tree-menu/group_icon_for_tree.png" alt="그룹" width={15} height={12} />;
       case "campaign":
-        return <MessageSquare className="h-4 w-4 text-green-600" />;
+        return <Megaphone  className="h-4 w-4 text-green-600" />;
       default:
         return <Building className="h-4 w-4 text-gray-500" />;
     }
