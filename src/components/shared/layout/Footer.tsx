@@ -121,7 +121,7 @@ export default function Footer({
       }else if( command === 'UPDATE' ){
         _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag;
       }else if( command === 'DELETE' ){
-        _message += '삭제, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag;
+        _message += '삭제, 캠페인 아이디 : ' + data['campaign_id'];
       }
       if( data['start_flag'] === 3){
         setFooterDataList((prev) => [

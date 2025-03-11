@@ -32,13 +32,7 @@ const CampaignGroupManager = ({groupId}: Props) => {
   const handleCampaignHeaderSearch = (param:CampaignGroupHeaderSearch) => {
     setCampaignGroupHeaderSearchParam(param);
   };
-  
-  // 캠페인 그룹 데이터 가져오기
-  const { data: campaignGroupData } = useApiForCampaignGroupList(0);
-  
-  // 캠페인 그룹 데이터 가져오기
-  const { data: campaignGroupCampaignListData } = useApiForCampaignGroupCampaignList(0);
-
+    
   const handleGroupSelect = (id: string) => {
     _setGroupId(parseInt(id));
     setGroupInfo(_campaignGroupList.find((item) => item.campaignGroupId === parseInt(id)) || initData);
@@ -48,6 +42,36 @@ const CampaignGroupManager = ({groupId}: Props) => {
   const handleCampaignSelect = (id: string) => {
     console.log("캠페인 선택:", id);
     setCampaignId(parseInt(id));
+  };
+
+  const handleInit = () => {
+    const tempRows: DataProps[] = [];
+    // 캠페인 그룹 데이터 가져오기
+    const { data: campaignGroupData } = useApiForCampaignGroupList(0);
+    for(let i=0; i<tenants.length; i++){
+      if (campaignGroupData) {
+        for(let j=0; j<campaignGroupData.result_data.length; j++){
+        if(tenants[i].tenant_id === campaignGroupData.result_data[j].tenant_id){
+          tempRows.push({
+            no: tempRows.length + 1,
+            tenantId: tenants[i].tenant_id,
+            tenantName: tenants[i].tenant_name,
+            campaignGroupId: campaignGroupData.result_data[j].group_id,
+            campaignGroupName: campaignGroupData.result_data[j].group_name,              
+          });
+          if( j === 0 ){
+            _setGroupId(campaignGroupData.result_data[j].group_id);
+            setGroupInfo(tempRows[0]);
+          }
+        }
+      }          
+      }          
+    }
+    _setCampasignGroupList(tempRows);
+    if( tempRows.length == 0){
+      _setGroupId(-1);
+      setGroupInfo(initData);
+    }
   };
 
   // 스케줄 조회
@@ -94,25 +118,31 @@ const CampaignGroupManager = ({groupId}: Props) => {
   const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
     onSuccess: (data) => {
       setPhoneDescriptions(data.result_data);
+      handleInit();      
     }
   });
   
   // 캠페인 그룹 소속 캠페인 데이터 로드 시 
   useEffect(() => {
-    if (campaignGroupCampaignListData && campaignGroupData && _groupId > 0) {
+    if ( _campaignGroupList && _groupId > 0) {
       const tempCampaignListRows: downDataProps[] = [];
-      for(let i=0; i<campaignGroupData.result_data.length; i++){
-        for(let j=0; j<campaignGroupCampaignListData.result_data.length; j++){
-          if(_groupId == campaignGroupData.result_data[i].group_id && _groupId === campaignGroupCampaignListData.result_data[j].group_id){
-            tempCampaignListRows.push({
-              no: tempCampaignListRows.length + 1,
-              campaignGroupId: campaignGroupData.result_data[i].group_id,
-              campaignGroupName: campaignGroupData.result_data[i].group_name,      
-              campaignId: campaignGroupCampaignListData.result_data[j].campaign_id,
-              campaignName: campaignGroupCampaignListData.result_data[j].campaign_name,              
-            });
-            if( j === 0 ){
-              setCampaignId(campaignGroupCampaignListData.result_data[j].campaign_id);
+      // 캠페인 그룹 데이터 가져오기
+      const { data: campaignGroupCampaignListData } = useApiForCampaignGroupCampaignList(0);
+    
+      for(let i=0; i<_campaignGroupList.length; i++){
+        if( campaignGroupCampaignListData && campaignGroupCampaignListData.result_data){
+          for(let j=0; j<campaignGroupCampaignListData.result_data.length; j++){
+            if(_groupId == _campaignGroupList[i].campaignGroupId && _groupId === campaignGroupCampaignListData.result_data[j].group_id){
+              tempCampaignListRows.push({
+                no: tempCampaignListRows.length + 1,
+                campaignGroupId: _campaignGroupList[i].campaignGroupId,
+                campaignGroupName: _campaignGroupList[i].campaignGroupName,      
+                campaignId: campaignGroupCampaignListData.result_data[j].campaign_id,
+                campaignName: campaignGroupCampaignListData.result_data[j].campaign_name,              
+              });
+              if( j === 0 ){
+                setCampaignId(campaignGroupCampaignListData.result_data[j].campaign_id);
+              }
             }
           }
         }          
@@ -122,40 +152,17 @@ const CampaignGroupManager = ({groupId}: Props) => {
         setCampaignId(0);
       }        
     }
-  }, [_groupId,campaignGroupData,campaignGroupCampaignListData]);
+  }, [_groupId,_campaignGroupList]);
 
   // 캠페인 그룹 데이터 로드 시 
   useEffect(() => {
-    if (tenants && campaignGroupData) {
-      const tempRows: DataProps[] = [];
-      for(let i=0; i<tenants.length; i++){
-        for(let j=0; j<campaignGroupData.result_data.length; j++){
-          if(tenants[i].tenant_id === campaignGroupData.result_data[j].tenant_id){
-            tempRows.push({
-              no: tempRows.length + 1,
-              tenantId: tenants[i].tenant_id,
-              tenantName: tenants[i].tenant_name,
-              campaignGroupId: campaignGroupData.result_data[j].group_id,
-              campaignGroupName: campaignGroupData.result_data[j].group_name,              
-            });
-            if( j === 0 ){
-              _setGroupId(campaignGroupData.result_data[j].group_id);
-              setGroupInfo(tempRows[0]);
-            }
-          }
-        }          
-      }
-      _setCampasignGroupList(tempRows);
-      if( tempRows.length == 0){
-        _setGroupId(-1);
-        setGroupInfo(initData);
-      }
+    if (tenants) {
       const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       fetchSchedules({
         tenant_id_array: tempTenantIdArray
       });
     }
-  }, [tenants,campaignGroupData]);
+  }, [tenants]);
 
   return (
     <div>
@@ -166,7 +173,7 @@ const CampaignGroupManager = ({groupId}: Props) => {
               campaignGroupList={_campaignGroupList} groupCampaignListData={tempCampaignListData}
               onGroupSelect={handleGroupSelect} onCampaignSelect={handleCampaignSelect}
             />
-            <CampaignGroupManagerDetail groupInfo={groupInfo} campaignId={campaignId} />
+            <CampaignGroupManagerDetail groupInfo={groupInfo} campaignId={campaignId} onInit={handleInit} />
           </div>
         </div>
     </div>
