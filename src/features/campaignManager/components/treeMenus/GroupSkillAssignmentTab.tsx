@@ -34,13 +34,13 @@ import { useQuery } from "@tanstack/react-query";
 import { getAssignableSkillsForCounselor } from "@/features/campaignManager/api/apiForCounselorSkil";
 import { useApiForDeleteCounselorsForSpecificSkill } from "@/features/campaignManager/hooks/useApiForDeleteCounselorsForSpecificSkill";
 import { useApiForAddCounselorsForSpecificSkill } from "@/features/campaignManager/hooks/useApiForAddCounselorsForSpecificSkill";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChevronDown, ChevronUp, Users, X } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "react-toastify";
-
+import Image from "next/image";
 interface Counselor {
   counselorId: string;
   counselorname: string;
@@ -246,7 +246,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
   // 로딩 상태 UI
   if (isLoading) {
     return (
-      <div className="p-4">
+      <div className="">
         <Card className="w-full relative">
           <div className="p-6 flex flex-col items-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-4"></div>
@@ -260,7 +260,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
   // 오류 상태 UI
   if (error) {
     return (
-      <div className="p-4">
+      <div className="">
         <Card className="w-full relative">
           <div className="p-6">
             <div className="text-red-500 mb-3">Error: {String(error)}</div>
@@ -279,26 +279,27 @@ export function GroupSkillAssignmentTab(): JSX.Element {
   // 상담원이 없는 경우 UI
   if (!isValidCounselorsArray) {
     return (
-      <div className="p-4">
+      <div className="">
         <Card className="w-full relative bg-white shadow-lg">
-          <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-            <h2 className="text-lg font-semibold">그룹 스킬 할당</h2>
-            <button onClick={handleCancel} className="text-gray-500 hover:text-gray-700">
+          <div className="flex flex-col space-y-2 text-center sm:text-left bg-[#AAA] px-4 py-2 border-b rounded-tl-[.5rem] rounded-tr-[.5rem]">
+            <h2 className="text-sm text-[#fff] font-normal">그룹 스킬 할당</h2>
+            {/* <button onClick={handleCancel} className="text-gray-500 hover:text-gray-700">
               <X className="h-5 w-5" />
-            </button>
+            </button> */}
           </div>
-          <div className="p-6 text-center">
-            <div className="flex justify-center mb-4">
-              <Users className="h-12 w-12 text-amber-500" />
+          <div className="px-[30px] py-[20px]">
+            <div className="flex items-center">
+                <Image className="mr-2" src="/tree-menu/group_icon_for_tree.png" alt="그룹" width={15} height={12} />
+                <span className="text-sm text-[#333]">상담원 정보를 찾을 수 없습니다</span>
             </div>
-            <div className="text-amber-500 font-medium mb-4">상담원 정보를 찾을 수 없습니다</div>
-            <p className="text-gray-600 mb-4">
+
+            <p className="text-[#333] mb-4 text-sm">
               선택된 그룹의 상담원 정보를 불러올 수 없습니다.<br />
               다시 시도하거나 관리자에게 문의하세요.
             </p>
-            <Button onClick={handleCancel} className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">
+            {/* <Button onClick={handleCancel} className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">
               닫기
-            </Button>
+            </Button> */}
           </div>
         </Card>
       </div>
@@ -306,17 +307,18 @@ export function GroupSkillAssignmentTab(): JSX.Element {
   }
 
   return (
-    <div className="p-4">
+    
+    <div className="">
       <Card className="w-full relative bg-white shadow-lg">
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-lg font-semibold">그룹 스킬 할당</h2>
-          <button onClick={handleCancel} className="text-gray-500 hover:text-gray-700">
+        <div className="flex flex-col space-y-2 text-center sm:text-left bg-[#AAA] px-4 py-2 border-b rounded-tl-[.5rem] rounded-tr-[.5rem]">
+          <h2 className="text-sm text-[#fff] font-normal">그룹 스킬 할당</h2>
+          {/* <button onClick={handleCancel} className="text-gray-500 hover:text-gray-700">
             <X className="h-5 w-5" />
-          </button>
+          </button> */}
         </div>
 
-        <div className="p-4">
-          <div className="text-sm text-gray-600 mb-4">
+        <div className="px-[30px] py-[20px]">
+          <div className="text-sm text-[#333] mb-4">
             그룹의 모든 상담원({candidateMembersForSkilAssign.length}명)에게 스킬을 일괄 할당할 수 있습니다.<br />
             할당할 스킬을 선택하면 그룹의 모든 상담원에게 선택된 스킬이 할당됩니다.
           </div>
@@ -335,7 +337,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
 
           {/* 디버깅용 Raw 데이터 표시 */}
           {showRawData && (
-            <div className="mb-4 overflow-auto max-h-[150px] text-xs border rounded p-2 bg-gray-50 whitespace-pre">
+            <div className="mb-4 overflow-auto max-h-[150px] text-sm border rounded p-2 bg-gray-50 whitespace-pre">
               {JSON.stringify(candidateMembersForSkilAssign, null, 2)}
             </div>
           )}
@@ -347,27 +349,27 @@ export function GroupSkillAssignmentTab(): JSX.Element {
               onClick={toggleCounselors}
             >
               <div className="flex items-center">
-                <Users className="h-4 w-4 mr-2 text-blue-500" />
-                <span className="font-medium">소속 상담원 목록</span>
+                <Image className="mr-2" src="/tree-menu/group_icon_for_tree.png" alt="그룹" width={15} height={12} />
+                <span className="text-sm text-[#333]">소속 상담원 목록</span>
               </div>
               <div className="flex items-center">
-                <span className="text-sm text-gray-500 mr-2">{candidateMembersForSkilAssign.length}명</span>
+                <span className="text-sm text-[#333] mr-2">{candidateMembersForSkilAssign.length}명</span>
                 {showCounselors ? (
-                  <ChevronUp className="h-4 w-4 text-gray-500" />
+                  <ChevronUp className="h-4 w-4 text-[#333]" />
                 ) : (
-                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                  <ChevronDown className="h-4 w-4 text-[#333]" />
                 )}
               </div>
             </div>
 
             {showCounselors && (
-              <div className="mt-2 max-h-[150px] overflow-y-auto border rounded p-2">
+              <div className="mt-2 max-h-[150px] overflow-y-auto border rounded">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="py-1 text-xs font-medium text-center">ID</TableHead>
-                      <TableHead className="py-1 text-xs font-medium text-center">이름</TableHead>
-                      <TableHead className="py-1 text-xs font-medium text-center">테넌트 ID</TableHead>
+                      <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>ID</TableHead>
+                      <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>이름</TableHead>
+                      <TableHead className="w-16 text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>테넌트 ID</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -378,10 +380,10 @@ export function GroupSkillAssignmentTab(): JSX.Element {
                       const tenantId = counselor.data?.tenantId || counselor.tenantId || '-';
 
                       return (
-                        <TableRow key={`counselor-${index}`}>
-                          <TableCell className="py-1 text-sm text-center">{id}</TableCell>
-                          <TableCell className="py-1 text-sm text-center">{name}</TableCell>
-                          <TableCell className="py-1 text-sm text-center">{tenantId}</TableCell>
+                        <TableRow key={`counselor-${index}`} className="custom-hover">
+                          <TableCell className="py-1 text-sm text-center text-[#444]">{id}</TableCell>
+                          <TableCell className="py-1 text-sm text-center text-[#444]">{name}</TableCell>
+                          <TableCell className="py-1 text-sm text-center text-[#444]">{tenantId}</TableCell>
                         </TableRow>
                       );
                     })}
@@ -392,7 +394,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
           </div>
 
           {/* 테넌트 ID 정보 */}
-          <div className="mb-3 px-2 py-1 bg-gray-50 border rounded text-xs text-gray-600">
+          <div className="p-2 bg-gray-50 border rounded text-sm text-[#333] mb-4">
             <span>테넌트 ID: {tenantId || 'N/A'}</span>
           </div>
 
@@ -401,23 +403,23 @@ export function GroupSkillAssignmentTab(): JSX.Element {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-16 text-center">선택</TableHead>
-                  <TableHead className="w-16 text-center">아이디</TableHead>
-                  <TableHead className="text-center">이름</TableHead>
+                  <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>선택</TableHead>
+                  <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>아이디</TableHead>
+                  <TableHead className="w-16 text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>이름</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {assignableSkills && assignableSkills.length > 0 ? (
                   assignableSkills.map((skill: Skill) => (
-                    <TableRow key={`skill-${skill.skill_id}`} className="hover:bg-gray-50">
-                      <TableCell className="text-center">
-                        <Checkbox
+                    <TableRow key={`skill-${skill.skill_id}`} className="custom-hover">
+                      <TableCell className="text-center text-[#444]" style={{ height: '30px' , padding:0}}>
+                        <CustomCheckbox
                           checked={selectedSkills.includes(skill.skill_id)}
                           onCheckedChange={() => toggleSkillSelection(skill.skill_id)}
                         />
                       </TableCell>
-                      <TableCell className="text-center">{skill.skill_id}</TableCell>
-                      <TableCell className="text-center">{skill.skill_name}</TableCell>
+                      <TableCell className="text-center text-[#444]" style={{ height: '30px' , padding:0}}>{skill.skill_id}</TableCell>
+                      <TableCell className="text-center text-[#444]" style={{ height: '30px' , padding:0}}>{skill.skill_name}</TableCell>
                     </TableRow>
                   ))
                 ) : (
@@ -432,7 +434,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
           </div>
         </div>
 
-        <div className="p-4 border-t border-gray-200 flex justify-center gap-2">
+        {/* <div className="p-4 border-t border-gray-200 flex justify-center gap-2">
           <Button
             onClick={handleConfirm}
             className="px-8 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
@@ -446,7 +448,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
           >
             취소
           </Button>
-        </div>
+        </div> */}
       </Card>
     </div>
   );

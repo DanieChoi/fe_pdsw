@@ -235,6 +235,8 @@ import { useApiForGetRelatedInfoForAssignSkilToCounselor } from "@/features/pref
 import { X, ChevronDown, ChevronUp, Users } from "lucide-react";
 import { toast } from "react-toastify";
 import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
+import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
+import Image from "next/image";
 
 export function TeamSkillAssignmentTab() {
   const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
@@ -542,25 +544,25 @@ const getValidCounselorIds = () => {
   if (!isValidCounselorsArray) {
     return (
       <div className="">
-        <Card className="w-[480px] relative bg-white shadow-lg">
-          <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-            <h2 className="text-lg font-semibold">팀 스킬 할당</h2>
-            <button onClick={handleCancel} className="text-gray-500 hover:text-gray-700">
+        <Card className="w-[520px] relative bg-white shadow-lg">
+          <div className="flex flex-col space-y-2 text-center sm:text-left bg-[#AAA] px-4 py-2 border-b rounded-tl-[.5rem] rounded-tr-[.5rem]">
+            <h2 className="text-sm text-[#fff] font-normal">팀 스킬 할당</h2>
+            {/* <button onClick={handleCancel} className="text-gray-500 hover:text-gray-700">
               <X className="h-5 w-5" />
-            </button>
+            </button> */}
           </div>
-          <div className="p-6 text-center">
-            <div className="flex justify-center mb-4">
-              <Users className="h-12 w-12 text-amber-500" />
+          <div className="px-[30px] py-[20px]">
+             <div className="flex items-center">
+                <Image src="/tree-menu/team_icon_for_tree.png" alt="팀" width={14} height={12} className="mr-2" />
+                <span className="text-sm text-[#333]">상담원 정보를 찾을 수 없습니다</span>
             </div>
-            <div className="text-amber-500 font-medium mb-4">상담원 정보를 찾을 수 없습니다</div>
-            <p className="text-gray-600 mb-4">
-              선택된 팀의 상담원 정보를 불러올 수 없습니다.<br />
+            <p className="text-[#333] mb-4 text-sm">
+              선택된 그룹의 상담원 정보를 불러올 수 없습니다.<br />
               다시 시도하거나 관리자에게 문의하세요.
             </p>
-            <Button onClick={handleCancel} className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">
+            {/* <Button onClick={handleCancel} className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">
               닫기
-            </Button>
+            </Button> */}
           </div>
         </Card>
       </div>
@@ -568,16 +570,17 @@ const getValidCounselorIds = () => {
   }
 
   return (
+    
     <div className="">
-      <Card className="w-[480px] relative bg-white shadow-lg">
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-lg font-semibold">팀 스킬 할당</h2>
-          <button onClick={handleCancel} className="text-gray-500 hover:text-gray-700">
+      <Card className="w-[520px] relative bg-white shadow-lg">
+        <div className="flex flex-col space-y-2 text-center sm:text-left bg-[#AAA] px-4 py-2 border-b rounded-tl-[.5rem] rounded-tr-[.5rem]">
+          <h2 className="text-sm text-[#fff] font-normal">팀 스킬 할당</h2>
+          {/* <button onClick={handleCancel} className="text-gray-500 hover:text-gray-700">
             <X className="h-5 w-5" />
-          </button>
+          </button> */}
         </div>
 
-        <div className="p-4">
+        <div className="px-[30px] py-[20px]">
           <div className="text-sm text-gray-600 mb-4">
             팀의 모든 상담원({candidateMembersForSkilAssign.length}명)에게 스킬을 일괄 할당할 수 있습니다.<br />
             할당할 스킬을 선택하고 확인 버튼을 누르면 팀의 모든 상담원에게 선택된 스킬이 할당됩니다.
@@ -606,12 +609,13 @@ const getValidCounselorIds = () => {
               className="flex justify-between items-center p-2 border rounded cursor-pointer bg-gray-50 hover:bg-gray-100"
               onClick={toggleCounselors}
             >
-              <div className="flex items-center">
-                <Users className="h-4 w-4 mr-2 text-blue-500" />
-                <span className="font-medium">소속 상담원 목록</span>
+               <div className="flex items-center">
+                  <Image src="/tree-menu/team_icon_for_tree.png" alt="팀" width={14} height={12} className="mr-2" />
+                  <span className="text-sm text-[#333]">상담원 정보를 찾을 수 없습니다</span>
               </div>
+              
               <div className="flex items-center">
-                <span className="text-sm text-gray-500 mr-2">{candidateMembersForSkilAssign.length}명</span>
+                <span className="text-sm text-[#333]">{candidateMembersForSkilAssign.length}명</span>
                 {showCounselors ? (
                   <ChevronUp className="h-4 w-4 text-gray-500" />
                 ) : (
@@ -621,13 +625,13 @@ const getValidCounselorIds = () => {
             </div>
 
             {showCounselors && (
-              <div className="mt-2 max-h-[150px] overflow-y-auto border rounded p-2">
+              <div className="mt-2 max-h-[150px] overflow-y-auto border rounded">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="py-1 text-xs font-medium text-center">ID</TableHead>
-                      <TableHead className="py-1 text-xs font-medium text-center">이름</TableHead>
-                      <TableHead className="py-1 text-xs font-medium text-center">테넌트 ID</TableHead>
+                      <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>ID</TableHead>
+                      <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>이름</TableHead>
+                      <TableHead className="w-16 text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>테넌트 ID</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -641,10 +645,10 @@ const getValidCounselorIds = () => {
                       console.log(`추출한 값:`, { id, name, tenantId });
 
                       return (
-                        <TableRow key={`counselor-${index}`}>
-                          <TableCell className="py-1 text-sm text-center">{id}</TableCell>
-                          <TableCell className="py-1 text-sm text-center">{name}</TableCell>
-                          <TableCell className="py-1 text-sm text-center">{tenantId}</TableCell>
+                        <TableRow key={`counselor-${index}`} className="custom-hover">
+                          <TableCell className="py-1 text-sm text-center text-[#444]">{id}</TableCell>
+                          <TableCell className="py-1 text-sm text-center text-[#444]">{name}</TableCell>
+                          <TableCell className="py-1 text-sm text-center text-[#444]">{tenantId}</TableCell>
                         </TableRow>
                       );
                     })}
@@ -655,7 +659,7 @@ const getValidCounselorIds = () => {
           </div>
 
           {/* 테넌트 ID 정보 */}
-          <div className="mb-3 px-2 py-1 bg-gray-50 border rounded text-xs text-gray-600 flex justify-between">
+          <div className="p-2 bg-gray-50 border rounded text-sm text-[#333] mb-4">
             <span>테넌트 ID: {tenantId || 'N/A'}</span>
             <span>대표 상담원 ID: {counselorId || 'N/A'}</span>
           </div>
@@ -665,23 +669,23 @@ const getValidCounselorIds = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-16 text-center">선택</TableHead>
-                  <TableHead className="w-16 text-center">아이디</TableHead>
-                  <TableHead className="text-center">이름</TableHead>
+                  <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>선택</TableHead>
+                  <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>아이디</TableHead>
+                  <TableHead className="w-16 text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>이름</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {assignableSkills && assignableSkills.length > 0 ? (
                   assignableSkills.map((skill) => (
-                    <TableRow key={`skill-${skill.skill_id}`} className="hover:bg-gray-50">
-                      <TableCell className="text-center">
-                        <Checkbox
+                    <TableRow key={`skill-${skill.skill_id}`} className="custom-hover">
+                      <TableCell className="text-center text-[#444]" style={{ height: '30px' , padding:0}}>
+                        <CustomCheckbox
                           checked={selectedSkills.includes(skill.skill_id)}
                           onCheckedChange={() => handleSkillToggle(skill.skill_id)}
                         />
                       </TableCell>
-                      <TableCell className="text-center">{skill.skill_id}</TableCell>
-                      <TableCell className="text-center">{skill.skill_name}</TableCell>
+                      <TableCell className="text-center text-[#444]" style={{ height: '30px' , padding:0}}>{skill.skill_id}</TableCell>
+                      <TableCell className="text-center text-[#444]" style={{ height: '30px' , padding:0}}>{skill.skill_name}</TableCell>
                     </TableRow>
                   ))
                 ) : (
@@ -696,7 +700,7 @@ const getValidCounselorIds = () => {
           </div>
         </div>
 
-        <div className="p-4 border-t border-gray-200 flex justify-center gap-2">
+        {/* <div className="p-4 border-t border-gray-200 flex justify-center gap-2">
           <Button
             onClick={handleConfirm}
             className="px-8 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
@@ -710,7 +714,7 @@ const getValidCounselorIds = () => {
           >
             취소
           </Button>
-        </div>
+        </div> */}
       </Card>
     </div>
   );

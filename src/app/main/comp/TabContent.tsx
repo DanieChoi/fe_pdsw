@@ -98,7 +98,7 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
     case 601: // 팀 스킬 할당 탭
       return (
         <div className="flex justify-left w-full">
-          <div className="max-w-[500px] w-full">
+          <div className="max-w-[530px] w-full">
             <TeamSkillAssignmentTab />
           </div>
         </div>

@@ -683,3 +683,4 @@ html, body {
 .m-w-1080{max-width: 1080px;width: 1080px;}
 .grid-custom .chknone .rdg-checkbox-input { visibility: hidden; }
 .h-340{height: 340px;}
+.custom-hover:hover {background-color: #fffaee !important;}
