@@ -152,7 +152,7 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
 
   const handleCellClick = ({ row }: CellClickArgs<Row>) => {
     setSelectedCampaign(campaigns.filter((campaign) => campaign.campaign_id === Number(row.campaignId))[0]);    
-    setCampaignIdForUpdateFromSideMenu(row.campaignId+'');
+    // setCampaignIdForUpdateFromSideMenu(row.campaignId+'');
   };
 
   return (

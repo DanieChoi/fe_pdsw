@@ -40,7 +40,6 @@ const CampaignGroupManager = ({groupId}: Props) => {
   const { data: campaignGroupCampaignListData } = useApiForCampaignGroupCampaignList(0);
 
   const handleGroupSelect = (id: string) => {
-    console.log("캠페인 그룹 선택:", id);
     _setGroupId(parseInt(id));
     setGroupInfo(_campaignGroupList.find((item) => item.campaignGroupId === parseInt(id)) || initData);
     setCampaignId(tempCampaignListData.find((item) => item.campaignGroupId === parseInt(id))?.campaignId || 0);
@@ -48,6 +47,7 @@ const CampaignGroupManager = ({groupId}: Props) => {
 
   const handleCampaignSelect = (id: string) => {
     console.log("캠페인 선택:", id);
+    setCampaignId(parseInt(id));
   };
 
   // 스케줄 조회
@@ -97,7 +97,7 @@ const CampaignGroupManager = ({groupId}: Props) => {
     }
   });
   
-  // 캠페인 그룹 데이터 로드 시 
+  // 캠페인 그룹 소속 캠페인 데이터 로드 시 
   useEffect(() => {
     if (campaignGroupCampaignListData && campaignGroupData && _groupId > 0) {
       const tempCampaignListRows: downDataProps[] = [];

@@ -31,6 +31,7 @@ import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/Cust
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 import CampaignTab from '@/app/main/comp/CampaignManager/CampaignTab';
 import {DataProps,downDataProps} from './CampaignGroupManagerList';
+import AddCampaignGroupDialog from "./AddCampaignGroupDialog";
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
@@ -329,6 +330,7 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId}: Prop
     tenantId: 0,
     type: '1',
   });
+  const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
@@ -1026,6 +1028,20 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId}: Prop
     }
   };
 
+  // 다이얼로그 닫기
+  const handleCloseAddGroupDialog = () => {
+    setIsAddGroupDialogOpen(false);
+  };
+
+  const handleAddGroup = (groupName: string, groupCode: string) => {
+    // console.log("새 그룹 추가:", {
+    //   tenantId: node.tenant_id, // node.id 대신 node.tenant_id 사용
+    //   tenantName: node.name,
+    //   groupName,
+    //   groupCode,
+    // });
+  }; 
+
   return (
     <div className='flex flex-col gap-5 w-[60%] overflow-auto'>
       <div>
@@ -1033,9 +1049,10 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId}: Prop
           className='border-b border-gray-300 pb-1'
           title="상세내역"
           buttons={[
-              { label: "새 캠페인 그룹", onClick: () => console.log("") },
+              { label: "새 캠페인 그룹", onClick: () => setIsAddGroupDialogOpen(true) },
+              { label: "소속 캠페인 추가/삭제", onClick: () => console.log("") },
               { label: "일괄 저장", onClick: () => handleCampaignSave(),},
-              { label: "일괄 삭제", onClick: () => console.log("") },
+              { label: "캠페인 그룹 삭제", onClick: () => console.log("") },
               { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
           ]}
           />
@@ -1178,6 +1195,13 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId}: Prop
         isOpen={callingNumberPopupState.isOpen}
         onConfirm={(param) => handleCallingNumlber(param)}
         onCancle={() => setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))}
+      />
+      <AddCampaignGroupDialog
+        isOpen={isAddGroupDialogOpen}
+        onClose={handleCloseAddGroupDialog}
+        tenantId={0} 
+        tenantName={''}
+        onAddGroup={handleAddGroup}
       />
     </div>
   );
