@@ -201,10 +201,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       );
     }
     if (node.type === "group") {
-
       // console.log("node at 캠페인탭 그룹 메뉴 : ", node);
-      
-
       return (
         <>
           <ContextMenuItem

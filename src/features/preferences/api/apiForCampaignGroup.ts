@@ -289,6 +289,7 @@ export const apiForCampaignGroupCampaignList = async (
 export const apiForCampaignGroupDataForCampaignGroupAdmin = async (
     group_id?: number
 ): Promise<CampaignGroupResponse> => {
+    
     // Create request body that matches the expected API format
     const requestBody: ApiRequest = {
         filter: group_id ? { group_id: [group_id] } : {},
