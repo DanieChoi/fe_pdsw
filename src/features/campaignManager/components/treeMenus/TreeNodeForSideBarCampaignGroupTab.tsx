@@ -21,6 +21,7 @@ import {
 import { TreeNode } from "@/features/campaignManager/types/typeForCampaignGroupForSideBar";
 import AddCampaignGroupDialog from "./dialog/AddCampaignGroupDialog";
 import { useTabStore } from "@/store/tabStore";
+import { ContextMenuForTreeNode } from "./ContextMenuForTreeNode";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -269,73 +270,62 @@ export function TreeNodeForSideBarCampaignGroupTab({
         </>
       );
     }
+
     if (node.type === "campaign") {
       return (
-        <>
-          <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 수정: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center whitespace-nowrap"
+        <ContextMenuForTreeNode
+          item={{
+            id: node.campaign_id?.toString() || "",
+            label: node.name,
+            type: "campaign",
+            status: node.status as 'started' | 'pending' | 'stopped' || 'stopped'
+          }}
+          onEdit={() => console.log(`캠페인 수정: ${node.name} (ID: ${node.campaign_id})`)}
+          onMonitor={() => console.log(`캠페인 모니터링: ${node.name} (ID: ${node.campaign_id})`)}
+          onHandleCampaignCopy={() => console.log(`캠페인 복사: ${node.name} (ID: ${node.campaign_id})`)}
+        >
+          <div
+            ref={contextMenuTriggerRef}
+            className={getNodeStyle()}
+            onClick={handleClick}
+            style={{ paddingLeft: `${level * 16 + 8}px` }}
           >
-            <FileText className="mr-2 h-4 w-4" />
-            캠페인 수정
-          </ContextMenuItem>
-          <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`시작 그룹: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center whitespace-nowrap"
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            시작 그룹
-          </ContextMenuItem>
-          <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 진행 정보: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center whitespace-nowrap"
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            캠페인 진행 정보
-          </ContextMenuItem>
-          <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`실시간 재발신: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center whitespace-nowrap"
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            실시간 재발신
-          </ContextMenuItem>
-          <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`예약 재발신: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center whitespace-nowrap"
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            예약 재발신
-          </ContextMenuItem>
-          <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 삭제: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center whitespace-nowrap"
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            캠페인 삭제
-          </ContextMenuItem>
-          <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 복사: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center whitespace-nowrap"
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            캠페인 복사
-          </ContextMenuItem>
-          <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 리스트 삭제: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center whitespace-nowrap"
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            캠페인 리스트 삭제
-          </ContextMenuItem>
-          <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹에서 삭제: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center whitespace-nowrap"
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            캠페인 그룹에서 삭제
-          </ContextMenuItem>
-        </>
+            <div className="flex items-center w-full gap-2">
+              {hasChildren ? (
+                isExpanded ? (
+                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-gray-500" />
+                )
+              ) : (
+                <span className="w-4" />
+              )}
+              <Briefcase className="h-4 w-4 text-green-600" />
+
+              {/* 캠페인 노드인 경우 상태 아이콘 표시 */}
+              {node.status && getStatusIcon(node.status) && (
+                <div className="flex-shrink-0 w-4 h-4 relative">
+                  <Image
+                    src={getStatusIcon(node.status) || ""}
+                    alt={node.status || "상태"}
+                    width={16}
+                    height={16}
+                    className="object-contain"
+                  />
+                </div>
+              )}
+
+              <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
+                {node.name}
+                {node.campaign_id && (
+                  <span className="ml-1 text-xs text-gray-500">
+                    (ID: {node.campaign_id})
+                  </span>
+                )}
+              </span>
+            </div>
+          </div>
+        </ContextMenuForTreeNode>
       );
     }
     return null;
@@ -360,10 +350,41 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
   return (
     <div className="select-none" data-node-type={node.type} data-node-id={node.id}>
-      <ContextMenu onOpenChange={handleContextMenuOpenChange}>
-        <ContextMenuTrigger asChild>
+      {node.type === "campaign" ? (
+        // 캠페인 노드인 경우 ContextMenuForTreeNode 사용
+        <ContextMenuForTreeNode
+          item={{
+            id: node.campaign_id?.toString() || "",
+            label: node.name,
+            type: "campaign",
+            status: node.status as 'started' | 'pending' | 'stopped' || 'stopped'
+          }}
+          onEdit={() => {
+            // useTabStore의 simulateHeaderMenuClick 및 setCampaignIdForUpdateFromSideMenu 사용
+            const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu } = useTabStore.getState();
+            simulateHeaderMenuClick(2);
+            setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
+          }}
+          onMonitor={() => {
+            // 상담원 상태 모니터 열기
+            const { addMultiTab } = useTabStore.getState();
+            const uniqueKey = `monitor-${Date.now()}`;
+            addMultiTab({
+              id: 22,
+              uniqueKey: uniqueKey,
+              title: `상담원 상태 모니터 - ${node.name}`,
+              icon: '',
+              href: '',
+              content: null,
+              campaignId: node.campaign_id?.toString()
+            });
+          }}
+          onHandleCampaignCopy={() => {
+            console.log(`캠페인 복사: ${node.name} (ID: ${node.campaign_id})`);
+            // 여기에 캠페인 복사 로직 추가
+          }}
+        >
           <div
-            ref={contextMenuTriggerRef}
             className={getNodeStyle()}
             onClick={handleClick}
             style={{ paddingLeft: `${level * 16 + 8}px` }}
@@ -378,10 +399,10 @@ export function TreeNodeForSideBarCampaignGroupTab({
               ) : (
                 <span className="w-4" />
               )}
-              {renderIcon()}
+              <span></span>  {/* 캠페인 아이콘은 ContextMenuForTreeNode에서 처리 */}
               
               {/* 캠페인 노드인 경우 상태 아이콘 표시 */}
-              {node.type === "campaign" && node.status && getStatusIcon(node.status) && (
+              {node.status && getStatusIcon(node.status) && (
                 <div className="flex-shrink-0 w-4 h-4 relative">
                   <Image 
                     src={getStatusIcon(node.status) || ""}
@@ -395,7 +416,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
               
               <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
                 {node.name}
-                {node.type === "campaign" && node.campaign_id && (
+                {node.campaign_id && (
                   <span className="ml-1 text-xs text-gray-500">
                     (ID: {node.campaign_id})
                   </span>
@@ -403,16 +424,45 @@ export function TreeNodeForSideBarCampaignGroupTab({
               </span>
             </div>
           </div>
-        </ContextMenuTrigger>
-        <ContextMenuContent
-          className="w-62 bg-white shadow-md border rounded-md"
-          onClick={(e) => e.stopPropagation()}
-          onPointerDown={(e) => e.stopPropagation()}
-        >
-          {renderMenuItems()}
-        </ContextMenuContent>
-      </ContextMenu>
-
+        </ContextMenuForTreeNode>
+      ) : (
+        // 캠페인 노드가 아닌 경우 기존 ContextMenu 사용
+        <ContextMenu onOpenChange={handleContextMenuOpenChange}>
+          <ContextMenuTrigger asChild>
+            <div
+              ref={contextMenuTriggerRef}
+              className={getNodeStyle()}
+              onClick={handleClick}
+              style={{ paddingLeft: `${level * 16 + 8}px` }}
+            >
+              <div className="flex items-center w-full gap-2">
+                {hasChildren ? (
+                  isExpanded ? (
+                    <ChevronDown className="h-4 w-4 text-gray-500" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 text-gray-500" />
+                  )
+                ) : (
+                  <span className="w-4" />
+                )}
+                {renderIcon()}
+                
+                <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
+                  {node.name}
+                </span>
+              </div>
+            </div>
+          </ContextMenuTrigger>
+          <ContextMenuContent
+            className="w-62 bg-white shadow-md border rounded-md"
+            onClick={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            {renderMenuItems()}
+          </ContextMenuContent>
+        </ContextMenu>
+      )}
+  
       {/* 확장된 상태일 때만 자식 노드 렌더링 */}
       {hasChildren && isExpanded && (
         <div className="children-container">
@@ -429,11 +479,11 @@ export function TreeNodeForSideBarCampaignGroupTab({
           ))}
         </div>
       )}
-
+  
       <AddCampaignGroupDialog
         isOpen={isAddGroupDialogOpen}
         onClose={handleCloseAddGroupDialog}
-        tenantId={node.tenant_id ? node.tenant_id : 0} // node.id 대신 node.tenant_id 사용
+        tenantId={node.tenant_id ? node.tenant_id : 0}
         tenantName={node.name}
         onAddGroup={handleAddGroup}
       />

@@ -4,12 +4,12 @@ import { useState, useEffect, useRef } from "react";
 import { baseTabs, TabId } from "@/features/campaignManager/components/data/baseTabs";
 import { TreeMenusForCampaigns } from "@/features/campaignManager/components/treeMenus/TreeMenusForCampaigns";
 import { TreeMenusForAgentTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentTab";
-import { TreeMenusForCampaignGroupTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentGroupTab";
 import { TabActions } from "./comp/TabActions";
 import { BottomTabsForSideMenu } from "./BottomTabsForSideMenu";
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useSidebarWidthStore } from "@/store/useSidebarWidthStore";
+import { TreeMenusForCampaignGroupTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForCampaignGroupTab";
 
 interface SidebarToggleButtonProps {
   isOpen: boolean;
