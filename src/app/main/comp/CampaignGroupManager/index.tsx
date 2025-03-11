@@ -11,15 +11,8 @@ import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useA
 import { useApiForCampaignGroupSearch } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupSearch';
 import { useApiForCampaignGroupCampaignList } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupCampaignList';
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
-<<<<<<< HEAD
-import { useApiForCampaignGroupList, useApiForCampaignGroupCampaignList } from "@/features/preferences/hooks/useApiForCampaignGroupList";
+import { useApiForCampaignGroupList } from "@/features/preferences/hooks/useApiForCampaignGroupList";
 import CampaignGroupWithCampaigns from './component/CampaignGroupWithCampaigns';
-=======
-import { 
-  CampaignGroupItem,
-  CampaignGroupGampaignListItem
-} from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
->>>>>>> 6ff7bce027343fceb126cb337588b4936f5811f9
 
 const initData: DataProps = { no: 0, tenantId: 0, tenantName: '', campaignGroupId: 0, campaignGroupName: '' };
 type Props = {
