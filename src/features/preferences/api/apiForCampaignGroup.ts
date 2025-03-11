@@ -313,3 +313,14 @@ export const apiForCampaignGroupDataForCampaignGroupAdmin = async (
         );
     }
 };
+
+// 캠페인 그룹 삭제
+// campaign-groups/{gorup_id}
+// delete
+// url properties: group_id
+// 
+// {
+//     "result_code": 0,
+//     "result_msg": "Success"
+// }
+// apiForDeleteCampaignGroup

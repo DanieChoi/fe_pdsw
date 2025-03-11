@@ -25,7 +25,7 @@ interface CampaignRow {
     campaignName: string;
 }
 
-const CampaignGroupWithCampaigns = ({ groupId, groupName, onCampaignSelect }: Props) => {
+const CampaignGroupWithCampaigns = ({ groupId, groupName }: Props) => {
     const [groupRows, setGroupRows] = useState<GroupRow[]>([]);
     const [campaignRows, setCampaignRows] = useState<CampaignRow[]>([]);
     
@@ -82,7 +82,7 @@ const CampaignGroupWithCampaigns = ({ groupId, groupName, onCampaignSelect }: Pr
     }, [campaignData]);
 
     const handleCampaignCellClick = (args: any) => {
-        onCampaignSelect(args.row.campaignId.toString());
+        // onCampaignSelect(args.row.campaignId.toString());
     };
 
     return (
