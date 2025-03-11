@@ -61,10 +61,11 @@ type Props = {
   groupCampaignListData?: downDataProps[];
   onGroupSelect: (id: string) => void;
   onCampaignSelect: (id: string) => void;
+  onGroupDelete: (id: string) => void;
 }
 
 export default function CampaignGroupManagerList({campaignId,campaignGroupHeaderSearchParam,campaignGroupList,groupCampaignListData
-    ,onGroupSelect,onCampaignSelect}: Props) {
+    ,onGroupSelect,onCampaignSelect,onGroupDelete}: Props) {
   const { campaigns, selectedCampaign , setSelectedCampaign } = useMainStore();
   const [selectedCampaignGroups, setSelectedCampaignGroups] = useState<Set<number>>(new Set([]));
   const [tempCampaigns, setTempCampaigns] = useState<DataProps[]>([]);

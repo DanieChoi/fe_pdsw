@@ -10,8 +10,9 @@ import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiF
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useApiForCampaignGroupSearch } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupSearch';
 import { useApiForCampaignGroupCampaignList } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupCampaignList';
+import { useApiForCampaignGroupCampaignListDelete } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupCampaignListDelete';
+import { useApiForCampaignGroupDelete } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupDelete';
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
-import { useApiForCampaignGroupList } from "@/features/preferences/hooks/useApiForCampaignGroupList";
 import CampaignGroupWithCampaigns from './component/CampaignGroupWithCampaigns';
 import { CampaignGroupGampaignListItem } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
 
@@ -47,6 +48,11 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
 
   const handleCampaignSelect = (id: string) => {
     setCampaignId(parseInt(id));
+  };
+
+  const handleGroupDelete = (id: string) => {
+    fetchCampaignGroupCampaignListDelete(parseInt(id) );
+    fetchCampaignGroupDelete(parseInt(id) );
   };
 
   const handleInit = () => {
@@ -147,6 +153,19 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
       setCampaignGroupCampaignListData(data.result_data || []);
     }
   });
+  // 캠페인 그룹 삭제
+  const { mutate: fetchCampaignGroupDelete } = useApiForCampaignGroupDelete({
+    onSuccess: (data) => {
+      handleInit();
+    }
+  });
+  // 캠페인 그룹 소속 캠페인 삭제
+  const { mutate: fetchCampaignGroupCampaignListDelete } = useApiForCampaignGroupCampaignListDelete({
+    onSuccess: (data) => {
+      
+    }
+  });
+  
 
   // 캠페인 그룹 소속 캠페인 데이터 로드 시 
   useEffect(() => {
@@ -191,32 +210,17 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
       <div className='flex flex-col gap-[15px] limit-width'>
         <CampaignGroupManagerHeader onSearch={handleCampaignHeaderSearch} />
         <div className="flex gap-[30px]">
-          {/* <CampaignGroupManagerList
+          <CampaignGroupManagerList
             campaignId={campaignIdForUpdateFromSideMenu || ''}
             campaignGroupHeaderSearchParam={campaignGroupHeaderSearchParam}
             campaignGroupList={_campaignGroupList}
             groupCampaignListData={tempCampaignListData}
             onGroupSelect={handleGroupSelect}
             onCampaignSelect={handleCampaignSelect}
-          /> */}
+            onGroupDelete={handleGroupDelete}
+          />
 
-          {groupId ? (
-            <CampaignGroupWithCampaigns
-              groupId={groupId}
-              groupName={groupName || ''}
-            />
-          ) : (
-            <CampaignGroupManagerList
-              campaignId={campaignIdForUpdateFromSideMenu || ''}
-              campaignGroupHeaderSearchParam={campaignGroupHeaderSearchParam}
-              campaignGroupList={_campaignGroupList}
-              groupCampaignListData={tempCampaignListData}
-              onGroupSelect={handleGroupSelect}
-              onCampaignSelect={handleCampaignSelect}
-            />
-          )}
-
-          <CampaignGroupManagerDetail groupInfo={groupInfo} campaignId={campaignId} onInit={handleInit} />
+          <CampaignGroupManagerDetail groupInfo={groupInfo} campaignId={campaignId} onInit={handleInit} onGroupDelete={handleGroupDelete}/>
         </div>
       </div>
     </div>
