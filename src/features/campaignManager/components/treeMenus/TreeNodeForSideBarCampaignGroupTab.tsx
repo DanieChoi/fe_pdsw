@@ -198,26 +198,61 @@ export function TreeNodeForSideBarCampaignGroupTab({
       return (
         <>
           <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 상세 보기: ${node.name} (ID: ${node.campaign_id})`))}
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 수정: ${node.name} (ID: ${node.campaign_id})`))}
             className="flex items-center"
           >
             <FileText className="mr-2 h-4 w-4" />
-            캠페인 상세 보기
+            캠페인 그룹 일괄 수정
           </ContextMenuItem>
           <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 통계: ${node.name} (ID: ${node.campaign_id})`))}
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 시작: ${node.name} (ID: ${node.campaign_id})`))}
             className="flex items-center"
           >
-            <BarChart3 className="mr-2 h-4 w-4" />
-            캠페인 통계
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹 일괄 시작
           </ContextMenuItem>
-          {/* <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`SMS 테스트 발송: ${node.name} (ID: ${node.campaign_id})`))}
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 완료: ${node.name} (ID: ${node.campaign_id})`))}
             className="flex items-center"
           >
-            <MessageSquare className="mr-2 h-4 w-4" />
-            SMS 테스트 발송
-          </ContextMenuItem> */}
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹 일괄 완료
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 중지: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹 일괄 중지
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 이름 변경: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹 이름 변경
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 삭제: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹 삭제
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹에 캠페인 추가: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹에 캠페인 추가
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 실시간 재확인: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹 실시간 재발신
+          </ContextMenuItem>
         </>
       );
     }
@@ -273,8 +308,8 @@ export function TreeNodeForSideBarCampaignGroupTab({
             </div>
           </div>
         </ContextMenuTrigger>
-        <ContextMenuContent 
-          className="w-48 bg-white shadow-md border rounded-md"
+        <ContextMenuContent
+          className="w-62 bg-white shadow-md border rounded-md"
           onClick={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
         >
