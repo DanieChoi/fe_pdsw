@@ -291,9 +291,10 @@ type Props = {
   groupInfo: DataProps;
   campaignId: number;
   onInit: () => void;
+  onGroupDelete: (id: string) => void;
 }
 
-export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit}: Props) {
+export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit,onGroupDelete}: Props) {
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
@@ -1049,7 +1050,7 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
               { label: "새 캠페인 그룹", onClick: () => setIsAddGroupDialogOpen(true) },
               { label: "소속 캠페인 추가/삭제", onClick: () => console.log("") },
               { label: "일괄 저장", onClick: () => handleCampaignSave(),},
-              { label: "캠페인 그룹 삭제", onClick: () => console.log("") },
+              { label: "캠페인 그룹 삭제", onClick: () => onGroupDelete(groupInfo.campaignGroupId+'') },
               { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
           ]}
           />
