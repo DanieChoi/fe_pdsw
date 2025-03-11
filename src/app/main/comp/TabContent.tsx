@@ -29,6 +29,8 @@ import CampaignGroupBulkUpdatePanel from "./CampaignGroupBulkUpdatePanel";
 
 // 탭 ID별 실제 화면을 매핑
 const renderContent = (tabId: number | null, campaignId?: string, campaignName?: string, params?: any) => {
+  console.log("params ??????????????????? : ", params);
+  
   switch (tabId) {
     case 1:
       return <CampaignGroupManager />;
@@ -228,6 +230,8 @@ const TabContent = () => {
             // 현재 활성화된 탭에서 campaignId 가져오기
             const campaignId = activeTab?.campaignId;
             const campaignName = activeTab?.campaignName;
+            const params = activeTab?.params; // params 추출 추가
+
 
             return (
               <React.Fragment key={section.id}>
@@ -243,7 +247,7 @@ const TabContent = () => {
                     }
                   }}
                 >
-                  {renderContent(tabIdToRender, campaignId, campaignName)}
+                  {renderContent(tabIdToRender, campaignId, campaignName, params)}
                 </div>
                 {index === 0 && sections.length === 2 && (
                   <div
