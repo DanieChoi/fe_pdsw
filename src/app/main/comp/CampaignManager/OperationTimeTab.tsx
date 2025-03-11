@@ -98,8 +98,8 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
       const CampaignScheduleEndTime = tempCampaignSchedule.end_time;
       // setStartDate(new Date(tempCampaignSchedule.start_date.substring(0,4)+'-'+ tempCampaignSchedule.start_date.substring(4,6)+'-'+ tempCampaignSchedule.start_date.substring(6,8)));
       // setEndDate(new Date(tempCampaignSchedule.end_date.substring(0,4)+'-'+ tempCampaignSchedule.end_date.substring(4,6)+'-'+ tempCampaignSchedule.end_date.substring(6,8)));
+      setTempData([]);
       if( CampaignScheduleStartTime.length > 0 && CampaignScheduleEndTime.length > 0 ) {
-        setTempData([]);
         CampaignScheduleStartTime.map((item:string, index) => {
           setTempData((prev) => [
             ...prev,
