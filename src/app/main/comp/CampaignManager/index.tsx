@@ -9,6 +9,16 @@ import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiF
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
+
+const errorMessage = {
+  isOpen: false,
+  message: '',
+  title: '로그인',
+  type: '0',
+};
 
 type Props = {
   campaignId?: string;
@@ -19,6 +29,8 @@ const CampaignManager = ({campaignId}: Props) => {
   const { tenants } = useMainStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
   const [_campaignId, _setCampaignId] = useState<string>('');
+  const [alertState, setAlertState] = useState(errorMessage);
+  const router = useRouter();
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
   
@@ -35,6 +47,18 @@ const CampaignManager = ({campaignId}: Props) => {
       fetchSkills({
         tenant_id_array: tempTenantIdArray
       });   
+    },onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: '로그인 정보가 없습니다.',
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
     }
   });
   // 스킬 조회
@@ -102,6 +126,13 @@ const CampaignManager = ({campaignId}: Props) => {
             <CampaignManagerDetail />
           </div>
         </div>
+      <CustomAlert
+        message={alertState.message}
+        title={alertState.title}
+        type={alertState.type}
+        isOpen={alertState.isOpen}
+        onClose={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   )
 }
