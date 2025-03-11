@@ -395,6 +395,11 @@ input::placeholder {
 }
 
 
+.grid-custom .rdg-row[aria-selected="true"]{
+  background-color: #FFFAEE;
+}
+
+
 .btn-st{
   width: 1rem;
   height: 1rem;
@@ -674,3 +679,7 @@ html, body {
 .dragging {
   opacity: 0.5;
 }
+/*팝업임시*/
+.m-w-1080{max-width: 1080px;width: 1080px;}
+.grid-custom .chknone .rdg-checkbox-input { visibility: hidden; }
+.h-340{height: 340px;}

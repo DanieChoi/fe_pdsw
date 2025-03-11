@@ -173,7 +173,7 @@ export function TreeMenusForCampaignGroupTab() {
   console.log("확장된 노드 목록:", Array.from(expandedNodes));
 
   return (
-    <div className="flex-1 overflow-auto p-4">
+    <div className="flex flex-grow overflow-y-auto min-h-0 tree-node">
       {/* <div className="mb-4">
         <h2 className="text-lg font-semibold">캠페인 그룹 관리</h2>
         <p className="text-sm text-gray-500">테넌트, 캠페인 그룹, 캠페인을 관리할 수 있습니다.</p>
@@ -195,7 +195,7 @@ export function TreeMenusForCampaignGroupTab() {
         </div>
       </div> */}
       
-      <div className="space-y-1 border rounded-md p-2">
+      <div className="w-full">
         {displayData.map((node) => (
           <TreeNodeForSideBarCampaignGroupTab
             key={node.id}

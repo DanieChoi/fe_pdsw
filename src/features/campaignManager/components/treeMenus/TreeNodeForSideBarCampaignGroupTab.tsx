@@ -23,6 +23,9 @@ import AddCampaignGroupDialog from "./dialog/AddCampaignGroupDialog";
 import { useTabStore } from "@/store/tabStore";
 import { ContextMenuForTreeNode } from "./ContextMenuForTreeNode";
 
+import CampaignAddPopup from '@/features/campaignManager/components/popups/CampaignAddPopup';
+
+
 interface TreeNodeProps {
   node: TreeNode;
   level: number;
@@ -67,6 +70,11 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedNodes.has(node.id);
   const isSelected = selectedNodeId === node.id;
+
+  // 팝업 상태
+  const [isCampaignAddPopupOpen, setIsCampaignAddPopupOpen] = useState(false);
+
+
 
   // 디버깅용 로그 추가
   useEffect(() => {
@@ -133,9 +141,9 @@ export function TreeNodeForSideBarCampaignGroupTab({
       case "root":
         return <Image src="/tree-menu/organization.png" alt="조직" width={14} height={12} />;
       case "tenant":
-        return <Image src="/tree-menu/tennant_office.png" alt="테넌트" width={14} height={12} />;
+        return <Image src="/tree-menu/folder.png" alt="폴더" width={14} height={12} />;
       case "group":
-        return <Image src="/tree-menu/group_icon_for_tree.png" alt="그룹" width={15} height={12} />;
+        return <Image src="/tree-menu/folder2.png" alt="폴더2" width={15} height={12} />;
       case "campaign":
         // 캠페인 노드일 경우, 기본 아이콘 반환
         return <span></span>;
@@ -215,56 +223,62 @@ export function TreeNodeForSideBarCampaignGroupTab({
             })}
             className="flex items-center whitespace-nowrap"
           >
-            <FileText className="mr-2 h-4 w-4" />
+            {/* <FileText className="mr-2 h-4 w-4" /> */}
             캠페인 그룹 일괄 수정
           </ContextMenuItem>
           <ContextMenuItem
             onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 시작: ${node.name}`))}
             className="flex items-center whitespace-nowrap"
           >
-            <FileText className="mr-2 h-4 w-4" />
+            {/* <FileText className="mr-2 h-4 w-4" /> */}
             캠페인 그룹 일괄 시작
           </ContextMenuItem>
           <ContextMenuItem
             onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 완료: ${node.name}`))}
             className="flex items-center whitespace-nowrap"
           >
-            <FileText className="mr-2 h-4 w-4" />
+            {/* <FileText className="mr-2 h-4 w-4" /> */}
             캠페인 그룹 일괄 완료
           </ContextMenuItem>
           <ContextMenuItem
             onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 중지: ${node.name}`))}
             className="flex items-center whitespace-nowrap"
           >
-            <FileText className="mr-2 h-4 w-4" />
+            {/* <FileText className="mr-2 h-4 w-4" /> */}
             캠페인 그룹 일괄 중지
           </ContextMenuItem>
           <ContextMenuItem
             onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 이름 변경: ${node.name}`))}
             className="flex items-center whitespace-nowrap"
           >
-            <FileText className="mr-2 h-4 w-4" />
+            {/* <FileText className="mr-2 h-4 w-4" /> */}
             캠페인 그룹 이름 변경
           </ContextMenuItem>
           <ContextMenuItem
             onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 삭제: ${node.name}`))}
             className="flex items-center whitespace-nowrap"
           >
-            <FileText className="mr-2 h-4 w-4" />
+            {/* <FileText className="mr-2 h-4 w-4" /> */}
             캠페인 그룹 삭제
           </ContextMenuItem>
           <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹에 캠페인 추가: ${node.name}`))}
+             onClick={(e) =>
+              handleMenuItemClick(e, () => {
+                console.log(`캠페인 추가/제외: ${node.name}`);
+                setIsCampaignAddPopupOpen(true);
+              })
+
+            }
             className="flex items-center whitespace-nowrap"
           >
-            <FileText className="mr-2 h-4 w-4" />
+            {/* <FileText className="mr-2 h-4 w-4" /> */}
             캠페인 그룹에 캠페인 추가
           </ContextMenuItem>
           <ContextMenuItem
             onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 실시간 재발신: ${node.name}`))}
             className="flex items-center whitespace-nowrap"
           >
-            <FileText className="mr-2 h-4 w-4" />
+            {/* <FileText className="mr-2 h-4 w-4" /> */}
             캠페인 그룹 실시간 재발신
           </ContextMenuItem>
         </>
@@ -333,11 +347,11 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
   // 노드의 스타일 결정
   const getNodeStyle = useCallback(() => {
-    let baseStyle = `flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150`;
+    let baseStyle = `flex items-center hover:bg-[#FFFAEE] px-2 py-0.5 cursor-pointer transition-colors duration-150`;
 
     // 선택된 노드는 배경색 변경
     if (isSelected) {
-      baseStyle += " bg-blue-50 text-blue-600 hover:bg-blue-100";
+      baseStyle += " bg-[#FFFAEE] text-555";
     }
 
     // 노드 타입에 따라 추가 스타일 적용
@@ -392,12 +406,12 @@ export function TreeNodeForSideBarCampaignGroupTab({
             <div className="flex items-center w-full gap-2">
               {hasChildren ? (
                 isExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                  <Image src="/tree-menu/minus_for_tree.png" alt="접기" width={12} height={12} />
                 ) : (
-                  <ChevronRight className="h-4 w-4 text-gray-500" />
+                  <Image src="/tree-menu/plus_icon_for_tree.png" alt="펼치기" width={12} height={12} />
                 )
               ) : (
-                <span className="w-4" />
+                <span className="w-3" />
               )}
               <span></span>  {/* 캠페인 아이콘은 ContextMenuForTreeNode에서 처리 */}
               
@@ -417,7 +431,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
               <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
                 {node.name}
                 {node.campaign_id && (
-                  <span className="ml-1 text-xs text-gray-500">
+                  <span className="ml-1 text-xs  text-[#555]">
                     (ID: {node.campaign_id})
                   </span>
                 )}
@@ -438,16 +452,16 @@ export function TreeNodeForSideBarCampaignGroupTab({
               <div className="flex items-center w-full gap-2">
                 {hasChildren ? (
                   isExpanded ? (
-                    <ChevronDown className="h-4 w-4 text-gray-500" />
+                    <Image src="/tree-menu/minus_for_tree.png" alt="접기" width={12} height={12} />
                   ) : (
-                    <ChevronRight className="h-4 w-4 text-gray-500" />
+                    <Image src="/tree-menu/plus_icon_for_tree.png" alt="펼치기" width={12} height={12} />
                   )
                 ) : (
-                  <span className="w-4" />
+                  <span className="w-3" />
                 )}
                 {renderIcon()}
                 
-                <span className={`text-sm ${isSelected ? "font-medium" : ""}`}>
+                <span className={`text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
                   {node.name}
                 </span>
               </div>
@@ -465,7 +479,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   
       {/* 확장된 상태일 때만 자식 노드 렌더링 */}
       {hasChildren && isExpanded && (
-        <div className="children-container">
+        <div className="children-container space-y-1">
           {node.children?.map((child) => (
             <TreeNodeForSideBarCampaignGroupTab
               key={child.id}
@@ -487,6 +501,12 @@ export function TreeNodeForSideBarCampaignGroupTab({
         tenantName={node.name}
         onAddGroup={handleAddGroup}
       />
+
+      <CampaignAddPopup
+        isOpen={isCampaignAddPopupOpen}
+        onConfirm={() => setIsCampaignAddPopupOpen(false)}
+        onCancel={() => setIsCampaignAddPopupOpen(false)}
+        />
     </div>
   );
 }

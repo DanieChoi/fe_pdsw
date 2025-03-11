@@ -91,8 +91,8 @@ export function TreeNodeForTenantWithAgent({
         onManage={handleManage}
       >
         <div
-          className={`flex items-center hover:bg-gray-100 rounded-lg px-2 py-1.5 cursor-pointer transition-colors duration-150
-            ${isSelected ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : ""}`}
+          className={`flex items-center hover:bg-[#FFFAEE] px-2 py-0.5 cursor-pointer transition-colors duration-150
+            ${isSelected ? "bg-blue-50  hover:bg-blue-100" : ""}`}
           onClick={handleClick}
           style={{ paddingLeft: `${level * 16 + 8}px` }}
         >
