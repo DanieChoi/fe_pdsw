@@ -12,6 +12,12 @@ import {
 } from "@/features/campaignManager/types/typeForCampaignGroupForSideBar";
 import { TenantListResponse } from "@/features/campaignManager/types/typeForTenant";
 import { apiForGetTenantList } from "@/features/campaignManager/api/apiForTennants";
+import { ApiRequest, CampaignGroupResponse } from "@/features/campaignManager/types/typeForCampaignGroup";
+
+interface CombinedData {
+    tenantData: TenantListResponse;
+    campaignGroupData: CampaignGroupApiResponse;
+}
 
 /**
  * 테넌트 목록, 캠페인 그룹 목록, 캠페인 목록을 동시에 가져오는 API 함수
@@ -144,14 +150,6 @@ export const transformToTreeData = (combinedData: ExtendedCombinedData): TreeNod
         });
     }
 
-    // start_flag를 상태 문자열로 변환하는 함수
-    const getStatusFromFlag = (start_flag?: number): string => {
-        if (start_flag === 1) return 'started';  // 시작된 상태
-        if (start_flag === 2) return 'pending';  // 대기 상태
-        if (start_flag === 3) return 'stopped';  // 종료된 상태
-        return 'unknown';
-    };
-
     // 테넌트 노드 생성 (그룹과 캠페인 포함)
     const tenantNodes = tenantData.result_data.map(tenant => ({
         id: `tenant-${tenant.tenant_id}`,
@@ -170,9 +168,7 @@ export const transformToTreeData = (combinedData: ExtendedCombinedData): TreeNod
                 type: "campaign" as const,
                 tenant_id: campaign.tenant_id,
                 group_id: campaign.group_id,
-                campaign_id: campaign.campaign_id,
-                start_flag: campaign.start_flag,                      // 추가: 원본 start_flag 값
-                status: getStatusFromFlag(campaign.start_flag)        // 추가: 상태 문자열
+                campaign_id: campaign.campaign_id
             }))
         }))
     }));
@@ -279,6 +275,33 @@ export const apiForCampaignGroupCampaignList = async (
             `collections/campaign-group-list`,
             request_data
         );
+        return data;
+    } catch (error: any) {
+        if (error.response?.status === 401) {
+            throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
+        }
+        throw new Error(
+            `${error.response?.data?.result_code || ''}||${error.response?.data?.result_msg || '데이터 가져오기 실패'}`
+        );
+    }
+};
+
+export const apiForCampaignGroupDataForCampaignGroupAdmin = async (
+    group_id?: number
+): Promise<CampaignGroupResponse> => {
+    // Create request body that matches the expected API format
+    const requestBody: ApiRequest = {
+        filter: group_id ? { group_id: [group_id] } : {},
+        sort: { group_id: 1 },
+        page: { index: 1, items: 100 }
+    };
+
+    try {
+        const { data } = await axiosInstance.post<CampaignGroupResponse>(
+            'collections/campaign-group-list',
+            requestBody
+        );
+        
         return data;
     } catch (error: any) {
         if (error.response?.status === 401) {

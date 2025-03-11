@@ -10,6 +10,7 @@ import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiF
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 import { useApiForCampaignGroupList, useApiForCampaignGroupCampaignList } from "@/features/preferences/hooks/useApiForCampaignGroupList";
+import CampaignGroupWithCampaigns from './component/CampaignGroupWithCampaigns';
 
 const initData: DataProps = { no: 0, tenantId: 0, tenantName: '', campaignGroupId: 0, campaignGroupName: '' };
 type Props = {
@@ -174,10 +175,31 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
 
         <CampaignGroupManagerHeader onSearch={handleCampaignHeaderSearch} />
         <div className="flex gap-[30px]">
-          <CampaignGroupManagerList campaignId={campaignIdForUpdateFromSideMenu || ''} campaignGroupHeaderSearchParam={campaignGroupHeaderSearchParam}
-            campaignGroupList={_campaignGroupList} groupCampaignListData={tempCampaignListData}
-            onGroupSelect={handleGroupSelect} onCampaignSelect={handleCampaignSelect}
-          />
+          {/* <CampaignGroupManagerList
+            campaignId={campaignIdForUpdateFromSideMenu || ''}
+            campaignGroupHeaderSearchParam={campaignGroupHeaderSearchParam}
+            campaignGroupList={_campaignGroupList}
+            groupCampaignListData={tempCampaignListData}
+            onGroupSelect={handleGroupSelect}
+            onCampaignSelect={handleCampaignSelect}
+          /> */}
+
+          {groupId ? (
+            <CampaignGroupWithCampaigns
+              groupId={groupId}
+              groupName={groupName || ''}
+            />
+          ) : (
+            <CampaignGroupManagerList
+              campaignId={campaignIdForUpdateFromSideMenu || ''}
+              campaignGroupHeaderSearchParam={campaignGroupHeaderSearchParam}
+              campaignGroupList={_campaignGroupList}
+              groupCampaignListData={tempCampaignListData}
+              onGroupSelect={handleGroupSelect}
+              onCampaignSelect={handleCampaignSelect}
+            />
+          )}
+
           <CampaignGroupManagerDetail groupInfo={groupInfo} campaignId={campaignId} onInit={handleInit} />
         </div>
       </div>
