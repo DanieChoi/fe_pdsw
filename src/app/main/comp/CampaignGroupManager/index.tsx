@@ -13,6 +13,7 @@ import { useApiForCampaignGroupCampaignList } from '@/features/campaignGroupMana
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 import { useApiForCampaignGroupList } from "@/features/preferences/hooks/useApiForCampaignGroupList";
 import CampaignGroupWithCampaigns from './component/CampaignGroupWithCampaigns';
+import { CampaignGroupGampaignListItem } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
 
 const initData: DataProps = { no: 0, tenantId: 0, tenantName: '', campaignGroupId: 0, campaignGroupName: '' };
 type Props = {
