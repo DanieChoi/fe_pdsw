@@ -1,23 +1,24 @@
 // C:\Users\terec\fe_pdsw\src\app\main\comp\CampaignManager\index.tsx
 import React, { useState, useEffect } from 'react'
-import CampaignGroupManagerHeader, {CampaignGroupHeaderSearch} from './CampaignGroupManagerHeader';
+import CampaignGroupManagerHeader, { CampaignGroupHeaderSearch } from './CampaignGroupManagerHeader';
 import CampaignGroupManagerDetail from './CampaignGroupManagerDetail';
-import CampaignGroupManagerList, {DataProps,downDataProps} from './CampaignGroupManagerList';
+import CampaignGroupManagerList, { DataProps, downDataProps } from './CampaignGroupManagerList';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
-import { useApiForCampaignGroupList,useApiForCampaignGroupCampaignList } from "@/features/preferences/hooks/useApiForCampaignGroupList";
+import { useApiForCampaignGroupList, useApiForCampaignGroupCampaignList } from "@/features/preferences/hooks/useApiForCampaignGroupList";
 
-const initData: DataProps = {no:0,tenantId:0,tenantName:'',campaignGroupId:0,campaignGroupName:''};
+const initData: DataProps = { no: 0, tenantId: 0, tenantName: '', campaignGroupId: 0, campaignGroupName: '' };
 type Props = {
   groupId?: string;
+  groupName?: string;
 }
 
-const CampaignGroupManager = ({groupId}: Props) => {
-  
+const CampaignGroupManager = ({ groupId, groupName }: Props) => {
+
   const { tenants, campaigns } = useMainStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
   const [_campaignGroupList, _setCampasignGroupList] = useState<DataProps[]>([]);
@@ -27,12 +28,12 @@ const CampaignGroupManager = ({groupId}: Props) => {
   const [campaignId, setCampaignId] = useState<number>(0);
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
-  
-  const [campaignGroupHeaderSearchParam,setCampaignGroupHeaderSearchParam] = useState<CampaignGroupHeaderSearch>();
-  const handleCampaignHeaderSearch = (param:CampaignGroupHeaderSearch) => {
+
+  const [campaignGroupHeaderSearchParam, setCampaignGroupHeaderSearchParam] = useState<CampaignGroupHeaderSearch>();
+  const handleCampaignHeaderSearch = (param: CampaignGroupHeaderSearch) => {
     setCampaignGroupHeaderSearchParam(param);
   };
-    
+
   const handleGroupSelect = (id: string) => {
     _setGroupId(parseInt(id));
     setGroupInfo(_campaignGroupList.find((item) => item.campaignGroupId === parseInt(id)) || initData);
@@ -47,7 +48,7 @@ const CampaignGroupManager = ({groupId}: Props) => {
   // Use `useApiForCampaignGroupList` and `useApiForCampaignGroupCampaignList` hooks at the top level
   const { data: campaignGroupData } = useApiForCampaignGroupList(0);
   const { data: campaignGroupCampaignListData } = useApiForCampaignGroupCampaignList(0);
-  
+
   const handleInit = () => {
     const tempRows: DataProps[] = [];
     for (let i = 0; i < tenants.length; i++) {
@@ -79,11 +80,11 @@ const CampaignGroupManager = ({groupId}: Props) => {
   // 스케줄 조회
   const { mutate: fetchSchedules } = useApiForSchedules({
     onSuccess: (data) => {
-      setSchedules(data.result_data);  
-      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id); 
+      setSchedules(data.result_data);
+      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       fetchSkills({
         tenant_id_array: tempTenantIdArray
-      });   
+      });
     }
   });
   // 스킬 조회
@@ -120,10 +121,10 @@ const CampaignGroupManager = ({groupId}: Props) => {
   const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
     onSuccess: (data) => {
       setPhoneDescriptions(data.result_data);
-      handleInit();      
+      handleInit();
     }
   });
-  
+
   // 캠페인 그룹 소속 캠페인 데이터 로드 시 
   useEffect(() => {
     if (_campaignGroupList && _groupId > 0) {
@@ -166,15 +167,20 @@ const CampaignGroupManager = ({groupId}: Props) => {
   return (
     <div>
       <div className='flex flex-col gap-[15px] limit-width'>
-          <CampaignGroupManagerHeader onSearch={handleCampaignHeaderSearch}/>
-          <div className="flex gap-[30px]">
-            <CampaignGroupManagerList campaignId={campaignIdForUpdateFromSideMenu||''} campaignGroupHeaderSearchParam={campaignGroupHeaderSearchParam}
-              campaignGroupList={_campaignGroupList} groupCampaignListData={tempCampaignListData}
-              onGroupSelect={handleGroupSelect} onCampaignSelect={handleCampaignSelect}
-            />
-            <CampaignGroupManagerDetail groupInfo={groupInfo} campaignId={campaignId} onInit={handleInit} />
-          </div>
+
+        <div>
+          groupId: {groupId}, groupName: {groupName}
         </div>
+
+        <CampaignGroupManagerHeader onSearch={handleCampaignHeaderSearch} />
+        <div className="flex gap-[30px]">
+          <CampaignGroupManagerList campaignId={campaignIdForUpdateFromSideMenu || ''} campaignGroupHeaderSearchParam={campaignGroupHeaderSearchParam}
+            campaignGroupList={_campaignGroupList} groupCampaignListData={tempCampaignListData}
+            onGroupSelect={handleGroupSelect} onCampaignSelect={handleCampaignSelect}
+          />
+          <CampaignGroupManagerDetail groupInfo={groupInfo} campaignId={campaignId} onInit={handleInit} />
+        </div>
+      </div>
     </div>
   )
 }

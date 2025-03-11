@@ -4,12 +4,12 @@ import { useState, useEffect, useRef } from "react";
 import { baseTabs, TabId } from "@/features/campaignManager/components/data/baseTabs";
 import { TreeMenusForCampaigns } from "@/features/campaignManager/components/treeMenus/TreeMenusForCampaigns";
 import { TreeMenusForAgentTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentTab";
+import { TreeMenusForCampaignGroupTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForCampaignGroupTab";
 import { TabActions } from "./comp/TabActions";
 import { BottomTabsForSideMenu } from "./BottomTabsForSideMenu";
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useSidebarWidthStore } from "@/store/useSidebarWidthStore";
-import { TreeMenusForCampaignGroupTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForCampaignGroupTab";
 
 interface SidebarToggleButtonProps {
   isOpen: boolean;
@@ -45,10 +45,10 @@ export default function SidebarContainer() {
   const setIsResizing = useSidebarWidthStore(state => state.setIsResizing);
 
   const [selectedTabId, setSelectedTabId] = useState<TabId>("campaign");
-  
+
   // 로컬 리사이징 상태 추가 (이중 안전장치)
   const [localResizing, setLocalResizing] = useState(false);
-  
+
   // 성능 최적화를 위한 refs
   const sidebarRef = useRef<HTMLDivElement>(null);
   const lastWidthRef = useRef(storeWidth);
@@ -61,12 +61,12 @@ export default function SidebarContainer() {
 
   const handleResizeStart = (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     // 트랜지션 효과 일시 중지 (렉 감소)
     if (sidebarRef.current) {
       sidebarRef.current.style.transition = 'none';
     }
-    
+
     // 로컬 상태와 글로벌 상태 모두 업데이트
     setLocalResizing(true);
     setIsResizing(true);
@@ -76,20 +76,20 @@ export default function SidebarContainer() {
   const handleMouseMove = (e: MouseEvent) => {
     // 로컬 상태로 리사이징 여부 확인
     if (!localResizing) return;
-    
+
     // DOM 직접 조작 (상태 업데이트 없이)
     const newWidth = e.clientX;
     const clampedWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
-    
+
     if (sidebarRef.current) {
       sidebarRef.current.style.width = `${clampedWidth}px`;
     }
-    
+
     // 디바운싱: 마우스 이동 중 실시간 상태 업데이트 제한
     if (resizeTimeoutRef.current) {
       clearTimeout(resizeTimeoutRef.current);
     }
-    
+
     resizeTimeoutRef.current = setTimeout(() => {
       setStoreWidth(clampedWidth);
     }, 10); // 최소 상태 업데이트 간격
@@ -98,24 +98,24 @@ export default function SidebarContainer() {
   const handleMouseUp = () => {
     // 로컬 상태로 리사이징 여부 확인
     if (!localResizing) return;
-    
+
     // 트랜지션 효과 복원
     if (sidebarRef.current) {
       sidebarRef.current.style.transition = '';
-      
+
       // 마지막 너비 계산
       const currentWidth = parseInt(sidebarRef.current.style.width, 10) || storeWidth;
       const clampedWidth = Math.max(minWidth, Math.min(maxWidth, currentWidth));
-      
+
       // 상태 업데이트 및 현재 탭에 너비 저장
       setStoreWidth(clampedWidth);
       setTabWidth(selectedTabId, clampedWidth);
     }
-    
+
     // 로컬 상태와 글로벌 상태 모두 업데이트
     setLocalResizing(false);
     setIsResizing(false);
-    
+
     // 디바운스 타임아웃 정리
     if (resizeTimeoutRef.current) {
       clearTimeout(resizeTimeoutRef.current);
@@ -137,7 +137,7 @@ export default function SidebarContainer() {
     } else {
       document.body.style.userSelect = '';
     }
-    
+
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);

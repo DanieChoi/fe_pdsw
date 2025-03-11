@@ -115,16 +115,21 @@ export default function Header() {
     );
   };
 
+  // const handleLoginOut = () => {
+  //   Cookies.remove('session_key');
+  //   router.push('/login');
+  // }
+
   const handleLoginOut = () => {
+    // 쿠키 제거
     Cookies.remove('session_key');
+    
+    // AuthStore의 상태를 초기화
+    useAuthStore.getState().clearAuth();
+    
+    // 홈 또는 로그인 페이지로 리다이렉트
     router.push('/login');
   }
-
-  // authStore 에서 tenant_id, role_id 가져오기
-  // const tenant_id = useAuthStore((state) => state.tenant_id);
-  // const role_id = useAuthStore((state) => state.role_id);
-  // const id = useAuthStore((state) => state.id);
-  //상담사 역할 ID(1: 상담사, 2: 파트매니저, 3: 그룹매니저, 4: 테넌트메니저, 5: 시스템 메니저, 6: 전체)
 
   // tofix  로그인 안했을때 미리 실행되서 에러 발생
   const { mutate: fetchTenants } = useApiForTenants({

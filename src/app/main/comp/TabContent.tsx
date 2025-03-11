@@ -30,10 +30,13 @@ import CampaignGroupBulkUpdatePanel from "./CampaignGroupBulkUpdatePanel";
 // 탭 ID별 실제 화면을 매핑
 const renderContent = (tabId: number | null, campaignId?: string, campaignName?: string, params?: any) => {
   console.log("params ??????????????????? : ", params);
-  
+
   switch (tabId) {
     case 1:
-      return <CampaignGroupManager />;
+      return <CampaignGroupManager
+        groupId={params?.groupId}
+        groupName={params?.groupName}
+      />;
     case 2:
       return <CampaignManager />;
     case 3:
@@ -75,7 +78,7 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
       return <CampaignClonePanel />;
 
     case 131: // 캠페인 삭제 패널
-      return <CampaignDeletePanel campaignId={campaignId} campaignName={campaignName}/>
+      return <CampaignDeletePanel campaignId={campaignId} campaignName={campaignName} />
 
     case 501:
       return (
@@ -124,9 +127,9 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
         <div className="flex justify-left w-full">
           <div className="max-w-[1000px] w-full">
             {/* <CampaignGroupBulkUpdatePanel /> */}
-            <CampaignGroupBulkUpdatePanel 
-              groupId={params?.groupId} 
-              groupName={params?.groupName} 
+            <CampaignGroupBulkUpdatePanel
+              groupId={params?.groupId}
+              groupName={params?.groupName}
             />
           </div>
         </div>

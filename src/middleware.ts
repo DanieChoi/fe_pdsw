@@ -1,19 +1,19 @@
-// src/middleware.ts
+// // src/middleware.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
-  // const sessionKey = request.cookies.get('session_key')
+  const sessionKey = request.cookies.get('session_key')
   
-  // // 로그인 페이지는 통과
-  // if (request.nextUrl.pathname.startsWith('/login')) {
-  //   return NextResponse.next()
-  // }
+  // 로그인 페이지는 통과
+  if (request.nextUrl.pathname.startsWith('/login')) {
+    return NextResponse.next()
+  }
 
-  // // 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
-  // if (!sessionKey) {
-  //   return NextResponse.redirect(new URL('/login', request.url))
-  // }
+  // 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
+  if (!sessionKey) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
 
   return NextResponse.next()
 }
@@ -23,3 +23,31 @@ export const config = {
     '/((?!pds|_next/static|_next/image|favicon.ico|login).*)',
   ],
 }
+
+// src/middleware.ts
+// import { NextResponse } from 'next/server'
+// import type { NextRequest } from 'next/server'
+
+// export function middleware(request: NextRequest) {
+//   const sessionKey = request.cookies.get('session_key')
+  
+//   // 로그인 페이지는 통과
+//   if (request.nextUrl.pathname.startsWith('/login')) {
+//     return NextResponse.next()
+//   }
+
+//   // 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
+//   if (!sessionKey) {
+//     return NextResponse.redirect(new URL('/login', request.url))
+//   }
+
+//   return NextResponse.next()
+// }
+
+// export const config = {
+//   matcher: [
+//     // 인증이 필요한 페이지들에 대한 패턴
+//     // 정적 리소스, API, 로그인 페이지 등은 제외
+//     '/((?!pds|_next/static|_next/image|favicon.ico|login|images|icons|api|assets|public).*)',
+//   ],
+// }

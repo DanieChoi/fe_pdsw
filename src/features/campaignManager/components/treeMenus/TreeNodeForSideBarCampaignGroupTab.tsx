@@ -193,22 +193,22 @@ export function TreeNodeForSideBarCampaignGroupTab({
       );
     }
     if (node.type === "group") {
+
+      // console.log("node at 캠페인탭 그룹 메뉴 : ", node);
+      
+
       return (
         <>
           <ContextMenuItem
             onClick={(e) => handleMenuItemClick(e, () => {
               console.log(`캠페인 그룹 일괄 수정: ${node.name}`);
               // 탭 스토어에서 새 탭 추가 함수를 가져와서 호출
-              // 여기에 탭 스토어의 addTab 함수를 import하고 사용해야 함
-              // 예: addTab({ id: 700, title: `캠페인 그룹 일괄 수정: ${node.name}`, groupId: node.id, groupName: node.name });
-
-              // useTabStore에서 addTab 함수를 가져와 사용
               addTab({
-                id: 700,
-                title: `캠페인 그룹 일괄 수정: ${node.name}`,
+                id: 1,
+                title: `캠페인 그룹 관리: ${node.name}`,
                 uniqueKey: `groupBulkUpdate_${node.id}`,
                 params: {
-                  groupId: node.id,
+                  groupId: node.group_id,
                   groupName: node.name
                 }
               });
