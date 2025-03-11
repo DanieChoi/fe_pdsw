@@ -8,7 +8,7 @@ import { useApiForCampaignGroupDataForCampaignGroupAdmin } from '@/features/pref
 interface Props {
     groupId: string;
     groupName: string;
-    onCampaignSelect: (id: string) => void;
+    // onCampaignSelect: (id: string) => void;
 }
 
 interface GroupRow {
