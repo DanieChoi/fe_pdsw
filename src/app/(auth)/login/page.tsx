@@ -66,6 +66,13 @@ export default function LoginPage() {
           title: '로그인',
           type: '2',
         });
+      }else if( e.message === 'User does not exist.'){
+        setAlertState({
+          isOpen: true,
+          message: 'API인증이 정상적으로 이루어 지지 않았습니다.',
+          title: '로그인',
+          type: '2',
+        });
       }else if( e.message === 'Password is wrong.'){
         setAlertState({
           isOpen: true,

@@ -150,7 +150,7 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
             columns={downColumns} 
             rows={memoizedDownDataRows} 
             className="grid-custom" 
-            rowKeyGetter={(row) => row.campaignGroupId}
+            rowKeyGetter={(row) => row.campaignId}
             selectedRows={selectedCampaignGroups}
             onSelectedRowsChange={handleSelectedRowsChange}
             rowHeight={30}

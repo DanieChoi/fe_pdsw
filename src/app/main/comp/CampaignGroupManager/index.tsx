@@ -8,8 +8,13 @@ import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkill
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
+import { useApiForCampaignGroupSearch } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupSearch';
+import { useApiForCampaignGroupCampaignList } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupCampaignList';
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
-import { useApiForCampaignGroupList, useApiForCampaignGroupCampaignList } from "@/features/preferences/hooks/useApiForCampaignGroupList";
+import { 
+  CampaignGroupItem,
+  CampaignGroupGampaignListItem
+} from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
 
 const initData: DataProps = { no: 0, tenantId: 0, tenantName: '', campaignGroupId: 0, campaignGroupName: '' };
 type Props = {
@@ -19,13 +24,14 @@ type Props = {
 
 const CampaignGroupManager = ({ groupId, groupName }: Props) => {
 
-  const { tenants, campaigns } = useMainStore();
+  const { tenants } = useMainStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
   const [_campaignGroupList, _setCampasignGroupList] = useState<DataProps[]>([]);
   const [tempCampaignListData, setTempCampaignListData] = useState<downDataProps[]>([]);
   const [groupInfo, setGroupInfo] = useState<DataProps>(initData);
   const [_groupId, _setGroupId] = useState<number>(groupId ? parseInt(groupId) : -1);
   const [campaignId, setCampaignId] = useState<number>(0);
+  const [campaignGroupCampaignListData, setCampaignGroupCampaignListData] = useState<CampaignGroupGampaignListItem[]>([]);
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
 
@@ -41,40 +47,11 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   };
 
   const handleCampaignSelect = (id: string) => {
-    console.log("캠페인 선택:", id);
     setCampaignId(parseInt(id));
   };
 
-  // Use `useApiForCampaignGroupList` and `useApiForCampaignGroupCampaignList` hooks at the top level
-  const { data: campaignGroupData } = useApiForCampaignGroupList(0);
-  const { data: campaignGroupCampaignListData } = useApiForCampaignGroupCampaignList(0);
-
   const handleInit = () => {
-    const tempRows: DataProps[] = [];
-    for (let i = 0; i < tenants.length; i++) {
-      if (campaignGroupData) {
-        for (let j = 0; j < campaignGroupData.result_data.length; j++) {
-          if (tenants[i].tenant_id === campaignGroupData.result_data[j].tenant_id) {
-            tempRows.push({
-              no: tempRows.length + 1,
-              tenantId: tenants[i].tenant_id,
-              tenantName: tenants[i].tenant_name,
-              campaignGroupId: campaignGroupData.result_data[j].group_id,
-              campaignGroupName: campaignGroupData.result_data[j].group_name,
-            });
-            if (j === 0) {
-              _setGroupId(campaignGroupData.result_data[j].group_id);
-              setGroupInfo(tempRows[0]);
-            }
-          }
-        }
-      }
-    }
-    _setCampasignGroupList(tempRows);
-    if (tempRows.length == 0) {
-      _setGroupId(-1);
-      setGroupInfo(initData);
-    }
+    fetchCampaignGroupSearch(null);
   };
 
   // 스케줄 조회
@@ -124,24 +101,71 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
       handleInit();
     }
   });
+  
+  // 캠페인 그룹 조회
+  const { mutate: fetchCampaignGroupSearch } = useApiForCampaignGroupSearch({
+    onSuccess: (data) => {      
+      const tempRows: DataProps[] = [];
+      if( data.result_data.length > 0 ){
+        for (let i = 0; i < tenants.length; i++) {
+          for (let j = 0; j < data.result_data.length; j++) {
+            if (tenants[i].tenant_id === data.result_data[j].tenant_id && _groupId < 0) {
+              tempRows.push({
+                no: tempRows.length + 1,
+                tenantId: tenants[i].tenant_id,
+                tenantName: tenants[i].tenant_name,
+                campaignGroupId: data.result_data[j].group_id,
+                campaignGroupName: data.result_data[j].group_name,
+              });
+              if (j === 0) {
+                _setGroupId(data.result_data[j].group_id);
+                setGroupInfo(tempRows[0]);
+              }
+            }else if( tenants[i].tenant_id === data.result_data[j].tenant_id && _groupId > -1 && _groupId === data.result_data[j].group_id ){
+              tempRows.push({
+                no: tempRows.length + 1,
+                tenantId: tenants[i].tenant_id,
+                tenantName: tenants[i].tenant_name,
+                campaignGroupId: data.result_data[j].group_id,
+                campaignGroupName: data.result_data[j].group_name,
+              });
+            }
+          }
+        }
+      }
+      _setCampasignGroupList(tempRows);
+      if (tempRows.length == 0) {
+        _setGroupId(-1);
+        setGroupInfo(initData);
+      }
+      fetchCampaignGroupCampaignList(null);
+    }
+  });
+
+  // 캠페인 그룹 소속 캠페인 데이터 로드 시 
+  const { mutate: fetchCampaignGroupCampaignList } = useApiForCampaignGroupCampaignList({
+    onSuccess: (data) => {      
+      setCampaignGroupCampaignListData(data.result_data || []);
+    }
+  });
 
   // 캠페인 그룹 소속 캠페인 데이터 로드 시 
   useEffect(() => {
     if (_campaignGroupList && _groupId > 0) {
       const tempCampaignListRows: downDataProps[] = [];
-      if (campaignGroupCampaignListData && campaignGroupCampaignListData.result_data) {
+      if (campaignGroupCampaignListData && campaignGroupCampaignListData) {
         for (let i = 0; i < _campaignGroupList.length; i++) {
-          for (let j = 0; j < campaignGroupCampaignListData.result_data.length; j++) {
-            if (_groupId === _campaignGroupList[i].campaignGroupId && _groupId === campaignGroupCampaignListData.result_data[j].group_id) {
+          for (let j = 0; j < campaignGroupCampaignListData.length; j++) {
+            if (_groupId === _campaignGroupList[i].campaignGroupId && _groupId === campaignGroupCampaignListData[j].group_id) {
               tempCampaignListRows.push({
                 no: tempCampaignListRows.length + 1,
                 campaignGroupId: _campaignGroupList[i].campaignGroupId,
                 campaignGroupName: _campaignGroupList[i].campaignGroupName,
-                campaignId: campaignGroupCampaignListData.result_data[j].campaign_id,
-                campaignName: campaignGroupCampaignListData.result_data[j].campaign_name,
+                campaignId: campaignGroupCampaignListData[j].campaign_id,
+                campaignName: campaignGroupCampaignListData[j].campaign_name,
               });
               if (j === 0) {
-                setCampaignId(campaignGroupCampaignListData.result_data[j].campaign_id);
+                setCampaignId(campaignGroupCampaignListData[j].campaign_id);
               }
             }
           }
@@ -154,7 +178,6 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
     }
   }, [_groupId, _campaignGroupList, campaignGroupCampaignListData]);
 
-  // 캠페인 그룹 데이터 로드 시 
   useEffect(() => {
     if (tenants) {
       const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
@@ -167,11 +190,6 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   return (
     <div>
       <div className='flex flex-col gap-[15px] limit-width'>
-
-        <div>
-          groupId: {groupId}, groupName: {groupName}
-        </div>
-
         <CampaignGroupManagerHeader onSearch={handleCampaignHeaderSearch} />
         <div className="flex gap-[30px]">
           <CampaignGroupManagerList campaignId={campaignIdForUpdateFromSideMenu || ''} campaignGroupHeaderSearchParam={campaignGroupHeaderSearchParam}
