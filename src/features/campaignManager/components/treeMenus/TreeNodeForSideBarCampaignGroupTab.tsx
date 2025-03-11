@@ -177,20 +177,61 @@ export function TreeNodeForSideBarCampaignGroupTab({
       return (
         <>
           <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`그룹 수정: ${node.name}`))}
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 수정: ${node.name}`))}
+            className="flex items-center whitespace-nowrap"
           >
-            그룹 수정
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹 일괄 수정
           </ContextMenuItem>
           <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`그룹 삭제: ${node.name}`))}
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 시작: ${node.name}`))}
+            className="flex items-center whitespace-nowrap"
           >
-            그룹 삭제
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹 일괄 시작
           </ContextMenuItem>
-          {/* <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`그룹 상세 정보: ${node.name}`))}
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 완료: ${node.name}`))}
+            className="flex items-center whitespace-nowrap"
           >
-            그룹 상세 정보
-          </ContextMenuItem> */}
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹 일괄 완료
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 중지: ${node.name}`))}
+            className="flex items-center whitespace-nowrap"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹 일괄 중지
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 이름 변경: ${node.name}`))}
+            className="flex items-center whitespace-nowrap"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹 이름 변경
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 삭제: ${node.name}`))}
+            className="flex items-center whitespace-nowrap"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹 삭제
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹에 캠페인 추가: ${node.name}`))}
+            className="flex items-center whitespace-nowrap"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹에 캠페인 추가
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 실시간 재발신: ${node.name}`))}
+            className="flex items-center whitespace-nowrap"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹 실시간 재발신
+          </ContextMenuItem>
         </>
       );
     }
@@ -198,60 +239,67 @@ export function TreeNodeForSideBarCampaignGroupTab({
       return (
         <>
           <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 수정: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center"
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 수정: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center whitespace-nowrap"
           >
             <FileText className="mr-2 h-4 w-4" />
-            캠페인 그룹 일괄 수정
+            캠페인 수정
           </ContextMenuItem>
           <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 시작: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center"
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`시작 그룹: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center whitespace-nowrap"
           >
             <FileText className="mr-2 h-4 w-4" />
-            캠페인 그룹 일괄 시작
+            시작 그룹
           </ContextMenuItem>
           <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 완료: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center"
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 진행 정보: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center whitespace-nowrap"
           >
             <FileText className="mr-2 h-4 w-4" />
-            캠페인 그룹 일괄 완료
+            캠페인 진행 정보
           </ContextMenuItem>
           <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 일괄 중지: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center"
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`실시간 재발신: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center whitespace-nowrap"
           >
             <FileText className="mr-2 h-4 w-4" />
-            캠페인 그룹 일괄 중지
+            실시간 재발신
           </ContextMenuItem>
           <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 이름 변경: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center"
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`예약 재발신: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center whitespace-nowrap"
           >
             <FileText className="mr-2 h-4 w-4" />
-            캠페인 그룹 이름 변경
+            예약 재발신
           </ContextMenuItem>
           <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 삭제: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center"
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 삭제: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center whitespace-nowrap"
           >
             <FileText className="mr-2 h-4 w-4" />
-            캠페인 그룹 삭제
+            캠페인 삭제
           </ContextMenuItem>
           <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹에 캠페인 추가: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center"
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 복사: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center whitespace-nowrap"
           >
             <FileText className="mr-2 h-4 w-4" />
-            캠페인 그룹에 캠페인 추가
+            캠페인 복사
           </ContextMenuItem>
           <ContextMenuItem
-            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹 실시간 재확인: ${node.name} (ID: ${node.campaign_id})`))}
-            className="flex items-center"
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 리스트 삭제: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center whitespace-nowrap"
           >
             <FileText className="mr-2 h-4 w-4" />
-            캠페인 그룹 실시간 재발신
+            캠페인 리스트 삭제
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={(e) => handleMenuItemClick(e, () => console.log(`캠페인 그룹에서 삭제: ${node.name} (ID: ${node.campaign_id})`))}
+            className="flex items-center whitespace-nowrap"
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            캠페인 그룹에서 삭제
           </ContextMenuItem>
         </>
       );
