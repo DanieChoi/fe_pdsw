@@ -1,8 +1,6 @@
 import React from 'react'
 
-interface Props {
-    
-}
+type Props = object
 
 const CampaignGroupBulkUpdatePanel = (props: Props) => {
     return (
