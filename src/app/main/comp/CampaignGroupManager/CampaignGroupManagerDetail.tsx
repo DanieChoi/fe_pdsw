@@ -290,9 +290,10 @@ export interface NotificationTabParam {
 type Props = {
   groupInfo: DataProps;
   campaignId: number;
+  onInit: () => void;
 }
 
-export default function CampaignGroupManagerDetail({groupInfo, campaignId}: Props) {
+export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit}: Props) {
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
@@ -1034,12 +1035,8 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId}: Prop
   };
 
   const handleAddGroup = (groupName: string, groupCode: string) => {
-    // console.log("새 그룹 추가:", {
-    //   tenantId: node.tenant_id, // node.id 대신 node.tenant_id 사용
-    //   tenantName: node.name,
-    //   groupName,
-    //   groupCode,
-    // });
+    onInit();
+    setIsAddGroupDialogOpen(false);
   }; 
 
   return (
