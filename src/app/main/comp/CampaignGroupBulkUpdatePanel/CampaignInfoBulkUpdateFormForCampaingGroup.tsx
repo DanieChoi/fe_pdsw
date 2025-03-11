@@ -82,16 +82,6 @@ export function CampaignInfoBulkUpdateFormForCampaingGroup({
       </div>
       
       {/* 작업 버튼 탭 */}
-      <div className="flex bg-gray-200 border-y border-gray-300">
-        <button className="px-3 py-1.5 text-sm border-r border-gray-400 hover:bg-gray-300">등록시간</button>
-        <button className="px-3 py-1.5 text-sm border-r border-gray-400 hover:bg-gray-300">발신순서</button>
-        <button className="px-3 py-1.5 text-sm border-r border-gray-400 hover:bg-gray-300">발신전략</button>
-        <button className="px-3 py-1.5 text-sm border-r border-gray-400 hover:bg-gray-300">발신방법</button>
-        <button className="px-3 py-1.5 text-sm border-r border-gray-400 hover:bg-gray-300">콜라인수</button>
-        <button className="px-3 py-1.5 text-sm border-r border-gray-400 hover:bg-gray-300">음력</button>
-        <button className="px-3 py-1.5 text-sm border-r border-gray-400 hover:bg-gray-300">할당상담원</button>
-        <button className="px-3 py-1.5 text-sm hover:bg-gray-300">기타정보</button>
-      </div>
     </div>
   );
 }

@@ -11,7 +11,7 @@ const CampaignGroupBulkUpdatePanel: React.FC<Props> = ({ groupId, groupName }) =
     console.log("CampaignGroupBulkUpdatePanel !!!!!!!!!: ", groupId, groupName);
         
   return (
-    <div className="w-full h-full flex flex-col border border-gray-300 bg-gray-100 gap-2">
+    <div className="w-full h-full flex flex-col border border-gray-300 bg-gray-100">
       {/* 패널 헤더 */}
       <div className="flex justify-between items-center bg-gray-300 px-3 py-1.5 border-b border-gray-400">
         <div className="font-medium">캠페인 그룹 일괄 수정 (groupId : {groupId} , groupName: {groupName})</div>
@@ -24,11 +24,6 @@ const CampaignGroupBulkUpdatePanel: React.FC<Props> = ({ groupId, groupName }) =
           groupId={groupId} 
           groupName={groupName} 
         />
-      </div>
-
-      {/* 약간의 세로 여백 */}
-      <div className='h-2'>
-        hi
       </div>
       
       {/* 콜 설정 섹션 */}
