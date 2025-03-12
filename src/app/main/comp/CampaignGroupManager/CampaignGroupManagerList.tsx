@@ -61,10 +61,11 @@ type Props = {
   groupCampaignListData?: downDataProps[];
   onGroupSelect: (id: string) => void;
   onCampaignSelect: (id: string) => void;
+  onSelectCampaignList: (data: Set<number>) => void;
 }
 
 export default function CampaignGroupManagerList({campaignId,campaignGroupHeaderSearchParam,campaignGroupList,groupCampaignListData
-    ,onGroupSelect,onCampaignSelect}: Props) {
+    ,onGroupSelect,onCampaignSelect,onSelectCampaignList}: Props) {
   const { campaigns, selectedCampaign , setSelectedCampaign } = useMainStore();
   const [selectedCampaignGroups, setSelectedCampaignGroups] = useState<Set<number>>(new Set([]));
   const [tempCampaigns, setTempCampaigns] = useState<DataProps[]>([]);
@@ -88,8 +89,8 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
     if( groupCampaignListData && groupCampaignListData.length > 0 ){
       const campaignIds = groupCampaignListData.map((campaign) => campaign.campaignId);
       setSelectedCampaignGroups(new Set(campaignIds));
-    }
-    
+      onSelectCampaignList(new Set(campaignIds));
+    }    
   }, [groupCampaignListData]);
 
   useEffect(() => {
@@ -127,6 +128,7 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
         Array.from(newSelection).filter(id => id !== 0)
     );
     setSelectedCampaignGroups(filteredSelection);
+    onSelectCampaignList(filteredSelection);
   };
 
   return (

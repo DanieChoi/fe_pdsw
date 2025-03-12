@@ -279,9 +279,18 @@ const CommonContextMenu: React.FC<CommonContextMenuProps> = ({
   );
 
   return (
+<<<<<<< HEAD
     <div className="relative inline-block text-left">
       {/* 트리거 요소 */}
       <div onContextMenu={handleContextMenu} onClick={(e) => e.stopPropagation()}>
+=======
+    <div className="relative text-left">
+      {/* 트리거 요소에 onContextMenu 이벤트 추가 */}
+      <div 
+        onContextMenu={handleContextMenu} 
+        onClick={(e) => e.stopPropagation()}
+      >
+>>>>>>> 03d4f7c055e5dc9e768cb05efc78801ba3ba18a1
         {trigger}
       </div>
 
@@ -313,6 +322,7 @@ const CommonContextMenu: React.FC<CommonContextMenuProps> = ({
               }}
               onClick={(e) => e.stopPropagation()}
             >
+<<<<<<< HEAD
               <div className="py-1">
                 {React.Children.map(children, (child) =>
                   React.isValidElement(child)
@@ -322,6 +332,15 @@ const CommonContextMenu: React.FC<CommonContextMenuProps> = ({
                         ),
                       })
                     : child
+=======
+              <div className="min-w-[8rem] space-y-[2px] overflow-hidden rounded-[3px] border border-[#333] bg-popover py-[10px] px-[12px] ">
+                {React.Children.map(children, child => 
+                  React.isValidElement(child) ? 
+                    React.cloneElement(child as React.ReactElement<CommonMenuItemProps>, { 
+                      onClick: handleMenuItemClick((child as React.ReactElement<CommonMenuItemProps>).props.onClick)
+                    }) 
+                  : child
+>>>>>>> 03d4f7c055e5dc9e768cb05efc78801ba3ba18a1
                 )}
               </div>
             </div>
@@ -337,7 +356,7 @@ const CommonContextMenu: React.FC<CommonContextMenuProps> = ({
  */
 const CommonMenuItem: React.FC<CommonMenuItemProps> = ({ onClick, children }) => (
   <button
-    className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+    className="hover:bg-[#F4F6F9] relative cursor-default select-none rounded-[3px] px-[6px] py-[4px] outline-none focus:bg-[#F4F6F9] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-[#333] flex items-center text-sm w-full"
     onClick={(e) => {
       e.stopPropagation();
       onClick();

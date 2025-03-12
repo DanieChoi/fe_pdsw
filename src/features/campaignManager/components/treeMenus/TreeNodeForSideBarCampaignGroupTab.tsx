@@ -143,6 +143,10 @@ export function TreeNodeForSideBarCampaignGroupTab({
       onNodeToggle(node.id);
     }
   }, [node.id, node.type, hasChildren, node.children?.length, onNodeSelect, onNodeToggle]);
+  
+  const handleContextMenu = useCallback(() => {
+    onNodeSelect(node.id);
+  }, [node.id, onNodeSelect]);
 
   // 컨텍스트 메뉴 상태 변경 처리
   const handleContextMenuOpenChange = useCallback((open: boolean) => {
@@ -204,6 +208,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
             ref={contextMenuTriggerRef}
             className={getNodeStyle()}
             onClick={handleClick}
+            onContextMenu={handleContextMenu}
             style={{ paddingLeft: `${level * 16 + 8}px` }}
           >
             <div className="flex items-center w-full gap-2">
@@ -262,6 +267,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       ref={contextMenuTriggerRef}
       className={getNodeStyle()}
       onClick={handleClick}
+      onContextMenu={handleContextMenu} 
       style={{ paddingLeft: `${level * 16 + 8}px` }}
     >
       <div className="flex items-center w-full gap-2">
@@ -317,6 +323,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
           <div
             className={getNodeStyle()}
             onClick={handleClick}
+            onContextMenu={handleContextMenu} 
             style={{ paddingLeft: `${level * 16 + 8}px` }}
           >
             <div className="flex items-center w-full gap-2">

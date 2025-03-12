@@ -14,6 +14,7 @@ import { useApiForCampaignGroupCampaignListDelete } from '@/features/campaignGro
 import { useApiForCampaignGroupDelete } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupDelete';
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 import { CampaignGroupGampaignListItem,CampaignGroupItem } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
 
 const initData: DataProps = { no: 0, tenantId: 0, tenantName: '', campaignGroupId: 0, campaignGroupName: '' };
 type Props = {
@@ -31,7 +32,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   const [_groupId, _setGroupId] = useState<number>(groupId ? parseInt(groupId) : -1);
   const [campaignId, setCampaignId] = useState<number>(0);
   const [campaignGroupCampaignListData, setCampaignGroupCampaignListData] = useState<CampaignGroupGampaignListItem[]>([]);
-  const [campaignGroupList, setCampasignGroupList] = useState<CampaignGroupItem[]>([]);
+  const [selectCampaignGroupList, setSelectCampaignGroupList] = useState<MainDataResponse[]>([]);
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
 
@@ -57,6 +58,17 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
 
   const handleInit = () => {
     fetchCampaignGroupSearch(null);
+  };
+
+  const handleSelectCampaignList = (data: Set<number>) => {
+    const tempData:MainDataResponse[] = [];
+    data.forEach((item) => {
+      const matchedCampaign = campaigns.find((campaign) => campaign.campaign_id === item);
+      if (matchedCampaign) {
+        tempData.push(matchedCampaign);
+      }
+    });
+    setSelectCampaignGroupList(tempData);
   };
 
   // 스케줄 조회
@@ -206,6 +218,12 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   }, [campaigns]);
 
   useEffect(() => {
+    if (groupId) {
+      _setGroupId(parseInt(groupId));
+    }
+  }, [groupId]);
+
+  useEffect(() => {
     if (tenants) {
       const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       fetchSchedules({
@@ -226,9 +244,12 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
             groupCampaignListData={tempCampaignListData}
             onGroupSelect={handleGroupSelect}
             onCampaignSelect={handleCampaignSelect}
+            onSelectCampaignList={handleSelectCampaignList}
           />
 
-          <CampaignGroupManagerDetail groupInfo={groupInfo} campaignId={campaignId} onInit={handleInit} onGroupDelete={handleGroupDelete}/>
+          <CampaignGroupManagerDetail groupInfo={groupInfo} campaignId={campaignId} onInit={handleInit} onGroupDelete={handleGroupDelete}
+            groupCampaignListData={tempCampaignListData}
+          />
         </div>
       </div>
     </div>
