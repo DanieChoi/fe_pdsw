@@ -13,6 +13,7 @@ import { useTabStore } from "@/store/tabStore";
 import { IDialogForSkilAssignmentForCounselor } from "../dialog/IDialogForSkilAssignmentForCounselor";
 import { IDialogForTeamSkilAssignment } from "../dialog/IDialogForTeamSkilAssignment";
 import { IDialogForGroupSkilAssignment } from "../dialog/IDialogForGroupSkilAssignment";
+import { toast } from "react-toastify";
 
 interface IContextMenuForGroupAndTeamAndCounselorProps {
   children: React.ReactNode;
@@ -90,7 +91,9 @@ export function IContextMenuForGroupAndTeamAndCounselor({
   const handleTeamSkillAssignment = () => {
     if (!validateTenantId()) return;
 
+    
     if (!item.members || item.members.length === 0) {
+      toast.warn("팀에 멤버가 없습니다");
       console.warn(`⚠️ 팀에 멤버가 없습니다. ${item.name} (${item.id})`);
       return;
     }
