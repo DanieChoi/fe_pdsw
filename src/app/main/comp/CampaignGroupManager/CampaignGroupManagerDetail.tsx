@@ -298,9 +298,10 @@ type Props = {
   campaignId: number;
   onInit: () => void;
   onGroupDelete: (param: GroupDeleteParam) => void;
+  groupCampaignListData?: downDataProps[];
 }
 
-export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit,onGroupDelete}: Props) {
+export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit,onGroupDelete,groupCampaignListData}: Props) {
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
@@ -582,7 +583,7 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
   const handleCallingNumlber = (param: string) => {
     if( inputCallingNumber !== param ){
       setChangeYn(true);
-      setCallingNumberChangeYn(true);
+      // setCallingNumberChangeYn(true); // 발신번호 변경여부 20230312 주석처리
       setInputCallingNumber(param);
       setTempCallingNumberInfo({...tempCallingNumberInfo
         , campaign_id: tempCampaignInfo.campaign_id
@@ -738,6 +739,9 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
         , predictive_dial_speed : value.predictive_dial_speed
         , progressive_dial_speed: value.progressive_dial_speed
       });
+      setTempCampaignsInfo({...tempCampaignInfo
+        , dial_speed : value.dial_mode === 2? Math.floor(value.progressive_dial_speed): value.predictive_dial_speed
+      });
       setTempCampaignDialSpeedInfo({...tempCampaignDialSpeedInfo
         , dial_speed : value.dial_mode === 2? Math.floor(value.progressive_dial_speed): value.predictive_dial_speed
       });
@@ -856,49 +860,117 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
     removeTab(Number(activeTabId),activeTabKey+'');
   }
 
-  // 캠페인 그룹 일괄 저장
+  //캠페인 저장
   const handleCampaignSave = () => {
-    setAlertState({
-      ...errorMessage,
-      isOpen: true,
-      message: '변경된 캠페인은 복구가 불가능 합니다.'
-      + '\n 캠페인을 수정하시겠습니까?',
-      onClose: handleCampaignSaveExecute,
-      onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
-    });
+    console.log(tempCampaignManagerInfo);
+    console.log('power_divert_queue :: '+tempCampaignManagerInfo.power_divert_queue);
+    let saveErrorCheck = false;
+    if(!saveErrorCheck && tempCampaignManagerInfo.tenant_id < 0 ){
+      saveErrorCheck = true;
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "테넌트를 선택해 주세요.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
+    //2018.11.27 Gideon #23127 캠페인 수정창 연결 IVR 입력 예외 처리
+    // if( tempCampaignManagerInfo.dial_mode === 1 && (tempCampaignManagerInfo.token_id === 0 || tempCampaignManagerInfo.token_id === 3) ){
+      if(!saveErrorCheck && tempCampaignManagerInfo.power_divert_queue === '0' || tempCampaignManagerInfo.power_divert_queue === ''){
+        saveErrorCheck = true;
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "'발신 방법' 탭의 '연결 IVR NO' 값을 입력해 주시기 바랍니다.", 
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }
+    // }
+    if(!saveErrorCheck && tempCampaignManagerInfo.campaign_name === '' ){
+      saveErrorCheck = true;
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "캠페인명을 입력해 주세요.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
+    if( !saveErrorCheck && tempCampaignSchedule.start_time.length === 0){
+      saveErrorCheck = true;
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "시작시간 또는 종료시간을 지정해 주세요.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
+    if( !saveErrorCheck ){      
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '변경된 캠페인은 복구가 불가능 합니다.'
+        + '\n 캠페인을 수정하시겠습니까?',
+        onClose: handleCampaignSaveExecute,
+        onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
   }
   
   //캠페인 저장 실행.
   const handleCampaignSaveExecute = () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
-    if( changeYn ){
-      if( campaignInfoChangeYn ){
-        fetchCampaignManagerUpdate(tempCampaignManagerInfo);
-      }
-      if( campaignSkillChangeYn ){
-        //캠페인 스킬 수정 api 호출
-        fetchCampaignSkillUpdate(tempCampaignSkills);
-      }
-      if( campaignScheduleChangeYn ){
-        //캠페인 스케줄 수정 api 호출
-        fetchCampaignScheduleUpdate(tempCampaignSchedule);
-      }
-      if( callingNumberChangeYn ){        
-        const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignInfo.campaign_id)
-          .map((data) => data.calling_number)
-          .join(',');
-        //캠페인 발신번호 추가,수정,삭제 api 호출
-        if( tempCallingNumberInfo.calling_number !== '' &&  tempCallNumber === '' ){
-          fetchCallingNumberInsert(tempCallingNumberInfo);
-        }else if( tempCallingNumberInfo.calling_number === '' &&  tempCallNumber !== '' ){
-          fetchCallingNumberDelete(tempCallingNumberInfo);
-        }else{
-          fetchCallingNumberUpdate(tempCallingNumberInfo);
+    // const tempGroupCampaignList = campaigns.filter((campaign) => campaign
+    if( typeof groupCampaignListData !== 'undefined' ){
+      const tempGroupCampaignList = campaigns.filter(campaign =>
+        groupCampaignListData.some(groupCampaign => campaign.campaign_id === groupCampaign.campaignId)
+      );
+      
+      for(let i=0; i<tempGroupCampaignList.length; i++){
+        if( changeYn ){
+          if( campaignInfoChangeYn ){
+            fetchCampaignManagerUpdate({...tempCampaignManagerInfo
+              , campaign_id: tempGroupCampaignList[i].campaign_id
+              , campaign_name: tempGroupCampaignList[i].campaign_name
+              , campaign_desc: tempGroupCampaignList[i].campaign_desc
+            });
+          }
+          if( campaignSkillChangeYn ){
+            //캠페인 스킬 수정 api 호출
+            fetchCampaignSkillUpdate({...tempCampaignSkills
+              , campaign_id: tempGroupCampaignList[i].campaign_id
+              , skill_id: []
+            });
+          }
+          if( campaignScheduleChangeYn ){
+            //캠페인 스케줄 수정 api 호출
+            fetchCampaignScheduleUpdate({...tempCampaignSchedule
+              , campaign_id: tempGroupCampaignList[i].campaign_id
+            });
+          }
+          if( callingNumberChangeYn ){        
+            const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignInfo.campaign_id)
+              .map((data) => data.calling_number)
+              .join(',');
+            //캠페인 발신번호 추가,수정,삭제 api 호출
+            if( tempCallingNumberInfo.calling_number !== '' &&  tempCallNumber === '' ){
+              fetchCallingNumberInsert(tempCallingNumberInfo);
+            }else if( tempCallingNumberInfo.calling_number === '' &&  tempCallNumber !== '' ){
+              fetchCallingNumberDelete(tempCallingNumberInfo);
+            }else{
+              fetchCallingNumberUpdate(tempCallingNumberInfo);
+            }
+          }
+          if( campaignDialSpeedChangeYn ){
+            //캠페인 발신 속도 수정 api 호출
+            fetchDialSpeedUpdate( {...tempCampaignDialSpeedInfo
+              , campaign_id: tempGroupCampaignList[i].campaign_id
+            });
+          }
         }
-      }
-      if( campaignDialSpeedChangeYn ){
-        //캠페인 발신 속도 수정 api 호출
-        fetchDialSpeedUpdate( tempCampaignDialSpeedInfo );
       }
     }
   }

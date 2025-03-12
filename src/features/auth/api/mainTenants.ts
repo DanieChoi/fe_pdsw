@@ -3,12 +3,12 @@ import { axiosInstance } from '@/lib/axios';
 import { MainCredentials, TenantListResponse } from '../types/mainIndex';
 
 // 테넌트 리스트 요청
-export const fetchTenants = async (): Promise<TenantListResponse> => {
+export const fetchTenants = async (credentials:MainCredentials): Promise<TenantListResponse> => {
   const tenantRequestData = {
     filter: {      
       tenant_id: {
-        start: 0,
-        end: 9999999,
+        start: credentials.tenant_id > 0?credentials.tenant_id: 0,
+        end: credentials.tenant_id > 0?credentials.tenant_id:9999999
       },
     },
     sort: {
