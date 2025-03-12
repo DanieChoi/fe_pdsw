@@ -19,11 +19,11 @@ export function useApiForCampaignStatusUpdate(
         reasonCode: data.reason_code,
       });
 
-      const errorMessage = getCampaignErrorMessage(data.result_code);
-      if (errorMessage) {
-        toast.error(errorMessage);
-        return;
-      }
+      // const errorMessage = getCampaignErrorMessage(data.result_code);
+      // if (errorMessage) {
+      //   toast.error(errorMessage);
+      //   return;
+      // }
 
       // 상태 업데이트 성공 후 관련 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ['treeMenuDataForSideMenu'] });

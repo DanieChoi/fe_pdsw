@@ -594,7 +594,7 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
 
   //캠페인 동작시간 탭 변경
   const handleCampaignScheduleChange = (value: OperationTimeParam) => {
-    if( campaignId > 0 ){
+    if( campaignId > 0 ){ //캠페인이 존재할때만 처리
       if( value.campaignInfoChangeYn ){
         setChangeYn(true);
         setCampaignInfoChangeYn(true);
@@ -856,7 +856,7 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
     removeTab(Number(activeTabId),activeTabKey+'');
   }
 
-  //캠페인 저장
+  // 캠페인 그룹 일괄 저장
   const handleCampaignSave = () => {
     setAlertState({
       ...errorMessage,
