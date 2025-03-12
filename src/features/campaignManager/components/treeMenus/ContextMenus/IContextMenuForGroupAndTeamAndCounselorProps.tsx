@@ -11,6 +11,7 @@ import { LayoutGrid, Ban } from "lucide-react";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
 import { useTabStore } from "@/store/tabStore";
 import { IDialogForSkilAssignmentForCounselor } from "../dialog/IDialogForSkilAssignmentForCounselor";
+import { IDialogForTeamSkilAssignment } from "../dialog/IDialogForTeamSkilAssignment";
 
 interface IContextMenuForGroupAndTeamAndCounselorProps {
   children: React.ReactNode;
@@ -29,9 +30,10 @@ export function IContextMenuForGroupAndTeamAndCounselor({
 }: IContextMenuForGroupAndTeamAndCounselorProps) {
   const { addTab, removeTab, openedTabs } = useTabStore();
   const { setSelectedCounselor, setCandidateMembersForSkilAssign } = useCounselorFilterStore();
-  
+
   // 다이얼로그 상태 관리
   const [isSkillDialogOpen, setIsSkillDialogOpen] = useState(false);
+  const [isTeamSkillDialogOpen, setIsTeamSkillDialogOpen] = useState(false);
 
   // 디버깅 함수 - 상세 로그 출력
   const logDebugInfo = (actionType: string, data: any) => {
@@ -40,13 +42,13 @@ export function IContextMenuForGroupAndTeamAndCounselor({
     console.log('이름:', item.name);
     console.log('ID:', item.id);
     console.log('테넌트 ID:', item.tenantId);
-    
+
     if (item.members) {
       console.log('멤버 수:', item.members.length);
       console.log('첫 번째 멤버 샘플:', item.members[0]);
       console.log('전체 멤버 목록:', item.members);
     }
-    
+
     console.log('전달 데이터:', data);
     console.groupEnd();
   };
@@ -71,34 +73,21 @@ export function IContextMenuForGroupAndTeamAndCounselor({
   // ====== 상담원 관련 함수 ======
   const handleCounselorSkillAssignment = () => {
     if (!validateTenantId()) return;
-    
+
     logDebugInfo("상담원 스킬 할당", {
       counselorId: item.id,
       counselorName: item.name,
       tenantId: item.tenantId
     });
-    
+
     // 다이얼로그 열기
     setIsSkillDialogOpen(true);
   };
-  
-  const handleCounselorSkillUnassignment = () => {
-    if (!validateTenantId()) return;
-    
-    logDebugInfo("상담원 스킬 할당 해제", {
-      counselorId: item.id,
-      counselorName: item.name,
-      tenantId: item.tenantId
-    });
-    
-    // 할당 해제도 동일한 다이얼로그 사용
-    setIsSkillDialogOpen(true);
-  };
 
-  // ====== 팀 관련 함수 ======
+  // 2. 팀 스킬 할당 함수 수정
   const handleTeamSkillAssignment = () => {
     if (!validateTenantId()) return;
-    
+
     if (!item.members || item.members.length === 0) {
       console.warn(`⚠️ 팀에 멤버가 없습니다. ${item.name} (${item.id})`);
       return;
@@ -109,7 +98,7 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       ...member,
       tenantId: item.tenantId
     }));
-    
+
     logDebugInfo("팀 스킬 할당", {
       teamId: item.id,
       teamName: item.name,
@@ -117,27 +106,30 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       tenantId: item.tenantId,
       members: membersWithTenantId
     });
-    
+
     // 상담원 목록 설정
     setCandidateMembersForSkilAssign(membersWithTenantId);
-    
-    // 기존 탭 정리
-    clearExistingTabs(601);
-    
-    // 탭 생성
-    addTab({
-      id: 601,
-      uniqueKey: `team-skill-assignment-${Date.now()}`,
-      title: `스킬 할당 - 팀: ${item.name} (${membersWithTenantId.length}명)`,
-      icon: "",
-      href: "",
-      content: null,
-    });
+
+    // 팀 스킬 할당 다이얼로그 열기
+    setIsTeamSkillDialogOpen(true);
   };
-  
+
+  const handleCounselorSkillUnassignment = () => {
+    if (!validateTenantId()) return;
+
+    logDebugInfo("상담원 스킬 할당 해제", {
+      counselorId: item.id,
+      counselorName: item.name,
+      tenantId: item.tenantId
+    });
+
+    // 할당 해제도 동일한 다이얼로그 사용
+    setIsSkillDialogOpen(true);
+  };
+
   const handleTeamSkillUnassignment = () => {
     if (!validateTenantId()) return;
-    
+
     if (!item.members || item.members.length === 0) {
       console.warn(`⚠️ 팀에 멤버가 없습니다. ${item.name} (${item.id})`);
       return;
@@ -148,7 +140,7 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       ...member,
       tenantId: item.tenantId
     }));
-    
+
     logDebugInfo("팀 스킬 할당 해제", {
       teamId: item.id,
       teamName: item.name,
@@ -156,57 +148,50 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       tenantId: item.tenantId,
       members: membersWithTenantId
     });
-    
+
     // 상담원 목록 설정
     setCandidateMembersForSkilAssign(membersWithTenantId);
-    
+
     // 기존 탭 정리
     clearExistingTabs(601);
-    
-    // 탭 생성
-    addTab({
-      id: 601,
-      uniqueKey: `team-skill-unassignment-${Date.now()}`,
-      title: `스킬 할당 해제 - 팀: ${item.name} (${membersWithTenantId.length}명)`,
-      icon: "",
-      href: "",
-      content: null,
-    });
+
+    // 다이어로그 출력
+    setIsTeamSkillDialogOpen(true);
   };
 
   // ====== 그룹 관련 함수 ======
   const handleGroupSkillAssignment = () => {
     if (!validateTenantId()) return;
-    
+
     if (!item.members || item.members.length === 0) {
       console.warn(`⚠️ 그룹에 멤버가 없습니다. ${item.name} (${item.id})`);
       return;
     }
-  
+
     // 처리 전 원본 멤버 데이터 로깅
     console.group("🔎 그룹 스킬 할당 - 멤버 데이터 처리 과정");
     console.log("1️⃣ 원본 멤버 데이터:", item.members);
     console.log("📊 멤버 수:", item.members.length);
-    
+
     // 첫 번째 멤버의 구조 자세히 확인
     if (item.members.length > 0) {
       console.log("🔍 첫 번째 멤버 상세 구조:", JSON.stringify(item.members[0], null, 2));
     }
-  
+
     // 멤버에게도 tenantId 전파하여 설정
     const membersWithTenantId = item.members.map(member => ({
       ...member,
       tenantId: item.tenantId
     }));
-    
+
     // 처리 후 데이터 로깅
     console.log("2️⃣ tenantId 추가 후 멤버 데이터:", membersWithTenantId);
     console.log("📊 처리된 멤버 수:", membersWithTenantId.length);
-    
+
     // 스토어 설정 전 최종 데이터 확인
     console.log("3️⃣ 스토어에 설정할 최종 데이터:", membersWithTenantId);
     console.groupEnd();
-    
+
     logDebugInfo("그룹 스킬 할당", {
       groupId: item.id,
       groupName: item.name,
@@ -214,10 +199,10 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       tenantId: item.tenantId,
       members: membersWithTenantId
     });
-    
+
     // 상담원 목록 설정
     setCandidateMembersForSkilAssign(membersWithTenantId);
-    
+
     // 스토어에 실제로 저장된 데이터 확인 (비동기 처리 후)
     setTimeout(() => {
       const storeState = useCounselorFilterStore.getState();
@@ -226,10 +211,10 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       console.log("📊 스토어에 저장된 멤버 수:", storeState.candidateMembersForSkilAssign.length);
       console.groupEnd();
     }, 100);
-    
+
     // 기존 탭 정리
     clearExistingTabs(602);
-    
+
     // 탭 생성
     addTab({
       id: 602,
@@ -240,10 +225,10 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       content: null,
     });
   };
-  
+
   const handleGroupSkillUnassignment = () => {
     if (!validateTenantId()) return;
-    
+
     if (!item.members || item.members.length === 0) {
       console.warn(`⚠️ 그룹에 멤버가 없습니다. ${item.name} (${item.id})`);
       return;
@@ -254,7 +239,7 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       ...member,
       tenantId: item.tenantId
     }));
-    
+
     logDebugInfo("그룹 스킬 할당 해제", {
       groupId: item.id,
       groupName: item.name,
@@ -262,13 +247,13 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       tenantId: item.tenantId,
       members: membersWithTenantId
     });
-    
+
     // 상담원 목록 설정
     setCandidateMembersForSkilAssign(membersWithTenantId);
-    
+
     // 기존 탭 정리
     clearExistingTabs(602);
-    
+
     // 탭 생성
     addTab({
       id: 602,
@@ -349,6 +334,18 @@ export function IContextMenuForGroupAndTeamAndCounselor({
           tenantId={item.tenantId}
         />
       )}
+
+      {item.type === "team" && isTeamSkillDialogOpen && (
+        <IDialogForTeamSkilAssignment
+          isOpen={isTeamSkillDialogOpen}
+          onClose={() => setIsTeamSkillDialogOpen(false)}
+          teamId={item.id}
+          teamName={item.name}
+          teamMembers={item.members || []}
+          tenantId={item.tenantId}
+        />
+      )}
+
     </>
   );
 }
