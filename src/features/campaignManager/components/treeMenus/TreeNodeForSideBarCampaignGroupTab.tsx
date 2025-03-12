@@ -19,9 +19,9 @@ import AddCampaignGroupDialog from "./dialog/AddCampaignGroupDialog";
 import { useTabStore } from "@/store/tabStore";
 import { ContextMenuForTreeNode } from "./ContextMenuForTreeNode";
 import CampaignAddPopup from '@/features/campaignManager/components/popups/CampaignAddPopup';
-import IContextMenuForCampaignGroupTabCamapaignGroup from "./ContextMenus/IContextMenuForCampaignGroupTabCamapaignGroup";
 import IContextMenuForCampaignTabTenant from "./ContextMenus/IContextMenuForCampaignTabTenant";
 import { CommonContextMenu } from "@/components/shared/CommonContextMenu";
+import IContextMenuForCampaignGroupTabCamapaignGroup from "./ContextMenus/IContextMenuForCampaignGroupTabCamapaignGroup";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -70,7 +70,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
   // 팝업 상태
   const [isCampaignAddPopupOpen, setIsCampaignAddPopupOpen] = useState(false);
-  
+
   // 디버깅용 로그 추가
   useEffect(() => {
     if (node.type === "group" && hasChildren) {
@@ -164,7 +164,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     }, 50);
   }, [forceCloseContextMenu]);
 
-  // 메뉴 항목 렌더링
+  // 메뉴 항목 렌더링 함수 수정
   const renderMenuItems = useCallback(() => {
     if (node.type === "tenant") {
       return (
@@ -179,6 +179,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       );
     }
     if (node.type === "group") {
+      // 주석 해제하고 CommonContextMenu 부분 제거
       return (
         <IContextMenuForCampaignGroupTabCamapaignGroup
           node={node}
@@ -331,7 +332,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
               <span></span>
               {node.status && getStatusIcon(node.status) && (
                 <div className="flex-shrink-0 w-4 h-4 relative">
-                  <Image 
+                  <Image
                     src={getStatusIcon(node.status) || ""}
                     alt={node.status || "상태"}
                     width={16}
@@ -397,7 +398,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
           </ContextMenuContent>
         </ContextMenu>
       )}
-  
+
       {hasChildren && isExpanded && (
         <div className="children-container space-y-1">
           {node.children?.map((child) => (
@@ -413,7 +414,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
           ))}
         </div>
       )}
-  
+
       <AddCampaignGroupDialog
         isOpen={isAddGroupDialogOpen}
         onClose={handleCloseAddGroupDialog}
@@ -421,7 +422,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
         tenantName={node.name}
         onAddGroup={handleAddGroup}
       />
-  
+
       <CampaignAddPopup
         isOpen={isCampaignAddPopupOpen}
         onConfirm={() => setIsCampaignAddPopupOpen(false)}

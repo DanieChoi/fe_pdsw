@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -11,7 +9,9 @@ import { getStatusIcon } from "@/components/shared/layout/utils/utils";
 import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useSidebarWidthStore } from "@/store/useSidebarWidthStore"; // 경로 조정 필요
 import { SortOption, useSortStore } from "@/store/storeForSideBarCampaignSort";
+import { useAuthStore } from "@/store";
 
+// 트리 상태 관리
 interface TreeState {
   selectedNodeId: string | undefined;
   expandedNodes: Set<string>;
@@ -37,7 +37,13 @@ const useTreeStore = create<TreeState>((set) => ({
   expandNodes: (nodes) => set({ expandedNodes: nodes }),
 }));
 
+// 캠페인 탭 전용 트리 메뉴 컴포넌트
 export function TreeMenusForCampaigns() {
+  // AuthStore에서 tenantId, role_id 가져오기
+  const { tenant_id, role_id } = useAuthStore();
+
+  // todo1
+  // useApiForGetTreeMenuDataForSideMenu 에 tenant_id, role_id 전달
   const { data: treeData, isLoading, error } = useApiForGetTreeMenuDataForSideMenu();
   const { selectedNodeId, expandedNodes, setSelectedNodeId, toggleNode, expandNodes } = useTreeStore();
   const { campaignSort } = useSortStore();

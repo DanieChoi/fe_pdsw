@@ -30,7 +30,7 @@ export const apiForGetCampaignList = async (): Promise<CampaignListResponse> => 
         );
 
         if (data.result_code === 0 && data.result_msg === "Success") {
-            console.log("api for campaign data check : ", data);
+            // console.log("api for campaign data check : ", data);
             return data;
         } else {
             throw new Error(`API Error: ${data.result_msg}`);

@@ -43,11 +43,9 @@ export async function assignSkillsToCounselor(
  */
 export const getAssignableSkillsForCounselor = async (tenantId: number): Promise<CounselorSkillListResponse> => {
 
-  console.log("📌 상담원 할당 가능 스킬 목록 조회 시작:", tenantId);
-  console.log("🔗 테넌트 ID 타입:", typeof tenantId);
-
-  console.log("🔗 테넌트 ID for 캠페인 탭 헤더 :", tenantId);
-
+  // console.log("📌 상담원 할당 가능 스킬 목록 조회 시작:", tenantId);
+  // console.log("🔗 테넌트 ID 타입:", typeof tenantId);
+  // console.log("🔗 테넌트 ID for 캠페인 탭 헤더 :", tenantId);
 
   const skillRequestData: CounselorSkillRequestData = {
     filter: {
@@ -73,9 +71,7 @@ export const getAssignableSkillsForCounselor = async (tenantId: number): Promise
       "collections/skill",
       skillRequestData
     );
-
-    console.log("✅ 상담원 할당 가능 스킬 목록 조회 성공 ???????????????????????????? ", data);
-
+    // console.log("✅ 상담원 할당 가능 스킬 목록 조회 성공 ???????????????????????????? ", data);
 
     return data;
 

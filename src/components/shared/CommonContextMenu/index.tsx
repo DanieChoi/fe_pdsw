@@ -13,44 +13,90 @@ interface CommonMenuItemProps {
   children: ReactNode;
 }
 
+// 전역 상태 및 이벤트 관리를 위한 객체
+const MenuManager = {
+  activeMenu: null as any,
+  setActiveMenu(menu: any) {
+    this.activeMenu = menu;
+  },
+  closeActiveMenu() {
+    if (this.activeMenu) {
+      this.activeMenu();
+      this.activeMenu = null;
+    }
+  },
+  closeOthers(current: any) {
+    if (this.activeMenu && this.activeMenu !== current) {
+      this.activeMenu();
+    }
+    this.setActiveMenu(current);
+  }
+};
+
+// 전역 이벤트 리스너 등록 (컴포넌트 외부에서 한 번만 실행)
+if (typeof window !== 'undefined') {
+  window.addEventListener('click', () => {
+    MenuManager.closeActiveMenu();
+  });
+  
+  window.addEventListener('contextmenu', () => {
+    MenuManager.closeActiveMenu();
+  });
+  
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      MenuManager.closeActiveMenu();
+    }
+  });
+}
+
 const CommonContextMenu: React.FC<CommonContextMenuProps> = ({ trigger, children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
-
-  const handleContextMenu = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // 컨텍스트 메뉴의 위치를 마우스 포인터 위치로 설정
-    setPosition({ x: e.clientX, y: e.clientY });
-    setIsOpen(true);
-  }, []);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
   }, []);
 
-  // 다른 곳을 클릭하면 메뉴 닫기
+  // 다른 메뉴가 열리면 현재 메뉴 닫기
   React.useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      setIsOpen(false);
-    };
-
-    const handleContextMenuOutside = (e: MouseEvent) => {
-      // 다른 곳에서 오른쪽 클릭하면 현재 메뉴 닫기
-      setIsOpen(false);
-    };
-
     if (isOpen) {
-      document.addEventListener('click', handleClickOutside);
-      document.addEventListener('contextmenu', handleContextMenuOutside);
+      MenuManager.closeOthers(handleClose);
     }
-
     return () => {
-      document.removeEventListener('click', handleClickOutside);
-      document.removeEventListener('contextmenu', handleContextMenuOutside);
+      if (MenuManager.activeMenu === handleClose) {
+        MenuManager.activeMenu = null;
+      }
     };
-  }, [isOpen]);
+  }, [isOpen, handleClose]);
+
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // 다른 컨텍스트 메뉴 닫기
+    MenuManager.closeActiveMenu();
+    
+    // 컨텍스트 메뉴의 위치를 마우스 포인터 위치로 설정
+    setPosition({ x: e.clientX, y: e.clientY });
+    setIsOpen(true);
+    
+    // 현재 메뉴를 활성 메뉴로 설정
+    MenuManager.setActiveMenu(handleClose);
+  }, [handleClose]);
+
+  // 메뉴 아이템 클릭 핸들러
+  const handleMenuItemClick = useCallback((originalOnClick: () => void) => {
+    return () => {
+      // 메뉴 닫기
+      setIsOpen(false);
+      
+      // setTimeout을 사용하여 메뉴가 완전히 닫힌 후 콜백 실행
+      setTimeout(() => {
+        originalOnClick();
+      }, 10);
+    };
+  }, []);
 
   return (
     <div className="relative inline-block text-left">
@@ -94,10 +140,7 @@ const CommonContextMenu: React.FC<CommonContextMenuProps> = ({ trigger, children
                 {React.Children.map(children, child => 
                   React.isValidElement(child) ? 
                     React.cloneElement(child as React.ReactElement<CommonMenuItemProps>, { 
-                      onClick: () => {
-                        (child as React.ReactElement<CommonMenuItemProps>).props.onClick();
-                        handleClose();
-                      }
+                      onClick: handleMenuItemClick((child as React.ReactElement<CommonMenuItemProps>).props.onClick)
                     }) 
                   : child
                 )}
