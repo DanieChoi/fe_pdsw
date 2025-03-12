@@ -86,6 +86,7 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
           <BlackListCountPopup />
         </div>
       );
+      
     case 600: // 상담원 스킬 할당 탭
       return (
         <div className="flex justify-left w-full">

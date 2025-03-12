@@ -1,4 +1,4 @@
-// src/features/campaignManager/components/popups/CampaignAddPopup.tsx
+// src/features/campaignManager/components/popups/CampaignAddPopup.tsx+
 import React, { useState, useMemo, useEffect } from 'react';
 import DataGrid, { SelectColumn } from "react-data-grid";
 import CustomAlert from '@/components/shared/layout/CustomAlert';
@@ -9,6 +9,7 @@ import TitleWrap from "@/components/shared/TitleWrap";
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import 'react-data-grid/lib/styles.css';
 import Image from "next/image";
+
 export interface CampaignAddPopupProps {
     isOpen?: boolean;
     onConfirm?: () => void;
