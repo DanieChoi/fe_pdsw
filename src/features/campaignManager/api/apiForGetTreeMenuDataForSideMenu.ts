@@ -1,4 +1,4 @@
-
+// src/features/campaignManager/api/apiForGetTreeMenuDataForSideMenu.ts
 import { TabData, TreeItem } from "@/features/campaignManager/types/typeForSidebar2";
 import { apiForGetTenantList } from "./apiForTennants";
 import { apiForGetCampaignList } from "./apiForCampaign";
@@ -13,9 +13,9 @@ function getStatusFromFlags(start_flag: number): 'started' | 'pending' | 'stoppe
   return 'stopped';                          // 기타 케이스는 stopped
 }
 
-export async function apiForGetTreeMenuDataForSideMenu(): Promise<TabData[]> {
+export async function apiForGetTreeMenuDataForSideMenu(tenant_id?: number, role_id?: string): Promise<TabData[]> {
   const [tenantsData, campaignData, skillDataForCampaign] = await Promise.all([
-    apiForGetTenantList(),
+    apiForGetTenantList(tenant_id),
     apiForGetCampaignList(),
     fetchskillCampaignList(),
   ]);
