@@ -182,7 +182,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
       return (
         <IContextMenuForCampaignGroupTabCamapaignGroup
           node={node}
-          handleMenuItemClick={handleMenuItemClick}
           setIsCampaignAddPopupOpen={setIsCampaignAddPopupOpen}
         />
       );
