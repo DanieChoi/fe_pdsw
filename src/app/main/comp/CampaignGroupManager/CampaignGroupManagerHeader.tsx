@@ -21,10 +21,11 @@ export interface CampaignGroupHeaderSearch {
 }
 
 type Props = {
+  groupId: number;
   onSearch: (param:CampaignGroupHeaderSearch) => void;
 }
 
-export default function CampaignGroupManagerHeader({onSearch}:Props) {
+export default function CampaignGroupManagerHeader({groupId,onSearch}:Props) {
   const { tenants } = useMainStore();
   const [tenantId, setTenantId] = useState('all'); // 테넌트
   const [campaignGroupName, setCampaignGroupName] = useState(''); // 캠페인이름
@@ -66,7 +67,7 @@ export default function CampaignGroupManagerHeader({onSearch}:Props) {
         </div>
       </div>
         <div className="flex justify-end gap-2">
-          {!readonly &&
+          {groupId < 0 &&
           <CommonButton onClick={onHeaderSearch}>조회</CommonButton>
           }
         </div>
