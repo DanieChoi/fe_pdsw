@@ -37,6 +37,13 @@ export interface CampaignGroupCampaignListResponse {
   result_data: CampaignGroupCampaignListResponseDataType[];
 }
 
+// 캠페인 그룹 소속 캠페인 삭제 요청
+export interface CampaignGroupCampaignListDeleteDataRequest {
+  tenant_id: number;
+  group_id: number;
+}
+
+
 // 삭제 응답 타입
 export interface DeleteResponse {
   result_code: number;

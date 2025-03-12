@@ -1,7 +1,7 @@
 // C:\Users\terec\fe_pdsw\src\app\main\comp\CampaignManager\index.tsx
 import React, { useState, useEffect } from 'react'
 import CampaignGroupManagerHeader, { CampaignGroupHeaderSearch } from './CampaignGroupManagerHeader';
-import CampaignGroupManagerDetail from './CampaignGroupManagerDetail';
+import CampaignGroupManagerDetail,{GroupDeleteParam} from './CampaignGroupManagerDetail';
 import CampaignGroupManagerList, { DataProps, downDataProps } from './CampaignGroupManagerList';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
@@ -13,7 +13,7 @@ import { useApiForCampaignGroupCampaignList } from '@/features/campaignGroupMana
 import { useApiForCampaignGroupCampaignListDelete } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupCampaignListDelete';
 import { useApiForCampaignGroupDelete } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupDelete';
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
-import { CampaignGroupGampaignListItem } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
+import { CampaignGroupGampaignListItem,CampaignGroupItem } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
 
 const initData: DataProps = { no: 0, tenantId: 0, tenantName: '', campaignGroupId: 0, campaignGroupName: '' };
 type Props = {
@@ -23,7 +23,7 @@ type Props = {
 
 const CampaignGroupManager = ({ groupId, groupName }: Props) => {
 
-  const { tenants } = useMainStore();
+  const { tenants,campaigns } = useMainStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
   const [_campaignGroupList, _setCampasignGroupList] = useState<DataProps[]>([]);
   const [tempCampaignListData, setTempCampaignListData] = useState<downDataProps[]>([]);
@@ -31,6 +31,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   const [_groupId, _setGroupId] = useState<number>(groupId ? parseInt(groupId) : -1);
   const [campaignId, setCampaignId] = useState<number>(0);
   const [campaignGroupCampaignListData, setCampaignGroupCampaignListData] = useState<CampaignGroupGampaignListItem[]>([]);
+  const [campaignGroupList, setCampasignGroupList] = useState<CampaignGroupItem[]>([]);
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
 
@@ -49,9 +50,9 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
     setCampaignId(parseInt(id));
   };
 
-  const handleGroupDelete = (id: string) => {
-    fetchCampaignGroupCampaignListDelete(parseInt(id) );
-    fetchCampaignGroupDelete(parseInt(id) );
+  const handleGroupDelete = (param: GroupDeleteParam) => {
+    fetchCampaignGroupCampaignListDelete({tenant_id: param.tenant_id, group_id: param.group_id});
+    fetchCampaignGroupDelete(param.group_id);
   };
 
   const handleInit = () => {
@@ -113,7 +114,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
       if( data.result_data.length > 0 ){
         for (let i = 0; i < tenants.length; i++) {
           for (let j = 0; j < data.result_data.length; j++) {
-            if (tenants[i].tenant_id === data.result_data[j].tenant_id && _groupId < 0) {
+            if (tenants[i].tenant_id === data.result_data[j].tenant_id && parseInt(groupId || '-1') < 0) {
               tempRows.push({
                 no: tempRows.length + 1,
                 tenantId: tenants[i].tenant_id,
@@ -126,13 +127,16 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
                 setGroupInfo(tempRows[0]);
               }
             }else if( tenants[i].tenant_id === data.result_data[j].tenant_id && _groupId > -1 && _groupId === data.result_data[j].group_id ){
-              tempRows.push({
+              const tempRowData = {
                 no: tempRows.length + 1,
                 tenantId: tenants[i].tenant_id,
                 tenantName: tenants[i].tenant_name,
                 campaignGroupId: data.result_data[j].group_id,
                 campaignGroupName: data.result_data[j].group_name,
-              });
+              };
+              tempRows.push(tempRowData);
+              _setGroupId(tempRowData.campaignGroupId);
+              setGroupInfo(tempRowData);
             }
           }
         }
@@ -194,6 +198,12 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
       }
     }
   }, [_groupId, _campaignGroupList, campaignGroupCampaignListData]);
+  
+  useEffect(() => {
+    if (campaigns) {
+      handleInit();
+    }
+  }, [campaigns]);
 
   useEffect(() => {
     if (tenants) {
@@ -207,7 +217,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   return (
     <div>
       <div className='flex flex-col gap-[15px] limit-width'>
-        <CampaignGroupManagerHeader onSearch={handleCampaignHeaderSearch} />
+        <CampaignGroupManagerHeader groupId={parseInt(groupId || '-1')} onSearch={handleCampaignHeaderSearch} />
         <div className="flex gap-[30px]">
           <CampaignGroupManagerList
             campaignId={campaignIdForUpdateFromSideMenu || ''}

@@ -32,6 +32,7 @@ import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 import CampaignTab from '@/app/main/comp/CampaignManager/CampaignTab';
 import {DataProps,downDataProps} from './CampaignGroupManagerList';
 import AddCampaignGroupDialog from "./AddCampaignGroupDialog";
+import CampaignAddPopup from '@/features/campaignManager/components/popups/CampaignAddPopup';
 
 const dialModeList = [
   {dial_id:1, dial_name: 'Power'},
@@ -287,11 +288,16 @@ export interface NotificationTabParam {
   supervisor_phone: string;
 }
 
+export interface GroupDeleteParam {
+  tenant_id: number;
+  group_id: number;
+}
+
 type Props = {
   groupInfo: DataProps;
   campaignId: number;
   onInit: () => void;
-  onGroupDelete: (id: string) => void;
+  onGroupDelete: (param: GroupDeleteParam) => void;
 }
 
 export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit,onGroupDelete}: Props) {
@@ -588,33 +594,35 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
 
   //캠페인 동작시간 탭 변경
   const handleCampaignScheduleChange = (value: OperationTimeParam) => {
-    if( value.campaignInfoChangeYn ){
-      setChangeYn(true);
-      setCampaignInfoChangeYn(true);
-      setTempCampaignManagerInfo({...tempCampaignManagerInfo
-        , start_flag: Number(value.start_flag)
-      });
-      setTempCampaignsInfo({...tempCampaignInfo
-        , start_flag: Number(value.start_flag)
-      });
-    }
-    if( value.campaignScheduleChangeYn ){
-      setChangeYn(true);
-      setCampaignScheduleChangeYn(true);
-      setTempCampaignSchedule({...tempCampaignSchedule
-        , campaign_id: value.campaign_id
-        , start_date: value.start_date
-        , end_date: value.end_date
-        , start_time: value.start_time
-        , end_time: value.end_time
-      });
-    }
-    if( value.onSave ){
-      setCampaignSaveYn(false);
-      handleCampaignSave();
-    }
-    if( value.onClosed ){
-      handleCampaignClosed();
+    if( campaignId > 0 ){
+      if( value.campaignInfoChangeYn ){
+        setChangeYn(true);
+        setCampaignInfoChangeYn(true);
+        setTempCampaignManagerInfo({...tempCampaignManagerInfo
+          , start_flag: Number(value.start_flag)
+        });
+        setTempCampaignsInfo({...tempCampaignInfo
+          , start_flag: Number(value.start_flag)
+        });
+      }
+      if( value.campaignScheduleChangeYn ){
+        setChangeYn(true);
+        setCampaignScheduleChangeYn(true);
+        setTempCampaignSchedule({...tempCampaignSchedule
+          , campaign_id: value.campaign_id
+          , start_date: value.start_date
+          , end_date: value.end_date
+          , start_time: value.start_time
+          , end_time: value.end_time
+        });
+      }
+      if( value.onSave ){
+        setCampaignSaveYn(false);
+        handleCampaignSave();
+      }
+      if( value.onClosed ){
+        handleCampaignClosed();
+      }
     }
   }
   
@@ -853,8 +861,7 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
     setAlertState({
       ...errorMessage,
       isOpen: true,
-      message: '캠페인 아이디 : ' + tempCampaignManagerInfo.campaign_id
-      + '\n 캠페인 이름 : ' + tempCampaignManagerInfo.campaign_name
+      message: '변경된 캠페인은 복구가 불가능 합니다.'
       + '\n 캠페인을 수정하시겠습니까?',
       onClose: handleCampaignSaveExecute,
       onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
@@ -1013,8 +1020,13 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
   //재발신 버튼 이벤트
   const handleRebroadcast = () => {
     // openRebroadcastSettings('20','재발신 설정');
-    if( campaignIdForUpdateFromSideMenu == null || campaignIdForUpdateFromSideMenu === ''){
-      setCampaignIdForUpdateFromSideMenu(tempCampaignInfo.campaign_id+'');
+    // if( campaignIdForUpdateFromSideMenu == null || campaignIdForUpdateFromSideMenu === '' || campaignIdForUpdateFromSideMenu === '0'){
+    //   setCampaignIdForUpdateFromSideMenu(campaignId+'');
+    // }
+    if( campaignId > 0){
+      setCampaignIdForUpdateFromSideMenu(campaignId+'');
+    }else{
+      setCampaignIdForUpdateFromSideMenu('');
     }
     if (openedTabs.some(tab => tab.id === 20)) {
       setActiveTab(20, openedTabs.filter((data) => data.id === 20)[0].uniqueKey);
@@ -1040,6 +1052,14 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
     setIsAddGroupDialogOpen(false);
   }; 
 
+  // 팝업 상태
+  const [isCampaignAddPopupOpen, setIsCampaignAddPopupOpen] = useState(false);
+  
+  // 다이얼로그 닫기
+  const handleCloseGroupAddCampaignOpen = () => {
+    setIsCampaignAddPopupOpen(true);
+  };
+
   return (
     <div className='flex flex-col gap-5 w-[60%] overflow-auto'>
       <div>
@@ -1048,9 +1068,12 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
           title="상세내역"
           buttons={[
               { label: "새 캠페인 그룹", onClick: () => setIsAddGroupDialogOpen(true) },
-              { label: "소속 캠페인 추가/삭제", onClick: () => console.log("") },
+              { label: "소속 캠페인 추가/삭제", onClick: () => handleCloseGroupAddCampaignOpen() },
               { label: "일괄 저장", onClick: () => handleCampaignSave(),},
-              { label: "캠페인 그룹 삭제", onClick: () => onGroupDelete(groupInfo.campaignGroupId+'') },
+              { label: "캠페인 그룹 삭제", onClick: () => onGroupDelete({
+                tenant_id: groupInfo.tenantId,
+                group_id: groupInfo.campaignGroupId
+              }) },
               { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
           ]}
           />
@@ -1200,6 +1223,11 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
         tenantId={0} 
         tenantName={''}
         onAddGroup={handleAddGroup}
+      />
+      <CampaignAddPopup
+        isOpen={isCampaignAddPopupOpen}
+        onConfirm={() => setIsCampaignAddPopupOpen(false)}
+        onCancel={() => setIsCampaignAddPopupOpen(false)}
       />
     </div>
   );

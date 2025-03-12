@@ -1,18 +1,19 @@
 // src/features/campaignManager/hooks/fetchCallingListDelete.ts
 import { axiosInstance } from '@/lib/axios';
-import { DeleteResponse } from '../types/campaignGroupManagerIndex';
+import { DeleteResponse,CampaignGroupCampaignListDeleteDataRequest } from '../types/campaignGroupManagerIndex';
 
 // 캠페인 그룹 소속 캠페인 삭제 요청
-export const fetchCampaignGroupCampaignListDelete = async (credentials: number): Promise<DeleteResponse> => {
+export const fetchCampaignGroupCampaignListDelete = async (credentials: CampaignGroupCampaignListDeleteDataRequest): Promise<DeleteResponse> => {
   const campaignGroupCampaignListRequestData = {
-    request_data: {      
+    request_data: {
+      tenant_id: credentials.tenant_id,
       campaign_id: 0
     }
   };
     
   try {
     const { data } = await axiosInstance.delete<DeleteResponse>(
-      'campaign-group/' + credentials + '/list',
+      'campaign-group/' + credentials.group_id + '/list',
       {
         headers: {
           'Content-Type': 'application/json' 
