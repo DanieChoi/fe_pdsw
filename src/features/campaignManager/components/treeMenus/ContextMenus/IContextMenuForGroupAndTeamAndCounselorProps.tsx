@@ -12,6 +12,7 @@ import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
 import { useTabStore } from "@/store/tabStore";
 import { IDialogForSkilAssignmentForCounselor } from "../dialog/IDialogForSkilAssignmentForCounselor";
 import { IDialogForTeamSkilAssignment } from "../dialog/IDialogForTeamSkilAssignment";
+import { IDialogForGroupSkilAssignment } from "../dialog/IDialogForGroupSkilAssignment";
 
 interface IContextMenuForGroupAndTeamAndCounselorProps {
   children: React.ReactNode;
@@ -34,6 +35,7 @@ export function IContextMenuForGroupAndTeamAndCounselor({
   // 다이얼로그 상태 관리
   const [isSkillDialogOpen, setIsSkillDialogOpen] = useState(false);
   const [isTeamSkillDialogOpen, setIsTeamSkillDialogOpen] = useState(false);
+  const [isGroupSkillDialogOpen, setIsGroupSkillDialogOpen] = useState(false);
 
   // 디버깅 함수 - 상세 로그 출력
   const logDebugInfo = (actionType: string, data: any) => {
@@ -168,27 +170,27 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       return;
     }
 
-    // 처리 전 원본 멤버 데이터 로깅
+    // 처리 전 원본 멤버 데이터 로깅 (기존 코드 유지)
     console.group("🔎 그룹 스킬 할당 - 멤버 데이터 처리 과정");
     console.log("1️⃣ 원본 멤버 데이터:", item.members);
     console.log("📊 멤버 수:", item.members.length);
 
-    // 첫 번째 멤버의 구조 자세히 확인
+    // 첫 번째 멤버의 구조 자세히 확인 (기존 코드 유지)
     if (item.members.length > 0) {
       console.log("🔍 첫 번째 멤버 상세 구조:", JSON.stringify(item.members[0], null, 2));
     }
 
-    // 멤버에게도 tenantId 전파하여 설정
+    // 멤버에게도 tenantId 전파하여 설정 (기존 코드 유지)
     const membersWithTenantId = item.members.map(member => ({
       ...member,
       tenantId: item.tenantId
     }));
 
-    // 처리 후 데이터 로깅
+    // 처리 후 데이터 로깅 (기존 코드 유지)
     console.log("2️⃣ tenantId 추가 후 멤버 데이터:", membersWithTenantId);
     console.log("📊 처리된 멤버 수:", membersWithTenantId.length);
 
-    // 스토어 설정 전 최종 데이터 확인
+    // 스토어 설정 전 최종 데이터 확인 (기존 코드 유지)
     console.log("3️⃣ 스토어에 설정할 최종 데이터:", membersWithTenantId);
     console.groupEnd();
 
@@ -200,10 +202,10 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       members: membersWithTenantId
     });
 
-    // 상담원 목록 설정
+    // 상담원 목록 설정 (기존 코드 유지)
     setCandidateMembersForSkilAssign(membersWithTenantId);
 
-    // 스토어에 실제로 저장된 데이터 확인 (비동기 처리 후)
+    // 스토어에 실제로 저장된 데이터 확인 (기존 코드 유지)
     setTimeout(() => {
       const storeState = useCounselorFilterStore.getState();
       console.group("🔄 스토어 상태 확인");
@@ -212,18 +214,8 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       console.groupEnd();
     }, 100);
 
-    // 기존 탭 정리
-    clearExistingTabs(602);
-
-    // 탭 생성
-    addTab({
-      id: 602,
-      uniqueKey: `group-skill-assignment-${Date.now()}`,
-      title: `스킬 할당 - 그룹: ${item.name} (${membersWithTenantId.length}명)`,
-      icon: "",
-      href: "",
-      content: null,
-    });
+    // 여기부터 변경: 탭 대신 다이얼로그 사용
+    setIsGroupSkillDialogOpen(true);
   };
 
   const handleGroupSkillUnassignment = () => {
@@ -251,18 +243,19 @@ export function IContextMenuForGroupAndTeamAndCounselor({
     // 상담원 목록 설정
     setCandidateMembersForSkilAssign(membersWithTenantId);
 
-    // 기존 탭 정리
-    clearExistingTabs(602);
+    // // 기존 탭 정리
+    // clearExistingTabs(602);
 
-    // 탭 생성
-    addTab({
-      id: 602,
-      uniqueKey: `group-skill-unassignment-${Date.now()}`,
-      title: `스킬 할당 해제 - 그룹: ${item.name} (${membersWithTenantId.length}명)`,
-      icon: "",
-      href: "",
-      content: null,
-    });
+    // // 탭 생성
+    // addTab({
+    //   id: 602,
+    //   uniqueKey: `group-skill-unassignment-${Date.now()}`,
+    //   title: `스킬 할당 해제 - 그룹: ${item.name} (${membersWithTenantId.length}명)`,
+    //   icon: "",
+    //   href: "",
+    //   content: null,
+    // });
+    setIsGroupSkillDialogOpen(true);
   };
 
   // 타입에 따라 적절한 핸들러 선택
@@ -342,6 +335,17 @@ export function IContextMenuForGroupAndTeamAndCounselor({
           teamId={item.id}
           teamName={item.name}
           teamMembers={item.members || []}
+          tenantId={item.tenantId}
+        />
+      )}
+
+      {item.type === "group" && isGroupSkillDialogOpen && (
+        <IDialogForGroupSkilAssignment
+          isOpen={isGroupSkillDialogOpen}
+          onClose={() => setIsGroupSkillDialogOpen(false)}
+          groupId={item.id}
+          groupName={item.name}
+          groupMembers={item.members || []}
           tenantId={item.tenantId}
         />
       )}
