@@ -99,7 +99,7 @@ const CommonContextMenu: React.FC<CommonContextMenuProps> = ({ trigger, children
   }, []);
 
   return (
-    <div className="relative inline-block text-left">
+    <div className="relative text-left">
       {/* 트리거 요소에 onContextMenu 이벤트 추가 */}
       <div 
         onContextMenu={handleContextMenu} 
@@ -136,7 +136,7 @@ const CommonContextMenu: React.FC<CommonContextMenuProps> = ({ trigger, children
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="py-1">
+              <div className="min-w-[8rem] space-y-[2px] overflow-hidden rounded-[3px] border border-[#333] bg-popover py-[10px] px-[12px] ">
                 {React.Children.map(children, child => 
                   React.isValidElement(child) ? 
                     React.cloneElement(child as React.ReactElement<CommonMenuItemProps>, { 
@@ -155,7 +155,7 @@ const CommonContextMenu: React.FC<CommonContextMenuProps> = ({ trigger, children
 
 const CommonMenuItem: React.FC<CommonMenuItemProps> = ({ onClick, children }) => (
   <button
-    className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+    className="hover:bg-[#F4F6F9] relative cursor-default select-none rounded-[3px] px-[6px] py-[4px] outline-none focus:bg-[#F4F6F9] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-[#333] flex items-center text-sm w-full"
     onClick={(e) => {
       e.stopPropagation();
       onClick();
