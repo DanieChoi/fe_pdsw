@@ -130,7 +130,6 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
 
   return (
     <div className="w-[40%] shrink-0">
-      <div>안녕 캠페인</div>
       <TitleWrap title="캠페인 그룹 검색목록" totalCount={memoizedRows.length} />
       <div className="overflow-x-auto">
         <div className="grid-custom-wrap h-[200px]">
