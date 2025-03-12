@@ -43,7 +43,6 @@ export function TreeMenusForCampaigns() {
   const { tenant_id, role_id } = useAuthStore();
 
   // todo1
-  // useApiForGetTreeMenuDataForSideMenu 에 tenant_id, role_id 전달
   const { data: treeData, isLoading, error } = useApiForGetTreeMenuDataForSideMenu();
   const { selectedNodeId, expandedNodes, setSelectedNodeId, toggleNode, expandNodes } = useTreeStore();
   const { campaignSort } = useSortStore();

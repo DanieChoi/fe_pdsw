@@ -24,13 +24,102 @@ interface CombinedData {
  * @param tenant_id 테넌트 ID (캠페인 그룹 조회에 사용)
  * @returns Promise<ExtendedCombinedData> 테넌트, 캠페인 그룹, 캠페인 데이터를 포함한 객체
  */
+// export const apiForCombinedTenantAndCampaignGroup = async (
+//     tenant_id: number
+// ): Promise<ExtendedCombinedData> => {
+//     try {
+//         // Promise.all을 사용하여 세 API를 병렬로 호출
+//         const [tenantData, campaignGroupData, campaignData] = await Promise.all([
+//             apiForGetTenantList(),
+//             apiForCampaignGroupList(tenant_id),
+//             apiForCampaignListForCampaignGroup({
+//                 filter: {
+//                     group_id: [],
+//                     campaign_id: {
+//                         start: 1,
+//                         end: 100
+//                     }
+//                 },  // 모든 캠페인 그룹의 캠페인 가져오기
+//                 sort: {
+//                     campaign_id: 1  // 캠페인 ID 기준 오름차순 정렬
+//                 },
+//                 page: {
+//                     index: 1,
+//                     items: 10  // 최대한 많은 아이템 가져오기
+//                 }
+//             })
+//         ]);
+
+//         console.log("Combined API for tenant data:", tenantData);
+//         console.log("Combined API for campaign group data:", campaignGroupData);
+//         console.log("Combined API for campaign data:", campaignData);
+
+//         return {
+//             tenantData,
+//             campaignGroupData,
+//             campaignData
+//         };
+//     } catch (error: any) {
+//         console.error("Combined API call failed:", error);
+
+//         // 에러 객체에 custom 속성 추가
+//         const enhancedError = new Error(
+//             error.message || "테넌트, 캠페인 그룹, 캠페인 데이터를 가져오는데 실패했습니다."
+//         );
+
+//         // 원본 에러 정보 유지
+//         (enhancedError as any).originalError = error;
+
+//         throw enhancedError;
+//     }
+// };
+
+// /**
+//  * 캠페인 그룹에 속한 캠페인 목록을 가져오는 API
+//  * @param request 필터, 정렬, 페이징 정보가 포함된 요청 객체
+//  * @returns 캠페인 그룹별 캠페인 목록
+//  */
+// export const apiForCampaignListForCampaignGroup = async (
+//     request: GetCampaignListForCampaignGroupRequest
+// ): Promise<CampaignGroupGampaignListApiResponse> => {
+//     try {
+//         const { data } = await axiosInstance.post<CampaignGroupGampaignListApiResponse>(
+//             'collections/campaign-group-list',
+//             request
+//         );
+
+//         console.log("Campaign list for campaign group ???????????????? :", data);
+
+
+//         return data.result_data ? data : {
+//             result_data: [],
+//             result_code: 0,
+//             result_msg: "No data",
+//             result_count: 0
+//         };
+//     } catch (error: any) {
+//         if (error.response?.status === 401) {
+//             throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
+//         }
+//         throw new Error(
+//             `${error.response?.data?.result_code || ''}||${error.response?.data?.result_msg || '데이터 가져오기 실패'}`
+//         );
+//     }
+// };
+
+/**
+ * 테넌트 목록, 캠페인 그룹 목록, 캠페인 목록을 동시에 가져오는 API 함수
+ * @param tenant_id 테넌트 ID (캠페인 그룹 조회에 사용)
+ * @returns Promise<ExtendedCombinedData> 테넌트, 캠페인 그룹, 캠페인 데이터를 포함한 객체
+ */
 export const apiForCombinedTenantAndCampaignGroup = async (
     tenant_id: number
 ): Promise<ExtendedCombinedData> => {
     try {
         // Promise.all을 사용하여 세 API를 병렬로 호출
+        // 여기서 tenant_id를 apiForGetTenantList에 전달하여 필터링
         const [tenantData, campaignGroupData, campaignData] = await Promise.all([
-            apiForGetTenantList(),
+            apiForGetTenantList(tenant_id), // tenant_id 전달
             apiForCampaignGroupList(tenant_id),
             apiForCampaignListForCampaignGroup({
                 filter: {
@@ -39,13 +128,13 @@ export const apiForCombinedTenantAndCampaignGroup = async (
                         start: 1,
                         end: 100
                     }
-                },  // 모든 캠페인 그룹의 캠페인 가져오기
+                },
                 sort: {
-                    campaign_id: 1  // 캠페인 ID 기준 오름차순 정렬
+                    campaign_id: 1
                 },
                 page: {
                     index: 1,
-                    items: 10  // 최대한 많은 아이템 가져오기
+                    items: 10
                 }
             })
         ]);
@@ -54,11 +143,29 @@ export const apiForCombinedTenantAndCampaignGroup = async (
         console.log("Combined API for campaign group data:", campaignGroupData);
         console.log("Combined API for campaign data:", campaignData);
 
-        return {
-            tenantData,
-            campaignGroupData,
-            campaignData
+        // 데이터 유효성 검사 및 기본값 설정
+        const safeData = {
+            tenantData: {
+                result_data: tenantData?.result_data || [],
+                result_code: tenantData?.result_code || 0,
+                result_msg: tenantData?.result_msg || "No tenant data",
+                result_count: tenantData?.result_count || 0
+            },
+            campaignGroupData: {
+                result_data: campaignGroupData?.result_data || [],
+                result_code: campaignGroupData?.result_code || 0,
+                result_msg: campaignGroupData?.result_msg || "No campaign group data",
+                result_count: campaignGroupData?.result_count || 0
+            },
+            campaignData: {
+                result_data: campaignData?.result_data || [],
+                result_code: campaignData?.result_code || 0,
+                result_msg: campaignData?.result_msg || "No campaign data",
+                result_count: campaignData?.result_count || 0
+            }
         };
+
+        return safeData;
     } catch (error: any) {
         console.error("Combined API call failed:", error);
 
@@ -88,16 +195,29 @@ export const apiForCampaignListForCampaignGroup = async (
             request
         );
 
-        console.log("Campaign list for campaign group ???????????????? :", data);
+        console.log("Campaign list for campaign group response:", data);
+        
+        // Check if data exists and has the expected structure
+        if (!data || typeof data !== 'object') {
+            console.error("Invalid API response format:", data);
+            return {
+                result_data: [],
+                result_code: 0,
+                result_msg: "Invalid response",
+                result_count: 0
+            };
+        }
 
-
-        return data.result_data ? data : {
-            result_data: [],
-            result_code: 0,
-            result_msg: "No data",
-            result_count: 0
+        // Return the data as-is if it has result_data, otherwise return empty array
+        return {
+            result_data: Array.isArray(data.result_data) ? data.result_data : [],
+            result_code: data.result_code || 0,
+            result_msg: data.result_msg || "No data",
+            result_count: data.result_count || 0
         };
     } catch (error: any) {
+        console.error("Error fetching campaign group list:", error);
+        
         if (error.response?.status === 401) {
             throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
         }

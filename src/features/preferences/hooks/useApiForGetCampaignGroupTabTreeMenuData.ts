@@ -1,14 +1,14 @@
 // src/features/preferences/hooks/useApiForCampaignGroupList.ts
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
-import { 
-    apiForCampaignGroupList, 
+import {
+    apiForCampaignGroupList,
     apiForCombinedTenantAndCampaignGroup,
     apiForCombinedDataForSideMenu,
     transformToTreeData,
     apiForCampaignGroupCampaignList,
     apiForCampaignListForCampaignGroup
 } from '../api/apiForCampaignGroup';
-import { 
+import {
     CampaignGroupApiResponse,
     TreeNode,
     SideMenuTreeData,
@@ -16,6 +16,7 @@ import {
     ExtendedCombinedData
 } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
 import { TenantListResponse } from '@/features/campaignManager/types/typeForTenant';
+import { useAuthStore } from '@/store/authStore';
 
 // 에러 타입 정의
 interface CombinedDataError {
@@ -33,10 +34,11 @@ interface CombinedDataError {
  * @returns 트리 구조의 데이터
  */
 export function useApiForGetCampaignGroupTabTreeMenuData(
-    tenant_id: number,
+    // tenant_id: number,
     enabled: boolean = true
 ): UseQueryResult<TreeNode[], CombinedDataError> {
-    console.log("tenant_id at 사이드 메뉴 호출 : ", tenant_id);
+    // console.log("tenant_id at 사이드 메뉴 호출 : ", tenant_id);
+    const { tenant_id, role_id } = useAuthStore();
 
     return useQuery<ExtendedCombinedData, CombinedDataError, TreeNode[]>({
         queryKey: ['sideMenuTreeData', tenant_id],

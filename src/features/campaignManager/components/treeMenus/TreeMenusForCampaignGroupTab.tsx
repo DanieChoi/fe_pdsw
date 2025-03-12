@@ -61,7 +61,7 @@ export function TreeMenusForCampaignGroupTab() {
   
   // 트리 구조 데이터 가져오기 (캠페인 포함)
   const { data: treeData, isLoading: isLoadingTree, error: errorTree } = 
-    useApiForGetCampaignGroupTabTreeMenuData(tenant_id);
+    useApiForGetCampaignGroupTabTreeMenuData();
 
   // 노드 확장/축소 토글
   const handleNodeToggle = (nodeId: string) => {
