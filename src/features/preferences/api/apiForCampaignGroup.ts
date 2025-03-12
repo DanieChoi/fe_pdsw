@@ -149,7 +149,8 @@ export const apiForCombinedTenantAndCampaignGroup = async (
                 result_data: tenantData?.result_data || [],
                 result_code: tenantData?.result_code || 0,
                 result_msg: tenantData?.result_msg || "No tenant data",
-                result_count: tenantData?.result_count || 0
+                result_count: tenantData?.result_count || 0,
+                total_count: tenantData?.total_count || 0
             },
             campaignGroupData: {
                 result_data: campaignGroupData?.result_data || [],
