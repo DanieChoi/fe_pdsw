@@ -16,7 +16,7 @@ export interface TabItem {
   content?: React.ReactNode;
   campaignId?: string;
   campaignName?: string;
-  params?: any; 
+  params?: any;
 }
 
 export interface TabSection {
@@ -77,6 +77,7 @@ export interface TabLayoutStore {
 
   // 새 탭을 열 때 사용
   addTab: (tab: TabItem) => void;
+  addTabCurrentOnly: (tab: TabItem) => void;
 
   addMultiTab: (tab: TabItem) => void;
 
@@ -932,4 +933,85 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
         activeTabKey: null
       };
     }),
+
+  addTabCurrentOnly: (tab) =>
+    set((state) => {
+      // 1. 동일한 ID를 가진 기존 탭들을 찾아서 모두 제거
+      const tabsToRemove = state.openedTabs.filter(t => t.id === tab.id);
+
+      // 각 탭 개별적으로 제거
+      tabsToRemove.forEach(tabToRemove => {
+        // removeTab 로직을 직접 여기서 구현 (내부에서 get().removeTab 호출 시 비동기 문제 발생 가능)
+        const newTabs = state.openedTabs.filter(
+          t => !(t.id === tabToRemove.id && t.uniqueKey === tabToRemove.uniqueKey)
+        );
+
+        const updatedRows = state.rows.map(row => ({
+          ...row,
+          sections: row.sections.map(sec => {
+            const newSectionTabs = sec.tabs.filter(
+              t => !(t.id === tabToRemove.id && t.uniqueKey === tabToRemove.uniqueKey)
+            );
+
+            return {
+              ...sec,
+              tabs: newSectionTabs,
+              activeTabKey:
+                sec.activeTabKey === tabToRemove.uniqueKey
+                  ? newSectionTabs.length > 0
+                    ? newSectionTabs[newSectionTabs.length - 1].uniqueKey
+                    : null
+                  : sec.activeTabKey,
+            };
+          }),
+        }));
+
+        state = {
+          ...state,
+          openedTabs: newTabs,
+          rows: updatedRows,
+        };
+      });
+
+      // 2. 새 탭 추가 (addTab 로직을 직접 가져옴)
+      const isAlreadyOpened = state.openedTabs.some(
+        t => t.id === tab.id && t.uniqueKey === tab.uniqueKey
+      );
+
+      if (isAlreadyOpened) {
+        return state;
+      }
+
+      const newOpenedTabs = [...state.openedTabs, tab];
+
+      const [firstRow] = state.rows;
+      if (!firstRow) return state;
+
+      const [firstSection] = firstRow.sections;
+      if (!firstSection) return state;
+
+      const updatedSection = {
+        ...firstSection,
+        tabs: [...firstSection.tabs, tab],
+        activeTabKey: tab.uniqueKey,
+      };
+
+      const updatedSections = adjustSectionWidths(
+        firstRow.sections.map(sec =>
+          sec.id === firstSection.id ? updatedSection : sec
+        )
+      );
+
+      const updatedRow = { ...firstRow, sections: updatedSections };
+      const newRows = state.rows.map(row =>
+        row.id === firstRow.id ? updatedRow : row
+      );
+
+      return {
+        ...state,
+        openedTabs: newOpenedTabs,
+        rows: newRows,
+      };
+    }),
+
 }));
