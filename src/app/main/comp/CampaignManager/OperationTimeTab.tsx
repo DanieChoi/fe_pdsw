@@ -261,15 +261,15 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
                           check = true;
                         }
                         if( !check ) {                          
-                          setTempData((prev) => [
-                            ...prev,
-                            {
-                              no: prev.length + 1,
-                              division: prev.length + 1,
-                              startTime: startTime.substring(0,2)+":"+startTime.substring(2,4),
-                              endTime: endTime.substring(0,2)+":"+endTime.substring(2,4),
-                            },
-                          ]);
+                          // setTempData((prev) => [
+                          //   ...prev,
+                          //   {
+                          //     no: prev.length + 1,
+                          //     division: prev.length + 1,
+                          //     startTime: startTime.substring(0,2)+":"+startTime.substring(2,4),
+                          //     endTime: endTime.substring(0,2)+":"+endTime.substring(2,4),
+                          //   },
+                          // ]);
                           tempStartTime.push(startTime);
                           tempEndTime.push(endTime);
 
