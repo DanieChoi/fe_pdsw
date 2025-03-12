@@ -206,6 +206,12 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   }, [campaigns]);
 
   useEffect(() => {
+    if (groupId) {
+      _setGroupId(parseInt(groupId));
+    }
+  }, [groupId]);
+
+  useEffect(() => {
     if (tenants) {
       const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       fetchSchedules({
