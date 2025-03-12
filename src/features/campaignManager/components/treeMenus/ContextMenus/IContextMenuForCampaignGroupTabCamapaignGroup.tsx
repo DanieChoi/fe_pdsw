@@ -6,6 +6,7 @@ import { useTabStore } from "@/store/tabStore";
 import { useApiForDeleteCampaignGroup } from "@/features/campaignManager/hooks/useApiForDeleteCampaignGroup";
 import { Button } from "@/components/ui/button";
 import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDialogForSideMenu";
+import IDialogForUpdateCampaignGroupName from "../dialog/IDialogForUpdateCampaignGroupName";
 import { toast } from "react-toastify";
 
 interface IContextMenuForCampaignGroupTabCamapaignProps {
@@ -21,6 +22,7 @@ const IContextMenuForCampaignGroupTabCamapaignGroup: FC<IContextMenuForCampaignG
 }) => {
   const { addTab } = useTabStore();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
 
   // 캠페인 그룹 삭제 훅 사용
   const { mutate: deleteCampaignGroup, isPending: isDeleting } = useApiForDeleteCampaignGroup({
@@ -46,6 +48,17 @@ const IContextMenuForCampaignGroupTabCamapaignGroup: FC<IContextMenuForCampaignG
   // 다이얼로그 닫기 핸들러
   const handleCloseDialog = () => {
     setIsDeleteDialogOpen(false);
+  };
+
+  // 이름 변경 다이얼로그 닫기 핸들러
+  const handleCloseRenameDialog = () => {
+    setIsRenameDialogOpen(false);
+  };
+
+  // 이름 변경 성공 핸들러
+  const handleRenameSuccess = () => {
+    // 여기에서 필요한 경우 리렌더링이나 데이터 갱신 로직을 추가할 수 있음
+    // 예: queryClient.invalidateQueries('campaignGroups');
   };
 
   return (
@@ -95,7 +108,12 @@ const IContextMenuForCampaignGroupTabCamapaignGroup: FC<IContextMenuForCampaignG
       </ContextMenuItem>
       <ContextMenuItem
         onClick={(e) =>
-          handleMenuItemClick(e, () => console.log(`캠페인 그룹 이름 변경: ${node.name}`))
+          handleMenuItemClick(e, () => { 
+            console.log("캠페인 그룹 이름 변경:", node);
+            console.log(`캠페인 그룹 tenant_id: ${node.tenant_id}`);
+            console.log(`캠페인 그룹 group_id: ${node.group_id}`);
+            setIsRenameDialogOpen(true);
+          })
         }
         className="flex items-center whitespace-nowrap"
       >
@@ -133,7 +151,7 @@ const IContextMenuForCampaignGroupTabCamapaignGroup: FC<IContextMenuForCampaignG
         캠페인 그룹 실시간 재발신
       </ContextMenuItem>
 
-      {/* CommonDialogForSideMenu 컴포넌트를 사용한 삭제 확인 다이얼로그 */}
+      {/* 캠페인 그룹 삭제 다이얼로그 */}
       <CommonDialogForSideMenu
         isOpen={isDeleteDialogOpen}
         onClose={handleCloseDialog}
@@ -142,7 +160,7 @@ const IContextMenuForCampaignGroupTabCamapaignGroup: FC<IContextMenuForCampaignG
       >
         <div className="space-y-4">
           <p className="text-destructive font-medium">이 작업은 되돌릴 수 없습니다.</p>
-          
+
           <div className="flex justify-end space-x-2 mt-6">
             <Button
               type="button"
@@ -165,6 +183,18 @@ const IContextMenuForCampaignGroupTabCamapaignGroup: FC<IContextMenuForCampaignG
           </div>
         </div>
       </CommonDialogForSideMenu>
+
+      {/* 캠페인 그룹 이름 변경 다이얼로그 */}
+      {isRenameDialogOpen && (
+        <IDialogForUpdateCampaignGroupName
+          isOpen={isRenameDialogOpen}
+          onClose={handleCloseRenameDialog}
+          groupId={node?.group_id}
+          tenantId={node?.tenant_id}
+          currentGroupName={node?.name}
+          onSuccess={handleRenameSuccess}
+        />
+      )}
     </>
   );
 };

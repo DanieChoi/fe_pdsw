@@ -89,9 +89,9 @@ export const apiForCampaignListForCampaignGroup = async (
         );
 
         console.log("Campaign list for campaign group ???????????????? :", data);
-        
 
-        return data.result_data ? data : { 
+
+        return data.result_data ? data : {
             result_data: [],
             result_code: 0,
             result_msg: "No data",
@@ -289,7 +289,7 @@ export const apiForCampaignGroupCampaignList = async (
 export const apiForCampaignGroupDataForCampaignGroupAdmin = async (
     group_id?: number
 ): Promise<CampaignGroupResponse> => {
-    
+
     // Create request body that matches the expected API format
     const requestBody: ApiRequest = {
         filter: group_id ? { group_id: [group_id] } : {},
@@ -302,7 +302,7 @@ export const apiForCampaignGroupDataForCampaignGroupAdmin = async (
             'collections/campaign-group-list',
             requestBody
         );
-        
+
         return data;
     } catch (error: any) {
         if (error.response?.status === 401) {
@@ -338,11 +338,51 @@ export const apiForDeleteCampaignGroup = async (
         if (error.response?.status === 401) {
             throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
         }
-        
+
         console.error("캠페인 그룹 삭제 실패:", error);
-        
+
         throw new Error(
             `${error.response?.data?.result_code || ''}||${error.response?.data?.result_msg || '캠페인 그룹 삭제 실패'}`
+        );
+    }
+};
+
+// todo:
+// apiForUpdateCampaignGroupName 함수 추가 필요
+// url: pds/campaign-groups/{gorup_id}
+// put
+
+// apiForCampaignGroup.ts 파일에 추가
+
+// 캠페인 그룹 이름 업데이트 API
+export const apiForUpdateCampaignGroupName = async (
+    group_id: number,
+    group_name: string,
+    tenant_id: number
+): Promise<SuccessResponse> => {
+    const request_data = {
+        request_data: {
+            tenant_id: tenant_id,
+            group_name: group_name
+        }
+    };
+
+    try {
+        // group_id를 URL에 포함시키고 PUT 메서드 사용
+        const { data } = await axiosInstance.put<SuccessResponse>(
+            `campaign-groups/${group_id}`,
+            request_data
+        );
+        return data;
+    } catch (error: any) {
+        if (error.response?.status === 401) {
+            throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
+        }
+
+        console.error("캠페인 그룹 이름 업데이트 실패:", error);
+
+        throw new Error(
+            `${error.response?.data?.result_code || ''}||${error.response?.data?.result_msg || '캠페인 그룹 이름 업데이트 실패'}`
         );
     }
 };
