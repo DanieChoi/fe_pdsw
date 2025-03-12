@@ -13,7 +13,6 @@ import { useApiForCampaignGroupCampaignList } from '@/features/campaignGroupMana
 import { useApiForCampaignGroupCampaignListDelete } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupCampaignListDelete';
 import { useApiForCampaignGroupDelete } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupDelete';
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
-import CampaignGroupWithCampaigns from './component/CampaignGroupWithCampaigns';
 import { CampaignGroupGampaignListItem } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
 
 const initData: DataProps = { no: 0, tenantId: 0, tenantName: '', campaignGroupId: 0, campaignGroupName: '' };
@@ -217,7 +216,6 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
             groupCampaignListData={tempCampaignListData}
             onGroupSelect={handleGroupSelect}
             onCampaignSelect={handleCampaignSelect}
-            onGroupDelete={handleGroupDelete}
           />
 
           <CampaignGroupManagerDetail groupInfo={groupInfo} campaignId={campaignId} onInit={handleInit} onGroupDelete={handleGroupDelete}/>

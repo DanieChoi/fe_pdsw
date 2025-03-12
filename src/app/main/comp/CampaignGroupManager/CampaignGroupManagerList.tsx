@@ -61,11 +61,10 @@ type Props = {
   groupCampaignListData?: downDataProps[];
   onGroupSelect: (id: string) => void;
   onCampaignSelect: (id: string) => void;
-  onGroupDelete: (id: string) => void;
 }
 
 export default function CampaignGroupManagerList({campaignId,campaignGroupHeaderSearchParam,campaignGroupList,groupCampaignListData
-    ,onGroupSelect,onCampaignSelect,onGroupDelete}: Props) {
+    ,onGroupSelect,onCampaignSelect}: Props) {
   const { campaigns, selectedCampaign , setSelectedCampaign } = useMainStore();
   const [selectedCampaignGroups, setSelectedCampaignGroups] = useState<Set<number>>(new Set([]));
   const [tempCampaigns, setTempCampaigns] = useState<DataProps[]>([]);
@@ -131,7 +130,6 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
 
   return (
     <div className="w-[40%] shrink-0">
-      <div>안녕 캠페인</div>
       <TitleWrap title="캠페인 그룹 검색목록" totalCount={memoizedRows.length} />
       <div className="overflow-x-auto">
         <div className="grid-custom-wrap h-[200px]">
