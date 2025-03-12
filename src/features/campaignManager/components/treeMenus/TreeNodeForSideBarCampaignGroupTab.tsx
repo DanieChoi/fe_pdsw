@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -21,6 +20,8 @@ import { useTabStore } from "@/store/tabStore";
 import { ContextMenuForTreeNode } from "./ContextMenuForTreeNode";
 import CampaignAddPopup from '@/features/campaignManager/components/popups/CampaignAddPopup';
 import IContextMenuForCampaignGroupTabCamapaignGroup from "./ContextMenus/IContextMenuForCampaignGroupTabCamapaignGroup";
+import IContextMenuForCampaignTabTenant from "./ContextMenus/IContextMenuForCampaignTabTenant";
+import { CommonContextMenu } from "@/components/shared/CommonContextMenu";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -30,7 +31,6 @@ interface TreeNodeProps {
   onNodeToggle: (nodeId: string) => void;
   onNodeSelect: (nodeId: string) => void;
 }
-
 
 const getStatusIcon = (status?: string) => {
   switch (status) {
@@ -70,8 +70,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
   // 팝업 상태
   const [isCampaignAddPopupOpen, setIsCampaignAddPopupOpen] = useState(false);
-
-
   
   // 디버깅용 로그 추가
   useEffect(() => {
@@ -83,19 +81,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
   // 컨텍스트 메뉴 강제 닫기 함수
   const forceCloseContextMenu = useCallback(() => {
     setIsContextMenuOpen(false);
-
-    // // 강제로 ESC 키 이벤트를 발생시켜 메뉴 닫기
-    // document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
-
-    // // 트리거 요소 밖으로 클릭 이벤트 시뮬레이션
-    // if (contextMenuTriggerRef.current) {
-    //   const clickEvent = new MouseEvent('click', {
-    //     bubbles: true,
-    //     cancelable: true,
-    //     view: window
-    //   });
-    //   document.body.dispatchEvent(clickEvent);
-    // }
   }, []);
 
   // "캠페인 그룹 추가" 메뉴 클릭 시 다이얼로그 열기
@@ -271,6 +256,32 @@ export function TreeNodeForSideBarCampaignGroupTab({
     return baseStyle;
   }, [isSelected, node.type]);
 
+  // tenant 타입일 때 트리거로 사용할 노드 UI
+  const renderTenantNodeUI = (
+    <div
+      ref={contextMenuTriggerRef}
+      className={getNodeStyle()}
+      onClick={handleClick}
+      style={{ paddingLeft: `${level * 16 + 8}px` }}
+    >
+      <div className="flex items-center w-full gap-2">
+        {hasChildren ? (
+          isExpanded ? (
+            <Image src="/tree-menu/minus_for_tree.png" alt="접기" width={12} height={12} />
+          ) : (
+            <Image src="/tree-menu/plus_icon_for_tree.png" alt="펼치기" width={12} height={12} />
+          )
+        ) : (
+          <span className="w-3" />
+        )}
+        <Image src="/tree-menu/folder.png" alt="폴더" width={14} height={12} />
+        <span className={`text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
+          {node.name}
+        </span>
+      </div>
+    </div>
+  );
+
   return (
     <div className="select-none" data-node-type={node.type} data-node-id={node.id}>
       {node.type === "campaign" ? (
@@ -341,7 +352,18 @@ export function TreeNodeForSideBarCampaignGroupTab({
             </div>
           </div>
         </ContextMenuForTreeNode>
+      ) : node.type === "tenant" ? (
+        // tenant 타입일 경우 CommonContextMenu 사용
+        <CommonContextMenu
+          trigger={renderTenantNodeUI}
+        >
+          <IContextMenuForCampaignTabTenant
+            node={node}
+            setIsAddGroupDialogOpen={setIsAddGroupDialogOpen}
+          />
+        </CommonContextMenu>
       ) : (
+        // 그 외 타입은 기존 ContextMenu 사용
         <ContextMenu onOpenChange={handleContextMenuOpenChange}>
           <ContextMenuTrigger asChild>
             <div

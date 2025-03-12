@@ -174,26 +174,6 @@ export function TreeMenusForCampaignGroupTab() {
 
   return (
     <div className="flex flex-grow overflow-y-auto min-h-0 tree-node">
-      {/* <div className="mb-4">
-        <h2 className="text-lg font-semibold">캠페인 그룹 관리</h2>
-        <p className="text-sm text-gray-500">테넌트, 캠페인 그룹, 캠페인을 관리할 수 있습니다.</p>
-      </div> */}
-      
-      {/* 테넌트/그룹/캠페인 통계 표시 */}
-      {/* <div className="grid grid-cols-3 gap-4 mb-4">
-        <div className="bg-blue-50 p-3 rounded-md">
-          <div className="text-sm text-blue-600 font-medium">테넌트</div>
-          <div className="text-xl font-bold">{countNodesByType(displayData, "tenant")}</div>
-        </div>
-        <div className="bg-indigo-50 p-3 rounded-md">
-          <div className="text-sm text-indigo-600 font-medium">캠페인 그룹</div>
-          <div className="text-xl font-bold">{countNodesByType(displayData, "group")}</div>
-        </div>
-        <div className="bg-green-50 p-3 rounded-md">
-          <div className="text-sm text-green-600 font-medium">캠페인</div>
-          <div className="text-xl font-bold">{countNodesByType(displayData, "campaign")}</div>
-        </div>
-      </div> */}
       
       <div className="w-full">
         {displayData.map((node) => (
