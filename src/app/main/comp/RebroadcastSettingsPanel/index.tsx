@@ -20,6 +20,8 @@ import { useApiForCampaignAutoRedialInsert } from '@/features/rebroadcastSetting
 import { useApiForAutoRedialDelete } from '@/features/campaignManager/hooks/useApiForAutoRedialDelete';
 import { useApiForCampaignRedialPreviewSearch } from '@/features/rebroadcastSettingsPanel/hooks/useApiForCampaignRedialPreviewSearch';
 import { useApiForCampaignCurrentRedial } from '@/features/rebroadcastSettingsPanel/hooks/useApiForCampaignCurrentRedial';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 interface RebroadcastSettings {
     campaignId: string;
@@ -101,6 +103,7 @@ const RebroadcastSettingsPanel = () => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
     const { campaigns } = useMainStore();
     const { campaignIdForUpdateFromSideMenu } = useTabStore();
+    const router = useRouter();
 
     const [settings, setSettings] = useState<RebroadcastSettings>(initialSettings);
     const [startDate, setStartDate] = useState<Value | null>(new Date());
@@ -643,6 +646,18 @@ const RebroadcastSettingsPanel = () => {
                     setListRedialQuery(selected.redialCondition);
                 }
             }
+        },onError: (data) => {      
+          if (data.message.split('||')[0] === '5') {
+            setAlertState({
+              ...errorMessage,
+              isOpen: true,
+              message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+            });
+            Cookies.remove('session_key');
+            setTimeout(() => {
+              router.push('/login');
+            }, 1000);
+          }
         }
     });
     
@@ -733,7 +748,7 @@ const RebroadcastSettingsPanel = () => {
         onError: (data) => {  
             setAlertState({
                 isOpen: true,
-                message: data.result_msg,
+                message: data.message,
                 title: '리스트 오류',
                 type: '2',
                 onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
@@ -777,24 +792,36 @@ const RebroadcastSettingsPanel = () => {
             }
         },
         onError: (data) => {  
-            if( caseType === 1 ){     
-                setAlertState({
-                    isOpen: true,
-                    message: '선택된 재발신 조건에 해당되는 리스트 수 : 0',
-                    title: '리스트 건수 확인',
-                    type: '2',
-                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-                });
-            }else if( caseType === 2 ){     
-                setAlertState({
-                    isOpen: true,
-                    message: '적용할 건수가 없습니다.',
-                    title: '리스트 건수 확인',
-                    type: '2',
-                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-                });
+            if (data.message.split('||')[0] === '5') {
+              setAlertState({
+                ...errorMessage,
+                isOpen: true,
+                message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+              });
+              Cookies.remove('session_key');
+              setTimeout(() => {
+                router.push('/login');
+              }, 1000);
+            }else{
+                if( caseType === 1 ){     
+                    setAlertState({
+                        isOpen: true,
+                        message: '선택된 재발신 조건에 해당되는 리스트 수 : 0',
+                        title: '리스트 건수 확인',
+                        type: '2',
+                        onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    });
+                }else if( caseType === 2 ){     
+                    setAlertState({
+                        isOpen: true,
+                        message: '적용할 건수가 없습니다.',
+                        title: '리스트 건수 확인',
+                        type: '2',
+                        onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    });
+                }
             }
         }
     });

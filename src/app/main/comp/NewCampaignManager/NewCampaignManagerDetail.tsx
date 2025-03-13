@@ -26,6 +26,8 @@ import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiF
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 export interface TabItem {
   id: number;
@@ -332,6 +334,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     tenantId: 0,
     type: '1',
   });
+  const router = useRouter();
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
@@ -816,6 +819,18 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
       }
       //캠페인 스케줄 수정 api 호출
       fetchCampaignScheduleInsert(_tempCampaignSchedule);
+    },onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
     }
   });
 

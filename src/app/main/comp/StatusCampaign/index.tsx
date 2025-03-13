@@ -79,8 +79,8 @@ const StatusCampaign: React.FC = () => {
           campaign_id: item.campId,
           dispatch_type: i.toString(),
           campaign_name: campaigns[selectedCampaignIdIndex].campaign_name,
-          progress: item.totLstCnt === 0 ? 0 : (item.nonTTCT / item.totLstCnt) * 100,
-          success: item.totLstCnt === 0 ? 0 : (item.scct / item.totLstCnt) * 100,
+          progress: item.totLstCnt === 0 ? 0 : parseFloat(((item.nonTTCT / item.totLstCnt) * 100).toFixed(1)),
+          success: item.totLstCnt === 0 ? 0 : parseFloat(((item.scct / item.totLstCnt) * 100).toFixed(1)),
         }));
         setCampaignInfoList(prev => [...prev, ...tempDataList]);
         if( maxDispatchCount < tempList.length ){
