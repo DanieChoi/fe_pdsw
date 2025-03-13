@@ -106,13 +106,13 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
                 <Label>진행률(%)</Label>
               </TableHeader>
               <TableCell className="text-center text-sm">
-                {(selectedCall?.totLstCnt || 0) === 0?0:(selectedCall?.nonTTCT || 0)/(selectedCall?.totLstCnt || 0)*100 }
+                {(selectedCall?.totLstCnt || 0) === 0 ? 0 : parseFloat(((selectedCall?.nonTTCT || 0) / (selectedCall?.totLstCnt || 0) * 100).toFixed(1))}
               </TableCell>
               <TableHeader className="w-[160px]">
                 <Label>리스트 대비 성공률 (%)</Label>
               </TableHeader>
               <TableCell className="text-center text-sm">
-                {(selectedCall?.totLstCnt || 0) === 0?0:(selectedCall?.scct || 0)/(selectedCall?.totLstCnt || 0)*100 }
+                {(selectedCall?.totLstCnt || 0) === 0?0:parseFloat(((selectedCall?.scct || 0)/(selectedCall?.totLstCnt || 0)*100).toFixed(1))}
               </TableCell>
               <TableHeader className="w-[120px]">
                 <Label>총 리스트</Label>
@@ -143,7 +143,9 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
         </Table>
         <div className="h-[370px] border border-[#ebebeb] rounded-b-[3px] p-2 flex justify-center items-center gap-5">
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-center">총 발신 : {selectedCall?.totDialCnt || 0}, 발신대비 성공률 : {(selectedCall?.scct || 0) === 0?0:(selectedCall?.scct || 0)/(selectedCall?.totDialCnt || 0)*100 }%</p>
+            <p className="text-sm text-center">총 발신 : {selectedCall?.totDialCnt || 0}, 발신대비 성공률 : 
+              {(selectedCall?.scct || 0) === 0?0:parseFloat(((selectedCall?.scct || 0)/(selectedCall?.totDialCnt || 0)*100).toFixed(1))}
+              %</p>
             <div className="relative">
               <PieChart width={260} height={250}>
                 <Pie

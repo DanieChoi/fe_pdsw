@@ -490,11 +490,11 @@ export default function Campaignprogress() {
           , id: 'campaign-'+ item.campId
           , centerId: 'center-1'
           , campaignName: campaigns[selectedCampaignIdIndex].campaign_name
-          , progressRate: item.totLstCnt === 0 ? 0 : (item.nonTTCT / item.totLstCnt) * 100
-          , successRateList: item.totLstCnt === 0 ? 0 : (item.scct / item.totLstCnt) * 100
+          , progressRate: item.totLstCnt === 0 ? 0 : parseFloat(((item.nonTTCT / item.totLstCnt) * 100).toFixed(1))
+          , successRateList: item.totLstCnt === 0 ? 0 : parseFloat(((item.scct / item.totLstCnt) * 100).toFixed(1))
           , nonSendCount: item.totLstCnt-item.scct-item.recallCnt-(item.buct+item.fact+item.tect+item.customerOnHookCnt+item.dialToneSilence+item.nact
             +item.etct+item.lineStopCnt+item.detectSilenceCnt+item.acct) //미발신 건수.
-          , successRateSend: item.scct === 0?0:(item.scct/item.totDialCnt)*100
+          , successRateSend: item.scct === 0 ? 0 : parseFloat(((item.scct / item.totDialCnt) * 100).toFixed(1))
           , dialAttemptCnt: item.firstCall
           , failSendCount: item.buct+item.fact+item.tect+item.customerOnHookCnt+item.dialToneSilence+item.nact
             +item.etct+item.lineStopCnt+item.detectSilenceCnt+item.acct

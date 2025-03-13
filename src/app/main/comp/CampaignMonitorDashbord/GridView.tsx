@@ -82,8 +82,8 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
       });
       setTempBarChartData([]);
       const tempBarChartData: SuccessRateData[] = [
-        { name: '발신대비(%)', value: (selectedCall?.scct || 0) === 0?0:(selectedCall?.scct || 0)/(selectedCall?.totDialCnt || 0)*100, color: '#FF8DA0' },
-        { name: '리스트대비(%)', value: (selectedCall?.scct || 0) === 0?0:(selectedCall?.scct || 0)/(selectedCall?.totLstCnt || 0)*100, color: '#88B3FC' }
+        { name: '발신대비(%)', value: (selectedCall?.scct || 0) === 0?0:parseFloat(((selectedCall?.scct || 0)/(selectedCall?.totDialCnt || 0)*100).toFixed(1)), color: '#FF8DA0' },
+        { name: '리스트대비(%)', value: (selectedCall?.scct || 0) === 0?0:parseFloat(((selectedCall?.scct || 0)/(selectedCall?.totLstCnt || 0)*100).toFixed(1)), color: '#88B3FC' }
       ];
       setTempBarChartData(tempBarChartData);
     }
@@ -209,13 +209,13 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                     <Label>진행률(%)</Label>
                   </TableHeader>
                   <TableCell className="text-center text-sm">
-                  {(selectedCall?.totLstCnt || 0) === 0?0:(selectedCall?.nonTTCT || 0)/(selectedCall?.totLstCnt || 0)*100 }
+                  {(selectedCall?.totLstCnt || 0) === 0 ? 0 : parseFloat(((selectedCall?.nonTTCT || 0) / (selectedCall?.totLstCnt || 0) * 100).toFixed(1))}
                   </TableCell>
                   <TableHeader className="w-[160px]">
                     <Label>리스트 대비 성공률 (%)</Label>
                   </TableHeader>
                   <TableCell className="text-center text-sm">
-                  {(selectedCall?.totLstCnt || 0) === 0?0:(selectedCall?.scct || 0)/(selectedCall?.totLstCnt || 0)*100 }
+                  {(selectedCall?.totLstCnt || 0) === 0?0:parseFloat(((selectedCall?.scct || 0)/(selectedCall?.totLstCnt || 0)*100).toFixed(1))}
                   </TableCell>
                   <TableHeader className="w-[120px]">
                     <Label>총 리스트</Label>
@@ -256,7 +256,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                     <Label>발신 대비<br/> 성공률(%)</Label>
                   </TableHeader>
                   <TableCell rowSpan={2} className="text-center text-sm !border-b-0">
-                    {(selectedCall?.scct || 0) === 0?0:(selectedCall?.scct || 0)/(selectedCall?.totDialCnt || 0)*100 }
+                    {(selectedCall?.scct || 0) === 0?0:parseFloat(((selectedCall?.scct || 0)/(selectedCall?.totDialCnt || 0)*100).toFixed(1))}
                   </TableCell>
                   <TableHeader className="!bg-[#DDF4F2] w-[120px]"><Label>총발신</Label></TableHeader>
                   <TableCell className="text-center text-sm">{selectedCall?.totDialCnt || 0}</TableCell>
