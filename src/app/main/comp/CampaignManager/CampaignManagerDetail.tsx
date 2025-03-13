@@ -336,6 +336,7 @@ export default function CampaignDetail() {
   const [callingNumberChangeYn, setCallingNumberChangeYn] = useState<boolean>(false); // 캠페인 발신번호 변경여부
   const [campaignScheduleChangeYn, setCampaignScheduleChangeYn] = useState<boolean>(false); // 캠페인 스케줄 변경여부
   const [campaignDialSpeedChangeYn, setCampaignDialSpeedChangeYn] = useState<boolean>(false); // 캠페인 발신속도 변경여부
+  const [rtnMessage, setRtnMessage] = useState<string>('');
   const { tenants
     , setCampaigns
     , selectedCampaign
@@ -908,6 +909,7 @@ export default function CampaignDetail() {
 
   //캠페인 저장 실행.
   const handleCampaignSaveExecute = () => {
+    setRtnMessage('캠페인 수정이 완료되었습니다.');
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     if (changeYn) {
       if (campaignInfoChangeYn) {
@@ -981,7 +983,18 @@ export default function CampaignDetail() {
       setSelectedCampaign(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
       setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
       setChangeYn(false);
-      removeTab(Number(activeTabId), activeTabKey + '');
+      // if( rtnMessage !== ''){
+        setRtnMessage('');        
+      //   setAlertState({
+      //     ...errorMessage,
+      //     isOpen: true,
+      //     message: rtnMessage,
+      //     type: '2',
+      //     onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      //   });
+      // }else{
+        removeTab(Number(activeTabId), activeTabKey + '');
+      // }
     }
   });
 
