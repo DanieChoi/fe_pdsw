@@ -1308,7 +1308,7 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
       <CampaignAddPopup
         isOpen={isCampaignAddPopupOpen}
         onConfirm={() => setIsCampaignAddPopupOpen(false)}
-        onCancel={() => setIsCampaignAddPopupOpen(false)}
+        onClose={() => setIsCampaignAddPopupOpen(false)}
       />
     </div>
   );

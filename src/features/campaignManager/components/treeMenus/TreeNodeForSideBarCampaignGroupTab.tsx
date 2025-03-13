@@ -211,7 +211,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
           <CampaignAddPopup
             isOpen={isCampaignAddPopupOpen}
             onConfirm={() => setIsCampaignAddPopupOpen(false)}
-            onCancel={() => setIsCampaignAddPopupOpen(false)}
+            onClose={() => setIsCampaignAddPopupOpen(false)}
           />,
           document.body
         )}
