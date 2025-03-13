@@ -34,12 +34,12 @@ const tempAdditionalInfoTab:AdditionalInfoTabParam = {
 };
 
 type Props = {
-  newCampaignYn: boolean;
+  callCampaignMenu: string;
   campaignInfo: MainDataResponse;
   onHandleAdditionalInfoTabChange: (param:AdditionalInfoTabParam) => void;
 }
 
-const AssignedAgentTab: React.FC<Props> = ({newCampaignYn,campaignInfo,onHandleAdditionalInfoTabChange}) => {
+const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHandleAdditionalInfoTabChange}) => {
   const [initialData, setInitialData] = useState<TreeRow[]>([]);
   const transformToTreeData = (counselors: any[]) => {
     const result: any[] = [];
@@ -120,14 +120,14 @@ const AssignedAgentTab: React.FC<Props> = ({newCampaignYn,campaignInfo,onHandleA
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set([]));
 
   useEffect(() => {
-    if (!newCampaignYn && campaignInfo && campaignInfo.campaign_id > 0 ) {  
+    if (!(callCampaignMenu == 'NewCampaignManager') && campaignInfo && campaignInfo.campaign_id > 0 ) {  
       fetchCampaignAssignmentAgents({
         tenantId: campaignInfo.tenant_id+''
         , campaignId: campaignInfo.campaign_id+''
       });
     }
     setInitialData([]);
-  }, [newCampaignYn,campaignInfo]);
+  }, [callCampaignMenu,campaignInfo]);
 
   const toggleRowExpand = (rowId: string) => {
     const newExpandedRows = new Set(expandedRows);
@@ -229,7 +229,7 @@ const AssignedAgentTab: React.FC<Props> = ({newCampaignYn,campaignInfo,onHandleA
           }}
         />
       </div>
-      {!newCampaignYn &&
+      {!(callCampaignMenu == 'NewCampaignManager' || callCampaignMenu == 'CampaignGroupManager' || callCampaignMenu == 'CampaignClone')  &&
       <div className="flex justify-end gap-2 mt-5">
         <CommonButton variant="secondary" onClick={()=> 
           onHandleAdditionalInfoTabChange({...tempAdditionalInfoTab

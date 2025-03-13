@@ -17,12 +17,12 @@ const tempNotificationTab:NotificationTabParam = {
 };
 
 type Props = {
-  newCampaignYn: boolean;
+  callCampaignMenu: string;
   campaignInfo: MainDataResponse;
   onHandleNotificationTabChange: (param:NotificationTabParam) => void;
 };
 
-const NotificationTab: React.FC<Props> = ({ newCampaignYn, campaignInfo, onHandleNotificationTabChange }) => {
+const NotificationTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onHandleNotificationTabChange }) => {
   const [isChecked, setIsChecked] = useState(false); // 잔량 부족 알림 사용 상태
   const [alertMessage, setAlertMessage] = useState(false);  // 메시지로 알림
   const [alertSound, setAlertSound] = useState(false);      // 소리로 알림
@@ -228,7 +228,7 @@ const NotificationTab: React.FC<Props> = ({ newCampaignYn, campaignInfo, onHandl
         </div>
 
         {/* 확인 / 취소 버튼 */}
-        {!newCampaignYn &&
+      {!(callCampaignMenu == 'NewCampaignManager' || callCampaignMenu == 'CampaignGroupManager' || callCampaignMenu == 'CampaignClone')  &&
         <div className="flex justify-end gap-2 mt-5">
           <CommonButton variant="secondary" onClick={()=> 
             onHandleNotificationTabChange({...tempNotificationTabParam

@@ -1261,7 +1261,7 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
       </div>
       <div>
         <CampaignTab campaignSchedule={tempCampaignSchedule}
-          newCampaignYn={true}
+          callCampaignMenu={'CampaignGroupManager'}
           campaignInfo={tempCampaignInfo}
           campaignDialSpeedInfo={tempCampaignDialSpeedInfoParam}
           onCampaignOutgoingOrderChange={(value) => handleCampaignOutgoingOrderChange(value)}

@@ -61,12 +61,12 @@ const CampaignOutgoingOrderTab:OutgoingStrategyTabParam = {
 };
 
 type Props = {
-  newCampaignYn: boolean;
+  callCampaignMenu: string;
   campaignInfo: MainDataResponse;
   onCampaignOutgoingStrategyChange: (param:OutgoingStrategyTabParam) => void;
 };
 
-const OutgoingStrategyTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCampaignOutgoingStrategyChange }) => {
+const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onCampaignOutgoingStrategyChange }) => {
   const [tempOutgoingStrategyTab, setTempOutgoingStrategyTab] = useState<OutgoingStrategyTabParam>(CampaignOutgoingOrderTab);
   const [maxCallsRows, setMaxCallsRows] = useState<MaxCallsRow[]>([
     {
@@ -265,7 +265,7 @@ const OutgoingStrategyTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCa
           </div>
         </div>
       </div>
-      {!newCampaignYn &&
+      {!(callCampaignMenu == 'NewCampaignManager' || callCampaignMenu == 'CampaignGroupManager' || callCampaignMenu == 'CampaignClone')  &&
       <div className="flex justify-end gap-2 mt-5">
         <CommonButton variant="secondary" onClick={()=> 
           onCampaignOutgoingStrategyChange({...tempOutgoingStrategyTab

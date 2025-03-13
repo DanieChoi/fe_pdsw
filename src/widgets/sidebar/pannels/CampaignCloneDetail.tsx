@@ -1131,7 +1131,7 @@ export default function CampaignDetail() {
       <div>
         <CampaignTab
           campaignSchedule={tempCampaignSchedule}
-          newCampaignYn={true}
+          callCampaignMenu={'CampaignClone'}
           campaignInfo={tempCampaignInfo}
           campaignDialSpeedInfo={tempCampaignDialSpeedInfoParam}
           onCampaignOutgoingOrderChange={(value) => handleCampaignOutgoingOrderChange(value)}
