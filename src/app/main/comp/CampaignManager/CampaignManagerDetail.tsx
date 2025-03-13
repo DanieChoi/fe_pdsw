@@ -43,6 +43,8 @@ import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 import { useApiForCampaignAgent } from '@/features/campaignManager/hooks/useApiForCampaignAgent';
 import { useApiForCallingListDelete } from '@/features/listManager/hooks/useApiForCallingListDelete';
 import { CheckCampaignSaveReturnCode } from '@/components/common/common';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 export interface TabItem {
   id: number;
@@ -360,6 +362,7 @@ export default function CampaignDetail() {
     tenantId: 0,
     type: '1',
   });
+  const router = useRouter();
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
@@ -1020,6 +1023,17 @@ export default function CampaignDetail() {
       }
     }
     , onError: (data) => {
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
       setCampaignInfoChangeYn(false);
     }
   });
@@ -1034,6 +1048,18 @@ export default function CampaignDetail() {
         , tenant_id: tempCampaignManagerInfo.tenant_id
       });
       // removeTab(Number(activeTabId),activeTabKey+'');
+    },onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
     }
   });
 
@@ -1259,6 +1285,18 @@ export default function CampaignDetail() {
           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
           onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
         });
+      }
+    },onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
       }
     }
   });

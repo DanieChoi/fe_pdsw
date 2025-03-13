@@ -10,8 +10,8 @@ export interface UpdateResponse {
 
 // 재발신 API 에러 타입
 export interface rebroadcastSettingsPanelApiError {
-  result_code: number;
-  result_msg: string;
+  message: string;
+  status: number;
 }
 
 // 재발신 추가 요청
