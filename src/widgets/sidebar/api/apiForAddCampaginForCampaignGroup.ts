@@ -5,7 +5,9 @@ import {
   CampaignListRequest,
   CampaignListResponse,
   CampaignSkillsRequest,
-  CampaignSkillsResponse
+  CampaignSkillsResponse,
+  CampaignGroupSkillsResponse,
+  CampaignGroupSkillsRequest
 } from "@/widgets/sidebar/api/type/typeForAddCampaignForCampaignGroup";
 
 /**
@@ -178,3 +180,65 @@ export const getSkilsWithCampaigns = async (campaignId?: number): Promise<Campai
   return apiForFetchSkilsWithCampaigns(defaultRequest);
 };
 
+/**
+ * 캠페인 그룹에 대한 캠페인 목록을 가져오는 API 함수
+ * @param request 캠페인 그룹 스킬 조회 요청 정보
+ * @returns Promise<CampaignGroupSkillsResponse> 캠페인 그룹 스킬 목록 응답 데이터
+ */
+export const apiForGetCampaignListForCampaignGroup = async (
+  request: CampaignGroupSkillsRequest
+): Promise<CampaignGroupSkillsResponse> => {
+  try {
+    const response = await axiosInstance.post<CampaignGroupSkillsResponse>(
+      "collections/skill-campaign",
+      request
+    );
+
+    return response.data;
+  } catch (error: any) {
+    console.error("Campaign Group skills API call failed:", error);
+
+    // 에러 객체에 custom 속성 추가
+    const enhancedError = new Error(
+      error.message || "캠페인 그룹 스킬 정보를 가져오는데 실패했습니다."
+    );
+
+    // 원본 에러 정보 유지
+    (enhancedError as any).originalError = error;
+
+    throw enhancedError;
+  }
+};
+
+/**
+ * 기본 요청으로 캠페인 그룹에 대한 캠페인 목록을 가져오는 헬퍼 함수
+ * @param campaignId 캠페인 ID (옵션)
+ * @param tenantId 테넌트 ID (옵션)
+ * @returns Promise<CampaignGroupSkillsResponse> 캠페인 그룹 스킬 목록 응답 데이터
+ */
+export const getCampaignListForCampaignGroup = async (
+  campaignId?: number,
+  tenantId?: number
+): Promise<CampaignGroupSkillsResponse> => {
+  const defaultRequest: CampaignGroupSkillsRequest = {
+    filter: {
+      group_id: [], // 기본적으로 빈 배열 설정
+      campaign_id: campaignId ? {
+        start: campaignId,
+        end: campaignId
+      } : {
+        start: 1,
+        end: 99
+      }
+    },
+    sort: {
+      campaign_id: 0 // skill_id -> campaign_id로 변경
+    },
+    page: {
+      index: 1,
+      items: 9999
+    }
+  };
+
+  return apiForGetCampaignListForCampaignGroup(defaultRequest);
+};

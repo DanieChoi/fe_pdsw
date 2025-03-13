@@ -100,3 +100,41 @@ export interface CampaignSkillsResponse {
   total_count: number;
   result_data: CampaignSkillsInfo[];
 }
+
+// 캠페인 그룹에 대한 캠페인 목록 조회 요청 인터페이스
+export interface CampaignGroupSkillsRequest {
+  filter: {
+    group_id: number[]; // 빈 배열도 가능하도록 설정
+    campaign_id: {
+      start: number;
+      end: number;
+    };
+  };
+  sort?: {
+    campaign_id?: number; // 정렬 기준을 campaign_id로 변경
+  };
+  page?: {
+    index: number;
+    items: number;
+  };
+}
+
+
+// 캠페인 그룹 정보 인터페이스
+export interface CampaignGroupSkillsInfo {
+  tenant_id: number;
+  group_id: number;
+  group_name: string;
+  campaign_id: number;
+  campaign_name: string;
+  start_flag: number;
+}
+
+// 캠페인 그룹 스킬 조회 응답 인터페이스
+export interface CampaignGroupSkillsResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data: CampaignGroupSkillsInfo[];
+}
