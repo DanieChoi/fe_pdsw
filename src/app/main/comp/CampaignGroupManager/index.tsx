@@ -13,8 +13,18 @@ import { useApiForCampaignGroupCampaignList } from '@/features/campaignGroupMana
 import { useApiForCampaignGroupCampaignListDelete } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupCampaignListDelete';
 import { useApiForCampaignGroupDelete } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupDelete';
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
-import { CampaignGroupGampaignListItem,CampaignGroupItem } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
+import { CampaignGroupGampaignListItem } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
+
+const errorMessage = {
+  isOpen: false,
+  message: '',
+  title: '로그인',
+  type: '0',
+};
 
 const initData: DataProps = { no: 0, tenantId: 0, tenantName: '', campaignGroupId: 0, campaignGroupName: '' };
 type Props = {
@@ -33,6 +43,8 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   const [campaignId, setCampaignId] = useState<number>(0);
   const [campaignGroupCampaignListData, setCampaignGroupCampaignListData] = useState<CampaignGroupGampaignListItem[]>([]);
   const [selectCampaignGroupList, setSelectCampaignGroupList] = useState<MainDataResponse[]>([]);
+  const [alertState, setAlertState] = useState(errorMessage);
+  const router = useRouter();
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
 
@@ -159,6 +171,18 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
         setGroupInfo(initData);
       }
       fetchCampaignGroupCampaignList(null);
+    },onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
     }
   });
 
@@ -248,10 +272,17 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
           />
 
           <CampaignGroupManagerDetail groupInfo={groupInfo} campaignId={campaignId} onInit={handleInit} onGroupDelete={handleGroupDelete}
-            groupCampaignListData={tempCampaignListData}
+            selectCampaignGroupList={selectCampaignGroupList}
           />
         </div>
       </div>
+      <CustomAlert
+        message={alertState.message}
+        title={alertState.title}
+        type={alertState.type}
+        isOpen={alertState.isOpen}
+        onClose={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
+      />
     </div>
   )
 }

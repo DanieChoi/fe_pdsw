@@ -52,7 +52,7 @@ const CampaignManager = ({campaignId}: Props) => {
         setAlertState({
           ...errorMessage,
           isOpen: true,
-          message: '로그인 정보가 없습니다.',
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
         });
         Cookies.remove('session_key');
         setTimeout(() => {
