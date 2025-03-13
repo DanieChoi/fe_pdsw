@@ -129,7 +129,6 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     );
   };
 
-  // 수정된 부분: groupData?.result_data가 없으면 빈 배열을 반환
   const groupCampaignsData = useMemo(() => {
     return (groupData?.result_data || []).filter(item => item.group_id === groupId);
   }, [groupData, groupId]);
@@ -167,9 +166,13 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
               {isLoadingAny ? (
                 <div className="flex items-center justify-center h-full text-sm">로딩 중...</div>
               ) : hasError ? (
-                <div className="flex items-center justify-center h-full text-red-500 text-sm">데이터 로드 중 오류 발생</div>
+                <div className="flex items-center justify-center h-full text-red-500 text-sm">
+                  데이터 로드 중 오류 발생
+                </div>
               ) : filteredSkills.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-gray-500 text-sm">검색 결과가 없습니다.</div>
+                <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+                  검색 결과가 없습니다.
+                </div>
               ) : (
                 <table className="w-full border-collapse table-fixed text-xs">
                   <thead>
@@ -185,33 +188,51 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
                       const isExpanded = expandedSkills.includes(skill.skillId);
                       return (
                         <React.Fragment key={`skill-${skill.skillId}`}>
-                          <tr className={`border-b ${isExpanded ? 'bg-slate-100' : 'bg-white'}`}>
+                          <tr className={`border-b ${isExpanded ? 'bg-blue-100' : 'bg-blue-50'}`}>
                             <td className="py-1 px-2 align-middle">
-                              <button className="focus:outline-none" onClick={() => toggleSkill(skill.skillId)}>
-                                {isExpanded ? <span className="text-xs">▼</span> : <span className="text-xs">►</span>}
+                              <button
+                                className="focus:outline-none"
+                                onClick={() => toggleSkill(skill.skillId)}
+                              >
+                                {isExpanded ? (
+                                  <span className="text-xs">▼</span>
+                                ) : (
+                                  <span className="text-xs">►</span>
+                                )}
                               </button>
                             </td>
-                            <td className="py-1 px-2 align-middle cursor-pointer" onClick={() => toggleSkill(skill.skillId)}>
+                            <td
+                              className="py-1 px-2 align-middle cursor-pointer"
+                              onClick={() => toggleSkill(skill.skillId)}
+                            >
                               <span className="font-medium">{getSkillName(skill.skillId)}</span>
                             </td>
                             <td className="py-1 px-2 align-middle"></td>
                             <td className="py-1 px-2 align-middle"></td>
                           </tr>
-                          {isExpanded && skill.campaigns.map(campaign => (
-                            <tr key={`campaign-${skill.skillId}-${campaign.campaignId}`} className="border-b bg-white hover:bg-gray-50">
-                              <td className="py-1 px-2 align-middle">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedLeftCampaigns.includes(campaign.campaignId)}
-                                  onChange={() => toggleLeftCampaignSelection(campaign.campaignId)}
-                                  className="h-3 w-3 cursor-pointer"
-                                />
-                              </td>
-                              <td className="py-1 px-2 align-middle text-gray-600">{getSkillName(skill.skillId)}</td>
-                              <td className="py-1 px-2 align-middle">{campaign.campaignId}</td>
-                              <td className="py-1 px-2 align-middle text-blue-600">{getCampaignName(campaign.campaignId)}</td>
-                            </tr>
-                          ))}
+                          {isExpanded &&
+                            skill.campaigns.map(campaign => (
+                              <tr
+                                key={`campaign-${skill.skillId}-${campaign.campaignId}`}
+                                className="border-b bg-white hover:bg-gray-50"
+                              >
+                                <td className="py-1 px-2 align-middle">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedLeftCampaigns.includes(campaign.campaignId)}
+                                    onChange={() => toggleLeftCampaignSelection(campaign.campaignId)}
+                                    className="h-3 w-3 cursor-pointer"
+                                  />
+                                </td>
+                                <td className="py-1 px-2 align-middle text-gray-600">
+                                  {getSkillName(skill.skillId)}
+                                </td>
+                                <td className="py-1 px-2 align-middle">{campaign.campaignId}</td>
+                                <td className="py-1 px-2 align-middle text-blue-600">
+                                  {getCampaignName(campaign.campaignId)}
+                                </td>
+                              </tr>
+                            ))}
                         </React.Fragment>
                       );
                     })}
@@ -225,10 +246,22 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
           </div>
         </div>
         <div className="py-2 px-4 border-t bg-gray-50 flex justify-between items-center">
-          <div className="text-xs text-gray-600">{groupCampaignsData.length}개의 캠페인 선택됨</div>
+          <div className="text-xs text-gray-600">
+            {groupCampaignsData.length}개의 캠페인 선택됨
+          </div>
           <div className="space-x-2">
-            <button onClick={onClose} className="px-3 py-1 text-xs bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">취소</button>
-            <button onClick={handleConfirm} className="px-3 py-1 text-xs rounded bg-blue-500 text-white hover:bg-blue-600">확인</button>
+            <button
+              onClick={onClose}
+              className="px-3 py-1 text-xs bg-gray-100 border border-gray-300 rounded hover:bg-gray-200"
+            >
+              취소
+            </button>
+            <button
+              onClick={handleConfirm}
+              className="px-3 py-1 text-xs rounded bg-blue-500 text-white hover:bg-blue-600"
+            >
+              확인
+            </button>
           </div>
         </div>
       </div>
