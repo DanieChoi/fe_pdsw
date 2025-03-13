@@ -48,7 +48,6 @@ const GroupCampaignList: React.FC<GroupCampaignListProps> = ({ isLoading, groupC
         {groupCampaigns.map(item => (
           <tr key={`group-${item.group_id}-${item.campaign_id}`} className="border-b bg-white hover:bg-gray-50">
             <td className="py-1 px-2 align-middle">
-              {/* 읽기 전용 체크박스 */}
               <input
                 type="checkbox"
                 checked={false}

@@ -129,8 +129,9 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     );
   };
 
+  // 수정된 부분: groupData?.result_data가 없으면 빈 배열을 반환
   const groupCampaignsData = useMemo(() => {
-    return groupData?.result_data.filter(item => item.group_id === groupId) || [];
+    return (groupData?.result_data || []).filter(item => item.group_id === groupId);
   }, [groupData, groupId]);
 
   const handleConfirm = () => {
