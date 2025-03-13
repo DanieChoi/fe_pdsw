@@ -209,10 +209,10 @@ export function TreeNodeForSideBarCampaignGroupTab({
         {/* 캠페인 추가 팝업 */}
         {isCampaignAddPopupOpen && createPortal(
           <CampaignAddPopup
-            isOpen={isCampaignAddPopupOpen}
-            onConfirm={() => setIsCampaignAddPopupOpen(false)}
-            onClose={() => setIsCampaignAddPopupOpen(false)}
-          />,
+            isOpen={isCampaignAddPopupOpen} 
+            groupId={node.group_id || 0}
+            onClose={() => setIsCampaignAddPopupOpen(false)}          
+            />,
           document.body
         )}
         
