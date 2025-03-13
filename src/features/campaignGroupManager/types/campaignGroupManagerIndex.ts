@@ -2,8 +2,8 @@
 
 // 캠페인 그룹 API 에러 타입
 export interface CampaignGroupManagerApiError {
-  result_code: number;
-  result_msg: string;
+  message: string;
+  status: number;
 }
 
 // 캠페인 그룹 조회 응답 데이터 타입
