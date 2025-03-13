@@ -11,6 +11,8 @@ import { useAuthStore, useMainStore } from '@/store';
 import { useApiForCounselorList } from '@/features/preferences/hooks/useApiForCounselorList';
 import { useApiForCreateMaxCall, useApiForMaxCallInitTimeList, useApiForMaxCallInitTimeUpdate, useApiForMaxCallList, useApiForUpdateMaxCall } from '@/features/preferences/hooks/useApiForMaxCall';
 import { useApiForCampaignAgentList } from '@/features/preferences/hooks/useApiForCampaignAgent';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 interface Row {
   id: string;
@@ -29,6 +31,13 @@ interface Row {
   hasChildren?: boolean;
 }
 
+const errorMessage = {
+  isOpen: false,
+  message: '',
+  title: '로그인',
+  type: '2'
+}
+
 const DistributionLimit = () => {
   const { tenant_id, role_id } = useAuthStore();
   const { campaigns, setSelectedCampaign } = useMainStore();
@@ -43,6 +52,7 @@ const DistributionLimit = () => {
   const [viewFilter, setViewFilter] = useState('all');
   const [rawAgentData, setRawAgentData] = useState<Row[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   
   const [formData, setFormData] = useState({
     center: '',
@@ -398,8 +408,22 @@ const DistributionLimit = () => {
       }
     },
     onError: (error) => {
-      console.error('캠페인 상담원 목록 조회 실패:', error);
-      setCampaignAgents([]);
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert('캠페인 상담원 목록 조회 실패: ' + error.message);
+        setCampaignAgents([]);
+      }
     }
   });
 
@@ -443,8 +467,22 @@ const DistributionLimit = () => {
       }
     },
     onError: (error) => {
-      console.error('상담원 목록 조회 실패:', error);
-      setRawAgentData([]);
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert('상담원 목록 조회 실패: ' + error.message);
+        setRawAgentData([]);
+      }
     }
   });
 
@@ -474,7 +512,21 @@ const DistributionLimit = () => {
       setIsLoading(false); // 로딩 완료
     },
     onError: (error) => {
-      console.error('운영설정 분배호수 제한 설정 리스트 조회 실패:', error);
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert('운영설정 분배호수 제한 설정 리스트 조회 실패: ' + error.message);
+      }
     }
   });
 
@@ -496,7 +548,21 @@ const DistributionLimit = () => {
       }
     },
     onError: (error) => {
-      showAlert(`초기화 시간 변경 중 오류가 발생했습니다: ${error.message}`);
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert(`초기화 시간 변경 중 오류가 발생했습니다: ${error.message}`);
+      }
     }
   });
 
@@ -602,7 +668,7 @@ const DistributionLimit = () => {
     const existingRow = rawAgentData.find(row => row.agent_id === formData.agentId);
     const isUpdate = existingRow && existingRow.max_dist !== '0';
   
-    showConfirm(`${isUpdate ? '수정' : '신규 등록'}하시겠습니까?`, () => {
+    showConfirm(`${isUpdate ? '수정' : '저장'}하시겠습니까?`, () => {
       if (isUpdate) {
         updateMaxCallMutation(saveData, {
           onSuccess: (response) => {
@@ -616,23 +682,51 @@ const DistributionLimit = () => {
             }
           },
           onError: (error: any) => {
-            showAlert(`수정 중 오류가 발생했습니다: ${error.message}`);
+            if (error.message.split('||')[0] === '5') {
+              setAlertState({
+                ...errorMessage,
+                isOpen: true,
+                message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                onConfirm: closeAlert,
+                onCancel: () => {}
+              });
+              Cookies.remove('session_key');
+              setTimeout(() => {
+                router.push('/login');
+              }, 1000);
+            } else {
+                showAlert(`수정 중 오류가 발생했습니다 : ${error.message}`);
+            }
           }
         });
       } else {
         createMaxCallMutation(saveData, {
           onSuccess: (response) => {
             if (response.result_code === 0) {
-              showAlert('성공적으로 등록되었습니다.');
+              showAlert('성공적으로 저장되었습니다.');
               fetchMaxCallList({
                 campaign_id: [parseInt(selectedCampaignId)]
               });
             } else {
-              showAlert(`등록 실패: ${response.result_msg}`);
+              showAlert(`저장 실패: ${response.result_msg}`);
             }
           },
           onError: (error: any) => {
-            showAlert(`등록 중 오류가 발생했습니다: ${error.message}`);
+            if (error.message.split('||')[0] === '5') {
+              setAlertState({
+                ...errorMessage,
+                isOpen: true,
+                message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                onConfirm: closeAlert,
+                onCancel: () => {}
+              });
+              Cookies.remove('session_key');
+              setTimeout(() => {
+                router.push('/login');
+              }, 1000);
+            } else {
+                showAlert(`저장 중 오류가 발생했습니다: ${error.message}`);
+            }
           }
         });
       }
@@ -1060,7 +1154,12 @@ const DistributionLimit = () => {
           isOpen={isTimeSettingOpen}
           message={
             <div className="flex flex-col gap-4">
-              <div>현재 설정 값이 없습니다. 시간을 입력하세요</div>
+              <div>
+                {initTime === "9999" 
+                  ? "현재 설정 값이 없습니다. 시간을 입력하세요" 
+                  : `현재설정값 : ${initTime.slice(0, 2)}:${initTime.slice(2)}`
+                }
+              </div>
               <CustomInput 
                 type="text" 
                 value={timeValue}
@@ -1071,16 +1170,16 @@ const DistributionLimit = () => {
             </div>
           }
           title="초기화 시간 설정"
-          type="2"
+          type="1"
           onClose={handleTimeSettingSave}
           onCancle={() => setIsTimeSettingOpen(false)}
         />
 
         <CustomAlert
           isOpen={isTimeRemoveOpen}
-          message="초기화 시간이 성공적으로 변경되었습니다."
+          message="초기화 시간 설정을 해제 하시겠습니까?"
           title="초기화 시간 설정해제"
-          type="2"
+          type="1"
           onClose={handleTimeRemove}
           onCancle={() => setIsTimeRemoveOpen(false)}
         />

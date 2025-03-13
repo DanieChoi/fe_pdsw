@@ -11,6 +11,8 @@ import {
   useApiForCallLimitSettingList, 
   useApiForCallLimitSettingUpdate 
 } from '@/features/preferences/hooks/useApiForCallLimitSetting';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 interface Row {
   campaign_id: string;
@@ -27,6 +29,13 @@ interface LimitSettingItem {
   max_criteria: number;
 }
 
+const errorMessage = {
+  isOpen: false,
+  message: '',
+  title: '로그인',
+  type: '2',
+};
+
 const CampaignSettings = () => {
   const { tenants, campaigns } = useMainStore();
   const [selectedRow, setSelectedRow] = useState<Row | null>(null);
@@ -35,6 +44,7 @@ const CampaignSettings = () => {
   const [campaignName, setCampaignName] = useState('');
   const [limitCount, setLimitCount] = useState('');
   const [limitSettings, setLimitSettings] = useState<LimitSettingItem[]>([]);
+  const router = useRouter();
   
   const [alertState, setAlertState] = useState({
     isOpen: false,
@@ -78,6 +88,20 @@ const CampaignSettings = () => {
   const { mutate: fetchCallLimitSettingList } = useApiForCallLimitSettingList({
     onSuccess: (data) => {
       setLimitSettings(data.result_data);
+    },onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
     }
   });
 
@@ -89,7 +113,21 @@ const { mutate: createCallLimitSetting } = useApiForCallLimitSettingCreate({
     });
   },
   onError: (error) => {
-    showAlert('저장에 실패했습니다: ' + error.message);
+    if (error.message.split('||')[0] === '5') {
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        onConfirm: closeAlert,
+        onCancel: () => {}
+      });
+      Cookies.remove('session_key');
+      setTimeout(() => {
+        router.push('/login');
+      }, 1000);
+    } else {
+        showAlert('저장에 실패했습니다: ' + error.message);
+    }
   }
 });
 
@@ -101,7 +139,21 @@ const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
     });
   },
   onError: (error) => {
-    showAlert('수정에 실패했습니다: ' + error.message);
+    if (error.message.split('||')[0] === '5') {
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        onConfirm: closeAlert,
+        onCancel: () => {}
+      });
+      Cookies.remove('session_key');
+      setTimeout(() => {
+        router.push('/login');
+      }, 1000);
+    } else {
+        showAlert('수정에 실패했습니다: ' + error.message);
+    }
   }
 });
 

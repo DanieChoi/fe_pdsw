@@ -13,6 +13,8 @@ import { CounselorAssignListResponse } from '@/features/preferences/types/System
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 // 메인 스킬 정보
 interface SkillRow {
@@ -45,6 +47,13 @@ interface AgentRow {
   consultMode: string;
 }
 
+const errorMessage = {
+  isOpen: false,
+  message: '',
+  title: '로그인',
+  type: '2',
+}
+
 const SkillEdit = () => {
   const { tenants, campaigns } = useMainStore();
   const { tenant_id, role_id } = useAuthStore();
@@ -57,6 +66,8 @@ const SkillEdit = () => {
   const [allCampaigns, setAllCampaigns] = useState<CampaignRow[]>([]);
   // 다중 선택 스킬 관리를 위한 상태 추가 (체크박스로 선택된 항목들)
   const [selectedSkillRows, setSelectedSkillRows] = useState<Set<string>>(new Set());
+  
+  const router = useRouter();
 
   // 신규 등록을 위한 초기 상태
   const initialSkillState = {
@@ -84,7 +95,7 @@ const SkillEdit = () => {
     isOpen: false,
     message: '',
     title: '알림',
-    type: '1',
+    type: '2',
     onConfirm: () => {},
     onCancel: () => {}
   });
@@ -254,7 +265,8 @@ const SkillEdit = () => {
               
               if (!campaignSkillInfo) {
                 failCount++;
-                console.error(`캠페인 ID ${campaignId}의 스킬 정보를 찾을 수 없습니다.`);
+                // console.error(`캠페인 ID ${campaignId}의 스킬 정보를 찾을 수 없습니다.`);
+                showAlert(`캠페인 ID ${campaignId}의 스킬 정보를 찾을 수 없습니다.`);
                 continue;
               }
               
@@ -274,14 +286,16 @@ const SkillEdit = () => {
                   },
                   onError: (error) => {
                     failCount++;
-                    console.error(`캠페인 ID ${campaignId} 스킬 해제 실패:`, error);
+                    // console.error(`캠페인 ID ${campaignId} 스킬 해제 실패:`, error);
+                    showAlert(`캠페인 ID ${campaignId} 스킬 해제 실패: ${error}`);
                     resolve(null);
                   }
                 });
               });
             } catch (error) {
               failCount++;
-              console.error(`캠페인 ID ${campaignId} 스킬 해제 오류:`, error);
+              // console.error(`캠페인 ID ${campaignId} 스킬 해제 오류:`, error);
+              showAlert(`캠페인 ID ${campaignId} 스킬 해제 오류: ${error}`);
             }
           }
           
@@ -314,7 +328,21 @@ const SkillEdit = () => {
           }
         },
         onError: (error) => {
-          showAlert(`캠페인 스킬 정보 조회 실패: ${error.message}`);
+          if (error.message.split('||')[0] === '5') {
+            setAlertState({
+              ...errorMessage,
+              isOpen: true,
+              message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+              onConfirm: closeAlert,
+              onCancel: () => {}
+            });
+            Cookies.remove('session_key');
+            setTimeout(() => {
+              router.push('/login');
+            }, 1000);
+          } else {
+              showAlert(`캠페인 스킬 정보 조회 실패: ${error.message}`);
+          }
         }
       });
     });
@@ -416,7 +444,21 @@ const SkillEdit = () => {
           setIsNewMode(false);
         },
         onError: (error) => {
-          showAlert(`저장 실패: ${error.message}`);
+          if (error.message.split('||')[0] === '5') {
+            setAlertState({
+              ...errorMessage,
+              isOpen: true,
+              message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+              onConfirm: closeAlert,
+              onCancel: () => {}
+            });
+            Cookies.remove('session_key');
+            setTimeout(() => {
+              router.push('/login');
+            }, 1000);
+          } else {
+            showAlert(`저장 실패: ${error.message}`);
+          }
         }
       });
     } else {
@@ -425,7 +467,21 @@ const SkillEdit = () => {
           fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
         },
         onError: (error) => {
-          showAlert(`수정 실패: ${error.message}`);
+          if (error.message.split('||')[0] === '5') {
+            setAlertState({
+              ...errorMessage,
+              isOpen: true,
+              message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+              onConfirm: closeAlert,
+              onCancel: () => {}
+            });
+            Cookies.remove('session_key');
+            setTimeout(() => {
+              router.push('/login');
+            }, 1000);
+          } else {
+            showAlert(`수정 실패: ${error.message}`);
+          }
         }
       });
     }
@@ -469,14 +525,28 @@ const SkillEdit = () => {
                   resolve();
                 },
                 onError: (error) => {
-                  failCount++;
-                  console.error(`스킬 ID ${skillId} 삭제 실패:`, error);
-                  reject(error);
+                  if (error.message.split('||')[0] === '5') {
+                    setAlertState({
+                      ...errorMessage,
+                      isOpen: true,
+                      message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                      onConfirm: closeAlert,
+                      onCancel: () => {}
+                    });
+                    Cookies.remove('session_key');
+                    setTimeout(() => {
+                      router.push('/login');
+                    }, 1000);
+                  } else {
+                      failCount++;
+                      showAlert(`스킬 ID ${skillId} 삭제 실패: ${error}`);
+                      reject(error);
+                  }
                 }
               });
             });
           } catch (error) {
-            console.error(`스킬 ID ${skillId} 삭제 중 오류:`, error);
+            showAlert(`스킬 ID ${skillId} 삭제 중 오류:  ${error}`);
           }
         }
         
@@ -538,7 +608,21 @@ const SkillEdit = () => {
             showAlert('스킬이 성공적으로 삭제되었습니다.');
           },
           onError: (error) => {
-            showAlert(`삭제 실패: ${error.message}`);
+            if (error.message.split('||')[0] === '5') {
+              setAlertState({
+                ...errorMessage,
+                isOpen: true,
+                message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                onConfirm: closeAlert,
+                onCancel: () => {}
+              });
+              Cookies.remove('session_key');
+              setTimeout(() => {
+                router.push('/login');
+              }, 1000);
+            } else {
+                showAlert(`삭제 실패: ${error.message}`);
+            }
           }
         });
       });
@@ -599,25 +683,83 @@ const SkillEdit = () => {
   // API Hooks
   const { mutate: fetchCounselorList, data: counselorData } = useApiForCounselorList({
     onError: (error) => {
-      console.error('상담원 리스트 조회 실패:', error);
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert(`상담원 리스트 조회 실패: ${error.message}`);
+      }
     }
   });
 
   const { mutate: fetchSkillList, data: skillData } = useApiForSkillList({
     onError: (error) => {
-      console.error('스킬 리스트 조회 실패:', error);
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert(`스킬 리스트 조회 실패: ${error.message}`);
+      }
     }
   });
 
   const { mutate: fetchSkillCampaignList } = useApiForSkillCampaignList({
     onSuccess: (data) => {
       setCampaignData(data);
+    },
+    onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
     }
   });
 
   const { mutate: fetchSkillAgentList } = useApiForSkillAgentList({
     onSuccess: (data) => {
       setAgentData(data);
+    },
+    onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
     }
   });
 
@@ -630,6 +772,21 @@ const SkillEdit = () => {
         mode: getDialModeText(campaign.dial_mode)
       }));
       setAllCampaigns(campaigns);
+    },
+    onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
     }
   });
 
@@ -647,6 +804,21 @@ const SkillEdit = () => {
         }));
         setFilteredAgents(mappedAgents);
       }
+    },
+    onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
     }
   });
 
@@ -655,7 +827,21 @@ const SkillEdit = () => {
       showAlert('스킬이 성공적으로 추가되었습니다.');
     },
     onError: (error) => {
-      showAlert(`스킬 추가 실패: ${error.message}`);
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert(`스킬 추가 실패: ${error.message}`);
+      }
     }
   });
 
@@ -664,7 +850,21 @@ const SkillEdit = () => {
       showAlert('스킬이 성공적으로 수정되었습니다.');
     },
     onError: (error) => {
-      showAlert(`스킬 수정 실패: ${error.message}`);
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert(`스킬 수정 실패: ${error.message}`);
+      }
     }
   });
 
@@ -673,7 +873,21 @@ const SkillEdit = () => {
       // showAlert('스킬이 성공적으로 삭제되었습니다.');
     },
     onError: (error) => {
-      showAlert(`스킬 삭제 실패: ${error.message}`);
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert(`스킬 삭제 실패: ${error.message}`);
+      }
     }
   })
 
@@ -683,14 +897,42 @@ const SkillEdit = () => {
       showAlert('상담원 스킬이 성공적으로 해제되었습니다.');
     },
     onError: (error) => {
-      showAlert(`상담원 스킬 해제 실패: ${error.message}`);
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert(`상담원 스킬 해제 실패: ${error.message}`);
+      }
     }
   });
 
   // 캠페인스킬 조회
   const { mutate: campaignSkillList } = useApiForCampaignSkill({
-    onSuccess: (data) => {
-      // console.log('캠페인스킬 조회 결과:', data);
+    onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert(`캠페인 스킬 조회 실패: ${error.message}`);
+      }
     }
   })
 
@@ -699,7 +941,21 @@ const SkillEdit = () => {
     showAlert('캠페인 스킬 할당이 성공적으로 완료되었습니다.');
   },
   onError: (error) => {
-    showAlert(`캠페인 스킬 할당 실패: ${error.message}`);
+    if (error.message.split('||')[0] === '5') {
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        onConfirm: closeAlert,
+        onCancel: () => {}
+      });
+      Cookies.remove('session_key');
+      setTimeout(() => {
+        router.push('/login');
+      }, 1000);
+    } else {
+      showAlert(`캠페인 스킬 할당 실패: ${error.message}`);
+    }
   }
   })
 
