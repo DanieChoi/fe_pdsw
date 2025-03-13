@@ -94,22 +94,26 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
   const getSkillName = (skillId: number): string =>
     skillLookup[skillId]?.skill_name || `스킬 ${skillId}`;
 
+  // 캠페인 이름 및 ID로 필터링하는 로직 (각 스킬별 캠페인도 필터링)
   const filteredSkills = useMemo(() => {
     if (!searchTerm) return skillsWithCampaigns;
-    return skillsWithCampaigns.filter(skill => {
-      if (
-        String(skill.skillId).includes(searchTerm) ||
-        getSkillName(skill.skillId).toLowerCase().includes(searchTerm.toLowerCase())
-      ) {
-        return true;
-      }
-      return skill.campaigns.some(c => {
-        return (
-          String(c.campaignId).includes(searchTerm) ||
-          getCampaignName(c.campaignId).toLowerCase().includes(searchTerm.toLowerCase())
+    const term = searchTerm.toLowerCase();
+    return skillsWithCampaigns
+      .map(skill => {
+        const skillMatches =
+          String(skill.skillId).includes(term) ||
+          getSkillName(skill.skillId).toLowerCase().includes(term);
+        // 스킬이 일치하지 않으면 캠페인들만 필터
+        const filteredCampaigns = skill.campaigns.filter(c =>
+          String(c.campaignId).includes(term) ||
+          getCampaignName(c.campaignId).toLowerCase().includes(term)
         );
-      });
-    });
+        if (skillMatches) {
+          return { ...skill, campaigns: skill.campaigns };
+        }
+        return { ...skill, campaigns: filteredCampaigns };
+      })
+      .filter(skill => skill.campaigns.length > 0);
   }, [skillsWithCampaigns, searchTerm]);
 
   const totalCampaigns = useMemo(
@@ -190,21 +194,11 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
                         <React.Fragment key={`skill-${skill.skillId}`}>
                           <tr className={`border-b ${isExpanded ? 'bg-blue-100' : 'bg-blue-50'}`}>
                             <td className="py-1 px-2 align-middle">
-                              <button
-                                className="focus:outline-none"
-                                onClick={() => toggleSkill(skill.skillId)}
-                              >
-                                {isExpanded ? (
-                                  <span className="text-xs">▼</span>
-                                ) : (
-                                  <span className="text-xs">►</span>
-                                )}
+                              <button className="focus:outline-none" onClick={() => toggleSkill(skill.skillId)}>
+                                {isExpanded ? <span className="text-xs">▼</span> : <span className="text-xs">►</span>}
                               </button>
                             </td>
-                            <td
-                              className="py-1 px-2 align-middle cursor-pointer"
-                              onClick={() => toggleSkill(skill.skillId)}
-                            >
+                            <td className="py-1 px-2 align-middle cursor-pointer" onClick={() => toggleSkill(skill.skillId)}>
                               <span className="font-medium">{getSkillName(skill.skillId)}</span>
                             </td>
                             <td className="py-1 px-2 align-middle"></td>
@@ -212,10 +206,7 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
                           </tr>
                           {isExpanded &&
                             skill.campaigns.map(campaign => (
-                              <tr
-                                key={`campaign-${skill.skillId}-${campaign.campaignId}`}
-                                className="border-b bg-white hover:bg-gray-50"
-                              >
+                              <tr key={`campaign-${skill.skillId}-${campaign.campaignId}`} className="border-b bg-white hover:bg-gray-50">
                                 <td className="py-1 px-2 align-middle">
                                   <input
                                     type="checkbox"
@@ -224,13 +215,9 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
                                     className="h-3 w-3 cursor-pointer"
                                   />
                                 </td>
-                                <td className="py-1 px-2 align-middle text-gray-600">
-                                  {getSkillName(skill.skillId)}
-                                </td>
+                                <td className="py-1 px-2 align-middle text-gray-600">{getSkillName(skill.skillId)}</td>
                                 <td className="py-1 px-2 align-middle">{campaign.campaignId}</td>
-                                <td className="py-1 px-2 align-middle text-blue-600">
-                                  {getCampaignName(campaign.campaignId)}
-                                </td>
+                                <td className="py-1 px-2 align-middle text-blue-600">{getCampaignName(campaign.campaignId)}</td>
                               </tr>
                             ))}
                         </React.Fragment>
@@ -246,20 +233,12 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
           </div>
         </div>
         <div className="py-2 px-4 border-t bg-gray-50 flex justify-between items-center">
-          <div className="text-xs text-gray-600">
-            {groupCampaignsData.length}개의 캠페인 선택됨
-          </div>
+          <div className="text-xs text-gray-600">{groupCampaignsData.length}개의 캠페인 선택됨</div>
           <div className="space-x-2">
-            <button
-              onClick={onClose}
-              className="px-3 py-1 text-xs bg-gray-100 border border-gray-300 rounded hover:bg-gray-200"
-            >
+            <button onClick={onClose} className="px-3 py-1 text-xs bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">
               취소
             </button>
-            <button
-              onClick={handleConfirm}
-              className="px-3 py-1 text-xs rounded bg-blue-500 text-white hover:bg-blue-600"
-            >
+            <button onClick={handleConfirm} className="px-3 py-1 text-xs rounded bg-blue-500 text-white hover:bg-blue-600">
               확인
             </button>
           </div>
