@@ -1,4 +1,3 @@
-// src/features/campaignManager/components/popups/CampaignAddPopup.tsx
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -8,6 +7,7 @@ import { useTotalSkillListForAddCampaignToCampaignGroup } from '@/widgets/sideba
 import useApiForGetCampaignListForCampaignGroup from '@/widgets/sidebar/hooks/useApiForGetCampaignListForCampaignGroup';
 import { CampaignInfo, SkillInfo } from '@/widgets/sidebar/api/type/typeForAddCampaignForCampaignGroup';
 import GroupCampaignList from './GroupCampaignList';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 
 interface SkillWithCampaigns {
   skillId: number;
@@ -68,7 +68,10 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
               skillMap[skillId] = { skillId, campaigns: [] };
             }
             if (!skillMap[skillId].campaigns.some(c => c.campaignId === campaign.campaign_id)) {
-              skillMap[skillId].campaigns.push({ campaignId: campaign.campaign_id, tenantId: campaign.tenant_id });
+              skillMap[skillId].campaigns.push({
+                campaignId: campaign.campaign_id,
+                tenantId: campaign.tenant_id
+              });
             }
           });
         }
@@ -94,7 +97,6 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
   const getSkillName = (skillId: number): string =>
     skillLookup[skillId]?.skill_name || `스킬 ${skillId}`;
 
-  // 캠페인 이름 및 ID로 필터링하는 로직 (각 스킬별 캠페인도 필터링)
   const filteredSkills = useMemo(() => {
     if (!searchTerm) return skillsWithCampaigns;
     const term = searchTerm.toLowerCase();
@@ -103,15 +105,14 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
         const skillMatches =
           String(skill.skillId).includes(term) ||
           getSkillName(skill.skillId).toLowerCase().includes(term);
-        // 스킬이 일치하지 않으면 캠페인들만 필터
         const filteredCampaigns = skill.campaigns.filter(c =>
           String(c.campaignId).includes(term) ||
           getCampaignName(c.campaignId).toLowerCase().includes(term)
         );
-        if (skillMatches) {
-          return { ...skill, campaigns: skill.campaigns };
-        }
-        return { ...skill, campaigns: filteredCampaigns };
+        return {
+          skillId: skill.skillId,
+          campaigns: skillMatches ? skill.campaigns : filteredCampaigns
+        };
       })
       .filter(skill => skill.campaigns.length > 0);
   }, [skillsWithCampaigns, searchTerm]);
@@ -137,6 +138,15 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     return (groupData?.result_data || []).filter(item => item.group_id === groupId);
   }, [groupData, groupId]);
 
+  // 버튼 클릭 시 실제 이동 로직은 추후 구현
+  const moveToGroup = () => {
+    console.log("moveToGroup 버튼 클릭");
+  };
+
+  const moveToAll = () => {
+    console.log("moveToAll 버튼 클릭");
+  };
+
   const handleConfirm = () => {
     const finalIds = groupCampaignsData.map(item => item.campaign_id);
     if (onSelect) onSelect(finalIds);
@@ -147,11 +157,16 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded shadow-md w-[70%] max-h-[1000px] flex flex-col overflow-hidden">
+      <div className="bg-white rounded shadow-md w-[70%] max-h-[90vh] flex flex-col overflow-hidden">
+        {/* 헤더 */}
         <div className="flex justify-between items-center px-4 py-2 border-b bg-gray-50">
           <h2 className="text-sm font-medium">캠페인 추가 (그룹ID: {groupId})</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg">×</button>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg">
+            ×
+          </button>
         </div>
+
+        {/* 검색 영역 */}
         <div className="px-4 py-2 border-b">
           <input
             type="text"
@@ -161,12 +176,17 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
             className="w-full py-1 px-2 text-xs border border-gray-300 rounded"
           />
         </div>
-        <div className="flex-1 overflow-hidden flex flex-col p-2">
-          <div className="px-2 py-1 border-b flex justify-between items-center bg-slate-50">
+
+        {/* 본문 */}
+        <div className="flex-1 flex flex-col p-4 overflow-hidden">
+          <div className="px-2 py-1 mb-2 border-b flex justify-between items-center bg-slate-50">
             <h3 className="text-xs font-medium">전체 캠페인 목록 (총 {totalCampaigns}건)</h3>
           </div>
-          <div className="flex flex-1 mt-2 overflow-hidden">
-            <div className="flex-1 border mr-4 overflow-auto rounded">
+
+          {/* 가로 레이아웃: 왼쪽 테이블 - 중앙 버튼 - 오른쪽 테이블 */}
+          <div className="flex flex-row gap-4 h-full overflow-hidden">
+            {/* 왼쪽 테이블 */}
+            <div className="flex-1 border rounded overflow-auto">
               {isLoadingAny ? (
                 <div className="flex items-center justify-center h-full text-sm">로딩 중...</div>
               ) : hasError ? (
@@ -194,11 +214,21 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
                         <React.Fragment key={`skill-${skill.skillId}`}>
                           <tr className={`border-b ${isExpanded ? 'bg-blue-100' : 'bg-blue-50'}`}>
                             <td className="py-1 px-2 align-middle">
-                              <button className="focus:outline-none" onClick={() => toggleSkill(skill.skillId)}>
-                                {isExpanded ? <span className="text-xs">▼</span> : <span className="text-xs">►</span>}
+                              <button
+                                className="focus:outline-none"
+                                onClick={() => toggleSkill(skill.skillId)}
+                              >
+                                {isExpanded ? (
+                                  <span className="text-xs">▼</span>
+                                ) : (
+                                  <span className="text-xs">►</span>
+                                )}
                               </button>
                             </td>
-                            <td className="py-1 px-2 align-middle cursor-pointer" onClick={() => toggleSkill(skill.skillId)}>
+                            <td
+                              className="py-1 px-2 align-middle cursor-pointer"
+                              onClick={() => toggleSkill(skill.skillId)}
+                            >
                               <span className="font-medium">{getSkillName(skill.skillId)}</span>
                             </td>
                             <td className="py-1 px-2 align-middle"></td>
@@ -206,18 +236,27 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
                           </tr>
                           {isExpanded &&
                             skill.campaigns.map(campaign => (
-                              <tr key={`campaign-${skill.skillId}-${campaign.campaignId}`} className="border-b bg-white hover:bg-gray-50">
+                              <tr
+                                key={`campaign-${skill.skillId}-${campaign.campaignId}`}
+                                className="border-b bg-white hover:bg-gray-50"
+                              >
                                 <td className="py-1 px-2 align-middle">
                                   <input
                                     type="checkbox"
                                     checked={selectedLeftCampaigns.includes(campaign.campaignId)}
-                                    onChange={() => toggleLeftCampaignSelection(campaign.campaignId)}
+                                    onChange={() =>
+                                      toggleLeftCampaignSelection(campaign.campaignId)
+                                    }
                                     className="h-3 w-3 cursor-pointer"
                                   />
                                 </td>
-                                <td className="py-1 px-2 align-middle text-gray-600">{getSkillName(skill.skillId)}</td>
+                                <td className="py-1 px-2 align-middle text-gray-600">
+                                  {getSkillName(skill.skillId)}
+                                </td>
                                 <td className="py-1 px-2 align-middle">{campaign.campaignId}</td>
-                                <td className="py-1 px-2 align-middle text-blue-600">{getCampaignName(campaign.campaignId)}</td>
+                                <td className="py-1 px-2 align-middle text-blue-600">
+                                  {getCampaignName(campaign.campaignId)}
+                                </td>
                               </tr>
                             ))}
                         </React.Fragment>
@@ -227,18 +266,51 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
                 </table>
               )}
             </div>
-            <div className="flex-1 border ml-4 overflow-auto rounded">
-              <GroupCampaignList isLoading={isLoadingGroup} groupCampaigns={groupCampaignsData} />
+
+            {/* 중앙 버튼 영역 - 세로 정렬 */}
+            <div className="flex flex-col justify-center items-center space-y-4 w-16">
+              <button
+                onClick={moveToGroup}
+                className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600"
+                title="선택한 캠페인을 그룹으로 이동"
+              >
+                <ChevronRight size={20} />
+              </button>
+              <button
+                onClick={moveToAll}
+                className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600"
+                title="그룹 캠페인을 전체로 이동"
+              >
+                <ChevronLeft size={20} />
+              </button>
+            </div>
+
+            {/* 오른쪽 테이블 */}
+            <div className="flex-1 border rounded overflow-auto">
+              <GroupCampaignList
+                isLoading={isLoadingGroup}
+                groupCampaigns={groupCampaignsData}
+              />
             </div>
           </div>
         </div>
+
+        {/* 푸터 */}
         <div className="py-2 px-4 border-t bg-gray-50 flex justify-between items-center">
-          <div className="text-xs text-gray-600">{groupCampaignsData.length}개의 캠페인 선택됨</div>
+          <div className="text-xs text-gray-600">
+            {groupCampaignsData.length}개의 캠페인 선택됨
+          </div>
           <div className="space-x-2">
-            <button onClick={onClose} className="px-3 py-1 text-xs bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">
+            <button
+              onClick={onClose}
+              className="px-3 py-1 text-xs bg-gray-100 border border-gray-300 rounded hover:bg-gray-200"
+            >
               취소
             </button>
-            <button onClick={handleConfirm} className="px-3 py-1 text-xs rounded bg-blue-500 text-white hover:bg-blue-600">
+            <button
+              onClick={handleConfirm}
+              className="px-3 py-1 text-xs rounded bg-blue-500 text-white hover:bg-blue-600"
+            >
               확인
             </button>
           </div>
