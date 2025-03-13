@@ -48,12 +48,12 @@ const CampaignOutgoingMethodTab:OutgoingMethodTabParam = {
 };
 
 type Props = {
-  newCampaignYn: boolean;
+  callCampaignMenu: string;
   campaignInfo: MainDataResponse;
   onCampaignOutgoingMethodChange: (param:OutgoingMethodTabParam) => void;
 };
 
-const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCampaignOutgoingMethodChange }) => {
+const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onCampaignOutgoingMethodChange }) => {
   const { campaigns } = useMainStore();
   const [maxRings] = useState<string>("10");
   const [dialModeOption, setDialModeOption] = useState<string>("default");
@@ -443,7 +443,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ newCampaignYn,campaignInfo, onCamp
         </div>
       </div>
 
-      {!newCampaignYn &&
+      {!(callCampaignMenu == 'NewCampaignManager' || callCampaignMenu == 'CampaignGroupManager' || callCampaignMenu == 'CampaignClone')  &&
       <div className="flex justify-end gap-2 mt-5">
         <CommonButton variant="secondary" onClick={()=> 
           onCampaignOutgoingMethodChange({...tempOutgoingMethodTab

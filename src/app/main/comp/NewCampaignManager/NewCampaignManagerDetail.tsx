@@ -1003,7 +1003,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
       </div>
       <div>
         <CampaignTab campaignSchedule={tempCampaignSchedule}
-          newCampaignYn={true}
+          callCampaignMenu={'NewCampaignManager'}
           campaignInfo={tempCampaignInfo}
           campaignDialSpeedInfo={tempCampaignDialSpeedInfoParam}
           onCampaignOutgoingOrderChange={(value) => handleCampaignOutgoingOrderChange(value)}

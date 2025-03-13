@@ -51,12 +51,12 @@ const CampaignOutgoingOrderTab:OutgoingOrderTabParam = {
 };
 
 type Props = {
-  newCampaignYn: boolean;
+  callCampaignMenu: string;
   campaignInfo: MainDataResponse;
   onCampaignOutgoingOrderChange: (param:OutgoingOrderTabParam) => void;
 };
 
-const OutgoingOrderTab: React.FC<Props> = ({ newCampaignYn, campaignInfo, onCampaignOutgoingOrderChange }) => {
+const OutgoingOrderTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onCampaignOutgoingOrderChange }) => {
   const { phoneDescriptions } = useCampainManagerStore();
   const [tempData, setTempData] = useState<DataProps[]>([]);
   const [tempRightData, setTempRightData] = useState<RightDataProps[]>([]);
@@ -359,7 +359,7 @@ const OutgoingOrderTab: React.FC<Props> = ({ newCampaignYn, campaignInfo, onCamp
               </div>
             </div>
           </div>
-          {!newCampaignYn &&
+          {!(callCampaignMenu == 'NewCampaignManager' || callCampaignMenu == 'CampaignGroupManager' || callCampaignMenu == 'CampaignClone')  &&
           <div className="flex justify-end gap-2 mt-5">
             <CommonButton variant="secondary" onClick={()=> 
               onCampaignOutgoingOrderChange({...tempCampaignOutgoingOrderTab

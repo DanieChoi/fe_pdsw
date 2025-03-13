@@ -103,10 +103,28 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
     if( typeof campaignGroupHeaderSearchParam != 'undefined' ){
       let _tempCampaignGroupList:DataProps[] = campaignGroupList || [];
       if( campaignGroupHeaderSearchParam.tenantId > -1 ){
-        _tempCampaignGroupList = _tempCampaignGroupList.filter((ampaignGroup) => ampaignGroup.tenantId === Number(campaignGroupHeaderSearchParam.tenantId));
+        _tempCampaignGroupList = _tempCampaignGroupList.filter((ampaignGroup) => ampaignGroup.tenantId === Number(campaignGroupHeaderSearchParam.tenantId))
+          .map((group,index) => {
+            return {
+              no: index+1,
+              tenantId: group.tenantId,
+              tenantName: group.tenantName,
+              campaignGroupId: group.campaignGroupId,
+              campaignGroupName: group.campaignGroupName
+            }
+        });
       }
       if( campaignGroupHeaderSearchParam.campaignGroupName != '' ){
-        _tempCampaignGroupList = _tempCampaignGroupList.filter((ampaignGroup) => ampaignGroup.campaignGroupName.includes(campaignGroupHeaderSearchParam.campaignGroupName));
+        _tempCampaignGroupList = _tempCampaignGroupList.filter((ampaignGroup) => ampaignGroup.campaignGroupName.includes(campaignGroupHeaderSearchParam.campaignGroupName))
+          .map((group,index) => {
+            return {
+              no: index+1,
+              tenantId: group.tenantId,
+              tenantName: group.tenantName,
+              campaignGroupId: group.campaignGroupId,
+              campaignGroupName: group.campaignGroupName
+            }
+        });
       }
       setTempCampaigns(_tempCampaignGroupList as unknown as DataProps[]);
       onGroupSelect(_tempCampaignGroupList[0].campaignGroupId.toString());
@@ -133,7 +151,7 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
 
   return (
     <div className="w-[40%] shrink-0">
-      <TitleWrap title="캠페인 그룹 검색목록" totalCount={memoizedRows.length} />
+      <TitleWrap title="캠페인 그룹 검색목록" totalCount={tempCampaigns.length} />
       <div className="overflow-x-auto">
         <div className="grid-custom-wrap h-[200px]">
           <DataGrid 

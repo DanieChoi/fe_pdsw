@@ -23,7 +23,7 @@ import { MainDataResponse } from '@/features/auth/types/mainIndex';
 
 type Props = {
   campaignSchedule: CampaignScheDuleListDataResponse;
-  newCampaignYn: boolean;
+  callCampaignMenu: string;
   campaignInfo: MainDataResponse;
   campaignDialSpeedInfo: CallPacingTabParam;
   onCampaignScheduleChange: (param:OperationTimeParam) => void;
@@ -37,7 +37,7 @@ type Props = {
 };
 
 const CampaignTab: React.FC<Props> = ({ campaignSchedule
-  , newCampaignYn
+  , callCampaignMenu
   , campaignInfo
   , campaignDialSpeedInfo
   , onCampaignScheduleChange
@@ -65,31 +65,31 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
         </TabsList>
       </div>
       <TabsContent value="tab1">
-        <OperationTimeTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} campaignSchedule={campaignSchedule} onCampaignScheduleChange={onCampaignScheduleChange} />
+        <OperationTimeTab callCampaignMenu={callCampaignMenu} campaignInfo={campaignInfo} campaignSchedule={campaignSchedule} onCampaignScheduleChange={onCampaignScheduleChange} />
       </TabsContent>
       <TabsContent value="tab2">
-        <OutgoingOrderTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onCampaignOutgoingOrderChange={onCampaignOutgoingOrderChange} />
+        <OutgoingOrderTab callCampaignMenu={callCampaignMenu} campaignInfo={campaignInfo} onCampaignOutgoingOrderChange={onCampaignOutgoingOrderChange} />
       </TabsContent>
       <TabsContent value="tab3">
-        <OutgoingStrategyTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onCampaignOutgoingStrategyChange={onCampaignOutgoingStrategyChange} />
+        <OutgoingStrategyTab callCampaignMenu={callCampaignMenu} campaignInfo={campaignInfo} onCampaignOutgoingStrategyChange={onCampaignOutgoingStrategyChange} />
       </TabsContent>
       <TabsContent value="tab4">
-        <OutgoingMethodTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onCampaignOutgoingMethodChange={onCampaignOutgoingMethodChange} />
+        <OutgoingMethodTab callCampaignMenu={callCampaignMenu} campaignInfo={campaignInfo} onCampaignOutgoingMethodChange={onCampaignOutgoingMethodChange} />
       </TabsContent>
       <TabsContent value="tab5">
-        <CallPacingTab newCampaignYn={newCampaignYn} campaignDialSpeedInfo={campaignDialSpeedInfo} onHandleCallPacingTabChange={onHandleCallPacingTabChange} />
+        <CallPacingTab callCampaignMenu={callCampaignMenu} campaignDialSpeedInfo={campaignDialSpeedInfo} onHandleCallPacingTabChange={onHandleCallPacingTabChange} />
       </TabsContent>
       <TabsContent value="tab6">
-        <CallbackTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onHandleCallbackTabChange={onHandleCallbackTabChange} />
+        <CallbackTab callCampaignMenu={callCampaignMenu} campaignInfo={campaignInfo} onHandleCallbackTabChange={onHandleCallbackTabChange} />
       </TabsContent>
       <TabsContent value="tab7">
-        <NotificationTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onHandleNotificationTabChange={onHandleNotificationTabChange} />
+        <NotificationTab callCampaignMenu={callCampaignMenu} campaignInfo={campaignInfo} onHandleNotificationTabChange={onHandleNotificationTabChange} />
       </TabsContent>
       <TabsContent value="tab8">
-        <AssignedAgentTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onHandleAdditionalInfoTabChange={onHandleAdditionalInfoTabChange} />
+        <AssignedAgentTab callCampaignMenu={callCampaignMenu} campaignInfo={campaignInfo} onHandleAdditionalInfoTabChange={onHandleAdditionalInfoTabChange} />
       </TabsContent>
       <TabsContent value="tab9">
-        <AdditionalInfoTab newCampaignYn={newCampaignYn} campaignInfo={campaignInfo} onHandleAdditionalInfoTabChange={onHandleAdditionalInfoTabChange} />
+        <AdditionalInfoTab callCampaignMenu={callCampaignMenu} campaignInfo={campaignInfo} onHandleAdditionalInfoTabChange={onHandleAdditionalInfoTabChange} />
       </TabsContent>
     </Tabs>
   );
