@@ -55,7 +55,7 @@ const errorMessage: CustomAlertRequest = {
 };
 
 type Props = {
-  newCampaignYn: boolean
+  callCampaignMenu: string;
   campaignInfo: MainDataResponse;
   campaignSchedule: CampaignScheDuleListDataResponse;
   onCampaignScheduleChange: (param:OperationTimeParam) => void;
@@ -76,7 +76,7 @@ const tempOperationTimeTab:OperationTimeParam = {
   start_flag: ''
 };
 
-const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaignSchedule, onCampaignScheduleChange }) => {
+const OperationTimeTab: React.FC<Props> = ({callCampaignMenu, campaignInfo, campaignSchedule, onCampaignScheduleChange }) => {
   const [tempData, setTempData] = useState<DataProps[]>([]);
   const [startTime, setStartTime] = useState(""); // 시작시간
   const [endTime, setEndTime] = useState(""); // 종료시간
@@ -122,7 +122,7 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
         onSave: false,
       });
     }
-  }, [newCampaignYn,campaignSchedule,campaignInfo]);
+  }, [callCampaignMenu,campaignSchedule,campaignInfo]);
 
   return (
     <div className="pt-[20px]">
@@ -132,8 +132,8 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
           <div className="flex flex-col gap-y-2">
             <div className="flex items-center gap-[10px] justify-between">
               <Label className="w-[70px] min-w-[70px]">시작</Label>
-              <Select value={campaignInfo.start_flag === 0?'2':campaignInfo.start_flag+''} onValueChange={(value) => handleSelectChange(value, 'startFlag')}
-                disabled={campaignInfo.start_flag === 0} >
+              <Select value={(callCampaignMenu == 'NewCampaignManager' || callCampaignMenu == 'CampaignGroupManager')?'2':campaignInfo.start_flag+''} onValueChange={(value) => handleSelectChange(value, 'startFlag')}
+                disabled={(callCampaignMenu == 'NewCampaignManager' || callCampaignMenu == 'CampaignGroupManager')} >
                 <SelectTrigger>
                   <SelectValue placeholder="시작" />
                 </SelectTrigger>
@@ -304,7 +304,7 @@ const OperationTimeTab: React.FC<Props> = ({newCampaignYn, campaignInfo, campaig
           </div>
         </div>
       </div>
-      {!newCampaignYn &&
+      {!(callCampaignMenu == 'NewCampaignManager' || callCampaignMenu == 'CampaignGroupManager' || callCampaignMenu == 'CampaignClone')  &&
       <div className="flex justify-end gap-2 mt-5">
         <CommonButton variant="secondary" onClick={()=> 
           onCampaignScheduleChange({...tempCampaignSchedule

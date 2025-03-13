@@ -14,12 +14,12 @@ const tempAdditionalInfoTab:AdditionalInfoTabParam = {
 };
 
 type Props = {
-  newCampaignYn: boolean;
+  callCampaignMenu: string;
   campaignInfo: MainDataResponse;
   onHandleAdditionalInfoTabChange: (param:AdditionalInfoTabParam) => void;
 };
 
-const AdditionalInfoTab: React.FC<Props> = ({ newCampaignYn, campaignInfo, onHandleAdditionalInfoTabChange }) => {
+const AdditionalInfoTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onHandleAdditionalInfoTabChange }) => {
   // 캠페인 생성 정보 상태
   const [creator, setCreator] = useState(''); // 생성 인
   const [creationDate, setCreationDate] = useState(""); // 생성 날짜
@@ -126,7 +126,7 @@ const AdditionalInfoTab: React.FC<Props> = ({ newCampaignYn, campaignInfo, onHan
       </div>
 
       {/* 확인/취소 버튼 */}
-      {!newCampaignYn &&
+      {!(callCampaignMenu == 'NewCampaignManager' || callCampaignMenu == 'CampaignGroupManager' || callCampaignMenu == 'CampaignClone')  &&
       <div className="flex justify-end gap-2 mt-5">
         <CommonButton variant="secondary" onClick={()=> 
           onHandleAdditionalInfoTabChange({...tempAdditionalInfoTab

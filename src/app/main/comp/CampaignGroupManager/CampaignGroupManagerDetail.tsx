@@ -298,10 +298,10 @@ type Props = {
   campaignId: number;
   onInit: () => void;
   onGroupDelete: (param: GroupDeleteParam) => void;
-  groupCampaignListData?: downDataProps[];
+  selectCampaignGroupList: MainDataResponse[];
 }
 
-export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit,onGroupDelete,groupCampaignListData}: Props) {
+export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit,onGroupDelete,selectCampaignGroupList}: Props) {
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
@@ -908,6 +908,16 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
+    if( !saveErrorCheck && selectCampaignGroupList.length === 0){
+      saveErrorCheck = true;
+      setAlertState({ 
+        ...errorMessage,
+        isOpen: true,
+        message: "캠페인 그룹 소속 캠페인 검색목록에서 일괄저장할 캠페인을 선택해 주세요.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
     if( !saveErrorCheck ){      
       setAlertState({
         ...errorMessage,
@@ -923,32 +933,28 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
   //캠페인 저장 실행.
   const handleCampaignSaveExecute = () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
-    // const tempGroupCampaignList = campaigns.filter((campaign) => campaign
-    if( typeof groupCampaignListData !== 'undefined' ){
-      const tempGroupCampaignList = campaigns.filter(campaign =>
-        groupCampaignListData.some(groupCampaign => campaign.campaign_id === groupCampaign.campaignId)
-      );
+    if( typeof selectCampaignGroupList !== 'undefined' && selectCampaignGroupList.length > 0 ){
       
-      for(let i=0; i<tempGroupCampaignList.length; i++){
+      for(let i=0; i<selectCampaignGroupList.length; i++){
         if( changeYn ){
           if( campaignInfoChangeYn ){
             fetchCampaignManagerUpdate({...tempCampaignManagerInfo
-              , campaign_id: tempGroupCampaignList[i].campaign_id
-              , campaign_name: tempGroupCampaignList[i].campaign_name
-              , campaign_desc: tempGroupCampaignList[i].campaign_desc
+              , campaign_id: selectCampaignGroupList[i].campaign_id
+              , campaign_name: selectCampaignGroupList[i].campaign_name
+              , campaign_desc: selectCampaignGroupList[i].campaign_desc
             });
           }
           if( campaignSkillChangeYn ){
             //캠페인 스킬 수정 api 호출
             fetchCampaignSkillUpdate({...tempCampaignSkills
-              , campaign_id: tempGroupCampaignList[i].campaign_id
+              , campaign_id: selectCampaignGroupList[i].campaign_id
               , skill_id: []
             });
           }
           if( campaignScheduleChangeYn ){
             //캠페인 스케줄 수정 api 호출
             fetchCampaignScheduleUpdate({...tempCampaignSchedule
-              , campaign_id: tempGroupCampaignList[i].campaign_id
+              , campaign_id: selectCampaignGroupList[i].campaign_id
             });
           }
           if( callingNumberChangeYn ){        
@@ -967,7 +973,7 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
           if( campaignDialSpeedChangeYn ){
             //캠페인 발신 속도 수정 api 호출
             fetchDialSpeedUpdate( {...tempCampaignDialSpeedInfo
-              , campaign_id: tempGroupCampaignList[i].campaign_id
+              , campaign_id: selectCampaignGroupList[i].campaign_id
             });
           }
         }
@@ -1091,25 +1097,28 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
 
   //재발신 버튼 이벤트
   const handleRebroadcast = () => {
-    // openRebroadcastSettings('20','재발신 설정');
-    // if( campaignIdForUpdateFromSideMenu == null || campaignIdForUpdateFromSideMenu === '' || campaignIdForUpdateFromSideMenu === '0'){
-    //   setCampaignIdForUpdateFromSideMenu(campaignId+'');
-    // }
     if( campaignId > 0){
       setCampaignIdForUpdateFromSideMenu(campaignId+'');
+      if (openedTabs.some(tab => tab.id === 20)) {
+        setActiveTab(20, openedTabs.filter((data) => data.id === 20)[0].uniqueKey);
+      } else if (!openedTabs.some(tab => tab.id === 20)) {
+        addTab({
+          id: 20,
+          uniqueKey: '20',
+          title: '재발신 설정',
+          icon: '',
+          href: '',
+          content: null,
+        });
+      }
     }else{
       setCampaignIdForUpdateFromSideMenu('');
-    }
-    if (openedTabs.some(tab => tab.id === 20)) {
-      setActiveTab(20, openedTabs.filter((data) => data.id === 20)[0].uniqueKey);
-    } else if (!openedTabs.some(tab => tab.id === 20)) {
-      addTab({
-        id: 20,
-        uniqueKey: '20',
-        title: '재발신 설정',
-        icon: '',
-        href: '',
-        content: null,
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "재발신할 캠페인을 선택해 주세요.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
   };
@@ -1146,7 +1155,7 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
                 tenant_id: groupInfo.tenantId,
                 group_id: groupInfo.campaignGroupId
               }) },
-              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue", disabled: campaignId > 0 ? false : true },
           ]}
           />
           <div className="grid grid-cols-3 gap-x-[26px] gap-y-2">
@@ -1252,7 +1261,7 @@ export default function CampaignGroupManagerDetail({groupInfo, campaignId,onInit
       </div>
       <div>
         <CampaignTab campaignSchedule={tempCampaignSchedule}
-          newCampaignYn={true}
+          callCampaignMenu={'CampaignGroupManager'}
           campaignInfo={tempCampaignInfo}
           campaignDialSpeedInfo={tempCampaignDialSpeedInfoParam}
           onCampaignOutgoingOrderChange={(value) => handleCampaignOutgoingOrderChange(value)}
