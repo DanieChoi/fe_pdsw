@@ -4,25 +4,27 @@ import { getCampaignListForCampaignGroup } from '@/widgets/sidebar/api/apiForAdd
 
 /**
  * 캠페인 그룹에 대한 캠페인 목록을 가져오는 React Query 훅
- * @param skillId 스킬 ID (선택 사항)
- * @param tenantId 테넌트 ID (선택 사항)
+ * @param groupId 캠페인 그룹 ID (필수)
+ * @param campaignId 캠페인 ID (옵션)
+ * @param tenantId 테넌트 ID (옵션)
  * @param isOpen 팝업이 열려있는지 여부 (기본값: false)
  * @param options React Query 추가 옵션
  * @returns 캠페인 그룹 스킬 목록 쿼리 결과
  */
 export const useApiForGetCampaignListForCampaignGroup = (
-  skillId?: number,
+  groupId: number,
+  campaignId?: number,
   tenantId?: number,
   isOpen: boolean = false,
   options?: UseQueryOptions<CampaignGroupSkillsResponse, Error>
 ) => {
   return useQuery<CampaignGroupSkillsResponse, Error>({
-    queryKey: ['campaignGroupSkills', skillId, tenantId],
-    queryFn: () => getCampaignListForCampaignGroup(skillId, tenantId),
+    queryKey: ['campaignGroupSkills', groupId, campaignId, tenantId],
+    queryFn: () => getCampaignListForCampaignGroup(groupId, campaignId, tenantId),
     staleTime: 5 * 60 * 1000, // 5분 캐시
     enabled: isOpen, // 팝업이 열려 있을 때만 API 호출
-    refetchOnWindowFocus: false, // 창이 포커스될 때 자동으로 다시 가져오지 않음
-    retry: 1, // 실패 시 1번만 재시도
+    refetchOnWindowFocus: false,
+    retry: 1,
     ...options,
   });
 };

@@ -190,7 +190,7 @@ export const apiForGetCampaignListForCampaignGroup = async (
 ): Promise<CampaignGroupSkillsResponse> => {
   try {
     const response = await axiosInstance.post<CampaignGroupSkillsResponse>(
-      "collections/skill-campaign",
+      "collections/campaign-group-list",
       request
     );
 
@@ -212,17 +212,19 @@ export const apiForGetCampaignListForCampaignGroup = async (
 
 /**
  * 기본 요청으로 캠페인 그룹에 대한 캠페인 목록을 가져오는 헬퍼 함수
+ * @param groupId 캠페인 그룹 ID (필수)
  * @param campaignId 캠페인 ID (옵션)
  * @param tenantId 테넌트 ID (옵션)
  * @returns Promise<CampaignGroupSkillsResponse> 캠페인 그룹 스킬 목록 응답 데이터
  */
 export const getCampaignListForCampaignGroup = async (
+  groupId: number,
   campaignId?: number,
   tenantId?: number
 ): Promise<CampaignGroupSkillsResponse> => {
   const defaultRequest: CampaignGroupSkillsRequest = {
     filter: {
-      group_id: [], // 기본적으로 빈 배열 설정
+      group_id: [groupId],
       campaign_id: campaignId ? {
         start: campaignId,
         end: campaignId
@@ -232,13 +234,14 @@ export const getCampaignListForCampaignGroup = async (
       }
     },
     sort: {
-      campaign_id: 0 // skill_id -> campaign_id로 변경
+      // 필요 시 추가 정렬 조건을 넣으세요.
     },
     page: {
-      index: 1,
+      index: 0,
       items: 9999
     }
   };
 
   return apiForGetCampaignListForCampaignGroup(defaultRequest);
 };
+
