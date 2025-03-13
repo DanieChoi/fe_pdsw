@@ -8,6 +8,8 @@ import { useCampainManagerStore } from '@/store';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useApiForPhoneDescriptionUpdate } from '@/features/campaignManager/hooks/useApiForPhoneDescriptionUpdate';
 import { useApiForPhoneDescriptionInsert } from '@/features/campaignManager/hooks/useApiForPhoneDescriptionInsert';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 interface PhoneRow {
   id: string;
@@ -23,6 +25,13 @@ interface PhoneDescription {
   description: string[];
 }
 
+const errorMessage = {
+  isOpen: false,
+  message: '',
+  title: '로그인',
+  type: '2',
+};
+
 const EditDescription = () => {
   const { phoneDescriptions, setPhoneDescriptions } = useCampainManagerStore();
   const [selectedRow, setSelectedRow] = useState<PhoneRow | null>(null);
@@ -32,6 +41,8 @@ const EditDescription = () => {
   const [inputPhone3, setInputPhone3] = useState('');
   const [inputPhone4, setInputPhone4] = useState('');
   const [inputPhone5, setInputPhone5] = useState('');
+
+  const router = useRouter();
 
   // api 응답 데이터를 그리드 형식으로 변환하는 함수
   const transformToGridData = (apiData: PhoneDescription[]): PhoneRow[] => {
@@ -50,6 +61,20 @@ const EditDescription = () => {
     onSuccess: (data) => {
       const sortedData = [...data.result_data].sort((a, b) => a.description_id - b.description_id);
       setPhoneDescriptions(sortedData);
+    },onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
     }
   })
 
@@ -61,6 +86,22 @@ const EditDescription = () => {
         tenant_id: 0,
       })
       showConfirm('저장되었습니다', () => {});
+    },onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+            onConfirm: closeAlert,
+            onCancel: () => {}
+          });
+          Cookies.remove('session_key');
+          setTimeout(() => {
+            router.push('/login');
+          }, 1000);
+      } else {
+          showAlert('전화번호설명 저장 중 오류가 발생했습니다: ' + error.message);
+      }
     }
   })
 
@@ -72,6 +113,22 @@ const EditDescription = () => {
         tenant_id: 0,
       });
       showConfirm('수정되었습니다', () => {});
+    },onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+            onConfirm: closeAlert,
+            onCancel: () => {}
+          });
+          Cookies.remove('session_key');
+          setTimeout(() => {
+            router.push('/login');
+          }, 1000);
+      } else {
+          showAlert('전화번호설명 저장 중 오류가 발생했습니다: ' + error.message);
+      }
     }
   })
 

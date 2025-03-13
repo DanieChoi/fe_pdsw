@@ -11,9 +11,18 @@ import { CustomInput } from "@/components/shared/CustomInput";
 import { useApiForCallingNumberUpdate } from '@/features/campaignManager/hooks/useApiForCallingNumberUpdate';
 import { useApiForCallingNumberInsert } from '@/features/campaignManager/hooks/useApiForCallingNumberInsert';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
+import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 
 type GridRow = MainDataResponse & {
   calling_number: string;
+};
+
+const errorMessage = {
+  isOpen: false,
+  message: '',
+  title: '로그인',
+  type: '2',
 };
 
 function CampaignLayout() {
@@ -26,6 +35,8 @@ function CampaignLayout() {
   const [selectedCampaignName, setSelectedCampaignName] = useState('');
   const [selectedCallingNumber, setSelectedCallingNumber] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+
+  const router = useRouter();
 
   const [alertState, setAlertState] = useState({
     isOpen: false,
@@ -69,7 +80,21 @@ function CampaignLayout() {
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
       setCallingNumbers(data.result_data);
-    }
+    },onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
+  }
   });
 
   //캠페인 발신번호 추가 api 호출
@@ -79,6 +104,22 @@ function CampaignLayout() {
         session_key: '',
         tenant_id: 0,
       });      
+    },onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+            onConfirm: closeAlert,
+            onCancel: () => {}
+          });
+          Cookies.remove('session_key');
+          setTimeout(() => {
+            router.push('/login');
+          }, 1000);
+      } else {
+          showAlert('발신번호 저장 중 오류가 발생했습니다: ' + error.message);
+      }
     }
   });
 
@@ -89,6 +130,22 @@ function CampaignLayout() {
         session_key: '',
         tenant_id: 0,
       })
+    },onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+            onConfirm: closeAlert,
+            onCancel: () => {}
+          });
+          Cookies.remove('session_key');
+          setTimeout(() => {
+            router.push('/login');
+          }, 1000);
+      } else {
+          showAlert('발신번호 수정 중 오류가 발생했습니다: ' + error.message);
+      }
     }
   })
 

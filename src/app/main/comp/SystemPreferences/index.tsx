@@ -10,6 +10,8 @@ import { useApiForChannelList } from '@/features/preferences/hooks/useApiForChan
 import { useApiForChannelEdit } from '@/features/preferences/hooks/useApiForChannelEdit';
 import { useApiForDialingDevice, useApiForDialingDeviceCreate, useApiForDialingDeviceUpdate } from '@/features/preferences/hooks/useApiForDialingDevice';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 interface EquipmentRow {
     device_id: string;
@@ -24,6 +26,13 @@ interface ChannelRow {
     mode: string;
     assignValue: number;
 }
+
+const errorMessage = {
+    isOpen: false,
+    message: '',
+    title: '로그인',
+    type: '0',
+};
 
 const SystemPreferences = () => {
     const [refreshCycle, setRefreshCycle] = useState("");
@@ -41,6 +50,7 @@ const SystemPreferences = () => {
     const { tenants, campaigns } = useMainStore();
     const [dialingDeviceList, setDialingDeviceList] = useState<DialingDeviceListDataResponse[]>([]);
     const [channelList, setChannelList] = useState<ChannelListDataResponse[]>([]);
+    const router = useRouter();
 
     const [alertState, setAlertState] = useState({
         isOpen: false,
@@ -101,6 +111,20 @@ const SystemPreferences = () => {
                 setSelectedDevice(deviceRow);
                 setIsEditable(true);
             }
+        },onError: (data) => {      
+            if (data.message.split('||')[0] === '5') {
+              setAlertState({
+                ...errorMessage,
+                isOpen: true,
+                message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                onConfirm: closeAlert,
+                onCancel: () => {}
+              });
+              Cookies.remove('session_key');
+              setTimeout(() => {
+                router.push('/login');
+              }, 1000);
+            }
         }
     });
 
@@ -108,7 +132,21 @@ const SystemPreferences = () => {
     const { mutate: fetchChannelList } = useApiForChannelList({
         onSuccess: (data) => {
             setChannelList(data.result_data);
-        }
+        },onError: (data) => {      
+            if (data.message.split('||')[0] === '5') {
+              setAlertState({
+                ...errorMessage,
+                isOpen: true,
+                message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                onConfirm: closeAlert,
+                onCancel: () => {}
+              });
+              Cookies.remove('session_key');
+              setTimeout(() => {
+                router.push('/login');
+              }, 1000);
+            }
+          }
     });
 
     // 채널 정보 수정 api 호출
@@ -118,9 +156,22 @@ const SystemPreferences = () => {
             fetchDialingDeviceList({
                 tenant_id_array: tenants.map(tenant => tenant.tenant_id)
             });
-        },
-        onError: (error) => {
-            showAlert('채널 정보 수정 중 오류가 발생했습니다: ' + error.message);
+        },onError: (error) => {
+            if (error.message.split('||')[0] === '5') {
+                setAlertState({
+                  ...errorMessage,
+                  isOpen: true,
+                  message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                  onConfirm: closeAlert,
+                  onCancel: () => {}
+                });
+                Cookies.remove('session_key');
+                setTimeout(() => {
+                  router.push('/login');
+                }, 1000);
+            } else {
+                showAlert('채널 정보 저장 중 오류가 발생했습니다: ' + error.message);
+            }
         }
     });
     
@@ -131,9 +182,22 @@ const SystemPreferences = () => {
             fetchDialingDeviceList({
                 tenant_id_array: tenants.map(tenant => tenant.tenant_id)
             });
-        },
-        onError: (error) => {
-            showAlert('장비 정보 저장 중 오류가 발생했습니다: ' + error.message);
+        },onError: (error) => {
+            if (error.message.split('||')[0] === '5') {
+                setAlertState({
+                  ...errorMessage,
+                  isOpen: true,
+                  message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                  onConfirm: closeAlert,
+                  onCancel: () => {}
+                });
+                Cookies.remove('session_key');
+                setTimeout(() => {
+                  router.push('/login');
+                }, 1000);
+            } else {
+                showAlert('장비 정보 저장 중 오류가 발생했습니다: ' + error.message);
+            }
         }
     });
 
@@ -146,7 +210,21 @@ const SystemPreferences = () => {
             });
         },
         onError: (error) => {
-            showAlert('장비 정보 수정 중 오류가 발생했습니다: ' + error.message);
+            if (error.message.split('||')[0] === '5') {
+                setAlertState({
+                  ...errorMessage,
+                  isOpen: true,
+                  message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                  onConfirm: closeAlert,
+                  onCancel: () => {}
+                });
+                Cookies.remove('session_key');
+                setTimeout(() => {
+                  router.push('/login');
+                }, 1000);
+            } else {
+                showAlert('장비 정보 저장 중 오류가 발생했습니다: ' + error.message);
+            }
         }
     });
 
