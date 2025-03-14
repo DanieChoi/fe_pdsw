@@ -211,6 +211,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
           <CampaignAddPopup
             isOpen={isCampaignAddPopupOpen} 
             groupId={node.group_id || 0}
+            groupName={node.name || ''}
             onClose={() => setIsCampaignAddPopupOpen(false)}          
             />,
           document.body
