@@ -9,6 +9,8 @@ import DataGrid, { Column as DataGridColumn } from 'react-data-grid';
 import { useApiForCallProgressStatus } from '@/features/monitoring/hooks/useApiForCallProgressStatus';
 import { useMainStore, useCampainManagerStore } from '@/store';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
+import { CallProgressStatusResponseDataType } from '@/features/monitoring/types/monitoringIndex';
+import { useApiForAgentStateMonitoringList } from '@/features/monitoring/hooks/useApiForAgentStateMonitoringList';
 
 // 타입 정의
 interface Stats {
@@ -63,6 +65,26 @@ interface OutboundCallProgressPanelProps {
   externalCampaignId?: string;
   onCampaignChange?: (campaignId: string) => void;
   onDataUpdate?: (data: CampaignData) => void;
+}
+
+// 발신진행상태 목록 데이터 타입
+interface SummaryCallProgressStatusDataType {
+  campaignId: number;                 //캠페인ID
+  campaignName: string;               //캠페인 이름
+  event: number;                      //채널에 발생한 마지막 이벤트(0(NONE), 1(ON_HOOK), 2(OFF_HOOK), 3(PRESS_DIGIT), 4(NETWORK_DELAY), 5(INTERRUPT_CALL), 6(RINGBACK), 7(CONNECT), 8(DETECT_BEGIN), 9(DETECT_END), 10(ROUTE))
+  dialSequence: number;               //발신 일련 번호
+  dialResult: number;                 //발신 결과 코드(0(NONE), 1(MAN), 2(BUSY), 3(NO_ANSWER), 4(FAX_MODEM), 5(ANSWERING_MACHINE), 6(ETC_FAIL), 7(INVALID_NUMBER), 8(DIALING), 9(LINE_STOP), 10(CUSTOMER_ONHOOK), 11(SILENCE), 12(DIALTONE_SILENCE), 13(BLACK_LIST), 14(ROUTE_FAIL), 15(BEFORE_BLACKLIST), 2501(MACHINE_BUSY), 2502(MACHINE_NOANSWER), 2503(MACHINE_POWEROFF), 2504(MACHINE_ROAMING), 2505(MACHINE_MISSING_NUMBER), 2506(MACHINE_ETC))
+  customerName: string;               //고객 이름
+  customerKey: string;                //고객 키
+  phoneNumber: string[];              //발신 번호
+  phoneDialCount: number[];           //발신 번호 별 시도 회수
+  dialedPhone: number;                //발신 번호 인덱스
+  reuseCount: number;                 //캠페인 재사용 회수 : 1(최초발신), 2~(재발신)
+  retryCall: number;                  //재시도 여부 : 0(재시도 없음), 1(재시도 있음)
+  waiting: number;                    //대기상담원
+  firstCall: number;                  //최초발신
+  _retryCall: number;                 //재시도발신
+  distributing: number;               //분배 대기
 }
 
 const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
@@ -278,42 +300,60 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     onSuccess: (data) => {  
       const tempList = data.sendingProgressStatusList;
       if( tempList.length > 0){
-        const tempCampaignData: CampaignDataMap = {};
+        const sumCallProgressStatus:SummaryCallProgressStatusDataType[] = [];
         for( let i=0;i<tempList.length;i++){
+          const index = sumCallProgressStatus.findIndex((data) => data.campaignId === tempList[i].campaignId);
+          if( index === -1){
+            sumCallProgressStatus.push({...tempList[i],
+              waiting: 0,  //대기상담원
+              firstCall: tempList[i].reuseCount === 1 ? 1 : 0, //최초발신
+              _retryCall: tempList[i].reuseCount === 2 ? 1 : 0, //재시도발신
+              distributing: 0 //분배 대기
+            });
+          }else{
+            // sumCallProgressStatus[index].waiting += tempList[i].waiting;
+            sumCallProgressStatus[index].firstCall += tempList[i].reuseCount === 1 ? 1 : 0;
+            sumCallProgressStatus[index].retryCall += tempList[i].reuseCount === 2 ? 1 : 0;
+            // sumCallProgressStatus[index].distributing += tempList[i].distributing;
+          }
+        }
+
+        const tempCampaignData: CampaignDataMap = {};
+        for( let i=0;i<sumCallProgressStatus.length;i++){
           const _tempCampaignData: CampaignDataMap = {
-            [tempList[i].campaignId]: {
+            [sumCallProgressStatus[i].campaignId]: {
               stats: {
-                waiting: 0, //tempList[i].waiting,
-                firstCall: 0, //tempList[i].firstCall,
-                retryCall: 0, //tempList[i].retryCall,
-                distributing: 0 //tempList[i].distributing
+                waiting: sumCallProgressStatus[i].waiting,    //대기상담원
+                firstCall: sumCallProgressStatus[i].firstCall,//최초발신
+                retryCall: sumCallProgressStatus[i].retryCall,//재시도발신
+                distributing: sumCallProgressStatus[i].waiting - (sumCallProgressStatus[i].firstCall+sumCallProgressStatus[i].retryCall)//분배 대기
               },
               barData: [
-                { name: '최초 발신용', value: 0 },
-                { name: '재시도 발신용', value: 0 },
-                { name: '분배 대기', value: 0 }
+                { name: '최초 발신용', value: sumCallProgressStatus[i].firstCall },  //최초 발신용
+                { name: '재시도 발신용', value: sumCallProgressStatus[i].retryCall },  //재시도 발신용
+                { name: '분배 대기', value: sumCallProgressStatus[i].waiting - (sumCallProgressStatus[i].firstCall+sumCallProgressStatus[i].retryCall) }   //분배 대기
               ],
               gridData: [
                 {
-                  skillId: campaignSkills.filter((skill) => skill.campaign_id === tempList[i].campaignId)
+                  skillId: campaignSkills.filter((skill) => skill.campaign_id === sumCallProgressStatus[i].campaignId)
                   .map((data) => data.skill_id)
                   .join(','),
-                  campaignId: tempList[i].campaignId+'',
-                  campaignName: tempList[i].campaignName,
-                  priority: '', //다이얼 순번
-                  custKey: tempList[i].customerKey,
-                  custName: tempList[i].customerName,
+                  campaignId: sumCallProgressStatus[i].campaignId+'',
+                  campaignName: sumCallProgressStatus[i].campaignName,
+                  priority: sumCallProgressStatus[i].dialedPhone+'', //다이얼 순번
+                  custKey: sumCallProgressStatus[i].customerKey,
+                  custName: sumCallProgressStatus[i].customerName,
                   phoneType: '',  //발신번호 구분
-                  phone1: tempList[i].phoneNumber[0]+'',
-                  attempt1: tempList[i].phoneDialCount[0]+'',
-                  phone2: tempList[i].phoneNumber[1]+'',
-                  attempt2: tempList[i].phoneDialCount[1]+'',
-                  phone3: tempList[i].phoneNumber[2]+'',
-                  attempt3: tempList[i].phoneDialCount[2]+'',
-                  phone4: tempList[i].phoneNumber[3]+'',
-                  attempt4: tempList[i].phoneDialCount[3]+'',
-                  phone5: tempList[i].phoneNumber[4]+'',
-                  attempt5: tempList[i].phoneDialCount[4]+'',
+                  phone1: sumCallProgressStatus[i].phoneNumber[0]+'',
+                  attempt1: sumCallProgressStatus[i].phoneDialCount[0]+'',
+                  phone2: sumCallProgressStatus[i].phoneNumber[1]+'',
+                  attempt2: sumCallProgressStatus[i].phoneDialCount[1]+'',
+                  phone3: sumCallProgressStatus[i].phoneNumber[2]+'',
+                  attempt3: sumCallProgressStatus[i].phoneDialCount[2]+'',
+                  phone4: sumCallProgressStatus[i].phoneNumber[3]+'',
+                  attempt4: sumCallProgressStatus[i].phoneDialCount[3]+'',
+                  phone5: sumCallProgressStatus[i].phoneNumber[4]+'',
+                  attempt5: sumCallProgressStatus[i].phoneDialCount[4]+'',
                   result: '' //다이얼 결과
                 }
               ]
@@ -333,6 +373,13 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
       setCampaignSkills(data.result_data);
+    }
+  });
+  
+  // 캠페인스킬 조회
+  const { mutate: fetchAgentStateMonitoringList } = useApiForAgentStateMonitoringList({
+    onSuccess: (data) => {
+      // setCampaignSkills(data.result_data);
     }
   });
 
