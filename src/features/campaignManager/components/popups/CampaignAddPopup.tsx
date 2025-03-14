@@ -15,9 +15,6 @@ interface SkillWithCampaigns {
   campaigns: { campaignId: number; tenantId: number }[];
 }
 
-// Import the CampaignGroupSkillsInfo type or define it here
-type CampaignGroupSkillsInfo = any; // Replace 'any' with the actual type
-
 interface Props {
   isOpen?: boolean;
   groupId: number;
@@ -28,7 +25,7 @@ interface Props {
 const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, groupId }) => {
   const [skillsWithCampaigns, setSkillsWithCampaigns] = useState<SkillWithCampaigns[]>([]);
   const [expandedSkills, setExpandedSkills] = useState<number[]>([1]);
-  const [selectedLeftCampaigns, setSelectedLeftCampaigns] = useState<number[]>([]);
+  const [selectedLeftCampaigns, setSelectedLeftCampaigns] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   const [campaignLookup, setCampaignLookup] = useState<Record<number, CampaignInfo>>({});
@@ -132,17 +129,34 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     );
   };
 
-  const toggleLeftCampaignSelection = (campaignId: number) => {
+  // 모든 스킬 확장/축소 토글
+  const toggleAllSkills = (expand: boolean) => {
+    if (expand) {
+      // 모든 스킬 ID를 펼침
+      const allSkillIds = filteredSkills.map(skill => skill.skillId);
+      setExpandedSkills(allSkillIds);
+    } else {
+      // 모두 접기
+      setExpandedSkills([]);
+    }
+  };
+
+  // Updated to handle string IDs (skillId-campaignId)
+  const toggleLeftCampaignSelection = (id: string) => {
     setSelectedLeftCampaigns(prev =>
-      prev.includes(campaignId) ? prev.filter(id => id !== campaignId) : [...prev, campaignId]
+      prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
     );
   };
 
+  // Updated to handle string IDs
   const toggleAllCampaigns = (checked: boolean) => {
     if (checked) {
-      // Select all visible campaigns
+      // 모든 스킬을 자동으로 펼친다
+      toggleAllSkills(true);
+      
+      // Select all visible campaigns with composite IDs
       const allCampaignIds = filteredSkills.flatMap(skill =>
-        skill.campaigns.map(campaign => campaign.campaignId)
+        skill.campaigns.map(campaign => `${skill.skillId}-${campaign.campaignId}`)
       );
       setSelectedLeftCampaigns(allCampaignIds);
     } else {
@@ -160,15 +174,30 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     return (groupData?.result_data || []).filter(item => item.group_id === groupId);
   }, [groupData, groupId]);
 
-  // 버튼 클릭 시 실제 이동 로직은 추후 구현
+  // Extract campaign IDs from the composite string IDs
+  const getSelectedCampaignIds = (): number[] => {
+    return selectedLeftCampaigns
+      .map(compositeId => {
+        const parts = compositeId.split('-');
+        return parts.length === 2 ? parseInt(parts[1]) : null;
+      })
+      .filter((id): id is number => id !== null);
+  };
+
+  // Move selected campaigns to group
   const moveToGroup = () => {
-    console.log("moveToGroup 버튼 클릭");
+    const campaignIds = getSelectedCampaignIds();
+    console.log("moveToGroup - Selected campaigns:", campaignIds);
+    // Here you would implement the logic to add these campaigns to the group
   };
 
+  // Move all campaigns from group back to all
   const moveToAll = () => {
-    console.log("moveToAll 버튼 클릭");
+    console.log("moveToAll - Selected group campaigns:", groupCampaignsData);
+    // Here you would implement the logic to remove campaigns from the group
   };
 
+  // Handle confirmation with numeric campaign IDs
   const handleConfirm = () => {
     const finalIds = groupCampaignsData.map(item => item.campaign_id);
     if (onSelect) onSelect(finalIds);
@@ -221,6 +250,7 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
                   toggleAllCampaigns={toggleAllCampaigns}
                   getCampaignName={getCampaignName}
                   getSkillName={getSkillName}
+                  setExpandedSkills={setExpandedSkills}
                 />
               </div>
             </div>

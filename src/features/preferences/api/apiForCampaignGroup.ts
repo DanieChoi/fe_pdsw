@@ -348,16 +348,7 @@ export const apiForCampaignGroupDataForCampaignGroupAdmin = async (
     }
 };
 
-// 캠페인 그룹 삭제
-// campaign-groups/{gorup_id}
-// delete
-// url properties: group_id
-// 
-// {
-//     "result_code": 0,
-//     "result_msg": "Success"
-// }
-// apiForDeleteCampaignGroup
+
 
 export const apiForDeleteCampaignGroup = async (
     group_id: number
@@ -420,3 +411,21 @@ export const apiForUpdateCampaignGroupName = async (
         );
     }
 };
+
+// 캠페인 그룹 캠페인 추가
+// pds/campaign-group/{group_id}/list
+// post
+
+// request 예시
+// {
+//     "request_data": {
+//         "campaign_id": 14,
+//         "tenant_id": 1
+//     }
+// }
+
+// response 예시
+// {
+//     "result_code": 0,
+//     "result_msg": "Success"
+// }
