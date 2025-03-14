@@ -461,18 +461,20 @@ export const apiForAddCampaignToSpecificCampaignGroup = async (
  */
 export const apiForRemoveCampaignFromCampaignGroup = async (
     group_id: number,
-    campaign_id: number
+    campaign_id: number,
+    tenant_id: number
 ): Promise<SuccessResponse> => {
     const request_data = {
         request_data: {
-            campaign_id: campaign_id
+            campaign_id: campaign_id,
+            tenant_id: tenant_id
         }
     };
 
     try {
         // DELETE 요청으로 캠페인 제거 - URL 형식: /pds/campaign-group/{group_id}/list
         const { data } = await axiosInstance.delete<SuccessResponse>(
-            `pds/campaign-group/${group_id}/list`,
+            `campaign-group/${group_id}/list`,
             { data: request_data }
         );
         return data;
@@ -488,7 +490,6 @@ export const apiForRemoveCampaignFromCampaignGroup = async (
         );
     }
 };
-
 
 
 // 캠페인 그룹 캠페인 추가

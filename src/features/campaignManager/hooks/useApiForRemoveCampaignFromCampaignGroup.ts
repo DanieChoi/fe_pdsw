@@ -7,6 +7,7 @@ import { apiForRemoveCampaignFromCampaignGroup } from '@/features/preferences/ap
 interface RemoveCampaignFromGroupParams {
   group_id: number;
   campaign_id: number;
+  tenant_id: number;
 }
 
 /**
@@ -25,8 +26,8 @@ const useApiForRemoveCampaignFromCampaignGroup = (
 
   return useMutation<SuccessResponse, Error, RemoveCampaignFromGroupParams>({
     mutationKey: ['removeCampaignFromGroup'],
-    mutationFn: ({ group_id, campaign_id }: RemoveCampaignFromGroupParams) => 
-      apiForRemoveCampaignFromCampaignGroup(group_id, campaign_id),
+    mutationFn: ({ group_id, campaign_id , tenant_id}: RemoveCampaignFromGroupParams) => 
+      apiForRemoveCampaignFromCampaignGroup(group_id, campaign_id, tenant_id),
     onSuccess: (data, variables, context) => {
       // 캠페인 그룹 관련 캐시 무효화
       queryClient.invalidateQueries({
