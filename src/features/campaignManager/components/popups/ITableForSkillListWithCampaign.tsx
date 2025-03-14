@@ -157,10 +157,10 @@ interface Props {
   isLoading: boolean;
   hasError: boolean;
   toggleSkill: (skillId: number) => void;
-  toggleLeftCampaignSelection: (campaignId: string | number) => void;
+  toggleLeftCampaignSelection: (campaignId: string | number | any) => void;
   toggleAllCampaigns: (checked: boolean) => void;
   getCampaignName: (campaignId: number) => string;
-  getSkillName: (skillId: number | string) => string;
+  getSkillName: (skillId: number | string | any) => string;
   setExpandedSkills: (skills: number[]) => void;
 }
 
