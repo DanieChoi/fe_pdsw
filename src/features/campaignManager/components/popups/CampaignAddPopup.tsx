@@ -327,6 +327,7 @@ import GroupCampaignList from './GroupCampaignList';
 import ITableForSkillListWithCampaign from './ITableForSkillListWithCampaign';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
+import { useAuthStore } from '@/store/authStore';
 
 interface SkillWithCampaigns {
   skillId: number;
@@ -359,6 +360,9 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     useTotalSkillListForAddCampaignToCampaignGroup(undefined, isOpen);
   const { data: groupData, isLoading: isLoadingGroup, error: groupError } =
     useApiForGetCampaignListForCampaignGroup(groupId, undefined, undefined, isOpen);
+
+  const tenant_id = useAuthStore(state => state.tenant_id);
+
 
   useEffect(() => {
     if (campaignListData?.result_data) {
@@ -559,6 +563,7 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
 
     // 로그 출력
     console.log("왼쪽 테이블에서 선택한 캠페인 ID:", campaignIds);
+    console.log("사용자의 테넌트 ID:", tenant_id);
 
     // 얼럿에 표시할 메시지 생성 - 더 간결하게
     const tableContent = createCampaignListTable(campaignDetails);
@@ -578,6 +583,8 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     // 여기에 캠페인을 그룹에 추가하는 로직 구현
     const campaignIds = getSelectedCampaignIds();
     console.log("그룹에 추가할 캠페인 ID:", campaignIds);
+    // 사용자 tenant_id 확인
+    console.log("사용자의 테넌트 ID:", tenant_id);
 
     // 실제 API 호출 또는 상태 업데이트 로직 추가 (임시로 콘솔 로그만 출력)
     console.log("캠페인이 그룹에 추가되었습니다.");
