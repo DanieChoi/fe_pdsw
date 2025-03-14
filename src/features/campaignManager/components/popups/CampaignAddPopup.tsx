@@ -7,12 +7,16 @@ import { useTotalSkillListForAddCampaignToCampaignGroup } from '@/widgets/sideba
 import useApiForGetCampaignListForCampaignGroup from '@/widgets/sidebar/hooks/useApiForGetCampaignListForCampaignGroup';
 import { CampaignInfo, SkillInfo } from '@/widgets/sidebar/api/type/typeForAddCampaignForCampaignGroup';
 import GroupCampaignList from './GroupCampaignList';
+import ITableForSkillListWithCampaign from './ITableForSkillListWithCampaign';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 
 interface SkillWithCampaigns {
   skillId: number;
   campaigns: { campaignId: number; tenantId: number }[];
 }
+
+// Import the CampaignGroupSkillsInfo type or define it here
+type CampaignGroupSkillsInfo = any; // Replace 'any' with the actual type
 
 interface Props {
   isOpen?: boolean;
@@ -90,7 +94,7 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
   }, [isOpen]);
 
   const isLoadingAny = isLoading || isLoadingCampaigns || isLoadingSkills;
-  const hasError = error || campaignError || skillError || groupError;
+  const hasError = Boolean(error || campaignError || skillError || groupError);
 
   const getCampaignName = (campaignId: number): string =>
     campaignLookup[campaignId]?.campaign_name || `캠페인 ${campaignId}`;
@@ -184,105 +188,40 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
           </div>
 
           {/* 가로 레이아웃: 왼쪽 테이블 - 중앙 버튼 - 오른쪽 테이블 */}
-          <div className="flex flex-row gap-4 h-full overflow-hidden">
+          <div className="flex h-full">
             {/* 왼쪽 테이블 */}
             <div className="flex-1 border rounded overflow-auto">
-              {isLoadingAny ? (
-                <div className="flex items-center justify-center h-full text-sm">로딩 중...</div>
-              ) : hasError ? (
-                <div className="flex items-center justify-center h-full text-red-500 text-sm">
-                  데이터 로드 중 오류 발생
-                </div>
-              ) : filteredSkills.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-gray-500 text-sm">
-                  검색 결과가 없습니다.
-                </div>
-              ) : (
-                <table className="w-full border-collapse table-fixed text-xs">
-                  <thead>
-                    <tr className="bg-white border-b">
-                      <th className="w-8"></th>
-                      <th className="text-left py-1 px-2 font-medium">스킬</th>
-                      <th className="text-left py-1 px-2 font-medium w-1/4">캠페인ID</th>
-                      <th className="text-left py-1 px-2 font-medium w-1/2">캠페인 이름</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredSkills.map(skill => {
-                      const isExpanded = expandedSkills.includes(skill.skillId);
-                      return (
-                        <React.Fragment key={`skill-${skill.skillId}`}>
-                          <tr className={`border-b ${isExpanded ? 'bg-blue-100' : 'bg-blue-50'}`}>
-                            <td className="py-1 px-2 align-middle">
-                              <button
-                                className="focus:outline-none"
-                                onClick={() => toggleSkill(skill.skillId)}
-                              >
-                                {isExpanded ? (
-                                  <span className="text-xs">▼</span>
-                                ) : (
-                                  <span className="text-xs">►</span>
-                                )}
-                              </button>
-                            </td>
-                            <td
-                              className="py-1 px-2 align-middle cursor-pointer"
-                              onClick={() => toggleSkill(skill.skillId)}
-                            >
-                              <span className="font-medium">{getSkillName(skill.skillId)}</span>
-                            </td>
-                            <td className="py-1 px-2 align-middle"></td>
-                            <td className="py-1 px-2 align-middle"></td>
-                          </tr>
-                          {isExpanded &&
-                            skill.campaigns.map(campaign => (
-                              <tr
-                                key={`campaign-${skill.skillId}-${campaign.campaignId}`}
-                                className="border-b bg-white hover:bg-gray-50"
-                              >
-                                <td className="py-1 px-2 align-middle">
-                                  <input
-                                    type="checkbox"
-                                    checked={selectedLeftCampaigns.includes(campaign.campaignId)}
-                                    onChange={() =>
-                                      toggleLeftCampaignSelection(campaign.campaignId)
-                                    }
-                                    className="h-3 w-3 cursor-pointer"
-                                  />
-                                </td>
-                                <td className="py-1 px-2 align-middle text-gray-600">
-                                  {getSkillName(skill.skillId)}
-                                </td>
-                                <td className="py-1 px-2 align-middle">{campaign.campaignId}</td>
-                                <td className="py-1 px-2 align-middle text-blue-600">
-                                  {getCampaignName(campaign.campaignId)}
-                                </td>
-                              </tr>
-                            ))}
-                        </React.Fragment>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              )}
+              <ITableForSkillListWithCampaign 
+                filteredSkills={filteredSkills}
+                expandedSkills={expandedSkills}
+                selectedLeftCampaigns={selectedLeftCampaigns}
+                isLoading={isLoadingAny}
+                hasError={hasError}
+                toggleSkill={toggleSkill}
+                toggleLeftCampaignSelection={toggleLeftCampaignSelection}
+                getCampaignName={getCampaignName}
+                getSkillName={getSkillName}
+              />
             </div>
 
-            {/* 중앙 버튼 영역 - 세로 정렬 */}
-            <div className="flex flex-col justify-center items-center space-y-4 w-16">
-              <button
-                onClick={moveToGroup}
-                className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600"
-                title="선택한 캠페인을 그룹으로 이동"
-              >
-                <ChevronRight size={20} />
-              </button>
-              <button
-                onClick={moveToAll}
-                className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600"
-                title="그룹 캠페인을 전체로 이동"
-              >
-                <ChevronLeft size={20} />
-              </button>
+            {/* 중앙 버튼 영역 */}
+            <div className="flex flex-col justify-center items-center px-4">
+              <div className="flex flex-col space-y-4">
+                <button
+                  onClick={moveToGroup}
+                  className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600"
+                  title="선택한 캠페인을 그룹으로 이동"
+                >
+                  <ChevronRight size={20} />
+                </button>
+                <button
+                  onClick={moveToAll}
+                  className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600"
+                  title="그룹 캠페인을 전체로 이동"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+              </div>
             </div>
 
             {/* 오른쪽 테이블 */}
