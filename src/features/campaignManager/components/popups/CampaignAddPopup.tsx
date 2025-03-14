@@ -1024,7 +1024,6 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
             width="max-w-md" // 더 작은 크기로 조정
             onClose={handleAlertConfirm}
             onCancle={() => setShowAlert(false)}
-            isProcessing={processingCampaigns || removingCampaigns}
           />
         )}
       </div>
