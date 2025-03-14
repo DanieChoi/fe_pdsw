@@ -54,19 +54,8 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   const { campaigns } = useMainStore();
   const [counter, setCounter] = useState(0);
 
-  const [agentData, setAgentData] = useState<AgentData[]>([
-    // 초기 더미 데이터는 주석 처리
-    // { id: 1, status: 'waiting', agent: 'sktest001', name: '김상담', time: '00:00:12' },
-    // { id: 2, status: 'waiting', agent: 'sktest005', name: '이상담', time: '00:15:30' },
-    // { id: 3, status: 'processing', agent: 'sktest002', name: '박상담', time: '00:05:45' },
-    // { id: 4, status: 'rest', agent: 'sktest008', name: '최상담', time: '00:30:00' },
-    // { id: 5, status: 'waiting', agent: 'sktest003', name: '정상담', time: '00:02:20' },
-    // { id: 6, status: 'processing', agent: 'sktest007', name: '강상담', time: '00:08:15' },
-    // { id: 7, status: 'afterProcessing', agent: 'sktest004', name: '윤상담', time: '00:20:40' },
-    // { id: 8, status: 'rest', agent: 'sktest009', name: '한상담', time: '00:45:10' },
-    // { id: 9, status: 'afterProcessing', agent: 'sktest006', name: '조상담', time: '00:12:35' },
-    // { id: 10, status: 'waiting', agent: 'sktest010', name: '신상담', time: '00:01:50' }
-  ]);
+  const [agentData, setAgentData] = useState<AgentData[]>([]);
+  const [_agentData, _setAgentData] = useState<AgentData[]>([]);
 
   const handleStatusChange = (status: keyof AgentStatus): void => {
     setSelectedStatuses(prev => ({
@@ -170,9 +159,9 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
                 : 'rest',
           agent: item.counselorId,
           name: item.counselorName,
-          time: getStatusTime(Number(item.statusTime || '0')),
+          time: item.statusTime || '0',
         }));
-        setAgentData(tempDataList);
+        _setAgentData(tempDataList);
         setCounter(counter+1);
       }
       
@@ -180,16 +169,21 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   });
 
   useEffect(() => {
-    if (counter>0 && campaigns.length > 0) {
-      const tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
-      if (tenantId) {
-        fetchAgentStateMonitoringList({
-          tenantId: tenantId,
-          campaignId: Number(campaignId)
-        });
-      }
+    if (_agentData.length > 0) {
+      let tempCounter = 0;
+      const interval = setInterval(() => {
+        const tempData = [];
+        for( let i=0; i<_agentData.length; i++ ) {
+          tempData.push({..._agentData[i]
+            , time: getStatusTime(Number(_agentData[i].time) + tempCounter)
+          });
+        }
+        setAgentData(tempData);
+        tempCounter++;
+      }, 1000);
+      return () => clearInterval(interval);
     }
-  }, [counter]);
+  }, [_agentData]);
 
   useEffect(() => {
     if (campaignId && campaigns.length > 0) {
