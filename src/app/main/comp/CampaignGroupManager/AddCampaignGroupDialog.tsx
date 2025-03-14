@@ -8,9 +8,20 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDialogForSideMenu";
 import { useApiForCreateCampaignGroup } from "@/features/preferences/hooks/useApiForCreateCampaignGroup";
+import { useApiForCampaignGroupCreate } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupCreate';
 import { toast } from "react-toastify";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { useMainStore, useCampainManagerStore } from '@/store';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
+
+const errorMessage = {
+  isOpen: false,
+  message: '',
+  title: '로그인',
+  type: '0',
+};
 
 interface AddCampaignGroupDialogProps {
   isOpen: boolean;
@@ -31,6 +42,8 @@ export function AddCampaignGroupDialog({
   const [groupId, setGroupId] = useState("");
   const [_tenantId, setTenantId] = useState(tenantId+''); // 테넌트
   const { tenants } = useMainStore();
+  const [alertState, setAlertState] = useState(errorMessage);
+  const router = useRouter();
 
   // 다이얼로그가 열릴 때마다 폼 초기화
   useEffect(() => {
@@ -40,32 +53,66 @@ export function AddCampaignGroupDialog({
     }
   }, [isOpen]);
 
-  // 캠페인 그룹 생성 API 호출 훅 사용
-  const { mutate, isPending } = useApiForCreateCampaignGroup({
-    onSuccess: (data, variables, context) => {
-      console.log("캠페인 그룹 생성 성공:", data);
-      toast.success("캠페인 그룹이 추가되었습니다.");
-      // onAddGroup 콜백이 존재하면 호출 (추가적인 작업이 필요할 경우)
+  // 캠페인 그룹 추가
+  const { mutate: fetchCampaignGroupCreate } = useApiForCampaignGroupCreate({
+    onSuccess: (data) => {
       if (onAddGroup) {
         onAddGroup(groupName, groupId);
       }
-      handleClose();
-    },
-    onError: (error, variables, context) => {
-      console.error("캠페인 그룹 생성 실패:", error);
-      // 필요시 에러 메시지를 사용자에게 보여줄 수 있습니다.
-      alert(error.message || "캠페인 그룹 생성에 실패하였습니다.");
-    },
+      handleClose();      
+    },onError: (data) => {      
+      console.log('error', data.message.split('||')[1]);
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }else if (data.message.split('||')[0] === '501') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: '이미 존재하는 그룹입니다.',
+        });
+      }else{
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: data.message.split('||')[1],
+        });
+      }
+    }
   });
+
+  // 캠페인 그룹 생성 API 호출 훅 사용
+  // const { mutate, isPending } = useApiForCreateCampaignGroup({
+  //   onSuccess: (data, variables, context) => {
+  //     console.log("캠페인 그룹 생성 성공:", data);
+  //     toast.success("캠페인 그룹이 추가되었습니다.");
+  //     // onAddGroup 콜백이 존재하면 호출 (추가적인 작업이 필요할 경우)
+  //     if (onAddGroup) {
+  //       onAddGroup(groupName, groupId);
+  //     }
+  //     handleClose();
+  //   },
+  //   onError: (error, variables, context) => {
+  //     console.error("캠페인 그룹 생성 실패:", error);
+  //     // 필요시 에러 메시지를 사용자에게 보여줄 수 있습니다.
+  //     alert(error.message || "캠페인 그룹 생성에 실패하였습니다.");
+  //   },
+  // });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation(); // 이벤트 전파 방지
     
     if (groupName.trim() && groupId.trim()) {
-      // 훅을 통해 API 호출 (tenantId는 이미 number 타입이므로 변환 불필요)
-      mutate({
-        group_id: groupId,
+      fetchCampaignGroupCreate({
+        group_id: Number(groupId),
         tenant_id: Number(_tenantId), 
         group_name: groupName,
       });
@@ -143,20 +190,27 @@ export function AddCampaignGroupDialog({
               variant="outline" 
               onClick={handleClose}
               onPointerDown={stopPropagation}
-              disabled={isPending}
+              disabled={false}
             >
               취소
             </Button>
             <Button 
               type="submit" 
-              disabled={isPending}
+              disabled={false}
               onPointerDown={stopPropagation}
             >
-              {isPending ? "생성 중..." : "그룹 추가"}
+              {false ? "생성 중..." : "그룹 추가"}
             </Button>
           </div>
         </div>
       </form>
+      <CustomAlert
+        message={alertState.message}
+        title={alertState.title}
+        type={alertState.type}
+        isOpen={alertState.isOpen}
+        onClose={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
+      />
     </CommonDialogForSideMenu>
   );
 }

@@ -43,6 +43,13 @@ export interface CampaignGroupCampaignListDeleteDataRequest {
   group_id: number;
 }
 
+// 캠페인 그룹 추가가 요청
+export interface CampaignGroupCreateDataRequest {
+  tenant_id: number;
+  group_id: number;
+  group_name: string;
+}
+
 
 // 삭제 응답 타입
 export interface DeleteResponse {

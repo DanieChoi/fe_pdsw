@@ -63,6 +63,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
     setCampaignId(parseInt(id));
   };
 
+  //캠페인 그룹 삭제
   const handleGroupDelete = (param: GroupDeleteParam) => {
     fetchCampaignGroupCampaignListDelete({tenant_id: param.tenant_id, group_id: param.group_id});
     fetchCampaignGroupDelete(param.group_id);

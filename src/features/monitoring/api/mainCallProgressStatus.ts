@@ -1,13 +1,20 @@
 // src/features/campaignManager/api/mainCampaignProgressInformation.ts
 import { axiosRedisInstance } from '@/lib/axios';
-import { CampaignProgressInformationRequest, CallProgressStatusResponse } from '../types/monitoringIndex';
+import { CallProgressStatusRequest, CallProgressStatusResponse } from '../types/monitoringIndex';
+import { getCookie } from '@/lib/cookies';
 
 // 발신진행상태 요청
-export const fetchCallProgressStatus = async (credentials: CampaignProgressInformationRequest): Promise<CallProgressStatusResponse> => {
+export const fetchCallProgressStatus = async (credentials: CallProgressStatusRequest): Promise<CallProgressStatusResponse> => {
+  const callProgressStatusRequestData = {
+    tenantId: credentials.tenantId,
+    campaignId: credentials.campaignId,
+    sessionKey: getCookie('session_key')
+  };
 
   try {
     const { data } = await axiosRedisInstance.get<CallProgressStatusResponse>(
-      `/monitor/tenant/${credentials.tenantId}/campaign/dial?campaignId=${credentials.campaignId}`
+      `/monitor/tenant/campaign/dial`,
+      { params: callProgressStatusRequestData }
     );
     return data;
   } catch (error: any) {
