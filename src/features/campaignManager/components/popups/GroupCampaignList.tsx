@@ -1,5 +1,6 @@
 "use client";
 
+import CommonCheckBox2 from '@/components/shared/CommonCheckBox2';
 import React from 'react';
 
 interface GroupCampaign {
@@ -7,6 +8,8 @@ interface GroupCampaign {
   campaign_id: number;
   tenant_id: number;
   campaign_name?: string;
+  skill_id?: number;
+  skill_name?: string;
 }
 
 interface Props {
@@ -20,12 +23,6 @@ const GroupCampaignList: React.FC<Props> = ({
   groupCampaigns = [],
   toggleAllGroupCampaigns
 }) => {
-  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (toggleAllGroupCampaigns) {
-      toggleAllGroupCampaigns(e.target.checked);
-    }
-  };
-
   return (
     <>
       {isLoading ? (
@@ -38,37 +35,45 @@ const GroupCampaignList: React.FC<Props> = ({
         <table className="w-full border-collapse table-fixed text-xs">
           <thead>
             <tr className="bg-white border-b">
-              <th className="w-8">
-                <div className="py-1 px-2 flex items-center justify-center">
-                  {/* <input
-                    type="checkbox"
+              <th className="w-10 text-center">
+                <div className="py-2 px-3 flex justify-center">
+                  <CommonCheckBox2
                     checked={groupCampaigns.length > 0}
-                    onChange={handleSelectAll}
-                    className="h-3 w-3 cursor-pointer"
+                    onChange={toggleAllGroupCampaigns}
                     title="전체 선택"
-                  /> */}
+                    size="md"
+                  />
                 </div>
               </th>
-              <th className="text-left py-1 px-2 font-medium w-1/4">캠페인ID</th>
-              <th className="text-left py-1 px-2 font-medium w-3/4">캠페인 이름</th>
+              <th className="text-center py-2 px-3 font-medium w-10">NO</th>
+              <th className="text-left py-2 px-3 font-medium w-20">스킬ID</th>
+              <th className="text-left py-2 px-3 font-medium w-20">스킬명</th>
+              <th className="text-left py-2 px-3 font-medium w-1/4">캠페인ID</th>
+              <th className="text-left py-2 px-3 font-medium w-1/2">캠페인 이름</th>
             </tr>
           </thead>
           <tbody>
-            {groupCampaigns.map((campaign) => (
+            {groupCampaigns.map((campaign, index) => (
               <tr 
                 key={`group-campaign-${campaign.campaign_id}`}
                 className="border-b bg-white hover:bg-gray-50"
               >
-                <td className="py-1 px-2 align-middle">
-                  <input
-                    type="checkbox"
-                    checked
-                    readOnly
-                    className="h-3 w-3 cursor-not-allowed opacity-50"
+                <td className="py-2 px-3 text-center">
+                  <CommonCheckBox2
+                    checked={true}
+                    disabled={true}
+                    size="md"
                   />
                 </td>
-                <td className="py-1 px-2 align-middle">{campaign.campaign_id}</td>
-                <td className="py-1 px-2 align-middle text-blue-600">
+                <td className="py-2 px-3 text-center">{index + 1}</td>
+                <td className="py-2 px-3 text-left">
+                  {campaign.skill_id || 1001}
+                </td>
+                <td className="py-2 px-3 text-left">
+                  {campaign.skill_name || `스킬${campaign.skill_id || 1}`}
+                </td>
+                <td className="py-2 px-3 text-left">{campaign.campaign_id}</td>
+                <td className="py-2 px-3 text-left text-blue-600">
                   {campaign.campaign_name || `캠페인 ${campaign.campaign_id}`}
                 </td>
               </tr>

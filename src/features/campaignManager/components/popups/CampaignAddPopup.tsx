@@ -137,11 +137,11 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
       prev.includes(campaignId) ? prev.filter(id => id !== campaignId) : [...prev, campaignId]
     );
   };
-  
+
   const toggleAllCampaigns = (checked: boolean) => {
     if (checked) {
       // Select all visible campaigns
-      const allCampaignIds = filteredSkills.flatMap(skill => 
+      const allCampaignIds = filteredSkills.flatMap(skill =>
         skill.campaigns.map(campaign => campaign.campaignId)
       );
       setSelectedLeftCampaigns(allCampaignIds);
@@ -150,7 +150,7 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
       setSelectedLeftCampaigns([]);
     }
   };
-  
+
   const toggleAllGroupCampaigns = (checked: boolean) => {
     // This function is for illustration - in the design, group campaigns are always checked
     console.log(`Toggle all group campaigns: ${checked}`);
@@ -226,23 +226,21 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
             </div>
 
             {/* 중앙 버튼 영역 */}
-            <div className="flex flex-col justify-center items-center px-4">
-              <div className="flex flex-col space-y-4">
-                <button
-                  onClick={moveToGroup}
-                  className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600"
-                  title="선택한 캠페인을 그룹으로 이동"
-                >
-                  <ChevronRight size={20} />
-                </button>
-                <button
-                  onClick={moveToAll}
-                  className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600"
-                  title="그룹 캠페인을 전체로 이동"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-              </div>
+            <div className="flex flex-col items-center gap-2 min-w-[22px] justify-center px-2">
+              <button
+                className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
+                onClick={moveToGroup}
+                disabled={selectedLeftCampaigns.length === 0}
+              >
+                →
+              </button>
+              <button
+                className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
+                onClick={moveToAll}
+                disabled={groupCampaignsData.length === 0}
+              >
+                ←
+              </button>
             </div>
 
             {/* 오른쪽 테이블 - 확실한 높이 제한 및 스크롤 처리 */}

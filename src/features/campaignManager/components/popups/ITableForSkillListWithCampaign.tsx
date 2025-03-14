@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import CommonCheckBox2 from "@/components/shared/CommonCheckBox2";
 
 interface SkillWithCampaigns {
   skillId: number;
@@ -45,10 +46,6 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
   
   const allSelected = allCampaignsCount > 0 && 
     allVisibleCampaignIds.every(id => selectedLeftCampaigns.includes(id));
-  
-  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    toggleAllCampaigns(e.target.checked);
-  };
 
   return (
     <>
@@ -67,11 +64,9 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
           <thead>
             <tr className="bg-white border-b">
               <th className="w-8 py-1 px-2 text-center">
-                <input
-                  type="checkbox"
+                <CommonCheckBox2
                   checked={allSelected}
-                  onChange={handleSelectAll}
-                  className="h-3 w-3 cursor-pointer"
+                  onChange={toggleAllCampaigns}
                   title="전체 선택"
                 />
               </th>
@@ -112,11 +107,9 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
                         className="border-b bg-white hover:bg-gray-50"
                       >
                         <td className="py-1 px-2 align-middle text-center">
-                          <input
-                            type="checkbox"
+                          <CommonCheckBox2
                             checked={selectedLeftCampaigns.includes(campaign.campaignId)}
                             onChange={() => toggleLeftCampaignSelection(campaign.campaignId)}
-                            className="h-3 w-3 cursor-pointer"
                           />
                         </td>
                         <td className="py-1 px-2 align-middle text-gray-600">
