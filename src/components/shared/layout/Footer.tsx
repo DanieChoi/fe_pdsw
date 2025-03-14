@@ -88,8 +88,24 @@ export default function Footer({
     else if( announce === 'dialing-device' ){
       if( command === 'UPDATE' && data['device_status'] === 'run' ){
         _message = 'CIDS 작동중';
+        // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
+        const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
+          detail: {
+            device_id: data['device_id'].toString(),
+            device_status: 'run'
+          }
+        });
+        window.dispatchEvent(deviceStatusEvent);
       }else if( command === 'UPDATE' && data['device_status'] === 'down' ){
         _message = 'CIDS 작동중지';
+        // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
+        const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
+          detail: {
+            device_id: data['device_id'].toString(),
+            device_status: 'down'
+          }
+        });
+        window.dispatchEvent(deviceStatusEvent);
       }
     }
     //캠페인수정>콜페이싱 수정

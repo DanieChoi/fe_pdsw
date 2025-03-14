@@ -27,6 +27,12 @@ interface ChannelRow {
     assignValue: number;
 }
 
+// 디바이스 상태 인터페이스 추가
+interface DeviceStatus {
+    device_id: string;
+    device_status: "run" | "down";
+}
+
 const errorMessage = {
     isOpen: false,
     message: '',
@@ -46,6 +52,9 @@ const SystemPreferences = () => {
     const [selectedChannel, setSelectedChannel] = useState<ChannelRow | null>(null);
     const [filteredChannels, setFilteredChannels] = useState<ChannelRow[]>([]);
     const [isEditable, setIsEditable] = useState(false);
+
+    // 디바이스 상태를 저장할 상태 변수 추가
+    const [deviceStatuses, setDeviceStatuses] = useState<Record<string, "run" | "down">>({});
 
     const { tenants, campaigns } = useMainStore();
     const [dialingDeviceList, setDialingDeviceList] = useState<DialingDeviceListDataResponse[]>([]);
@@ -89,6 +98,43 @@ const SystemPreferences = () => {
     const closeAlert = () => {
         setAlertState(prev => ({ ...prev, isOpen: false }));
     };
+
+    // Footer에서 발생하는 이벤트 수신을 위한 이벤트 리스너 추가
+    useEffect(() => {
+        console.log("Setting up device status change listener");
+        
+        // 장비 상태 변경 이벤트 수신 함수
+        const handleDeviceStatusChange = (event: any) => {
+            console.log("Received device status change event:", event.detail);
+            
+            const { device_id, device_status } = event.detail;
+            
+            // 디바이스 상태 업데이트
+            setDeviceStatuses(prev => ({
+                ...prev,
+                [device_id]: device_status
+            }));
+    
+            // 선택된 디바이스가 변경된 디바이스와 동일하면 상태 갱신
+            if (selectedDevice && selectedDevice.device_id === device_id) {
+                setSelectedDevice(prev => {
+                    if (!prev) return null;
+                    return {
+                        ...prev,
+                        usage: device_status === "run" ? "사용" : "미사용"
+                    };
+                });
+            }
+        };
+        
+        // 이벤트 리스너 등록 (타입 캐스팅 추가)
+        window.addEventListener('deviceStatusChange', handleDeviceStatusChange as EventListener);
+        
+        // 컴포넌트 언마운트 시 리스너 제거
+        return () => {
+            window.removeEventListener('deviceStatusChange', handleDeviceStatusChange as EventListener);
+        };
+    }, [selectedDevice]);
 
     // 장비 목록 조회
     const { mutate: fetchDialingDeviceList } = useApiForDialingDevice({
@@ -237,16 +283,17 @@ const SystemPreferences = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // 장비의 사용여부를 확인하는 함수
+    // 장비의 사용여부를 확인하는 함수 (실시간 상태 반영)
     const getDeviceUsage = (deviceId: number): string => {
-        const deviceChannels = channelList.find(
-            channel => channel.device_id === deviceId
-        );
-
-        if (!deviceChannels) return "사용안함";
-
-        const isAllZero = deviceChannels.channel_assign.every(value => value === 0);
-        return isAllZero ? "사용안함" : "사용";
+        const deviceIdStr = deviceId.toString();
+        
+        // 실시간 상태가 있으면 확인 - "run"일 때만 "사용", 그 외에는 항상 "미사용"
+        if (deviceIdStr in deviceStatuses) {
+            return deviceStatuses[deviceIdStr] === "run" ? "사용" : "미사용";
+        }
+        
+        // 실시간 상태가 없으면 기본값은 항상 "미사용"
+        return "미사용";
     };
 
     const getChannelMode = (assignValue: number, assignKind: number): string => {
@@ -296,7 +343,7 @@ const SystemPreferences = () => {
         return "미할당";
     };
 
-    // 장비 목록 데이터 구성
+    // 장비 목록 데이터 구성 (deviceStatuses 추가로 변경 사항 반영)
     const equipmentRows = useMemo(() => {
         return dialingDeviceList.map(device => ({
             device_id: device.device_id.toString(),
@@ -304,8 +351,8 @@ const SystemPreferences = () => {
             device_name: device.device_name,
             usage: getDeviceUsage(device.device_id)
         }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dialingDeviceList, channelList]);
+    // deviceStatuses 의존성 추가
+    }, [dialingDeviceList, channelList, deviceStatuses]);
 
     const equipmentColumns = [
         { key: "device_id", name: "장비번호" },
