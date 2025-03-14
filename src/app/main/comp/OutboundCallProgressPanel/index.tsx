@@ -6,6 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-custom";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import DataGrid, { Column as DataGridColumn } from 'react-data-grid';
+import { useApiForCallProgressStatus } from '@/features/monitoring/hooks/useApiForCallProgressStatus';
+import { useMainStore, useCampainManagerStore } from '@/store';
+import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 
 // 타입 정의
 interface Stats {
@@ -34,6 +37,10 @@ interface GridData {
   attempt2: string;
   phone3: string;
   attempt3: string;
+  phone4: string;
+  attempt4: string;
+  phone5: string;
+  attempt5: string;
   result: string;
 }
 
@@ -64,6 +71,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   onDataUpdate
 }) => {
   const [internalSelectedCampaign, setInternalSelectedCampaign] = useState<string>('all');
+  const { campaigns } = useMainStore();
+  const { campaignSkills, setCampaignSkills } = useCampainManagerStore();
+  const [ _campaignData, _setCampaignData ] = useState<CampaignDataMap>({});
 
   // 실제 사용할 캠페인 ID 결정
   const selectedCampaign = externalCampaignId ?? internalSelectedCampaign;
@@ -87,76 +97,84 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   };
 
   // 캠페인별 데이터
-  const campaignData: CampaignDataMap = {
-    test1: {
-      stats: {
-        waiting: 2,
-        firstCall: 3,
-        retryCall: 2,
-        distributing: 1
-      },
-      barData: [
-        { name: '최초 발신용', value: 80 },
-        { name: '재시도 발신용', value: 50 },
-        { name: '분배 대기', value: 30 }
-      ],
-      gridData: [
-        {
-          skillId: '1246',
-          campaignId: '0125',
-          campaignName: 'test1캠페인',
-          priority: '2',
-          custKey: '241545',
-          custName: '김철수',
-          phoneType: '일반전화',
-          phone1: '01087654321',
-          attempt1: '1',
-          phone2: '01087654321',
-          attempt2: '1',
-          phone3: '01087654321',
-          attempt3: '2',
-          result: '실패'
-        }
-      ]
-    },
-    test2: {
-      stats: {
-        waiting: 1,
-        firstCall: 2,
-        retryCall: 1,
-        distributing: 0
-      },
-      barData: [
-        { name: '최초 발신용', value: 60 },
-        { name: '재시도 발신용', value: 40 },
-        { name: '분배 대기', value: 20 }
-      ],
-      gridData: [
-        {
-          skillId: '1247',
-          campaignId: '0126',
-          campaignName: 'test2캠페인',
-          priority: '3',
-          custKey: '241546',
-          custName: '이영희',
-          phoneType: '회사전화',
-          phone1: '01098765432',
-          attempt1: '2',
-          phone2: '01098765432',
-          attempt2: '1',
-          phone3: '01098765432',
-          attempt3: '1',
-          result: '진행중'
-        }
-      ]
-    }
-  };
+  // const campaignData: CampaignDataMap = {
+  //   test1: {
+  //     stats: {
+  //       waiting: 2,
+  //       firstCall: 3,
+  //       retryCall: 2,
+  //       distributing: 1
+  //     },
+  //     barData: [
+  //       { name: '최초 발신용', value: 80 },
+  //       { name: '재시도 발신용', value: 50 },
+  //       { name: '분배 대기', value: 30 }
+  //     ],
+  //     gridData: [
+  //       {
+  //         skillId: '1246',
+  //         campaignId: '0125',
+  //         campaignName: 'test1캠페인',
+  //         priority: '2',
+  //         custKey: '241545',
+  //         custName: '김철수',
+  //         phoneType: '일반전화',
+  //         phone1: '01087654321',
+  //         attempt1: '1',
+  //         phone2: '01087654321',
+  //         attempt2: '1',
+  //         phone3: '01087654321',
+  //         attempt3: '2',
+  //         phone4: '01087654321',
+  //         attempt4: '2',
+  //         phone5: '01087654321',
+  //         attempt5: '2',
+  //         result: '실패'
+  //       }
+  //     ]
+  //   },
+  //   test2: {
+  //     stats: {
+  //       waiting: 1,
+  //       firstCall: 2,
+  //       retryCall: 1,
+  //       distributing: 0
+  //     },
+  //     barData: [
+  //       { name: '최초 발신용', value: 60 },
+  //       { name: '재시도 발신용', value: 40 },
+  //       { name: '분배 대기', value: 20 }
+  //     ],
+  //     gridData: [
+  //       {
+  //         skillId: '1247',
+  //         campaignId: '0126',
+  //         campaignName: 'test2캠페인',
+  //         priority: '3',
+  //         custKey: '241546',
+  //         custName: '이영희',
+  //         phoneType: '회사전화',
+  //         phone1: '01098765432',
+  //         attempt1: '2',
+  //         phone2: '01098765432',
+  //         attempt2: '1',
+  //         phone3: '01098765432',
+  //         attempt3: '1',
+  //         phone4: '01087654321',
+  //         attempt4: '2',
+  //         phone5: '01087654321',
+  //         attempt5: '2',
+  //         result: '진행중'
+  //       }
+  //     ]
+  //   }
+  // };
 
   // 전체 데이터 계산을 위한 useMemo 훅 사용
   const allCampaignData = useMemo<CampaignData>(() => {
-    if (Object.keys(campaignData).length === 0) return emptyData;
+    if (Object.keys(_campaignData).length === 0) return emptyData;
     // 모든 캠페인의 통계 합계 계산
-    const totalStats = Object.values(campaignData).reduce((acc, campaign) => ({
+    const totalStats = Object.values(_campaignData).reduce((acc, campaign) => ({
       waiting: acc.waiting + campaign.stats.waiting,
       firstCall: acc.firstCall + campaign.stats.firstCall,
       retryCall: acc.retryCall + campaign.stats.retryCall,
@@ -167,40 +185,40 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     const totalBarData = [
       {
         name: '최초 발신용',
-        value: Object.values(campaignData).reduce((sum, campaign) =>
+        value: Object.values(_campaignData).reduce((sum, campaign) =>
           sum + (campaign.barData.find(item => item.name === '최초 발신용')?.value ?? 0), 0
         )
       },
       {
         name: '재시도 발신용',
-        value: Object.values(campaignData).reduce((sum, campaign) =>
+        value: Object.values(_campaignData).reduce((sum, campaign) =>
           sum + (campaign.barData.find(item => item.name === '재시도 발신용')?.value ?? 0), 0
         )
       },
       {
         name: '분배 대기',
-        value: Object.values(campaignData).reduce((sum, campaign) =>
+        value: Object.values(_campaignData).reduce((sum, campaign) =>
           sum + (campaign.barData.find(item => item.name === '분배 대기')?.value ?? 0), 0
         )
       }
     ];
 
     // 모든 캠페인의 그리드 데이터 통합
-    const totalGridData = Object.values(campaignData).flatMap(campaign => campaign.gridData);
+    const totalGridData = Object.values(_campaignData).flatMap(campaign => campaign.gridData);
 
     return {
       stats: totalStats,
       barData: totalBarData,
       gridData: totalGridData
     };
-  }, [campaignData]);
+  }, [_campaignData]);
 
  // 현재 선택된 캠페인의 데이터 (안전하게 처리)
  const currentData = useMemo(() => {
   if (selectedCampaign === 'all') return allCampaignData;
   if (!selectedCampaign) return emptyData;
-  return campaignData[selectedCampaign] || emptyData;
-}, [selectedCampaign, allCampaignData, campaignData]);
+  return _campaignData[selectedCampaign] || emptyData;
+}, [selectedCampaign, allCampaignData, _campaignData]);
 
   // 데이터 업데이트 시 부모 컴포넌트에 알림
   useEffect(() => {
@@ -224,6 +242,10 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     { key: 'attempt2', name: '시도횟수' },
     { key: 'phone3', name: '전화번호3' },
     { key: 'attempt3', name: '시도횟수' },
+    { key: 'phone4', name: '전화번호3' },
+    { key: 'attempt4', name: '시도횟수' },
+    { key: 'phone5', name: '전화번호3' },
+    { key: 'attempt5', name: '시도횟수' },
     { key: 'result', name: '다이얼 결과' }
   ];
 
@@ -234,10 +256,94 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     } else {
       setInternalSelectedCampaign(value);
     }
+    if( value !== 'all'){
+      const campaignInfo = campaigns.find(data => data.campaign_id === Number(value));
+      fetchCallProgressStatus({
+        tenantId: campaignInfo?.tenant_id || 1,
+        campaignId: campaignInfo?.campaign_id || 0
+      });
+    }else{
+      fetchCallProgressStatus({
+        tenantId: 1,
+        campaignId: 0
+      });
+    }
   };
 
   // Select 컴포넌트 렌더링 여부 결정
   const shouldRenderSelect = externalCampaignId === undefined;
+
+  // 발신 진행 정보 api 호출
+  const { mutate: fetchCallProgressStatus } = useApiForCallProgressStatus({
+    onSuccess: (data) => {  
+      const tempList = data.sendingProgressStatusList;
+      if( tempList.length > 0){
+        const tempCampaignData: CampaignDataMap = {};
+        for( let i=0;i<tempList.length;i++){
+          const _tempCampaignData: CampaignDataMap = {
+            [tempList[i].campaignId]: {
+              stats: {
+                waiting: 0, //tempList[i].waiting,
+                firstCall: 0, //tempList[i].firstCall,
+                retryCall: 0, //tempList[i].retryCall,
+                distributing: 0 //tempList[i].distributing
+              },
+              barData: [
+                { name: '최초 발신용', value: 0 },
+                { name: '재시도 발신용', value: 0 },
+                { name: '분배 대기', value: 0 }
+              ],
+              gridData: [
+                {
+                  skillId: campaignSkills.filter((skill) => skill.campaign_id === tempList[i].campaignId)
+                  .map((data) => data.skill_id)
+                  .join(','),
+                  campaignId: tempList[i].campaignId+'',
+                  campaignName: tempList[i].campaignName,
+                  priority: '', //다이얼 순번
+                  custKey: tempList[i].customerKey,
+                  custName: tempList[i].customerName,
+                  phoneType: '',  //발신번호 구분
+                  phone1: tempList[i].phoneNumber[0]+'',
+                  attempt1: tempList[i].phoneDialCount[0]+'',
+                  phone2: tempList[i].phoneNumber[1]+'',
+                  attempt2: tempList[i].phoneDialCount[1]+'',
+                  phone3: tempList[i].phoneNumber[2]+'',
+                  attempt3: tempList[i].phoneDialCount[2]+'',
+                  phone4: tempList[i].phoneNumber[3]+'',
+                  attempt4: tempList[i].phoneDialCount[3]+'',
+                  phone5: tempList[i].phoneNumber[4]+'',
+                  attempt5: tempList[i].phoneDialCount[4]+'',
+                  result: '' //다이얼 결과
+                }
+              ]
+            }
+          };
+          Object.assign(tempCampaignData, _tempCampaignData);
+        }
+        _setCampaignData(tempCampaignData);
+      }
+      // setDataList(tempList);
+      // setSelectedCall(tempList[0]);
+      console.log("API 응답 데이터:", tempList);
+    }
+  });
+
+  // 캠페인스킬 조회
+  const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
+    onSuccess: (data) => {
+      setCampaignSkills(data.result_data);
+    }
+  });
+
+  useEffect(() => {
+    if( campaignSkills.length === 0){
+      fetchCampaignSkills({
+        session_key: '',
+        tenant_id: 0,
+      });
+    }
+  }, []);
 
   return (
     <div className="flex flex-col gap-5 h-full out-wrap">
@@ -250,7 +356,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">캠페인전체</SelectItem>
-              {Object.entries(campaignData).map(([id, data]) => (
+              {Object.entries(_campaignData).map(([id, data]) => (
                 <SelectItem key={id} value={id}>
                   {data.gridData[0]?.campaignName || id}
                 </SelectItem>
