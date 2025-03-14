@@ -207,9 +207,9 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
 
           {/* 가로 레이아웃: 왼쪽 테이블 - 중앙 버튼 - 오른쪽 테이블 */}
           <div className="flex flex-1 h-full">
-            {/* 왼쪽 테이블 - 확실한 높이 제한 및 스크롤 처리 */}
+            {/* 왼쪽 테이블 - 수정된 스타일 */}
             <div className="flex-1 h-full">
-              <div className="border rounded h-full overflow-auto">
+              <div className="border rounded h-full overflow-hidden">
                 <ITableForSkillListWithCampaign
                   filteredSkills={filteredSkills}
                   expandedSkills={expandedSkills}
@@ -232,20 +232,20 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
                 onClick={moveToGroup}
                 disabled={selectedLeftCampaigns.length === 0}
               >
-                →
+                <ChevronRight size={14} />
               </button>
               <button
                 className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
                 onClick={moveToAll}
                 disabled={groupCampaignsData.length === 0}
               >
-                ←
+                <ChevronLeft size={14} />
               </button>
             </div>
 
-            {/* 오른쪽 테이블 - 확실한 높이 제한 및 스크롤 처리 */}
+            {/* 오른쪽 테이블 - 수정된 스타일 */}
             <div className="flex-1 h-full">
-              <div className="border rounded h-full overflow-auto">
+              <div className="border rounded h-full overflow-hidden">
                 <GroupCampaignList
                   isLoading={isLoadingGroup}
                   groupCampaigns={groupCampaignsData}
@@ -254,7 +254,9 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
               </div>
             </div>
           </div>
+
         </div>
+        <div className='h-5'></div>
 
         {/* 푸터 */}
         <div className="py-2 px-4 border-t bg-gray-50 flex justify-between items-center">
