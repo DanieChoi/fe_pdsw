@@ -412,7 +412,90 @@ export const apiForUpdateCampaignGroupName = async (
     }
 };
 
+/**
+ * 특정 캠페인 그룹에 캠페인을 추가하는 API
+ * @param group_id 캠페인을 추가할 캠페인 그룹의 ID
+ * @param campaign_id 추가할 캠페인의 ID
+ * @param tenant_id 테넌트 ID
+ * @returns API 응답 (성공 여부)
+ */
+export const apiForAddCampaignToSpecificCampaignGroup = async (
+    group_id: number,
+    campaign_id: number,
+    tenant_id: number
+): Promise<SuccessResponse> => {
+    const request_data = {
+        request_data: {
+            campaign_id: campaign_id,
+            tenant_id: tenant_id
+        }
+    };
+
+    try {
+        // group_id를 URL에 포함시키고 POST 메서드 사용
+        const { data } = await axiosInstance.post<SuccessResponse>(
+            `campaign-group/${group_id}/list`,
+            request_data
+        );
+        return data;
+    } catch (error: any) {
+        if (error.response?.status === 401) {
+            throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
+        }
+
+        console.error("캠페인 그룹에 캠페인 추가 실패:", error);
+
+        throw new Error(
+            `${error.response?.data?.result_code || ''}||${error.response?.data?.result_msg || '캠페인 그룹에 캠페인 추가 실패'}`
+        );
+    }
+};
+
+// Add this function to src/features/preferences/api/apiForCampaignGroup.ts
+
+/**
+ * 특정 캠페인 그룹에서 캠페인을 제거하는 API
+ * @param group_id 캠페인 그룹 ID
+ * @param campaign_id 제거할 캠페인 ID
+ * @returns API 응답 (성공 여부)
+ */
+export const apiForRemoveCampaignFromCampaignGroup = async (
+    group_id: number,
+    campaign_id: number
+): Promise<SuccessResponse> => {
+    const request_data = {
+        request_data: {
+            campaign_id: campaign_id
+        }
+    };
+
+    try {
+        // DELETE 요청으로 캠페인 제거 - URL 형식: /pds/campaign-group/{group_id}/list
+        const { data } = await axiosInstance.delete<SuccessResponse>(
+            `pds/campaign-group/${group_id}/list`,
+            { data: request_data }
+        );
+        return data;
+    } catch (error: any) {
+        if (error.response?.status === 401) {
+            throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
+        }
+
+        console.error("캠페인 그룹에서 캠페인 제거 실패:", error);
+
+        throw new Error(
+            `${error.response?.data?.result_code || ''}||${error.response?.data?.result_msg || '캠페인 그룹에서 캠페인 제거 실패'}`
+        );
+    }
+};
+
+
+
 // 캠페인 그룹 캠페인 추가
+
+// 함수 이름:
+// apiForAddCampaingToSpecificCampaignGroup
+
 // pds/campaign-group/{group_id}/list
 // post
 

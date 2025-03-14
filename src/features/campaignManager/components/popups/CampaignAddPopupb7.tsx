@@ -1,4 +1,3 @@
-
 // "use client";
 
 // import React, { useState, useEffect, useMemo } from 'react';
@@ -10,8 +9,6 @@
 // import GroupCampaignList from './GroupCampaignList';
 // import ITableForSkillListWithCampaign from './ITableForSkillListWithCampaign';
 // import { ChevronRight, ChevronLeft } from 'lucide-react';
-// import CustomAlert from '@/components/shared/layout/CustomAlert';
-// import { useAuthStore } from '@/store/authStore';
 
 // interface SkillWithCampaigns {
 //   skillId: number;
@@ -21,18 +18,15 @@
 // interface Props {
 //   isOpen?: boolean;
 //   groupId: number;
-//   groupName?: string;
 //   onClose?: () => void;
 //   onSelect?: (selectedCampaigns: number[]) => void;
 // }
 
-// const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, groupId, groupName }) => {
+// const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, groupId }) => {
 //   const [skillsWithCampaigns, setSkillsWithCampaigns] = useState<SkillWithCampaigns[]>([]);
 //   const [expandedSkills, setExpandedSkills] = useState<number[]>([1]);
 //   const [selectedLeftCampaigns, setSelectedLeftCampaigns] = useState<string[]>([]);
 //   const [searchTerm, setSearchTerm] = useState('');
-//   const [showAlert, setShowAlert] = useState(false);
-//   const [alertMessage, setAlertMessage] = useState<React.ReactNode>('');
 
 //   const [campaignLookup, setCampaignLookup] = useState<Record<number, CampaignInfo>>({});
 //   const [skillLookup, setSkillLookup] = useState<Record<number, SkillInfo>>({});
@@ -44,9 +38,6 @@
 //     useTotalSkillListForAddCampaignToCampaignGroup(undefined, isOpen);
 //   const { data: groupData, isLoading: isLoadingGroup, error: groupError } =
 //     useApiForGetCampaignListForCampaignGroup(groupId, undefined, undefined, isOpen);
-
-//   const tenant_id = useAuthStore(state => state.tenant_id);
-
 
 //   useEffect(() => {
 //     if (campaignListData?.result_data) {
@@ -193,88 +184,11 @@
 //       .filter((id): id is number => id !== null);
 //   };
 
-//   // 선택된 캠페인 상세 정보 추출
-//   const getSelectedCampaignDetails = () => {
-//     return getSelectedCampaignIds().map(id => ({
-//       campaignId: id,
-//       campaignName: getCampaignName(id),
-//       skillId: selectedLeftCampaigns.find(compositeId => {
-//         const [_, campaignIdStr] = compositeId.split('-');
-//         return parseInt(campaignIdStr) === id;
-//       })?.split('-')[0] || '',
-//       skillName: selectedLeftCampaigns.find(compositeId => {
-//         const [skillId, campaignIdStr] = compositeId.split('-');
-//         return parseInt(campaignIdStr) === id;
-//       })?.split('-')[0] ? getSkillName(parseInt(selectedLeftCampaigns.find(compositeId => {
-//         const [skillId, campaignIdStr] = compositeId.split('-');
-//         return parseInt(campaignIdStr) === id;
-//       })?.split('-')[0] || '0')) : ''
-//     }));
-//   };
-
-//   // 선택된 캠페인 목록을 테이블 형태로 변환
-//   const createCampaignListTable = (campaignDetails: ReturnType<typeof getSelectedCampaignDetails>) => {
-//     return (
-//       <div className="max-h-40 overflow-auto">
-//         <table className="w-full border-collapse text-xs">
-//           <thead>
-//             <tr className="bg-gray-100">
-//               <th className="border border-gray-300 p-1">캠페인 ID</th>
-//               <th className="border border-gray-300 p-1">캠페인 이름</th>
-//               <th className="border border-gray-300 p-1">스킬</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {campaignDetails.map((campaign, index) => (
-//               <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-//                 <td className="border border-gray-300 p-1">{campaign.campaignId}</td>
-//                 <td className="border border-gray-300 p-1">{campaign.campaignName}</td>
-//                 <td className="border border-gray-300 p-1">{campaign.skillName}</td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-//     );
-//   };
-
 //   // Move selected campaigns to group
 //   const moveToGroup = () => {
 //     const campaignIds = getSelectedCampaignIds();
-//     if (campaignIds.length === 0) return;
-
-//     const campaignDetails = getSelectedCampaignDetails();
-
-//     // 로그 출력
-//     console.log("왼쪽 테이블에서 선택한 캠페인 ID:", campaignIds);
-//     console.log("사용자의 테넌트 ID:", tenant_id);
-
-//     // 얼럿에 표시할 메시지 생성 - 더 간결하게
-//     const tableContent = createCampaignListTable(campaignDetails);
-//     const alertContent = (
-//       <div>
-//         <p className="mb-2">{groupName} 에 아래의 {campaignIds.length} 개의 캠페인을 추가하시겠습니까?</p>
-//         {tableContent}
-//       </div>
-//     );
-
-//     setAlertMessage(alertContent);
-//     setShowAlert(true);
-//   };
-
-//   // 캠페인 그룹에 실제로 추가하는 함수
-//   const confirmAddToGroup = () => {
-//     // 여기에 캠페인을 그룹에 추가하는 로직 구현
-//     const campaignIds = getSelectedCampaignIds();
-//     console.log("그룹에 추가할 캠페인 ID:", campaignIds);
-//     // 사용자 tenant_id 확인
-//     console.log("사용자의 테넌트 ID:", tenant_id);
-
-//     // 실제 API 호출 또는 상태 업데이트 로직 추가 (임시로 콘솔 로그만 출력)
-//     console.log("캠페인이 그룹에 추가되었습니다.");
-
-//     // 얼럿 닫기
-//     setShowAlert(false);
+//     console.log("moveToGroup - Selected campaigns:", campaignIds);
+//     // Here you would implement the logic to add these campaigns to the group
 //   };
 
 //   // Move all campaigns from group back to all
@@ -285,9 +199,8 @@
 
 //   // Handle confirmation with numeric campaign IDs
 //   const handleConfirm = () => {
-//     const campaignIds = getSelectedCampaignIds();
-//     console.log("Selected campaign IDs: ", campaignIds);
-//     if (onSelect) onSelect(campaignIds);
+//     const finalIds = groupCampaignsData.map(item => item.campaign_id);
+//     if (onSelect) onSelect(finalIds);
 //     if (onClose) onClose();
 //   };
 
@@ -298,7 +211,7 @@
 //       <div className="bg-white rounded shadow-md w-[70%] max-h-[90vh] flex flex-col overflow-hidden">
 //         {/* 헤더 */}
 //         <div className="flex justify-between items-center px-4 py-2 border-b bg-gray-50">
-//           <h2 className="text-sm font-medium">{groupName} 에 대해 캠페인 추가</h2>
+//           <h2 className="text-sm font-medium">캠페인 추가 (그룹ID: {groupId})</h2>
 //           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg">
 //             ×
 //           </button>
@@ -348,7 +261,6 @@
 //                 className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
 //                 onClick={moveToGroup}
 //                 disabled={selectedLeftCampaigns.length === 0}
-//                 title="선택한 캠페인 추가"
 //               >
 //                 <ChevronRight size={14} />
 //               </button>
@@ -356,7 +268,6 @@
 //                 className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
 //                 onClick={moveToAll}
 //                 disabled={groupCampaignsData.length === 0}
-//                 title="모든 캠페인 제거"
 //               >
 //                 <ChevronLeft size={14} />
 //               </button>
@@ -373,14 +284,14 @@
 //               </div>
 //             </div>
 //           </div>
+
 //         </div>
 //         <div className='h-5'></div>
 
 //         {/* 푸터 */}
 //         <div className="py-2 px-4 border-t bg-gray-50 flex justify-between items-center">
 //           <div className="text-xs text-gray-600">
-//             <span></span>
-//             <span className="ml-3"></span>
+//             {groupCampaignsData.length}개의 캠페인 선택됨
 //           </div>
 //           <div className="space-x-2">
 //             <button
@@ -397,19 +308,6 @@
 //             </button>
 //           </div>
 //         </div>
-
-//         {/* CustomAlert 컴포넌트 */}
-//         {showAlert && (
-//           <CustomAlert
-//             isOpen={showAlert}
-//             title="캠페인 추가 확인"
-//             message={alertMessage}
-//             type="1"
-//             width="max-w-md" // 더 작은 크기로 조정
-//             onClose={confirmAddToGroup}
-//             onCancle={() => setShowAlert(false)}
-//           />
-//         )}
 //       </div>
 //     </div>
 //   );
@@ -420,22 +318,16 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import useApiForGetSkillsWithCampaigns from '@/widgets/sidebar/hooks/useApiForGetSkillsWithCampaigns';
 import { useTotalCampaignListForAddCampaignToCampaignGroup } from '@/widgets/sidebar/hooks/useTotalCampaignListForAddCampaignToCampaignGroup';
 import { useTotalSkillListForAddCampaignToCampaignGroup } from '@/widgets/sidebar/hooks/useTotalSkillListForAddCampaignToCampaignGroup';
 import useApiForGetCampaignListForCampaignGroup from '@/widgets/sidebar/hooks/useApiForGetCampaignListForCampaignGroup';
 import { CampaignInfo, SkillInfo } from '@/widgets/sidebar/api/type/typeForAddCampaignForCampaignGroup';
-import { batchAddCampaignsToGroup } from '@/components/shared/layout/utils/batchAddCampaigns';
-import { batchRemoveCampaignsFromGroup } from '@/components/shared/layout/utils/batchRemoveCampaigns';
 import GroupCampaignList from './GroupCampaignList';
 import ITableForSkillListWithCampaign from './ITableForSkillListWithCampaign';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useAuthStore } from '@/store/authStore';
-import { toast } from 'react-toastify';
-import useApiForAddCampaignToSpecificCampaignGroup from '../../hooks/useApiForAddCampaignToSpecificCampaignGroup';
-import useApiForRemoveCampaignFromCampaignGroup from '../../hooks/useApiForRemoveCampaignFromCampaignGroup';
 
 interface SkillWithCampaigns {
   skillId: number;
@@ -451,27 +343,16 @@ interface Props {
 }
 
 const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, groupId, groupName }) => {
-  // State 관리
   const [skillsWithCampaigns, setSkillsWithCampaigns] = useState<SkillWithCampaigns[]>([]);
   const [expandedSkills, setExpandedSkills] = useState<number[]>([1]);
   const [selectedLeftCampaigns, setSelectedLeftCampaigns] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState<React.ReactNode>('');
-  const [processingCampaigns, setProcessingCampaigns] = useState(false);
-  const [confirmRemove, setConfirmRemove] = useState(false);
-  const [removingCampaigns, setRemovingCampaigns] = useState(false);
 
   const [campaignLookup, setCampaignLookup] = useState<Record<number, CampaignInfo>>({});
   const [skillLookup, setSkillLookup] = useState<Record<number, SkillInfo>>({});
 
-  // 사용자 테넌트 ID 가져오기
-  const tenant_id = useAuthStore(state => state.tenant_id);
-  
-  // Query Client 가져오기
-  const queryClient = useQueryClient();
-
-  // API 훅 사용
   const { data, isLoading, error } = useApiForGetSkillsWithCampaigns(undefined, isOpen);
   const { data: campaignListData, isLoading: isLoadingCampaigns, error: campaignError } =
     useTotalCampaignListForAddCampaignToCampaignGroup(undefined, isOpen);
@@ -480,30 +361,9 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
   const { data: groupData, isLoading: isLoadingGroup, error: groupError } =
     useApiForGetCampaignListForCampaignGroup(groupId, undefined, undefined, isOpen);
 
-  // 캠페인 추가/제거 뮤테이션 훅
-  const { mutate: addCampaignToGroup, isPending: isAddingCampaign } = useApiForAddCampaignToSpecificCampaignGroup({
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['campaignGroupSkills', groupId]
-      });
-    },
-    onError: (error: Error) => {
-      toast.error(`캠페인 추가 실패: ${error.message}`);
-    }
-  });
+  const tenant_id = useAuthStore(state => state.tenant_id);
 
-  const { mutate: removeCampaignFromGroup, isPending: isRemovingCampaign } = useApiForRemoveCampaignFromCampaignGroup({
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['campaignGroupSkills', groupId]
-      });
-    },
-    onError: (error: Error) => {
-      toast.error(`캠페인 제거 실패: ${error.message}`);
-    }
-  });
 
-  // 캠페인 목록 데이터 로딩시 캠페인 이름 lookup 설정
   useEffect(() => {
     if (campaignListData?.result_data) {
       const lookup: Record<number, CampaignInfo> = {};
@@ -514,7 +374,6 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     }
   }, [campaignListData]);
 
-  // 스킬 목록 데이터 로딩시 스킬 이름 lookup 설정
   useEffect(() => {
     if (skillListData?.result_data) {
       const lookup: Record<number, SkillInfo> = {};
@@ -525,7 +384,6 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     }
   }, [skillListData]);
 
-  // 캠페인 데이터 로딩시 스킬별 캠페인 매핑
   useEffect(() => {
     if (data && data.result_data) {
       const skillMap: Record<number, SkillWithCampaigns> = {};
@@ -549,28 +407,22 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     }
   }, [data]);
 
-  // 팝업 열릴 때 상태 초기화
   useEffect(() => {
     if (isOpen) {
       setSelectedLeftCampaigns([]);
       setExpandedSkills([1]);
       setSearchTerm('');
-      setShowAlert(false);
-      setConfirmRemove(false);
     }
   }, [isOpen]);
 
-  // 로딩 및 에러 상태 관리
   const isLoadingAny = isLoading || isLoadingCampaigns || isLoadingSkills;
   const hasError = Boolean(error || campaignError || skillError || groupError);
 
-  // 캠페인 및 스킬 이름 조회 함수
   const getCampaignName = (campaignId: number): string =>
     campaignLookup[campaignId]?.campaign_name || `캠페인 ${campaignId}`;
   const getSkillName = (skillId: number): string =>
     skillLookup[skillId]?.skill_name || `스킬 ${skillId}`;
 
-  // 검색어에 따른 필터링된 스킬 목록
   const filteredSkills = useMemo(() => {
     if (!searchTerm) return skillsWithCampaigns;
     const term = searchTerm.toLowerCase();
@@ -591,13 +443,11 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
       .filter(skill => skill.campaigns.length > 0);
   }, [skillsWithCampaigns, searchTerm]);
 
-  // 전체 캠페인 수 계산
   const totalCampaigns = useMemo(
     () => filteredSkills.reduce((acc, skill) => acc + skill.campaigns.length, 0),
     [filteredSkills]
   );
 
-  // 스킬 토글 함수
   const toggleSkill = (skillId: number) => {
     setExpandedSkills(prev =>
       prev.includes(skillId) ? prev.filter(id => id !== skillId) : [...prev, skillId]
@@ -616,14 +466,14 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     }
   };
 
-  // 캠페인 선택 토글 함수 (복합 ID 형태: skillId-campaignId)
+  // Updated to handle string IDs (skillId-campaignId)
   const toggleLeftCampaignSelection = (id: string) => {
     setSelectedLeftCampaigns(prev =>
       prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
     );
   };
 
-  // 모든 캠페인 선택/해제 토글
+  // Updated to handle string IDs
   const toggleAllCampaigns = (checked: boolean) => {
     if (checked) {
       // 모든 스킬을 자동으로 펼친다
@@ -640,17 +490,16 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     }
   };
 
-  // 그룹 캠페인 토글 (디자인상 사용되지 않음)
   const toggleAllGroupCampaigns = (checked: boolean) => {
+    // This function is for illustration - in the design, group campaigns are always checked
     console.log(`Toggle all group campaigns: ${checked}`);
   };
 
-  // 현재 그룹에 속한 캠페인 목록
   const groupCampaignsData = useMemo(() => {
     return (groupData?.result_data || []).filter(item => item.group_id === groupId);
   }, [groupData, groupId]);
 
-  // 선택된 캠페인 ID 목록 가져오기
+  // Extract campaign IDs from the composite string IDs
   const getSelectedCampaignIds = (): number[] => {
     return selectedLeftCampaigns
       .map(compositeId => {
@@ -705,31 +554,7 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     );
   };
 
-  // 그룹 캠페인 목록을 테이블 형태로 변환
-  const createGroupCampaignListTable = (campaigns: typeof groupCampaignsData) => {
-    return (
-      <div className="max-h-40 overflow-auto">
-        <table className="w-full border-collapse text-xs">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 p-1">캠페인 ID</th>
-              <th className="border border-gray-300 p-1">캠페인 이름</th>
-            </tr>
-          </thead>
-          <tbody>
-            {campaigns.map((campaign, index) => (
-              <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                <td className="border border-gray-300 p-1">{campaign.campaign_id}</td>
-                <td className="border border-gray-300 p-1">{getCampaignName(campaign.campaign_id)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-
-  // 오른쪽 화살표 버튼 - 선택한 캠페인을 그룹에 추가
+  // Move selected campaigns to group
   const moveToGroup = () => {
     const campaignIds = getSelectedCampaignIds();
     if (campaignIds.length === 0) return;
@@ -740,7 +565,7 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     console.log("왼쪽 테이블에서 선택한 캠페인 ID:", campaignIds);
     console.log("사용자의 테넌트 ID:", tenant_id);
 
-    // 얼럿에 표시할 메시지 생성
+    // 얼럿에 표시할 메시지 생성 - 더 간결하게
     const tableContent = createCampaignListTable(campaignDetails);
     const alertContent = (
       <div>
@@ -750,152 +575,34 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
     );
 
     setAlertMessage(alertContent);
-    setConfirmRemove(false); // 추가 모드
     setShowAlert(true);
   };
 
   // 캠페인 그룹에 실제로 추가하는 함수
-  const confirmAddToGroup = async () => {
+  const confirmAddToGroup = () => {
+    // 여기에 캠페인을 그룹에 추가하는 로직 구현
     const campaignIds = getSelectedCampaignIds();
-    if (campaignIds.length === 0) {
-      setShowAlert(false);
-      return;
-    }
+    console.log("그룹에 추가할 캠페인 ID:", campaignIds);
+    // 사용자 tenant_id 확인
+    console.log("사용자의 테넌트 ID:", tenant_id);
 
-    // 여러 캠페인을 추가해야 하는 경우 처리 중임을 표시
-    setProcessingCampaigns(true);
-    toast.success("캠페인 추가 중...");
-    
-    try {
-      // 배치 처리 함수 호출
-      const result = await batchAddCampaignsToGroup(
-        groupId,
-        campaignIds,
-        Number(tenant_id)
-      );
-      
-      toast.success("캠페인 추가 완료");
+    // 실제 API 호출 또는 상태 업데이트 로직 추가 (임시로 콘솔 로그만 출력)
+    console.log("캠페인이 그룹에 추가되었습니다.");
 
-      // 캐시 무효화 - 데이터가 변경되었으므로 관련 쿼리 갱신
-      queryClient.invalidateQueries({
-        queryKey: ['campaignGroupSkills', groupId]
-      });
-      
-      queryClient.invalidateQueries({
-        queryKey: ['campaignGroupList']
-      });
-      
-      queryClient.invalidateQueries({
-        queryKey: ['sideMenuData']
-      });
-      
-      // 결과에 따른 알림 표시
-      if (result.success) {
-        toast.success(`${result.successCount}개의 캠페인이 "${groupName}" 그룹에 추가되었습니다.`);
-      } else if (result.successCount > 0 && result.failedCampaigns.length > 0) {
-        toast.warning(
-          `${result.successCount}개의 캠페인이 추가되었지만, ${result.failedCampaigns.length}개는 실패했습니다.`
-        );
-      } else {
-        toast.error("캠페인 추가에 실패했습니다.");
-      }
-      
-      // 선택 상태 초기화
-      setSelectedLeftCampaigns([]);
-    } catch (error) {
-      console.error("캠페인 추가 중 오류 발생:", error);
-      toast.error("캠페인 추가 과정에서 오류가 발생했습니다.");
-    } finally {
-      setProcessingCampaigns(false);
-      setShowAlert(false);
-    }
+    // 얼럿 닫기
+    setShowAlert(false);
   };
 
-  // 왼쪽 화살표 버튼 - 그룹에서 모든 캠페인 제거
+  // Move all campaigns from group back to all
   const moveToAll = () => {
-    if (groupCampaignsData.length === 0) return;
-    
-    // 캠페인 그룹에서 제거할 캠페인 목록 표시
-    const tableContent = createGroupCampaignListTable(groupCampaignsData);
-    
-    const alertContent = (
-      <div>
-        <p className="mb-2">{groupName} 에서 아래의 {groupCampaignsData.length} 개의 캠페인을 제거하시겠습니까?</p>
-        {tableContent}
-      </div>
-    );
-    
-    setAlertMessage(alertContent);
-    setConfirmRemove(true); // 제거 모드
-    setShowAlert(true);
-  };
-  
-  // 캠페인 그룹에서 실제로 제거하는 함수
-  const confirmRemoveFromGroup = async () => {
-    if (groupCampaignsData.length === 0) {
-      setShowAlert(false);
-      return;
-    }
-    
-    // 제거할 캠페인 ID 배열
-    const campaignIds = groupCampaignsData.map(item => item.campaign_id);
-    
-    // 프로세스 중임을 표시
-    setRemovingCampaigns(true);
-    
-    try {
-      // 배치 처리 함수 호출
-      const result = await batchRemoveCampaignsFromGroup(
-        groupId,
-        campaignIds
-      );
-      
-      // 캐시 무효화
-      queryClient.invalidateQueries({
-        queryKey: ['campaignGroupSkills', groupId]
-      });
-      
-      queryClient.invalidateQueries({
-        queryKey: ['campaignGroupList']
-      });
-      
-      queryClient.invalidateQueries({
-        queryKey: ['sideMenuData']
-      });
-      
-      // 결과에 따른 알림 표시
-      if (result.success) {
-        toast.success(`${result.successCount}개의 캠페인이 "${groupName}" 그룹에서 제거되었습니다.`);
-      } else if (result.successCount > 0 && result.failedCampaigns.length > 0) {
-        toast.warning(
-          `${result.successCount}개의 캠페인이 제거되었지만, ${result.failedCampaigns.length}개는 실패했습니다.`
-        );
-      } else {
-        toast.error("캠페인 제거에 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("캠페인 제거 중 오류 발생:", error);
-      toast.error("캠페인 제거 과정에서 오류가 발생했습니다.");
-    } finally {
-      setRemovingCampaigns(false);
-      setShowAlert(false);
-      setConfirmRemove(false);
-    }
-  };
-  
-  // 얼럿 확인 처리 함수
-  const handleAlertConfirm = () => {
-    if (confirmRemove) {
-      confirmRemoveFromGroup();
-    } else {
-      confirmAddToGroup();
-    }
+    console.log("moveToAll - Selected group campaigns:", groupCampaignsData);
+    // Here you would implement the logic to remove campaigns from the group
   };
 
-  // 확인 버튼 처리
+  // Handle confirmation with numeric campaign IDs
   const handleConfirm = () => {
-    const campaignIds = groupCampaignsData.map(item => item.campaign_id);
-    console.log("현재 그룹의 캠페인 ID 목록: ", campaignIds);
+    const campaignIds = getSelectedCampaignIds();
+    console.log("Selected campaign IDs: ", campaignIds);
     if (onSelect) onSelect(campaignIds);
     if (onClose) onClose();
   };
@@ -956,26 +663,18 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
               <button
                 className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
                 onClick={moveToGroup}
-                disabled={selectedLeftCampaigns.length === 0 || processingCampaigns || isAddingCampaign || removingCampaigns || isRemovingCampaign}
+                disabled={selectedLeftCampaigns.length === 0}
                 title="선택한 캠페인 추가"
               >
-                {processingCampaigns || isAddingCampaign ? (
-                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <ChevronRight size={14} />
-                )}
+                <ChevronRight size={14} />
               </button>
               <button
                 className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
                 onClick={moveToAll}
-                disabled={groupCampaignsData.length === 0 || processingCampaigns || isAddingCampaign || removingCampaigns || isRemovingCampaign}
+                disabled={groupCampaignsData.length === 0}
                 title="모든 캠페인 제거"
               >
-                {removingCampaigns || isRemovingCampaign ? (
-                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <ChevronLeft size={14} />
-                )}
+                <ChevronLeft size={14} />
               </button>
             </div>
 
@@ -996,7 +695,8 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
         {/* 푸터 */}
         <div className="py-2 px-4 border-t bg-gray-50 flex justify-between items-center">
           <div className="text-xs text-gray-600">
-            <span>현재 그룹에 {groupCampaignsData.length}개의 캠페인이 있습니다</span>
+            <span></span>
+            <span className="ml-3"></span>
           </div>
           <div className="space-x-2">
             <button
@@ -1018,13 +718,12 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
         {showAlert && (
           <CustomAlert
             isOpen={showAlert}
-            title={confirmRemove ? "캠페인 제거 확인" : "캠페인 추가 확인"}
+            title="캠페인 추가 확인"
             message={alertMessage}
             type="1"
             width="max-w-md" // 더 작은 크기로 조정
-            onClose={handleAlertConfirm}
+            onClose={confirmAddToGroup}
             onCancle={() => setShowAlert(false)}
-            isProcessing={processingCampaigns || removingCampaigns}
           />
         )}
       </div>
