@@ -137,6 +137,24 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
       prev.includes(campaignId) ? prev.filter(id => id !== campaignId) : [...prev, campaignId]
     );
   };
+  
+  const toggleAllCampaigns = (checked: boolean) => {
+    if (checked) {
+      // Select all visible campaigns
+      const allCampaignIds = filteredSkills.flatMap(skill => 
+        skill.campaigns.map(campaign => campaign.campaignId)
+      );
+      setSelectedLeftCampaigns(allCampaignIds);
+    } else {
+      // Deselect all
+      setSelectedLeftCampaigns([]);
+    }
+  };
+  
+  const toggleAllGroupCampaigns = (checked: boolean) => {
+    // This function is for illustration - in the design, group campaigns are always checked
+    console.log(`Toggle all group campaigns: ${checked}`);
+  };
 
   const groupCampaignsData = useMemo(() => {
     return (groupData?.result_data || []).filter(item => item.group_id === groupId);
@@ -181,27 +199,30 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
           />
         </div>
 
-        {/* 본문 */}
-        <div className="flex-1 flex flex-col p-4 overflow-hidden">
+        {/* 본문 - 고정된 높이를 가지도록 설정 */}
+        <div className="flex flex-col p-4 overflow-hidden" style={{ height: 'calc(100vh - 200px)' }}>
           <div className="px-2 py-1 mb-2 border-b flex justify-between items-center bg-slate-50">
             <h3 className="text-xs font-medium">전체 캠페인 목록 (총 {totalCampaigns}건)</h3>
           </div>
 
           {/* 가로 레이아웃: 왼쪽 테이블 - 중앙 버튼 - 오른쪽 테이블 */}
-          <div className="flex h-full">
-            {/* 왼쪽 테이블 */}
-            <div className="flex-1 border rounded overflow-auto">
-              <ITableForSkillListWithCampaign 
-                filteredSkills={filteredSkills}
-                expandedSkills={expandedSkills}
-                selectedLeftCampaigns={selectedLeftCampaigns}
-                isLoading={isLoadingAny}
-                hasError={hasError}
-                toggleSkill={toggleSkill}
-                toggleLeftCampaignSelection={toggleLeftCampaignSelection}
-                getCampaignName={getCampaignName}
-                getSkillName={getSkillName}
-              />
+          <div className="flex flex-1 h-full">
+            {/* 왼쪽 테이블 - 확실한 높이 제한 및 스크롤 처리 */}
+            <div className="flex-1 h-full">
+              <div className="border rounded h-full overflow-auto">
+                <ITableForSkillListWithCampaign
+                  filteredSkills={filteredSkills}
+                  expandedSkills={expandedSkills}
+                  selectedLeftCampaigns={selectedLeftCampaigns}
+                  isLoading={isLoadingAny}
+                  hasError={hasError}
+                  toggleSkill={toggleSkill}
+                  toggleLeftCampaignSelection={toggleLeftCampaignSelection}
+                  toggleAllCampaigns={toggleAllCampaigns}
+                  getCampaignName={getCampaignName}
+                  getSkillName={getSkillName}
+                />
+              </div>
             </div>
 
             {/* 중앙 버튼 영역 */}
@@ -224,12 +245,15 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
               </div>
             </div>
 
-            {/* 오른쪽 테이블 */}
-            <div className="flex-1 border rounded overflow-auto">
-              <GroupCampaignList
-                isLoading={isLoadingGroup}
-                groupCampaigns={groupCampaignsData}
-              />
+            {/* 오른쪽 테이블 - 확실한 높이 제한 및 스크롤 처리 */}
+            <div className="flex-1 h-full">
+              <div className="border rounded h-full overflow-auto">
+                <GroupCampaignList
+                  isLoading={isLoadingGroup}
+                  groupCampaigns={groupCampaignsData}
+                  toggleAllGroupCampaigns={toggleAllGroupCampaigns}
+                />
+              </div>
             </div>
           </div>
         </div>

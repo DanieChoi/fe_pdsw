@@ -12,9 +12,20 @@ interface GroupCampaign {
 interface Props {
   isLoading: boolean;
   groupCampaigns: GroupCampaign[];
+  toggleAllGroupCampaigns?: (checked: boolean) => void;
 }
 
-const GroupCampaignList: React.FC<Props> = ({ isLoading, groupCampaigns = [] }) => {
+const GroupCampaignList: React.FC<Props> = ({ 
+  isLoading, 
+  groupCampaigns = [],
+  toggleAllGroupCampaigns
+}) => {
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (toggleAllGroupCampaigns) {
+      toggleAllGroupCampaigns(e.target.checked);
+    }
+  };
+
   return (
     <>
       {isLoading ? (
@@ -27,7 +38,17 @@ const GroupCampaignList: React.FC<Props> = ({ isLoading, groupCampaigns = [] }) 
         <table className="w-full border-collapse table-fixed text-xs">
           <thead>
             <tr className="bg-white border-b">
-              <th className="w-8"></th>
+              <th className="w-8">
+                <div className="py-1 px-2 flex items-center justify-center">
+                  {/* <input
+                    type="checkbox"
+                    checked={groupCampaigns.length > 0}
+                    onChange={handleSelectAll}
+                    className="h-3 w-3 cursor-pointer"
+                    title="전체 선택"
+                  /> */}
+                </div>
+              </th>
               <th className="text-left py-1 px-2 font-medium w-1/4">캠페인ID</th>
               <th className="text-left py-1 px-2 font-medium w-3/4">캠페인 이름</th>
             </tr>

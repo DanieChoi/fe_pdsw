@@ -16,6 +16,7 @@ interface Props {
   hasError: boolean;
   toggleSkill: (skillId: number) => void;
   toggleLeftCampaignSelection: (campaignId: number) => void;
+  toggleAllCampaigns: (checked: boolean) => void;
   getCampaignName: (campaignId: number) => string;
   getSkillName: (skillId: number) => string;
 }
@@ -28,9 +29,27 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
   hasError,
   toggleSkill,
   toggleLeftCampaignSelection,
+  toggleAllCampaigns,
   getCampaignName,
   getSkillName,
 }) => {
+  // Calculate if all visible campaigns are selected
+  const allCampaignsCount = filteredSkills.reduce(
+    (count, skill) => count + skill.campaigns.length,
+    0
+  );
+  
+  const allVisibleCampaignIds = filteredSkills.flatMap(skill => 
+    skill.campaigns.map(campaign => campaign.campaignId)
+  );
+  
+  const allSelected = allCampaignsCount > 0 && 
+    allVisibleCampaignIds.every(id => selectedLeftCampaigns.includes(id));
+  
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    toggleAllCampaigns(e.target.checked);
+  };
+
   return (
     <>
       {isLoading ? (
@@ -47,7 +66,17 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
         <table className="w-full border-collapse table-fixed text-xs">
           <thead>
             <tr className="bg-white border-b">
-              <th className="w-8"></th>
+              <th className="w-8">
+                <div className="py-1 px-2 flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    checked={allSelected}
+                    onChange={handleSelectAll}
+                    className="h-3 w-3 cursor-pointer"
+                    title="전체 선택"
+                  />
+                </div>
+              </th>
               <th className="text-left py-1 px-2 font-medium">스킬</th>
               <th className="text-left py-1 px-2 font-medium w-1/4">캠페인ID</th>
               <th className="text-left py-1 px-2 font-medium w-1/2">캠페인 이름</th>
