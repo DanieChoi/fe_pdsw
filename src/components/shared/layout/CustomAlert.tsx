@@ -11,6 +11,7 @@ export interface CustomAlertRequest {
     onCancle?: () => void;
     width?: string; // width prop 추가
     showButtons?: boolean;
+    confirmDisabled?: boolean; // 확인 버튼 비활성화 여부
 }
 
 const CustomAlert = ({ 
@@ -21,7 +22,8 @@ const CustomAlert = ({
     onClose,
     onCancle,
     width = 'max-w-sm', // 기본값 설정
-    showButtons = true
+    showButtons = true,
+    confirmDisabled = false
 }: CustomAlertRequest) => {
     return (
         <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -33,18 +35,20 @@ const CustomAlert = ({
                 </AlertDialogHeader>
                 <div className="p-4 bg-white rounded-bl-[.5rem] rounded-br-[.5rem]">
                     <div className="text-sm text-gray-700 mb-4">
-                        {typeof message === 'string' ? message.split('\n').map((line, index) => (
-                            <React.Fragment key={index}>
+                        {typeof message === 'string'
+                          ? message.split('\n').map((line, index) => (
+                              <React.Fragment key={index}>
                                 {line}
                                 <br />
-                            </React.Fragment>
-                        )) : message}
+                              </React.Fragment>
+                            ))
+                          : message}
                     </div>
                     {showButtons && (
                     <div className="flex justify-end gap-1.5">
                         {type === '1' ? (
                             <>
-                                <CommonButton onClick={onClose}>
+                                <CommonButton onClick={onClose} disabled={confirmDisabled}>
                                     확인
                                 </CommonButton>
                                 {onCancle && (
@@ -55,9 +59,9 @@ const CustomAlert = ({
                                     </CommonButton>
                                 )}
                             </>
-                        ) : type === '0' ?(
+                        ) : type === '0' ? (
                             <>
-                                <CommonButton onClick={onClose}>
+                                <CommonButton onClick={onClose} disabled={confirmDisabled}>
                                     확인
                                 </CommonButton>
                                 <CommonButton
@@ -69,7 +73,7 @@ const CustomAlert = ({
                             </>
                         ) : (
                             <>
-                                <CommonButton onClick={onClose}>
+                                <CommonButton onClick={onClose} disabled={confirmDisabled}>
                                     확인
                                 </CommonButton>
                             </>
