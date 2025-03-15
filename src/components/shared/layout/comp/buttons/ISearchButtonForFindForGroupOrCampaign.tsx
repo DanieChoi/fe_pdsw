@@ -101,7 +101,7 @@ const ISearchButtonForFindForGroupOrCampaign: React.FC<ISearchButtonProps> = ({ 
       {isOpen && (
         <div
           ref={searchBoxRef}
-          className="absolute top-full mt-1 right-0 transform translate-x-[50%] bg-white shadow-md rounded p-2 z-10 min-w-[240px]"
+          className="absolute top-full mt-1 right-0 transform translate-x-[26%] bg-white shadow-md rounded p-2 z-10 min-w-[240px]"
         >
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
