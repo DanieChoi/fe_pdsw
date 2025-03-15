@@ -55,6 +55,7 @@ const ISearchButtonForFindForGroupOrCampaign: React.FC<ISearchButtonProps> = ({ 
       const foundNodeId = searchNode(searchTerm);
       
       if (foundNodeId) {
+        // On success, close the search box after a brief delay
         setSearchFeedback({ 
           message: "항목을 찾았습니다.", 
           type: "success"
@@ -64,6 +65,11 @@ const ISearchButtonForFindForGroupOrCampaign: React.FC<ISearchButtonProps> = ({ 
         if (onSearch) {
           onSearch(searchTerm);
         }
+        
+        // Close the search box after a short delay so user can see success message
+        setTimeout(() => {
+          setIsOpen(false);
+        }, 1000);
       } else {
         setSearchFeedback({ 
           message: "검색 결과가 없습니다.", 
@@ -95,7 +101,7 @@ const ISearchButtonForFindForGroupOrCampaign: React.FC<ISearchButtonProps> = ({ 
       {isOpen && (
         <div
           ref={searchBoxRef}
-          className="absolute top-full mt-1 right-0 bg-white shadow-md rounded p-2 z-10 min-w-[240px]"
+          className="absolute top-full mt-1 right-0 transform translate-x-[50%] bg-white shadow-md rounded p-2 z-10 min-w-[240px]"
         >
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
