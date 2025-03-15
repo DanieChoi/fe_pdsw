@@ -97,7 +97,7 @@ export const getCampaignGroupMenuItems = (
     </Item>,
 
     // 여기도 동일한 방식으로 수정
-    <Separator key="separator-2" style={{ margin: '5px 0' }} />,
+    <Separator key="separator-2" />,
 
     <Item
       key="add-campaign"
