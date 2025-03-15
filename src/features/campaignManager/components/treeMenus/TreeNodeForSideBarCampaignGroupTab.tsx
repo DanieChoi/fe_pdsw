@@ -71,12 +71,12 @@ export function TreeNodeForSideBarCampaignGroupTab({
     }
   });
 
-  // Context menu IDs
+  // 컨텍스트 메뉴 ID
   const campaignMenuId = `campaign-menu-${node.id}`;
   const tenantMenuId = `tenant-menu-${node.id}`;
   const groupMenuId = `group-menu-${node.id}`;
   
-  // Context menu hooks
+  // 컨텍스트 메뉴 훅
   const { show: showCampaignMenu } = useContextMenu({ id: campaignMenuId });
   const { show: showTenantMenu } = useContextMenu({ id: tenantMenuId });
   const { show: showGroupMenu } = useContextMenu({ id: groupMenuId });
@@ -85,7 +85,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const isExpanded = expandedNodes.has(node.id);
   const isSelected = selectedNodeId === node.id;
 
-  // 디버깅용 로그 추가
+  // 디버깅용 로그
   useEffect(() => {
     if (node.type === "group" && hasChildren) {
       console.log(`그룹 노드 ${node.name}에 캠페인 ${node.children?.length}개 있음, 확장 상태: ${isExpanded}`);
@@ -117,9 +117,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
   const handleCloseAddGroupDialog = useCallback(() => {
     setIsAddGroupDialogOpen(false);
-    // 다이얼로그가 닫혔다고 표시
     recentlyClosedDialogRef.current = true;
-    // 일정 시간 후에 플래그 초기화
     setTimeout(() => {
       recentlyClosedDialogRef.current = false;
     }, 300);
@@ -134,7 +132,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   }, []);
 
   const handleRenameSuccess = useCallback(() => {
-    // 여기에서 필요한 경우 리렌더링이나 데이터 갱신 로직을 추가할 수 있음
+    // 필요한 경우 리렌더링이나 데이터 갱신 로직 추가
   }, []);
   
   const handleCloseDeleteDialog = useCallback(() => {
@@ -160,7 +158,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     });
   }, [node.tenant_id, node.name]);
 
-  // 스타일 계산
+  // 노드 스타일 계산
   const getNodeStyle = useCallback(() => {
     let baseStyle = `flex items-center hover:bg-[#FFFAEE] px-2 py-0.5 cursor-pointer transition-colors duration-150`;
     if (isSelected) {
@@ -188,7 +186,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     }
   }, [node.type]);
 
-  // 모든 대화상자 렌더링 함수
+  // 모든 대화상자 렌더링
   const renderAllDialogs = () => {
     if (!isBrowser) return null;
     
@@ -213,7 +211,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
             groupId={node.group_id || 0}
             groupName={node.name || ''}
             onClose={() => setIsCampaignAddPopupOpen(false)}          
-            />,
+          />,
           document.body
         )}
         
@@ -316,8 +314,8 @@ export function TreeNodeForSideBarCampaignGroupTab({
     <div className="select-none" data-node-type={node.type} data-node-id={node.id}>
       {renderNodeUI()}
 
-      {/* Campaign node context menu */}
-      <Menu id={campaignMenuId}>
+      {/* 캠페인 노드 컨텍스트 메뉴 */}
+      <Menu id={campaignMenuId} className="compact-menu">
         <Item
           onClick={() => {
             const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu } = useTabStore.getState();
@@ -353,20 +351,21 @@ export function TreeNodeForSideBarCampaignGroupTab({
         </Item>
       </Menu>
 
-      {/* Tenant node context menu */}
-      <Menu id={tenantMenuId}>
+      {/* 테넌트 노드 컨텍스트 메뉴 */}
+      <Menu id={tenantMenuId} className="compact-menu">
         <Item
           onClick={() => {
             console.log(`캠페인 그룹 추가: ${node.name}`);
             setIsAddGroupDialogOpen(true);
           }}
+          style={{ color: "#0070F3" , fontSize: "14px" }}
         >
           캠페인 그룹 추가
         </Item>
       </Menu>
 
-      {/* Group node context menu */}
-      <Menu id={groupMenuId}>
+      {/* 그룹 노드 컨텍스트 메뉴 */}
+      <Menu id={groupMenuId} className="compact-menu">
         {getCampaignGroupMenuItems(
           node,
           setIsCampaignAddPopupOpen,
@@ -375,7 +374,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
         )}
       </Menu>
 
-      {/* 자식 노드들 렌더링 */}
+      {/* 자식 노드 렌더링 */}
       {hasChildren && isExpanded && (
         <div className="children-container space-y-1">
           {node.children?.map((child) => (
@@ -394,6 +393,23 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
       {/* 모든 다이얼로그 렌더링 */}
       {renderAllDialogs()}
+
+      <style jsx>{`
+        .compact-menu {
+          font-size: 20px;
+          padding: 4px;
+          border-radius: 4px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .compact-menu .react-contexify__item {
+          padding: 4px 8px;
+          min-height: auto;
+          transition: background-color 0.2s ease;
+        }
+        .compact-menu .react-contexify__item:hover {
+          background-color: #f3f3f3;
+        }
+      `}</style>
     </div>
   );
 }

@@ -553,12 +553,12 @@ const CampaignAddPopup: React.FC<Props> = ({
             >
               취소
             </button>
-            <button
+            {/* <button
               onClick={handleConfirm}
               className="px-3 py-1 text-xs rounded bg-blue-500 text-white hover:bg-blue-600"
             >
               확인
-            </button>
+            </button> */}
           </div>
         </div>
         {showAlert && (

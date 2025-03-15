@@ -685,3 +685,69 @@ html, body {
 .h-340{height: 340px;}
 .custom-hover:hover {background-color: #fffaee !important;}
 
+/* 사이드 메뉴 스크롤 관련 */
+/* Add this to your global CSS file or a component's styles */
+
+@keyframes highlight-pulse {
+  0% {
+    background-color: rgba(255, 250, 238, 0.5);
+  }
+  50% {
+    background-color: rgba(255, 235, 155, 0.8);
+  }
+  100% {
+    background-color: rgba(255, 250, 238, 0.5);
+  }
+}
+
+.highlight-found-node {
+  animation: highlight-pulse 1s ease 2;
+  background-color: rgba(255, 250, 238, 0.5);
+  position: relative;
+}
+
+.highlight-found-node::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border: 2px solid #fbbf24;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* 캠페인 그룹 탭 sort 관련 */
+
+/* Add this to your global CSS file */
+
+@keyframes highlight-pulse {
+  0% {
+    background-color: rgba(255, 250, 238, 0.5);
+  }
+  50% {
+    background-color: rgba(255, 235, 155, 0.8);
+  }
+  100% {
+    background-color: rgba(255, 250, 238, 0.5);
+  }
+}
+
+.highlight-found-node {
+  animation: highlight-pulse 1s ease 2;
+  background-color: rgba(255, 250, 238, 0.5);
+  position: relative;
+}
+
+.highlight-found-node::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border: 2px solid #fbbf24;
+  border-radius: 4px;
+  pointer-events: none;
+}
