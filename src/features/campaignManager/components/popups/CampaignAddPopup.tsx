@@ -41,21 +41,15 @@ const CampaignAddPopup: React.FC<Props> = ({
   // ----------------------------
   const [skillsWithCampaigns, setSkillsWithCampaigns] = useState<SkillWithCampaigns[]>([]);
   const [expandedSkills, setExpandedSkills] = useState<number[]>([1]);
-  const [selectedLeftCampaigns, setSelectedLeftCampaigns] = useState<string[]>([]); 
+  const [selectedLeftCampaigns, setSelectedLeftCampaigns] = useState<string[]>([]);
   const [selectedRightCampaigns, setSelectedRightCampaigns] = useState<number[]>([]);
-
-  // **팝업에서 보여줄(추가) 캠페인 목록**을 별도로 관리
   const [campaignIdsForPopup, setCampaignIdsForPopup] = useState<number[]>([]);
-
   const [searchTerm, setSearchTerm] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState<React.ReactNode>('');
   const [confirmRemove, setConfirmRemove] = useState(false);
-
-  // 프로세스/로딩 표시
   const [processingCampaigns, setProcessingCampaigns] = useState(false);
   const [removingCampaigns, setRemovingCampaigns] = useState(false);
-
   const [campaignLookup, setCampaignLookup] = useState<Record<number, CampaignInfo>>({});
   const [skillLookup, setSkillLookup] = useState<Record<number, SkillInfo>>({});
 
@@ -111,7 +105,6 @@ const CampaignAddPopup: React.FC<Props> = ({
   // ----------------------------
   //  Effects
   // ----------------------------
-  // 1) 캠페인 목록 데이터 로딩 -> campaignLookup 세팅
   useEffect(() => {
     if (campaignListData?.result_data) {
       const lookup: Record<number, CampaignInfo> = {};
@@ -122,7 +115,6 @@ const CampaignAddPopup: React.FC<Props> = ({
     }
   }, [campaignListData]);
 
-  // 2) 스킬 목록 데이터 로딩 -> skillLookup 세팅
   useEffect(() => {
     if (skillListData?.result_data) {
       const lookup: Record<number, SkillInfo> = {};
@@ -133,7 +125,6 @@ const CampaignAddPopup: React.FC<Props> = ({
     }
   }, [skillListData]);
 
-  // 3) 캠페인 데이터 로딩 -> skillsWithCampaigns 세팅
   useEffect(() => {
     if (data?.result_data) {
       const skillMap: Record<number, SkillWithCampaigns> = {};
@@ -157,7 +148,6 @@ const CampaignAddPopup: React.FC<Props> = ({
     }
   }, [data]);
 
-  // 4) 팝업 열릴 때마다 상태 초기화
   useEffect(() => {
     if (isOpen) {
       setSelectedLeftCampaigns([]);
@@ -166,31 +156,26 @@ const CampaignAddPopup: React.FC<Props> = ({
       setSearchTerm('');
       setShowAlert(false);
       setConfirmRemove(false);
-      setCampaignIdsForPopup([]); // 팝업 열릴 때마다 초기화
+      setCampaignIdsForPopup([]);
     }
   }, [isOpen]);
 
   // ----------------------------
-  //  Derived data
+  //  Derived data & Helpers
   // ----------------------------
   const isLoadingAny = isLoading || isLoadingCampaigns || isLoadingSkills;
   const hasError = Boolean(error || campaignError || skillError || groupError);
 
-  // 그룹에 속한 캠페인 목록
   const groupCampaignsData = useMemo(() => {
     return (groupData?.result_data || []).filter(item => item.group_id === groupId);
   }, [groupData, groupId]);
 
-  // ----------------------------
-  //  Helpers
-  // ----------------------------
   const getCampaignName = (campaignId: number) =>
     campaignLookup[campaignId]?.campaign_name || `캠페인 ${campaignId}`;
 
   const getSkillName = (skillId: number) =>
     skillLookup[skillId]?.skill_name || `스킬 ${skillId}`;
 
-  // 검색어 필터
   const filteredSkills = useMemo(() => {
     if (!searchTerm) return skillsWithCampaigns;
     const term = searchTerm.toLowerCase();
@@ -216,9 +201,6 @@ const CampaignAddPopup: React.FC<Props> = ({
     [filteredSkills]
   );
 
-  // ----------------------------
-  //  Table toggles
-  // ----------------------------
   const toggleSkill = (skillId: number) => {
     setExpandedSkills(prev =>
       prev.includes(skillId) ? prev.filter(id => id !== skillId) : [...prev, skillId]
@@ -234,10 +216,6 @@ const CampaignAddPopup: React.FC<Props> = ({
     }
   };
 
-  // ----------------------------
-  //  Left Table (전체 캠페인)
-  // ----------------------------
-  // (skillId-campaignId) 형식
   const toggleLeftCampaignSelection = (id: string) => {
     setSelectedLeftCampaigns(prev =>
       prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
@@ -256,17 +234,10 @@ const CampaignAddPopup: React.FC<Props> = ({
     }
   };
 
-  // ----------------------------
-  //  Right Table (그룹 캠페인)
-  // ----------------------------
   const toggleAllGroupCampaigns = (checked: boolean, selectedIds: number[] = []) => {
     setSelectedRightCampaigns(selectedIds);
   };
 
-  // ----------------------------
-  //  Selection helper
-  // ----------------------------
-  // 선택된 (왼쪽) 캠페인 ID만 추출
   const getSelectedCampaignIds = (): number[] => {
     return selectedLeftCampaigns
       .map(compositeId => {
@@ -279,10 +250,8 @@ const CampaignAddPopup: React.FC<Props> = ({
   // ----------------------------
   //  Confirm Popup Table
   // ----------------------------
-  // “추가” 확인창에서 보여줄 테이블은 campaignIdsForPopup 기반
   const createCampaignListTable = (campaignIds: number[]) => {
     const groupCampaignIds = new Set(groupCampaignsData.map(item => item.campaign_id));
-
     return (
       <div className="max-h-40 overflow-auto">
         <table className="w-full border-collapse text-xs">
@@ -299,18 +268,13 @@ const CampaignAddPopup: React.FC<Props> = ({
               return (
                 <tr
                   key={id}
-                  className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} ${
-                    isDuplicate ? 'bg-orange-100' : ''
-                  }`}
+                  className={isDuplicate ? 'bg-orange-100' : (index % 2 === 0 ? 'bg-white' : 'bg-gray-50')}
                 >
                   <td className="border border-gray-300 p-1">{id}</td>
                   <td className="border border-gray-300 p-1">{getCampaignName(id)}</td>
                   <td className="border border-gray-300 p-1 text-center">
                     {isDuplicate && (
-                      <button
-                        onClick={() => handleRemoveFromPopup(id)}
-                        className="text-red-500"
-                      >
+                      <button onClick={() => handleRemoveFromPopup(id)} className="text-red-500">
                         x
                       </button>
                     )}
@@ -324,12 +288,10 @@ const CampaignAddPopup: React.FC<Props> = ({
     );
   };
 
-  // “제거” 확인창에서 보여줄 테이블
   const createGroupCampaignListTable = (campaignIds: number[]) => {
     const selectedCampaigns = groupCampaignsData.filter(item =>
       campaignIds.includes(item.campaign_id)
     );
-
     return (
       <div className="max-h-40 overflow-auto">
         <table className="w-full border-collapse text-xs">
@@ -341,14 +303,9 @@ const CampaignAddPopup: React.FC<Props> = ({
           </thead>
           <tbody>
             {selectedCampaigns.map((campaign, index) => (
-              <tr
-                key={campaign.campaign_id}
-                className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
-              >
+              <tr key={campaign.campaign_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 <td className="border border-gray-300 p-1">{campaign.campaign_id}</td>
-                <td className="border border-gray-300 p-1">
-                  {getCampaignName(campaign.campaign_id)}
-                </td>
+                <td className="border border-gray-300 p-1">{getCampaignName(campaign.campaign_id)}</td>
               </tr>
             ))}
           </tbody>
@@ -360,38 +317,25 @@ const CampaignAddPopup: React.FC<Props> = ({
   // ----------------------------
   //  Popup Actions
   // ----------------------------
-  // x 버튼: “추가” 확인창에서 중복 항목 제거
   const handleRemoveFromPopup = (campaignId: number) => {
-    // 1) 실제로는 selectedLeftCampaigns에서도 제거해야
-    //    (사용자가 체크해제된 상태로 돌아가게 하려면)
     setSelectedLeftCampaigns(prev =>
       prev.filter(item => {
         const parts = item.split('-');
         return parseInt(parts[1]) !== campaignId;
       })
     );
-
-    // 2) 팝업에 표시되는 배열에서도 제거
     setCampaignIdsForPopup(prev => prev.filter(id => id !== campaignId));
   };
 
-  // ----------------------------
-  //  “추가” 버튼 -> 팝업 열기
-  // ----------------------------
   const moveToGroup = () => {
     const campaignIds = getSelectedCampaignIds();
     if (campaignIds.length === 0) return;
-
-    // 팝업에서 보여줄 임시 목록을 별도 state에 저장
     setCampaignIdsForPopup(campaignIds);
-
-    // 확인창 메시지(기본 안내문)
     const alertContent = (
       <div>
         <p className="mb-2">
           {groupName} 에 아래의 {campaignIds.length} 개의 캠페인을 추가하시겠습니까?
         </p>
-        {/* 실제 테이블은 아래 render 시점에서 campaignIdsForPopup 를 참조 */}
       </div>
     );
     setAlertMessage(alertContent);
@@ -399,37 +343,23 @@ const CampaignAddPopup: React.FC<Props> = ({
     setShowAlert(true);
   };
 
-  // ----------------------------
-  //  “추가” 확정
-  // ----------------------------
   const confirmAddToGroup = async () => {
     if (campaignIdsForPopup.length === 0) {
       setShowAlert(false);
       return;
     }
-
     setProcessingCampaigns(true);
-    toast.success('캠페인 추가 중...');
-
     try {
-      // 실제로 batchAdd 실행
       const result = await batchAddCampaignsToGroup(
         groupId,
-        campaignIdsForPopup, // 팝업에서 남은 목록만 추가
+        campaignIdsForPopup,
         Number(tenant_id)
       );
-
-      toast.success('캠페인 추가 완료');
-
-      // 캐시 무효화
       queryClient.invalidateQueries({ queryKey: ['campaignGroupSkills', groupId] });
       queryClient.invalidateQueries({ queryKey: ['campaignGroupList'] });
       queryClient.invalidateQueries({ queryKey: ['sideMenuData'] });
-
       if (result.success) {
-        toast.success(
-          `${result.successCount}개의 캠페인이 "${groupName}" 그룹에 추가되었습니다.`
-        );
+        toast.success(`${result.successCount}개의 캠페인이 "${groupName}" 그룹에 추가되었습니다.`);
       } else if (result.successCount > 0 && result.failedCampaigns.length > 0) {
         toast.warning(
           `${result.successCount}개의 캠페인이 추가되었지만, ${result.failedCampaigns.length}개는 실패했습니다.`
@@ -437,8 +367,6 @@ const CampaignAddPopup: React.FC<Props> = ({
       } else {
         toast.error('캠페인 추가에 실패했습니다.');
       }
-
-      // 왼쪽 테이블 체크 상태도 비워줌
       setSelectedLeftCampaigns([]);
       setCampaignIdsForPopup([]);
     } catch (error) {
@@ -450,58 +378,42 @@ const CampaignAddPopup: React.FC<Props> = ({
     }
   };
 
-  // ----------------------------
-  //  “제거” 버튼 -> 팝업 열기
-  // ----------------------------
   const moveToAll = () => {
     if (selectedRightCampaigns.length === 0) {
       toast.warn('제거할 캠페인을 선택해주세요.');
       return;
     }
-
-    // 확인창 메시지
     const tableContent = createGroupCampaignListTable(selectedRightCampaigns);
     const alertContent = (
       <div>
         <p className="mb-2">
-          {groupName} 에서 아래의 {selectedRightCampaigns.length} 개의 캠페인을
-          제거하시겠습니까?
+          {groupName} 에서 아래의 {selectedRightCampaigns.length} 개의 캠페인을 제거하시겠습니까?
         </p>
         {tableContent}
       </div>
     );
-
     setAlertMessage(alertContent);
     setConfirmRemove(true);
     setShowAlert(true);
   };
 
-  // ----------------------------
-  //  “제거” 확정
-  // ----------------------------
   const confirmRemoveFromGroup = async () => {
     if (selectedRightCampaigns.length === 0) {
       setShowAlert(false);
       return;
     }
-
     setRemovingCampaigns(true);
-
     try {
       const result = await batchRemoveCampaignsFromGroup(
         groupId,
         selectedRightCampaigns,
         tenant_id
       );
-
       queryClient.invalidateQueries({ queryKey: ['campaignGroupSkills', groupId] });
       queryClient.invalidateQueries({ queryKey: ['campaignGroupList'] });
       queryClient.invalidateQueries({ queryKey: ['sideMenuData'] });
-
       if (result.success) {
-        toast.success(
-          `${result.successCount}개의 캠페인이 "${groupName}" 그룹에서 제거되었습니다.`
-        );
+        toast.success(`${result.successCount}개의 캠페인이 "${groupName}" 그룹에서 제거되었습니다.`);
       } else if (result.successCount > 0 && result.failedCampaigns.length > 0) {
         toast.warning(
           `${result.successCount}개의 캠페인이 제거되었지만, ${result.failedCampaigns.length}개는 실패했습니다.`
@@ -520,9 +432,6 @@ const CampaignAddPopup: React.FC<Props> = ({
     }
   };
 
-  // ----------------------------
-  //  Alert Confirm
-  // ----------------------------
   const handleAlertConfirm = () => {
     if (confirmRemove) {
       confirmRemoveFromGroup();
@@ -531,41 +440,27 @@ const CampaignAddPopup: React.FC<Props> = ({
     }
   };
 
-  // ----------------------------
-  //  Footer Confirm
-  // ----------------------------
   const handleConfirm = () => {
-    // onSelect에 현재 그룹의 캠페인 ID를 넘기고 닫기
     const campaignIds = groupCampaignsData.map(item => item.campaign_id);
     if (onSelect) onSelect(campaignIds);
     if (onClose) onClose();
   };
 
-  // ----------------------------
-  //  중복 존재 여부
-  // ----------------------------
-  // 팝업에서 보여줄 목록 중 하나라도 이미 그룹에 있으면 confirmDisabled
   const duplicatesExist = campaignIdsForPopup.some(id =>
     groupCampaignsData.some(item => item.campaign_id === id)
   );
 
-  // ----------------------------
-  //  Render
-  // ----------------------------
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded shadow-md w-[70%] max-h-[90vh] flex flex-col overflow-hidden">
-        {/* 헤더 */}
         <div className="flex justify-between items-center px-4 py-2 border-b bg-gray-50">
           <h2 className="text-sm font-medium">{groupName} 에 대해 캠페인 추가</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg">
             ×
           </button>
         </div>
-
-        {/* 검색 영역 */}
         <div className="px-4 py-2 border-b">
           <input
             type="text"
@@ -575,20 +470,11 @@ const CampaignAddPopup: React.FC<Props> = ({
             className="w-full py-1 px-2 text-xs border border-gray-300 rounded"
           />
         </div>
-
-        {/* 본문 */}
-        <div
-          className="flex flex-col p-4 overflow-hidden"
-          style={{ height: 'calc(100vh - 200px)' }}
-        >
+        <div className="flex flex-col p-4 overflow-hidden" style={{ height: 'calc(100vh - 200px)' }}>
           <div className="px-2 py-1 mb-2 border-b flex justify-between items-center bg-slate-50">
-            <h3 className="text-xs font-medium">
-              전체 캠페인 목록 (총 {totalCampaigns}건)
-            </h3>
+            <h3 className="text-xs font-medium">전체 캠페인 목록 (총 {totalCampaigns}건)</h3>
           </div>
-
           <div className="flex flex-1 h-full">
-            {/* 왼쪽 테이블 */}
             <div className="flex-1 h-full">
               <div className="border rounded h-full overflow-hidden">
                 <ITableForSkillListWithCampaign
@@ -606,10 +492,7 @@ const CampaignAddPopup: React.FC<Props> = ({
                 />
               </div>
             </div>
-
-            {/* 중앙 버튼 영역 */}
             <div className="flex flex-col items-center gap-2 min-w-[22px] justify-center px-2">
-              {/* 추가 버튼 */}
               <button
                 className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
                 onClick={moveToGroup}
@@ -628,8 +511,6 @@ const CampaignAddPopup: React.FC<Props> = ({
                   <ChevronRight size={14} />
                 )}
               </button>
-
-              {/* 제거 버튼 */}
               <button
                 className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
                 onClick={moveToAll}
@@ -649,8 +530,6 @@ const CampaignAddPopup: React.FC<Props> = ({
                 )}
               </button>
             </div>
-
-            {/* 오른쪽 테이블 */}
             <div className="flex-1 h-full">
               <div className="border rounded h-full overflow-hidden">
                 <GroupCampaignList
@@ -663,8 +542,6 @@ const CampaignAddPopup: React.FC<Props> = ({
           </div>
         </div>
         <div className="h-5"></div>
-
-        {/* 푸터 */}
         <div className="py-2 px-4 border-t bg-gray-50 flex justify-between items-center">
           <div className="text-xs text-gray-600">
             현재 그룹에 {groupCampaignsData.length}개의 캠페인이 있습니다
@@ -684,14 +561,10 @@ const CampaignAddPopup: React.FC<Props> = ({
             </button>
           </div>
         </div>
-
-        {/* CustomAlert */}
         {showAlert && (
           <CustomAlert
             isOpen={showAlert}
             title={confirmRemove ? '캠페인 제거 확인' : '캠페인 추가 확인'}
-            // 팝업 내부에서 "추가" 모드일 때는 campaignIdsForPopup를 테이블로 렌더링
-            // "제거" 모드일 때는 이미 alertMessage 자체에 테이블 포함
             message={
               <div>
                 {alertMessage}
@@ -702,8 +575,7 @@ const CampaignAddPopup: React.FC<Props> = ({
             width="max-w-md"
             onClose={handleAlertConfirm}
             onCancle={() => setShowAlert(false)}
-            confirmDisabled={confirmRemove ? false : duplicatesExist} 
-            // 제거 모드에는 비활성화 없음, 추가 모드에는 중복 시 비활성화
+            confirmDisabled={confirmRemove ? false : duplicatesExist}
           />
         )}
       </div>
