@@ -1,4 +1,3 @@
-// src\features\campaignManager\components\treeMenus\TreeMenusForAgentGroupTab.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -20,13 +19,20 @@ export function TreeMenusForCampaignGroupTab() {
     toggleNode, 
     selectNode,
     sortField,
-    sortDirection
+    sortDirection,
+    expandAllNodes // 펼치기 위한 함수 추가
   } = useSideMenuCampaignGroupTabStore();
 
   // Fetch tree data on component mount
   useEffect(() => {
-    fetchTreeData(tenant_id);
-  }, [tenant_id, fetchTreeData]);
+    const fetchData = async () => {
+      await fetchTreeData(tenant_id);
+      // 데이터 로드 완료 후 모든 노드 자동 펼치기
+      expandAllNodes();
+    };
+    
+    fetchData();
+  }, [tenant_id, fetchTreeData, expandAllNodes]);
   
   // Debug logging
   useEffect(() => {
