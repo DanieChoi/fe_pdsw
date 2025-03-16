@@ -71,10 +71,10 @@ import { FilterType } from '@/features/campaignManager/types/typeForSidebar2';
 import { SortButtonForCampaign } from '../buttons/SortButtonForCampaign';
 import OptionButtonsForSideMenuAgentTab from '../buttons/OptionButtonsForSideMenuAgentTab';
 import SortButtonForCounsellorGroup from '../buttons/SortButtonForCounsellorGroup';
-import IFilterButtonForCampaignTabHeader from './IFilterButtonForCampaignGroupTabHeader';
 import { useSortStore, SortOption } from '@/store/storeForSideBarCampaignSort';
 import ISearchButtonForFindForGroupOrCampaign from '../buttons/ISearchButtonForFindForGroupOrCampaign';
 import IFilterButtonForCampaignGroupTabHeader from './IFilterButtonForCampaignGroupTabHeader';
+import IFilterButtonForCampaignTabHeader from '../buttons/IFilterButtonForCampaignTabHeader';
 
 interface TabActionsProps {
   tabId: string;
