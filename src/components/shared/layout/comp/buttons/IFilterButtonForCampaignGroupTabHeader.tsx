@@ -17,7 +17,6 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
     sortDirection,
     selectedNodeType,
     sortByNodeType,
-    expandNodesForSorting  // 명시적으로 함수 가져오기
   } = useSideMenuCampaignGroupTabStore();
 
   // 정렬 필드 토글 (id/name)
@@ -28,7 +27,7 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
     // 다른 필드로 전환하면서 현재 방향 유지
     sortByNodeType("tenant", field, sortDirection);
     // 필드 변경 후 확장 상태 적용 - 현재 선택된 노드 타입 기준
-    expandNodesForSorting(selectedNodeType);
+    // expandNodesForSorting(selectedNodeType);
   };
 
   // 노드 타입별 정렬 처리
@@ -61,7 +60,7 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
       // 업데이트된 트리 데이터 가져오기
       const { treeData } = useSideMenuCampaignGroupTabStore.getState();
 
-      const applyExpansionByNodeType = (nodes, parentPath = []) => {
+      const applyExpansionByNodeType = (nodes: any[], parentPath: string[] = []) => {
         nodes.forEach(node => {
           // 부모 노드는 항상 확장
           parentPath.forEach(id => newExpandedNodes.add(id));
