@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { TreeNodeForSideBarCampaignGroupTab } from "./TreeNodeForSideBarCampaignGroupTab";
 import { useAuthStore } from "@/store/authStore";
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
@@ -8,7 +8,6 @@ import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampai
 export function TreeMenusForCampaignGroupTab() {
   const { tenant_id } = useAuthStore();
   
-  // 스토어에서 가져오기
   const { 
     treeData, 
     isLoading, 
@@ -17,22 +16,14 @@ export function TreeMenusForCampaignGroupTab() {
     selectedNodeId,
     fetchTreeData, 
     toggleNode, 
-    selectNode,
-    sortField,
-    sortDirection,
-    expandAllNodes, // 초기 펼치기용으로 유지
-    selectedNodeType // 현재 선택된 노드 타입을 위해 추가
+    selectNode
   } = useSideMenuCampaignGroupTabStore();
 
-  // 초기 로드 시 모든 노드 펼치기 유지 (처음에는 다 펼쳐진 상태로 시작)
+  // 초기 데이터 로드만 담당
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchTreeData(tenant_id);
-      expandAllNodes(); // 초기에는 모든 노드 펼치기 유지
-    };
-    
-    fetchData();
-  }, [tenant_id, fetchTreeData, expandAllNodes]);
+    fetchTreeData(tenant_id);
+    // fetchTreeData 내부에서 테넌트 레벨만 자동 확장됨
+  }, [tenant_id, fetchTreeData]);
   
   return (
     <div className="flex flex-grow overflow-y-auto min-h-0 tree-node">
