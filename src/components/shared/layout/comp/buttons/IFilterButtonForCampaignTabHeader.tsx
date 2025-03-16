@@ -12,15 +12,16 @@ import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 const IFilterButtonForCampaignTabHeader = () => {
   const [showSkillFilter, setShowSkillFilter] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  // 로컬에서 선택된 스킬 ID를 관리하기 위한 상태 추가
   const [localSelectedSkills, setLocalSelectedSkills] = useState<number[]>([]);
 
-  // 통합 스토어에서 필터 관련 상태와 메서드 가져오기
+  // 통합 스토어에서 선택된 스킬 ID 목록과 필터 모드를 가져오기
   const {
     skilIdsForCampaignTreeMenu,
     setSkilIdsForCampaignTreeMenu,
     filterMode,
     setFilterMode
-  } = useTreeMenuStore();
+  } = useTreeMenuStore(); // 변경됨
   
   // 할당 가능한 스킬 목록 가져오기
   const { data: skills = [] } = useAssignableSkills();
