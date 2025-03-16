@@ -4,10 +4,10 @@ import React, { useState, useEffect } from "react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import CommonButton from "@/components/shared/CommonButton";
 import { Check, CheckIcon, CheckSquare, Square } from "lucide-react";
-import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCampaignTab";
 import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
 import Image from 'next/image'
+import SkilFilterOptionPannelForCampaignTab from "../TabActions/SkilFilterOptionPannelForCampaignTab";
 
 const IFilterButtonForCampaignTabHeader = () => {
   const [showSkillFilter, setShowSkillFilter] = useState(false);
