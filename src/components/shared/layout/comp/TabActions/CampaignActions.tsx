@@ -24,10 +24,7 @@ export function CampaignActions({
         onFilter={onFilter}
         selectedFilter={selectedFilter}
       />
-      <SortButtonForCampaign 
-        onSort={onSort}
-        selectedSort={selectedSort}
-      />
+      <SortButtonForCampaign />
     </div>
   );
 }
