@@ -26,13 +26,26 @@ interface TreeNodeProps {
   onNodeSelect: (nodeId: string) => void;
 }
 
-const getStatusIcon = (status?: string) => {
+// export const getStatusIconWithStartFlag = (status?: number) => {
+//   switch (status) {
+//     case 1:
+//       return '/sidebar-menu/tree_play.svg';
+//     case 2:
+//       return '/sidebar-menu/tree_pause.svg';
+//     case 3:
+//       return '/sidebar-menu/tree_stop.svg';
+//     default:
+//       return null;
+//   }
+// };
+
+const getStatusIcon = (status?: number) => {
   switch (status) {
-    case 'started':
+    case 1:
       return '/sidebar-menu/tree_play.svg';
-    case 'pending':
+    case 2:
       return '/sidebar-menu/tree_pause.svg';
-    case 'stopped':
+    case 3:
       return '/sidebar-menu/tree_stop.svg';
     default:
       return null;
@@ -53,7 +66,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const recentlyClosedDialogRef = useRef(false);
-  
+
   // 브라우저 환경 확인 (Portal 사용 위함)
   const [isBrowser, setIsBrowser] = useState(false);
   useEffect(() => {
@@ -75,7 +88,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const campaignMenuId = `campaign-menu-${node.id}`;
   const tenantMenuId = `tenant-menu-${node.id}`;
   const groupMenuId = `group-menu-${node.id}`;
-  
+
   // 컨텍스트 메뉴 훅
   const { show: showCampaignMenu } = useContextMenu({ id: campaignMenuId });
   const { show: showTenantMenu } = useContextMenu({ id: tenantMenuId });
@@ -103,9 +116,9 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
   const handleContextMenuEvent = (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     onNodeSelect(node.id);
-    
+
     if (node.type === "campaign") {
       showCampaignMenu({ event: e });
     } else if (node.type === "tenant") {
@@ -122,7 +135,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       recentlyClosedDialogRef.current = false;
     }, 300);
   }, []);
-  
+
   const handleCloseRenameDialog = useCallback(() => {
     setIsRenameDialogOpen(false);
     recentlyClosedDialogRef.current = true;
@@ -134,7 +147,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const handleRenameSuccess = useCallback(() => {
     // 필요한 경우 리렌더링이나 데이터 갱신 로직 추가
   }, []);
-  
+
   const handleCloseDeleteDialog = useCallback(() => {
     setIsDeleteDialogOpen(false);
     recentlyClosedDialogRef.current = true;
@@ -142,7 +155,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       recentlyClosedDialogRef.current = false;
     }, 300);
   }, []);
-  
+
   const confirmDelete = useCallback(() => {
     if (node && node.group_id) {
       deleteCampaignGroup(node.group_id);
@@ -180,7 +193,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       case "group":
         return <Image src="/tree-menu/folder2.png" alt="폴더2" width={15} height={12} />;
       case "campaign":
-        return <Briefcase className="h-4 w-4 text-green-600" />;
+        return <span></span>;
       default:
         return <Building className="h-4 w-4 text-gray-500" />;
     }
@@ -189,7 +202,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   // 모든 대화상자 렌더링
   const renderAllDialogs = () => {
     if (!isBrowser) return null;
-    
+
     return (
       <>
         {/* 캠페인 그룹 추가 다이얼로그 */}
@@ -203,18 +216,18 @@ export function TreeNodeForSideBarCampaignGroupTab({
           />,
           document.body
         )}
-        
+
         {/* 캠페인 추가 팝업 */}
         {isCampaignAddPopupOpen && createPortal(
           <CampaignAddPopup
-            isOpen={isCampaignAddPopupOpen} 
+            isOpen={isCampaignAddPopupOpen}
             groupId={node.group_id || 0}
             groupName={node.name || ''}
-            onClose={() => setIsCampaignAddPopupOpen(false)}          
+            onClose={() => setIsCampaignAddPopupOpen(false)}
           />,
           document.body
         )}
-        
+
         {/* 캠페인 그룹 삭제 다이얼로그 */}
         {isDeleteDialogOpen && createPortal(
           <CommonDialogForSideMenu
@@ -249,7 +262,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
           </CommonDialogForSideMenu>,
           document.body
         )}
-        
+
         {/* 캠페인 그룹 이름 변경 다이얼로그 */}
         {isRenameDialogOpen && node.group_id !== undefined && createPortal(
           <IDialogForUpdateCampaignGroupName
@@ -285,20 +298,9 @@ export function TreeNodeForSideBarCampaignGroupTab({
           <span className="w-3" />
         )}
         {renderIcon()}
-        
-        {node.type === "campaign" && node.status && getStatusIcon(node.status) && (
-          <div className="flex-shrink-0 w-4 h-4 relative">
-            <Image
-              src={getStatusIcon(node.status) || ""}
-              alt={node.status || "상태"}
-              width={16}
-              height={16}
-              className="object-contain"
-            />
-          </div>
-        )}
-        
-        <span className={`text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
+
+        <span className={`flex text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
+          {getStatusIcon(node.start_flag) && <Image src={getStatusIcon(node.start_flag) || ''} alt="상태" width={12} height={12} className="mr-1"/>}
           {node.name}
           {node.type === "campaign" && node.campaign_id && (
             <span className="ml-1 text-xs text-[#555]">
@@ -358,7 +360,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
             console.log(`캠페인 그룹 추가: ${node.name}`);
             setIsAddGroupDialogOpen(true);
           }}
-          style={{ color: "#0070F3" , fontSize: "14px" }}
+          style={{ color: "#0070F3", fontSize: "14px" }}
         >
           캠페인 그룹 추가
         </Item>

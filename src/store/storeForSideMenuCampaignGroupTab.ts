@@ -69,6 +69,8 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
       const combinedData = await apiForCombinedTenantAndCampaignGroup(tenant_id);
       const transformedData = transformToTreeData(combinedData);
       
+      console.log("transformedData : ", transformedData);
+
       set({ 
         treeData: transformedData,
         originalTreeData: JSON.parse(JSON.stringify(transformedData)), // Deep copy

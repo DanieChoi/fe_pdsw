@@ -73,7 +73,6 @@ export const apiForGetTenantList = async (tenant_id?: number): Promise<TenantLis
 
     // 응답 데이터가 예상한 형식과 일치하는지 검증
     if (data.result_code === 0 && data.result_msg === "Success") {
-      console.log("api for tenant data check : ", data);
       return data;
     } else {
       throw new Error(`API Error: ${data.result_msg}`);

@@ -202,7 +202,8 @@ export const transformToTreeData = (combinedData: ExtendedCombinedData): TreeNod
                 type: "campaign" as const,
                 tenant_id: campaign.tenant_id,
                 group_id: campaign.group_id,
-                campaign_id: campaign.campaign_id
+                campaign_id: campaign.campaign_id,
+                start_flag: campaign.start_flag,
             }))
         }))
     }));

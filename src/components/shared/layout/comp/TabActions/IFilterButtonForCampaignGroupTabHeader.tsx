@@ -1,89 +1,155 @@
+// "use client";
+
+// import React, { useState } from "react";
+// import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+// import CommonButton from "@/components/shared/CommonButton";
+// import { ArrowUp, ArrowDown } from "lucide-react";
+// import Image from 'next/image';
+// import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
+
+// // 노드 타입별 정렬 필드 정의
+// type NodeType = "tenant" | "group" | "campaign";
+
+// const IFilterButtonForCampaignGroupTabHeader = () => {
+//   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  
+//   // 스토어에서 정렬 상태 가져오기
+//   const { 
+//     sortField, 
+//     sortDirection, 
+//     applySort 
+//   } = useSideMenuCampaignGroupTabStore();
+
+//   // 특정 노드 타입 및 방향으로 정렬 적용
+//   const handleSortDirectionSelect = (nodeType: NodeType, direction: "asc" | "desc", event: React.MouseEvent) => {
+//     event.stopPropagation();
+    
+//     // 노드 타입에 따라 적절한 ID 필드 선택 (우리는 항상 'id'를 sortField로 사용하고, 
+//     // 노드 타입에 따라 다른 ID 필드를 사용하는 것을 스토어의 sortTreeData 함수에서 처리)
+//     applySort("id", direction);
+//     setIsPopoverOpen(false);
+//   };
+
+//   return (
+//     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+//       <PopoverTrigger asChild>
+//         <CommonButton 
+//           variant="ghost" 
+//           size="sm" 
+//           className="text-xs font-normal gap-[2px] hover:bg-[transparent] text-[#888] !p-0"
+//         >
+//           정렬
+//           <Image 
+//             src={`/tree-menu/array.png`} 
+//             alt={`정렬`} 
+//             width={9} 
+//             height={10} 
+//           />
+//         </CommonButton>
+//       </PopoverTrigger>
+//       <PopoverContent className="w-auto min-w-[180px] p-0 py-[10px] px-[12px] rounded-[3px] border border-[#333]" align="start">
+//         <div className="flex flex-col space-y-2">
+//           <div className="text-sm font-medium mb-1">정렬 기준</div>
+          
+//           {/* 테넌트 정렬 옵션 */}
+//           <div className="flex items-center hover:bg-[#F4F6F9] cursor-pointer rounded-[3px] px-[6px] py-[4px]">
+//             <div className="flex-1 text-sm">테넌트 보기</div>
+//             <div className="flex gap-1">
+//               <button
+//                 className={`p-1 rounded text-gray-400 hover:text-[#333]`}
+//                 onClick={(e) => handleSortDirectionSelect('tenant', 'asc', e)}
+//               >
+//                 <ArrowUp className="h-3.5 w-3.5" />
+//               </button>
+//               <button
+//                 className={`p-1 rounded text-gray-400 hover:text-[#333]`}
+//                 onClick={(e) => handleSortDirectionSelect('tenant', 'desc', e)}
+//               >
+//                 <ArrowDown className="h-3.5 w-3.5" />
+//               </button>
+//             </div>
+//           </div>
+          
+//           {/* 그룹 정렬 옵션 */}
+//           <div className="flex items-center hover:bg-[#F4F6F9] cursor-pointer rounded-[3px] px-[6px] py-[4px]">
+//             <div className="flex-1 text-sm">그룹 보기</div>
+//             <div className="flex gap-1">
+//               <button
+//                 className={`p-1 rounded text-gray-400 hover:text-[#333]`}
+//                 onClick={(e) => handleSortDirectionSelect('group', 'asc', e)}
+//               >
+//                 <ArrowUp className="h-3.5 w-3.5" />
+//               </button>
+//               <button
+//                 className={`p-1 rounded text-gray-400 hover:text-[#333]`}
+//                 onClick={(e) => handleSortDirectionSelect('group', 'desc', e)}
+//               >
+//                 <ArrowDown className="h-3.5 w-3.5" />
+//               </button>
+//             </div>
+//           </div>
+          
+//           {/* 캠페인 정렬 옵션 */}
+//           <div className="flex items-center hover:bg-[#F4F6F9] cursor-pointer rounded-[3px] px-[6px] py-[4px]">
+//             <div className="flex-1 text-sm">캠페인 보기</div>
+//             <div className="flex gap-1">
+//               <button
+//                 className={`p-1 rounded text-gray-400 hover:text-[#333]`}
+//                 onClick={(e) => handleSortDirectionSelect('campaign', 'asc', e)}
+//               >
+//                 <ArrowUp className="h-3.5 w-3.5" />
+//               </button>
+//               <button
+//                 className={`p-1 rounded text-gray-400 hover:text-[#333]`}
+//                 onClick={(e) => handleSortDirectionSelect('campaign', 'desc', e)}
+//               >
+//                 <ArrowDown className="h-3.5 w-3.5" />
+//               </button>
+//             </div>
+//           </div>
+          
+//           <div className="border-t my-1"></div>
+          
+//         </div>
+//       </PopoverContent>
+//     </Popover>
+//   );
+// };
+
+// export default IFilterButtonForCampaignGroupTabHeader;
+
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import CommonButton from "@/components/shared/CommonButton";
-import { Check, CheckIcon, CheckSquare, Square } from "lucide-react";
-import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCampaignTab";
-import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
-import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
-import Image from 'next/image'
+import { ArrowUp, ArrowDown } from "lucide-react";
+import Image from 'next/image';
+import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
+import { SortField, SortDirection, NodeType } from "@/store/storeForSideMenuCampaignGroupTab";
 
-const IFilterButtonForCampaignTabHeader = () => {
-  const [showSkillFilter, setShowSkillFilter] = useState(false);
+const IFilterButtonForCampaignGroupTabHeader = () => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  // 로컬에서 선택된 스킬 ID를 관리하기 위한 상태 추가
-  const [localSelectedSkills, setLocalSelectedSkills] = useState<number[]>([]);
-
-  // 스토어에서 선택된 스킬 ID 목록과 필터 모드를 가져오기
-  const {
-    skilIdsForCampaignTreeMenu,
-    setSkilIdsForCampaignTreeMenu,
-    filterMode,
-    setFilterMode
-  } = useSideMenuCampaignTabStore();
   
-  // 할당 가능한 스킬 목록 가져오기
-  const { data: skills = [] } = useAssignableSkills();
+  // 스토어에서 정렬 상태 가져오기
+  const { 
+    sortField, 
+    sortDirection, 
+    sortByNodeType
+  } = useSideMenuCampaignGroupTabStore();
 
-  // 현재 "전체 선택" 상태 확인 (로컬 상태 기준)
-  const allSkillIds = skills.map(skill => skill.skill_id);
-  const allSelected = allSkillIds.length > 0 && 
-    allSkillIds.every(id => localSelectedSkills.includes(id));
-  const someSelected = localSelectedSkills.length > 0 && !allSelected;
-  
-  // 팝오버가 열릴 때 스토어 값으로 로컬 상태 초기화
-  useEffect(() => {
-    if (isPopoverOpen) {
-      setLocalSelectedSkills([...skilIdsForCampaignTreeMenu]);
-    }
-  }, [isPopoverOpen, skilIdsForCampaignTreeMenu]);
-
-  // 선택 스킬로 보기 클릭 처리
-  const handleSelectSkillsClick = () => {
-    setShowSkillFilter(true);
-  };
-
-  // 전체보기 클릭 처리
-  const handleViewAllClick = () => {
-    // 스토어의 선택된 스킬 ID 목록을 빈 배열로 설정 (체크박스 모두 해제 효과)
-    setSkilIdsForCampaignTreeMenu([]);
-
-    // 필터 모드를 'all'로 설정
-    setFilterMode("all");
-
-    // 팝오버 닫기
-    setShowSkillFilter(false);
-    setIsPopoverOpen(false);
-  };
-
-  // 확인 버튼 클릭 시 로컬 상태를 스토어에 반영하고 창 닫기
-  const handleConfirmClick = () => {
-    // 로컬 상태를 스토어에 반영
-    setSkilIdsForCampaignTreeMenu(localSelectedSkills);
+  // 정렬 필드 토글 (id/name)
+  const toggleSortField = (field: SortField) => {
+    // 현재 필드가 선택된 필드와 같으면 아무것도 하지 않음
+    if (sortField === field) return;
     
-    // 선택된 스킬이 있으면 필터 모드를 'skill'로, 없으면 'all'로 설정
-    setFilterMode(localSelectedSkills.length > 0 ? "skill" : "all");
-    
-    // 창 닫기
-    setShowSkillFilter(false);
-    setIsPopoverOpen(false);
+    // 다른 필드로 전환하면서 현재 방향 유지
+    sortByNodeType("tenant", field, sortDirection);
   };
 
-  // 전체 선택/해제 토글 기능 (로컬 상태만 변경)
-  const toggleAllSkills = () => {
-    if (allSelected) {
-      // 전체 해제
-      setLocalSelectedSkills([]);
-    } else {
-      // 전체 선택
-      setLocalSelectedSkills([...allSkillIds]);
-    }
-  };
-
-  // 자식 컴포넌트로 전달할 로컬 상태 관리 함수들
-  const handleLocalSkillChange = (skillIds: number[]) => {
-    setLocalSelectedSkills(skillIds);
+  // 노드 타입별 정렬 처리
+  const handleNodeTypeSort = (nodeType: NodeType, direction: SortDirection) => {
+    sortByNodeType(nodeType, sortField, direction);
   };
 
   return (
@@ -92,102 +158,98 @@ const IFilterButtonForCampaignTabHeader = () => {
         <CommonButton 
           variant="ghost" 
           size="sm" 
-          className="text-xs font-normal gap-[2px]  hover:bg-[transparent] text-[#888] !p-0"
+          className="text-xs font-normal gap-[2px] hover:bg-[transparent] text-[#888] !p-0"
         >
-          필터
+          정렬
           <Image 
-            src={`/tree-menu/filter.png`} 
-            alt={`필터`} 
+            src={`/tree-menu/array.png`} 
+            alt={`정렬`} 
             width={9} 
             height={10} 
           />
         </CommonButton>
       </PopoverTrigger>
-      <PopoverContent className="w-auto min-w-[150px] p-0 py-[10px] px-[12px] rounded-[3px] border border-[#333]" align="start">
-        {!showSkillFilter ? (
-          // 기본 필터 옵션 메뉴
-          <div className="flex flex-col">
-            <div className="">
-              <CommonButton
-                variant="ghost"
-                className="w-full justify-between rounded-[3px] px-[6px] py-[4px] text-sm text-[#333] hover:bg-[#F4F6F9]"
-                onClick={handleViewAllClick}
+      <PopoverContent className="w-auto min-w-[180px] p-0 py-[10px] px-[12px] rounded-[3px] border border-[#333]" align="start">
+        <div className="flex flex-col space-y-1">
+          {/* 정렬 기준 헤더와 필드 토글 */}
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium">정렬 기준</span>
+            <div className="flex border border-dashed border-red-500 rounded overflow-hidden">
+              <button
+                className={`px-2 py-0.5 text-xs ${sortField === "id" ? "bg-blue-100 text-blue-600" : "bg-white"}`}
+                onClick={() => toggleSortField("id")}
               >
-                <span>전체보기</span>
-                {filterMode === "all" && (
-                  <CheckIcon className="h-4 w-4 text-[#333]" />
-                )}
-              </CommonButton>
-            </div>
-            <div>
-              <CommonButton
-                variant="ghost"
-                className="w-full justify-between rounded-[3px] px-[6px] py-[4px] text-sm text-[#333] hover:bg-[#F4F6F9]"
-                onClick={handleSelectSkillsClick}
+                id
+              </button>
+              <button
+                className={`px-2 py-0.5 text-xs ${sortField === "name" ? "bg-blue-100 text-blue-600" : "bg-white"}`}
+                onClick={() => toggleSortField("name")}
               >
-                <span>선택 스킬로 보기</span>
-                {filterMode === "skill" && (
-                  <CheckIcon className="h-4 w-4 text-[#333]" />
-                )}
-              </CommonButton>
+                name
+              </button>
             </div>
           </div>
-        ) : (
-          // 스킬 필터 패널
-          <div className="p-0 w-[150px]">
-            <div className="flex items-center gap-3">
-              <CommonButton
-                variant="ghost"
-                onClick={() => setShowSkillFilter(false)}
-                className="text-sm text-[#333] !p-0"
+          
+          {/* 테넌트 정렬 옵션 */}
+          <div className="flex items-center hover:bg-[#F4F6F9] cursor-pointer rounded-[3px] px-[6px] py-[4px]">
+            <div className="flex-1 text-sm">테넌트 보기</div>
+            <div className="flex gap-1">
+              <button
+                className={`p-1 rounded text-gray-400 hover:text-[#333]`}
+                onClick={() => handleNodeTypeSort('tenant', 'asc')}
               >
-                &lt; 뒤로
-              </CommonButton>
-              <span className="text-sm text-[#333]">스킬 선택</span>
+                <ArrowUp className="h-3.5 w-3.5" />
+              </button>
+              <button
+                className={`p-1 rounded text-gray-400 hover:text-[#333]`}
+                onClick={() => handleNodeTypeSort('tenant', 'desc')}
+              >
+                <ArrowDown className="h-3.5 w-3.5" />
+              </button>
             </div>
-            <div className="mt-[12px] mb-[1px] hover:bg-[#F4F6F9]">
-              <CommonButton
-                  variant="ghost"
-                  onClick={toggleAllSkills}
-                  className="text-sm text-[#333] flex items-center !px-[6px] !py-[3px]"
-                  title={allSelected ? "전체 해제" : "전체 선택"}
-                >
-                  {allSelected ? (
-                    <>
-                      <div className="h-4 w-4 shrink-0 rounded-none border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:text-black border-[#000] data-[state=checked]:border-primary bg-[#fff] flex justify-center items-center">
-                          <Check className="h-4 w-4" />
-                      </div>
-                      <span className="ml-1 text-sm">모두 해제</span>
-                    </>
-                  ) : someSelected ? (
-                    <>
-                      <div className="relative">
-                        <div className="h-4 w-4 shrink-0 rounded-none border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:text-black border-[#b6b6b6] data-[state=checked]:border-primary bg-[#fff] flex justify-center items-center">
-                          <div className="h-3 w-3 bg-[#333]"></div>
-                        </div>
-                      </div>
-                      <span className="ml-1 text-sm">전체 선택</span>
-                    </>
-                  ) : (
-                    <>
-                        <div className="h-4 w-4 shrink-0 rounded-none border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:text-black border-[#b6b6b6] data-[state=checked]:border-primary bg-[#fff]">
-                        </div>
-                      <span className="ml-1 text-sm">전체 선택</span>
-                    </>
-                  )}
-                </CommonButton>
-            </div>
-            <SkilFilterOptionPannelForCampaignTab
-              shouldCloseOnConfirm={true}
-              onConfirm={handleConfirmClick}
-              selectedSkills={localSelectedSkills}
-              onSelectedSkillsChange={handleLocalSkillChange}
-            />
           </div>
-        )}
+          
+          {/* 그룹 정렬 옵션 */}
+          <div className="flex items-center hover:bg-[#F4F6F9] cursor-pointer rounded-[3px] px-[6px] py-[4px]">
+            <div className="flex-1 text-sm">그룹 보기</div>
+            <div className="flex gap-1">
+              <button
+                className={`p-1 rounded text-gray-400 hover:text-[#333]`}
+                onClick={() => handleNodeTypeSort('group', 'asc')}
+              >
+                <ArrowUp className="h-3.5 w-3.5" />
+              </button>
+              <button
+                className={`p-1 rounded text-gray-400 hover:text-[#333]`}
+                onClick={() => handleNodeTypeSort('group', 'desc')}
+              >
+                <ArrowDown className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+          
+          {/* 캠페인 정렬 옵션 */}
+          <div className="flex items-center hover:bg-[#F4F6F9] cursor-pointer rounded-[3px] px-[6px] py-[4px]">
+            <div className="flex-1 text-sm">캠페인 보기</div>
+            <div className="flex gap-1">
+              <button
+                className={`p-1 rounded text-gray-400 hover:text-[#333]`}
+                onClick={() => handleNodeTypeSort('campaign', 'asc')}
+              >
+                <ArrowUp className="h-3.5 w-3.5" />
+              </button>
+              <button
+                className={`p-1 rounded text-gray-400 hover:text-[#333]`}
+                onClick={() => handleNodeTypeSort('campaign', 'desc')}
+              >
+                <ArrowDown className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
       </PopoverContent>
     </Popover>
   );
 };
 
-export default IFilterButtonForCampaignTabHeader;
+export default IFilterButtonForCampaignGroupTabHeader;

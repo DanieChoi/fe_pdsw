@@ -9,20 +9,20 @@ import { FilterType, SortType, TreeItem } from "@/features/campaignManager/types
  * @param setWidth - width를 업데이트하는 함수
  */
 export const handleMouseMoveForSidebar = (e: MouseEvent, isResizing: boolean, setWidth: (width: number) => void) => {
-    if (!isResizing) return;
-    const newWidth = e.clientX;
-    if (newWidth >= 200 && newWidth <= 600) {
-      setWidth(newWidth);
-    }
-  };
-  
-  /**
-   * Sidebar에서 MouseUp 이벤트 핸들러
-   * @param setIsResizing - 리사이징 상태를 업데이트하는 함수
-   */
-  export const handleMouseUpForSidebar = (setIsResizing: (isResizing: boolean) => void) => {
-    setIsResizing(false);
-  };
+  if (!isResizing) return;
+  const newWidth = e.clientX;
+  if (newWidth >= 200 && newWidth <= 600) {
+    setWidth(newWidth);
+  }
+};
+
+/**
+ * Sidebar에서 MouseUp 이벤트 핸들러
+ * @param setIsResizing - 리사이징 상태를 업데이트하는 함수
+ */
+export const handleMouseUpForSidebar = (setIsResizing: (isResizing: boolean) => void) => {
+  setIsResizing(false);
+};
 
 // src/components/shared/layout/utils/utils.ts
 
@@ -123,16 +123,28 @@ export const sortTreeItemsForSidebar = (items: TreeItem[], type: SortType): Tree
 
 // \nproject\fe_pdsw\src\components\shared\layout\utils\utils.ts
 export const getStatusIcon = (status?: string) => {
-    switch (status) {
-      case 'started':
-        return '/sidebar-menu/tree_play.svg';
-      case 'pending':
-        return '/sidebar-menu/tree_pause.svg';
-      case 'stopped':
-        return '/sidebar-menu/tree_stop.svg';
-      default:
-        return null;
-    }
-  };
+  switch (status) {
+    case 'started':
+      return '/sidebar-menu/tree_play.svg';
+    case 'pending':
+      return '/sidebar-menu/tree_pause.svg';
+    case 'stopped':
+      return '/sidebar-menu/tree_stop.svg';
+    default:
+      return null;
+  }
+};
 
-  
+export const getStatusIconWithStartFlag = (status?: number) => {
+  switch (status) {
+    case 1:
+      return '/sidebar-menu/tree_play.svg';
+    case 2:
+      return '/sidebar-menu/tree_pause.svg';
+    case 3:
+      return '/sidebar-menu/tree_stop.svg';
+    default:
+      return null;
+  }
+};
+
