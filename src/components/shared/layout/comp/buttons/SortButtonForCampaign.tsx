@@ -7,43 +7,37 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import CommonButton from "@/components/shared/CommonButton";
-import { Check, ArrowUp, ArrowDown } from "lucide-react";
-import { SortType, SortDirection, SortOption } from '@/store/storeForSideBarCampaignSort';
+import { ArrowUp, ArrowDown } from "lucide-react";
 import Image from 'next/image';
-
-interface SortButtonForCampaignProps {
-  onSort?: (option: SortOption) => void;
-  selectedSort?: SortOption;
-}
+import { SortDirection, SortType } from '@/store/storeForSideBarCampaignSort';
+import { useTreeMenuStore } from '@/store/storeForSsideMenuCampaignTab';
 
 const campaignSortOptions: Array<{ id: SortType; label: string }> = [
   { id: 'name', label: '이름순' },
   { id: 'id', label: '아이디순' },
 ];
 
-export function SortButtonForCampaign({ 
-  onSort, 
-  selectedSort 
-}: SortButtonForCampaignProps) {
+export function SortButtonForCampaign() {
   const [isOpen, setIsOpen] = React.useState(false);
+  const { campaignSort, setCampaignSort } = useTreeMenuStore();
 
-  // Handle sort type selection (clicking the row)
+  // 행 클릭 시 정렬 타입 선택 처리
   const handleSortSelect = (sortType: SortType) => {
-    if (selectedSort?.type === sortType) {
-      // Toggle direction if same type is selected
-      const newDirection: SortDirection = selectedSort.direction === 'asc' ? 'desc' : 'asc';
-      onSort?.({ type: sortType, direction: newDirection });
+    if (campaignSort.type === sortType) {
+      // 같은 타입 선택 시 방향 전환
+      const newDirection: SortDirection = campaignSort.direction === 'asc' ? 'desc' : 'asc';
+      setCampaignSort({ type: sortType, direction: newDirection });
     } else {
-      // Default to ascending for new sort type
-      onSort?.({ type: sortType, direction: 'asc' });
+      // 새로운 타입 선택 시 오름차순 기본값
+      setCampaignSort({ type: sortType, direction: 'asc' });
     }
     setIsOpen(false);
   };
 
-  // Handle direction selection (prevent event bubbling)
+  // 방향 버튼 클릭 시 처리 (이벤트 버블링 방지)
   const handleDirectionSelect = (sortType: SortType, direction: SortDirection, event: React.MouseEvent) => {
     event.stopPropagation();
-    onSort?.({ type: sortType, direction });
+    setCampaignSort({ type: sortType, direction });
     setIsOpen(false);
   };
 
@@ -76,7 +70,7 @@ export function SortButtonForCampaign({
               <div className="flex gap-1">
                 <button
                   className={`p-1 rounded ${
-                    selectedSort?.type === option.id && selectedSort?.direction === 'asc'
+                    campaignSort.type === option.id && campaignSort.direction === 'asc'
                       ? 'bg-[#F4F6F9] text-[#333]'
                       : 'text-gray-400 hover:text-[#333]'
                   }`}
@@ -86,7 +80,7 @@ export function SortButtonForCampaign({
                 </button>
                 <button
                   className={`p-1 rounded ${
-                    selectedSort?.type === option.id && selectedSort?.direction === 'desc'
+                    campaignSort.type === option.id && campaignSort.direction === 'desc'
                       ? 'bg-[#F4F6F9] text-[#333]'
                       : 'text-gray-400 hover:text-[#333]'
                   }`}

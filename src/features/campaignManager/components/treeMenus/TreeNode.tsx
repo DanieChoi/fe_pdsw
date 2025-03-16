@@ -1,4 +1,3 @@
-
 "use client";
 
 import { TreeNodeProps } from "@/components/shared/layout/SidebarPresenter";
@@ -9,8 +8,8 @@ import { useCallback } from "react";
 import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { FolderContextMenu } from "./FolderContextMenuForTreeNode";
 import Image from "next/image";
-import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
 import clsx from "clsx";
+import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 
 export function TreeNode({
   item,
@@ -21,7 +20,7 @@ export function TreeNode({
   onNodeToggle,
   onNodeSelect,
 }: TreeNodeProps) {
-  const { skilIdsForCampaignTreeMenu } = useSideMenuCampaignTabStore();
+  const { skilIdsForCampaignTreeMenu } = useTreeMenuStore(); // 통합 스토어 사용
   const {
     simulateHeaderMenuClick,
     setCampaignIdForUpdateFromSideMenu,
@@ -91,12 +90,11 @@ export function TreeNode({
   const handleEdit = () => {
     console.log("Edit clicked:", { id: item.id, label: item.label, type: item.type });
   };
-  // const handleDelete = () => {
-  //   console.log("Delete clicked:", { id: item.id, label: item.label, type: item.type });
-  // };
+  
   const handleMonitor = () => {
     console.log("Monitor clicked:", { id: item.id, label: item.label, type: item.type });
   };
+  
   const onHandleCampaignCopy = () => {
     console.log("Copy clicked:", { id: item.id, label: item.label, type: item.type });
     setCampaignIdForUpdateFromSideMenu(item.id);
@@ -167,7 +165,6 @@ export function TreeNode({
         <ContextMenuForTreeNode
           item={item}
           onEdit={handleEdit}
-          // onDelete={handleDelete}
           onMonitor={handleMonitor}
           onHandleCampaignCopy={onHandleCampaignCopy}
         >

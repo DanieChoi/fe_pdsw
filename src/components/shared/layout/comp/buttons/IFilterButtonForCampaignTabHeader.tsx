@@ -3,25 +3,24 @@
 import React, { useState, useEffect } from "react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import CommonButton from "@/components/shared/CommonButton";
-import { Check, CheckIcon, CheckSquare, Square } from "lucide-react";
-import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
+import { Check, CheckIcon } from "lucide-react";
 import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
 import Image from 'next/image'
 import SkilFilterOptionPannelForCampaignTab from "../TabActions/SkilFilterOptionPannelForCampaignTab";
+import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 
 const IFilterButtonForCampaignTabHeader = () => {
   const [showSkillFilter, setShowSkillFilter] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  // 로컬에서 선택된 스킬 ID를 관리하기 위한 상태 추가
   const [localSelectedSkills, setLocalSelectedSkills] = useState<number[]>([]);
 
-  // 스토어에서 선택된 스킬 ID 목록과 필터 모드를 가져오기
+  // 통합 스토어에서 필터 관련 상태와 메서드 가져오기
   const {
     skilIdsForCampaignTreeMenu,
     setSkilIdsForCampaignTreeMenu,
     filterMode,
     setFilterMode
-  } = useSideMenuCampaignTabStore();
+  } = useTreeMenuStore();
   
   // 할당 가능한 스킬 목록 가져오기
   const { data: skills = [] } = useAssignableSkills();

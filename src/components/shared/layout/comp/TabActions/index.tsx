@@ -1,80 +1,12 @@
-// import { FilterType } from '@/features/campaignManager/types/typeForSidebar2';
-// import { SortButtonForCampaign } from '../buttons/SortButtonForCampaign';
-// import OptionButtonsForSideMenuAgentTab from '../buttons/OptionButtonsForSideMenuAgentTab';
-// import SortButtonForCounsellorGroup from '../buttons/SortButtonForCounsellorGroup';
-// import IFilterButtonForCampaignTabHeader from './IFilterButtonForCampaignTabHeader';
-// import { useSortStore, SortOption } from '@/store/storeForSideBarCampaignSort';
-// import ISearchButtonForFindForGroupOrCampaign from '../buttons/ISearchButtonForFindForGroupOrCampaign';
-
-// interface TabActionsProps {
-//   tabId: string;
-//   onFilter?: (type: FilterType) => void;
-//   // These props are for backward compatibility
-//   onSort?: (type: any) => void;
-//   selectedFilter?: FilterType;
-//   selectedSort?: any;
-// }
-
-// export function TabActions({
-//   tabId,
-//   onFilter,
-//   onSort,
-//   selectedFilter,
-//   selectedSort
-// }: TabActionsProps) {
-//   // Get the sort state and setter from the store
-//   const { campaignSort, setCampaignSort } = useSortStore();
-
-//   // Handle sort selection with new option format
-//   const handleSort = (option: SortOption) => {
-//     // Update the global sort state
-//     setCampaignSort(option);
-
-//     // Call the onSort prop if provided (for backward compatibility)
-//     if (onSort) {
-//       // Only pass the type for backward compatibility
-//       onSort(option.type);
-//     }
-//   };
-
-//   switch (tabId) {
-//     case 'campaign':
-//       return (
-//         <div className="flex items-center gap-[10px]">
-//           <IFilterButtonForCampaignTabHeader />
-//           <SortButtonForCampaign
-//             onSort={handleSort}
-//             selectedSort={campaignSort} // Use the global state
-//           />
-//         </div>
-//       );
-//     case 'agent':
-//       return (
-//         <div className="flex items-center gap-[10px]">
-//           <OptionButtonsForSideMenuAgentTab />
-//         </div>
-//       );
-//     case 'campaign-group':
-//       return (
-//         <div className="flex items-center gap-[10px]">
-//           {/* The search button now directly uses the store */}
-//           <ISearchButtonForFindForGroupOrCampaign />
-//           <IFilterButtonForCampaignGroupTabHeader />
-//         </div>
-//       );
-//     default:
-//       return null;
-//   }
-// }
+"use client";
 
 import { FilterType } from '@/features/campaignManager/types/typeForSidebar2';
 import { SortButtonForCampaign } from '../buttons/SortButtonForCampaign';
 import OptionButtonsForSideMenuAgentTab from '../buttons/OptionButtonsForSideMenuAgentTab';
-import SortButtonForCounsellorGroup from '../buttons/SortButtonForCounsellorGroup';
-import { useSortStore, SortOption } from '@/store/storeForSideBarCampaignSort';
 import ISearchButtonForFindForGroupOrCampaign from '../buttons/ISearchButtonForFindForGroupOrCampaign';
 import IFilterButtonForCampaignGroupTabHeader from './IFilterButtonForCampaignGroupTabHeader';
 import IFilterButtonForCampaignTabHeader from '../buttons/IFilterButtonForCampaignTabHeader';
+import { SortOption, useTreeMenuStore } from '@/store/storeForSsideMenuCampaignTab';
 
 interface TabActionsProps {
   tabId: string;
@@ -92,17 +24,16 @@ export function TabActions({
   selectedFilter,
   selectedSort
 }: TabActionsProps) {
-  // Get the sort state and setter from the store
-  const { campaignSort, setCampaignSort } = useSortStore();
+  // 통합 스토어에서 정렬 상태와 setter 가져오기
+  const { campaignSort, setCampaignSort } = useTreeMenuStore();
 
-  // Handle sort selection with new option format
+  // 정렬 옵션 선택 처리
   const handleSort = (option: SortOption) => {
-    // Update the global sort state
+    // 통합 스토어 상태 업데이트
     setCampaignSort(option);
 
-    // Call the onSort prop if provided (for backward compatibility)
+    // 이전 버전 호환성을 위한 onSort prop 처리 (있는 경우)
     if (onSort) {
-      // Only pass the type for backward compatibility
       onSort(option.type);
     }
   };
@@ -112,10 +43,7 @@ export function TabActions({
       return (
         <div className="flex items-center gap-[10px]">
           <IFilterButtonForCampaignTabHeader />
-          <SortButtonForCampaign
-            onSort={handleSort}
-            selectedSort={campaignSort} // Use the global state
-          />
+          <SortButtonForCampaign />
         </div>
       );
     case 'agent':

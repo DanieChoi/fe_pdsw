@@ -4,10 +4,9 @@ import {
   ContextMenuContent,
   ContextMenuItem,
 } from "@/components/ui/context-menu";
-import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useTabStore } from "@/store/tabStore";
-import { Check } from "lucide-react";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
+import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 
 export interface FolderContextMenuProps {
   item: {
@@ -18,7 +17,7 @@ export interface FolderContextMenuProps {
 
 export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
   const { addTab, openedTabs, setActiveTab } = useTabStore();
-  const { selectedMenus, toggleMenu } = useSideMenuCampaignTabStore();
+  const { selectedMenus, toggleMenu } = useTreeMenuStore(); // 통합 스토어 사용
 
   // 체크박스가 필요한 메뉴 ID
   const checkableMenuIds = [14, 23];
@@ -56,7 +55,6 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
         });
       },
     },
-
   ];
 
   return (

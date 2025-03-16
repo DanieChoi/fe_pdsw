@@ -4,49 +4,97 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useSideMenuCampaignTabStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
+import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 
 interface Skill {
   skill_id: number;
   skill_name: string;
 }
 
-// closePanel 콜백 추가
-const SkilFilterOptionPannelForCampaignTab = ({ closePanel }: { closePanel?: () => void }) => {
+interface SkilFilterOptionPannelProps {
+  closePanel?: () => void;
+  onConfirm?: () => void;
+  selectedSkills?: number[];
+  onSelectedSkillsChange?: (skills: number[]) => void;
+  shouldCloseOnConfirm?: boolean;
+}
+
+const SkilFilterOptionPannelForCampaignTab = ({
+  closePanel,
+  onConfirm,
+  selectedSkills: externalSelectedSkills,
+  onSelectedSkillsChange,
+  shouldCloseOnConfirm = false
+}: SkilFilterOptionPannelProps) => {
   const { tenant_id } = useAuthStore();
+  
+  // 통합 스토어에서 스킬 ID 목록 가져오기
+  const { skilIdsForCampaignTreeMenu, setSkilIdsForCampaignTreeMenu, setFilterMode } = useTreeMenuStore();
   
   // 할당 가능한 스킬 목록 가져오기
   const { data: skills = [] as Skill[], isLoading, isError } = useAssignableSkills();
   
-  // zustand 스토어에서 skilIdsForCampaignTreeMenu 가져오기
-  const { skilIdsForCampaignTreeMenu, setSkilIdsForCampaignTreeMenu } = useSideMenuCampaignTabStore();
-
   // 로컬 상태로 체크 박스 선택 상태 관리
-  const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
+  const [localSelectedSkills, setLocalSelectedSkills] = useState<number[]>([]);
 
-  // 스토어에서 불러온 기존 선택된 스킬을 로컬 상태와 동기화
+  // 외부에서 선택된 스킬이 있으면 우선 사용, 없으면 스토어 값 사용
   useEffect(() => {
-    setSelectedSkills(skilIdsForCampaignTreeMenu);
-  }, [skilIdsForCampaignTreeMenu]);
+    if (externalSelectedSkills) {
+      setLocalSelectedSkills(externalSelectedSkills);
+    } else {
+      setLocalSelectedSkills(skilIdsForCampaignTreeMenu);
+    }
+  }, [externalSelectedSkills, skilIdsForCampaignTreeMenu]);
 
   // 체크박스 변경 핸들러
   const handleSkillChange = (skill_id: number) => {
-    setSelectedSkills((prev) =>
-      prev.includes(skill_id) ? prev.filter((id) => id !== skill_id) : [...prev, skill_id]
-    );
+    const updatedSkills = localSelectedSkills.includes(skill_id)
+      ? localSelectedSkills.filter((id) => id !== skill_id)
+      : [...localSelectedSkills, skill_id];
+    
+    setLocalSelectedSkills(updatedSkills);
+    
+    // 외부 상태 업데이트 콜백이 있으면 호출
+    if (onSelectedSkillsChange) {
+      onSelectedSkillsChange(updatedSkills);
+    }
   };
 
-  // 확인 버튼 → 선택한 스킬 ID를 zustand 스토어에 저장하고 패널 닫기
+  // 확인 버튼 → 선택한 스킬 ID를 스토어에 저장하고 패널 닫기
   const handleConfirm = () => {
-    setSkilIdsForCampaignTreeMenu(selectedSkills);
-    if (closePanel) closePanel();
+    // 외부에서 관리되는 경우 외부 콜백만 실행
+    if (onConfirm) {
+      onConfirm();
+    } 
+    // 외부에서 관리되지 않는 경우 스토어 직접 업데이트
+    else {
+      setSkilIdsForCampaignTreeMenu(localSelectedSkills);
+      // 선택된 스킬이 있으면 필터 모드를 'skill'로, 없으면 'all'로 설정
+      setFilterMode(localSelectedSkills.length > 0 ? 'skill' : 'all');
+      
+      if (shouldCloseOnConfirm && closePanel) {
+        closePanel();
+      }
+    }
+    
+    // 항상 패널 닫기 (외부 콜백이 처리하지 않는 경우)
+    if (!onConfirm && closePanel) {
+      closePanel();
+    }
   };
 
   // 취소 버튼 → 로컬 상태 초기화하고 패널 닫기
   const handleCancel = () => {
-    setSelectedSkills(skilIdsForCampaignTreeMenu); // 기존 값으로 복원
-    if (closePanel) closePanel();
+    if (externalSelectedSkills) {
+      setLocalSelectedSkills(externalSelectedSkills);
+    } else {
+      setLocalSelectedSkills(skilIdsForCampaignTreeMenu);
+    }
+    
+    if (closePanel) {
+      closePanel();
+    }
   };
 
   return (
@@ -74,7 +122,7 @@ const SkilFilterOptionPannelForCampaignTab = ({ closePanel }: { closePanel?: () 
                     <div className="flex justify-center items-center">
                       <Checkbox
                         id={`skill-${skill_id}`}
-                        checked={selectedSkills.includes(skill_id)}
+                        checked={localSelectedSkills.includes(skill_id)}
                         onCheckedChange={() => handleSkillChange(skill_id)}
                       />
                     </div>
