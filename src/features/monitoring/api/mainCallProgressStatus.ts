@@ -12,9 +12,9 @@ export const fetchCallProgressStatus = async (credentials: CallProgressStatusReq
   };
 
   try {
-    const { data } = await axiosRedisInstance.get<CallProgressStatusResponse>(
+    const { data } = await axiosRedisInstance.post<CallProgressStatusResponse>(
       `/monitor/tenant/campaign/dial`,
-      { params: callProgressStatusRequestData }
+      callProgressStatusRequestData 
     );
     return data;
   } catch (error: any) {
