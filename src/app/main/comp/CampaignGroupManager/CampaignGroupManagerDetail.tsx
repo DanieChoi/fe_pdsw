@@ -34,6 +34,8 @@ import CampaignTab from '@/app/main/comp/CampaignManager/CampaignTab';
 import { DataProps, downDataProps } from './CampaignGroupManagerList';
 import AddCampaignGroupDialog from "./AddCampaignGroupDialog";
 import CampaignAddPopup from '@/features/campaignManager/components/popups/CampaignAddPopup';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 const dialModeList = [
   { dial_id: 1, dial_name: 'Power' },
@@ -341,6 +343,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
     type: '1',
   });
   const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
+  const router = useRouter();
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
@@ -1044,6 +1047,18 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
   const { mutate: fetchCampaignManagerUpdate } = useApiForCampaignManagerUpdate({
     onSuccess: (data) => {
       setCampaignInfoChangeYn(false);
+    },onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
     }
   });
 
@@ -1160,6 +1175,11 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
   const handleCloseAddGroupDialog = () => {
     setIsAddGroupDialogOpen(false);
   };
+  // 소속캠페인 추가 다이얼로그 열기
+  const handleCloseCampaignDialog = () => {
+    onInit();
+    setIsCampaignAddPopupOpen(false);
+  }
 
   const handleAddGroup = (groupName: string, groupCode: string) => {
     onInit();
@@ -1345,7 +1365,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
       <CampaignAddPopup
         isOpen={isCampaignAddPopupOpen}
         groupId={groupInfo.campaignGroupId}
-        onClose={() => setIsCampaignAddPopupOpen(false)}
+        onClose={handleCloseCampaignDialog}
         // groupName={''}
       />
     </div>

@@ -197,12 +197,36 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   const { mutate: fetchCampaignGroupDelete } = useApiForCampaignGroupDelete({
     onSuccess: (data) => {
       handleInit();
+    },onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
     }
   });
   // 캠페인 그룹 소속 캠페인 삭제
   const { mutate: fetchCampaignGroupCampaignListDelete } = useApiForCampaignGroupCampaignListDelete({
     onSuccess: (data) => {
       
+    },onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
     }
   });
   
