@@ -20,6 +20,7 @@ import { useApiForCampaignStatusUpdate } from '@/features/campaignManager/hooks/
 import { CheckCampaignSaveReturnCode } from '@/components/common/common';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import { useApiForDialSpeedUpdate } from '@/features/campaignManager/hooks/useApiForDialSpeedUpdate';
 
 
 const errorMessage: CustomAlertRequest = {
@@ -136,7 +137,7 @@ const MonitorPage = () => {
 
   const [selectedCampaign, setSelectedCampaign] = useState<string>('');
   const [campaignStatus, setCampaignStatus] = useState<CampaignStatus>('멈춤');
-  const [callPacing, setCallPacing] = useState<number>(100);
+  const [callPacing, setCallPacing] = useState<number>(0);
   const [_campaigns, _setCampaigns] = useState<Campaign[]>([]);
   const [campaignList, setCampaignList ] = useState<any[]>([]);
   const [campaignSkillList, setCampaignSkillList ] = useState<any[]>([]);
@@ -299,6 +300,28 @@ const MonitorPage = () => {
     }
   });
 
+  //캠페인 발신 속도 수정 api 호출
+  const { mutate: fetchDialSpeedUpdate } = useApiForDialSpeedUpdate({
+    onSuccess: (data) => {
+      fetchMain({
+        session_key: '',
+        tenant_id: tenant_id,
+      });
+    },onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
+    }
+  });
+
    // 캠페인 관련 핸들러
    const handleStatusChange = (newStatus: string) => {
     setCampaignStatus(newStatus as CampaignStatus);
@@ -311,6 +334,8 @@ const MonitorPage = () => {
 
     const handleCampaignSelect = (campaignId: string) => {
       setSelectedCampaign(campaignId);
+      const tempCampaignInfo = campaigns.find(c => c.campaign_id === Number(campaignId));
+      setCallPacing(tempCampaignInfo?.dial_mode === 2 ? tempCampaignInfo.dial_speed * 2 : tempCampaignInfo?.dial_mode === 3 ? tempCampaignInfo.dial_speed : 0);
       // API 호출 로직 추가
     };
 
@@ -323,7 +348,13 @@ const MonitorPage = () => {
 
     const handleCallPacingApply = () => {
       console.log('Applying call pacing:', callPacing);
-      // TODO: API 호출하여 콜페이싱 값 적용
+      const tempCampaign = campaigns.find(c => c.campaign_id === Number(selectedCampaign));
+      //캠페인 발신 속도 수정 api 호출
+      fetchDialSpeedUpdate({
+        campaign_id: Number(selectedCampaign),
+        dial_speed: tempCampaign?.dial_mode === 2 ? callPacing/2 : tempCampaign?.dial_mode === 3 ? callPacing : 0,
+        tenant_id: tempCampaign?.tenant_id ?? 0
+      });
     };
 
     const handleRebroadcastEdit = () => {
@@ -527,25 +558,27 @@ const MonitorPage = () => {
       const tempCampaign = _campaigns.find(c => c.id === selectedCampaign)||initData;
       setCurrentCampaign(tempCampaign);
       setCampaignStatus(tempCampaign.startFlag === 1 ? '시작' : tempCampaign.startFlag === 2 ? '멈춤' : '중지');
+      const tempCampaignInfo = campaigns.find(c => c.campaign_id === Number(tempCampaign.id));
+      setCallPacing(tempCampaignInfo?.dial_mode === 2 ? tempCampaignInfo.dial_speed * 2 : tempCampaignInfo?.dial_mode === 3 ? tempCampaignInfo.dial_speed : 0);
     }
   }, [selectedCampaign]);
 
   useEffect(() => {
     if( campaignList.length > 0 && campaignSkillList.length > 0 ){
       const updatedCampaigns:Campaign[] = campaignList.map((data) => ({
-          id: data.campaign_id,
-          name: `[${data.campaign_id}]${data.campaign_name}`,
-          skills: campaignSkillList.filter((skill) => skill.campaign_id === data.campaign_id)
-              .map((data) => data.skill_id).join(',').split(',').map((data) => Number(data)),
-          endTime: '',
-          startFlag: data.start_flag,
-          tenant_id: data.tenant_id,
-        }));
-        if( selectedCampaign === '' ){
-          setSelectedCampaign(updatedCampaigns[0].id);
-        }
-        _setCampaigns(updatedCampaigns);
-      }      
+        id: data.campaign_id,
+        name: `[${data.campaign_id}]${data.campaign_name}`,
+        skills: campaignSkillList.filter((skill) => skill.campaign_id === data.campaign_id)
+            .map((data) => data.skill_id).join(',').split(',').map((data) => Number(data)),
+        endTime: '',
+        startFlag: data.start_flag,
+        tenant_id: data.tenant_id,
+      }));
+      if( selectedCampaign === '' ){
+        setSelectedCampaign(updatedCampaigns[0].id);
+      }
+      _setCampaigns(updatedCampaigns);
+    }      
 
   }, [campaignList,campaignSkillList]);
   
