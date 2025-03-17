@@ -9,9 +9,9 @@ export interface CustomAlertRequest {
     isOpen?: boolean;
     onClose: () => void;
     onCancle?: () => void;
-    width?: string; // width prop 추가
+    width?: string;
     showButtons?: boolean;
-    confirmDisabled?: boolean; // 확인 버튼 비활성화 여부
+    confirmDisabled?: boolean;
 }
 
 const CustomAlert = ({
@@ -21,7 +21,7 @@ const CustomAlert = ({
     isOpen = true,
     onClose,
     onCancle,
-    width = 'max-w-sm', // 기본값 설정
+    width = 'max-w-sm',
     showButtons = true,
     confirmDisabled = false
 }: CustomAlertRequest) => {
@@ -38,7 +38,6 @@ const CustomAlert = ({
                     }
                 }
             }}
-
         >
             <AlertDialogContent className={`p-0 ${width} rounded-none border shadow-sm`}>
                 <AlertDialogHeader className="bg-[#AAA] px-4 py-2 border-b rounded-tl-[.5rem] rounded-tr-[.5rem]">
@@ -61,7 +60,11 @@ const CustomAlert = ({
                         <div className="flex justify-end gap-1.5">
                             {type === '1' ? (
                                 <>
-                                    <CommonButton onClick={onClose} disabled={confirmDisabled}>
+                                    <CommonButton 
+                                        onClick={onClose} 
+                                        disabled={confirmDisabled}
+                                        className={confirmDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+                                    >
                                         확인
                                     </CommonButton>
                                     {onCancle && (
@@ -72,7 +75,11 @@ const CustomAlert = ({
                                 </>
                             ) : type === '0' ? (
                                 <>
-                                    <CommonButton onClick={onClose} disabled={confirmDisabled}>
+                                    <CommonButton 
+                                        onClick={onClose} 
+                                        disabled={confirmDisabled}
+                                        className={confirmDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+                                    >
                                         확인
                                     </CommonButton>
                                     <CommonButton variant="outline" onClick={onClose}>
@@ -81,7 +88,11 @@ const CustomAlert = ({
                                 </>
                             ) : (
                                 <>
-                                    <CommonButton onClick={onClose} disabled={confirmDisabled}>
+                                    <CommonButton 
+                                        onClick={onClose} 
+                                        disabled={confirmDisabled}
+                                        className={confirmDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+                                    >
                                         확인
                                     </CommonButton>
                                 </>
