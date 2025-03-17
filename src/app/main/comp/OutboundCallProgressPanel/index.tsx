@@ -10,8 +10,6 @@ import { useApiForCallProgressStatus } from '@/features/monitoring/hooks/useApiF
 import { useMainStore, useCampainManagerStore } from '@/store';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
-import { CallProgressStatusResponseDataType } from '@/features/monitoring/types/monitoringIndex';
-import { useApiForAgentStateMonitoringList } from '@/features/monitoring/hooks/useApiForAgentStateMonitoringList';
 
 // 타입 정의
 interface Stats {
@@ -62,12 +60,6 @@ interface Column extends DataGridColumn<GridData> {
   name: string;
 }
 
-interface OutboundCallProgressPanelProps {
-  externalCampaignId?: string;
-  onCampaignChange?: (campaignId: string) => void;
-  onDataUpdate?: (data: CampaignData) => void;
-}
-
 // 발신진행상태 목록 데이터 타입
 interface SummaryCallProgressStatusDataType {
   campaignId: number;                 //캠페인ID
@@ -88,6 +80,12 @@ interface SummaryCallProgressStatusDataType {
   distributing: number;               //분배 대기
   result: string;                     //다이얼 결과
   phoneType: string;                  //발신번호 구분
+}
+
+interface OutboundCallProgressPanelProps {
+  externalCampaignId?: string;
+  onCampaignChange?: (campaignId: string) => void;
+  onDataUpdate?: (data: CampaignData) => void;
 }
 
 const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
@@ -297,7 +295,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   };
 
   // Select 컴포넌트 렌더링 여부 결정
-  const shouldRenderSelect = externalCampaignId === undefined;
+  const [ shouldRenderSelect , setShouldRenderSelect ] = useState<boolean>(false);
 
   // 발신 진행 정보 api 호출
   const { mutate: fetchCallProgressStatus } = useApiForCallProgressStatus({
@@ -388,26 +386,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
                   { name: '분배 대기', value: 0 }
                 ],
                 gridData: [
-                  {
-                    skillId: '',
-                    campaignId: '',
-                    campaignName: '',
-                    priority: '',
-                    custKey: '',
-                    custName: '',
-                    phoneType: '',
-                    phone1: '',
-                    attempt1: '',
-                    phone2: '',
-                    attempt2: '',
-                    phone3: '',
-                    attempt3: '',
-                    phone4: '',
-                    attempt4: '',
-                    phone5: '',
-                    attempt5: '',
-                    result: ''
-                  }
                 ]
               }
         });
@@ -432,6 +410,19 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     }
   });
   
+  useEffect(() => {
+    if( externalCampaignId ){
+      const campaignInfo = campaigns.find(data => data.campaign_id === Number(externalCampaignId));
+      fetchCallProgressStatus({
+        tenantId: campaignInfo?.tenant_id+'' || '1',
+        campaignId: campaignInfo?.campaign_id+'' || '0'
+      });
+      setShouldRenderSelect(false);
+    }else{
+      setShouldRenderSelect(true);
+    }
+  }, [externalCampaignId]);
+
   useEffect(() => {
     if( campaignSkills.length > 0 && phoneDescriptions.length > 0){
       fetchCallProgressStatus({

@@ -166,17 +166,29 @@ const ListManager: React.FC = () => {
       setUploadedFiles([]);
       setSendList([]);
     }
-    , onError: (data) => {
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const seconds = now.getSeconds().toString().padStart(2, '0');
-      const newProgressListData = { ...progressListData
-        , id: progressList.length+1
-        , datetime: hours + ':' + minutes + ':' + seconds
-        , message: '파일 전송 도중 에러 : ' + data.message
-      };
-      setProgressList(prev => [newProgressListData, ...prev]);
+    , onError: (data) => {  
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        const newProgressListData = { ...progressListData
+          , id: progressList.length+1
+          , datetime: hours + ':' + minutes + ':' + seconds
+          , message: '파일 전송 도중 에러 : ' + data.message
+        };
+        setProgressList(prev => [newProgressListData, ...prev]);
+      } 
     }
   });
   
@@ -206,16 +218,28 @@ const ListManager: React.FC = () => {
       setSendList([]);
     }
     , onError: (data) => {
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const seconds = now.getSeconds().toString().padStart(2, '0');
-      const newProgressListData = { ...progressListData
-        , id: progressList.length+1
-        , datetime: hours + ':' + minutes + ':' + seconds
-        , message: '파일 전송 도중 에러 : ' + data.message
-      };
-      setProgressList(prev => [newProgressListData, ...prev]);
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        const newProgressListData = { ...progressListData
+          , id: progressList.length+1
+          , datetime: hours + ':' + minutes + ':' + seconds
+          , message: '파일 전송 도중 에러 : ' + data.message
+        };
+        setProgressList(prev => [newProgressListData, ...prev]);
+      }
     }
   });
 
