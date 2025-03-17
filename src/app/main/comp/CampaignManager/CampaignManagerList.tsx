@@ -86,7 +86,7 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
   }, [campaigns, campaignId]);
 
   useEffect(() => {
-    if( tempCampaigns.length > 0 ){
+    if( tempCampaigns && tempCampaigns.length > 0 ){
       setTempData([]);
       tempCampaigns.map((data, index) => {
         setTempData((prev) => [
@@ -157,7 +157,7 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
 
   return (
     <div className="w-[40%] shrink-0">
-      <TitleWrap title="캠페인 목록" totalCount={tempCampaigns.length} />
+      <TitleWrap title="캠페인 목록" totalCount={tempCampaigns?.length || 0} />
       <div className="overflow-x-auto">
         <div className="grid-custom-wrap h-[500px]">
           <DataGrid 

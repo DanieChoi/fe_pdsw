@@ -373,11 +373,49 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
           Object.assign(tempCampaignData, _tempCampaignData);
         }
         _setCampaignData(tempCampaignData);
+      }else{
+        _setCampaignData({
+              ' ': {
+                stats: {
+                  waiting: data.waitingCounselorCnt,
+                  firstCall: 0,
+                  retryCall: 0,
+                  distributing: 0
+                },
+                barData: [
+                  { name: '최초 발신용', value: 0 },
+                  { name: '재시도 발신용', value: 0 },
+                  { name: '분배 대기', value: 0 }
+                ],
+                gridData: [
+                  {
+                    skillId: '',
+                    campaignId: '',
+                    campaignName: '',
+                    priority: '',
+                    custKey: '',
+                    custName: '',
+                    phoneType: '',
+                    phone1: '',
+                    attempt1: '',
+                    phone2: '',
+                    attempt2: '',
+                    phone3: '',
+                    attempt3: '',
+                    phone4: '',
+                    attempt4: '',
+                    phone5: '',
+                    attempt5: '',
+                    result: ''
+                  }
+                ]
+              }
+        });
       }
       // setDataList(tempList);
       // setSelectedCall(tempList[0]);
-      console.log("API 응답 데이터:", tempList);
-    }
+      console.log("API 응답 데이터:", tempList); 
+    } 
   });
   
   // 전화번호설명 템플릿 조회
@@ -418,12 +456,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         tenant_id: 0,
       });
       count++;
-    }
-    if( count === 0){
-      fetchCallProgressStatus({
-        tenantId: '1',
-        campaignId: '0'
-      });
     }
   }, []);
 
