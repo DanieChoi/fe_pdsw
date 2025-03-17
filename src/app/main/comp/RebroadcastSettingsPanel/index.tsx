@@ -698,6 +698,18 @@ const RebroadcastSettingsPanel = () => {
             setReservationShouldShowDelete(true);
 
             setTextType('미실행');
+        },onError: (data) => {      
+          if (data.message.split('||')[0] === '5') {
+            setAlertState({
+              ...errorMessage,
+              isOpen: true,
+              message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+            });
+            Cookies.remove('session_key');
+            setTimeout(() => {
+              router.push('/login');
+            }, 1000);
+          }
         }
     });
     
@@ -711,6 +723,18 @@ const RebroadcastSettingsPanel = () => {
             if (updatedList.length === 0) {
                 resetAllStates();
             }
+        },onError: (data) => {      
+          if (data.message.split('||')[0] === '5') {
+            setAlertState({
+              ...errorMessage,
+              isOpen: true,
+              message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+            });
+            Cookies.remove('session_key');
+            setTimeout(() => {
+              router.push('/login');
+            }, 1000);
+          }
         }
     });
 
