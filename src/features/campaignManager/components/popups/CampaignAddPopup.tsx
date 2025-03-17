@@ -5,7 +5,7 @@ import { useTotalCampaignListForAddCampaignToCampaignGroup } from '@/widgets/sid
 import { useTotalSkillListForAddCampaignToCampaignGroup } from '@/widgets/sidebar/hooks/useTotalSkillListForAddCampaignToCampaignGroup';
 import useApiForGetCampaignListForCampaignGroup from '@/widgets/sidebar/hooks/useApiForGetCampaignListForCampaignGroup';
 import { CampaignInfo, SkillInfo } from '@/widgets/sidebar/api/type/typeForAddCampaignForCampaignGroup';
-import { batchAddCampaignsToGroup } from '@/components/shared/layout/utils/batchAddCampaigns';
+// import { batchAddCampaignsToGroup } from '@/components/shared/layout/utils/batchAddCampaigns';
 import { batchRemoveCampaignsFromGroup } from '@/components/shared/layout/utils/batchRemoveCampaigns';
 import GroupCampaignList from './GroupCampaignList';
 import ITableForSkillListWithCampaign from './ITableForSkillListWithCampaign';
