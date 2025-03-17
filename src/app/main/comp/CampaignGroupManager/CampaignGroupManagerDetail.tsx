@@ -969,14 +969,15 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
 
       for (let i = 0; i < selectCampaignGroupList.length; i++) {
         if (changeYn) {
-          if (campaignInfoChangeYn) {
+          // if (campaignInfoChangeYn) {
             fetchCampaignManagerUpdate({
               ...tempCampaignManagerInfo
               , campaign_id: selectCampaignGroupList[i].campaign_id
               , campaign_name: selectCampaignGroupList[i].campaign_name
               , campaign_desc: selectCampaignGroupList[i].campaign_desc
+              , start_flag: 2
             });
-          }
+          // }
           if (campaignSkillChangeYn) {
             //캠페인 스킬 수정 api 호출
             fetchCampaignSkillUpdate({
