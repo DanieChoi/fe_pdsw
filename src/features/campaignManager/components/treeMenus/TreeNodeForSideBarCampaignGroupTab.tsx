@@ -1,6 +1,7 @@
+// src\features\campaignManager\components\treeMenus\TreeNodeForSideBarCampaignGroupTab.tsx
 "use client";
 
-import { Building, Briefcase } from "lucide-react";
+import { Building } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback, useState, useEffect, useRef } from "react";
 import { Menu, Item, useContextMenu, Separator } from "react-contexify";
@@ -16,6 +17,7 @@ import IDialogForUpdateCampaignGroupName from "./dialog/IDialogForUpdateCampaign
 import { toast } from "react-toastify";
 import { useApiForDeleteCampaignGroup } from "@/features/campaignManager/hooks/useApiForDeleteCampaignGroup";
 import { getCampaignGroupMenuItems } from "./ContextMenus/IContextMenuForCampaignGroupTabCamapaignGroup";
+import { IContextMenuForCampaignForCampaignGroup, CampaignStatus } from "./ContextMenus/IContextMenuForCampaignForCampaignGroup";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -25,19 +27,6 @@ interface TreeNodeProps {
   onNodeToggle: (nodeId: string) => void;
   onNodeSelect: (nodeId: string) => void;
 }
-
-// export const getStatusIconWithStartFlag = (status?: number) => {
-//   switch (status) {
-//     case 1:
-//       return '/sidebar-menu/tree_play.svg';
-//     case 2:
-//       return '/sidebar-menu/tree_pause.svg';
-//     case 3:
-//       return '/sidebar-menu/tree_stop.svg';
-//     default:
-//       return null;
-//   }
-// };
 
 const getStatusIcon = (status?: number) => {
   switch (status) {
@@ -49,6 +38,16 @@ const getStatusIcon = (status?: number) => {
       return '/sidebar-menu/tree_stop.svg';
     default:
       return null;
+  }
+};
+
+// TreeNode의 start_flag를 CampaignStatus로 변환하는 함수
+const getStatusFromFlag = (flag?: number): CampaignStatus => {
+  switch (flag) {
+    case 1: return 'started';
+    case 2: return 'pending';
+    case 3: return 'stopped';
+    default: return 'stopped';
   }
 };
 
@@ -84,13 +83,11 @@ export function TreeNodeForSideBarCampaignGroupTab({
     }
   });
 
-  // 컨텍스트 메뉴 ID
-  const campaignMenuId = `campaign-menu-${node.id}`;
+  // 컨텍스트 메뉴 ID (캠페인 타입이 아닌 경우만 사용)
   const tenantMenuId = `tenant-menu-${node.id}`;
   const groupMenuId = `group-menu-${node.id}`;
 
-  // 컨텍스트 메뉴 훅
-  const { show: showCampaignMenu } = useContextMenu({ id: campaignMenuId });
+  // 컨텍스트 메뉴 훅 (캠페인 타입이 아닌 경우만 사용)
   const { show: showTenantMenu } = useContextMenu({ id: tenantMenuId });
   const { show: showGroupMenu } = useContextMenu({ id: groupMenuId });
 
@@ -116,12 +113,10 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
   const handleContextMenuEvent = (e: React.MouseEvent) => {
     e.preventDefault();
-
     onNodeSelect(node.id);
 
-    if (node.type === "campaign") {
-      showCampaignMenu({ event: e });
-    } else if (node.type === "tenant") {
+    // 캠페인 타입은 새로운 컨텍스트 메뉴 컴포넌트로 처리하므로 여기서는 제외
+    if (node.type === "tenant") {
       showTenantMenu({ event: e });
     } else if (node.type === "group") {
       showGroupMenu({ event: e });
@@ -284,7 +279,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     <div
       className={getNodeStyle()}
       onClick={handleClick}
-      onContextMenu={handleContextMenuEvent}
+      onContextMenu={node.type === "campaign" ? undefined : handleContextMenuEvent}
       style={{ paddingLeft: `${level * 16 + 8}px` }}
     >
       <div className="flex items-center w-full gap-2">
@@ -312,46 +307,62 @@ export function TreeNodeForSideBarCampaignGroupTab({
     </div>
   );
 
+  // 캠페인 관련 핸들러 함수들
+  const handleEditCampaign = useCallback(() => {
+    const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu } = useTabStore.getState();
+    simulateHeaderMenuClick(2);
+    setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
+  }, [node.campaign_id]);
+
+  const handleMonitorCampaign = useCallback(() => {
+    const { addMultiTab } = useTabStore.getState();
+    const uniqueKey = `monitor-${Date.now()}`;
+    addMultiTab({
+      id: 22,
+      uniqueKey: uniqueKey,
+      title: `상담원 상태 모니터 - ${node.name}`,
+      icon: '',
+      href: '',
+      content: null,
+      campaignId: node.campaign_id?.toString()
+    });
+  }, [node.name, node.campaign_id]);
+
+  const handleCopyCampaign = useCallback(() => {
+    console.log(`캠페인 복사: ${node.name} (ID: ${node.campaign_id})`);
+    toast.info("캠페인 복사 기능이 준비 중입니다.");
+  }, [node.name, node.campaign_id]);
+
+  // 노드 유형에 따라 적절한 렌더링 방식 결정
+  const renderNodeWithProperContextMenu = () => {
+    // 캠페인 노드인 경우 새로운 컨텍스트 메뉴 컴포넌트 사용
+    if (node.type === "campaign") {
+      // TreeNode를 ContextMenuForTreeNodeProps.item으로 변환
+      const campaignItem = {
+        id: node.id,
+        label: node.name,
+        type: node.type,
+        status: getStatusFromFlag(node.start_flag)
+      };
+
+      return (
+        <IContextMenuForCampaignForCampaignGroup
+          item={campaignItem}
+          onEdit={handleEditCampaign}
+          onMonitor={handleMonitorCampaign}
+          onHandleCampaignCopy={handleCopyCampaign}
+        >
+          {renderNodeUI()}
+        </IContextMenuForCampaignForCampaignGroup>
+      );
+    }
+    // 그 외 노드는 기존 방식 그대로 사용
+    return renderNodeUI();
+  };
+
   return (
     <div className="select-none" data-node-type={node.type} data-node-id={node.id}>
-      {renderNodeUI()}
-
-      {/* 캠페인 노드 컨텍스트 메뉴 */}
-      <Menu id={campaignMenuId} className="compact-menu">
-        <Item
-          onClick={() => {
-            const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu } = useTabStore.getState();
-            simulateHeaderMenuClick(2);
-            setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
-          }}
-        >
-          캠페인 수정
-        </Item>
-        <Item
-          onClick={() => {
-            const { addMultiTab } = useTabStore.getState();
-            const uniqueKey = `monitor-${Date.now()}`;
-            addMultiTab({
-              id: 22,
-              uniqueKey: uniqueKey,
-              title: `상담원 상태 모니터 - ${node.name}`,
-              icon: '',
-              href: '',
-              content: null,
-              campaignId: node.campaign_id?.toString()
-            });
-          }}
-        >
-          캠페인 모니터링
-        </Item>
-        <Item
-          onClick={() => {
-            console.log(`캠페인 복사: ${node.name} (ID: ${node.campaign_id})`);
-          }}
-        >
-          캠페인 복사
-        </Item>
-      </Menu>
+      {renderNodeWithProperContextMenu()}
 
       {/* 테넌트 노드 컨텍스트 메뉴 */}
       <Menu id={tenantMenuId} className="compact-menu">
