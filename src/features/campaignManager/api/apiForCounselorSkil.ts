@@ -160,15 +160,16 @@ export const apiForDeleteCounselorsForSpecificSkill = async (
   skillId: number,
   counselorIds: string[]
 ): Promise<CounselorSkillAssignmentResponse> => {
-  console.log("📌 스킬에서 상담사 제외 시작");
+  console.log("📌 스킬에서 상담사 해제 시작");
   console.log("🎯 대상 스킬 ID:", skillId);
-  console.log("🔗 제외할 상담사 목록:", counselorIds);
+  console.log("🔗 해제할 상담사 목록:", counselorIds);
 
   try {
+    // API 엔드포인트가 정확하지 않을 수 있으므로 실제 API에 맞게 수정 필요
     const { data } = await axiosInstance.delete<CounselorSkillAssignmentResponse>(
       `skills/${skillId}/agent-list`,
       {
-        data: {                // request_data를 data 안에 넣음
+        data: {
           request_data: {
             agent_id: counselorIds
           }
@@ -176,13 +177,13 @@ export const apiForDeleteCounselorsForSpecificSkill = async (
       }
     );
 
-    console.log("✅ 스킬을 가진 상담사 목록에서 특정 상담사들 제외 성공:", data);
+    console.log("✅ 스킬을 가진 상담사 목록에서 특정 상담사들 해제 성공:", data);
     return data;
   } catch (error) {
-    console.error("❌ 스킬에서 상담사 제외 실패:", error);
+    console.error("❌ 스킬에서 상담사 해제 실패:", error);
     const typedError = error as CounselorSkillApiError;
     throw new Error(
-      typedError.response?.data?.result_msg || "스킬에서 상담사 제외 중 오류가 발생했습니다."
+      typedError.response?.data?.result_msg || "스킬에서 상담사 해제 중 오류가 발생했습니다."
     );
   }
 };
@@ -194,8 +195,8 @@ export const apiForAddCounselorsForSpecificSkill = async (
   counselorIds: string[]
 ): Promise<CounselorSkillAssignmentResponse> => {
   console.log("📌 스킬에 상담사 추가 시작");
-  console.log("🎯 대상 스킬 ID 11111111111111111111 :", skillId);
-  console.log("🔗 추가할 상담사 목록 22222222222222222222:", counselorIds);
+  console.log("🎯 대상 스킬 ID:", skillId);
+  console.log("🔗 추가할 상담사 목록:", counselorIds);
 
   try {
     const { data } = await axiosInstance.post<CounselorSkillAssignmentResponse>(

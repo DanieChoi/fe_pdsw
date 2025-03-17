@@ -1,320 +1,16 @@
-// "use client";
-
-// import React, { useEffect, useState } from "react";
-// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-// import { Card } from "@/components/ui/card";
-// import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
-// import { Button } from "@/components/ui/button";
-// import { ChevronDown, ChevronUp } from "lucide-react";
-// import { toast } from "react-toastify";
-// import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDialogForSideMenu";
-// import { useApiForDeleteCounselorsForSpecificSkill } from "@/features/campaignManager/hooks/useApiForDeleteCounselorsForSpecificSkill";
-// import { useApiForAddCounselorsForSpecificSkill } from "@/features/campaignManager/hooks/useApiForAddCounselorsForSpecificSkill";
-// import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
-// import Image from "next/image";
-
-// interface IDialogForGroupSkilAssignmentProps {
-//   isOpen: boolean;
-//   onClose: () => void;
-//   groupId: string;
-//   groupName: string;
-//   groupMembers: any[];
-//   tenantId: string;
-// }
-
-// export function IDialogForGroupSkilAssignment({
-//   isOpen,
-//   onClose,
-//   groupId,
-//   groupName,
-//   groupMembers,
-//   tenantId
-// }: IDialogForGroupSkilAssignmentProps) {
-//   const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
-//   const [showCounselors, setShowCounselors] = useState(false);
-
-//   console.log(`그룹 스킬 할당 다이얼로그 열림 - 그룹 ID: ${groupId}, 이름: ${groupName}, 테넌트: ${tenantId}, 멤버 수: ${groupMembers.length}`);
-
-//   // 할당 가능한 스킬 목록 조회
-//   const { data: assignableSkills, isLoading: isSkillsLoading, error: skillsError } = useAssignableSkills(Number(tenantId));
-
-//   const deleteCounselorMutation = useApiForDeleteCounselorsForSpecificSkill(tenantId ?? "0");
-//   const addCounselorMutation = useApiForAddCounselorsForSpecificSkill(tenantId ?? "0");
-
-//   // 유효한 상담원 ID 배열 생성 함수
-//   const getValidCounselorIds = (): string[] => {
-//     if (!groupMembers || groupMembers.length === 0) {
-//       console.warn("⚠️ 유효한 상담원 배열이 없습니다.");
-//       return [];
-//     }
-
-//     // 유효한 ID만 필터링
-//     const validIds = groupMembers
-//       .filter(counselor => {
-//         // 데이터 구조에 따라 ID 추출
-//         const id = (counselor.data && counselor.data.counselorId) || counselor.counselorId;
-//         return id && id !== '-';
-//       })
-//       .map(counselor => {
-//         // ID 추출
-//         return (counselor.data && counselor.data.counselorId) || counselor.counselorId;
-//       });
-    
-//     console.log("✅ 추출된 상담원 ID 목록:", validIds, "개수:", validIds.length);
-    
-//     return validIds;
-//   };
-
-//   // 스킬 선택/해제 핸들러
-//   const handleSkillToggle = (skillId: number) => {
-//     const counselorIds = getValidCounselorIds();
-
-//     if (counselorIds.length === 0) {
-//       toast.error('유효한 상담원이 없습니다.');
-//       return;
-//     }
-
-//     setSelectedSkills((prev) => {
-//       const isCurrentlySelected = prev.includes(skillId);
-
-//       if (isCurrentlySelected) {
-//         console.log("📌 체크 해제된 스킬 정보:", {
-//           skillId: skillId,
-//           counselorIds: counselorIds,
-//           counselorCount: counselorIds.length
-//         });
-
-//         deleteCounselorMutation.mutate({
-//           skillId: skillId,
-//           counselorIds: counselorIds
-//         }, {
-//           onSuccess: () => {
-//             toast.success('스킬이 해제되었습니다.');
-//           },
-//           onError: (error) => {
-//             console.error('스킬 해제 오류:', error);
-//             toast.error('스킬 해제 중 오류가 발생했습니다.');
-//           }
-//         });
-//       } else {
-//         console.log("📌 체크된 스킬 정보:", {
-//           skillId: skillId,
-//           counselorIds: counselorIds,
-//           counselorCount: counselorIds.length
-//         });
-
-//         addCounselorMutation.mutate({
-//           skillId: skillId,
-//           counselorIds: counselorIds
-//         }, {
-//           onSuccess: () => {
-//             toast.success('스킬이 할당되었습니다.');
-//           },
-//           onError: (error) => {
-//             console.error('스킬 할당 오류:', error);
-//             toast.error('스킬 할당 중 오류가 발생했습니다.');
-//           }
-//         });
-//       }
-
-//       return isCurrentlySelected
-//         ? prev.filter(id => id !== skillId)
-//         : [...prev, skillId];
-//     });
-//   };
-
-//   // 상담원 목록 토글
-//   const toggleCounselors = () => {
-//     setShowCounselors(!showCounselors);
-//   };
-
-//   // 취소 버튼 핸들러
-//   const handleCancel = () => {
-//     onClose();
-//   };
-
-//   // 확인 버튼 핸들러
-//   const handleConfirm = () => {
-//     // 다이얼로그에서 스킬 선택/해제할 때마다 바로 API를 호출하므로,
-//     // 확인 버튼은 단순히 다이얼로그를 닫는 역할만 수행합니다.
-//     toast.success('스킬 할당 작업이 완료되었습니다.');
-//     onClose();
-//   };
-
-//   const isLoading = isSkillsLoading;
-//   const error = skillsError;
-
-//   const renderContent = () => {
-//     if (error) {
-//       return <div className="text-red-500 p-4">Error: {String(error)}</div>;
-//     }
-
-//     if (isLoading) {
-//       return (
-//         <div className="p-6 flex flex-col items-center">
-//           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-4"></div>
-//           <div>데이터를 불러오는 중입니다...</div>
-//         </div>
-//       );
-//     }
-
-//     // 상담원이 없는 경우 UI
-//     if (!groupMembers || groupMembers.length === 0) {
-//       return (
-//         <div className="px-[30px] py-[20px]">
-//           <div className="flex items-center">
-//             <Image src="/tree-menu/group_icon_for_tree.png" alt="그룹" width={15} height={12} className="mr-2" />
-//             <span className="text-sm text-[#333]">상담원 정보를 찾을 수 없습니다</span>
-//           </div>
-//           <p className="text-[#333] mb-4 text-sm">
-//             선택된 그룹의 상담원 정보를 불러올 수 없습니다.<br />
-//             다시 시도하거나 관리자에게 문의하세요.
-//           </p>
-//         </div>
-//       );
-//     }
-
-//     return (
-//       <div className="px-[30px] py-[20px]">
-//         <div className="text-sm text-gray-600 mb-4">
-//           그룹의 모든 상담원({groupMembers.length}명)에게 스킬을 일괄 할당<br />
-//         </div>
-
-//         {/* 상담원 목록 표시 */}
-//         <div className="mb-4">
-//           <div
-//             className="flex justify-between items-center p-2 border rounded cursor-pointer bg-gray-50 hover:bg-gray-100"
-//             onClick={toggleCounselors}
-//           >
-//             <div className="flex items-center">
-//               <Image src="/tree-menu/group_icon_for_tree.png" alt="그룹" width={15} height={12} className="mr-2" />
-//               <span className="text-sm text-[#333]">{groupName}</span>
-//             </div>
-            
-//             <div className="flex items-center">
-//               <span className="text-sm text-[#333]">{groupMembers.length}명</span>
-//               {showCounselors ? (
-//                 <ChevronUp className="h-4 w-4 text-gray-500" />
-//               ) : (
-//                 <ChevronDown className="h-4 w-4 text-gray-500" />
-//               )}
-//             </div>
-//           </div>
-
-//           {showCounselors && (
-//             <div className="mt-2 max-h-[150px] overflow-y-auto border rounded">
-//               <Table>
-//                 <TableHeader>
-//                   <TableRow>
-//                     <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>ID</TableHead>
-//                     <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>이름</TableHead>
-//                     <TableHead className="w-16 text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>테넌트 ID</TableHead>
-//                   </TableRow>
-//                 </TableHeader>
-//                 <TableBody>
-//                   {groupMembers.map((counselor, index) => {
-//                     // 필드에 올바르게 접근
-//                     const id = counselor.data?.counselorId || counselor.counselorId || '-';
-//                     const name = counselor.data?.counselorname || counselor.counselorname || '-';
-//                     const currentTenantId = counselor.data?.tenantId || counselor.tenantId || '-';
-
-//                     return (
-//                       <TableRow key={`counselor-${index}`} className="custom-hover">
-//                         <TableCell className="py-1 text-sm text-center text-[#444]">{id}</TableCell>
-//                         <TableCell className="py-1 text-sm text-center text-[#444]">{name}</TableCell>
-//                         <TableCell className="py-1 text-sm text-center text-[#444]">{currentTenantId}</TableCell>
-//                       </TableRow>
-//                     );
-//                   })}
-//                 </TableBody>
-//               </Table>
-//             </div>
-//           )}
-//         </div>
-
-//         {/* 테넌트 ID 정보 */}
-//         {/* <div className="p-2 bg-gray-50 border rounded text-sm text-[#333] mb-4">
-//           <span>테넌트 ID: {tenantId || 'N/A'}</span>
-//         </div> */}
-
-//         {/* 스킬 목록 테이블 */}
-//         <div className="max-h-[250px] overflow-y-auto border rounded">
-//           <Table>
-//             <TableHeader>
-//               <TableRow>
-//                 <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>선택</TableHead>
-//                 <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>아이디</TableHead>
-//                 <TableHead className="w-16 text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>이름</TableHead>
-//               </TableRow>
-//             </TableHeader>
-//             <TableBody>
-//               {assignableSkills && assignableSkills.length > 0 ? (
-//                 assignableSkills.map((skill) => (
-//                   <TableRow key={`skill-${skill.skill_id}`} className="custom-hover">
-//                     <TableCell className="text-center text-[#444]" style={{ height: '30px' , padding:0}}>
-//                       <CustomCheckbox
-//                         checked={selectedSkills.includes(skill.skill_id)}
-//                         onCheckedChange={() => handleSkillToggle(skill.skill_id)}
-//                       />
-//                     </TableCell>
-//                     <TableCell className="text-center text-[#444]" style={{ height: '30px' , padding:0}}>{skill.skill_id}</TableCell>
-//                     <TableCell className="text-center text-[#444]" style={{ height: '30px' , padding:0}}>{skill.skill_name}</TableCell>
-//                   </TableRow>
-//                 ))
-//               ) : (
-//                 <TableRow>
-//                   <TableCell colSpan={3} className="text-center py-4">
-//                     할당 가능한 스킬이 없습니다.
-//                   </TableCell>
-//                 </TableRow>
-//               )}
-//             </TableBody>
-//           </Table>
-//         </div>
-
-//         <div className="mt-6 flex justify-center gap-2">
-//           <Button
-//             onClick={handleConfirm}
-//             className="px-6 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
-//           >
-//             확인
-//           </Button>
-//           <Button
-//             variant="outline"
-//             onClick={handleCancel}
-//             className="px-6 py-1.5 border border-gray-300 rounded text-sm"
-//           >
-//             취소
-//           </Button>
-//         </div>
-//       </div>
-//     );
-//   };
-
-//   return (
-//     <CommonDialogForSideMenu
-//       isOpen={isOpen}
-//       onClose={onClose}
-//       title={`그룹 스킬 할당 - ${groupName || ''}`}
-//     >
-//       {renderContent()}
-//     </CommonDialogForSideMenu>
-//   );
-// }
-
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card } from "@/components/ui/card";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "react-toastify";
 import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDialogForSideMenu";
-import { useApiForDeleteCounselorsForSpecificSkill } from "@/features/campaignManager/hooks/useApiForDeleteCounselorsForSpecificSkill";
-import { useApiForAddCounselorsForSpecificSkill } from "@/features/campaignManager/hooks/useApiForAddCounselorsForSpecificSkill";
+import { useApiForGetRelatedInfoForAssignSkilToCounselor } from "@/features/preferences/hooks/useApiForGetRelatedInfoForAssignSkilToCounselor";
 import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
+import { useApiBatchSkillAssignment } from "@/features/campaignManager/hooks/useApiBatchSkillAssignment";
+import { useApiDeleteCounselorsFromSkills } from "@/features/campaignManager/hooks/useApiDeleteCounselorsFromSkills";
 import Image from "next/image";
 
 interface IDialogForGroupSkilAssignmentProps {
@@ -324,6 +20,8 @@ interface IDialogForGroupSkilAssignmentProps {
   groupName: string;
   groupMembers: any[];
   tenantId: string;
+  isUnassignment?: boolean;
+  dialogTitle?: string;
 }
 
 export function IDialogForGroupSkilAssignment({
@@ -332,21 +30,58 @@ export function IDialogForGroupSkilAssignment({
   groupId,
   groupName,
   groupMembers,
-  tenantId
+  tenantId,
+  isUnassignment = false,
+  dialogTitle
 }: IDialogForGroupSkilAssignmentProps) {
   const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
+  const [assignedSkillsInfo, setAssignedSkillsInfo] = useState<number[]>([]);
   const [showCounselors, setShowCounselors] = useState(false);
+  const [isUnassignMode, setIsUnassignMode] = useState(false);
 
-  console.log(`그룹 스킬 할당 다이얼로그 열림 - 그룹 ID: ${groupId}, 이름: ${groupName}, 테넌트: ${tenantId}, 멤버 수: ${groupMembers.length}`);
+  // isUnassignment prop이 변경될 때 isUnassignMode 상태 업데이트
+  useEffect(() => {
+    setIsUnassignMode(isUnassignment);
+    // 모드가 변경되면 선택된 스킬 초기화
+    setSelectedSkills([]);
+  }, [isUnassignment]);
+
+  // 첫 번째 상담원을 대표로 사용하여 스킬 정보 조회
+  const firstCounselor = groupMembers.length > 0 ? groupMembers[0] : null;
+  const representativeCounselorId = firstCounselor?.counselorId || firstCounselor?.data?.counselorId || "";
 
   // 할당 가능한 스킬 목록 조회
   const { data: assignableSkills, isLoading: isSkillsLoading, error: skillsError } = useAssignableSkills(Number(tenantId));
 
-  const deleteCounselorMutation = useApiForDeleteCounselorsForSpecificSkill(tenantId ?? "0");
-  const addCounselorMutation = useApiForAddCounselorsForSpecificSkill(tenantId ?? "0");
+  // 기존 할당된 스킬 정보 조회
+  const { assignedSkills, isLoading: isAssignedSkillsLoading, error: assignedSkillsError } = useApiForGetRelatedInfoForAssignSkilToCounselor(
+    representativeCounselorId,
+    Number(tenantId)
+  );
+
+  // 배치 처리를 위한 커스텀 훅 사용
+  const addSkillsMutation = useApiBatchSkillAssignment(tenantId ?? "0");
+  const deleteSkillsMutation = useApiDeleteCounselorsFromSkills(tenantId ?? "0");
+
+  // 로딩 상태 통합
+  const isProcessing = addSkillsMutation.isPending || deleteSkillsMutation.isPending;
+
+  // 할당된 스킬 정보 저장 (표시용)
+  useEffect(() => {
+    if ((assignedSkills?.result_data ?? []).length > 0) {
+      const assignedSkillIds = assignedSkills?.result_data.flatMap((item) => item.skill_id) ?? [];
+      // 정보 표시용으로만 사용하므로 저장
+      setAssignedSkillsInfo(assignedSkillIds);
+      // 초기 선택값은 빈 배열로 설정 (모두 해제 상태)
+      setSelectedSkills([]);
+    } else {
+      setAssignedSkillsInfo([]);
+      setSelectedSkills([]);
+    }
+  }, [assignedSkills]);
 
   // 유효한 상담원 ID 배열 생성 함수
-  const getValidCounselorIds = (): string[] => {
+  const getValidCounselorIds = () => {
     if (!groupMembers || groupMembers.length === 0) {
       console.warn("⚠️ 유효한 상담원 배열이 없습니다.");
       return [];
@@ -363,66 +98,24 @@ export function IDialogForGroupSkilAssignment({
         // ID 추출
         return (counselor.data && counselor.data.counselorId) || counselor.counselorId;
       });
-    
-    console.log("✅ 추출된 상담원 ID 목록:", validIds, "개수:", validIds.length);
-    
+
     return validIds;
   };
 
   // 스킬 선택/해제 핸들러
   const handleSkillToggle = (skillId: number) => {
-    const counselorIds = getValidCounselorIds();
-
-    if (counselorIds.length === 0) {
-      toast.error('유효한 상담원이 없습니다.');
-      return;
-    }
-
     setSelectedSkills((prev) => {
       const isCurrentlySelected = prev.includes(skillId);
-
-      if (isCurrentlySelected) {
-        console.log("📌 체크 해제된 스킬 정보:", {
-          skillId: skillId,
-          counselorIds: counselorIds,
-          counselorCount: counselorIds.length
-        });
-
-        deleteCounselorMutation.mutate({
-          skillId: skillId,
-          counselorIds: counselorIds
-        }, {
-          onSuccess: () => {
-            toast.success('스킬이 해제되었습니다.');
-          },
-          onError: (error) => {
-            console.error('스킬 해제 오류:', error);
-            toast.error('스킬 해제 중 오류가 발생했습니다.');
-          }
-        });
-      } else {
-        console.log("📌 체크된 스킬 정보:", {
-          skillId: skillId,
-          counselorIds: counselorIds,
-          counselorCount: counselorIds.length
-        });
-
-        addCounselorMutation.mutate({
-          skillId: skillId,
-          counselorIds: counselorIds
-        }, {
-          onSuccess: () => {
-            toast.success('스킬이 할당되었습니다.');
-          },
-          onError: (error) => {
-            console.error('스킬 할당 오류:', error);
-            toast.error('스킬 할당 중 오류가 발생했습니다.');
-          }
-        });
+      
+      // 최대 스킬 할당 개수 체크 (할당 모드일 때만)
+      if (!isCurrentlySelected && prev.length >= 10 && !isUnassignMode) {
+        toast.error("최대 10개의 스킬만 할당할 수 있습니다.");
+        return prev;
       }
 
-      return isCurrentlySelected
-        ? prev.filter(id => id !== skillId)
+      // 선택 상태 토글
+      return isCurrentlySelected 
+        ? prev.filter(id => id !== skillId) 
         : [...prev, skillId];
     });
   };
@@ -437,16 +130,91 @@ export function IDialogForGroupSkilAssignment({
     onClose();
   };
 
-  // 확인 버튼 핸들러
-  const handleConfirm = () => {
-    // 다이얼로그에서 스킬 선택/해제할 때마다 바로 API를 호출하므로,
-    // 확인 버튼은 단순히 다이얼로그를 닫는 역할만 수행합니다.
-    toast.success('스킬 할당 작업이 완료되었습니다.');
-    onClose();
+  // 할당 모드: 선택된 스킬을 추가
+  const getSkillsToAdd = () => {
+    if (isUnassignMode) return [];
+    // 할당 모드에서는 모든 선택된 스킬을 반환
+    return selectedSkills;
   };
 
-  const isLoading = isSkillsLoading;
-  const error = skillsError;
+  // 해제 모드: 선택된 스킬만 해제
+  const getSkillsToRemove = () => {
+    if (!isUnassignMode) return [];
+    return selectedSkills;
+  };
+
+  // 확인 버튼 핸들러
+  const handleConfirm = async () => {
+    const counselorIds = getValidCounselorIds();
+    const skillsToAdd = getSkillsToAdd();
+    const skillsToRemove = getSkillsToRemove();
+    
+    if (counselorIds.length === 0) {
+      toast.error('유효한 상담원이 없습니다.');
+      return;
+    }
+    
+    if (skillsToAdd.length === 0 && skillsToRemove.length === 0) {
+      toast.info("변경할 사항이 없습니다.");
+      onClose();
+      return;
+    }
+
+    try {
+      // 추가할 스킬이 있으면 배치 처리
+      if (skillsToAdd.length > 0) {
+        const addResult = await addSkillsMutation.mutateAsync({
+          skillIds: skillsToAdd,
+          counselorIds: counselorIds,
+          tenantId,
+          isUnassignment: false
+        });
+        
+        if (addResult.success) {
+          toast.success(`${skillsToAdd.length}개 스킬이 모든 상담원에게 할당되었습니다.`);
+        } else {
+          toast.warning(`${addResult.successCount}개 스킬만 할당되었습니다. ${addResult.failedSkills.length}개 실패.`);
+        }
+      }
+      
+      // 제거할 스킬이 있으면 배치 처리
+      if (skillsToRemove.length > 0) {
+        const removeResult = await deleteSkillsMutation.mutateAsync({
+          skillIds: skillsToRemove,
+          counselorIds: counselorIds,
+          tenantId
+        });
+        
+        if (removeResult.success) {
+          toast.success(`${skillsToRemove.length}개 스킬이 모든 상담원에게서 해제되었습니다.`);
+        } else {
+          toast.warning(`${removeResult.successCount}개 스킬만 해제되었습니다. ${removeResult.failedSkills.length}개 실패.`);
+        }
+      }
+      
+      onClose();
+    } catch (error) {
+      console.error("스킬 할당/해제 중 오류 발생:", error);
+      toast.error("스킬 처리 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 확인 버튼 텍스트 계산
+  const getConfirmButtonText = () => {
+    const skillsToAdd = getSkillsToAdd();
+    const skillsToRemove = getSkillsToRemove();
+    
+    if (isUnassignMode && skillsToRemove.length > 0) {
+      return `스킬 해제 (${skillsToRemove.length}개)`;
+    } else if (!isUnassignMode && skillsToAdd.length > 0) {
+      return `스킬 할당 (${skillsToAdd.length}개)`;
+    }
+    
+    return isUnassignMode ? "스킬 해제" : "스킬 할당";
+  };
+
+  const isLoading = isSkillsLoading || isAssignedSkillsLoading;
+  const error = skillsError || assignedSkillsError;
 
   const renderContent = () => {
     if (error) {
@@ -478,11 +246,23 @@ export function IDialogForGroupSkilAssignment({
       );
     }
 
+    // 할당/해제할 스킬 계산
+    const skillsToAdd = getSkillsToAdd();
+    const skillsToRemove = getSkillsToRemove();
+    const buttonDisabled = skillsToAdd.length === 0 && skillsToRemove.length === 0;
+
     return (
       <div className="p-4">
         {/* 공통 설명 영역 */}
         <div className="text-sm text-gray-600 mb-4">
-          그룹의 모든 상담원({groupMembers.length}명)에게 스킬을 일괄 할당합니다.
+          {isUnassignMode 
+            ? `그룹의 모든 상담원(${groupMembers.length}명)에게서 스킬을 일괄 해제합니다. 해제할 스킬을 선택하세요.`
+            : `그룹의 모든 상담원(${groupMembers.length}명)에게 스킬을 일괄 할당합니다. 할당할 스킬을 선택하세요.`}
+        </div>
+
+        {/* 테넌트 ID 정보 */}
+        <div className="p-2 bg-gray-50 border rounded text-sm text-[#333] mb-4">
+          <span>테넌트 ID: {tenantId || 'N/A'}</span>
         </div>
 
         {/* 2등분 레이아웃 */}
@@ -499,7 +279,7 @@ export function IDialogForGroupSkilAssignment({
                 <Image src="/tree-menu/group_icon_for_tree.png" alt="그룹" width={15} height={12} className="mr-2" />
                 <span className="text-sm text-[#333]">{groupName}</span>
               </div>
-              
+
               <div className="flex items-center">
                 <span className="text-sm text-[#333] mr-2">{groupMembers.length}명</span>
                 {showCounselors ? (
@@ -544,8 +324,15 @@ export function IDialogForGroupSkilAssignment({
 
           {/* 오른쪽 영역: 스킬 목록 */}
           <div className="w-1/2">
-            <div className="mb-2 font-medium text-sm">할당할 스킬 선택</div>
-            
+            <div className="mb-2 font-medium text-sm">
+              {isUnassignMode ? "해제할 스킬 선택" : "할당할 스킬 선택"}
+              <span className="ml-2 text-blue-500 text-xs">
+                {isUnassignMode 
+                  ? `(${skillsToRemove.length}개 선택됨)` 
+                  : `(${skillsToAdd.length}개 선택됨)`}
+              </span>
+            </div>
+
             {/* 스킬 목록 테이블 */}
             <div className="border rounded" style={{ maxHeight: '350px', overflow: 'auto' }}>
               <Table>
@@ -558,22 +345,64 @@ export function IDialogForGroupSkilAssignment({
                 </TableHeader>
                 <TableBody>
                   {assignableSkills && assignableSkills.length > 0 ? (
-                    assignableSkills.map((skill) => (
-                      <TableRow key={`skill-${skill.skill_id}`} className="custom-hover">
-                        <TableCell className="text-center text-[#444]" style={{ height: '30px', padding: 0 }}>
-                          <CustomCheckbox
-                            checked={selectedSkills.includes(skill.skill_id)}
-                            onCheckedChange={() => handleSkillToggle(skill.skill_id)}
-                          />
-                        </TableCell>
-                        <TableCell className="text-center text-[#444]" style={{ height: '30px', padding: 0 }}>{skill.skill_id}</TableCell>
-                        <TableCell className="text-center text-[#444]" style={{ height: '30px', padding: 0 }}>{skill.skill_name}</TableCell>
-                      </TableRow>
-                    ))
+                    assignableSkills.map((skill) => {
+                      const isAlreadyAssigned = assignedSkillsInfo.includes(skill.skill_id);
+                      const isCurrentlySelected = selectedSkills.includes(skill.skill_id);
+                      
+                      // 해제 모드에서는 이미 할당된 스킬만 표시
+                      if (isUnassignMode && !isAlreadyAssigned) {
+                        return null;
+                      }
+                      
+                      // 상태 계산
+                      const willBeAdded = !isUnassignMode && isCurrentlySelected;
+                      const willBeRemoved = isUnassignMode && isCurrentlySelected;
+                      
+                      return (
+                        <TableRow 
+                          key={`skill-${skill.skill_id}`} 
+                          className={`custom-hover ${willBeAdded || willBeRemoved ? 'bg-blue-50' : ''}`}
+                        >
+                          <TableCell className="text-center text-[#444]" style={{ height: '30px', padding: 0 }}>
+                            <CustomCheckbox
+                              checked={isCurrentlySelected}
+                              onCheckedChange={() => handleSkillToggle(skill.skill_id)}
+                              disabled={isProcessing}
+                            />
+                          </TableCell>
+                          <TableCell className="text-center text-[#444]" style={{ height: '30px', padding: 0 }}>
+                            {skill.skill_id}
+                          </TableCell>
+                          <TableCell className="text-center text-[#444]" style={{ height: '30px', padding: 0 }}>
+                            {skill.skill_name}
+                            {isAlreadyAssigned && !isCurrentlySelected && !isUnassignMode && (
+                              <span className="ml-2 text-xs text-green-500">
+                                (현재 할당됨)
+                              </span>
+                            )}
+                            {isAlreadyAssigned && isCurrentlySelected && !isUnassignMode && (
+                              <span className="ml-2 text-xs text-blue-500">
+                                (재할당 예정)
+                              </span>
+                            )}
+                            {!isAlreadyAssigned && willBeAdded && (
+                              <span className="ml-2 text-xs text-blue-500">
+                                (추가 예정)
+                              </span>
+                            )}
+                            {willBeRemoved && (
+                              <span className="ml-2 text-xs text-red-500">
+                                (해제 예정)
+                              </span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    }).filter(Boolean) // null 제거
                   ) : (
                     <TableRow>
                       <TableCell colSpan={3} className="text-center py-4">
-                        할당 가능한 스킬이 없습니다.
+                        {isUnassignMode ? "해제할 스킬이 없습니다." : "할당 가능한 스킬이 없습니다."}
                       </TableCell>
                     </TableRow>
                   )}
@@ -588,13 +417,19 @@ export function IDialogForGroupSkilAssignment({
           <Button
             onClick={handleConfirm}
             className="px-6 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
+            disabled={isProcessing || buttonDisabled}
           >
-            확인
+            {isProcessing ? "처리 중..." : (
+              isUnassignMode 
+                ? `스킬 해제 (${skillsToRemove.length}개)` 
+                : `스킬 할당 (${skillsToAdd.length}개)`
+            )}
           </Button>
           <Button
             variant="outline"
             onClick={handleCancel}
             className="px-6 py-1.5 border border-gray-300 rounded text-sm"
+            disabled={isProcessing}
           >
             취소
           </Button>
@@ -607,8 +442,7 @@ export function IDialogForGroupSkilAssignment({
     <CommonDialogForSideMenu
       isOpen={isOpen}
       onClose={onClose}
-      title={`그룹 스킬 할당 - ${groupName || ''}`}
-      // 다이얼로그 너비를 70%로 설정하고 최대 너비 지정
+      title={dialogTitle || `그룹 스킬 ${isUnassignMode ? "해제" : "할당"} - ${groupName || ''}`}
       dialogClassName="w-[70%] max-w-[1200px] min-w-[800px]"
     >
       {renderContent()}
