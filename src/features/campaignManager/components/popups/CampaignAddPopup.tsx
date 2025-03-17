@@ -6,7 +6,7 @@ import { useTotalSkillListForAddCampaignToCampaignGroup } from '@/widgets/sideba
 import useApiForGetCampaignListForCampaignGroup from '@/widgets/sidebar/hooks/useApiForGetCampaignListForCampaignGroup';
 import { CampaignInfo, SkillInfo } from '@/widgets/sidebar/api/type/typeForAddCampaignForCampaignGroup';
 // import { batchAddCampaignsToGroup } from '@/components/shared/layout/utils/batchAddCampaigns';
-import { batchRemoveCampaignsFromGroup } from '@/components/shared/layout/utils/batchRemoveCampaigns';
+// import { batchRemoveCampaignsFromGroup } from '@/components/shared/layout/utils/batchRemoveCampaigns';
 import GroupCampaignList from './GroupCampaignList';
 import ITableForSkillListWithCampaign from './ITableForSkillListWithCampaign';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
@@ -377,7 +377,7 @@ const CampaignAddPopup: React.FC<Props> = ({
         campaign_ids: filteredCampaignIds,
         tenant_id: Number(tenant_id)
       }, {
-        onSuccess: (data) => {
+        onSuccess: (data: { result_code: string | number }) => {
           // 중복된 캠페인이 있었는지 확인
           const duplicateCount = campaignIdsForPopup.length - filteredCampaignIds.length;
           
@@ -439,27 +439,35 @@ const CampaignAddPopup: React.FC<Props> = ({
     }
     setRemovingCampaigns(true);
     try {
-      const result = await batchRemoveCampaignsFromGroup(
-        groupId,
-        selectedRightCampaigns,
-        tenant_id
-      );
-      queryClient.invalidateQueries({ queryKey: ['campaignGroupSkills', groupId] });
-      queryClient.invalidateQueries({ queryKey: ['campaignGroupList'] });
-      queryClient.invalidateQueries({ queryKey: ['sideMenuData'] });
-      if (result.success) {
-        toast.success(`${result.successCount}개의 캠페인이 "${groupName}" 그룹에서 제거되었습니다.`);
-      } else if (result.successCount > 0 && result.failedCampaigns.length > 0) {
-        toast.warning(
-          `${result.successCount}개의 캠페인이 제거되었지만, ${result.failedCampaigns.length}개는 실패했습니다.`
-        );
-      } else {
-        toast.error('캠페인 제거에 실패했습니다.');
-      }
+      // batchRemoveCampaignsFromGroup 대신 훅 사용
+      removeCampaignFromGroup({
+        group_id: groupId,
+        campaign_ids: selectedRightCampaigns,
+        tenant_id: Number(tenant_id)
+      }, {
+        onSuccess: (data: { result_code: string | number }) => {
+          if (Number(data.result_code) === 0) {
+            toast.success(`${selectedRightCampaigns.length}개의 캠페인이 "${groupName}" 그룹에서 제거되었습니다.`);
+          } else {
+            toast.error('캠페인 제거에 실패했습니다.');
+          }
+          setRemovingCampaigns(false);
+          setShowAlert(false);
+          setConfirmRemove(false);
+          setSelectedRightCampaigns([]);
+        },
+        onError: (error) => {
+          console.error('캠페인 제거 중 오류 발생:', error);
+          toast.error('캠페인 제거 과정에서 오류가 발생했습니다.');
+          setRemovingCampaigns(false);
+          setShowAlert(false);
+          setConfirmRemove(false);
+          setSelectedRightCampaigns([]);
+        }
+      });
     } catch (error) {
       console.error('캠페인 제거 중 오류 발생:', error);
       toast.error('캠페인 제거 과정에서 오류가 발생했습니다.');
-    } finally {
       setRemovingCampaigns(false);
       setShowAlert(false);
       setConfirmRemove(false);

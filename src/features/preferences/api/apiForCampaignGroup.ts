@@ -464,12 +464,12 @@ export const apiForAddCampaignToSpecificCampaignGroup = async (
  */
 export const apiForRemoveCampaignFromCampaignGroup = async (
     group_id: number,
-    campaign_id: number,
+    campaign_ids: number[],
     tenant_id: number
 ): Promise<SuccessResponse> => {
     const request_data = {
         request_data: {
-            campaign_id: campaign_id,
+            campaign_id: campaign_ids,
             tenant_id: tenant_id
         }
     };
