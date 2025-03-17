@@ -31,6 +31,7 @@ export default function Header() {
   const [alertState, setAlertState] = useState(errorMessage);
   const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
   const [isSplitDialogOpen, setIsSplitDialogOpen] = useState(false);
+
   const openInNewWindow = () => {
     // 현재 화면의 크기를 가져옵니다
     const width = window.screen.width;
@@ -271,6 +272,9 @@ export default function Header() {
       <header className="bg-white border-b">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between header-padding">
+
+            {/* <div>role_id: {role_id}</div> */}
+
             <nav className="flex overflow-x-auto gap-3">
               {menuItems.map((item) => {
                 const count = getTabCountById(item.id);
@@ -285,11 +289,7 @@ export default function Header() {
                       onClick={(e) => handleMenuClick(item, e)}
                       className="relative py-1.5 px-2"
                     >
-                      {/* {isActive && (
-                        <div className="absolute top-1 right-1">
-                          <Check className="w-3 h-3 text-[#fff]" />
-                        </div>
-                      )} */}
+
                       <div className="flex items-center justify-center">
                         <Image
                           src={item.icon}

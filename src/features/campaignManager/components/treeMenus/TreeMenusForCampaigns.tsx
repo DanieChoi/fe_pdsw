@@ -42,15 +42,15 @@ export function TreeMenusForCampaigns() {
 
   // 트리 데이터 API 호출
   const { data: treeData, isLoading, error } = useApiForGetTreeMenuDataForSideMenu();
-  
+
   // 트리 노드 선택/확장 상태 관리
   const { selectedNodeId, expandedNodes, setSelectedNodeId, toggleNode, expandNodes } = useTreeStore();
-  
+
   // 통합 스토어에서 정렬 및 필터링 상태 가져오기
-  const { 
-    campaignSort, 
-    skilIdsForCampaignTreeMenu, 
-    filterMode 
+  const {
+    campaignSort,
+    skilIdsForCampaignTreeMenu,
+    filterMode
   } = useTreeMenuStore();
 
   // 사이드바 너비 설정
@@ -213,12 +213,12 @@ export function TreeMenusForCampaigns() {
       return () => clearTimeout(timer);
     }
   }, [
-    isLoading, 
-    error, 
-    sortedItems.length, 
-    campaignSort.type, 
-    campaignSort.direction, 
-    filterMode, 
+    isLoading,
+    error,
+    sortedItems.length,
+    campaignSort.type,
+    campaignSort.direction,
+    filterMode,
     selectedSkillIds.length
   ]);
 
@@ -257,7 +257,7 @@ export function TreeMenusForCampaigns() {
   if (isLoading) {
     return <div className="p-4 flex-1 min-h-[calc(100%-148px)]">Loading...</div>;
   }
-  
+
   // 에러 상태
   if (error) {
     return <div className="p-4 text-red-600 flex-1 min-h-[calc(100%-148px)]">{(error as Error).message}</div>;

@@ -145,7 +145,7 @@ export function SortButtonForCampaign() {
         </CommonButton>
       </PopoverTrigger>
       <PopoverContent className="w-auto min-w-[300px] p-0 py-[10px] px-[12px] rounded-[3px] border border-[#333]" align="end">
-        <div className="text-sm font-medium mb-3">노드 타입별 정렬</div>
+        {/* <div className="text-sm font-medium mb-3">노드 타입별 정렬</div> */}
         
         <table className="w-full text-sm border-collapse">
           <thead className="bg-gray-50">

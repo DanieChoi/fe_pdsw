@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Search } from "lucide-react";
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
+import CommonButton from '@/components/shared/CommonButton';
 
 interface ISearchButtonProps {
   onSearch?: (searchTerm: string) => void;
@@ -89,19 +90,22 @@ const ISearchButtonForFindForGroupOrCampaign: React.FC<ISearchButtonProps> = ({ 
 
   return (
     <div className="relative">
-      <button
+      <CommonButton 
         ref={buttonRef}
         onClick={handleToggle}
-        className="p-1 rounded hover:bg-gray-100"
+        variant="ghost" 
+        size="sm" 
+        className="text-xs font-normal gap-[2px] hover:bg-[transparent] text-[#888] !p-0 flex items-center"
         aria-label="검색"
       >
-        <Search size={18} />
-      </button>
+        검색
+        <Search className="h-3 w-3 ml-1" />
+      </CommonButton>
 
       {isOpen && (
         <div
           ref={searchBoxRef}
-          className="absolute top-full mt-1 right-0 transform translate-x-[26%] bg-white shadow-md rounded p-2 z-10 min-w-[240px]"
+          className="absolute top-full mt-1 right-0 transform translate-x-[26%] bg-white shadow-md rounded p-2 z-10 min-w-[240px] border border-[#333] rounded-[3px]"
         >
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
@@ -116,7 +120,7 @@ const ISearchButtonForFindForGroupOrCampaign: React.FC<ISearchButtonProps> = ({ 
               />
               <button
                 onClick={handleSearch}
-                className="bg-blue-500 text-white rounded px-2 py-1 text-sm"
+                className="text-gray-600 hover:text-gray-800 border border-gray-300 rounded px-2 py-1 text-sm"
               >
                 검색
               </button>
