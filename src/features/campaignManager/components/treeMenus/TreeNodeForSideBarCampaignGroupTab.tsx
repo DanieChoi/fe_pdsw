@@ -1,4 +1,4 @@
-// src\features\campaignManager\components\treeMenus\TreeNodeForSideBarCampaignGroupTab.tsx
+// src/features/campaignManager/components/treeMenus/TreeNodeForSideBarCampaignGroupTab.tsx
 "use client";
 
 import { Building } from "lucide-react";
@@ -16,8 +16,9 @@ import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDial
 import IDialogForUpdateCampaignGroupName from "./dialog/IDialogForUpdateCampaignGroupName";
 import { toast } from "react-toastify";
 import { useApiForDeleteCampaignGroup } from "@/features/campaignManager/hooks/useApiForDeleteCampaignGroup";
-import { getCampaignGroupMenuItems } from "./ContextMenus/IContextMenuForCampaignGroupTabCamapaignGroup";
+// 기존 getCampaignGroupMenuItems 대신 새 컴포넌트를 임포트합니다.
 import { IContextMenuForCampaignForCampaignGroup, CampaignStatus } from "./ContextMenus/IContextMenuForCampaignForCampaignGroup";
+import IContextMenuForCampaignGroupAtCampaignGroup from "./ContextMenus/IContextMenuForCampaignGroupAtCampaignGroup";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -41,7 +42,6 @@ const getStatusIcon = (status?: number) => {
   }
 };
 
-// TreeNode의 start_flag를 CampaignStatus로 변환하는 함수
 const getStatusFromFlag = (flag?: number): CampaignStatus => {
   switch (flag) {
     case 1: return 'started';
@@ -59,20 +59,17 @@ export function TreeNodeForSideBarCampaignGroupTab({
   onNodeToggle,
   onNodeSelect,
 }: TreeNodeProps) {
-  // 다이얼로그와 팝업 상태
   const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
   const [isCampaignAddPopupOpen, setIsCampaignAddPopupOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const recentlyClosedDialogRef = useRef(false);
 
-  // 브라우저 환경 확인 (Portal 사용 위함)
   const [isBrowser, setIsBrowser] = useState(false);
   useEffect(() => {
     setIsBrowser(true);
   }, []);
 
-  // API 훅 설정
   const { mutate: deleteCampaignGroup, isPending: isDeleting } = useApiForDeleteCampaignGroup({
     onSuccess: () => {
       toast.success("캠페인 그룹이 삭제되었습니다.");
@@ -83,11 +80,9 @@ export function TreeNodeForSideBarCampaignGroupTab({
     }
   });
 
-  // 컨텍스트 메뉴 ID (캠페인 타입이 아닌 경우만 사용)
   const tenantMenuId = `tenant-menu-${node.id}`;
   const groupMenuId = `group-menu-${node.id}`;
 
-  // 컨텍스트 메뉴 훅 (캠페인 타입이 아닌 경우만 사용)
   const { show: showTenantMenu } = useContextMenu({ id: tenantMenuId });
   const { show: showGroupMenu } = useContextMenu({ id: groupMenuId });
 
@@ -95,14 +90,12 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const isExpanded = expandedNodes.has(node.id);
   const isSelected = selectedNodeId === node.id;
 
-  // 디버깅용 로그
   useEffect(() => {
     if (node.type === "group" && hasChildren) {
       console.log(`그룹 노드 ${node.name}에 캠페인 ${node.children?.length}개 있음, 확장 상태: ${isExpanded}`);
     }
   }, [node, hasChildren, isExpanded]);
 
-  // 핸들러 함수들
   const handleClick = useCallback(() => {
     onNodeSelect(node.id);
     if (hasChildren) {
@@ -114,8 +107,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const handleContextMenuEvent = (e: React.MouseEvent) => {
     e.preventDefault();
     onNodeSelect(node.id);
-
-    // 캠페인 타입은 새로운 컨텍스트 메뉴 컴포넌트로 처리하므로 여기서는 제외
     if (node.type === "tenant") {
       showTenantMenu({ event: e });
     } else if (node.type === "group") {
@@ -166,7 +157,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
     });
   }, [node.tenant_id, node.name]);
 
-  // 노드 스타일 계산
   const getNodeStyle = useCallback(() => {
     let baseStyle = `flex items-center hover:bg-[#FFFAEE] px-2 py-0.5 cursor-pointer transition-colors duration-150`;
     if (isSelected) {
@@ -178,7 +168,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
     return baseStyle;
   }, [isSelected, node.type]);
 
-  // 아이콘 렌더링
   const renderIcon = useCallback(() => {
     switch (node.type?.toLowerCase()) {
       case "root":
@@ -194,13 +183,11 @@ export function TreeNodeForSideBarCampaignGroupTab({
     }
   }, [node.type]);
 
-  // 모든 대화상자 렌더링
   const renderAllDialogs = () => {
     if (!isBrowser) return null;
 
     return (
       <>
-        {/* 캠페인 그룹 추가 다이얼로그 */}
         {isAddGroupDialogOpen && createPortal(
           <AddCampaignGroupDialog
             isOpen={isAddGroupDialogOpen}
@@ -212,7 +199,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
           document.body
         )}
 
-        {/* 캠페인 추가 팝업 */}
         {isCampaignAddPopupOpen && createPortal(
           <CampaignAddPopup
             isOpen={isCampaignAddPopupOpen}
@@ -223,7 +209,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
           document.body
         )}
 
-        {/* 캠페인 그룹 삭제 다이얼로그 */}
         {isDeleteDialogOpen && createPortal(
           <CommonDialogForSideMenu
             isOpen={isDeleteDialogOpen}
@@ -258,7 +243,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
           document.body
         )}
 
-        {/* 캠페인 그룹 이름 변경 다이얼로그 */}
         {isRenameDialogOpen && node.group_id !== undefined && createPortal(
           <IDialogForUpdateCampaignGroupName
             isOpen={isRenameDialogOpen}
@@ -274,7 +258,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
     );
   };
 
-  // 노드 UI 렌더링
   const renderNodeUI = () => (
     <div
       className={getNodeStyle()}
@@ -293,7 +276,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
           <span className="w-3" />
         )}
         {renderIcon()}
-
         <span className={`flex text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
           {getStatusIcon(node.start_flag) && <Image src={getStatusIcon(node.start_flag) || ''} alt="상태" width={12} height={12} className="mr-1"/>}
           {node.name}
@@ -307,7 +289,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
     </div>
   );
 
-  // 캠페인 관련 핸들러 함수들
   const handleEditCampaign = useCallback(() => {
     const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu } = useTabStore.getState();
     simulateHeaderMenuClick(2);
@@ -333,15 +314,9 @@ export function TreeNodeForSideBarCampaignGroupTab({
     toast.info("캠페인 복사 기능이 준비 중입니다.");
   }, [node.name, node.campaign_id]);
 
-  // 노드 유형에 따라 적절한 렌더링 방식 결정
   const renderNodeWithProperContextMenu = () => {
-    // 캠페인 노드인 경우 새로운 컨텍스트 메뉴 컴포넌트 사용
     if (node.type === "campaign") {
-
       console.log("캠페인 node : ");
-      
-
-      // TreeNode를 ContextMenuForTreeNodeProps.item으로 변환
       const campaignItem = {
         id: node.campaign_id,
         label: node.name,
@@ -360,7 +335,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
         </IContextMenuForCampaignForCampaignGroup>
       );
     }
-    // 그 외 노드는 기존 방식 그대로 사용
     return renderNodeUI();
   };
 
@@ -381,17 +355,16 @@ export function TreeNodeForSideBarCampaignGroupTab({
         </Item>
       </Menu>
 
-      {/* 그룹 노드 컨텍스트 메뉴 */}
+      {/* 그룹 노드 컨텍스트 메뉴 - 새 컴포넌트 적용 */}
       <Menu id={groupMenuId} className="compact-menu">
-        {getCampaignGroupMenuItems(
-          node,
-          setIsCampaignAddPopupOpen,
-          setIsDeleteDialogOpen,
-          setIsRenameDialogOpen
-        )}
+        <IContextMenuForCampaignGroupAtCampaignGroup
+          node={node}
+          setIsCampaignAddPopupOpen={setIsCampaignAddPopupOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          setIsRenameDialogOpen={setIsRenameDialogOpen}
+        />
       </Menu>
 
-      {/* 자식 노드 렌더링 */}
       {hasChildren && isExpanded && (
         <div className="children-container space-y-1">
           {node.children?.map((child) => (
@@ -408,7 +381,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
         </div>
       )}
 
-      {/* 모든 다이얼로그 렌더링 */}
       {renderAllDialogs()}
 
       <style jsx>{`

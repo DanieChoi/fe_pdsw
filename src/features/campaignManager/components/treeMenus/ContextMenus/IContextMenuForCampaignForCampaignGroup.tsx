@@ -740,6 +740,8 @@ export function IContextMenuForCampaignForCampaignGroup({
       campaignId: campaignId,
       campaignName: campaignName
     });
+
+    
   };
 
   const getStatusNumber = (status: CampaignStatus): number => {

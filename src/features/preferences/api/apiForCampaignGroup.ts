@@ -81,6 +81,8 @@ export const apiForCombinedTenantAndCampaignGroup = async (
 
         return safeData;
     } catch (error: any) {
+
+        // tofix for hyunsok
         console.error("Combined API call failed:", error);
 
         // 에러 객체에 custom 속성 추가

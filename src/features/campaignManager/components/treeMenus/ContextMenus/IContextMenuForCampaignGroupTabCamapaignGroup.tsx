@@ -1,7 +1,6 @@
 import React from "react";
 import { useTabStore } from "@/store/tabStore";
 import { Item, Separator } from "react-contexify";
-import styles from "./ContextMenuStyles.module.css";
 
 interface IContextMenuForCampaignGroupTabCamapaignProps {
   node: any;

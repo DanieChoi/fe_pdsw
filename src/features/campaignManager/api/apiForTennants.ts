@@ -80,8 +80,8 @@ export const apiForGetTenantList = async (tenant_id?: number): Promise<TenantLis
   } catch (error) {
     const typedError = error as TenantApiError;
 
-    throw new Error(
-      typedError.response?.data?.result_msg || '테넌트 데이터를 가져오는데 실패했습니다.'
-    );
+    // tofix for hyunsok 여기서 session invalid 에러 발생
+    throw error;
+
   }
 };

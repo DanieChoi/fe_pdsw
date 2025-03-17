@@ -13,6 +13,7 @@ import { fetchCallingNumberDelete } from '@/features/campaignManager/api/mainCal
 import { CallingNumberListDataResponse, CampaignInfoDeleteRequest, CampaignInfoUpdateRequest } from '@/features/campaignManager/types/campaignManagerIndex';
 import { fetchReservedCallDelete } from '@/features/campaignManager/api/mainReservedCallDelete';
 import { toast } from 'react-toastify';
+import { useSideMenuCampaignGroupTabStore } from '@/store/storeForSideMenuCampaignGroupTab';
 
 interface Props {
     campaignId?: string;
@@ -157,6 +158,7 @@ const CampaignDeletePanel = ({ campaignId, campaignName }: Props) => {
     const [tempCallingNumberInfo, setTempCallingNumberInfo] = useState<CallingNumberListDataResponse>(CallingNumberInfo);
     const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
 
+    const { updateCampaignStatus, refetchTreeData } = useSideMenuCampaignGroupTabStore();
 
 
     //캠페인 스킬 수정 api 호출
@@ -253,6 +255,9 @@ const CampaignDeletePanel = ({ campaignId, campaignName }: Props) => {
             tenant_id: 0, // 실제 tenant_id 값으로 교체 필요
             delete_dial_list: 1
         });
+
+        refetchTreeData();
+        
     };
 
     // 현재 탭이 포함된 행과 섹션 ID 찾기
