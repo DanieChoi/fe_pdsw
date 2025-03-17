@@ -337,9 +337,13 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const renderNodeWithProperContextMenu = () => {
     // 캠페인 노드인 경우 새로운 컨텍스트 메뉴 컴포넌트 사용
     if (node.type === "campaign") {
+
+      console.log("캠페인 node : ");
+      
+
       // TreeNode를 ContextMenuForTreeNodeProps.item으로 변환
       const campaignItem = {
-        id: node.id,
+        id: node.campaign_id,
         label: node.name,
         type: node.type,
         status: getStatusFromFlag(node.start_flag)

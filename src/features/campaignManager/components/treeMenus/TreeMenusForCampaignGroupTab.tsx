@@ -19,8 +19,11 @@ export function TreeMenusForCampaignGroupTab() {
     selectNode
   } = useSideMenuCampaignGroupTabStore();
 
+  console.log("treeData : ", treeData);
+
   // 초기 데이터 로드만 담당
   useEffect(() => {
+    console.log("tenant_id is exist ?: ", tenant_id);
     fetchTreeData(tenant_id);
     // fetchTreeData 내부에서 테넌트 레벨만 자동 확장됨
   }, [tenant_id, fetchTreeData]);

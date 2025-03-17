@@ -15,6 +15,7 @@ interface SideMenuCampaignGroupTabState {
   originalTreeData: TreeNode[]; // Store original data for sorting
   isLoading: boolean;
   error: Error | null;
+  tenant_id: number;
 
   // UI state
   expandedNodes: Set<string>;
@@ -27,6 +28,7 @@ interface SideMenuCampaignGroupTabState {
 
   // Actions
   fetchTreeData: (tenant_id: number) => Promise<void>;
+  refetchTreeData: (tenant_id?: number) => Promise<void>;
   toggleNode: (nodeId: string) => void;
   selectNode: (nodeId: string) => void;
   expandAllNodes: () => void;
@@ -53,6 +55,8 @@ interface SideMenuCampaignGroupTabState {
   removeCampaignFromGroup: (campaignId: string) => void;
   updateNodeName: (nodeId: string, newName: string) => void;
   currentExpansionMode: 'tenant' | 'group' | 'all' | null;
+
+  updateCampaignStatus: (campaignId: string, status: number) => void;
 }
 
 export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabState>((set, get) => ({
@@ -67,10 +71,17 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
   sortDirection: "asc",
   selectedNodeType: "all",
   currentExpansionMode: null,
+  tenant_id: 0,
 
   // Actions
   fetchTreeData: async (tenant_id: number) => {
-    set({ isLoading: true, error: null });
+
+    console.log("tenant_id 2 ? : ", tenant_id);
+    
+
+    set({ isLoading: true, error: null, tenant_id: tenant_id });
+  
+    console.log("fetchTreeData - 상태 업데이트 후 tenant_id:", get().tenant_id);
 
     try {
       const combinedData = await apiForCombinedTenantAndCampaignGroup(tenant_id);
@@ -106,6 +117,45 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
       console.error("Error fetching tree data:", error);
       set({
         error: error instanceof Error ? error : new Error('Unknown error occurred'),
+        isLoading: false
+      });
+    }
+  },
+
+  refetchTreeData: async (tenant_id?: number) => {
+    // tenant_id가 없으면 저장된 값 사용 시도
+    const savedTenantId = tenant_id || get().tenant_id;
+    
+    console.log("refetchTreeData - 사용할 tenant_id:", savedTenantId);
+    
+    // 0도 유효한 tenant_id로 간주하도록 조건 수정
+    // 조건을 !savedTenantId 대신 savedTenantId === undefined || savedTenantId === null로 변경
+    if (savedTenantId === undefined || savedTenantId === null) {
+      console.error("테넌트 ID가 없습니다.");
+      return;
+    }
+    
+    // 현재 확장 상태와 선택 상태 저장
+    const currentExpanded = get().expandedNodes;
+    const currentSelected = get().selectedNodeId;
+    
+    set({ isLoading: true, error: null });
+  
+    try {
+      const combinedData = await apiForCombinedTenantAndCampaignGroup(savedTenantId);
+      const transformedData = transformToTreeData(combinedData);
+  
+      set({
+        treeData: transformedData,
+        originalTreeData: JSON.parse(JSON.stringify(transformedData)),
+        expandedNodes: currentExpanded, // 확장 상태 유지
+        selectedNodeId: currentSelected, // 선택 상태 유지
+        isLoading: false
+      });
+    } catch (error) {
+      console.error("트리 데이터 다시 가져오기 오류:", error);
+      set({
+        error: error instanceof Error ? error : new Error('알 수 없는 오류가 발생했습니다'),
         isLoading: false
       });
     }
@@ -500,7 +550,43 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
     }
 
     return foundNodeId;
-  }
+  },
+
+  // 캠페인 상태 업데이트 함수
+  updateCampaignStatus: (campaignId: string, status: number) => {
+    set(state => {
+      const newTreeData = JSON.parse(JSON.stringify(state.treeData));
+      const newOriginalData = JSON.parse(JSON.stringify(state.originalTreeData));
+
+      const updateStatusInTree = (nodes: TreeNode[]): boolean => {
+        for (let i = 0; i < nodes.length; i++) {
+          const node = nodes[i];
+
+          // campaign_id로 비교하도록 수정
+          if (node.type === 'campaign' && (node.id === campaignId || node.campaign_id?.toString() === campaignId)) {
+            node.start_flag = status;
+            return true;
+          }
+
+          if (node.children && node.children.length > 0) {
+            if (updateStatusInTree(node.children)) {
+              return true;
+            }
+          }
+        }
+        return false;
+      };
+
+      updateStatusInTree(newTreeData);
+      updateStatusInTree(newOriginalData);
+
+      return {
+        treeData: newTreeData,
+        originalTreeData: newOriginalData
+      };
+    });
+  },
+
 }));
 
 // Helper function for sorting tree data

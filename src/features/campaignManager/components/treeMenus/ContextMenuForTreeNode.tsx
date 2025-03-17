@@ -234,6 +234,11 @@ export function ContextMenuForTreeNode({
       return;
     }
 
+    console.log("상태 변경 클릭1 : ", status);
+
+    // console.log("item for 상태 변경 ", item);
+    
+
     try {
       console.log('Status change requested:', {
         campaignId: item.id,
