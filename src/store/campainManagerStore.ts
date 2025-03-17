@@ -14,6 +14,7 @@ interface CampainManagerState {
   campaignSkills: CampaignSkillDataResponse[];
   phoneDescriptions: PhoneDescriptionListDataResponse[];  
   totalCount: number;
+  campaignGroupManagerInit: boolean;
 }
 
 interface CampainManagerActions {
@@ -23,6 +24,7 @@ interface CampainManagerActions {
   setCampaignSkills: (campaignSkills: CampaignSkillDataResponse[]) => void;
   setPhoneDescriptions: (phoneDescriptions: PhoneDescriptionListDataResponse[]) => void;
   setTotalCount: (count: number) => void;
+  setCampaignGroupManagerInit: (init: boolean) => void;
 }
 
 type CampainManagerStore = CampainManagerState & CampainManagerActions;
@@ -35,10 +37,12 @@ export const useCampainManagerStore = create<CampainManagerStore>((set) => ({
   phoneDescriptions: [],
   selectedCampaign: null,
   totalCount: 0,
+  campaignGroupManagerInit: false,
   setSkills: (skills) => set({ skills }),
   setCallingNumbers: (callingNumbers) => set({ callingNumbers }),
   setSchedules: (schedules) => set({ schedules }),
   setCampaignSkills: (campaignSkills) => set({ campaignSkills }),
   setPhoneDescriptions: (phoneDescriptions) => set({ phoneDescriptions }),
   setTotalCount: (totalCount) => set({ totalCount }),
+  setCampaignGroupManagerInit: (campaignGroupManagerInit) => set({ campaignGroupManagerInit }),
 }));

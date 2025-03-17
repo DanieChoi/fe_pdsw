@@ -46,7 +46,8 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   const [alertState, setAlertState] = useState(errorMessage);
   const router = useRouter();
 
-  const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
+  const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions
+    , campaignGroupManagerInit, setCampaignGroupManagerInit } = useCampainManagerStore();
 
   const [campaignGroupHeaderSearchParam, setCampaignGroupHeaderSearchParam] = useState<CampaignGroupHeaderSearch>();
   const handleCampaignHeaderSearch = (param: CampaignGroupHeaderSearch) => {
@@ -70,7 +71,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   };
 
   const handleInit = () => {
-    fetchCampaignGroupSearch(null);
+    setCampaignGroupManagerInit(true);
   };
 
   const handleSelectCampaignList = (data: Set<number>) => {
@@ -260,6 +261,13 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
     }
   }, [_groupId, _campaignGroupList, campaignGroupCampaignListData]);
   
+  useEffect(() => {
+    if (campaignGroupManagerInit) {
+      setCampaignGroupManagerInit(false);
+      fetchCampaignGroupSearch(null);
+    }
+  }, [campaignGroupManagerInit]);
+
   useEffect(() => {
     if (campaigns) {
       handleInit();
