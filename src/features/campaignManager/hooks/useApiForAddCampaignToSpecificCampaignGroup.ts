@@ -6,7 +6,7 @@ import { apiForAddCampaignToSpecificCampaignGroup } from '@/features/preferences
 
 interface AddCampaignToGroupParams {
   group_id: number;
-  campaign_id: number;
+  campaign_ids: number[];
   tenant_id: number;
 }
 
@@ -26,8 +26,8 @@ const useApiForAddCampaignToSpecificCampaignGroup = (
 
   return useMutation<SuccessResponse, Error, AddCampaignToGroupParams>({
     mutationKey: ['addCampaignToGroup'],
-    mutationFn: ({ group_id, campaign_id, tenant_id }: AddCampaignToGroupParams) => 
-      apiForAddCampaignToSpecificCampaignGroup(group_id, campaign_id, tenant_id),
+    mutationFn: ({ group_id, campaign_ids, tenant_id }: AddCampaignToGroupParams) => 
+      apiForAddCampaignToSpecificCampaignGroup(group_id, campaign_ids, tenant_id),
     onSuccess: (data, variables, context) => {
       // 캠페인 그룹 관련 캐시 무효화
       queryClient.invalidateQueries({

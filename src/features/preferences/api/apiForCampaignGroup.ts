@@ -418,18 +418,18 @@ export const apiForUpdateCampaignGroupName = async (
 /**
  * 특정 캠페인 그룹에 캠페인을 추가하는 API
  * @param group_id 캠페인을 추가할 캠페인 그룹의 ID
- * @param campaign_id 추가할 캠페인의 ID
+ * @param campaign_ids 추가할 캠페인의 ID 배열
  * @param tenant_id 테넌트 ID
  * @returns API 응답 (성공 여부)
  */
 export const apiForAddCampaignToSpecificCampaignGroup = async (
     group_id: number,
-    campaign_id: number,
+    campaign_ids: number[],
     tenant_id: number
 ): Promise<SuccessResponse> => {
     const request_data = {
         request_data: {
-            campaign_id: campaign_id,
+            campaign_id: campaign_ids,
             tenant_id: tenant_id
         }
     };
