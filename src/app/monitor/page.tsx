@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { useAuthStore, useMainStore, useCampainManagerStore } from '@/store';
+import { useAuthStore, useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 import ChannelMonitor from '@/app/main/comp/ChannelMonitor';
 import AgentStatusMonitoring from '@/app/main/comp/AgentStatusMonitoring';
 import OutboundCallProgressPanel from '@/app/main/comp/OutboundCallProgressPanel';
 import CampaignMonitorDashbord from '@/app/main/comp/CampaignMonitorDashbord';
 import Image from "next/image";
-import CustomAlert from '@/components/shared/layout/CustomAlert';
+import CustomAlert, {CustomAlertRequest} from '@/components/shared/layout/CustomAlert';
 import CampaignManager from '@/app/main/comp/CampaignManager';
 import RebroadcastSettingsPanel from '@/app/main/comp/RebroadcastSettingsPanel';
 import SkillListPopup from '@/components/shared/layout/SkillListPopup';
@@ -16,7 +16,20 @@ import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
+import { useApiForCampaignStatusUpdate } from '@/features/campaignManager/hooks/useApiForCampaignStatusUpdate';
+import { CheckCampaignSaveReturnCode } from '@/components/common/common';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
+
+const errorMessage: CustomAlertRequest = {
+  isOpen: false,
+  message: '',
+  title: '캠페인',
+  type: '1',
+  onClose: () => { },
+  onCancle: () => { },
+};
 
 // 타입 정의
 interface Sizes {
@@ -77,22 +90,25 @@ const initData : Campaign = {
 
 const MonitorPage = () => {
   const { tenants, setTenants, campaigns, setCampaigns } = useMainStore();
+  const { setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const { skills, setSkills } = useCampainManagerStore();
 
-   // 인증 관련 상태
-   const { tenant_id } = useAuthStore();
+    // 인증 관련 상태
+    const { tenant_id } = useAuthStore();
 
-   // 드래그 관련 상태
-   const containerRef = useRef<HTMLDivElement>(null);
-   const [isDragging, setIsDragging] = useState<boolean>(false);
-   const [activeDragger, setActiveDragger] = useState<DraggerId | null>(null);
-   const initialPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-   const initialSizesRef = useRef<Sizes | null>(null);
+    // 드래그 관련 상태
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [isDragging, setIsDragging] = useState<boolean>(false);
+    const [activeDragger, setActiveDragger] = useState<DraggerId | null>(null);
+    const initialPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+    const initialSizesRef = useRef<Sizes | null>(null);
  
    // 모달/팝업 상태
-   const [isCampaignManagerOpen, setIsCampaignManagerOpen] = useState(false);
-   const [isRebroadcastOpen, setIsRebroadcastOpen] = useState(false);
-   const [isSkillPopupOpen, setIsSkillPopupOpen] = useState(false);
+    const [isCampaignManagerOpen, setIsCampaignManagerOpen] = useState(false);
+    const [isRebroadcastOpen, setIsRebroadcastOpen] = useState(false);
+    const [isSkillPopupOpen, setIsSkillPopupOpen] = useState(false);
+    const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
+    const router = useRouter();
  
    // 크기 조정 상태
    const [sizes, setSizes] = useState<Sizes>({
@@ -250,16 +266,53 @@ const MonitorPage = () => {
     });
   }, [isDragging, activeDragger]);
 
-   // 캠페인 관련 핸들러
-   const handleStatusChange = useCallback((newStatus: string) => {
-    setCampaignStatus(newStatus as CampaignStatus);
-    // API 호출 로직 추가
-  }, []);
+  //캠페인 상태 변경 api 호출
+  const { mutate: fetchCampaignStatusUpdate } = useApiForCampaignStatusUpdate({
+    onSuccess: (data) => {
+      if (!(data.result_code === 0 || data.result_code === -13)) {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: CheckCampaignSaveReturnCode(data.reason_code),
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+          onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+        setCampaignStatus(currentCampaign.startFlag === 1 ? '시작' : currentCampaign.startFlag === 2 ? '멈춤' : '중지');
+      }else{        
+        fetchMain({
+          session_key: '',
+          tenant_id: tenant_id,
+        });
+      }
+    },onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
+    }
+  });
 
-    const handleCampaignSelect = useCallback((campaignId: string) => {
+   // 캠페인 관련 핸들러
+   const handleStatusChange = (newStatus: string) => {
+    setCampaignStatus(newStatus as CampaignStatus);
+    fetchCampaignStatusUpdate({
+      campaign_id: Number(selectedCampaign)
+      , campaign_status: newStatus === '시작' ? 1 : newStatus === '멈춤' ? 2 : 3
+    });
+    // API 호출 로직 추가
+  };
+
+    const handleCampaignSelect = (campaignId: string) => {
       setSelectedCampaign(campaignId);
       // API 호출 로직 추가
-    }, []);
+    };
 
     const handleCallPacingChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
       const value = parseInt(e.target.value);
@@ -268,10 +321,15 @@ const MonitorPage = () => {
       }
     }, []);
 
-    const handleCallPacingApply = useCallback(() => {
+    const handleCallPacingApply = () => {
       console.log('Applying call pacing:', callPacing);
       // TODO: API 호출하여 콜페이싱 값 적용
-    }, [callPacing]);
+    };
+
+    const handleRebroadcastEdit = () => {
+      setCampaignIdForUpdateFromSideMenu(selectedCampaign+'');
+      setIsRebroadcastOpen(true);
+    };
 
     // 스킬 관련 핸들러
     const handleSkillPopupClose = () => {
@@ -370,7 +428,7 @@ const MonitorPage = () => {
             onCallPacingApply={handleCallPacingApply}
             onCampaignEdit={() => setIsCampaignManagerOpen(true)}
             onSkillEdit={handleSkillModify}
-            onRebroadcastEdit={() => setIsRebroadcastOpen(true)}
+            onRebroadcastEdit={handleRebroadcastEdit}
           />
         );
       case 'outbound-progress':
@@ -659,6 +717,15 @@ const renderBottomRow = () => {
             width="max-w-[1300px]"
           />
 
+        <CustomAlert
+          message={alertState.message}
+          title={alertState.title}
+          type={alertState.type}
+          isOpen={alertState.isOpen}
+          onClose={() => {
+            alertState.onClose()
+          }}
+        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
     </div>
   );
 };
