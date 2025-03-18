@@ -1,16 +1,22 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
-import { useAuthStore } from "@/store/authStore";
-import { useApiForGetRelatedInfoForAssignSkilToCounselor } from "@/features/preferences/hooks/useApiForGetRelatedInfoForAssignSkilToCounselor";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { CounselorSkill } from "@/features/campaignManager/types/typeForCounselorSkill";
-import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDialogForSideMenu";
+import { useApiForGetRelatedInfoForAssignSkilToCounselor } from "@/features/preferences/hooks/useApiForGetRelatedInfoForAssignSkilToCounselor";
 import { useApiDeleteCounselorsFromSkills } from "@/features/campaignManager/hooks/useApiDeleteCounselorsFromSkills";
 import { useApiBatchSkillAssignment } from "@/features/campaignManager/hooks/useApiBatchSkillAssignment";
+import CommonDialogWithCustomAlertStyle from "@/components/shared/layout/CommonDialogWithCustomAlertStyle";
 
 interface IDialogForSkilAssignmentForCounselorProps {
   isOpen: boolean;
@@ -29,7 +35,7 @@ export function IDialogForSkilAssignmentForCounselor({
   counselorName,
   tenantId,
   isUnassignment = false,
-  dialogTitle
+  dialogTitle,
 }: IDialogForSkilAssignmentForCounselorProps) {
   const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
   const [initialSkills, setInitialSkills] = useState<number[]>([]);
@@ -39,29 +45,30 @@ export function IDialogForSkilAssignmentForCounselor({
     removed: number[];
   }>({ added: [], removed: [] });
 
-  // isUnassignment prop이 변경될 때 isUnassignMode 상태 업데이트
+  // isUnassignment prop 변경 시 모드 업데이트
   useEffect(() => {
     setIsUnassignMode(isUnassignment);
   }, [isUnassignment]);
 
-  const { assignedSkills, assignableSkills, isLoading, error } = useApiForGetRelatedInfoForAssignSkilToCounselor(
-    counselorId,
-    Number(tenantId)
-  );
+  const { assignedSkills, assignableSkills, isLoading, error } =
+    useApiForGetRelatedInfoForAssignSkilToCounselor(
+      counselorId,
+      Number(tenantId)
+    );
 
-  // 스킬 할당 및 해제 커스텀 훅 사용
+  // 스킬 추가/해제 처리 훅
   const addSkillsMutation = useApiBatchSkillAssignment(tenantId ?? "0");
   const deleteSkillsMutation = useApiDeleteCounselorsFromSkills(tenantId ?? "0");
+  const isProcessing =
+    addSkillsMutation.isPending || deleteSkillsMutation.isPending;
 
-  // 로딩 상태 통합
-  const isProcessing = addSkillsMutation.isPending || deleteSkillsMutation.isPending;
-
+  // 다이얼로그가 열릴 때 할당된 스킬을 초기화하고 pending 변경사항을 초기화
   useEffect(() => {
     if ((assignedSkills?.result_data ?? []).length > 0) {
-      const assignedSkillIds = assignedSkills?.result_data.flatMap((item) => item.skill_id) ?? [];
+      const assignedSkillIds =
+        assignedSkills?.result_data.flatMap((item) => item.skill_id) ?? [];
       setSelectedSkills(assignedSkillIds);
       setInitialSkills(assignedSkillIds);
-      // 다이얼로그를 열 때마다 pending 변경사항 초기화
       setPendingChanges({ added: [], removed: [] });
     } else {
       setSelectedSkills([]);
@@ -70,40 +77,40 @@ export function IDialogForSkilAssignmentForCounselor({
     }
   }, [assignedSkills]);
 
+  // 스킬 선택/해제 및 pending 변경사항 추적
   const handleSkillToggle = (skillId: number) => {
     setSelectedSkills((prev) => {
       const isCurrentlySelected = prev.includes(skillId);
-      
-      // 최대 스킬 할당 개수 체크
+
+      // 할당 모드일 때 최대 10개 체크
       if (!isCurrentlySelected && prev.length >= 10 && !isUnassignMode) {
         toast.error("최대 10개의 스킬만 할당할 수 있습니다.");
         return prev;
       }
 
-      // pending 변경사항 추적
-      setPendingChanges(current => {
+      // pending 변경사항 업데이트
+      setPendingChanges((current) => {
         if (isCurrentlySelected) {
-          // 체크 해제: 이미 추가된 항목이면 added에서 제거, 원래 있던 항목이면 removed에 추가
+          // 체크 해제: 원래 있던 항목은 removed에 추가
           return {
-            added: current.added.filter(id => id !== skillId),
-            removed: initialSkills.includes(skillId) 
+            added: current.added.filter((id) => id !== skillId),
+            removed: initialSkills.includes(skillId)
               ? [...current.removed, skillId]
-              : current.removed
+              : current.removed,
           };
         } else {
-          // 체크: 이미 removed에 있으면 removed에서 제거, 원래 없던 항목이면 added에 추가
+          // 체크: 원래 없던 항목은 added에 추가
           return {
-            added: !initialSkills.includes(skillId) 
+            added: !initialSkills.includes(skillId)
               ? [...current.added, skillId]
               : current.added,
-            removed: current.removed.filter(id => id !== skillId)
+            removed: current.removed.filter((id) => id !== skillId),
           };
         }
       });
 
-      // 선택 상태 토글
-      return isCurrentlySelected 
-        ? prev.filter(id => id !== skillId) 
+      return isCurrentlySelected
+        ? prev.filter((id) => id !== skillId)
         : [...prev, skillId];
     });
   };
@@ -114,7 +121,7 @@ export function IDialogForSkilAssignmentForCounselor({
 
   const handleConfirm = async () => {
     const { added, removed } = pendingChanges;
-    
+
     if (added.length === 0 && removed.length === 0) {
       toast.info("변경된 사항이 없습니다.");
       onClose();
@@ -128,32 +135,33 @@ export function IDialogForSkilAssignmentForCounselor({
           skillIds: added,
           counselorIds: [counselorId],
           tenantId,
-          isUnassignment: false
+          isUnassignment: false,
         });
-        
         if (addResult.success) {
           toast.success(`${added.length}개 스킬이 할당되었습니다.`);
         } else {
-          toast.warning(`${addResult.successCount}개 스킬만 할당되었습니다. ${addResult.failedSkills.length}개 실패.`);
+          toast.warning(
+            `${addResult.successCount}개 스킬만 할당되었습니다. ${addResult.failedSkills.length}개 실패.`
+          );
         }
       }
-      
+
       // 제거할 스킬이 있으면 배치 처리
       if (removed.length > 0) {
         const removeResult = await deleteSkillsMutation.mutateAsync({
           skillIds: removed,
           counselorIds: [counselorId],
-          tenantId
+          tenantId,
         });
-        
         if (removeResult.success) {
           toast.success(`${removed.length}개 스킬이 해제되었습니다.`);
         } else {
-          toast.warning(`${removeResult.successCount}개 스킬만 해제되었습니다. ${removeResult.failedSkills.length}개 실패.`);
+          toast.warning(
+            `${removeResult.successCount}개 스킬만 해제되었습니다. ${removeResult.failedSkills.length}개 실패.`
+          );
         }
       }
-      
-      // 데이터 다시 불러오기 (React Query가 자동으로 무효화를 처리하지만, 명시적으로 호출할 수도 있음)
+
       onClose();
     } catch (error) {
       console.error("스킬 할당/해제 중 오류 발생:", error);
@@ -163,7 +171,6 @@ export function IDialogForSkilAssignmentForCounselor({
 
   const getConfirmButtonText = () => {
     const { added, removed } = pendingChanges;
-    
     if (isUnassignMode) {
       return `스킬 해제 (${removed.length}개)`;
     } else if (added.length > 0 && removed.length > 0) {
@@ -173,7 +180,6 @@ export function IDialogForSkilAssignmentForCounselor({
     } else if (removed.length > 0) {
       return `스킬 해제 (${removed.length}개)`;
     }
-    
     return isUnassignMode ? "스킬 해제" : "스킬 할당";
   };
 
@@ -200,9 +206,15 @@ export function IDialogForSkilAssignmentForCounselor({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]">선택</TableHead>
-                <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]">아이디</TableHead>
-                <TableHead className="text-center bg-[#F8F8F8] text-[#333]">이름</TableHead>
+                <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]">
+                  선택
+                </TableHead>
+                <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]">
+                  아이디
+                </TableHead>
+                <TableHead className="text-center bg-[#F8F8F8] text-[#333]">
+                  이름
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -210,11 +222,12 @@ export function IDialogForSkilAssignmentForCounselor({
                 const isInitiallySelected = initialSkills.includes(skill.skill_id);
                 const isCurrentlySelected = selectedSkills.includes(skill.skill_id);
                 const hasChanged = isInitiallySelected !== isCurrentlySelected;
-                
                 return (
-                  <TableRow 
-                    key={`${skill.tenant_id}-${skill.skill_id}`} 
-                    className={`custom-hover ${hasChanged ? 'bg-blue-50' : ''}`}
+                  <TableRow
+                    key={`${skill.tenant_id}-${skill.skill_id}`}
+                    className={`custom-hover ${
+                      hasChanged ? "bg-blue-50" : ""
+                    }`}
                   >
                     <TableCell className="text-center text-[#444]">
                       <CustomCheckbox
@@ -223,12 +236,16 @@ export function IDialogForSkilAssignmentForCounselor({
                         disabled={isProcessing}
                       />
                     </TableCell>
-                    <TableCell className="text-center text-[#444]">{skill.skill_id}</TableCell>
+                    <TableCell className="text-center text-[#444]">
+                      {skill.skill_id}
+                    </TableCell>
                     <TableCell className="text-center text-[#444]">
                       {skill.skill_name}
                       {hasChanged && (
                         <span className="ml-2 text-xs text-blue-500">
-                          {isCurrentlySelected ? '(추가 예정)' : '(해제 예정)'}
+                          {isCurrentlySelected
+                            ? "(추가 예정)"
+                            : "(해제 예정)"}
                         </span>
                       )}
                     </TableCell>
@@ -243,13 +260,17 @@ export function IDialogForSkilAssignmentForCounselor({
           <Button
             onClick={handleConfirm}
             className="px-6 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
-            disabled={isProcessing || (pendingChanges.added.length === 0 && pendingChanges.removed.length === 0)}
+            disabled={
+              isProcessing ||
+              (pendingChanges.added.length === 0 &&
+                pendingChanges.removed.length === 0)
+            }
           >
             {isProcessing ? "처리 중..." : getConfirmButtonText()}
           </Button>
-          <Button 
-            variant="outline" 
-            onClick={handleCancel} 
+          <Button
+            variant="outline"
+            onClick={handleCancel}
             className="px-6 py-1.5 border border-gray-300 rounded text-sm"
             disabled={isProcessing}
           >
@@ -261,12 +282,17 @@ export function IDialogForSkilAssignmentForCounselor({
   };
 
   return (
-    <CommonDialogForSideMenu 
-      isOpen={isOpen} 
-      onClose={onClose} 
-      title={dialogTitle || `스킬 ${isUnassignMode ? "해제" : "할당"} - ${counselorName || ''}`}
+    <CommonDialogWithCustomAlertStyle
+      isOpen={isOpen}
+      onClose={onClose}
+      title={
+        dialogTitle ||
+        `스킬 ${isUnassignMode ? "해제" : "할당"} - ${counselorName || ""}`
+      }
+      width="w-[70%] max-w-[1200px] min-w-[800px]"
+      showButtons={false} // 내부 커스텀 버튼 사용
     >
       {renderContent()}
-    </CommonDialogForSideMenu>
+    </CommonDialogWithCustomAlertStyle>
   );
 }
