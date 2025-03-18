@@ -9,6 +9,7 @@ interface TreeNodeProps {
   getStatusIcon: (status?: string) => string | null;
   onNodeToggle: (nodeId: string) => void;
   onNodeSelect: (nodeId: string) => void;
+  compact?: boolean;
 }
 
 const TreeNode: React.FC<TreeNodeProps> = ({

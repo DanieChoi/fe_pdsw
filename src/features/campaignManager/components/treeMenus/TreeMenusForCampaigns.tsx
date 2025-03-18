@@ -50,7 +50,8 @@ export function TreeMenusForCampaigns() {
   const {
     campaignSort,
     skilIdsForCampaignTreeMenu,
-    filterMode
+    filterMode,
+    viewMode
   } = useTreeMenuStore();
 
   // 사이드바 너비 설정
@@ -68,10 +69,10 @@ export function TreeMenusForCampaigns() {
   // 필터링 로직
   function filterTreeItems(items: TreeItem[]): TreeItem[] {
     // 필터 모드가 'all'이면 모든 아이템 표시
-    if (filterMode === "all") return items;
+    if (filterMode === "all") return viewMode === 'tenant' ? filterByViewMode(items) : items;
 
     // 스킬 기반 필터링
-    return items.reduce((acc: TreeItem[], node: TreeItem) => {
+    const filteredItems = items.reduce((acc: TreeItem[], node: TreeItem) => {
       if (node.type === "campaign") {
         const campaignSkillIds = Array.isArray(node.children)
           ? node.children
@@ -90,6 +91,34 @@ export function TreeMenusForCampaigns() {
       }
       return acc;
     }, []);
+    
+    // 뷰 모드에 따라 필터링 적용
+    return viewMode === 'tenant' ? filterByViewMode(filteredItems) : filteredItems;
+  }
+
+  // 뷰 모드에 따른 필터링 (테넌트만 또는 캠페인까지)
+  function filterByViewMode(items: TreeItem[]): TreeItem[] {
+    if (viewMode === 'tenant') {
+      return items.map(item => {
+        if (item.type === "folder") {
+          // 폴더 내의 테넌트 노드만 유지하고 캠페인 노드는 제외
+          const tenantChildren = item.children ? 
+            item.children.filter(child => child.type !== "campaign") : [];
+          
+          // 테넌트 노드의 자식들을 재귀적으로 필터링
+          const filteredTenantChildren = tenantChildren.map(child => {
+            if (child.children) {
+              return { ...child, children: [] }; // 테넌트 노드의 자식들(캠페인)은 제거
+            }
+            return child;
+          });
+          
+          return { ...item, children: filteredTenantChildren };
+        }
+        return item;
+      });
+    }
+    return items; // 'campaign' 모드에서는 모든 노드 표시
   }
 
   // 정렬 로직
@@ -183,14 +212,15 @@ export function TreeMenusForCampaigns() {
       // 최소값 설정
       maxContentWidth = Math.max(maxContentWidth, 200);
 
-      // 여백 추가
-      const idealWidth = maxContentWidth + 25;
+      // 여백 추가 (뷰 모드에 따라 다른 여백 추가)
+      const idealWidth = maxContentWidth + (viewMode === 'tenant' ? 15 : 25);
 
       console.log("캠페인 탭 측정:", {
         campaignWidth: campaignMaxWidth,
         folderWidth: folderMaxWidth,
         treeWidth: treeMaxWidth,
-        finalWidth: idealWidth
+        finalWidth: idealWidth,
+        viewMode: viewMode
       });
 
       // 캠페인 탭 너비 설정
@@ -219,7 +249,8 @@ export function TreeMenusForCampaigns() {
     campaignSort.type,
     campaignSort.direction,
     filterMode,
-    selectedSkillIds.length
+    selectedSkillIds.length,
+    viewMode
   ]);
 
   // 컴포넌트 언마운트 시 타이머 정리
@@ -248,24 +279,26 @@ export function TreeMenusForCampaigns() {
         }
       };
 
-      expandUpToLevel(items, 0, 3);
+      // 뷰 모드에 따라 다른 레벨까지 확장
+      const maxExpandLevel = viewMode === 'tenant' ? 1 : 3;
+      expandUpToLevel(items, 0, maxExpandLevel);
       expandNodes(newExpanded);
     }
-  }, [isLoading, error, treeData, expandNodes, originalItems]);
+  }, [isLoading, error, treeData, expandNodes, originalItems, viewMode]);
 
   // 로딩 상태
   if (isLoading) {
-    return <div className="p-4 flex-1 min-h-[calc(100%-148px)]">Loading...</div>;
+    return <div className="p-2 flex-1 min-h-[calc(100%-148px)] text-xs">Loading...</div>;
   }
 
   // 에러 상태
   if (error) {
-    return <div className="p-4 text-red-600 flex-1 min-h-[calc(100%-148px)]">{(error as Error).message}</div>;
+    return <div className="p-2 text-red-600 flex-1 min-h-[calc(100%-148px)] text-xs">{(error as Error).message}</div>;
   }
 
   // 트리 렌더링
   return (
-    <div className="flex-1 overflow-auto tree-node" ref={containerRef}>
+    <div className="flex-1 overflow-auto tree-node text-xs" ref={containerRef}>
       {sortedItems.map((item: TreeItem) => (
         <TreeNode
           key={item.id}
@@ -276,6 +309,7 @@ export function TreeMenusForCampaigns() {
           getStatusIcon={getStatusIcon}
           onNodeToggle={toggleNode}
           onNodeSelect={setSelectedNodeId}
+          compact={true} // 컴팩트 모드 활성화
         />
       ))}
     </div>

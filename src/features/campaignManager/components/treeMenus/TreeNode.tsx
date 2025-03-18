@@ -19,8 +19,9 @@ export function TreeNode({
   getStatusIcon,
   onNodeToggle,
   onNodeSelect,
+  compact = false, // 컴팩트 모드 기본값 추가
 }: TreeNodeProps) {
-  const { skilIdsForCampaignTreeMenu } = useTreeMenuStore(); // 통합 스토어 사용
+  const { skilIdsForCampaignTreeMenu, viewMode } = useTreeMenuStore(); // 통합 스토어 사용
   const {
     simulateHeaderMenuClick,
     setCampaignIdForUpdateFromSideMenu,
@@ -33,6 +34,11 @@ export function TreeNode({
   const isExpanded = expandedNodes.has(item.id);
   const isSelected = selectedNodeId === item.id;
   const statusIcon = item.type === "campaign" ? getStatusIcon(item.status) : null;
+
+  // 뷰 모드가 tenant이고 item.type이 campaign인 경우 렌더링하지 않음
+  if (viewMode === 'tenant' && item.type === 'campaign') {
+    return null;
+  }
 
   const handleClick = useCallback(() => {
     onNodeSelect(item.id);
@@ -56,35 +62,41 @@ export function TreeNode({
     return null;
   }
 
-  //
+  // 아이콘 크기 조정 (컴팩트 모드일 경우 더 작게)
+  const iconSize = compact ? 10 : 14;
+  const expandIconSize = compact ? 10 : 12;
+
+  // 노드 아이콘 가져오기
   const getNodeIcon = () => {
     if (item.type === "folder") {
       return level === 0 ? (
         <Image
           src="/tree-menu/organization.png"
           alt="조직"
-          width={14}
-          height={12}
+          width={iconSize}
+          height={iconSize * 0.85}
+          className="flex-shrink-0"
         />
       ) : (
         <Image
           src="/tree-menu/folder.png"
           alt="그룹"
-          width={14}
-          height={12}
+          width={iconSize}
+          height={iconSize * 0.85}
+          className="flex-shrink-0"
         />
       );
     }
     
     if (item.type === "campaign") {
       return statusIcon ? (
-        <Image src={statusIcon} alt="status" width={12} height={12} />
+        <Image src={statusIcon} alt="status" width={iconSize} height={iconSize} className="flex-shrink-0" />
       ) : (
-        <FileText className="h-4 w-4 text-gray-400" />
+        <FileText className={`${compact ? 'h-3 w-3' : 'h-4 w-4'} text-gray-400 flex-shrink-0`} />
       );
     }
     
-    return <FileText className="h-4 w-4 text-gray-400" />;
+    return <FileText className={`${compact ? 'h-3 w-3' : 'h-4 w-4'} text-gray-400 flex-shrink-0`} />;
   };
 
   const handleEdit = () => {
@@ -109,41 +121,62 @@ export function TreeNode({
     });
   };
 
+  // 노드 클래스 - 컴팩트 모드일 경우 더 작은 패딩 적용
   const nodeStyle = clsx(
-    "flex items-center hover:bg-[#FFFAEE] px-2 py-0.5 cursor-pointer transition-colors duration-150",
+    "flex items-center hover:bg-[#FFFAEE] cursor-pointer transition-colors duration-150",
     {
       "bg-[#FFFAEE]": isSelected,
+      "px-2 py-0.5": !compact, // 기본 패딩
+      "px-1 py-0.5": compact,  // 컴팩트 모드 패딩
+    },
+    item.type === "folder" ? "folder-node" : "campaign-node",
+    "tree-item"
+  );
+
+  // 텍스트 스타일 - 컴팩트 모드일 경우 더 작은 폰트
+  const textStyle = clsx(
+    "text-555 truncate",
+    {
+      "font-medium": isSelected,
+      "text-sm": !compact,
+      "text-xs": compact
     }
   );
 
   // 공통된 노드 내용 컴포넌트
   const nodeContent = (
-    <div className="flex items-center w-full gap-2">
+    <div className="flex items-center w-full gap-1">
       {hasChildren ? (
         isExpanded ? (
           <Image
             src="/tree-menu/minus_for_tree.png"
             alt="접기"
-            width={12}
-            height={12}
+            width={expandIconSize}
+            height={expandIconSize}
+            className="flex-shrink-0"
           />
         ) : (
           <Image
             src="/tree-menu/plus_icon_for_tree.png"
             alt="펼치기"
-            width={12}
-            height={12}
+            width={expandIconSize}
+            height={expandIconSize}
+            className="flex-shrink-0"
           />
         )
       ) : (
-        <span className="w-3" />
+        <span className={compact ? "w-2" : "w-3"} />
       )}
       {getNodeIcon()}
-      <span className={clsx("text-sm text-555", { "font-medium": isSelected })}>
+      <span className={textStyle}>
         {item.label}
       </span>
     </div>
   );
+
+  // 레벨 인덴트 계산 - 컴팩트 모드일 경우 더 작은 인덴트
+  const indentSize = compact ? 12 : 16;
+  const paddingLeft = `${level * indentSize + (compact ? 6 : 8)}px`;
 
   return (
     <div className="select-none">
@@ -154,7 +187,7 @@ export function TreeNode({
               className={nodeStyle}
               onClick={handleClick}
               onContextMenu={handleContextMenu}
-              style={{ paddingLeft: `${level * 16 + 8}px` }}
+              style={{ paddingLeft }}
             >
               {nodeContent}
             </div>
@@ -173,7 +206,7 @@ export function TreeNode({
             onClick={handleClick}
             onDoubleClick={handleDoubleClick}
             onContextMenu={handleContextMenu}
-            style={{ paddingLeft: `${level * 16 + 8}px` }}
+            style={{ paddingLeft }}
           >
             {nodeContent}
           </div>
@@ -181,7 +214,7 @@ export function TreeNode({
       )}
 
       {hasChildren && isExpanded && (
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {item.children?.map((child: typeof item) => (
             <TreeNode
               key={child.id}
@@ -192,6 +225,7 @@ export function TreeNode({
               getStatusIcon={getStatusIcon}
               onNodeToggle={onNodeToggle}
               onNodeSelect={onNodeSelect}
+              compact={compact}
             />
           ))}
         </div>
