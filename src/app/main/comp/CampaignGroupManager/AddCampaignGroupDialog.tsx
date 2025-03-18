@@ -7,14 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDialogForSideMenu";
-import { useApiForCreateCampaignGroup } from "@/features/preferences/hooks/useApiForCreateCampaignGroup";
 import { useApiForCampaignGroupCreate } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupCreate';
-import { toast } from "react-toastify";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
-import { useMainStore, useCampainManagerStore } from '@/store';
+import { useMainStore } from '@/store';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
-import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
+import CustomAlert from '@/components/shared/layout/CustomAlert';
+import { DataProps } from './CampaignGroupManagerList';
 
 const errorMessage = {
   isOpen: false,
@@ -28,6 +27,7 @@ interface AddCampaignGroupDialogProps {
   onClose: (e?: React.MouseEvent | React.KeyboardEvent | Event) => void;
   tenantId: number; // string에서 number로 변경
   tenantName: string;
+  campaignGroupList: DataProps[];
   onAddGroup?: (groupName: string, groupCode: string) => void;
 }
 
@@ -36,6 +36,7 @@ export function AddCampaignGroupDialog({
   onClose,
   tenantId,
   tenantName,
+  campaignGroupList,
   onAddGroup,
 }: AddCampaignGroupDialogProps) {
   const [groupName, setGroupName] = useState("");
@@ -109,8 +110,16 @@ export function AddCampaignGroupDialog({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation(); // 이벤트 전파 방지
+    if( campaignGroupList.filter((group) => group.campaignGroupId === Number(groupId)).length > 0 ){
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '이미 존재하는 그룹입니다.',
+      });
+      return;
+    }
     
-    if (groupName.trim() && groupId.trim()) {
+    if (groupName.trim() && groupId.trim() ) {
       fetchCampaignGroupCreate({
         group_id: Number(groupId),
         tenant_id: Number(_tenantId), 

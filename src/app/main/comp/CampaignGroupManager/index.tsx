@@ -18,12 +18,22 @@ import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
+import AddCampaignGroupDialog from "./AddCampaignGroupDialog";
 
 const errorMessage = {
   isOpen: false,
   message: '',
   title: '로그인',
   type: '0',
+};
+
+const _addGroupParam = {
+  isOpen: false,
+  tenantId: 0,
+  tenantName: '',
+  campaignGroupList:[] as DataProps[],
+  onAddGroup: (groupName: string, groupCode: string) => { },
+  onClose: () => {},
 };
 
 const initData: DataProps = { no: 0, tenantId: 0, tenantName: '', campaignGroupId: 0, campaignGroupName: '' };
@@ -45,6 +55,8 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   const [selectCampaignGroupList, setSelectCampaignGroupList] = useState<MainDataResponse[]>([]);
   const [alertState, setAlertState] = useState(errorMessage);
   const router = useRouter();
+  // const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
+  const [ addGroupParam, setAddGroupParam ] = useState(_addGroupParam);
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions
     , campaignGroupManagerInit, setCampaignGroupManagerInit } = useCampainManagerStore();
@@ -66,8 +78,17 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
 
   //캠페인 그룹 삭제
   const handleGroupDelete = (param: GroupDeleteParam) => {
-    fetchCampaignGroupCampaignListDelete({tenant_id: param.tenant_id, group_id: param.group_id});
+    fetchCampaignGroupCampaignListDelete({tenant_id: param.tenant_id, group_id: param.group_id, campaign_id: []});
     fetchCampaignGroupDelete(param.group_id);
+  };
+
+  // 다이얼로그 닫기
+  const handleCloseAddGroupDialog = () => {
+    setAddGroupParam((prev) => ({ ...prev, isOpen: false }))
+  };
+  const handleAddGroup = (groupName: string, groupCode: string) => {
+    handleInit();
+    setAddGroupParam((prev) => ({ ...prev, isOpen: false }))
   };
 
   const handleInit = () => {
@@ -305,10 +326,26 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
           />
 
           <CampaignGroupManagerDetail groupInfo={groupInfo} campaignId={campaignId} onInit={handleInit} onGroupDelete={handleGroupDelete}
-            selectCampaignGroupList={selectCampaignGroupList}
+            selectCampaignGroupList={selectCampaignGroupList} onAddGroupDialogOpen={() => setAddGroupParam({
+              ...addGroupParam,
+              isOpen: true,
+              onClose: handleCloseAddGroupDialog,
+              tenantId: groupInfo.tenantId,
+              tenantName: groupInfo.tenantName,
+              campaignGroupList: _campaignGroupList,
+              onAddGroup: handleAddGroup
+            })}
           />
         </div>
       </div>
+      <AddCampaignGroupDialog
+        isOpen={addGroupParam.isOpen}
+        onClose={handleCloseAddGroupDialog}
+        tenantId={0}
+        tenantName={''}
+        campaignGroupList={_campaignGroupList}
+        onAddGroup={handleAddGroup}
+      />
       <CustomAlert
         message={alertState.message}
         title={alertState.title}

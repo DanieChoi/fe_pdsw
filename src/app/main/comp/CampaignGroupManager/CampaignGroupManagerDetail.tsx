@@ -302,9 +302,10 @@ type Props = {
   onInit: () => void;
   onGroupDelete: (param: GroupDeleteParam) => void;
   selectCampaignGroupList: MainDataResponse[];
+  onAddGroupDialogOpen: () => void;
 }
 
-export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onInit, onGroupDelete, selectCampaignGroupList }: Props) {
+export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onInit, onGroupDelete, selectCampaignGroupList,onAddGroupDialogOpen }: Props) {
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
@@ -342,7 +343,6 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
     tenantId: 0,
     type: '1',
   });
-  const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
   const router = useRouter();
 
   //캠페인 정보 최초 세팅 
@@ -1172,20 +1172,11 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
     }
   };
 
-  // 다이얼로그 닫기
-  const handleCloseAddGroupDialog = () => {
-    setIsAddGroupDialogOpen(false);
-  };
   // 소속캠페인 추가 다이얼로그 열기
   const handleCloseCampaignDialog = () => {
     onInit();
     setIsCampaignAddPopupOpen(false);
   }
-
-  const handleAddGroup = (groupName: string, groupCode: string) => {
-    onInit();
-    setIsAddGroupDialogOpen(false);
-  };
 
   // 팝업 상태
   const [isCampaignAddPopupOpen, setIsCampaignAddPopupOpen] = useState(false);
@@ -1202,7 +1193,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
           className='border-b border-gray-300 pb-1'
           title="상세내역"
           buttons={[
-            { label: "새 캠페인 그룹", onClick: () => setIsAddGroupDialogOpen(true) },
+            { label: "새 캠페인 그룹", onClick: () => onAddGroupDialogOpen() },
             { label: "소속 캠페인 추가/삭제", onClick: () => handleCloseGroupAddCampaignOpen() },
             { label: "일괄 저장", onClick: () => handleCampaignSave(), },
             {
@@ -1355,13 +1346,6 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
         isOpen={callingNumberPopupState.isOpen}
         onConfirm={(param) => handleCallingNumlber(param)}
         onCancle={() => setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))}
-      />
-      <AddCampaignGroupDialog
-        isOpen={isAddGroupDialogOpen}
-        onClose={handleCloseAddGroupDialog}
-        tenantId={0}
-        tenantName={''}
-        onAddGroup={handleAddGroup}
       />
       <CampaignAddPopup
         isOpen={isCampaignAddPopupOpen}
