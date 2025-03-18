@@ -516,6 +516,8 @@ export default function CampaignDetail() {
             start_time: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].start_time,
             end_time: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].end_time
           });
+        }else{
+          setTempCampaignSchedule(CampaignScheduleInfo);
         }
       } else {
         setTempCampaignSchedule({
