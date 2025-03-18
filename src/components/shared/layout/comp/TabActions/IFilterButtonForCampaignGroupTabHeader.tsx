@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import CommonButton from "@/components/shared/CommonButton";
 import { ArrowUp, ArrowDown } from "lucide-react";
@@ -18,6 +18,14 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
     sortByNodeType,
     currentExpansionMode
   } = useSideMenuCampaignGroupTabStore();
+
+  // 초기 로딩시 currentExpansionMode가 null일 경우를 처리
+  useEffect(() => {
+    if (currentExpansionMode === null) {
+      // 초기 상태는 그룹 레벨까지 확장('group')으로 설정
+      useSideMenuCampaignGroupTabStore.getState().expandTenantAndGroup();
+    }
+  }, [currentExpansionMode]);
 
   const toggleSortField = (field: SortField) => {
     if (sortField === field) return;
@@ -39,6 +47,29 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
     return currentExpansionMode === mode 
       ? `${baseClass} bg-green-100 text-green-700 border-green-200` 
       : `${baseClass} hover:bg-gray-50`;
+  };
+
+  // 추가: 'all' 버튼 추가
+  const renderExpansionButtons = () => {
+    return (
+      <div className="flex gap-1">
+        <button
+          className={getExpansionButtonClass('tenant')}
+          onClick={() => useSideMenuCampaignGroupTabStore.getState().expandTenantOnly()}
+          title="테넌트 레벨만 보기"
+        >
+          T
+        </button>
+        <button
+          className={getExpansionButtonClass('group')}
+          onClick={() => useSideMenuCampaignGroupTabStore.getState().expandTenantAndGroup()}
+          title="테넌트 및 그룹 레벨 보기"
+        >
+          G
+        </button>
+
+      </div>
+    );
   };
 
   return (
@@ -66,29 +97,7 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
             <div className="mb-2">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">정렬 기준</span>
-                <div className="flex gap-1">
-                  <button
-                    className={getExpansionButtonClass('tenant')}
-                    onClick={() => useSideMenuCampaignGroupTabStore.getState().expandTenantOnly()}
-                    title="테넌트 레벨만 보기"
-                  >
-                    T
-                  </button>
-                  <button
-                    className={getExpansionButtonClass('group')}
-                    onClick={() => useSideMenuCampaignGroupTabStore.getState().expandTenantAndGroup()}
-                    title="테넌트 및 그룹 레벨 보기"
-                  >
-                    G
-                  </button>
-                  {/* <button
-                    className={getExpansionButtonClass('all')}
-                    onClick={() => useSideMenuCampaignGroupTabStore.getState().expandAllLevels()}
-                    title="모든 레벨 보기 (캠페인 포함)"
-                  >
-                    C
-                  </button> */}
-                </div>
+                {renderExpansionButtons()}
               </div>
 
               <div className="flex gap-2">
@@ -111,6 +120,38 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
                   onClick={() => toggleSortField("name")}
                 >
                   이름
+                </button>
+              </div>
+            </div>
+
+            {/* 구분선 */}
+            <div className="border-t border-gray-200 my-2"></div>
+
+            {/* 전체 정렬 옵션 */}
+            <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-3 py-2">
+              <div className="flex-1 text-sm">전체 보기</div>
+              <div className="flex gap-2">
+                <button
+                  className={`p-1.5 rounded-md ${
+                    isActiveSort('all', 'asc')
+                      ? 'bg-green-100 text-green-700'
+                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                  }`}
+                  onClick={() => handleNodeTypeSort('all', 'asc')}
+                  title={`${sortField === 'name' ? '이름' : 'ID'} 오름차순`}
+                >
+                  <ArrowUp className="h-4 w-4" />
+                </button>
+                <button
+                  className={`p-1.5 rounded-md ${
+                    isActiveSort('all', 'desc')
+                      ? 'bg-green-100 text-green-700'
+                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                  }`}
+                  onClick={() => handleNodeTypeSort('all', 'desc')}
+                  title={`${sortField === 'name' ? '이름' : 'ID'} 내림차순`}
+                >
+                  <ArrowDown className="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -208,34 +249,6 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
             {/* 구분선 */}
             <div className="border-t border-gray-200 my-2"></div>
 
-            {/* 전체 정렬 옵션 */}
-            <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-3 py-2">
-              <div className="flex-1 text-sm">전체 보기</div>
-              <div className="flex gap-2">
-                <button
-                  className={`p-1.5 rounded-md ${
-                    isActiveSort('all', 'asc')
-                      ? 'bg-green-100 text-green-700'
-                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                  }`}
-                  onClick={() => handleNodeTypeSort('all', 'asc')}
-                  title={`${sortField === 'name' ? '이름' : 'ID'} 오름차순`}
-                >
-                  <ArrowUp className="h-4 w-4" />
-                </button>
-                <button
-                  className={`p-1.5 rounded-md ${
-                    isActiveSort('all', 'desc')
-                      ? 'bg-green-100 text-green-700'
-                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                  }`}
-                  onClick={() => handleNodeTypeSort('all', 'desc')}
-                  title={`${sortField === 'name' ? '이름' : 'ID'} 내림차순`}
-                >
-                  <ArrowDown className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
           </div>
         </PopoverContent>
       </Popover>

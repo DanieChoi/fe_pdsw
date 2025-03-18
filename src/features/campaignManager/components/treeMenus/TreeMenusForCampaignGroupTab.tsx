@@ -16,17 +16,25 @@ export function TreeMenusForCampaignGroupTab() {
     selectedNodeId,
     fetchTreeData, 
     toggleNode, 
-    selectNode
+    selectNode,
+    expandAllLevels // 모든 레벨을 확장하는 함수 추가
   } = useSideMenuCampaignGroupTabStore();
 
   console.log("treeData : ", treeData);
 
-  // 초기 데이터 로드만 담당
+  // 초기 데이터 로드
   useEffect(() => {
     console.log("tenant_id is exist ?: ", tenant_id);
     fetchTreeData(tenant_id);
-    // fetchTreeData 내부에서 테넌트 레벨만 자동 확장됨
   }, [tenant_id, fetchTreeData]);
+  
+  // 데이터가 로드된 후 테넌트와 그룹 레벨 확장
+  useEffect(() => {
+    if (treeData.length > 0) {
+      // 테넌트와 그룹 레벨까지만 확장
+      useSideMenuCampaignGroupTabStore.getState().expandTenantAndGroup();
+    }
+  }, [treeData]);
   
   return (
     <div className="flex flex-grow overflow-y-auto min-h-0 tree-node">
