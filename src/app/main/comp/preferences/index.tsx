@@ -157,7 +157,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                     <SelectItem value="알림만">알림</SelectItem>
                   </SelectContent>
                   </Select>
-                <span className="text-sm">초(sec)</span>
+                {/* <span className="text-sm">초(sec)</span> */}
               </div>
               </TableCell>
               <TableCell>
@@ -167,7 +167,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             </tbody>
         </Table>
         </div>
-        <div>
+        {/* <div>
         <TitleWrap title="로그" />
         <Table className='text-[#333]'>
            <tbody>
@@ -187,7 +187,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             </TableRow>
             </tbody>
         </Table>
-        </div>
+        </div> */}
         <div>
         <div className="flex justify-between items-center mb-2">
             <div className="flex items-center gap-8">

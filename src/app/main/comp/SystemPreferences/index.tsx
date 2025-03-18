@@ -139,6 +139,7 @@ const SystemPreferences = () => {
     // 장비 목록 조회
     const { mutate: fetchDialingDeviceList } = useApiForDialingDevice({
         onSuccess: (data) => {
+            console.log("시스템 모니터링 데이터: ", data.result_data);
             setDialingDeviceList(data.result_data);
             
             // 현재 저장된 장비를 찾아서 선택 상태로 설정
@@ -170,6 +171,8 @@ const SystemPreferences = () => {
               setTimeout(() => {
                 router.push('/login');
               }, 1000);
+            } else {
+                showAlert(`시스템 모니터링 조회 실패: ${data.message}`);
             }
         }
     });
