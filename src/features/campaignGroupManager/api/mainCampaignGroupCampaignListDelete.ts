@@ -7,7 +7,7 @@ export const fetchCampaignGroupCampaignListDelete = async (credentials: Campaign
   const campaignGroupCampaignListRequestData = {
     request_data: {
       tenant_id: credentials.tenant_id,
-      campaign_id: 0
+      campaign_id: credentials.campaign_id
     }
   };
     

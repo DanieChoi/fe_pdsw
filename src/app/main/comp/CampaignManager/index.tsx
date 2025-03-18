@@ -26,7 +26,7 @@ type Props = {
 
 const CampaignManager = ({campaignId}: Props) => {
   
-  const { tenants } = useMainStore();
+  const { tenants, campaigns, setCampaigns } = useMainStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
   const [_campaignId, _setCampaignId] = useState<string>('');
   const [alertState, setAlertState] = useState(errorMessage);
@@ -99,13 +99,13 @@ const CampaignManager = ({campaignId}: Props) => {
   });
   
   useEffect(() => {
-    if( tenants ){
+    if( tenants && campaigns ){
       const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       fetchSchedules({
         tenant_id_array: tempTenantIdArray
       });
     }
-  }, [tenants]);
+  }, [tenants, campaigns]);
 
   useEffect(() => {
     console.log('campaignIdForUpdateFromSideMenu:',campaignIdForUpdateFromSideMenu);

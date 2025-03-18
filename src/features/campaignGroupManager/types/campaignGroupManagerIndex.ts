@@ -41,6 +41,7 @@ export interface CampaignGroupCampaignListResponse {
 export interface CampaignGroupCampaignListDeleteDataRequest {
   tenant_id: number;
   group_id: number;
+  campaign_id: number[];
 }
 
 // 캠페인 그룹 추가가 요청
