@@ -19,6 +19,7 @@ import { useApiForDeleteCampaignGroup } from "@/features/campaignManager/hooks/u
 // 기존 getCampaignGroupMenuItems 대신 새 컴포넌트를 임포트합니다.
 import { IContextMenuForCampaignForCampaignGroup, CampaignStatus } from "./ContextMenus/IContextMenuForCampaignForCampaignGroup";
 import IContextMenuForCampaignGroupAtCampaignGroup from "./ContextMenus/IContextMenuForCampaignGroupAtCampaignGroup";
+import IContextMenuForTenantAtCampaignGroup from "./ContextMenus/IContextMenuForTenantAtCampaignGroup";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -277,7 +278,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
         )}
         {renderIcon()}
         <span className={`flex text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
-          {getStatusIcon(node.start_flag) && <Image src={getStatusIcon(node.start_flag) || ''} alt="상태" width={12} height={12} className="mr-1"/>}
+          {getStatusIcon(node.start_flag) && <Image src={getStatusIcon(node.start_flag) || ''} alt="상태" width={12} height={12} className="mr-1" />}
           {node.name}
           {node.type === "campaign" && node.campaign_id && (
             <span className="ml-1 text-xs text-[#555]">
@@ -344,15 +345,10 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
       {/* 테넌트 노드 컨텍스트 메뉴 */}
       <Menu id={tenantMenuId} className="compact-menu">
-        <Item
-          onClick={() => {
-            console.log(`캠페인 그룹 추가: ${node.name}`);
-            setIsAddGroupDialogOpen(true);
-          }}
-          style={{ color: "#0070F3", fontSize: "14px" }}
-        >
-          캠페인 그룹 추가
-        </Item>
+        <IContextMenuForTenantAtCampaignGroup
+          nodeName={node.name}
+          onAddGroup={() => setIsAddGroupDialogOpen(true)}
+        />
       </Menu>
 
       {/* 그룹 노드 컨텍스트 메뉴 - 새 컴포넌트 적용 */}
