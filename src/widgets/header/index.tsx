@@ -1,5 +1,4 @@
 import { CommonButton } from "@/components/shared/CommonButton";
-import { Check, LayoutGrid } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useTabStore } from '@/store/tabStore'
@@ -11,8 +10,7 @@ import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 import useApiForFetchCounselorList from '@/features/campaignManager/hooks/useApiForFetchCounselorList';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
-import { SplitScreenDialog } from './ui/SplitScreenDialog'
-import SplitScreenDialog2 from './ui/SplitScreenDialog2'
+
 
 const errorMessage = {
   isOpen: false,
@@ -273,7 +271,7 @@ export default function Header() {
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between header-padding">
 
-            {/* <div>role_id: {role_id}</div> */}
+            <div>role_id: {role_id}</div>
 
             <nav className="flex overflow-x-auto gap-3">
               {menuItems.map((item) => {

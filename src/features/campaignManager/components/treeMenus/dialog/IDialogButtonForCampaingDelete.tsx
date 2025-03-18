@@ -1,0 +1,239 @@
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import CommonButton from '@/components/shared/CommonButton';
+import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDialogForSideMenu";
+import { useApiForCampaignManagerDelete } from '@/features/campaignManager/hooks/useApiForCampaignManagerDelete';
+import { useApiForCampaignScheduleDelete } from '@/features/campaignManager/hooks/useApiForCampaignScheduleDelete';
+import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
+import { useCampainManagerStore } from '@/store';
+import { fetchCallingNumberDelete } from '@/features/campaignManager/api/mainCallingNumberDelete';
+import { fetchReservedCallDelete } from '@/features/campaignManager/api/mainReservedCallDelete';
+import { useSideMenuCampaignGroupTabStore } from '@/store/storeForSideMenuCampaignGroupTab';
+import { toast } from 'react-toastify';
+import { useTabStore } from '@/store/tabStore';
+
+interface Props {
+  campaignId?: string | number;
+  campaignName?: string;
+  variant?: 'outline' | 'destructive' | 'default' | 'secondary' | 'ghost' | 'link';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
+  className?: string;
+  buttonText?: string;
+  isDisabled?: boolean;
+  tenant_id?: number;
+  // 외부 제어용 isOpen과 변경 콜백 추가
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+const campaignInfoDelete = {
+  campaign_id: 0,
+  tenant_id: 0,
+  delete_dial_list: 1
+};
+
+const IDialogButtonForCampaingDelete: React.FC<Props> = ({
+  campaignId,
+  campaignName = '캠페인',
+  variant = 'destructive',
+  size = 'sm',
+  className = '',
+  buttonText = '삭제',
+  isDisabled = false,
+  tenant_id = 0,
+  isOpen: externalIsOpen,
+  onOpenChange,
+}) => {
+  // 외부에서 isOpen prop을 전달하지 않으면 내부 상태로 관리
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isDialogOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // 스토어 및 API 훅들
+  const { refetchTreeData } = useSideMenuCampaignGroupTabStore();
+  const { callingNumbers, campaignSkills } = useCampainManagerStore();
+  const { activeTabKey, closeAllTabs, rows } = useTabStore();
+
+  const { mutate: updateCampaignSkill } = useApiForCampaignSkillUpdate({
+    onSuccess: () => {
+      console.log('캠페인 스킬 할당 해제 성공');
+    },
+    onError: (error) => {
+      console.error('캠페인 스킬 할당 해제 실패:', error);
+    }
+  });
+
+  const { mutate: deleteCampaignSchedule } = useApiForCampaignScheduleDelete({
+    onSuccess: (data) => {
+      // 스킬 해제
+      const relatedSkills = campaignSkills
+        .filter((skill) => skill.campaign_id === Number(campaignId))
+        .map((data) => data.skill_id);
+      if (relatedSkills.length > 0) {
+        updateCampaignSkill({
+          campaign_id: Number(campaignId),
+          skill_id: []
+        });
+      }
+
+      // 발신번호 삭제
+      const relatedCallingNumbers = callingNumbers
+        .filter((callingNumber) => callingNumber.campaign_id === Number(campaignId))
+        .map((data) => data.calling_number);
+      if (relatedCallingNumbers.length > 0) {
+        fetchCallingNumberDelete({
+          campaign_id: Number(campaignId),
+          calling_number: relatedCallingNumbers.join(',')
+        });
+      }
+
+      // 예약콜 제한 삭제
+      fetchReservedCallDelete({
+        campaign_id: Number(campaignId),
+        tenant_id: tenant_id,
+        delete_dial_list: 1
+      });
+
+      // 트리 데이터 리패치 및 탭 닫기
+      refetchTreeData();
+      closeCurrentTab();
+    }
+  });
+
+  const { mutate: deleteCampaign, isPending } = useApiForCampaignManagerDelete({
+    onSuccess: (data) => {
+      console.log('캠페인 삭제 성공:', data);
+      toast.success(`'${campaignName}' 캠페인이 삭제되었습니다.`);
+
+      // 삭제 후 스케줄 삭제 등 처리
+      deleteCampaignSchedule({
+        campaign_id: Number(campaignId),
+        tenant_id: tenant_id,
+        delete_dial_list: 1
+      });
+
+      closeDialog();
+      setIsDeleting(false);
+    },
+    onError: (error) => {
+      console.error('캠페인 삭제 실패:', error);
+      toast.error(`캠페인 삭제에 실패했습니다: ${error.message || '알 수 없는 오류'}`);
+      setIsDeleting(false);
+    }
+  });
+
+  const findCurrentTabLocation = () => {
+    for (const row of rows) {
+      for (const section of row.sections) {
+        if (section.tabs.some(tab => tab.uniqueKey === activeTabKey)) {
+          return { rowId: row.id, sectionId: section.id };
+        }
+      }
+    }
+    return { rowId: 'row-1', sectionId: 'default' };
+  };
+
+  const closeCurrentTab = () => {
+    if (!activeTabKey) return;
+    const { rowId, sectionId } = findCurrentTabLocation();
+    setTimeout(() => {
+      closeAllTabs(rowId, sectionId);
+    }, 100);
+  };
+
+  const handleDelete = () => {
+    if (!campaignId) {
+      toast.error('삭제할 캠페인 정보가 없습니다.');
+      return;
+    }
+    setIsDeleting(true);
+    deleteCampaign({
+      campaign_id: Number(campaignId),
+      tenant_id: tenant_id,
+      delete_dial_list: 1
+    });
+  };
+
+  const openDialog = () => {
+    if (onOpenChange) {
+      onOpenChange(true);
+    } else {
+      setInternalIsOpen(true);
+    }
+  };
+
+  const closeDialog = () => {
+    if (onOpenChange) {
+      onOpenChange(false);
+    } else {
+      setInternalIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeDialog();
+      }
+    };
+    window.addEventListener('keydown', handleEscapeKey);
+    return () => {
+      window.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, []);
+
+  return (
+    <>
+      {/* 삭제 버튼 */}
+      <CommonButton
+        variant={variant}
+        size={size}
+        className={className}
+        onClick={openDialog}
+        disabled={isDisabled || isPending}
+      >
+        {buttonText}
+      </CommonButton>
+
+      {/* 삭제 확인 다이얼로그 */}
+      {isDialogOpen && (
+        <CommonDialogForSideMenu
+          isOpen={isDialogOpen}
+          onClose={closeDialog}
+          title="캠페인 삭제"
+          description={`정말로 '${campaignName}' 캠페인을 삭제하시겠습니까?`}
+        >
+          <div className="space-y-4">
+            <p className="text-destructive font-medium text-sm">
+              이 작업은 되돌릴 수 없습니다.
+            </p>
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={closeDialog}
+                disabled={isDeleting}
+                className="w-20 text-xs"
+              >
+                취소
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="w-20 text-xs"
+              >
+                {isDeleting ? "삭제 중..." : "삭제"}
+              </Button>
+            </div>
+          </div>
+        </CommonDialogForSideMenu>
+      )}
+    </>
+  );
+};
+
+export default IDialogButtonForCampaingDelete;

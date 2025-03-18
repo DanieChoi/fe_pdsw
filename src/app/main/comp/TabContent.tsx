@@ -78,7 +78,7 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
       return <CampaignClonePanel />;
 
     case 131: // 캠페인 삭제 패널
-      return <CampaignDeletePanel campaignId={campaignId} campaignName={campaignName} />
+      return <CampaignDeletePanel campaignId={campaignId} campaignName={campaignName} />;
 
     case 501:
       return (

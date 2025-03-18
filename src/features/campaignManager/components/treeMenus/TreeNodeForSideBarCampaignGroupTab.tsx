@@ -16,10 +16,10 @@ import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDial
 import IDialogForUpdateCampaignGroupName from "./dialog/IDialogForUpdateCampaignGroupName";
 import { toast } from "react-toastify";
 import { useApiForDeleteCampaignGroup } from "@/features/campaignManager/hooks/useApiForDeleteCampaignGroup";
-// 기존 getCampaignGroupMenuItems 대신 새 컴포넌트를 임포트합니다.
 import { IContextMenuForCampaignForCampaignGroup, CampaignStatus } from "./ContextMenus/IContextMenuForCampaignForCampaignGroup";
 import IContextMenuForCampaignGroupAtCampaignGroup from "./ContextMenus/IContextMenuForCampaignGroupAtCampaignGroup";
 import IContextMenuForTenantAtCampaignGroup from "./ContextMenus/IContextMenuForTenantAtCampaignGroup";
+import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -65,6 +65,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const recentlyClosedDialogRef = useRef(false);
+  const { updateCampaignStatus, refetchTreeData } = useSideMenuCampaignGroupTabStore();
 
   const [isBrowser, setIsBrowser] = useState(false);
   useEffect(() => {
@@ -123,12 +124,14 @@ export function TreeNodeForSideBarCampaignGroupTab({
     }, 300);
   }, []);
 
-  const handleCloseRenameDialog = useCallback(() => {
+  // tofix : 캠페인 이름 수정후 리패치
+  const handleCloseRenameDialog = useCallback(async () => {
     setIsRenameDialogOpen(false);
     recentlyClosedDialogRef.current = true;
     setTimeout(() => {
       recentlyClosedDialogRef.current = false;
     }, 300);
+    await refetchTreeData();
   }, []);
 
   const handleRenameSuccess = useCallback(() => {
