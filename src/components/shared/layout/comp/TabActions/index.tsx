@@ -54,7 +54,7 @@ export function TabActions({
       );
     case 'campaign-group':
       return (
-        <div className="flex items-center gap-[10px]">
+        <div className="flex items-center gap-[8px]">
           <ISearchButtonForFindForGroupOrCampaign />
           <IFilterButtonForCampaignGroupTabHeader />
         </div>

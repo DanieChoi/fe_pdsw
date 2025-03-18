@@ -99,7 +99,7 @@ const ISearchButtonForFindForGroupOrCampaign: React.FC<ISearchButtonProps> = ({ 
         aria-label="검색"
       >
         검색
-        <Search className="h-3 w-3 ml-1" />
+        <Search className="h-3 w-3" />
       </CommonButton>
 
       {isOpen && (
