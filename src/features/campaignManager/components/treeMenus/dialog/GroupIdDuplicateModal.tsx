@@ -50,7 +50,7 @@ const GroupIdDuplicateModal = ({
       message={
         <div>
           <p className="mb-2 font-medium text-red-500">
-            입력하신 그룹 아이디 '{groupId}'는 이미 사용 중입니다.
+            입력하신 그룹 아이디 &apos;{groupId}&apos;는 이미 사용 중입니다.
           </p>
           <p className="mb-2">현재 테넌트({tenantName})의 그룹 아이디 목록:</p>
           <div className="max-h-40 overflow-y-auto bg-gray-50 p-2 border rounded text-xs mb-4">
