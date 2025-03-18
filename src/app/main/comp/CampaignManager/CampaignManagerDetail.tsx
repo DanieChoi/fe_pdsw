@@ -321,7 +321,6 @@ export interface NotificationTabParam {
   supervisor_phone: string;
 }
 
-
 export default function CampaignDetail() {
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
@@ -970,6 +969,8 @@ export default function CampaignDetail() {
         session_key: '',
         tenant_id: 0,
       });
+      // setCampaignInfoChangeYn(true);
+      // onInit();
     }
   }, [campaignInfoChangeYn, campaignSkillChangeYn, callingNumberChangeYn, campaignDialSpeedChangeYn]);
 
@@ -984,7 +985,7 @@ export default function CampaignDetail() {
       // }
       setSelectedCampaign(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
       setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
-      setChangeYn(false);
+      // setCampaignInfoChangeYn(true);
       // if( rtnMessage !== ''){
         setRtnMessage('');        
       //   setAlertState({
@@ -1049,7 +1050,6 @@ export default function CampaignDetail() {
           router.push('/login');
         }, 1000);
       }
-      setCampaignInfoChangeYn(false);
     }
   });
 
