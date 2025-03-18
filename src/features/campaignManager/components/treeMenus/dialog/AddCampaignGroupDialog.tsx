@@ -9,6 +9,7 @@ import { useApiForCreateCampaignGroup } from "@/features/preferences/hooks/useAp
 import { toast } from "react-toastify";
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
 import CustomAlert from "@/components/shared/layout/CustomAlert";
+import GroupIdDuplicateModal from "./GroupIdDuplicateModal";
 
 interface AddCampaignGroupDialogProps {
   isOpen: boolean;
@@ -29,12 +30,15 @@ export function AddCampaignGroupDialog({
   const [groupId, setGroupId] = useState("");
   const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
   const [groupIdList, setGroupIdList] = useState<string[]>([]);
+  const [isValidated, setIsValidated] = useState(false);
+  const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
 
   // 다이얼로그가 열릴 때마다 폼 초기화
   useEffect(() => {
     if (isOpen) {
       setGroupName("");
       setGroupId("");
+      setIsValidated(false);
     }
   }, [isOpen]);
 
@@ -76,16 +80,46 @@ export function AddCampaignGroupDialog({
 
   // 중복 체크 및 중복 다이얼로그 열기
   const handleCheckDuplicate = () => {
-    if (!groupId.trim()) return;
+    if (!groupId.trim()) return false;
+    
+    setIsCheckingDuplicate(true);
     
     const groupIds = getGroupIdsInTenant(tenantId);
+    console.log(`테넌트 ${tenantId}의 그룹 ID 목록:`, groupIds);
     setGroupIdList(groupIds);
     
-    if (checkDuplicateGroupId(groupId)) {
+    const isDuplicate = checkDuplicateGroupId(groupId);
+    
+    if (isDuplicate) {
+      console.log(`그룹 ID '${groupId}' 중복 확인됨`);
       setIsDuplicateModalOpen(true);
+      setIsValidated(false);
+      setIsCheckingDuplicate(false);
       return true;
     }
+    
+    // 중복이 없다면 유효함을 표시
+    setIsValidated(true);
+    setIsCheckingDuplicate(false);
+    toast.success("사용 가능한 그룹 ID입니다.");
     return false;
+  };
+
+  // 새로운 그룹 아이디 적용
+  const handleNewGroupId = (newId: string) => {
+    setGroupId(newId);
+    setIsDuplicateModalOpen(false);
+    // 모달에서 입력받은 ID는 이미 중복 체크가 되었으므로 유효함
+    setIsValidated(true);
+  };
+
+  // 그룹 아이디 변경
+  const handleGroupIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setGroupId(newValue);
+    
+    // 유효성 상태 초기화
+    setIsValidated(false);
   };
 
   // 캠페인 그룹 생성 API 호출 훅 사용
@@ -111,14 +145,18 @@ export function AddCampaignGroupDialog({
     e.stopPropagation(); // 이벤트 전파 방지
     
     if (groupName.trim() && groupId.trim()) {
-      // 중복 체크 후 중복이 없을 경우에만 API 호출
-      if (!handleCheckDuplicate()) {
-        mutate({
-          group_id: groupId,
-          tenant_id: tenantId,
-          group_name: groupName,
-        });
+      // 중복 체크가 완료되었는지 확인
+      if (!isValidated) {
+        toast.warning("먼저 그룹 ID 중복 확인을 해주세요.");
+        return;
       }
+      
+      // 모든 검증을 통과했으므로 API 호출
+      mutate({
+        group_id: groupId,
+        tenant_id: tenantId,
+        group_name: groupName,
+      });
     }
   };
 
@@ -135,11 +173,6 @@ export function AddCampaignGroupDialog({
     e.stopPropagation();
   };
 
-  // 그룹 아이디 변경 및 포커스 아웃 시 중복 체크
-  const handleGroupIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setGroupId(e.target.value);
-  };
-
   return (
     <>
       <CommonDialogForSideMenu
@@ -150,18 +183,32 @@ export function AddCampaignGroupDialog({
       >
         <form onSubmit={handleSubmit} onClick={stopPropagation} onPointerDown={stopPropagation}>
           <div className="space-y-4">
-            {/* 그룹 아이디 */}
+            {/* 그룹 아이디 - 중복 확인 버튼이 있는 레이아웃 */}
             <div className="flex flex-col space-y-1">
               <Label htmlFor="groupId">캠페인 그룹 아이디</Label>
-              <Input
-                id="groupId"
-                value={groupId}
-                onChange={handleGroupIdChange}
-                onBlur={() => handleCheckDuplicate()}
-                placeholder="그룹 아이디를 입력하세요"
-                onClick={stopPropagation}
-                onPointerDown={stopPropagation}
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="groupId"
+                  value={groupId}
+                  onChange={handleGroupIdChange}
+                  placeholder="그룹 아이디를 입력하세요"
+                  onClick={stopPropagation}
+                  onPointerDown={stopPropagation}
+                  className="rounded-r-none"
+                />
+                <Button 
+                  type="button"
+                  onClick={handleCheckDuplicate}
+                  disabled={!groupId.trim() || isCheckingDuplicate}
+                  className="rounded-l-none"
+                  onPointerDown={stopPropagation}
+                >
+                  {isCheckingDuplicate ? "확인중..." : isValidated ? "✓ 확인됨" : "중복 확인"}
+                </Button>
+              </div>
+              {isValidated && (
+                <p className="text-xs text-green-500 mt-1">사용 가능한 그룹 아이디입니다.</p>
+              )}
             </div>
 
             {/* 그룹명 */}
@@ -190,7 +237,7 @@ export function AddCampaignGroupDialog({
               </Button>
               <Button 
                 type="submit" 
-                disabled={isPending || !groupName.trim() || !groupId.trim()}
+                disabled={isPending || !groupName.trim() || !groupId.trim() || !isValidated}
                 onPointerDown={stopPropagation}
               >
                 {isPending ? "생성 중..." : "그룹 추가"}
@@ -202,29 +249,13 @@ export function AddCampaignGroupDialog({
 
       {/* 중복 확인 다이얼로그 */}
       {isDuplicateModalOpen && (
-        <CustomAlert
+        <GroupIdDuplicateModal
           isOpen={isDuplicateModalOpen}
           onClose={() => setIsDuplicateModalOpen(false)}
-          title="그룹 아이디 중복"
-          type="1"
-          message={
-            <div>
-              <p className="mb-2">입력하신 그룹 아이디 '{groupId}'는 이미 사용 중입니다.</p>
-              <p className="mb-2">현재 테넌트({tenantName})의 그룹 아이디 목록:</p>
-              <div className="max-h-40 overflow-y-auto bg-gray-50 p-2 border rounded text-xs">
-                {groupIdList.length > 0 ? (
-                  <ul className="list-disc pl-4">
-                    {groupIdList.map((id, index) => (
-                      <li key={index}>{id}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>등록된 그룹이 없습니다.</p>
-                )}
-              </div>
-            </div>
-          }
-          width="max-w-md"
+          groupId={groupId}
+          tenantName={tenantName}
+          groupIdList={groupIdList}
+          onNewIdSubmit={handleNewGroupId}
         />
       )}
     </>
