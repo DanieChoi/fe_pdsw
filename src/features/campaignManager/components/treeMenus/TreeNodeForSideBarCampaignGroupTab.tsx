@@ -224,7 +224,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
             width="max-w-md"
           >
             <div className="space-y-4">
-              <p className="text-sm">정말로 캠페인 그룹 '{node?.name}'을(를) 삭제하시겠습니까?</p>
+              <p className="text-sm">정말로 캠페인 그룹 &apos;{node?.name}&apos;을(를) 삭제하시겠습니까?</p>
               <p className="text-destructive font-medium">이 작업은 되돌릴 수 없습니다.</p>
               <div className="flex justify-end space-x-2 mt-6">
                 <Button

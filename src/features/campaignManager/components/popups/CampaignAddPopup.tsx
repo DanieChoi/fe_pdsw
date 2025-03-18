@@ -5,16 +5,14 @@ import { useTotalCampaignListForAddCampaignToCampaignGroup } from '@/widgets/sid
 import { useTotalSkillListForAddCampaignToCampaignGroup } from '@/widgets/sidebar/hooks/useTotalSkillListForAddCampaignToCampaignGroup';
 import useApiForGetCampaignListForCampaignGroup from '@/widgets/sidebar/hooks/useApiForGetCampaignListForCampaignGroup';
 import { CampaignInfo, SkillInfo } from '@/widgets/sidebar/api/type/typeForAddCampaignForCampaignGroup';
-// import { batchAddCampaignsToGroup } from '@/components/shared/layout/utils/batchAddCampaigns';
-// import { batchRemoveCampaignsFromGroup } from '@/components/shared/layout/utils/batchRemoveCampaigns';
 import GroupCampaignList from './GroupCampaignList';
 import ITableForSkillListWithCampaign from './ITableForSkillListWithCampaign';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
-import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'react-toastify';
 import useApiForAddCampaignToSpecificCampaignGroup from '../../hooks/useApiForAddCampaignToSpecificCampaignGroup';
 import useApiForRemoveCampaignFromCampaignGroup from '../../hooks/useApiForRemoveCampaignFromCampaignGroup';
+import CommonDialogWithCustomAlertStyle from '@/components/shared/layout/CommonDialogWithCustomAlertStyle';
 
 interface SkillWithCampaigns {
   skillId: number;
@@ -371,14 +369,12 @@ const CampaignAddPopup: React.FC<Props> = ({
     
     setProcessingCampaigns(true);
     try {
-      // 필터링된 캠페인 ID 목록만 전송 - 훅 사용으로 변경
       addCampaignToGroup({
         group_id: groupId,
         campaign_ids: filteredCampaignIds,
         tenant_id: Number(tenant_id)
       }, {
         onSuccess: (data: { result_code: string | number }) => {
-          // 중복된 캠페인이 있었는지 확인
           const duplicateCount = campaignIdsForPopup.length - filteredCampaignIds.length;
           
           if (Number(data.result_code) === 0) {
@@ -439,7 +435,6 @@ const CampaignAddPopup: React.FC<Props> = ({
     }
     setRemovingCampaigns(true);
     try {
-      // batchRemoveCampaignsFromGroup 대신 훅 사용
       removeCampaignFromGroup({
         group_id: groupId,
         campaign_ids: selectedRightCampaigns,
@@ -592,25 +587,22 @@ const CampaignAddPopup: React.FC<Props> = ({
             >
               취소
             </button>
-
           </div>
         </div>
         {showAlert && (
-          <CustomAlert
-            isOpen={showAlert}
+          <CommonDialogWithCustomAlertStyle
             title={confirmRemove ? '캠페인 제거 확인' : '캠페인 추가 확인'}
-            message={
-              <div>
-                {alertMessage}
-                {!confirmRemove && createCampaignListTable(campaignIdsForPopup)}
-              </div>
-            }
-            type="1"
+            isOpen={showAlert}
+            onClose={handleAlertConfirm}
+            onCancel={() => setShowAlert(false)}
             width="max-w-md"
-            onClose={handleAlertConfirm} // 캠페인 추가 confirm 함수 
-            onCancle={() => setShowAlert(false)}
-            confirmDisabled={!confirmRemove && !hasUniqueSelections} // 중복되지 않은 항목이 없으면 비활성화
-          />
+            confirmDisabled={!confirmRemove && !hasUniqueSelections}
+          >
+            <div>
+              {alertMessage}
+              {!confirmRemove && createCampaignListTable(campaignIdsForPopup)}
+            </div>
+          </CommonDialogWithCustomAlertStyle>
         )}
       </div>
     </div>
