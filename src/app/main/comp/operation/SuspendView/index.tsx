@@ -209,8 +209,8 @@ const SuspendView = () => {
         return {
           type: 'campaign',
           campaign_id: String(item.campaign_id),
-          // 캠페인 정보가 있으면 캠페인 이름 사용, 없으면 '알 수 없음' 표시
-          campaign_name: campaignInfo ? campaignInfo.campaign_name : '알 수 없음',
+          // 캠페인 정보가 있으면 캠페인 이름 사용, 없으면 '' 표시
+          campaign_name: campaignInfo ? campaignInfo.campaign_name : '',
           release_time: item.suspend_time
         };
       });
@@ -225,8 +225,8 @@ const SuspendView = () => {
         return {
           type: 'skill',
           skill_id: String(item.skill_id),
-          // 스킬 정보가 있으면 스킬 이름 사용, 없으면 '알 수 없음' 표시
-          skill_name: skillInfo ? skillInfo.skill_name : '알 수 없음',
+          // 스킬 정보가 있으면 스킬 이름 사용, 없으면 '' 표시
+          skill_name: skillInfo ? skillInfo.skill_name : '',
           release_time: item.suspend_time
         };
       });
