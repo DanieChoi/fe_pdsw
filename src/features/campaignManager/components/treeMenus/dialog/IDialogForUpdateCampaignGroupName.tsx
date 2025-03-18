@@ -4,9 +4,9 @@ import React, { FC, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDialogForSideMenu";
 import { useApiForCampaignGroupNameUpdate } from "@/features/campaignManager/hooks/useApiForCampaignGroupNameUpdate";
 import { toast } from "react-toastify";
+import CommonDialogWithCustomAlertStyle from "@/components/shared/layout/CommonDialogWithCustomAlertStyle";
 
 interface IDialogForUpdateCampaignGroupNameProps {
   isOpen: boolean;
@@ -23,7 +23,7 @@ const IDialogForUpdateCampaignGroupName: FC<IDialogForUpdateCampaignGroupNamePro
   groupId,
   tenantId,
   currentGroupName,
-  onSuccess
+  onSuccess,
 }) => {
   const [groupName, setGroupName] = useState("");
   const [error, setError] = useState("");
@@ -44,12 +44,12 @@ const IDialogForUpdateCampaignGroupName: FC<IDialogForUpdateCampaignGroupNamePro
     onError: (error) => {
       console.error("캠페인 그룹 이름 변경 실패:", error);
       toast.error("캠페인 그룹 이름 변경에 실패했습니다.");
-    }
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // 유효성 검사
     if (!groupName.trim()) {
       setError("그룹 이름을 입력해주세요.");
@@ -66,18 +66,22 @@ const IDialogForUpdateCampaignGroupName: FC<IDialogForUpdateCampaignGroupNamePro
     updateGroupName({
       group_id: groupId,
       group_name: groupName,
-      tenant_id: tenantId
+      tenant_id: tenantId,
     });
   };
 
   return (
-    <CommonDialogForSideMenu
+    <CommonDialogWithCustomAlertStyle
       isOpen={isOpen}
       onClose={onClose}
       title="캠페인 그룹 이름 변경"
-      description="새로운 캠페인 그룹 이름을 입력해주세요."
+      width="w-[30%] max-w-[1200px] min-w-[500px]"
+      showButtons={false} // 내부에서 커스텀 버튼 사용
     >
       <form onSubmit={handleSubmit} className="space-y-4">
+        <p className="text-sm text-gray-600 mb-4">
+          새로운 캠페인 그룹 이름을 입력해주세요.
+        </p>
         <div className="space-y-2">
           <Label htmlFor="groupName">그룹 이름</Label>
           <Input
@@ -93,7 +97,6 @@ const IDialogForUpdateCampaignGroupName: FC<IDialogForUpdateCampaignGroupNamePro
           />
           {error && <p className="text-sm text-red-500">{error}</p>}
         </div>
-
         <div className="flex justify-end space-x-2 mt-6">
           <Button
             type="button"
@@ -104,16 +107,12 @@ const IDialogForUpdateCampaignGroupName: FC<IDialogForUpdateCampaignGroupNamePro
           >
             취소
           </Button>
-          <Button
-            type="submit"
-            disabled={isPending}
-            className="w-20"
-          >
+          <Button type="submit" disabled={isPending} className="w-20">
             {isPending ? "저장 중..." : "저장"}
           </Button>
         </div>
       </form>
-    </CommonDialogForSideMenu>
+    </CommonDialogWithCustomAlertStyle>
   );
 };
 
