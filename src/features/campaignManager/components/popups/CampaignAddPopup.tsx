@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 import useApiForAddCampaignToSpecificCampaignGroup from '../../hooks/useApiForAddCampaignToSpecificCampaignGroup';
 import useApiForRemoveCampaignFromCampaignGroup from '../../hooks/useApiForRemoveCampaignFromCampaignGroup';
 import CommonDialogWithCustomAlertStyle from '@/components/shared/layout/CommonDialogWithCustomAlertStyle';
+import { useSideMenuCampaignGroupTabStore } from '@/store/storeForSideMenuCampaignGroupTab';
 
 interface SkillWithCampaigns {
   skillId: number;
@@ -50,6 +51,7 @@ const CampaignAddPopup: React.FC<Props> = ({
   const [removingCampaigns, setRemovingCampaigns] = useState(false);
   const [campaignLookup, setCampaignLookup] = useState<Record<number, CampaignInfo>>({});
   const [skillLookup, setSkillLookup] = useState<Record<number, SkillInfo>>({});
+  const { refetchTreeData } = useSideMenuCampaignGroupTabStore();
 
   // ----------------------------
   //  Hooks
@@ -388,7 +390,9 @@ const CampaignAddPopup: React.FC<Props> = ({
           } else {
             toast.error('캠페인 추가에 실패했습니다.');
           }
-          
+
+          refetchTreeData();
+
           setSelectedLeftCampaigns([]);
           setCampaignIdsForPopup([]);
           setProcessingCampaigns(false);
