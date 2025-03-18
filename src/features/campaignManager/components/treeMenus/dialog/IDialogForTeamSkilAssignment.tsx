@@ -6,8 +6,7 @@ import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "react-toastify";
-import { CounselorSkill } from "@/features/campaignManager/types/typeForCounselorSkill";
-import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDialogForSideMenu";
+import CommonDialogWithCustomAlertStyle from "@/components/shared/layout/CommonDialogWithCustomAlertStyle";
 import { useApiForGetRelatedInfoForAssignSkilToCounselor } from "@/features/preferences/hooks/useApiForGetRelatedInfoForAssignSkilToCounselor";
 import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
 import Image from "next/image";
@@ -134,7 +133,6 @@ export function IDialogForTeamSkilAssignment({
   // 할당 모드: 선택된 스킬을 추가 (이미 할당된 스킬도 포함)
   const getSkillsToAdd = () => {
     if (isUnassignMode) return [];
-    // 할당 모드에서는 모든 선택된 스킬을 반환
     return selectedSkills;
   };
 
@@ -241,7 +239,6 @@ export function IDialogForTeamSkilAssignment({
       );
     }
 
-    // 상담원이 없는 경우 UI
     if (!teamMembers || teamMembers.length === 0) {
       return (
         <div className="px-6 py-4">
@@ -257,31 +254,22 @@ export function IDialogForTeamSkilAssignment({
       );
     }
 
-    // 할당/해제할 스킬 계산
     const skillsToAdd = getSkillsToAdd();
     const skillsToRemove = getSkillsToRemove();
-    const buttonDisabled = skillsToAdd.length === 0 && skillsToRemove.length === 0;
 
     return (
       <div className="p-4">
-        {/* 공통 설명 영역 */}
         <div className="text-sm text-gray-600 mb-4">
           {isUnassignMode 
-            ? `팀의 모든 상담원(${teamMembers.length}명)에게서 스킬을 일괄 해제합니다. 해제할 스킬을 선택하세요.`
+            ? `팀의 모든 상담원(${teamMembers.length}명)에게서 스킬을 일괄 해제합니다. 해제할 스킬을 선택하세요.` 
             : `팀의 모든 상담원(${teamMembers.length}명)에게 스킬을 일괄 할당합니다. 할당할 스킬을 선택하세요.`}
         </div>
-
-        {/* 테넌트 ID 정보 */}
         <div className="p-2 bg-gray-50 border rounded text-sm text-[#333] mb-4">
           <span>테넌트 ID: {tenantId || 'N/A'}</span>
         </div>
-
-        {/* 2등분 레이아웃 */}
         <div className="flex flex-row gap-6">
-          {/* 왼쪽 영역: 그룹 정보 및 상담원 목록 */}
           <div className="w-1/2">
             <div className="mb-2 font-medium text-sm">팀 정보</div>
-            {/* 상담원 목록 토글 헤더 */}
             <div
               className="flex justify-between items-center p-2 border rounded cursor-pointer bg-gray-50 hover:bg-gray-100 mb-2"
               onClick={toggleCounselors}
@@ -290,7 +278,6 @@ export function IDialogForTeamSkilAssignment({
                 <Image src="/tree-menu/team_icon_for_tree.png" alt="팀" width={14} height={12} className="mr-2" />
                 <span className="text-sm text-[#333]">{teamName}</span>
               </div>
-
               <div className="flex items-center">
                 <span className="text-sm text-[#333] mr-2">{teamMembers.length}명</span>
                 {showCounselors ? (
@@ -300,8 +287,6 @@ export function IDialogForTeamSkilAssignment({
                 )}
               </div>
             </div>
-
-            {/* 상담원 목록 (토글되는 영역) */}
             {showCounselors && (
               <div className="border rounded" style={{ maxHeight: '300px', overflow: 'auto' }}>
                 <Table>
@@ -314,11 +299,9 @@ export function IDialogForTeamSkilAssignment({
                   </TableHeader>
                   <TableBody>
                     {teamMembers.map((counselor, index) => {
-                      // 필드에 올바르게 접근
                       const id = counselor.data?.counselorId || counselor.counselorId || '-';
                       const name = counselor.data?.counselorname || counselor.counselorname || '-';
                       const currentTenantId = counselor.data?.tenantId || counselor.tenantId || '-';
-
                       return (
                         <TableRow key={`counselor-${index}`} className="custom-hover">
                           <TableCell className="py-1 text-sm text-center text-[#444]">{id}</TableCell>
@@ -332,8 +315,6 @@ export function IDialogForTeamSkilAssignment({
               </div>
             )}
           </div>
-
-          {/* 오른쪽 영역: 스킬 목록 */}
           <div className="w-1/2">
             <div className="mb-2 font-medium text-sm">
               {isUnassignMode ? "해제할 스킬 선택" : "할당할 스킬 선택"}
@@ -343,8 +324,6 @@ export function IDialogForTeamSkilAssignment({
                   : `(${skillsToAdd.length}개 선택됨)`}
               </span>
             </div>
-
-            {/* 스킬 목록 테이블 */}
             <div className="border rounded" style={{ maxHeight: '350px', overflow: 'auto' }}>
               <Table>
                 <TableHeader className="sticky top-0 z-10">
@@ -359,16 +338,11 @@ export function IDialogForTeamSkilAssignment({
                     assignableSkills.map((skill) => {
                       const isAlreadyAssigned = assignedSkillsInfo.includes(skill.skill_id);
                       const isCurrentlySelected = selectedSkills.includes(skill.skill_id);
-                      
-                      // 해제 모드에서는 이미 할당된 스킬만 표시
                       if (isUnassignMode && !isAlreadyAssigned) {
                         return null;
                       }
-                      
-                      // 할당 모드에서는 모든 선택된 스킬이 추가 대상
                       const willBeAdded = !isUnassignMode && isCurrentlySelected;
                       const willBeRemoved = isUnassignMode && isCurrentlySelected;
-                      
                       return (
                         <TableRow 
                           key={`skill-${skill.skill_id}`} 
@@ -387,29 +361,21 @@ export function IDialogForTeamSkilAssignment({
                           <TableCell className="text-center text-[#444]" style={{ height: '30px', padding: 0 }}>
                             {skill.skill_name}
                             {isAlreadyAssigned && !isCurrentlySelected && !isUnassignMode && (
-                              <span className="ml-2 text-xs text-green-500">
-                                (현재 할당됨)
-                              </span>
+                              <span className="ml-2 text-xs text-green-500">(현재 할당됨)</span>
                             )}
                             {isAlreadyAssigned && isCurrentlySelected && !isUnassignMode && (
-                              <span className="ml-2 text-xs text-blue-500">
-                                (재할당 예정)
-                              </span>
+                              <span className="ml-2 text-xs text-blue-500">(재할당 예정)</span>
                             )}
                             {!isAlreadyAssigned && willBeAdded && (
-                              <span className="ml-2 text-xs text-blue-500">
-                                (추가 예정)
-                              </span>
+                              <span className="ml-2 text-xs text-blue-500">(추가 예정)</span>
                             )}
                             {willBeRemoved && (
-                              <span className="ml-2 text-xs text-red-500">
-                                (해제 예정)
-                              </span>
+                              <span className="ml-2 text-xs text-red-500">(해제 예정)</span>
                             )}
                           </TableCell>
                         </TableRow>
                       );
-                    }).filter(Boolean) // null 제거
+                    }).filter(Boolean)
                   ) : (
                     <TableRow>
                       <TableCell colSpan={3} className="text-center py-4">
@@ -422,18 +388,16 @@ export function IDialogForTeamSkilAssignment({
             </div>
           </div>
         </div>
-
-        {/* 하단 버튼 영역 */}
         <div className="mt-6 flex justify-center gap-2">
           <Button
             onClick={handleConfirm}
             className="px-6 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
-            disabled={isProcessing || buttonDisabled}
+            disabled={isProcessing || isButtonDisabled()}
           >
             {isProcessing ? "처리 중..." : (
               isUnassignMode 
-                ? `스킬 해제 (${skillsToRemove.length}개)` 
-                : `스킬 할당 (${skillsToAdd.length}개)`
+                ? `스킬 해제 (${getSkillsToRemove().length}개)` 
+                : `스킬 할당 (${getSkillsToAdd().length}개)`
             )}
           </Button>
           <Button
@@ -450,13 +414,14 @@ export function IDialogForTeamSkilAssignment({
   };
 
   return (
-    <CommonDialogForSideMenu
+    <CommonDialogWithCustomAlertStyle
       isOpen={isOpen}
       onClose={onClose}
       title={dialogTitle || `팀 스킬 ${isUnassignMode ? "해제" : "할당"} - ${teamName || ''}`}
-      dialogClassName="w-[70%] max-w-[1200px] min-w-[800px]"
+      width="w-[70%] max-w-[1200px] min-w-[800px]"
+      showButtons={false}
     >
       {renderContent()}
-    </CommonDialogForSideMenu>
+    </CommonDialogWithCustomAlertStyle>
   );
 }
