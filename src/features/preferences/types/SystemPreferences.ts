@@ -339,3 +339,27 @@ export interface CampaignSkillListResponse {
   total_count: number;
   result_data: CampaignSkillDataResponse[];
 }
+
+// 서스팬드 캠페인 조회
+export interface SuspendedCampaignListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data:[
+    camapain_id: number,
+    suspend_time: string
+  ]
+}
+
+// 서스팬드 스킬 조회
+export interface SuspendedSkillListResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  total_count: number;
+  result_data:[
+    skill_id: number,
+    suspend_time: string
+  ]
+}
