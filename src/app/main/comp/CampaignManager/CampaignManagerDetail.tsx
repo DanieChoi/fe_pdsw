@@ -24,6 +24,7 @@ import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/u
 import { useApiForCampaignManagerUpdate } from '@/features/campaignManager/hooks/useApiForCampaignManagerUpdate';
 import { useApiForCampaignManagerDelete } from '@/features/campaignManager/hooks/useApiForCampaignManagerDelete';
 import { useApiForCampaignScheduleUpdate } from '@/features/campaignManager/hooks/useApiForCampaignScheduleUpdate';
+import { useApiForCampaignScheduleInsert } from '@/features/campaignManager/hooks/useApiForCampaignScheduleInsert';
 import { useApiForCampaignScheduleDelete } from '@/features/campaignManager/hooks/useApiForCampaignScheduleDelete';
 import { useApiForCallingNumberUpdate } from '@/features/campaignManager/hooks/useApiForCallingNumberUpdate';
 import { useApiForCampaignStatusUpdate } from '@/features/campaignManager/hooks/useApiForCampaignStatusUpdate';
@@ -1017,8 +1018,13 @@ export default function CampaignDetail() {
         }
       }
       if (campaignScheduleChangeYn) {
-        //캠페인 스케줄 수정 api 호출
-        fetchCampaignScheduleUpdate(tempCampaignSchedule);
+        if( tempCampaignSchedule.tenant_id === 0){
+          //캠페인 스케줄 등록 api 호출
+          fetchCampaignScheduleInsert({...tempCampaignSchedule,tenant_id:tempCampaignManagerInfo.tenant_id});
+        }else{
+          //캠페인 스케줄 수정 api 호출
+          fetchCampaignScheduleUpdate(tempCampaignSchedule);
+        }
       }
       if (callingNumberChangeYn) {
         const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignInfo.campaign_id)
@@ -1105,6 +1111,16 @@ export default function CampaignDetail() {
     }
   });
 
+  //캠페인 스케줄 등록 api 호출
+  const { mutate: fetchCampaignScheduleInsert } = useApiForCampaignScheduleInsert({
+    onSuccess: (data) => {
+      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
+      fetchSchedules({
+        tenant_id_array: tempTenantIdArray
+      });      
+    }
+  });
+  
   //캠페인 스케줄 수정 api 호출 
   const { mutate: fetchCampaignScheduleUpdate } = useApiForCampaignScheduleUpdate({
     onSuccess: (data) => {
