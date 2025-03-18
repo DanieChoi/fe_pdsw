@@ -491,14 +491,14 @@ const CampaignAddPopup: React.FC<Props> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded shadow-md w-[70%] max-h-[90vh] flex flex-col overflow-hidden">
-        <div className="flex justify-between items-center px-4 py-2 border-b bg-gray-50">
-          <h2 className="text-sm font-medium">{groupName} 에 대해 캠페인 추가</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-lg">
-            ×
-          </button>
-        </div>
+    <CommonDialogWithCustomAlertStyle
+      title={`${groupName} 에 대해 캠페인 추가`}
+      isOpen={isOpen}
+      onClose={() => onClose?.()}
+      width="w-[70%]"
+      showButtons={false}
+    >
+      <div className="flex flex-col overflow-hidden">
         <div className="px-4 py-2 border-b">
           <input
             type="text"
@@ -609,7 +609,7 @@ const CampaignAddPopup: React.FC<Props> = ({
           </CommonDialogWithCustomAlertStyle>
         )}
       </div>
-    </div>
+    </CommonDialogWithCustomAlertStyle>
   );
 };
 
