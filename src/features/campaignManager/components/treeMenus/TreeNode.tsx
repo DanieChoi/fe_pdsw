@@ -35,11 +35,6 @@ export function TreeNode({
   const isSelected = selectedNodeId === item.id;
   const statusIcon = item.type === "campaign" ? getStatusIcon(item.status) : null;
 
-  // 뷰 모드가 tenant이고 item.type이 campaign인 경우 렌더링하지 않음
-  if (viewMode === 'tenant' && item.type === 'campaign') {
-    return null;
-  }
-
   const handleClick = useCallback(() => {
     onNodeSelect(item.id);
     if (hasChildren) {
@@ -57,6 +52,33 @@ export function TreeNode({
     simulateHeaderMenuClick(2);
     setCampaignIdForUpdateFromSideMenu(item.id);
   }, [item, simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu]);
+
+  const handleEdit = useCallback(() => {
+    console.log("Edit clicked:", { id: item.id, label: item.label, type: item.type });
+  }, [item.id, item.label, item.type]);
+  
+  const handleMonitor = useCallback(() => {
+    console.log("Monitor clicked:", { id: item.id, label: item.label, type: item.type });
+  }, [item.id, item.label, item.type]);
+  
+  const onHandleCampaignCopy = useCallback(() => {
+    console.log("Copy clicked:", { id: item.id, label: item.label, type: item.type });
+    setCampaignIdForUpdateFromSideMenu(item.id);
+    setCampaignIdForCopyCampaign(item.id);
+    addTab({
+      id: 130,
+      uniqueKey: "130",
+      title: "캠페인 복사",
+      icon: "",
+      href: "",
+      content: null,
+    });
+  }, [item, setCampaignIdForUpdateFromSideMenu, setCampaignIdForCopyCampaign, addTab]);
+
+  // 뷰 모드가 tenant이고 item.type이 campaign인 경우 렌더링하지 않음
+  if (viewMode === 'tenant' && item.type === 'campaign') {
+    return null;
+  }
 
   if (item.visible === false) {
     return null;
@@ -97,28 +119,6 @@ export function TreeNode({
     }
     
     return <FileText className={`${compact ? 'h-3 w-3' : 'h-4 w-4'} text-gray-400 flex-shrink-0`} />;
-  };
-
-  const handleEdit = () => {
-    console.log("Edit clicked:", { id: item.id, label: item.label, type: item.type });
-  };
-  
-  const handleMonitor = () => {
-    console.log("Monitor clicked:", { id: item.id, label: item.label, type: item.type });
-  };
-  
-  const onHandleCampaignCopy = () => {
-    console.log("Copy clicked:", { id: item.id, label: item.label, type: item.type });
-    setCampaignIdForUpdateFromSideMenu(item.id);
-    setCampaignIdForCopyCampaign(item.id);
-    addTab({
-      id: 130,
-      uniqueKey: "130",
-      title: "캠페인 복사",
-      icon: "",
-      href: "",
-      content: null,
-    });
   };
 
   // 노드 클래스 - 컴팩트 모드일 경우 더 작은 패딩 적용
