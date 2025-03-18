@@ -298,6 +298,9 @@ export function AddCampaignGroupDialog({
   const [isValidated, setIsValidated] = useState(false);
   const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
 
+    const { refetchTreeData } = useSideMenuCampaignGroupTabStore();
+  
+
   // 다이얼로그가 열릴 때마다 폼 초기화
   useEffect(() => {
     if (isOpen) {
@@ -388,6 +391,9 @@ export function AddCampaignGroupDialog({
       if (onAddGroup) {
         onAddGroup(groupName, groupId);
       }
+
+      refetchTreeData();
+
       handleClose();
     },
     onError: (error, variables, context) => {

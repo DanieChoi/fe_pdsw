@@ -20,6 +20,7 @@ import { IContextMenuForCampaignForCampaignGroup, CampaignStatus } from "./Conte
 import IContextMenuForCampaignGroupAtCampaignGroup from "./ContextMenus/IContextMenuForCampaignGroupAtCampaignGroup";
 import IContextMenuForTenantAtCampaignGroup from "./ContextMenus/IContextMenuForTenantAtCampaignGroup";
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
+import CommonDialogWithCustomAlertStyle from "@/components/shared/layout/CommonDialogWithCustomAlertStyle";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -76,6 +77,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     onSuccess: () => {
       toast.success("캠페인 그룹이 삭제되었습니다.");
       setIsDeleteDialogOpen(false);
+      refetchTreeData();
     },
     onError: (error) => {
       alert(`캠페인 그룹 삭제 실패: ${error.message}`);
@@ -214,13 +216,15 @@ export function TreeNodeForSideBarCampaignGroupTab({
         )}
 
         {isDeleteDialogOpen && createPortal(
-          <CommonDialogForSideMenu
+          <CommonDialogWithCustomAlertStyle
             isOpen={isDeleteDialogOpen}
             onClose={handleCloseDeleteDialog}
             title="캠페인 그룹 삭제"
-            description={`정말로 캠페인 그룹 '${node?.name}'을(를) 삭제하시겠습니까?`}
+            showButtons={false}
+            width="max-w-md"
           >
             <div className="space-y-4">
+              <p className="text-sm">정말로 캠페인 그룹 '{node?.name}'을(를) 삭제하시겠습니까?</p>
               <p className="text-destructive font-medium">이 작업은 되돌릴 수 없습니다.</p>
               <div className="flex justify-end space-x-2 mt-6">
                 <Button
@@ -243,7 +247,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
                 </Button>
               </div>
             </div>
-          </CommonDialogForSideMenu>,
+          </CommonDialogWithCustomAlertStyle>,
           document.body
         )}
 
