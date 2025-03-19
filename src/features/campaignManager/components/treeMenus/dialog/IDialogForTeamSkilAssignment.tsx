@@ -6,7 +6,7 @@ import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "react-toastify";
-import CommonDialogWithCustomAlertStyle from "@/components/shared/layout/CommonDialogWithCustomAlertStyle";
+import CustomAlert from "@/components/shared/layout/CustomAlert";
 import { useApiForGetRelatedInfoForAssignSkilToCounselor } from "@/features/preferences/hooks/useApiForGetRelatedInfoForAssignSkilToCounselor";
 import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
 import Image from "next/image";
@@ -414,14 +414,15 @@ export function IDialogForTeamSkilAssignment({
   };
 
   return (
-    <CommonDialogWithCustomAlertStyle
+    <CustomAlert
       isOpen={isOpen}
-      onClose={onClose}
       title={dialogTitle || `팀 스킬 ${isUnassignMode ? "해제" : "할당"} - ${teamName || ''}`}
+      message={renderContent()}
+      type="1"
+      onClose={onClose}
+      onCancle={onClose}
       width="w-[70%] max-w-[1200px] min-w-[800px]"
       showButtons={false}
-    >
-      {renderContent()}
-    </CommonDialogWithCustomAlertStyle>
+    />
   );
 }

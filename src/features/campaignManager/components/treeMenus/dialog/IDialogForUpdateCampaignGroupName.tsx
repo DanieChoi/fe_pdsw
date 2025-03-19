@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useApiForCampaignGroupNameUpdate } from "@/features/campaignManager/hooks/useApiForCampaignGroupNameUpdate";
 import { toast } from "react-toastify";
-import CommonDialogWithCustomAlertStyle from "@/components/shared/layout/CommonDialogWithCustomAlertStyle";
+import CustomAlert from "@/components/shared/layout/CustomAlert";
 
 interface IDialogForUpdateCampaignGroupNameProps {
   isOpen: boolean;
@@ -70,49 +70,53 @@ const IDialogForUpdateCampaignGroupName: FC<IDialogForUpdateCampaignGroupNamePro
     });
   };
 
+  const content = (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <p className="text-sm text-gray-600 mb-4">
+        새로운 캠페인 그룹 이름을 입력해주세요.
+      </p>
+      <div className="space-y-2">
+        <Label htmlFor="groupName">그룹 이름</Label>
+        <Input
+          id="groupName"
+          value={groupName}
+          onChange={(e) => {
+            setGroupName(e.target.value);
+            setError("");
+          }}
+          placeholder="그룹 이름을 입력하세요"
+          className={error ? "border-red-500" : ""}
+          disabled={isPending}
+        />
+        {error && <p className="text-sm text-red-500">{error}</p>}
+      </div>
+      <div className="flex justify-end space-x-2 mt-6">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onClose}
+          disabled={isPending}
+          className="w-20"
+        >
+          취소
+        </Button>
+        <Button type="submit" disabled={isPending} className="w-20">
+          {isPending ? "저장 중..." : "저장"}
+        </Button>
+      </div>
+    </form>
+  );
+
   return (
-    <CommonDialogWithCustomAlertStyle
+    <CustomAlert
       isOpen={isOpen}
-      onClose={onClose}
       title="캠페인 그룹 이름 변경"
+      message={content}
+      onClose={onClose}
+      onCancle={onClose}
+      type="1"
       width="w-[30%] max-w-[1200px] min-w-[500px]"
-      showButtons={false} // 내부에서 커스텀 버튼 사용
-    >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <p className="text-sm text-gray-600 mb-4">
-          새로운 캠페인 그룹 이름을 입력해주세요.
-        </p>
-        <div className="space-y-2">
-          <Label htmlFor="groupName">그룹 이름</Label>
-          <Input
-            id="groupName"
-            value={groupName}
-            onChange={(e) => {
-              setGroupName(e.target.value);
-              setError("");
-            }}
-            placeholder="그룹 이름을 입력하세요"
-            className={error ? "border-red-500" : ""}
-            disabled={isPending}
-          />
-          {error && <p className="text-sm text-red-500">{error}</p>}
-        </div>
-        <div className="flex justify-end space-x-2 mt-6">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            disabled={isPending}
-            className="w-20"
-          >
-            취소
-          </Button>
-          <Button type="submit" disabled={isPending} className="w-20">
-            {isPending ? "저장 중..." : "저장"}
-          </Button>
-        </div>
-      </form>
-    </CommonDialogWithCustomAlertStyle>
+    />
   );
 };
 

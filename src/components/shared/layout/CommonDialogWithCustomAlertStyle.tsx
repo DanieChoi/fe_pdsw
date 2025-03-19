@@ -1,4 +1,4 @@
-// CommonDialogWithCustomAlertStyle.tsx
+// src\components\shared\layout\CommonDialogWithCustomAlertStyle.tsx
 import React, { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { CommonButton } from "@/components/shared/CommonButton";

@@ -16,7 +16,7 @@ import { CounselorSkill } from "@/features/campaignManager/types/typeForCounselo
 import { useApiForGetRelatedInfoForAssignSkilToCounselor } from "@/features/preferences/hooks/useApiForGetRelatedInfoForAssignSkilToCounselor";
 import { useApiDeleteCounselorsFromSkills } from "@/features/campaignManager/hooks/useApiDeleteCounselorsFromSkills";
 import { useApiBatchSkillAssignment } from "@/features/campaignManager/hooks/useApiBatchSkillAssignment";
-import CommonDialogWithCustomAlertStyle from "@/components/shared/layout/CommonDialogWithCustomAlertStyle";
+import CustomAlert from "@/components/shared/layout/CustomAlert";
 
 interface IDialogForSkilAssignmentForCounselorProps {
   isOpen: boolean;
@@ -282,17 +282,17 @@ export function IDialogForSkilAssignmentForCounselor({
   };
 
   return (
-    <CommonDialogWithCustomAlertStyle
+    <CustomAlert
       isOpen={isOpen}
       onClose={onClose}
       title={
         dialogTitle ||
         `스킬 ${isUnassignMode ? "해제" : "할당"} - ${counselorName || ""}`
       }
+      message={renderContent()}
+      type="custom"
       width="w-[70%] max-w-[1200px] min-w-[800px]"
       showButtons={false} // 내부 커스텀 버튼 사용
-    >
-      {renderContent()}
-    </CommonDialogWithCustomAlertStyle>
+    />
   );
 }

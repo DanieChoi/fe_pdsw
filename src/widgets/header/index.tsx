@@ -270,8 +270,7 @@ export default function Header() {
       <header className="bg-white border-b">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between header-padding">
-
-            <div>role_id: {role_id}</div>
+            {/* <div>role_id: {role_id}</div> */}
 
             <nav className="flex overflow-x-auto gap-3">
               {menuItems.map((item) => {

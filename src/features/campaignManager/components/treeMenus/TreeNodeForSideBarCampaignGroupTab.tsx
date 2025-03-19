@@ -1,10 +1,9 @@
-// src/features/campaignManager/components/treeMenus/TreeNodeForSideBarCampaignGroupTab.tsx
 "use client";
 
 import { Building } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback, useState, useEffect, useRef } from "react";
-import { Menu, Item, useContextMenu, Separator } from "react-contexify";
+import { Menu, useContextMenu } from "react-contexify";
 import "react-contexify/dist/ReactContexify.css";
 import { TreeNode } from "@/features/campaignManager/types/typeForCampaignGroupForSideBar";
 import AddCampaignGroupDialog from "./dialog/AddCampaignGroupDialog";
@@ -20,7 +19,7 @@ import { IContextMenuForCampaignForCampaignGroup, CampaignStatus } from "./Conte
 import IContextMenuForCampaignGroupAtCampaignGroup from "./ContextMenus/IContextMenuForCampaignGroupAtCampaignGroup";
 import IContextMenuForTenantAtCampaignGroup from "./ContextMenus/IContextMenuForTenantAtCampaignGroup";
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
-import CommonDialogWithCustomAlertStyle from "@/components/shared/layout/CommonDialogWithCustomAlertStyle";
+import IDialogButtonForDeleteCampaignGroup from "@/widgets/sidebar/dialogs/IDialogButtonForDeleteCampaignGroup";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -126,7 +125,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     }, 300);
   }, []);
 
-  // tofix : 캠페인 이름 수정후 리패치
+  // 캠페인 이름 수정 후 리패치 처리
   const handleCloseRenameDialog = useCallback(async () => {
     setIsRenameDialogOpen(false);
     recentlyClosedDialogRef.current = true;
@@ -216,38 +215,13 @@ export function TreeNodeForSideBarCampaignGroupTab({
         )}
 
         {isDeleteDialogOpen && createPortal(
-          <CommonDialogWithCustomAlertStyle
+          <IDialogButtonForDeleteCampaignGroup
             isOpen={isDeleteDialogOpen}
-            onClose={handleCloseDeleteDialog}
-            title="캠페인 그룹 삭제"
-            showButtons={false}
-            width="max-w-md"
-          >
-            <div className="space-y-4">
-              <p className="text-sm">정말로 캠페인 그룹 &apos;{node?.name}&apos;을(를) 삭제하시겠습니까?</p>
-              <p className="text-destructive font-medium">이 작업은 되돌릴 수 없습니다.</p>
-              <div className="flex justify-end space-x-2 mt-6">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCloseDeleteDialog}
-                  disabled={isDeleting}
-                  className="w-20"
-                >
-                  취소
-                </Button>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={confirmDelete}
-                  disabled={isDeleting}
-                  className="w-20"
-                >
-                  {isDeleting ? "삭제 중..." : "삭제"}
-                </Button>
-              </div>
-            </div>
-          </CommonDialogWithCustomAlertStyle>,
+            groupName={node.name}
+            onCancel={handleCloseDeleteDialog}
+            onDelete={confirmDelete}
+            isDeleting={isDeleting}
+          />,
           document.body
         )}
 
@@ -324,7 +298,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
   const renderNodeWithProperContextMenu = () => {
     if (node.type === "campaign") {
-      console.log("캠페인 node : ");
       const campaignItem = {
         id: node.campaign_id,
         label: node.name,
@@ -358,7 +331,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
         />
       </Menu>
 
-      {/* 그룹 노드 컨텍스트 메뉴 - 새 컴포넌트 적용 */}
+      {/* 그룹 노드 컨텍스트 메뉴 */}
       <Menu id={groupMenuId} className="compact-menu">
         <IContextMenuForCampaignGroupAtCampaignGroup
           node={node}

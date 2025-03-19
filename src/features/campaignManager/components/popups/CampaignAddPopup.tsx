@@ -12,7 +12,7 @@ import { useAuthStore } from '@/store/authStore';
 import { toast } from 'react-toastify';
 import useApiForAddCampaignToSpecificCampaignGroup from '../../hooks/useApiForAddCampaignToSpecificCampaignGroup';
 import useApiForRemoveCampaignFromCampaignGroup from '../../hooks/useApiForRemoveCampaignFromCampaignGroup';
-import CommonDialogWithCustomAlertStyle from '@/components/shared/layout/CommonDialogWithCustomAlertStyle';
+import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useSideMenuCampaignGroupTabStore } from '@/store/storeForSideMenuCampaignGroupTab';
 
 interface SkillWithCampaigns {
@@ -358,17 +358,17 @@ const CampaignAddPopup: React.FC<Props> = ({
       setShowAlert(false);
       return;
     }
-    
+
     // 중복 캠페인 ID 필터링
     const filteredCampaignIds = campaignIdsForPopup.filter(id => !existingCampaignIds.has(id));
-    
+
     // 모든 캠페인이 이미 그룹에 존재하는 경우 알림 후 종료
     if (filteredCampaignIds.length === 0) {
       toast.info("추가할 모든 캠페인이 이미 그룹에 존재합니다.");
       setShowAlert(false);
       return;
     }
-    
+
     setProcessingCampaigns(true);
     try {
       addCampaignToGroup({
@@ -378,7 +378,7 @@ const CampaignAddPopup: React.FC<Props> = ({
       }, {
         onSuccess: (data: { result_code: string | number }) => {
           const duplicateCount = campaignIdsForPopup.length - filteredCampaignIds.length;
-          
+
           if (Number(data.result_code) === 0) {
             if (duplicateCount > 0) {
               toast.success(
@@ -491,126 +491,137 @@ const CampaignAddPopup: React.FC<Props> = ({
   if (!isOpen) return null;
 
   return (
-    <CommonDialogWithCustomAlertStyle
-      title={`${groupName} 에 대해 캠페인 추가`}
-      isOpen={isOpen}
-      onClose={() => onClose?.()}
-      width="w-[70%]"
-      showButtons={false}
-    >
-      <div className="flex flex-col overflow-hidden">
-        <div className="px-4 py-2 border-b">
-          <input
-            type="text"
-            placeholder="검색..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            className="w-full py-1 px-2 text-xs border border-gray-300 rounded"
-          />
-        </div>
-        <div className="flex flex-col p-4 overflow-hidden" style={{ height: 'calc(100vh - 200px)' }}>
-          <div className="px-2 py-1 mb-2 border-b flex justify-between items-center bg-slate-50">
-            <h3 className="text-xs font-medium">전체 캠페인 목록 (총 {totalCampaigns}건)</h3>
-          </div>
-          <div className="flex flex-1 h-full">
-            <div className="flex-1 h-full">
-              <div className="border rounded h-full overflow-hidden">
-                <ITableForSkillListWithCampaign
-                  filteredSkills={filteredSkills}
-                  expandedSkills={expandedSkills}
-                  selectedLeftCampaigns={selectedLeftCampaigns}
-                  isLoading={isLoadingAny}
-                  hasError={hasError}
-                  toggleSkill={toggleSkill}
-                  toggleLeftCampaignSelection={toggleLeftCampaignSelection}
-                  toggleAllCampaigns={toggleAllCampaigns}
-                  getCampaignName={getCampaignName}
-                  getSkillName={getSkillName}
-                  setExpandedSkills={setExpandedSkills}
-                />
-              </div>
+    <>
+      <CustomAlert
+        title={`${groupName} 에 대해 캠페인 추가`}
+        isOpen={isOpen}
+        onClose={() => onClose?.()}
+        message={
+          <div className="flex flex-col overflow-hidden">
+            <div className="px-4 py-2 border-b">
+              <input
+                type="text"
+                placeholder="검색..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="w-full py-1 px-2 text-xs border border-gray-300 rounded"
+              />
             </div>
-            <div className="flex flex-col items-center gap-2 min-w-[22px] justify-center px-2">
-              <button
-                className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
-                onClick={moveToGroup}
-                disabled={
-                  selectedLeftCampaigns.length === 0 ||
-                  processingCampaigns ||
-                  isAddingCampaign ||
-                  removingCampaigns ||
-                  isRemovingCampaign
-                }
-                title="선택한 캠페인 추가"
-              >
-                {processingCampaigns || isAddingCampaign ? (
-                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <ChevronRight size={14} />
-                )}
-              </button>
-              <button
-                className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
-                onClick={moveToAll}
-                disabled={
-                  selectedRightCampaigns.length === 0 ||
-                  processingCampaigns ||
-                  isAddingCampaign ||
-                  removingCampaigns ||
-                  isRemovingCampaign
-                }
-                title="선택한 캠페인 제거"
-              >
-                {removingCampaigns || isRemovingCampaign ? (
-                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <ChevronLeft size={14} />
-                )}
-              </button>
-            </div>
-            <div className="flex-1 h-full">
-              <div className="border rounded h-full overflow-hidden">
-                <GroupCampaignList
-                  isLoading={isLoadingGroup}
-                  groupCampaigns={groupCampaignsData}
-                  toggleAllGroupCampaigns={toggleAllGroupCampaigns}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="h-5"></div>
-        <div className="py-2 px-4 border-t bg-gray-50 flex justify-between items-center">
-          <div className="text-xs text-gray-600">
-            현재 그룹에 {groupCampaignsData.length}개의 캠페인이 있습니다
-          </div>
-          <div className="space-x-2">
-            <button
-              onClick={onClose}
-              className="px-3 py-1 text-xs bg-gray-100 border border-gray-300 rounded hover:bg-gray-200"
+            <div
+              className="flex flex-col p-4 overflow-hidden"
+              style={{ height: 'calc(100vh - 200px)' }}
             >
-              취소
-            </button>
+              <div className="px-2 py-1 mb-2 border-b flex justify-between items-center bg-slate-50">
+                <h3 className="text-xs font-medium">
+                  전체 캠페인 목록 (총 {totalCampaigns}건)
+                </h3>
+              </div>
+              <div className="flex flex-1 h-full">
+                <div className="flex-1 h-full">
+                  <div className="border rounded h-full overflow-hidden">
+                    <ITableForSkillListWithCampaign
+                      filteredSkills={filteredSkills}
+                      expandedSkills={expandedSkills}
+                      selectedLeftCampaigns={selectedLeftCampaigns}
+                      isLoading={isLoadingAny}
+                      hasError={hasError}
+                      toggleSkill={toggleSkill}
+                      toggleLeftCampaignSelection={toggleLeftCampaignSelection}
+                      toggleAllCampaigns={toggleAllCampaigns}
+                      getCampaignName={getCampaignName}
+                      getSkillName={getSkillName}
+                      setExpandedSkills={setExpandedSkills}
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col items-center gap-2 min-w-[22px] justify-center px-2">
+                  <button
+                    className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
+                    onClick={moveToGroup}
+                    disabled={
+                      selectedLeftCampaigns.length === 0 ||
+                      processingCampaigns ||
+                      isAddingCampaign ||
+                      removingCampaigns ||
+                      isRemovingCampaign
+                    }
+                    title="선택한 캠페인 추가"
+                  >
+                    {processingCampaigns || isAddingCampaign ? (
+                      <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <ChevronRight size={14} />
+                    )}
+                  </button>
+                  <button
+                    className="w-[22px] h-[22px] bg-[#60C3CD] text-white rounded-full flex items-center justify-center disabled:opacity-50"
+                    onClick={moveToAll}
+                    disabled={
+                      selectedRightCampaigns.length === 0 ||
+                      processingCampaigns ||
+                      isAddingCampaign ||
+                      removingCampaigns ||
+                      isRemovingCampaign
+                    }
+                    title="선택한 캠페인 제거"
+                  >
+                    {removingCampaigns || isRemovingCampaign ? (
+                      <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <ChevronLeft size={14} />
+                    )}
+                  </button>
+                </div>
+                <div className="flex-1 h-full">
+                  <div className="border rounded h-full overflow-hidden">
+                    <GroupCampaignList
+                      isLoading={isLoadingGroup}
+                      groupCampaigns={groupCampaignsData}
+                      toggleAllGroupCampaigns={toggleAllGroupCampaigns}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="h-5"></div>
+            <div className="py-2 px-4 border-t bg-gray-50 flex justify-between items-center">
+              <div className="text-xs text-gray-600">
+                현재 그룹에 {groupCampaignsData.length}개의 캠페인이 있습니다
+              </div>
+              <div className="space-x-2">
+                <button
+                  onClick={onClose}
+                  className="px-3 py-1 text-xs bg-gray-100 border border-gray-300 rounded hover:bg-gray-200"
+                >
+                  취소
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-        {showAlert && (
-          <CommonDialogWithCustomAlertStyle
-            title={confirmRemove ? '캠페인 제거 확인' : '캠페인 추가 확인'}
-            isOpen={showAlert}
-            onClose={handleAlertConfirm}
-            onCancel={() => setShowAlert(false)}
-            width="max-w-md"
-            confirmDisabled={!confirmRemove && !hasUniqueSelections}
-          >
+        }
+        type="custom"
+        width="max-w-[1000px]"
+        showButtons={false}
+      />
+      {showAlert && (
+        <CustomAlert
+          title={confirmRemove ? '캠페인 제거 확인' : '캠페인 추가 확인'}
+          isOpen={showAlert}
+          onClose={handleAlertConfirm}
+          onCancle={() => setShowAlert(false)}
+          message={
             <div>
               {alertMessage}
               {!confirmRemove && createCampaignListTable(campaignIdsForPopup)}
             </div>
-          </CommonDialogWithCustomAlertStyle>
-        )}
-      </div>
-    </CommonDialogWithCustomAlertStyle>
+          }
+          type="custom"
+          width="max-w-md"
+          confirmDisabled={!confirmRemove && !hasUniqueSelections}
+        />
+      )}
+    </>
   );
-};
+}
 
 export default CampaignAddPopup;
