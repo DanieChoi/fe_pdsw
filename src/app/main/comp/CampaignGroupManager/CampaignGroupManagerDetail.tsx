@@ -348,7 +348,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
   //캠페인 정보 최초 세팅 
   useEffect(() => {
     if (typeof selectedCampaign !== 'undefined' && selectedCampaign !== null && campaignId > 0) {
-      setChangeYn(false);
+      setChangeYn(true);
       setCampaignInfoChangeYn(false);
       setTempCampaignsInfo({
         ...tempCampaignInfo,
@@ -966,7 +966,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
   const handleCampaignSaveExecute = () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     if (typeof selectCampaignGroupList !== 'undefined' && selectCampaignGroupList.length > 0) {
-
+      setCampaignInfoChangeYn(true);
       for (let i = 0; i < selectCampaignGroupList.length; i++) {
         if (changeYn) {
           // if (campaignInfoChangeYn) {
@@ -978,21 +978,21 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
               , start_flag: 2
             });
           // }
-          if (campaignSkillChangeYn) {
+          // if (campaignSkillChangeYn) {
             //캠페인 스킬 수정 api 호출
             fetchCampaignSkillUpdate({
               ...tempCampaignSkills
               , campaign_id: selectCampaignGroupList[i].campaign_id
               , skill_id: []
             });
-          }
-          if (campaignScheduleChangeYn) {
+          // }
+          // if (campaignScheduleChangeYn) {
             //캠페인 스케줄 수정 api 호출
             fetchCampaignScheduleUpdate({
               ...tempCampaignSchedule
               , campaign_id: selectCampaignGroupList[i].campaign_id
             });
-          }
+          // }
           if (callingNumberChangeYn) {
             const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignInfo.campaign_id)
               .map((data) => data.calling_number)
@@ -1016,11 +1016,6 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
         }
       }
     }
-  }
-
-  //캠페인 스케줄 저장
-  const handleCampaignScheduleSave = () => {
-
   }
 
   //변경여부 체크
