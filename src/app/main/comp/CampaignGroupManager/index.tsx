@@ -69,7 +69,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   const handleGroupSelect = (id: string) => {
     _setGroupId(parseInt(id));
     setGroupInfo(_campaignGroupList.find((item) => item.campaignGroupId === parseInt(id)) || initData);
-    setCampaignId(tempCampaignListData.find((item) => item.campaignGroupId === parseInt(id))?.campaignId || 0);
+    setCampaignId(campaignGroupCampaignListData.find((item) => item.group_id === parseInt(id))?.campaign_id || 0);
   };
 
   const handleCampaignSelect = (id: string) => {
