@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import DataGrid, { Column } from "react-data-grid";
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import DataGrid from "react-data-grid";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { Label } from "@/components/ui/label";
-import { useApiForSuspendedCampaignList, useApiForSuspendedSkillList } from '@/features/preferences/hooks/useApiForSuspendView';
+import { useApiForDeleteSuspendedCampaign, useApiForDeleteSuspendedSkill, useApiForSuspendedCampaignList, useApiForSuspendedSkillList } from '@/features/preferences/hooks/useApiForSuspendView';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
@@ -12,6 +12,7 @@ import { useMainStore } from '@/store';
 type ViewMode = 'campaign' | 'skill';
 
 interface BaseRow {
+  id: string;
   release_time: string;
 }
 
@@ -44,6 +45,7 @@ const SuspendView = () => {
   const [suspendedSkills, setSuspendedSkills] = useState<any[]>([]);
   const [skillMasterList, setSkillMasterList] = useState<any[]>([]);
   const [isSkillDataLoaded, setIsSkillDataLoaded] = useState(false);
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
 
   const [alertState, setAlertState] = useState({
     isOpen: false,
@@ -86,8 +88,8 @@ const SuspendView = () => {
   // 서스팬드 캠페인 조회
   const { mutate: fetchSuspendedCampaignList } = useApiForSuspendedCampaignList({
     onSuccess: (data) => {
-      // console.log('서스팬드 캠페인 API Response:', data.result_data);
       setSuspendedCampaigns(data.result_data || []);
+      setSelectedRows(new Set());
     },
     onError: (data) => {      
       if (data.message.split('||')[0] === '5') {
@@ -108,11 +110,36 @@ const SuspendView = () => {
     }
   });
 
+  // 서스팬드 캠페인 삭제
+  const { mutate: deleteSuspendedCampaign } = useApiForDeleteSuspendedCampaign({
+    onSuccess: (data) => {
+      showAlert('삭제가 완료되었습니다.');
+      fetchSuspendedCampaignList();
+    },
+    onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert(`삭제 실패: ${data.message}`);
+      }
+    }
+  });
+
   // 서스팬드 스킬 조회
   const { mutate: fetchSuspendedSkillList } = useApiForSuspendedSkillList({
     onSuccess: (data) => {
-      // console.log('서스팬드 스킬 API Response:', data.result_data);
       setSuspendedSkills(data.result_data || []);
+      setSelectedRows(new Set());
     },
     onError: (data) => {      
       if (data.message.split('||')[0] === '5') {
@@ -133,10 +160,34 @@ const SuspendView = () => {
     }
   });
 
+  // 서스팬드 스킬 삭제
+  const { mutate: deleteSuspendedSkill } = useApiForDeleteSuspendedSkill({
+    onSuccess: (data) => {
+      showAlert('삭제가 완료되었습니다.');
+      fetchSuspendedSkillList();
+    },
+    onError: (data) => {      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert(`삭제 실패: ${data.message}`);
+      }
+    }
+  });
+
   // 스킬 마스터 리스트 조회
   const { mutate: fetchSkillList } = useApiForSkillList({
     onSuccess: (data) => {
-      // console.log('스킬 마스터 API Response:', data.result_data);
       setSkillMasterList(data.result_data || []);
       setIsSkillDataLoaded(true);
     },
@@ -169,7 +220,6 @@ const SuspendView = () => {
     if (viewMode === 'campaign') {
       fetchSuspendedCampaignList();
     } else if (viewMode === 'skill') {
-      // 스킬 데이터가 아직 로드되지 않은 경우에만 호출
       fetchSuspendedSkillList();
       
       if (!isSkillDataLoaded) {
@@ -178,54 +228,97 @@ const SuspendView = () => {
     }
   }, [viewMode]);
 
+  // DELETE 키 이벤트 핸들러
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    if (event.key === 'Delete' && selectedRows.size > 0) {
+      event.preventDefault();
+      handleDeleteSelected();
+    }
+  }, [selectedRows, viewMode]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
   const handleViewModeChange = (value: string) => {
     setViewMode(value as ViewMode);
+    setSelectedRows(new Set());
   };
 
-  const columns = useMemo<readonly Column<GridRow>[]>(() => {
+  const handleDeleteSelected = () => {
+    if (selectedRows.size === 0) return;
+    
     if (viewMode === 'campaign') {
-      return [
-        { key: 'campaign_id', name: '캠페인 아이디' },
-        { key: 'campaign_name', name: '캠페인 이름' },
-        { key: 'release_time', name: '해제시간' }
-      ];
+      const selectedCampaignIds = Array.from(selectedRows).map(id => {
+        // 캠페인 ID 추출
+        const row = rows.find(r => r.id === id);
+        return row?.type === 'campaign' ? parseInt(row.campaign_id) : null;
+      }).filter(id => id !== null) as number[];
+      
+      if (selectedCampaignIds.length === 0) return;
+      
+      showConfirm(`선택한 ${selectedCampaignIds.length}개의 캠페인을 삭제하시겠습니까?`, () => {
+        selectedCampaignIds.forEach(id => {
+          deleteSuspendedCampaign(id);
+        });
+      });
+    } else if (viewMode === 'skill') {
+      const selectedSkillIds = Array.from(selectedRows).map(id => {
+        // 스킬 ID 추출
+        const row = rows.find(r => r.id === id);
+        return row?.type === 'skill' ? parseInt(row.skill_id) : null;
+      }).filter(id => id !== null) as number[];
+      
+      if (selectedSkillIds.length === 0) return;
+      
+      showConfirm(`선택한 ${selectedSkillIds.length}개의 스킬을 삭제하시겠습니까?`, () => {
+        selectedSkillIds.forEach(id => {
+          deleteSuspendedSkill(id);
+        });
+      });
     }
-    return [
-      { key: 'skill_id', name: '스킬 아이디' },
-      { key: 'skill_name', name: '스킬 이름' },
-      { key: 'release_time', name: '해제시간' }
-    ];
+  };
+
+  const columns = useMemo(() => {
+    return viewMode === 'campaign'
+      ? [
+          { key: 'campaign_id', name: '캠페인 아이디' },
+          { key: 'campaign_name', name: '캠페인 이름' },
+          { key: 'release_time', name: '해제시간' }
+        ]
+      : [
+          { key: 'skill_id', name: '스킬 아이디' },
+          { key: 'skill_name', name: '스킬 이름' },
+          { key: 'release_time', name: '해제시간' }
+        ];
   }, [viewMode]);
 
   const rows = useMemo<GridRow[]>(() => {
     if (viewMode === 'campaign') {
-      // suspendedCampaigns와 mainStore의 campaigns 연결하여 캠페인 이름 가져오기
       return suspendedCampaigns.map(item => {
-        // campaigns 배열에서 campaign_id가 일치하는 캠페인 찾기
         const campaignInfo = campaigns.find(
           campaign => campaign.campaign_id === Number(item.campaign_id)
         );
         
         return {
           type: 'campaign',
+          id: `campaign-${item.campaign_id}`,
           campaign_id: String(item.campaign_id),
-          // 캠페인 정보가 있으면 캠페인 이름 사용, 없으면 '' 표시
           campaign_name: campaignInfo ? campaignInfo.campaign_name : '',
           release_time: item.suspend_time
         };
       });
     } else {
-      // 스킬 모드일 때 - 서스팬드 스킬 리스트와 스킬 마스터 리스트 연결
       return suspendedSkills.map(item => {
-        // 스킬 마스터 리스트에서 skill_id가 일치하는 스킬 찾기
         const skillInfo = skillMasterList.find(
           skill => skill.skill_id === Number(item.skill_id)
         );
         
         return {
           type: 'skill',
+          id: `skill-${item.skill_id}`,
           skill_id: String(item.skill_id),
-          // 스킬 정보가 있으면 스킬 이름 사용, 없으면 '' 표시
           skill_name: skillInfo ? skillInfo.skill_name : '',
           release_time: item.suspend_time
         };
@@ -233,11 +326,7 @@ const SuspendView = () => {
     }
   }, [viewMode, suspendedCampaigns, suspendedSkills, campaigns, skillMasterList]);
 
-  const rowKeyGetter = (row: GridRow) => {
-    return row.type === 'campaign'
-      ? `${row.campaign_id}-${row.release_time}`
-      : `${row.skill_id}-${row.release_time}`;
-  };
+  const rowKeyGetter = (row: GridRow) => row.id;
 
   return (
     <div className="space-y-4">
@@ -259,15 +348,23 @@ const SuspendView = () => {
 
       <div className="w-[580px]">
         <div className="grid-custom-wrap h-[230px]">
-          <DataGrid<GridRow>
+          <DataGrid
             columns={columns}
             rows={rows}
             className="grid-custom"
             rowHeight={30}
             headerRowHeight={30}
             rowKeyGetter={rowKeyGetter}
+            selectedRows={selectedRows}
+            onSelectedRowsChange={setSelectedRows}
+            onRowsChange={() => {}}
           />
         </div>
+        {selectedRows.size > 0 && (
+          <div className="mt-2 text-sm text-gray-600">
+            {selectedRows.size}개의 {viewMode === 'campaign' ? '캠페인' : '스킬'}이 선택됨. 삭제하려면 DELETE 키를 누르세요.
+          </div>
+        )}
       </div>
 
       <CustomAlert

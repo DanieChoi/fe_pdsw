@@ -1,10 +1,10 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { SuspendedCampaignListResponse, SuspendedSkillListResponse } from "../types/SystemPreferences";
-import { fetchSuspendedCampaignList, fetchSuspendedSkillList } from "../api/apiForsuspendView";
+import { ApiError, SuccesResponse, SuspendedCampaignListResponse, SuspendedSkillListResponse } from "../types/SystemPreferences";
+import { fetchDeleteSuspendedCampaign, fetchDeleteSuspendedSkill, fetchSuspendedCampaignList, fetchSuspendedSkillList } from "../api/apiForsuspendView";
 
 // 서스팬드 캠페인 조회
 export function useApiForSuspendedCampaignList (
-    options?: UseMutationOptions<SuspendedCampaignListResponse, Error>
+    options?: UseMutationOptions<SuspendedCampaignListResponse, ApiError>
 ) {
     return useMutation({
         mutationKey: ['suspendedCampaignList'],
@@ -12,15 +12,31 @@ export function useApiForSuspendedCampaignList (
         onSuccess: (data, variables, context) => {
             options?.onSuccess?.(data, variables, context);
         },
-        onError: (error: Error, variables, context: unknown) => {
+        onError: (error: ApiError, variables, context: unknown) => {
             options?.onError?.(error, variables, context);
         },
     });
 }
 
+// 서스팬드 캠페인 삭제
+export function useApiForDeleteSuspendedCampaign (
+    options?: UseMutationOptions<SuccesResponse, ApiError, unknown>
+) {
+    return useMutation({
+        mutationKey: ['deleteSuspendedCampaign'],
+        mutationFn: fetchDeleteSuspendedCampaign,
+        onSuccess: (data, variables, context) => {
+            options?.onSuccess?.(data, variables, context);
+        },
+        onError: (error: ApiError, variables, context: unknown) => {
+            options?.onError?.(error, variables, context);
+        }
+    });
+}
+
 // 서스팬드 스킬 조회
 export function useApiForSuspendedSkillList (
-    options?: UseMutationOptions<SuspendedSkillListResponse, Error>
+    options?: UseMutationOptions<SuspendedSkillListResponse, ApiError, unknown>
 ) {
     return useMutation({
         mutationKey: ['suspendedSkillList'],
@@ -28,8 +44,24 @@ export function useApiForSuspendedSkillList (
         onSuccess: (data, variables, context) => {
             options?.onSuccess?.(data, variables, context);
         },
-        onError: (error: Error, variables, context: unknown) => {
+        onError: (error: ApiError, variables, context: unknown) => {
             options?.onError?.(error, variables, context);
         },
+    });
+}
+
+// 서스팬드 스킬킬 삭제
+export function useApiForDeleteSuspendedSkill (
+    options?: UseMutationOptions<SuccesResponse, ApiError, unknown>
+) {
+    return useMutation({
+        mutationKey: ['deleteSuspendedSkill'],
+        mutationFn: fetchDeleteSuspendedSkill,
+        onSuccess: (data, variables, context) => {
+            options?.onSuccess?.(data, variables, context);
+        },
+        onError: (error: ApiError, variables, context: unknown) => {
+            options?.onError?.(error, variables, context);
+        }
     });
 }
