@@ -288,17 +288,17 @@ export function TreeMenusForCampaigns() {
 
   // 로딩 상태
   if (isLoading) {
-    return <div className="p-2 flex-1 min-h-[calc(100%-148px)] text-xs">Loading...</div>;
+    return <div className="p-2 flex-1 min-h-[calc(100%-148px)] text-sm">Loading...</div>;
   }
 
   // 에러 상태
   if (error) {
-    return <div className="p-2 text-red-600 flex-1 min-h-[calc(100%-148px)] text-xs">{(error as Error).message}</div>;
+    return <div className="p-2 text-red-600 flex-1 min-h-[calc(100%-148px)] text-sm">{(error as Error).message}</div>;
   }
 
   // 트리 렌더링
   return (
-    <div className="flex-1 overflow-auto tree-node text-xs" ref={containerRef}>
+    <div className="flex-1 overflow-auto tree-node text-sm" ref={containerRef}>
       {sortedItems.map((item: TreeItem) => (
         <TreeNode
           key={item.id}

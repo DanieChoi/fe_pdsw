@@ -423,7 +423,6 @@ export function ContextMenuForTreeNode({
             </ContextMenuItem>
           )}
 
-          <ContextMenuSeparator className="my-1" />
 
           <ContextMenuItem
             onClick={() => handleMonitorClick(item.id, item.label)}

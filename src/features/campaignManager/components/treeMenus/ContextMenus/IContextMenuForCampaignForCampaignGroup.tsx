@@ -252,21 +252,19 @@ export function IContextMenuForCampaignForCampaignGroup({
     fetchCampaignBlacklistCount(Number(item.id));
   };
 
-  // 컴팩트한 메뉴 아이템 스타일
-  const menuItemClass = "text-xs py-1 px-2 cursor-pointer";
 
   return (
     <>
       <ContextMenu>
         <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-        <ContextMenuContent className="w-[140px] p-1 text-[13px]">
-          <ContextMenuItem onClick={handleEditMenuClick} className={menuItemClass}>
+        <ContextMenuContent className="w-[150px]">
+          <ContextMenuItem onClick={handleEditMenuClick} >
             캠페인 수정
           </ContextMenuItem>
 
           <ContextMenuSub>
             <ContextMenuSubTrigger
-              className={menuItemClass}
+             
               onPointerDown={() => {
                 preventCloseRef.current = false;
               }}
@@ -274,12 +272,12 @@ export function IContextMenuForCampaignForCampaignGroup({
               <span className="flex items-center">
                 시작구분:
                 <span className="ml-1 flex items-center">
-                  <div className="w-3 h-3 mr-1">
+                  <div className="w-4 h-4 mr-1">
                     <Image
                       src={getStatusIcon(currentStatus) || ''}
                       alt={currentStatus}
-                      width={12}
-                      height={12}
+                      width={16}
+                      height={16}
                     />
                   </div>
                   {statusInfo[currentStatus].label}
@@ -305,19 +303,19 @@ export function IContextMenuForCampaignForCampaignGroup({
                     preventCloseRef.current = true;
                   }}
                   className={cn(
-                    "flex items-center justify-between text-xs px-2 py-1",
+                    "flex items-center justify-between text-sm px-2 py-1.5",
                     currentStatus === status ? "bg-gray-50" : "",
                     updateCampaignStatusMutation.isPending ? "opacity-70" : ""
                   )}
                   disabled={updateCampaignStatusMutation.isPending}
                 >
                   <div className="flex items-center">
-                    <div className="w-3 h-3 mr-1">
+                    <div className="w-4 h-4 mr-2">
                       <Image
                         src={getStatusIcon(status) || ''}
                         alt={status}
-                        width={12}
-                        height={12}
+                        width={16}
+                        height={16}
                       />
                     </div>
                     <span>{statusInfo[status].label}</span>
@@ -333,25 +331,23 @@ export function IContextMenuForCampaignForCampaignGroup({
 
           <ContextMenuItem
             onClick={() => handleProgressInfoClick(item.id, item.label)}
-            className={menuItemClass}
+
           >
             캠페인 진행정보
           </ContextMenuItem>
 
-          <ContextMenuSeparator className="my-0.5" />
+          <ContextMenuSeparator className="my-1" />
 
           <ContextMenuItem
             onClick={handleRebroadcastClick}
-            className={menuItemClass}
           >
             재발신
           </ContextMenuItem>
 
-          <ContextMenuSeparator className="my-0.5" />
+          <ContextMenuSeparator className="my-1" />
 
           <ContextMenuItem
             onClick={handleCampaignCopy}
-            className={menuItemClass}
           >
             캠페인 복사
           </ContextMenuItem>
@@ -359,35 +355,31 @@ export function IContextMenuForCampaignForCampaignGroup({
           {!isFolder && (
             <ContextMenuItem
               onClick={() => onCampaignDelete(currentStatus)}
-              className={`${menuItemClass} text-red-500`}
+              className="text-red-500"
             >
               캠페인 삭제
             </ContextMenuItem>
           )}
 
-          <ContextMenuSeparator className="my-0.5" />
+          <ContextMenuSeparator className="my-1" />
 
           {currentStatus === 'stopped' && (
             <ContextMenuItem
               onClick={() => handleCampaignListDelete(item.id)}
-              className={menuItemClass}
             >
               캠페인 리스트 삭제
             </ContextMenuItem>
           )}
 
-          <ContextMenuSeparator className="my-0.5" />
 
           <ContextMenuItem
             onClick={() => handleMonitorClick(item.id, item.label)}
-            className={menuItemClass}
           >
             상담원 상태 모니터
           </ContextMenuItem>
 
           <ContextMenuItem
             onClick={handleBlacklistCountCheckClick}
-            className={menuItemClass}
           >
             블랙리스트 건수 조회
           </ContextMenuItem>

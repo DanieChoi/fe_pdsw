@@ -298,7 +298,7 @@ export function TreeNodeForCounselorListForSideBar({
     <div className="select-none">
       {renderWithContextMenu(renderNodeContent())}
       {hasChildren && isExpanded && (
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {children.map((child: any) => {
             let childId;
             switch (child.type) {

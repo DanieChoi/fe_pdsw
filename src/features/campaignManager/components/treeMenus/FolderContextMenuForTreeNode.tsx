@@ -58,7 +58,7 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
   ];
 
   return (
-    <ContextMenuContent className="p-1">
+    <ContextMenuContent>
       {menuItems.map((menuItem) => (
         <ContextMenuItem
           key={menuItem.id}

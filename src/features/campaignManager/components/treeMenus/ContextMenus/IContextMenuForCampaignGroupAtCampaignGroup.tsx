@@ -12,10 +12,9 @@ interface IContextMenuForCampaignGroupAtCampaignGroupProps {
 
 // 공통 스타일 설정
 const itemStyle: React.CSSProperties = {
-  fontSize: "14px",       // 글씨 크기
-  padding: "2px 5px",     // 아이템 여백
-  minWidth: "120px",      // 최소 너비
-  cursor: "pointer",      // 마우스 커서
+  fontSize: "13px",       // 글씨 크기
+  padding: "4px 6px",     // 아이템 여백
+  borderRadius: "3px",
 };
 
 const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampaignGroupAtCampaignGroupProps> = ({
@@ -28,9 +27,10 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
 
   return (
     <>
-      <Item
+      <div
         key="bulk-update"
         style={itemStyle}
+        className="contexify-custom-item"
         onClick={() => {
           console.log(`캠페인 그룹 일괄 수정: ${node.name}`);
           addTabCurrentOnly({
@@ -45,76 +45,83 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
         }}
       >
         캠페인 그룹 일괄 수정
-      </Item>
+      </div>
 
-      <Item
+      <div
         key="bulk-start"
         style={itemStyle}
+        className="contexify-custom-item"
         onClick={() => console.log(`캠페인 그룹 일괄 시작: ${node.name}`)}
       >
         캠페인 그룹 일괄 시작
-      </Item>
+      </div>
 
-      <Item
+      <div
         key="bulk-complete"
         style={itemStyle}
+        className="contexify-custom-item"
         onClick={() => console.log(`캠페인 그룹 일괄 완료: ${node.name}`)}
       >
         캠페인 그룹 일괄 완료
-      </Item>
+      </div>
 
-      <Item
+      <div
         key="bulk-stop"
         style={itemStyle}
+        className="contexify-custom-item"
         onClick={() => console.log(`캠페인 그룹 일괄 중지: ${node.name}`)}
       >
         캠페인 그룹 일괄 중지
-      </Item>
+      </div>
 
       <Separator key="separator-1" />
 
-      <Item
+      <div
         key="rename"
         style={itemStyle}
+        className="contexify-custom-item"
         onClick={() => {
           console.log("캠페인 그룹 이름 변경:", node);
           setIsRenameDialogOpen(true);
         }}
       >
         캠페인 그룹 이름 변경
-      </Item>
+      </div>
 
-      <Item
+      <div
         key="delete"
         style={itemStyle}
+        className="contexify-custom-item"
         onClick={() => {
           console.log(`캠페인 그룹 삭제: ${node.name}`);
           setIsDeleteDialogOpen(true);
         }}
       >
         캠페인 그룹 삭제
-      </Item>
+      </div>
 
       <Separator key="separator-2" />
 
-      <Item
+      <div
         key="add-campaign"
         style={itemStyle}
+        className="contexify-custom-item"
         onClick={() => {
           console.log(`캠페인 추가/제외: ${node.name}`);
           setIsCampaignAddPopupOpen(true);
         }}
       >
         캠페인 그룹에 캠페인 추가
-      </Item>
+      </div>
 
-      <Item
+      <div
         key="resend"
         style={itemStyle}
+        className="contexify-custom-item"
         onClick={() => console.log(`캠페인 그룹 실시간 재발신: ${node.name}`)}
       >
         캠페인 그룹 실시간 재발신
-      </Item>
+      </div>
     </>
   );
 };

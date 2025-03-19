@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { Menu, Item, useContextMenu } from "react-contexify";
+import { Menu, useContextMenu } from "react-contexify";
 import "react-contexify/ReactContexify.css";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
 import { useTabStore } from "@/store/tabStore";
@@ -201,13 +201,13 @@ export function IContextMenuForGroupAndTeamAndCounselor({
       <div onContextMenu={handleContextMenu}>{children}</div>
 
       {/* React-Contexify 메뉴 정의 */}
-      <Menu id={MENU_ID} animation="fade">
-        <Item onClick={() => openSkillAssignmentDialog(false)}>
+      <Menu id={MENU_ID} animation="fade" className="compact-menu">
+        <div className="contexify-custom-item" onClick={() => openSkillAssignmentDialog(false)}>
           {getMenuItemTitle(false)}
-        </Item>
-        <Item onClick={() => openSkillAssignmentDialog(true)}>
+        </div>
+        <div className="contexify-custom-item" onClick={() => openSkillAssignmentDialog(true)}>
           {getMenuItemTitle(true)}
-        </Item>
+        </div>
       </Menu>
 
       {/* ===== 상담원 스킬 할당 다이얼로그 ===== */}

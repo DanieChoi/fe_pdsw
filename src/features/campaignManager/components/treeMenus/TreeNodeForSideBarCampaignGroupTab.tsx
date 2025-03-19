@@ -342,7 +342,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       </Menu>
 
       {hasChildren && isExpanded && (
-        <div className="children-container space-y-1">
+        <div className="children-container">
           {node.children?.map((child) => (
             <TreeNodeForSideBarCampaignGroupTab
               key={child.id}

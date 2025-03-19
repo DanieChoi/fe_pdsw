@@ -95,16 +95,16 @@ export function TreeNode({
         <Image
           src="/tree-menu/organization.png"
           alt="조직"
-          width={iconSize}
-          height={iconSize * 0.85}
+          width={14}
+          height={12}
           className="flex-shrink-0"
         />
       ) : (
         <Image
           src="/tree-menu/folder.png"
           alt="그룹"
-          width={iconSize}
-          height={iconSize * 0.85}
+          width={14}
+          height={12}
           className="flex-shrink-0"
         />
       );
@@ -112,7 +112,7 @@ export function TreeNode({
     
     if (item.type === "campaign") {
       return statusIcon ? (
-        <Image src={statusIcon} alt="status" width={iconSize} height={iconSize} className="flex-shrink-0" />
+        <Image src={statusIcon} alt="status" width={12} height={12} className="flex-shrink-0" />
       ) : (
         <FileText className={`${compact ? 'h-4 w-4' : 'h-4 w-4'} text-gray-400 flex-shrink-0`} />
       );
@@ -151,21 +151,21 @@ export function TreeNode({
           <Image
             src="/tree-menu/minus_for_tree.png"
             alt="접기"
-            width={expandIconSize}
-            height={expandIconSize}
+            width={12}
+            height={12}
             className="flex-shrink-0"
           />
         ) : (
           <Image
             src="/tree-menu/plus_icon_for_tree.png"
             alt="펼치기"
-            width={expandIconSize}
-            height={expandIconSize}
+            width={12}
+            height={12}
             className="flex-shrink-0"
           />
         )
       ) : (
-        <span className={compact ? "w-2" : "w-3"} />
+        <span className="w-3" />
       )}
       {getNodeIcon()}
       <span className={textStyle}>

@@ -1,6 +1,5 @@
 // src/features/campaignManager/components/treeMenus/ContextMenus/IContextMenuForTenantAtCampaignGroup.tsx
 import React from "react";
-import { Item } from "react-contexify";
 
 interface IContextMenuForTenantAtCampaignGroupProps {
   nodeName: string;
@@ -9,15 +8,15 @@ interface IContextMenuForTenantAtCampaignGroupProps {
 
 const IContextMenuForTenantAtCampaignGroup: React.FC<IContextMenuForTenantAtCampaignGroupProps> = ({ nodeName, onAddGroup }) => {
   return (
-    <Item
+    <div
+      className="contexify-custom-item"
       onClick={() => {
         console.log(`캠페인 그룹 추가: ${nodeName}`);
         onAddGroup();
       }}
-      style={{ color: "#0070F3", fontSize: "14px" }}
     >
       캠페인 그룹 추가
-    </Item>
+    </div>
   );
 };
 
