@@ -18,7 +18,7 @@ export interface LoginResponse {
   result_code: number;
   result_msg: string;
   session_key: string;
-  expired_in: number;
+  expires_in: number; // expired_in에서 expires_in으로 수정
   tenant_id: number;
   role_id: number;
   menu_role_id: number;

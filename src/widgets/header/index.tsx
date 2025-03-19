@@ -24,7 +24,8 @@ export default function Header() {
   // const _sessionKey = Cookies.get('session_key') || '';
   const _tenantId = Number(Cookies.get('tenant_id'));
 
-  const { id, tenant_id, session_key: _sessionKey, role_id } = useAuthStore();
+  // const { id, tenant_id, session_key: _sessionKey, role_id } = useAuthStore();
+  const { id, tenant_id, session_key: _sessionKey, role_id, menu_role_id } = useAuthStore();
 
   const [alertState, setAlertState] = useState(errorMessage);
   const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
@@ -270,7 +271,7 @@ export default function Header() {
       <header className="bg-white border-b">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between header-padding">
-            {/* <div>role_id: {role_id}</div> */}
+            <div>menu_role_id: {menu_role_id}</div>
 
             <nav className="flex overflow-x-auto gap-3">
               {menuItems.map((item) => {

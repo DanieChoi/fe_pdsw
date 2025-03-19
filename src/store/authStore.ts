@@ -8,8 +8,9 @@ type AuthStore = {
   tenant_id: number;
   session_key: string;
   role_id: number;
+  menu_role_id: number;
   // Actions
-  setAuth: (id: string, tenant_id: number, session_key: string, role_id: number) => void;
+  setAuth: (id: string, tenant_id: number, session_key: string, role_id: number, menu_role_id: number) => void;
   clearAuth: () => void;
 };
 
@@ -22,9 +23,10 @@ export const useAuthStore = create<AuthStore>()(
         tenant_id: 0,
         session_key: "",
         role_id: 0,
+        menu_role_id: 0,
         // Actions
-        setAuth: (id, tenant_id, session_key, role_id) =>
-          set({ id, tenant_id, session_key, role_id }, false, "setAuth"),
+        setAuth: (id, tenant_id, session_key, role_id, menu_role_id) =>
+          set({ id, tenant_id, session_key, role_id, menu_role_id }, false, "setAuth"),
         clearAuth: () =>
           set({ id: "", tenant_id: 0, session_key: "", role_id: 0 }, false, "clearAuth"),
       }),

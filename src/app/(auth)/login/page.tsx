@@ -40,13 +40,14 @@ export default function LoginPage() {
     onSuccess: (data) => {
       setIsPending(false);
 
-      console.log('data (로그인 응답)', data);
+      console.log('data (로그인 응답2)', data);
 
       setAuth(
         formData.user_name,              // id
         data.tenant_id,  // tenant_id
         data.session_key, // session_key
-        data.role_id     // role_id 추가
+        data.role_id,     // role_id 추가
+        data.menu_role_id
       );
 
       // 기억하기가 체크되어 있다면 로컬 스토리지에 저장
