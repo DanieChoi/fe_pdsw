@@ -21,6 +21,7 @@ export interface LoginResponse {
   expired_in: number;
   tenant_id: number;
   role_id: number;
+  menu_role_id: number;
 }
 
 // API 에러 타입

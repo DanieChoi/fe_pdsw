@@ -6,6 +6,7 @@ export interface UserInfoData {
     tenant_id: number;
     session_key: string;
     role_id: number;
+    menu_role_id: number;
 }
 
 // Redux DevTools와 함께 스토어 생성
@@ -15,7 +16,8 @@ const useStore = create<UserInfoData>()(
             id: '',
             tenant_id: -1,
             session_key: '',
-            role_id: -1
+            role_id: -1,
+            menu_role_id: -1
         }),
         {
             name: "UserStore", // Redux DevTools에 표시될 스토어 이름

@@ -57,7 +57,8 @@ export const loginApi = {
         id: dataFirst.id,
         tenant_id: data.tenant_id,
         session_key: data.session_key,
-        role_id: data.role_id // role_id 추가
+        role_id: data.role_id, 
+        menu_role_id: data.menu_role_id
       };
       useStore.setState(userInfo);
 
