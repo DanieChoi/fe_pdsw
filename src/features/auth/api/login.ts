@@ -32,6 +32,8 @@ export const loginApi = {
 
       const { data } = await axiosInstance.post<LoginResponse>('/login', loginData);
 
+      console.log("data for login !!!!!!!!!!!!!!!!!!!!!!! : ", data); // 로그인 응답 데이터 확인
+
       if (data.result_code !== 0) {
         throw new Error(data.result_msg || '로그인 실패');
       }
@@ -50,31 +52,19 @@ export const loginApi = {
         throw new Error('접근권한이 없습니다.');
       }
 
-      // console.log("단계 = ", process.env.NEXT_PUBLIC_API_URL);
-
-      // const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-
-      // // const eventSource = new EventSource(`${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`);
-      // const eventSource = new EventSource(`http://10.10.30.228:4000/api/v1/notification/${tenant_id}/subscribe`);
-
-      // console.log("eventSource = ", eventSource);
-
-      // eventSource.addEventListener("message", (event) => {
-      //   //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
-      //   console.log("event = ", event.data);
-      // });
-
-      // 사용자 정보 전역 상태 저장
+      // 사용자 정보 전역 상태 저장 - role_id 추가
       const userInfo: UserInfoData = {
         id: dataFirst.id,
         tenant_id: data.tenant_id,
-        session_key: data.session_key
+        session_key: data.session_key,
+        role_id: data.role_id // role_id 추가
       };
       useStore.setState(userInfo);
 
       // 로그인 응답 데이터 로깅
       console.log('Login response:', data);
       console.log('Session key:', data.session_key);
+      console.log('Role ID:', data.role_id); // role_id 로깅 추가
 
       // 클라이언트에서 직접 쿠키 설정
       Cookies.set('session_key', data.session_key, {
@@ -92,11 +82,21 @@ export const loginApi = {
         path: '/', // 전체 도메인에서 접근 가능하도록 설정
         domain: window.location.hostname // 현재 도메인으로 설정
       });
+      
+      // role_id도 쿠키에 저장 (선택적)
+      Cookies.set('role_id', String(data.role_id), {
+        expires: 1, // 1일
+        secure: false,
+        sameSite: 'Lax',
+        path: '/',
+        domain: window.location.hostname
+      });
 
       // 쿠키 설정 확인
       console.log('Cookies after setting:', {
         session_key: Cookies.get('session_key'),
-        tenant_id: Cookies.get('tenant_id')
+        tenant_id: Cookies.get('tenant_id'),
+        role_id: Cookies.get('role_id') // role_id 쿠키 확인 추가
       });
 
       return data;
