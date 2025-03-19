@@ -184,7 +184,7 @@ const SkillEdit = () => {
       description: row.description
     });
     setIsNewMode(false);
-    
+
     // 캠페인 데이터 불러오기
     const loadCampaignData = () => {
       if (campaignData && campaignData.result_data) {
@@ -975,12 +975,26 @@ const SkillEdit = () => {
 
   useEffect(() => {
     if (campaignData && selectedSkill) {
-      // 캠페인 데이터가 업데이트되면 선택된 스킬의 캠페인 목록도 업데이트
-      const skillCampaignEntry = campaignData.result_data.find(
-        (entry: any) => String(entry.skill_id) === selectedSkill.skillId
-      );
-      const campaignIds: string[] = skillCampaignEntry ? skillCampaignEntry.campaign_id : [];
-      const relatedCampaigns = allCampaigns.filter(campaign => campaignIds.includes(campaign.campaignId));
+      
+      // 캠페인 데이터 구조 탐색
+      let campaignIds: any[] = [];
+      
+      if (campaignData.result_data && Array.isArray(campaignData.result_data)) {
+        const skillCampaignEntry = campaignData.result_data.find(
+          (entry: any) => String(entry.skill_id) === selectedSkill.skillId
+        );
+        
+        if (skillCampaignEntry && Array.isArray(skillCampaignEntry.campaign_id)) {
+          campaignIds = skillCampaignEntry.campaign_id;
+        }
+      }
+      
+      // 문자열과 숫자 비교를 모두 허용하기 위한 필터링
+      const relatedCampaigns = allCampaigns.filter(campaign => {
+        const campaignIdNum = Number(campaign.campaignId);
+        return campaignIds.some(id => id === campaign.campaignId || id === campaignIdNum);
+      });
+      
       setFilteredCampaigns(relatedCampaigns);
     }
   }, [campaignData, selectedSkill, allCampaigns]);
