@@ -461,9 +461,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">캠페인전체</SelectItem>
-              {Object.entries(_campaignData).map(([id, data]) => (
-                <SelectItem key={id} value={id}>
-                  {data.gridData[0]?.campaignName || id}
+              {campaigns.map(option => (
+                <SelectItem key={option.campaign_id} value={option.campaign_id.toString()}>
+                  [{option.campaign_id}]{option.campaign_name}
                 </SelectItem>
               ))}
             </SelectContent>
