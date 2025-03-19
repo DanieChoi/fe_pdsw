@@ -108,7 +108,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                         dataKey="value"
                         label={({ value, x, y }) => (
                           <text x={x} y={y} className="text-[10px]" textAnchor="middle">
-                            {`${value}%`}
+                            {`${parseFloat(value.toFixed(1))}%`}
                           </text>
                         )}
                         labelLine={{ stroke: '#999999', strokeWidth: 1 }}
