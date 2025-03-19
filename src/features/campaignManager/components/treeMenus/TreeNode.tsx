@@ -114,11 +114,11 @@ export function TreeNode({
       return statusIcon ? (
         <Image src={statusIcon} alt="status" width={iconSize} height={iconSize} className="flex-shrink-0" />
       ) : (
-        <FileText className={`${compact ? 'h-3 w-3' : 'h-4 w-4'} text-gray-400 flex-shrink-0`} />
+        <FileText className={`${compact ? 'h-4 w-4' : 'h-4 w-4'} text-gray-400 flex-shrink-0`} />
       );
     }
     
-    return <FileText className={`${compact ? 'h-3 w-3' : 'h-4 w-4'} text-gray-400 flex-shrink-0`} />;
+    return <FileText className={`${compact ? 'h-4 w-4' : 'h-4 w-4'} text-gray-400 flex-shrink-0`} />;
   };
 
   // 노드 클래스 - 컴팩트 모드일 경우 더 작은 패딩 적용
@@ -138,9 +138,9 @@ export function TreeNode({
     "text-555 truncate",
     {
       "font-medium": isSelected,
-      "text-sm": !compact,
-      "text-xs": compact
-    }
+      "text-lg": !compact,
+      "text-sm": compact
+    },
   );
 
   // 공통된 노드 내용 컴포넌트
