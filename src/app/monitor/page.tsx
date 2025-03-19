@@ -587,13 +587,13 @@ const MonitorPage = () => {
       session_key: '',
       tenant_id: tenant_id,
     });
-    const interval = setInterval(() => {           
-      fetchMain({
-        session_key: '',
-        tenant_id: tenant_id,
-      });
-    }, 30000);  
-    return () => clearInterval(interval);
+    // const interval = setInterval(() => {           
+    //   fetchMain({
+    //     session_key: '',
+    //     tenant_id: tenant_id,
+    //   });
+    // }, 30000);  
+    // return () => clearInterval(interval);
   }, [tenant_id]);
   
   useEffect(() => {     
