@@ -7,7 +7,6 @@ import {
 } from "./typeForMenusAuthorityInfo";
 import axios from "axios";
 
-//
 /**
  * 사용자 권한에 따른 사용가능한 메뉴 리스트를 가져오는 API 함수
  * @param param0 roleId - 역할 ID (1: 시스템관리자, 2: 테넌트관리자01, 3: 테넌트관리자02)
@@ -17,8 +16,8 @@ export async function apiForGetAuthorizedMenusInfoForMenuRoleId({
   roleId
 }: IRequestTypeForGetAuthorizedMenusInfoForMenuRoleId): Promise<IResponseTypeForGetAuthorizedMenusInfoForMenuRoleId> {
   // const response = await axios.get(
-  const response = await axiosRedisInstance.get(
-    `/auth/availableMenuList?roleId=${roleId}`
+  const response = await axios.get(
+    `http://10.10.30.228:4000/api/v1/auth/availableMenuList?roleId=${roleId}`
   );
   
   console.log("Available menu list response:", response.data);
