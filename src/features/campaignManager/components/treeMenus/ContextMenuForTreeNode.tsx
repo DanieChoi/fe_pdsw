@@ -25,6 +25,8 @@ import { useApiForCampaignBlacklistCount } from "@/features/listManager/hooks/us
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import useApiForCampaignListDelete from "@/features/listManager/hooks/useApiForCampaignListDelete";
+import { CheckCampaignSaveReturnCode } from '@/components/common/common';
+import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 
 export type CampaignStatus = 'started' | 'pending' | 'stopped';
 
@@ -39,6 +41,15 @@ export const getStatusIcon = (status?: string) => {
     default:
       return null;
   }
+};
+
+const errorMessage: CustomAlertRequest = {
+  isOpen: false,
+  message: '',
+  title: '캠페인',
+  type: '1',
+  onClose: () => { },
+  onCancle: () => { },
 };
 
 interface ContextMenuForTreeNodeProps {
@@ -65,8 +76,10 @@ export function ContextMenuForTreeNode({
   const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab, addMultiTab } = useTabStore();
   const [isBlacklistPopupOpen, setIsBlacklistPopupOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<CampaignStatus>(item.status);
+  const [tempStatus, setTempStatus] = useState<CampaignStatus>(item.status);
   const [blackListCount, setBlackListCount] = useState<number>(0);
   const preventCloseRef = useRef(false);
+  const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
 
   // 상태 관련 정보
   const statusInfo = {
@@ -77,17 +90,40 @@ export function ContextMenuForTreeNode({
 
   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
     onSuccess: (data) => {
-      toast.success("캠페인 상태가 성공적으로 변경되었습니다.", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-
       // API 호출 완료 후에도 창이 닫히지 않도록 플래그 유지
       preventCloseRef.current = true;
+      if (data.result_code === 0) {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          type: '2',
+          message: '캠페인 상태가 성공적으로 변경되었습니다.',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+          onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+          
+        });
+        // 로컬 상태 업데이트
+        setCurrentStatus(tempStatus);
+  
+      } else {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          type: '2',
+          message: CheckCampaignSaveReturnCode(data.reason_code),
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+          onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }
+      // toast.success("캠페인 상태가 성공적으로 변경되었습니다.", {
+      //   position: "top-center",
+      //   autoClose: 3000,
+      //   hideProgressBar: false,
+      //   closeOnClick: true,
+      //   pauseOnHover: true,
+      //   draggable: true,
+      // });
+
     },
     onError: (error) => {
       toast.error(error.message || "상태 변경 중 오류가 발생했습니다.", {
@@ -234,18 +270,19 @@ export function ContextMenuForTreeNode({
       return;
     }
 
-    console.log("상태 변경 클릭1 : ", status);
+    // console.log("상태 변경 클릭1 : ", status);
+    setTempStatus(status);  // 임시 상태 업데이트
 
     // console.log("item for 상태 변경 ", item);
     
 
     try {
-      console.log('Status change requested:', {
-        campaignId: item.id,
-        campaignName: item.label,
-        previousStatus: currentStatus,
-        newStatus: status
-      });
+      // console.log('Status change requested:', {
+      //   campaignId: item.id,
+      //   campaignName: item.label,
+      //   previousStatus: currentStatus,
+      //   newStatus: status
+      // });
 
       // 메뉴를 열린 상태로 유지하기 위한 플래그 설정
       preventCloseRef.current = true;
@@ -257,14 +294,14 @@ export function ContextMenuForTreeNode({
       });
 
       // 로컬 상태 업데이트
-      setCurrentStatus(status);
+      // setCurrentStatus(status);
 
-      console.log('Status changed successfully:', {
-        campaignId: item.id,
-        campaignName: item.label,
-        status: status,
-        timestamp: new Date().toISOString()
-      });
+      // console.log('Status changed successfully:', {
+      //   campaignId: item.id,
+      //   campaignName: item.label,
+      //   status: status,
+      //   timestamp: new Date().toISOString()
+      // });
 
     } catch (error) {
       console.error('Error changing campaign status:', {
@@ -451,6 +488,15 @@ export function ContextMenuForTreeNode({
           onCancel={() => setIsBlacklistPopupOpen(false)}
         />
       )}
+      <CustomAlert
+        message={alertState.message}
+        title={alertState.title}
+        type={alertState.type}
+        isOpen={alertState.isOpen}
+        onClose={() => {
+          alertState.onClose()
+        }}
+        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
     </>
   );
 }
