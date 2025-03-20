@@ -38,7 +38,7 @@ export const loginApi = {
       }
 
       //SSE 실시간 이벤트 구독
-      let tenant_id = (data.role_id === 5 || data.role_id === 6) ? 0 : data.tenant_id;
+      const tenant_id = (data.role_id === 5 || data.role_id === 6) ? 0 : data.tenant_id;
 
       // 특정 role_id에 대한 접근 제한
       if (data.role_id === 1 || data.role_id === 2 || data.role_id === 3) {

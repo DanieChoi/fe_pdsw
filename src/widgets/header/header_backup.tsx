@@ -31,8 +31,6 @@ export default function Header() {
 
   const {
     availableMenus,
-    availableHeaderMenus,
-    availableHeaderMenuIds,
     setAvailableMenus,
     setLoading,
     setError
@@ -122,6 +120,11 @@ export default function Header() {
     );
   };
 
+  // const handleLoginOut = () => {
+  //   Cookies.remove('session_key');
+  //   router.push('/login');
+  // }
+
   const handleLoginOut = () => {
     // 쿠키 제거
     Cookies.remove('session_key');
@@ -151,6 +154,14 @@ export default function Header() {
         } else {
           setTenants(data.result_data.filter(data => data.tenant_id === tenant_id));
         }
+        // const tempTenantIdArray = data.result_data.map(tenant => Number(tenant.tenant_id));
+        // fetchSkills({
+        //   tenant_id_array: tempTenantIdArray
+        // });
+        // fetchMain({
+        //   session_key: _sessionKey,
+        //   tenant_id: _tenantId
+        // });
       }
     },
     onError: (error) => {
@@ -177,6 +188,7 @@ export default function Header() {
   }, [tenants]);
 
   useEffect(() => {
+    // console.log('Fetching tenants with:', { _sessionKey, _tenantId });
     fetchTenants({
       session_key: _sessionKey,
       tenant_id: _tenantId,
@@ -185,23 +197,27 @@ export default function Header() {
 
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
+      // console.log('Main API response:', data);
+      // setCampaigns(data.result_data);
       if (tenant_id === 0) {
         setCampaigns(data.result_data);
       } else {
         setCampaigns(data.result_data.filter(data => data.tenant_id === tenant_id));
       }
       setShouldFetchCounselors(true);  // 이 시점에 상담사 목록 조회 활성화
+
     }
   });
 
   // 훅 관리
-  const { data: dataForMenusInfoForRoleId, menuList, headerMenuIds, isLoading: isLoadingMenuInfo } =
+  const { data: dataForMenusInfoForRoleId, menuList, isLoading: isLoadingMenuInfo } =
     useApiForGetAuthorizedMenusInfoForMenuRoleId({
       roleId: menu_role_id || 1, // menu_role_id가 없을 경우 기본값 1
       enabled: !!menu_role_id // menu_role_id가 있을 때만 활성화
     });
 
   console.log("dataForMenusInfoForRoleId : ", dataForMenusInfoForRoleId);
+
 
   const { data: counselorListData } = useApiForFetchCounselorList({
     credentials: {
@@ -270,46 +286,47 @@ export default function Header() {
       <header className="bg-white border-b">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between header-padding">
-            <nav className="flex overflow-x-auto gap-3">
-              {menuItems
-                // availableHeaderMenuIds에 있는 메뉴만 필터링
-                .filter(item => availableHeaderMenuIds?.includes(item.id))
-                .map((item) => {
-                  const count = getTabCountById(item.id);
-                  const isActive = isActiveTab(item.id);
-                  const isOpened = isTabOpened(item.id);
+            {/* <div>menu_role_id: {menu_role_id}</div> */}
 
-                  return (
-                    <div key={`menu-${item.id}`} className="menu-item">
-                      <CommonButton
-                        variant={isActive ? 'menuActive' : (isOpened ? 'menuOpened' : 'menu')}
-                        size="default"
-                        onClick={(e) => handleMenuClick(item, e)}
-                        className="relative py-1.5 px-2"
-                      >
-                        <div className="flex items-center justify-center">
-                          <Image
-                            src={item.icon}
-                            alt={item.title}
-                            width={32}
-                            height={32}
-                            className="object-contain"
-                          />
-                        </div>
-                        <div className="flex items-center">
-                          <span className={`text-xs whitespace-nowrap ${isActive ? 'text-white' : 'text-[#333]'}`}>{item.title}</span>
-                          {count > 1 && (
-                            <span className="ml-1 px-1.5 py-0.5 text-[10px] leading-none bg-[#E5F3F3] text-[#5BC2C1] rounded-full min-w-[16px] text-center">
-                              {count}
-                            </span>
-                          )}
-                        </div>
-                      </CommonButton>
-                    </div>
-                  );
-                })}
+            <nav className="flex overflow-x-auto gap-3">
+              {menuItems.map((item) => {
+                const count = getTabCountById(item.id);
+                const isActive = isActiveTab(item.id);
+                const isOpened = isTabOpened(item.id);
+
+                return (
+                  <div key={`menu-${item.id}`} className="menu-item">
+                    <CommonButton
+                      variant={isActive ? 'menuActive' : (isOpened ? 'menuOpened' : 'menu')}
+                      size="default"
+                      onClick={(e) => handleMenuClick(item, e)}
+                      className="relative py-1.5 px-2"
+                    >
+
+                      <div className="flex items-center justify-center">
+                        <Image
+                          src={item.icon}
+                          alt={item.title}
+                          width={32}
+                          height={32}
+                          className="object-contain"
+                        />
+                      </div>
+                      <div className="flex items-center">
+                        <span className={`text-xs whitespace-nowrap ${isActive ? 'text-white' : 'text-[#333]'}`}>{item.title}</span>
+                        {count > 1 && (
+                          <span className="ml-1 px-1.5 py-0.5 text-[10px] leading-none bg-[#E5F3F3] text-[#5BC2C1] rounded-full min-w-[16px] text-center">
+                            {count}
+                          </span>
+                        )}
+                      </div>
+                    </CommonButton>
+                  </div>
+                );
+              })}
             </nav>
             <div>
+
               {/* <div className="flex items-center gap-2">
                 <CommonButton
                   variant="outline"
@@ -334,8 +351,11 @@ export default function Header() {
                 <SplitScreenDialog2 tabs={openedTabs}/>
 
               </div> */}
+
             </div>
           </div>
+
+
         </div>
       </header>
       <CustomAlert

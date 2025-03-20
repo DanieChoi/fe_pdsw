@@ -15,8 +15,9 @@ import axios from "axios";
 export async function apiForGetAuthorizedMenusInfoForMenuRoleId({
   roleId
 }: IRequestTypeForGetAuthorizedMenusInfoForMenuRoleId): Promise<IResponseTypeForGetAuthorizedMenusInfoForMenuRoleId> {
-  const response = await axios.get(
-    `http://localhost:4000/api/v1/auth/availableMenuList?roleId=${roleId}`
+  // const response = await axios.get(
+  const response = await axiosRedisInstance.get(
+    `/auth/availableMenuList?roleId=${roleId}`
   );
   
   console.log("Available menu list response:", response.data);
