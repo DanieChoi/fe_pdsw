@@ -14,6 +14,12 @@ interface AvailableMenuState {
   availableCampaignTabCampaignContextMenuIds: number[];
   // 스킬 할당 메뉴 (SSG, SST, SSS)
   availableMenuIdsForSkilAssignment: number[];
+  // 캠페인 그룹 탭 테넌트 메뉴 (SGT)
+  availableMenuIdsForCampaignGroupTabTenant: number[];
+  // 캠페인 그룹 탭 캠페인 그룹 메뉴 (SGG)
+  availableMenuIdsForCampaignGroupTabCampaignGroup: number[];
+  // 캠페인 그룹 탭 캠페인 메뉴 (SSS)
+  availableMenuIdsForCampaignGroupTabCampaign: number[];
   isLoading: boolean;
   isError: boolean;
   setAvailableMenus: (menus: IMenuInfo[]) => void;
@@ -27,6 +33,12 @@ interface AvailableMenuState {
   setAvailableCampaignTabCampaignContextMenuIds: (ids: number[]) => void;
   // 스킬 할당 메뉴 setter
   setAvailableMenuIdsForSkilAssignment: (ids: number[]) => void;
+  // 캠페인 그룹 탭 테넌트 메뉴 setter
+  setAvailableMenuIdsForCampaignGroupTabTenant: (ids: number[]) => void;
+  // 캠페인 그룹 탭 캠페인 그룹 메뉴 setter
+  setAvailableMenuIdsForCampaignGroupTabCampaignGroup: (ids: number[]) => void;
+  // 캠페인 그룹 탭 캠페인 메뉴 setter
+  setAvailableMenuIdsForCampaignGroupTabCampaign: (ids: number[]) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: boolean) => void;
   clearMenus: () => void;
@@ -47,6 +59,12 @@ export const useAvailableMenuStore = create<AvailableMenuState>()(
         availableCampaignTabCampaignContextMenuIds: [],
         // 스킬 할당 메뉴 초기화
         availableMenuIdsForSkilAssignment: [],
+        // 캠페인 그룹 탭 테넌트 메뉴 초기화
+        availableMenuIdsForCampaignGroupTabTenant: [],
+        // 캠페인 그룹 탭 캠페인 그룹 메뉴 초기화
+        availableMenuIdsForCampaignGroupTabCampaignGroup: [],
+        // 캠페인 그룹 탭 캠페인 메뉴 초기화
+        availableMenuIdsForCampaignGroupTabCampaign: [],
         isLoading: false,
         isError: false,
         setAvailableMenus: (menus) => set({ availableMenus: menus }, false, "setAvailableMenus"),
@@ -60,6 +78,12 @@ export const useAvailableMenuStore = create<AvailableMenuState>()(
         setAvailableCampaignTabCampaignContextMenuIds: (ids) => set({ availableCampaignTabCampaignContextMenuIds: ids }, false, "setAvailableCampaignTabCampaignContextMenuIds"),
         // 스킬 할당 메뉴 setter 구현
         setAvailableMenuIdsForSkilAssignment: (ids) => set({ availableMenuIdsForSkilAssignment: ids }, false, "setAvailableMenuIdsForSkilAssignment"),
+        // 캠페인 그룹 탭 테넌트 메뉴 setter 구현
+        setAvailableMenuIdsForCampaignGroupTabTenant: (ids) => set({ availableMenuIdsForCampaignGroupTabTenant: ids }, false, "setAvailableMenuIdsForCampaignGroupTabTenant"),
+        // 캠페인 그룹 탭 캠페인 그룹 메뉴 setter 구현
+        setAvailableMenuIdsForCampaignGroupTabCampaignGroup: (ids) => set({ availableMenuIdsForCampaignGroupTabCampaignGroup: ids }, false, "setAvailableMenuIdsForCampaignGroupTabCampaignGroup"),
+        // 캠페인 그룹 탭 캠페인 메뉴 setter 구현
+        setAvailableMenuIdsForCampaignGroupTabCampaign: (ids) => set({ availableMenuIdsForCampaignGroupTabCampaign: ids }, false, "setAvailableMenuIdsForCampaignGroupTabCampaign"),
         setLoading: (loading) => set({ isLoading: loading }, false, "setLoading"),
         setError: (error) => set({ isError: error }, false, "setError"), 
         clearMenus: () => set(
@@ -71,7 +95,10 @@ export const useAvailableMenuStore = create<AvailableMenuState>()(
             availableCampaignTenantContextMenuIds: [],
             availableCampaignTabCampaignContextMenus: [],
             availableCampaignTabCampaignContextMenuIds: [],
-            availableMenuIdsForSkilAssignment: []
+            availableMenuIdsForSkilAssignment: [],
+            availableMenuIdsForCampaignGroupTabTenant: [],
+            availableMenuIdsForCampaignGroupTabCampaignGroup: [],
+            availableMenuIdsForCampaignGroupTabCampaign: []
           }, 
           false, 
           "clearMenus"
