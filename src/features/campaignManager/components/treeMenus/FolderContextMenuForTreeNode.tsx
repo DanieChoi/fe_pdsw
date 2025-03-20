@@ -7,6 +7,7 @@ import {
 import { useTabStore } from "@/store/tabStore";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
+import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
 
 export interface FolderContextMenuProps {
   item: {
@@ -18,6 +19,7 @@ export interface FolderContextMenuProps {
 export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
   const { addTab, openedTabs, setActiveTab } = useTabStore();
   const { selectedMenus, toggleMenu } = useTreeMenuStore(); // 통합 스토어 사용
+  const { availableCampaignTenantContextMenuIds } = useAvailableMenuStore(); // 권한 있는 메뉴 ID 가져오기
 
   // 체크박스가 필요한 메뉴 ID
   const checkableMenuIds = [14, 23];
@@ -59,9 +61,14 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
     },
   ];
 
+  // 사용자가 접근 권한이 있는 메뉴 아이템만 필터링
+  const filteredMenuItems = menuItems.filter((menuItem) => 
+    availableCampaignTenantContextMenuIds.includes(menuItem.menuId)
+  );
+
   return (
     <ContextMenuContent>
-      {menuItems.map((menuItem) => (
+      {filteredMenuItems.map((menuItem) => (
         <ContextMenuItem
           key={menuItem.id}
           onClick={menuItem.handler}
