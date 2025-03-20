@@ -268,12 +268,13 @@ export default function Header() {
         </div>
       </div>
       <header className="bg-white border-b">
+      {/* menu_role_id : {menu_role_id} */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between header-padding">
             <nav className="flex overflow-x-auto gap-3">
               {menuItems
                 // availableHeaderMenuIds에 있는 메뉴만 필터링
-                // .filter(item => availableHeaderMenuIds?.includes(item.id))
+                .filter(item => availableHeaderMenuIds?.includes(item.id))
                 .map((item) => {
                   const count = getTabCountById(item.id);
                   const isActive = isActiveTab(item.id);
