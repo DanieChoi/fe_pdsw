@@ -25,6 +25,7 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
   const menuItems = [
     {
       id: 13,
+      menuId: 15,
       title: "새 캠페인",
       handler: () => {
         if (openedTabs.some((tab) => tab.id === 13)) {
@@ -43,6 +44,7 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
     },
     {
       id: 22,
+      menuId: 15,
       title: "상담원 상태 모니터",
       handler: () => {
         addTab({

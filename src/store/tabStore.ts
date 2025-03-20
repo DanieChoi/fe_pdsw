@@ -202,7 +202,14 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
 
     // 없으면 컨텍스트 메뉴에서 찾기
     if (!menuItem) {
-      menuItem = contextMenuItems.find(item => item.id === menuId);
+      const contextItem = contextMenuItems.find(item => item.id === menuId);
+      // 컨텍스트 아이템을 MenuItem 형식으로 변환 (menuId 추가)
+      if (contextItem) {
+        menuItem = {
+          ...contextItem,
+          menuId: contextItem.id, // id를 menuId로 복사
+        };
+      }
     }
 
     if (!menuItem) return;
