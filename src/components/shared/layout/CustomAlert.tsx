@@ -46,7 +46,7 @@ const CustomAlert = ({
                     </AlertDialogTitle>
                 </AlertDialogHeader>
                 <div className="p-4 bg-white rounded-bl-[.5rem] rounded-br-[.5rem]">
-                    <div className="text-sm text-gray-700 mb-4">
+                    <div className="text-sm text-[#333]">
                         {typeof message === 'string'
                             ? message.split('\n').map((line, index) => (
                                 <React.Fragment key={index}>

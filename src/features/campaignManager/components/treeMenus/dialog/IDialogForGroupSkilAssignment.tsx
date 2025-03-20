@@ -436,6 +436,7 @@ import { useApiBatchSkillAssignment } from "@/features/campaignManager/hooks/use
 import { useApiDeleteCounselorsFromSkills } from "@/features/campaignManager/hooks/useApiDeleteCounselorsFromSkills";
 import Image from "next/image";
 import CustomAlert from "@/components/shared/layout/CustomAlert";
+import { CommonButton } from "@/components/shared/CommonButton";
 
 interface IDialogForGroupSkilAssignmentProps {
   isOpen: boolean;
@@ -677,25 +678,25 @@ export function IDialogForGroupSkilAssignment({
     const buttonDisabled = skillsToAdd.length === 0 && skillsToRemove.length === 0;
 
     return (
-      <div className="p-4">
+      <div className="">
         {/* 설명 영역 */}
-        <div className="text-sm text-gray-600 mb-4">
+        <div className="text-sm text-[#333] mb-4">
           {isUnassignMode
             ? `그룹의 모든 상담원(${groupMembers.length}명)에게서 스킬을 일괄 해제합니다. 해제할 스킬을 선택하세요.`
             : `그룹의 모든 상담원(${groupMembers.length}명)에게 스킬을 일괄 할당합니다. 할당할 스킬을 선택하세요.`}
         </div>
 
         {/* 테넌트 ID 정보 */}
-        <div className="p-2 bg-gray-50 border rounded text-sm text-[#333] mb-4">
+        <div className="gary-border-box">
           <span>테넌트 ID: {tenantId || "N/A"}</span>
         </div>
 
-        <div className="flex flex-row gap-6">
-          {/* 왼쪽: 그룹 정보 및 상담원 목록 */}
-          <div className="w-1/2">
+        <div className="">
+          {/* 그룹 정보 및 상담원 목록 */}
+          <div className="">
             <div className="mb-2 font-medium text-sm">그룹 정보</div>
             <div
-              className="flex justify-between items-center p-2 border rounded cursor-pointer bg-gray-50 hover:bg-gray-100 mb-2"
+              className="flex justify-between items-center gary-border-box cursor-pointer"
               onClick={toggleCounselors}
             >
               <div className="flex items-center">
@@ -722,7 +723,7 @@ export function IDialogForGroupSkilAssignment({
 
             {showCounselors && (
               <div
-                className="border rounded"
+                className="border rounded  mb-2"
                 style={{ maxHeight: "300px", overflow: "auto" }}
               >
                 <Table>
@@ -785,8 +786,8 @@ export function IDialogForGroupSkilAssignment({
             )}
           </div>
 
-          {/* 오른쪽: 스킬 목록 */}
-          <div className="w-1/2">
+          {/* 스킬 목록 */}
+          <div className="">
             <div className="mb-2 font-medium text-sm">
               {isUnassignMode ? "해제할 스킬 선택" : "할당할 스킬 선택"}
               <span className="ml-2 text-blue-500 text-xs">
@@ -842,7 +843,7 @@ export function IDialogForGroupSkilAssignment({
                           <TableRow
                             key={`skill-${skill.skill_id}`}
                             className={`custom-hover ${
-                              willBeAdded || willBeRemoved ? "bg-blue-50" : ""
+                              willBeAdded || willBeRemoved ? "bg-[#FFFAEE]" : ""
                             }`}
                           >
                             <TableCell
@@ -914,10 +915,9 @@ export function IDialogForGroupSkilAssignment({
         </div>
 
         {/* 하단 버튼 영역 */}
-        <div className="mt-6 flex justify-center gap-2">
-          <Button
+        <div className="mt-6 flex justify-end gap-1.5">
+          <CommonButton
             onClick={handleConfirm}
-            className="px-6 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
             disabled={isProcessing || buttonDisabled}
           >
             {isProcessing
@@ -925,15 +925,14 @@ export function IDialogForGroupSkilAssignment({
               : isUnassignMode
               ? `스킬 해제 (${getSkillsToRemove().length}개)`
               : `스킬 할당 (${getSkillsToAdd().length}개)`}
-          </Button>
-          <Button
+          </CommonButton>
+          <CommonButton
             variant="outline"
             onClick={handleCancel}
-            className="px-6 py-1.5 border border-gray-300 rounded text-sm"
             disabled={isProcessing}
           >
             취소
-          </Button>
+          </CommonButton>
         </div>
       </div>
     );
@@ -949,7 +948,7 @@ export function IDialogForGroupSkilAssignment({
       }
       message={renderContent()}
       type="custom"
-      width="w-[70%] max-w-[1200px] min-w-[800px]"
+      width="min-w-[800px]"
       showButtons={false} // 내부 커스텀 버튼 사용
     />
   );

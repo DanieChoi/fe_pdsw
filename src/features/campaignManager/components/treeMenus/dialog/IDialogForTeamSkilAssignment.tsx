@@ -12,7 +12,7 @@ import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableS
 import Image from "next/image";
 import { useApiDeleteCounselorsFromSkills } from "@/features/campaignManager/hooks/useApiDeleteCounselorsFromSkills";
 import { useApiBatchSkillAssignment } from "@/features/campaignManager/hooks/useApiBatchSkillAssignment";
-
+import { CommonButton } from "@/components/shared/CommonButton";
 interface IDialogForTeamSkilAssignmentProps {
   isOpen: boolean;
   onClose: () => void;
@@ -258,20 +258,20 @@ export function IDialogForTeamSkilAssignment({
     const skillsToRemove = getSkillsToRemove();
 
     return (
-      <div className="p-4">
-        <div className="text-sm text-gray-600 mb-4">
+      <div className="">
+        <div className="text-sm text-[#333] mb-4">
           {isUnassignMode 
             ? `팀의 모든 상담원(${teamMembers.length}명)에게서 스킬을 일괄 해제합니다. 해제할 스킬을 선택하세요.` 
             : `팀의 모든 상담원(${teamMembers.length}명)에게 스킬을 일괄 할당합니다. 할당할 스킬을 선택하세요.`}
         </div>
-        <div className="p-2 bg-gray-50 border rounded text-sm text-[#333] mb-4">
+        <div className="gary-border-box ">
           <span>테넌트 ID: {tenantId || 'N/A'}</span>
         </div>
-        <div className="flex flex-row gap-6">
-          <div className="w-1/2">
+        <div className="gap-6">
+          <div className="">
             <div className="mb-2 font-medium text-sm">팀 정보</div>
             <div
-              className="flex justify-between items-center p-2 border rounded cursor-pointer bg-gray-50 hover:bg-gray-100 mb-2"
+              className="flex justify-between items-center gary-border-box cursor-pointer"
               onClick={toggleCounselors}
             >
               <div className="flex items-center">
@@ -288,7 +288,7 @@ export function IDialogForTeamSkilAssignment({
               </div>
             </div>
             {showCounselors && (
-              <div className="border rounded" style={{ maxHeight: '300px', overflow: 'auto' }}>
+              <div className="border rounded mb-2" style={{ maxHeight: '300px', overflow: 'auto' }}>
                 <Table>
                   <TableHeader className="sticky top-0 z-10">
                     <TableRow>
@@ -315,10 +315,10 @@ export function IDialogForTeamSkilAssignment({
               </div>
             )}
           </div>
-          <div className="w-1/2">
+          <div className="">
             <div className="mb-2 font-medium text-sm">
               {isUnassignMode ? "해제할 스킬 선택" : "할당할 스킬 선택"}
-              <span className="ml-2 text-blue-500 text-xs">
+              <span className="ml-2 text-sm">
                 {isUnassignMode 
                   ? `(${skillsToRemove.length}개 선택됨)` 
                   : `(${skillsToAdd.length}개 선택됨)`}
@@ -346,7 +346,7 @@ export function IDialogForTeamSkilAssignment({
                       return (
                         <TableRow 
                           key={`skill-${skill.skill_id}`} 
-                          className={`custom-hover ${willBeAdded || willBeRemoved ? 'bg-blue-50' : ''}`}
+                          className={`custom-hover ${willBeAdded || willBeRemoved ?  "bg-[#FFFAEE]" : ""}`}
                         >
                           <TableCell className="text-center text-[#444]" style={{ height: '30px', padding: 0 }}>
                             <CustomCheckbox
@@ -388,10 +388,9 @@ export function IDialogForTeamSkilAssignment({
             </div>
           </div>
         </div>
-        <div className="mt-6 flex justify-center gap-2">
-          <Button
+        <div className="mt-6 flex justify-end gap-1.5">
+          <CommonButton
             onClick={handleConfirm}
-            className="px-6 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
             disabled={isProcessing || isButtonDisabled()}
           >
             {isProcessing ? "처리 중..." : (
@@ -399,15 +398,14 @@ export function IDialogForTeamSkilAssignment({
                 ? `스킬 해제 (${getSkillsToRemove().length}개)` 
                 : `스킬 할당 (${getSkillsToAdd().length}개)`
             )}
-          </Button>
-          <Button
+          </CommonButton>
+          <CommonButton
             variant="outline"
             onClick={handleCancel}
-            className="px-6 py-1.5 border border-gray-300 rounded text-sm"
             disabled={isProcessing}
           >
             취소
-          </Button>
+          </CommonButton>
         </div>
       </div>
     );
@@ -421,7 +419,7 @@ export function IDialogForTeamSkilAssignment({
       type="1"
       onClose={onClose}
       onCancle={onClose}
-      width="w-[70%] max-w-[1200px] min-w-[800px]"
+      width="min-w-[800px]"
       showButtons={false}
     />
   );
