@@ -10,7 +10,7 @@ import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 import useApiForFetchCounselorList from '@/features/campaignManager/hooks/useApiForFetchCounselorList';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
-
+import { useApiForGetAuthorizedMenusInfoForMenuRoleId } from "./hooks/useApiForGetAuthorizedMenusInfoForMenuRoleId";
 
 const errorMessage = {
   isOpen: false,
@@ -21,10 +21,7 @@ const errorMessage = {
 
 export default function Header() {
   const router = useRouter();
-  // const _sessionKey = Cookies.get('session_key') || '';
   const _tenantId = Number(Cookies.get('tenant_id'));
-
-  // const { id, tenant_id, session_key: _sessionKey, role_id } = useAuthStore();
   const { id, tenant_id, session_key: _sessionKey, role_id, menu_role_id } = useAuthStore();
 
   const [alertState, setAlertState] = useState(errorMessage);
@@ -35,21 +32,21 @@ export default function Header() {
     // 현재 화면의 크기를 가져옵니다
     const width = window.screen.width;
     const height = window.screen.height;
-    
+
     // 창을 화면 중앙에 위치시킵니다
     const left = 0;  // 전체 화면이므로 0으로 설정
     const top = 0;   // 전체 화면이므로 0으로 설정
 
     const newWindow = window.open(
       '/monitor',
-      'monitor-window',  
+      'monitor-window',
       `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no`
     );
 
     if (newWindow) {
       newWindow.focus();
     }
-};
+  };
   const {
     tenants,
     setCampaigns,
@@ -77,7 +74,7 @@ export default function Header() {
       openInNewWindow();
       return;
     }
-   
+
     if (event.ctrlKey) {
       duplicateTab(item.id);
     } else {
@@ -123,10 +120,10 @@ export default function Header() {
   const handleLoginOut = () => {
     // 쿠키 제거
     Cookies.remove('session_key');
-    
+
     // AuthStore의 상태를 초기화
     useAuthStore.getState().clearAuth();
-    
+
     // 홈 또는 로그인 페이지로 리다이렉트
     router.push('/login');
   }
@@ -144,10 +141,10 @@ export default function Header() {
         Cookies.remove('session_key');
         router.push('/login');
       } else {
-        if( tenant_id === 0){
+        if (tenant_id === 0) {
           setTenants(data.result_data);
-        }else{
-          setTenants(data.result_data.filter(data=>data.tenant_id === tenant_id));
+        } else {
+          setTenants(data.result_data.filter(data => data.tenant_id === tenant_id));
         }
         // const tempTenantIdArray = data.result_data.map(tenant => Number(tenant.tenant_id));
         // fetchSkills({
@@ -172,9 +169,9 @@ export default function Header() {
       }
     }
   });
-  
+
   useEffect(() => {
-    if( tenants.length > 0 ){
+    if (tenants.length > 0) {
       fetchMain({
         session_key: _sessionKey,
         tenant_id: _tenantId
@@ -194,15 +191,25 @@ export default function Header() {
     onSuccess: (data) => {
       // console.log('Main API response:', data);
       // setCampaigns(data.result_data);
-      if( tenant_id === 0){
+      if (tenant_id === 0) {
         setCampaigns(data.result_data);
-      }else{
-        setCampaigns(data.result_data.filter(data=>data.tenant_id === tenant_id));
+      } else {
+        setCampaigns(data.result_data.filter(data => data.tenant_id === tenant_id));
       }
       setShouldFetchCounselors(true);  // 이 시점에 상담사 목록 조회 활성화
 
     }
   });
+
+  // 훅 관리
+  const { data: dataForMenusInfoForRoleId, menuList, isLoading: isLoadingMenuInfo } =
+    useApiForGetAuthorizedMenusInfoForMenuRoleId({
+      roleId: role_id || 1, // menu_role_id가 없을 경우 기본값 1
+      enabled: !!menu_role_id // menu_role_id가 있을 때만 활성화
+    });
+
+  console.log("dataForMenusInfoForRoleId : ", dataForMenusInfoForRoleId);
+  
 
   const { data: counselorListData } = useApiForFetchCounselorList({
     credentials: {
@@ -244,13 +251,13 @@ export default function Header() {
                 height={14}
                 priority
               />
-              <span>{id}({role_id === 1?'상담사'
-              :role_id === 2?'파트매니저'
-              :role_id === 3?'그룹매니저'
-              :role_id === 4?'테넌트메니저'
-              :role_id === 5?'시스템 메니저'
-              :role_id === 6?'전체'
-              :''})</span>
+              <span>{id}({role_id === 1 ? '상담사'
+                : role_id === 2 ? '파트매니저'
+                  : role_id === 3 ? '그룹매니저'
+                    : role_id === 4 ? '테넌트메니저'
+                      : role_id === 5 ? '시스템 메니저'
+                        : role_id === 6 ? '전체'
+                          : ''})</span>
             </div>
             <CommonButton
               variant="ghost"
@@ -271,7 +278,7 @@ export default function Header() {
       <header className="bg-white border-b">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between header-padding">
-            <div>menu_role_id: {menu_role_id}</div>
+            {/* <div>menu_role_id: {menu_role_id}</div> */}
 
             <nav className="flex overflow-x-auto gap-3">
               {menuItems.map((item) => {
