@@ -26,7 +26,8 @@ export function useApiForCampaignStatusUpdate(
       // }
 
       // 상태 업데이트 성공 후 관련 쿼리 무효화
-      queryClient.invalidateQueries({ queryKey: ['treeMenuDataForSideMenu'] });
+      
+      // queryClient.invalidateQueries({ queryKey: ['treeMenuDataForSideMenu'] });
 
       options?.onSuccess?.(data, variables, context);
     },
