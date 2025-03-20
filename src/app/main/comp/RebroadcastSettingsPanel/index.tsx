@@ -22,6 +22,8 @@ import { useApiForCampaignRedialPreviewSearch } from '@/features/rebroadcastSett
 import { useApiForCampaignCurrentRedial } from '@/features/rebroadcastSettingsPanel/hooks/useApiForCampaignCurrentRedial';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import { useApiForCampaignStatusUpdate } from '@/features/campaignManager/hooks/useApiForCampaignStatusUpdate';
+import { CheckCampaignSaveReturnCode } from '@/components/common/common';
 
 interface RebroadcastSettings {
     campaignId: string;
@@ -850,11 +852,47 @@ const RebroadcastSettingsPanel = () => {
         }
     });
 
+    //캠페인 상태 변경 api 호출
+    const { mutate: fetchCampaignStatusUpdate } = useApiForCampaignStatusUpdate({
+        onSuccess: (data) => {
+            if (data.result_code === 0) {
+                fetchCampaignCurrentRedial({
+                    campaign_id: Number(campaignIdForUpdateFromSideMenu),
+                    condition: MakeRedialPacket()
+                });
+            } else {
+                setAlertState({
+                ...errorMessage,
+                isOpen: true,
+                message: CheckCampaignSaveReturnCode(data.reason_code),
+                onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+                onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+                });
+            }
+        },onError: (data) => {      
+        if (data.message.split('||')[0] === '5') {
+            setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+            });
+            Cookies.remove('session_key');
+            setTimeout(() => {
+            router.push('/login');
+            }, 1000);
+        }
+        }
+    });
+
     //캠페인 실시간 적용 이벤트.  
     const handleCampaignCurrentRedial = () => {
-        fetchCampaignCurrentRedial({
-            campaign_id: Number(campaignIdForUpdateFromSideMenu),
-            condition: MakeRedialPacket()
+        // fetchCampaignCurrentRedial({
+        //     campaign_id: Number(campaignIdForUpdateFromSideMenu),
+        //     condition: MakeRedialPacket()
+        // });
+        fetchCampaignStatusUpdate({
+            campaign_id: Number(campaignIdForUpdateFromSideMenu)
+          , campaign_status: 1
         });
     };
 
