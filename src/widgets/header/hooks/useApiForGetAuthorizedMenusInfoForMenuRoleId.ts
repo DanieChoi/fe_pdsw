@@ -22,6 +22,8 @@ interface UseApiForGetAuthorizedMenusInfoForMenuRoleIdReturn {
   campaignTenantContextMenuIds: number[];
   campaignTabCampaignContextMenuList: IMenuInfo[];
   campaignTabCampaignContextMenuIds: number[];
+  skillAssignmentMenuList: IMenuInfo[];
+  skillAssignmentMenuIds: number[];
   isLoading: boolean;
   isError: boolean;
   error: unknown;
@@ -47,6 +49,8 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
   const [campaignTenantContextMenuIds, setCampaignTenantContextMenuIds] = useState<number[]>([]);
   const [campaignTabCampaignContextMenuList, setCampaignTabCampaignContextMenuList] = useState<IMenuInfo[]>([]);
   const [campaignTabCampaignContextMenuIds, setCampaignTabCampaignContextMenuIds] = useState<number[]>([]);
+  const [skillAssignmentMenuList, setSkillAssignmentMenuList] = useState<IMenuInfo[]>([]);
+  const [skillAssignmentMenuIds, setSkillAssignmentMenuIds] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [error, setError] = useState<unknown>(null);
@@ -60,6 +64,7 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
     setAvailableCampaignTenantContextMenuIds,
     setAvailableCampaignTabCampaignContextMenus,
     setAvailableCampaignTabCampaignContextMenuIds,
+    setAvailableMenuIdsForSkilAssignment,
     setLoading: setStoreLoading, 
     setError: setStoreError 
   } = useAvailableMenuStore();
@@ -95,6 +100,16 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
       // 캠페인 탭 캠페인 컨텍스트 메뉴 ID 배열 생성
       const campaignTabCampaignContextIds = campaignTabCampaignContextMenus.map(menu => menu.menuId);
       
+      // SSG, SST, SSS 코드를 가진 스킬 할당 메뉴 필터링
+      const skillAssignmentMenus = allMenus.filter(menu => 
+        menu.locationDistinctionCode === 'SSG' || 
+        menu.locationDistinctionCode === 'SST' || 
+        menu.locationDistinctionCode === 'SSS'
+      );
+      
+      // 스킬 할당 메뉴 ID 배열 생성
+      const skillAssignmentIds = skillAssignmentMenus.map(menu => menu.menuId);
+      
       // 로컬 상태 업데이트
       setData(response);
       setMenuList(allMenus);
@@ -104,6 +119,8 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
       setCampaignTenantContextMenuIds(campaignTenantContextIds);
       setCampaignTabCampaignContextMenuList(campaignTabCampaignContextMenus);
       setCampaignTabCampaignContextMenuIds(campaignTabCampaignContextIds);
+      setSkillAssignmentMenuList(skillAssignmentMenus);
+      setSkillAssignmentMenuIds(skillAssignmentIds);
       
       console.log("메뉴 권한 정보가 로컬 상태에 저장되었습니다:", allMenus);
       console.log("헤더 메뉴 정보가 로컬 상태에 저장되었습니다:", headerMenus);
@@ -112,6 +129,8 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
       console.log("캠페인 테넌트 컨텍스트 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignTenantContextIds);
       console.log("캠페인 탭 캠페인 컨텍스트 메뉴가 로컬 상태에 저장되었습니다:", campaignTabCampaignContextMenus);
       console.log("캠페인 탭 캠페인 컨텍스트 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignTabCampaignContextIds);
+      console.log("스킬 할당 메뉴가 로컬 상태에 저장되었습니다:", skillAssignmentMenus);
+      console.log("스킬 할당 메뉴 ID가 로컬 상태에 저장되었습니다:", skillAssignmentIds);
 
       // Zustand 스토어 업데이트
       setAvailableMenus(allMenus);
@@ -121,6 +140,7 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
       setAvailableCampaignTenantContextMenuIds(campaignTenantContextIds);
       setAvailableCampaignTabCampaignContextMenus(campaignTabCampaignContextMenus);
       setAvailableCampaignTabCampaignContextMenuIds(campaignTabCampaignContextIds);
+      setAvailableMenuIdsForSkilAssignment(skillAssignmentIds);
       
     } catch (err) {
       console.error('Error fetching authorized menus:', err);
@@ -155,6 +175,8 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
     campaignTenantContextMenuIds,
     campaignTabCampaignContextMenuList,
     campaignTabCampaignContextMenuIds,
+    skillAssignmentMenuList,
+    skillAssignmentMenuIds,
     isLoading,
     isError,
     error,

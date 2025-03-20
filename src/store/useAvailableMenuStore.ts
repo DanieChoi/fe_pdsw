@@ -12,6 +12,8 @@ interface AvailableMenuState {
   // 캠페인 탭 캠페인 컨텍스트 메뉴 (CCC)
   availableCampaignTabCampaignContextMenus: IMenuInfo[];
   availableCampaignTabCampaignContextMenuIds: number[];
+  // 스킬 할당 메뉴 (SSG, SST, SSS)
+  availableMenuIdsForSkilAssignment: number[];
   isLoading: boolean;
   isError: boolean;
   setAvailableMenus: (menus: IMenuInfo[]) => void;
@@ -23,6 +25,8 @@ interface AvailableMenuState {
   // 캠페인 탭 캠페인 컨텍스트 메뉴 setter
   setAvailableCampaignTabCampaignContextMenus: (menus: IMenuInfo[]) => void;
   setAvailableCampaignTabCampaignContextMenuIds: (ids: number[]) => void;
+  // 스킬 할당 메뉴 setter
+  setAvailableMenuIdsForSkilAssignment: (ids: number[]) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: boolean) => void;
   clearMenus: () => void;
@@ -41,6 +45,8 @@ export const useAvailableMenuStore = create<AvailableMenuState>()(
         // 캠페인 탭 캠페인 컨텍스트 메뉴 초기화
         availableCampaignTabCampaignContextMenus: [],
         availableCampaignTabCampaignContextMenuIds: [],
+        // 스킬 할당 메뉴 초기화
+        availableMenuIdsForSkilAssignment: [],
         isLoading: false,
         isError: false,
         setAvailableMenus: (menus) => set({ availableMenus: menus }, false, "setAvailableMenus"),
@@ -52,6 +58,8 @@ export const useAvailableMenuStore = create<AvailableMenuState>()(
         // 캠페인 탭 캠페인 컨텍스트 메뉴 setter 구현
         setAvailableCampaignTabCampaignContextMenus: (menus) => set({ availableCampaignTabCampaignContextMenus: menus }, false, "setAvailableCampaignTabCampaignContextMenus"),
         setAvailableCampaignTabCampaignContextMenuIds: (ids) => set({ availableCampaignTabCampaignContextMenuIds: ids }, false, "setAvailableCampaignTabCampaignContextMenuIds"),
+        // 스킬 할당 메뉴 setter 구현
+        setAvailableMenuIdsForSkilAssignment: (ids) => set({ availableMenuIdsForSkilAssignment: ids }, false, "setAvailableMenuIdsForSkilAssignment"),
         setLoading: (loading) => set({ isLoading: loading }, false, "setLoading"),
         setError: (error) => set({ isError: error }, false, "setError"), 
         clearMenus: () => set(
@@ -62,7 +70,8 @@ export const useAvailableMenuStore = create<AvailableMenuState>()(
             availableCampaignTenantContextMenus: [],
             availableCampaignTenantContextMenuIds: [],
             availableCampaignTabCampaignContextMenus: [],
-            availableCampaignTabCampaignContextMenuIds: []
+            availableCampaignTabCampaignContextMenuIds: [],
+            availableMenuIdsForSkilAssignment: []
           }, 
           false, 
           "clearMenus"

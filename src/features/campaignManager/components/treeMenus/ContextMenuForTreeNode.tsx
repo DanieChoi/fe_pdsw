@@ -25,6 +25,7 @@ import useApiForCampaignListDelete from "@/features/listManager/hooks/useApiForC
 import { CheckCampaignSaveReturnCode } from '@/components/common/common';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
+import React from "react";
 
 export type CampaignStatus = 'started' | 'pending' | 'stopped';
 
@@ -374,14 +375,15 @@ export function ContextMenuForTreeNode({
   const filteredMenuItems = mainMenuItems.filter((menuItem) => {
     // separator는 권한 체크 없이 포함
     if (menuItem.type === "separator") return true;
-    
+
     // menuId가 없는 항목은 무조건 표시 (이전 코드의 호환성 유지)
     if (menuItem.menuId === undefined) return true;
-    
+
     // 권한이 있는 메뉴만 표시
     return availableCampaignTabCampaignContextMenuIds.includes(menuItem.menuId);
   });
 
+  // 수정이 필요한 부분만 변경했습니다.
   return (
     <>
       <ContextMenu>
@@ -393,7 +395,8 @@ export function ContextMenuForTreeNode({
               return <ContextMenuSeparator key={menuItem.key} className="my-1" />;
             }
             if (menuItem.render) {
-              return <>{menuItem.render()}</>;
+              // key 속성을 추가하여 React 오류 해결
+              return <React.Fragment key={menuItem.key}>{menuItem.render()}</React.Fragment>;
             }
             return (
               <ContextMenuItem

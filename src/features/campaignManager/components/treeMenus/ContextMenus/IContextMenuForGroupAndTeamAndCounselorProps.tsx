@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { Menu, useContextMenu } from "react-contexify";
+import { Menu, Item, useContextMenu } from "react-contexify";
 import "react-contexify/ReactContexify.css";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
 import { useTabStore } from "@/store/tabStore";
@@ -9,6 +9,7 @@ import { IDialogForSkilAssignmentForCounselor } from "../dialog/IDialogForSkilAs
 import { IDialogForTeamSkilAssignment } from "../dialog/IDialogForTeamSkilAssignment";
 import { toast } from "react-toastify";
 import { IDialogForGroupSkilAssignment } from "../dialog/IDialogForGroupSkilAssignment";
+import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
 
 interface IContextMenuForGroupAndTeamAndCounselorProps {
   children: React.ReactNode;
@@ -21,12 +22,34 @@ interface IContextMenuForGroupAndTeamAndCounselorProps {
   };
 }
 
+// 메뉴 아이템 정의 인터페이스
+interface MenuItemDefinition {
+  menuId: number;
+  key: string;
+  title?: string;
+  onClick?: () => void;
+  isUnassignment?: boolean;
+  type?: string;
+  disabled?: boolean;
+}
+
+// 메뉴 ID 상수 정의
+const MENU_IDS = {
+  GROUP_SKILL_ASSIGN: 31,
+  GROUP_SKILL_UNASSIGN: 32,
+  TEAM_SKILL_ASSIGN: 33,
+  TEAM_SKILL_UNASSIGN: 34,
+  COUNSELOR_SKILL_ASSIGN: 35,
+  COUNSELOR_SKILL_UNASSIGN: 36
+};
+
 export function IContextMenuForGroupAndTeamAndCounselor({
   children,
   item,
 }: IContextMenuForGroupAndTeamAndCounselorProps) {
   const { addTab, removeTab, openedTabs } = useTabStore();
   const { setCandidateMembersForSkilAssign } = useCounselorFilterStore();
+  const { availableMenuIdsForSkilAssignment } = useAvailableMenuStore();
 
   // 다이얼로그 상태 관리
   const [isSkillDialogOpen, setIsSkillDialogOpen] = useState(false);
@@ -195,20 +218,75 @@ export function IContextMenuForGroupAndTeamAndCounselor({
     }
   };
 
+  // 각 타입별로 메뉴 아이템의 ID를 가져옴
+  const getMenuItemId = (type: string, isUnassign: boolean): number => {
+    switch (type) {
+      case "counselor":
+        return isUnassign ? MENU_IDS.COUNSELOR_SKILL_UNASSIGN : MENU_IDS.COUNSELOR_SKILL_ASSIGN;
+      case "team":
+        return isUnassign ? MENU_IDS.TEAM_SKILL_UNASSIGN : MENU_IDS.TEAM_SKILL_ASSIGN;
+      case "group":
+        return isUnassign ? MENU_IDS.GROUP_SKILL_UNASSIGN : MENU_IDS.GROUP_SKILL_ASSIGN;
+      default:
+        return 0;
+    }
+  };
+
+  // 메뉴 아이템 정의
+  const menuItems: MenuItemDefinition[] = [
+    {
+      key: "skill-assign",
+      title: getMenuItemTitle(false),
+      onClick: () => openSkillAssignmentDialog(false),
+      isUnassignment: false,
+      menuId: getMenuItemId(item.type, false)
+    },
+    {
+      key: "skill-unassign",
+      title: getMenuItemTitle(true),
+      onClick: () => openSkillAssignmentDialog(true),
+      isUnassignment: true,
+      menuId: getMenuItemId(item.type, true)
+    }
+  ];
+
+  // 메뉴 아이템 권한 체크 (현재 로그인한 사용자가 해당 메뉴에 접근 권한이 있는지)
+  const hasMenuPermission = (menuId: number): boolean => {
+    return availableMenuIdsForSkilAssignment.includes(menuId);
+  };
+
+  // 권한이 있는 메뉴 아이템만 필터링
+  const authorizedMenuItems = menuItems.filter(item => 
+    hasMenuPermission(item.menuId)
+  );
+
+  // 메뉴 아이템이 하나도 없으면 컨텍스트 메뉴를 비활성화
+  const hasAnyMenuItems = authorizedMenuItems.length > 0;
+
+  // 아이템 클릭 핸들러
+  const handleItemClick = (menuItem: MenuItemDefinition) => {
+    if (menuItem.onClick) {
+      menuItem.onClick();
+    }
+  };
+
   return (
     <>
       {/* 컨텍스트 메뉴를 트리거할 요소 */}
-      <div onContextMenu={handleContextMenu}>{children}</div>
+      <div onContextMenu={hasAnyMenuItems ? handleContextMenu : undefined}>
+        {children}
+      </div>
 
       {/* React-Contexify 메뉴 정의 */}
-      <Menu id={MENU_ID} animation="fade" className="compact-menu">
-        <div className="contexify-custom-item" onClick={() => openSkillAssignmentDialog(false)}>
-          {getMenuItemTitle(false)}
-        </div>
-        <div className="contexify-custom-item" onClick={() => openSkillAssignmentDialog(true)}>
-          {getMenuItemTitle(true)}
-        </div>
-      </Menu>
+      {hasAnyMenuItems && (
+        <Menu id={MENU_ID} animation="fade">
+          {authorizedMenuItems.map((menuItem) => (
+            <Item key={menuItem.key} onClick={() => handleItemClick(menuItem)}>
+              {menuItem.title}
+            </Item>
+          ))}
+        </Menu>
+      )}
 
       {/* ===== 상담원 스킬 할당 다이얼로그 ===== */}
       {item.type === "counselor" && isSkillDialogOpen && (
