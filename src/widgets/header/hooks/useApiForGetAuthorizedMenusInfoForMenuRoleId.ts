@@ -1,5 +1,3 @@
-// src\widgets\header\hooks\useApiForGetAuthorizedMenusInfoForMenuRoleId.ts
-
 import { useState, useEffect } from 'react';
 import { 
   apiForGetAuthorizedMenusInfoForMenuRoleId 
@@ -22,6 +20,17 @@ interface UseApiForGetAuthorizedMenusInfoForMenuRoleIdReturn {
   headerMenuIds: number[];
   campaignTenantContextMenuList: IMenuInfo[];
   campaignTenantContextMenuIds: number[];
+  campaignTabCampaignContextMenuList: IMenuInfo[];
+  campaignTabCampaignContextMenuIds: number[];
+  skillAssignmentMenuList: IMenuInfo[];
+  skillAssignmentMenuIds: number[];
+  // 추가된 반환값
+  campaignGroupTabTenantMenuList: IMenuInfo[];
+  campaignGroupTabTenantMenuIds: number[];
+  campaignGroupTabCampaignGroupMenuList: IMenuInfo[];
+  campaignGroupTabCampaignGroupMenuIds: number[];
+  campaignGroupTabCampaignMenuList: IMenuInfo[];
+  campaignGroupTabCampaignMenuIds: number[];
   isLoading: boolean;
   isError: boolean;
   error: unknown;
@@ -45,6 +54,19 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
   const [headerMenuIds, setHeaderMenuIds] = useState<number[]>([]);
   const [campaignTenantContextMenuList, setCampaignTenantContextMenuList] = useState<IMenuInfo[]>([]);
   const [campaignTenantContextMenuIds, setCampaignTenantContextMenuIds] = useState<number[]>([]);
+  const [campaignTabCampaignContextMenuList, setCampaignTabCampaignContextMenuList] = useState<IMenuInfo[]>([]);
+  const [campaignTabCampaignContextMenuIds, setCampaignTabCampaignContextMenuIds] = useState<number[]>([]);
+  const [skillAssignmentMenuList, setSkillAssignmentMenuList] = useState<IMenuInfo[]>([]);
+  const [skillAssignmentMenuIds, setSkillAssignmentMenuIds] = useState<number[]>([]);
+  
+  // 추가된 상태 변수들
+  const [campaignGroupTabTenantMenuList, setCampaignGroupTabTenantMenuList] = useState<IMenuInfo[]>([]);
+  const [campaignGroupTabTenantMenuIds, setCampaignGroupTabTenantMenuIds] = useState<number[]>([]);
+  const [campaignGroupTabCampaignGroupMenuList, setCampaignGroupTabCampaignGroupMenuList] = useState<IMenuInfo[]>([]);
+  const [campaignGroupTabCampaignGroupMenuIds, setCampaignGroupTabCampaignGroupMenuIds] = useState<number[]>([]);
+  const [campaignGroupTabCampaignMenuList, setCampaignGroupTabCampaignMenuList] = useState<IMenuInfo[]>([]);
+  const [campaignGroupTabCampaignMenuIds, setCampaignGroupTabCampaignMenuIds] = useState<number[]>([]);
+  
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [error, setError] = useState<unknown>(null);
@@ -56,6 +78,13 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
     setAvailableHeaderMenuIds,
     setAvailableCampaignTenantContextMenus,
     setAvailableCampaignTenantContextMenuIds,
+    setAvailableCampaignTabCampaignContextMenus,
+    setAvailableCampaignTabCampaignContextMenuIds,
+    setAvailableMenuIdsForSkilAssignment,
+    // 추가된 setter 함수들
+    setAvailableMenuIdsForCampaignGroupTabTenant,
+    setAvailableMenuIdsForCampaignGroupTabCampaignGroup,
+    setAvailableMenuIdsForCampaignGroupTabCampaign,
     setLoading: setStoreLoading, 
     setError: setStoreError 
   } = useAvailableMenuStore();
@@ -79,11 +108,45 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
       // 헤더 메뉴 ID 배열 생성
       const headerIds = headerMenus.map(menu => menu.menuId);
       
-      // SCC 코드를 가진 캠페인 테넌트 컨텍스트 메뉴 필터링
-      const campaignTenantContextMenus = allMenus.filter(menu => menu.locationDistinctionCode === 'SCC');
+      // CTC 코드를 가진 캠페인 테넌트 컨텍스트 메뉴 필터링
+      const campaignTenantContextMenus = allMenus.filter(menu => menu.locationDistinctionCode === 'CTC');
       
       // 캠페인 테넌트 컨텍스트 메뉴 ID 배열 생성
       const campaignTenantContextIds = campaignTenantContextMenus.map(menu => menu.menuId);
+      
+      // CCC 코드를 가진 캠페인 탭 캠페인 컨텍스트 메뉴 필터링
+      const campaignTabCampaignContextMenus = allMenus.filter(menu => menu.locationDistinctionCode === 'SCM');
+      
+      // 캠페인 탭 캠페인 컨텍스트 메뉴 ID 배열 생성
+      const campaignTabCampaignContextIds = campaignTabCampaignContextMenus.map(menu => menu.menuId);
+      
+      // SSG, SST, SSS 코드를 가진 스킬 할당 메뉴 필터링
+      const skillAssignmentMenus = allMenus.filter(menu => 
+        menu.locationDistinctionCode === 'SSG' || 
+        menu.locationDistinctionCode === 'SST' || 
+        menu.locationDistinctionCode === 'SSS'
+      );
+      
+      // 스킬 할당 메뉴 ID 배열 생성
+      const skillAssignmentIds = skillAssignmentMenus.map(menu => menu.menuId);
+      
+      // SGT 코드를 가진 캠페인 그룹 탭 테넌트 메뉴 필터링
+      const campaignGroupTabTenantMenus = allMenus.filter(menu => menu.locationDistinctionCode === 'SGT');
+      
+      // 캠페인 그룹 탭 테넌트 메뉴 ID 배열 생성
+      const campaignGroupTabTenantIds = campaignGroupTabTenantMenus.map(menu => menu.menuId);
+      
+      // SGG 코드를 가진 캠페인 그룹 탭 캠페인 그룹 메뉴 필터링
+      const campaignGroupTabCampaignGroupMenus = allMenus.filter(menu => menu.locationDistinctionCode === 'SGG');
+      
+      // 캠페인 그룹 탭 캠페인 그룹 메뉴 ID 배열 생성
+      const campaignGroupTabCampaignGroupIds = campaignGroupTabCampaignGroupMenus.map(menu => menu.menuId);
+      
+      // SSS 코드를 가진 캠페인 그룹 탭 캠페인 메뉴 필터링
+      const campaignGroupTabCampaignMenus = allMenus.filter(menu => menu.locationDistinctionCode === 'SSS');
+      
+      // 캠페인 그룹 탭 캠페인 메뉴 ID 배열 생성
+      const campaignGroupTabCampaignIds = campaignGroupTabCampaignMenus.map(menu => menu.menuId);
       
       // 로컬 상태 업데이트
       setData(response);
@@ -92,12 +155,32 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
       setHeaderMenuIds(headerIds);
       setCampaignTenantContextMenuList(campaignTenantContextMenus);
       setCampaignTenantContextMenuIds(campaignTenantContextIds);
+      setCampaignTabCampaignContextMenuList(campaignTabCampaignContextMenus);
+      setCampaignTabCampaignContextMenuIds(campaignTabCampaignContextIds);
+      setSkillAssignmentMenuList(skillAssignmentMenus);
+      setSkillAssignmentMenuIds(skillAssignmentIds);
+      setCampaignGroupTabTenantMenuList(campaignGroupTabTenantMenus);
+      setCampaignGroupTabTenantMenuIds(campaignGroupTabTenantIds);
+      setCampaignGroupTabCampaignGroupMenuList(campaignGroupTabCampaignGroupMenus);
+      setCampaignGroupTabCampaignGroupMenuIds(campaignGroupTabCampaignGroupIds);
+      setCampaignGroupTabCampaignMenuList(campaignGroupTabCampaignMenus);
+      setCampaignGroupTabCampaignMenuIds(campaignGroupTabCampaignIds);
       
       console.log("메뉴 권한 정보가 로컬 상태에 저장되었습니다:", allMenus);
       console.log("헤더 메뉴 정보가 로컬 상태에 저장되었습니다:", headerMenus);
       console.log("헤더 메뉴 ID가 로컬 상태에 저장되었습니다:", headerIds);
       console.log("캠페인 테넌트 컨텍스트 메뉴가 로컬 상태에 저장되었습니다:", campaignTenantContextMenus);
       console.log("캠페인 테넌트 컨텍스트 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignTenantContextIds);
+      console.log("캠페인 탭 캠페인 컨텍스트 메뉴가 로컬 상태에 저장되었습니다:", campaignTabCampaignContextMenus);
+      console.log("캠페인 탭 캠페인 컨텍스트 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignTabCampaignContextIds);
+      console.log("스킬 할당 메뉴가 로컬 상태에 저장되었습니다:", skillAssignmentMenus);
+      console.log("스킬 할당 메뉴 ID가 로컬 상태에 저장되었습니다:", skillAssignmentIds);
+      console.log("캠페인 그룹 탭 테넌트 메뉴가 로컬 상태에 저장되었습니다:", campaignGroupTabTenantMenus);
+      console.log("캠페인 그룹 탭 테넌트 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignGroupTabTenantIds);
+      console.log("캠페인 그룹 탭 캠페인 그룹 메뉴가 로컬 상태에 저장되었습니다:", campaignGroupTabCampaignGroupMenus);
+      console.log("캠페인 그룹 탭 캠페인 그룹 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignGroupTabCampaignGroupIds);
+      console.log("캠페인 그룹 탭 캠페인 메뉴가 로컬 상태에 저장되었습니다:", campaignGroupTabCampaignMenus);
+      console.log("캠페인 그룹 탭 캠페인 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignGroupTabCampaignIds);
 
       // Zustand 스토어 업데이트
       setAvailableMenus(allMenus);
@@ -105,6 +188,12 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
       setAvailableHeaderMenuIds(headerIds);
       setAvailableCampaignTenantContextMenus(campaignTenantContextMenus);
       setAvailableCampaignTenantContextMenuIds(campaignTenantContextIds);
+      setAvailableCampaignTabCampaignContextMenus(campaignTabCampaignContextMenus);
+      setAvailableCampaignTabCampaignContextMenuIds(campaignTabCampaignContextIds);
+      setAvailableMenuIdsForSkilAssignment(skillAssignmentIds);
+      setAvailableMenuIdsForCampaignGroupTabTenant(campaignGroupTabTenantIds);
+      setAvailableMenuIdsForCampaignGroupTabCampaignGroup(campaignGroupTabCampaignGroupIds);
+      setAvailableMenuIdsForCampaignGroupTabCampaign(campaignGroupTabCampaignIds);
       
     } catch (err) {
       console.error('Error fetching authorized menus:', err);
@@ -137,6 +226,17 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
     headerMenuIds,
     campaignTenantContextMenuList,
     campaignTenantContextMenuIds,
+    campaignTabCampaignContextMenuList,
+    campaignTabCampaignContextMenuIds,
+    skillAssignmentMenuList,
+    skillAssignmentMenuIds,
+    // 추가된 반환값
+    campaignGroupTabTenantMenuList,
+    campaignGroupTabTenantMenuIds,
+    campaignGroupTabCampaignGroupMenuList,
+    campaignGroupTabCampaignGroupMenuIds,
+    campaignGroupTabCampaignMenuList,
+    campaignGroupTabCampaignMenuIds,
     isLoading,
     isError,
     error,

@@ -1,3 +1,4 @@
+// \nproject\fe_pdsw\src\features\campaignManager\components\treeMenus\ContextMenuForTreeNode.tsx
 "use client";
 
 import {
@@ -12,20 +13,20 @@ import {
 } from "@/components/ui/context-menu";
 import { useTabStore } from "@/store/tabStore";
 import {
-  Check,
+  Edit, Copy, Activity, Trash2, Monitor, Settings, Search, List, Clock, History,
+  UserCheck, Shield, RefreshCcw, AlertTriangle, Check, ChevronRight
 } from "lucide-react";
-import { useState, useRef, JSX } from "react";
+import { useState, useRef } from "react";
 import BlackListCountPopup from '@/features/campaignManager/components/popups/BlackListCountPopup';
 import { toast } from 'react-toastify';
 import { useApiForCampaignStatusUpdate } from "../../hooks/useApiForCampaignStatusUpdate";
 import { useApiForCampaignBlacklistCount } from "@/features/listManager/hooks/useApiForCampaignBlacklistCount";
+
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import useApiForCampaignListDelete from "@/features/listManager/hooks/useApiForCampaignListDelete";
 import { CheckCampaignSaveReturnCode } from '@/components/common/common';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
-import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
-import React from "react";
 
 export type CampaignStatus = 'started' | 'pending' | 'stopped';
 
@@ -64,18 +65,6 @@ interface ContextMenuForTreeNodeProps {
   onHandleCampaignCopy: () => void;
 }
 
-// 메뉴 아이템 정의 인터페이스
-interface MenuItemDefinition {
-  menuId?: number;
-  key: string;
-  title?: string;
-  onClick?: () => void;
-  render?: () => JSX.Element;
-  type?: "separator";
-  condition?: boolean;
-  className?: string;
-}
-
 export function ContextMenuForTreeNode({
   children,
   item,
@@ -91,8 +80,6 @@ export function ContextMenuForTreeNode({
   const [blackListCount, setBlackListCount] = useState<number>(0);
   const preventCloseRef = useRef(false);
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
-
-  const { availableCampaignTabCampaignContextMenuIds } = useAvailableMenuStore();
 
   // 상태 관련 정보
   const statusInfo = {
@@ -113,9 +100,11 @@ export function ContextMenuForTreeNode({
           message: '캠페인 상태가 성공적으로 변경되었습니다.',
           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
           onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+          
         });
         // 로컬 상태 업데이트
         setCurrentStatus(tempStatus);
+  
       } else {
         setAlertState({
           ...errorMessage,
@@ -126,6 +115,15 @@ export function ContextMenuForTreeNode({
           onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
         });
       }
+      // toast.success("캠페인 상태가 성공적으로 변경되었습니다.", {
+      //   position: "top-center",
+      //   autoClose: 3000,
+      //   hideProgressBar: false,
+      //   closeOnClick: true,
+      //   pauseOnHover: true,
+      //   draggable: true,
+      // });
+
     },
     onError: (error) => {
       toast.error(error.message || "상태 변경 중 오류가 발생했습니다.", {
@@ -142,6 +140,7 @@ export function ContextMenuForTreeNode({
   const { mutate: deleteCampaignList } = useApiForCampaignListDelete({
     onSuccess: (data) => {
       console.log('캠페인 리스트 삭제 성공 : ', data);
+
       toast.success("캠페인 리스트가 성공적으로 삭제되었습니다.", {
         position: "top-center",
         autoClose: 3000,
@@ -163,7 +162,11 @@ export function ContextMenuForTreeNode({
     },
   });
 
-  const handleCampaignListDelete = (campaignId: any) => {
+  const handleCampaignListDelete = (campaingId: any) => {
+
+    console.log('캠페인 리스트 삭제 클릭 id ??? : ', campaingId);
+    
+
     if (currentStatus !== 'stopped') {
       toast.error("캠페인이 중지 상태일 때만 리스트를 삭제할 수 있습니다.", {
         position: "top-center",
@@ -175,7 +178,9 @@ export function ContextMenuForTreeNode({
       });
       return;
     }
-    deleteCampaignList(campaignId);
+
+    // Call the mutation with campaign ID
+    deleteCampaignList(campaingId);
   };
 
   const handleEditMenuClick = () => {
@@ -185,6 +190,7 @@ export function ContextMenuForTreeNode({
 
   const handleProgressInfoClick = (campaignId: any, campaignName: string) => {
     const uniqueKey = `progress-info-${campaignId}-${Date.now()}`;
+
     addMultiTab({
       id: 21,
       uniqueKey: uniqueKey,
@@ -209,6 +215,7 @@ export function ContextMenuForTreeNode({
 
   const handleMonitorClick = (campaignId: any, campaignName: string) => {
     const uniqueKey = `monitor-${Date.now()}`;
+
     addMultiTab({
       id: 22,
       uniqueKey: uniqueKey,
@@ -221,6 +228,9 @@ export function ContextMenuForTreeNode({
   };
 
   const onCampaignDelete = (status: string, campaignId: any, campaignName: string) => {
+    console.log('캠페인 삭제 클릭 : ', status);
+    const uniqueKey = `monitor-${Date.now()}`;
+
     if (status !== 'stopped') {
       toast.error("캠페인이 중지 상태일 때만 삭제할 수 있습니다.", {
         position: "top-center",
@@ -232,9 +242,10 @@ export function ContextMenuForTreeNode({
       });
       return;
     }
+
     addTab({
       id: 131,
-      uniqueKey: `monitor-${Date.now()}`,
+      uniqueKey: uniqueKey,
       title: `상담원 삭제 - ${campaignName}`,
       icon: '',
       href: '',
@@ -254,16 +265,44 @@ export function ContextMenuForTreeNode({
   };
 
   const handleStartClick = async (status: CampaignStatus) => {
+    // 이미 선택된 상태거나 로딩 중이면 무시
     if (currentStatus === status || updateCampaignStatusMutation.isPending) {
       return;
     }
-    setTempStatus(status);
+
+    // console.log("상태 변경 클릭1 : ", status);
+    setTempStatus(status);  // 임시 상태 업데이트
+
+    // console.log("item for 상태 변경 ", item);
+    
+
     try {
+      // console.log('Status change requested:', {
+      //   campaignId: item.id,
+      //   campaignName: item.label,
+      //   previousStatus: currentStatus,
+      //   newStatus: status
+      // });
+
+      // 메뉴를 열린 상태로 유지하기 위한 플래그 설정
       preventCloseRef.current = true;
+
+      // API 호출
       await updateCampaignStatusMutation.mutateAsync({
         campaign_id: Number(item.id),
         campaign_status: getStatusNumber(status)
       });
+
+      // 로컬 상태 업데이트
+      // setCurrentStatus(status);
+
+      // console.log('Status changed successfully:', {
+      //   campaignId: item.id,
+      //   campaignName: item.label,
+      //   status: status,
+      //   timestamp: new Date().toISOString()
+      // });
+
     } catch (error) {
       console.error('Error changing campaign status:', {
         campaignId: item.id,
@@ -274,7 +313,7 @@ export function ContextMenuForTreeNode({
     }
   };
 
-  // 캠페인 블랙리스트 건수 조회 API 호출
+  //캠페인 블랙리스트 건수 조회 api 호출
   const { mutate: fetchCampaignBlacklistCount } = useApiForCampaignBlacklistCount({
     onSuccess: (data) => {
       setBlackListCount(data.result_data.blacklist_count);
@@ -284,130 +323,159 @@ export function ContextMenuForTreeNode({
     }
   });
 
+  //캠페인 블랙리스트 건수 조회 클릭 이벤트.
   const handleBlacklistCountCheckClick = () => {
     fetchCampaignBlacklistCount(Number(item.id));
   };
 
-  // 상태 서브메뉴 렌더링
-  const renderStatusSubMenu = () => (
-    <ContextMenuSub>
-      <ContextMenuSubTrigger
-        className="flex items-center text-sm"
-        onPointerDown={(e) => {
-          preventCloseRef.current = false;
-        }}
-      >
-        <span className="flex items-center">
-          시작구분:
-          <span className="ml-1 flex items-center">
-            <div className="w-4 h-4 mr-1">
-              <Image
-                src={getStatusIcon(currentStatus) || ''}
-                alt={currentStatus}
-                width={16}
-                height={16}
-              />
-            </div>
-            {statusInfo[currentStatus].label}
-          </span>
-        </span>
-      </ContextMenuSubTrigger>
-      <ContextMenuSubContent
-        className="min-w-[120px] p-1"
-        onPointerDownOutside={(e) => {
-          if (preventCloseRef.current) {
-            e.preventDefault();
-            preventCloseRef.current = false;
-          }
-        }}
-      >
-        {(Object.keys(statusInfo) as Array<CampaignStatus>).map((status) => (
-          <ContextMenuItem
-            key={status}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleStartClick(status);
-              preventCloseRef.current = true;
-            }}
-            className={cn(
-              "flex items-center justify-between text-sm px-2 py-1.5",
-              currentStatus === status ? "bg-gray-50" : "",
-              updateCampaignStatusMutation.isPending ? "opacity-70" : ""
-            )}
-            disabled={updateCampaignStatusMutation.isPending}
-          >
-            <div className="flex items-center">
-              <div className="w-4 h-4 mr-2">
-                <Image
-                  src={getStatusIcon(status) || ''}
-                  alt={status}
-                  width={16}
-                  height={16}
-                />
-              </div>
-              <span>{statusInfo[status].label}</span>
-            </div>
-            {currentStatus === status && (
-              <Check className="h-4 w-4 text-green-500" />
-            )}
-          </ContextMenuItem>
-        ))}
-      </ContextMenuSubContent>
-    </ContextMenuSub>
-  );
-
-  // 메인 메뉴 아이템들을 배열로 분리
-  const mainMenuItems: MenuItemDefinition[] = [
-    { key: "edit", title: "캠페인 수정", onClick: handleEditMenuClick, menuId: 19 },
-    { key: "status", render: renderStatusSubMenu, menuId: 20 },
-    { key: "progress", title: "캠페인 진행정보", onClick: () => handleProgressInfoClick(item.id, item.label), menuId: 24 },
-    { key: "separator1", type: "separator" },
-    { key: "rebroadcast", title: "재발신", onClick: handleRebroadcastClick, menuId: 25 },
-    { key: "separator2", type: "separator" },
-    { key: "copy", title: "캠페인 복사", onClick: onHandleCampaignCopy, menuId: 26 },
-    { key: "delete", title: "캠페인 삭제", onClick: () => onCampaignDelete(currentStatus, item.id, item.label), condition: !isFolder, className: "text-red-500", menuId: 27 },
-    { key: "separator3", type: "separator" },
-    { key: "listDelete", title: "캠페인 리스트 삭제", onClick: () => handleCampaignListDelete(item.id), condition: currentStatus === 'stopped', menuId: 28 },
-    { key: "monitor", title: "상담원 상태 모니터", onClick: () => handleMonitorClick(item.id, item.label), menuId: 29 },
-    { key: "blacklist", title: "블랙리스트 건수 조회", onClick: handleBlacklistCountCheckClick, menuId: 30 },
-  ];
-
-  const filteredMenuItems = mainMenuItems.filter((menuItem) => {
-    // separator는 권한 체크 없이 포함
-    if (menuItem.type === "separator") return true;
-
-    // menuId가 없는 항목은 무조건 표시 (이전 코드의 호환성 유지)
-    if (menuItem.menuId === undefined) return true;
-
-    // 권한이 있는 메뉴만 표시
-    return availableCampaignTabCampaignContextMenuIds.includes(menuItem.menuId);
-  });
-
-  // 수정이 필요한 부분만 변경했습니다.
   return (
     <>
       <ContextMenu>
         <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
         <ContextMenuContent className="w-[150px]">
-          {filteredMenuItems.map((menuItem) => {
-            if (menuItem.condition === false) return null;
-            if (menuItem.type === "separator") {
-              return <ContextMenuSeparator key={menuItem.key} className="my-1" />;
-            }
-            if (menuItem.render) {
-              // key 속성을 추가하여 React 오류 해결
-              return <React.Fragment key={menuItem.key}>{menuItem.render()}</React.Fragment>;
-            }
-            return (
-              <ContextMenuItem
-                key={menuItem.key}
-                onClick={menuItem.onClick}
-                className={cn("flex items-center text-sm", menuItem.className)}
-              >
-                {menuItem.title}
-              </ContextMenuItem>
-            );
-          })}
+          <ContextMenuItem onClick={handleEditMenuClick} className="flex items-center text-sm">
+            {/* <Edit className="mr-2 h-4 w-4 text-gray-500" /> */}
+            캠페인 수정
+          </ContextMenuItem>
+
+          <ContextMenuSub>
+            <ContextMenuSubTrigger
+              className="flex items-center text-sm"
+              onPointerDown={(e) => {
+                // 트리거 클릭 시 preventClose 플래그 초기화
+                preventCloseRef.current = false;
+              }}
+            >
+              {/* <Search className="mr-2 h-4 w-4 text-gray-500" /> */}
+              <span className="flex items-center">
+                시작구분:
+                <span className="ml-1 flex items-center">
+                  <div className="w-4 h-4 mr-1">
+                    <Image
+                      src={getStatusIcon(currentStatus) || ''}
+                      alt={currentStatus}
+                      width={16}
+                      height={16}
+                    />
+                  </div>
+                  {statusInfo[currentStatus].label}
+                </span>
+              </span>
+            </ContextMenuSubTrigger>
+
+            <ContextMenuSubContent
+              className="min-w-[120px] p-1"
+              onPointerDownOutside={(e) => {
+                if (preventCloseRef.current) {
+                  // 상태 변경 후 메뉴가 닫히지 않도록 처리
+                  e.preventDefault();
+                  preventCloseRef.current = false;
+                }
+              }}
+            >
+              {(Object.keys(statusInfo) as Array<CampaignStatus>).map((status) => (
+                <ContextMenuItem
+                  key={status}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleStartClick(status);
+                    preventCloseRef.current = true;
+                  }}
+                  className={cn(
+                    "flex items-center justify-between text-sm px-2 py-1.5",
+                    currentStatus === status ? "bg-gray-50" : "",
+                    updateCampaignStatusMutation.isPending ? "opacity-70" : ""
+                  )}
+                  disabled={updateCampaignStatusMutation.isPending}
+                >
+                  <div className="flex items-center">
+                    <div className="w-4 h-4 mr-2">
+                      <Image
+                        src={getStatusIcon(status) || ''}
+                        alt={status}
+                        width={16}
+                        height={16}
+                      />
+                    </div>
+                    <span>{statusInfo[status].label}</span>
+                  </div>
+
+                  {/* 현재 선택된 상태에만 체크 표시 */}
+                  {currentStatus === status && (
+                    <Check className="h-4 w-4 text-green-500" />
+                  )}
+                </ContextMenuItem>
+              ))}
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+
+          <ContextMenuItem
+            onClick={() => handleProgressInfoClick(item.id, item.label)}
+            className="flex items-center text-sm"
+          >
+            {/* <Settings className="mr-2 h-4 w-4 text-gray-500" /> */}
+            캠페인 진행정보
+          </ContextMenuItem>
+
+          <ContextMenuSeparator className="my-1" />
+
+          <ContextMenuItem
+            onClick={handleRebroadcastClick}
+            className="flex items-center text-sm"
+          >
+            {/* <RefreshCcw className="mr-2 h-4 w-4 text-gray-500" /> */}
+            재발신
+          </ContextMenuItem>
+
+          <ContextMenuSeparator className="my-1" />
+
+          <ContextMenuItem
+            onClick={onHandleCampaignCopy}
+            className="flex items-center text-sm"
+          >
+            {/* <Copy className="mr-2 h-4 w-4 text-gray-500" /> */}
+            캠페인 복사
+          </ContextMenuItem>
+
+          {!isFolder && (
+            <ContextMenuItem
+              onClick={() => onCampaignDelete(currentStatus, item.id, item.label)}
+              className="flex items-center text-sm text-red-500"
+            >
+              {/* <Trash2 className="mr-2 h-4 w-4" /> */}
+              캠페인 삭제
+            </ContextMenuItem>
+          )}
+
+          <ContextMenuSeparator className="my-1" />
+
+          {/* current status가 stopped 일 경우 캠페인 리스트 삭제 버튼 출력 */}
+          {currentStatus === 'stopped' && (
+            <ContextMenuItem
+              onClick={() => handleCampaignListDelete(item.id)}
+              className="flex items-center text-sm"
+            >
+              {/* <List className="mr-2 h-4 w-4 text-gray-500" /> */}
+              캠페인 리스트 삭제
+            </ContextMenuItem>
+          )}
+
+
+          <ContextMenuItem
+            onClick={() => handleMonitorClick(item.id, item.label)}
+            className="flex items-center text-sm"
+          >
+            {/* <Activity className="mr-2 h-4 w-4 text-gray-500" /> */}
+            상담원 상태 모니터
+          </ContextMenuItem>
+
+          <ContextMenuItem
+            onClick={handleBlacklistCountCheckClick}
+            className="flex items-center text-sm"
+          >
+            {/* <Shield className="mr-2 h-4 w-4 text-gray-500" /> */}
+            블랙리스트 건수 조회
+          </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
 
@@ -426,10 +494,9 @@ export function ContextMenuForTreeNode({
         type={alertState.type}
         isOpen={alertState.isOpen}
         onClose={() => {
-          alertState.onClose();
+          alertState.onClose()
         }}
-        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
-      />
+        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
     </>
   );
 }

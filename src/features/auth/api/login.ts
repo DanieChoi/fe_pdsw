@@ -2,6 +2,7 @@ import { LoginCredentials, LoginRequest, LoginResponse, LoginResponseFirst } fro
 import { axiosInstance, externalAxiosInstance } from '@/lib/axios';
 import useStore, { UserInfoData } from '@/features/auth/hooks/store';
 import Cookies from 'js-cookie';
+import axios from 'axios';
 
 export const loginApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
@@ -44,6 +45,23 @@ export const loginApi = {
       if (data.role_id === 1 || data.role_id === 2 || data.role_id === 3) {
         throw new Error('접근권한이 없습니다.');
       }
+
+      // IP 조회 API 호출 (외부)
+      const { data: dataSecond } = await axios.get<{ip:string}>(
+        `https://api.ipify.org?format=json`,
+      );
+      Cookies.set('userHost', String(dataSecond.ip), {
+        expires: 1, 
+        secure: false,
+        sameSite: 'Lax',
+        path: '/'
+      });
+      Cookies.set('id', String(dataFirst.id), {
+        expires: 1, 
+        secure: false,
+        sameSite: 'Lax',
+        path: '/'
+      });
 
       // 사용자 정보 객체 생성
       const userInfo: UserInfoData = {
