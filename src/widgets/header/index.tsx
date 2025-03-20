@@ -208,7 +208,7 @@ export default function Header() {
       // 필요한 credentials 정보
       session_key: _sessionKey,
       tenant_id: tenant_id,
-      roleId: role_id
+      roleId: menu_role_id
     },
     // enabled: shouldFetchCounselors,  // fetchMain 완료 후에만 실행
   });
@@ -268,12 +268,13 @@ export default function Header() {
         </div>
       </div>
       <header className="bg-white border-b">
+      {/* menu_role_id : {menu_role_id} */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between header-padding">
             <nav className="flex overflow-x-auto gap-3">
               {menuItems
                 // availableHeaderMenuIds에 있는 메뉴만 필터링
-                .filter(item => availableHeaderMenuIds?.includes(item.id))
+                .filter(item => availableHeaderMenuIds?.includes(item.menuId))
                 .map((item) => {
                   const count = getTabCountById(item.id);
                   const isActive = isActiveTab(item.id);
