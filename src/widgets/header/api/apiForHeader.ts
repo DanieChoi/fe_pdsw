@@ -1,10 +1,11 @@
 // src\widgets\header\api\apiForHeader.ts
 
-import { axiosInstance } from "@/lib/axios";
+import { axiosRedisInstance } from "@/lib/axios";
 import { 
   IRequestTypeForGetAuthorizedMenusInfoForMenuRoleId,
   IResponseTypeForGetAuthorizedMenusInfoForMenuRoleId 
 } from "./typeForMenusAuthorityInfo";
+import axios from "axios";
 
 /**
  * 사용자 권한에 따른 사용가능한 메뉴 리스트를 가져오는 API 함수
@@ -14,8 +15,8 @@ import {
 export async function apiForGetAuthorizedMenusInfoForMenuRoleId({
   roleId
 }: IRequestTypeForGetAuthorizedMenusInfoForMenuRoleId): Promise<IResponseTypeForGetAuthorizedMenusInfoForMenuRoleId> {
-  const response = await axiosInstance.get(
-    `/api/v1/auth/availableMenuList?roleId=${roleId}`
+  const response = await axios.get(
+    `http://localhost:4000/api/v1/auth/availableMenuList?roleId=${roleId}`
   );
   
   console.log("Available menu list response:", response.data);

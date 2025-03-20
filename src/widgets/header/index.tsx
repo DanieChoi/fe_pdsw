@@ -204,7 +204,7 @@ export default function Header() {
   // 훅 관리
   const { data: dataForMenusInfoForRoleId, menuList, isLoading: isLoadingMenuInfo } =
     useApiForGetAuthorizedMenusInfoForMenuRoleId({
-      roleId: role_id || 1, // menu_role_id가 없을 경우 기본값 1
+      roleId: menu_role_id || 1, // menu_role_id가 없을 경우 기본값 1
       enabled: !!menu_role_id // menu_role_id가 있을 때만 활성화
     });
 
