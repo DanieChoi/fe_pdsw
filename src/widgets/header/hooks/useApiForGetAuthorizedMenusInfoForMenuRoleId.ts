@@ -1,5 +1,3 @@
-// src\widgets\header\hooks\useApiForGetAuthorizedMenusInfoForMenuRoleId.ts
-
 import { useState, useEffect } from 'react';
 import { 
   apiForGetAuthorizedMenusInfoForMenuRoleId 
@@ -22,6 +20,8 @@ interface UseApiForGetAuthorizedMenusInfoForMenuRoleIdReturn {
   headerMenuIds: number[];
   campaignTenantContextMenuList: IMenuInfo[];
   campaignTenantContextMenuIds: number[];
+  campaignTabCampaignContextMenuList: IMenuInfo[];
+  campaignTabCampaignContextMenuIds: number[];
   isLoading: boolean;
   isError: boolean;
   error: unknown;
@@ -45,6 +45,8 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
   const [headerMenuIds, setHeaderMenuIds] = useState<number[]>([]);
   const [campaignTenantContextMenuList, setCampaignTenantContextMenuList] = useState<IMenuInfo[]>([]);
   const [campaignTenantContextMenuIds, setCampaignTenantContextMenuIds] = useState<number[]>([]);
+  const [campaignTabCampaignContextMenuList, setCampaignTabCampaignContextMenuList] = useState<IMenuInfo[]>([]);
+  const [campaignTabCampaignContextMenuIds, setCampaignTabCampaignContextMenuIds] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [error, setError] = useState<unknown>(null);
@@ -56,6 +58,8 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
     setAvailableHeaderMenuIds,
     setAvailableCampaignTenantContextMenus,
     setAvailableCampaignTenantContextMenuIds,
+    setAvailableCampaignTabCampaignContextMenus,
+    setAvailableCampaignTabCampaignContextMenuIds,
     setLoading: setStoreLoading, 
     setError: setStoreError 
   } = useAvailableMenuStore();
@@ -79,11 +83,17 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
       // 헤더 메뉴 ID 배열 생성
       const headerIds = headerMenus.map(menu => menu.menuId);
       
-      // SCC 코드를 가진 캠페인 테넌트 컨텍스트 메뉴 필터링
-      const campaignTenantContextMenus = allMenus.filter(menu => menu.locationDistinctionCode === 'SCC');
+      // CTC 코드를 가진 캠페인 테넌트 컨텍스트 메뉴 필터링
+      const campaignTenantContextMenus = allMenus.filter(menu => menu.locationDistinctionCode === 'CTC');
       
       // 캠페인 테넌트 컨텍스트 메뉴 ID 배열 생성
       const campaignTenantContextIds = campaignTenantContextMenus.map(menu => menu.menuId);
+      
+      // CCC 코드를 가진 캠페인 탭 캠페인 컨텍스트 메뉴 필터링
+      const campaignTabCampaignContextMenus = allMenus.filter(menu => menu.locationDistinctionCode === 'SCM');
+      
+      // 캠페인 탭 캠페인 컨텍스트 메뉴 ID 배열 생성
+      const campaignTabCampaignContextIds = campaignTabCampaignContextMenus.map(menu => menu.menuId);
       
       // 로컬 상태 업데이트
       setData(response);
@@ -92,12 +102,16 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
       setHeaderMenuIds(headerIds);
       setCampaignTenantContextMenuList(campaignTenantContextMenus);
       setCampaignTenantContextMenuIds(campaignTenantContextIds);
+      setCampaignTabCampaignContextMenuList(campaignTabCampaignContextMenus);
+      setCampaignTabCampaignContextMenuIds(campaignTabCampaignContextIds);
       
       console.log("메뉴 권한 정보가 로컬 상태에 저장되었습니다:", allMenus);
       console.log("헤더 메뉴 정보가 로컬 상태에 저장되었습니다:", headerMenus);
       console.log("헤더 메뉴 ID가 로컬 상태에 저장되었습니다:", headerIds);
       console.log("캠페인 테넌트 컨텍스트 메뉴가 로컬 상태에 저장되었습니다:", campaignTenantContextMenus);
       console.log("캠페인 테넌트 컨텍스트 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignTenantContextIds);
+      console.log("캠페인 탭 캠페인 컨텍스트 메뉴가 로컬 상태에 저장되었습니다:", campaignTabCampaignContextMenus);
+      console.log("캠페인 탭 캠페인 컨텍스트 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignTabCampaignContextIds);
 
       // Zustand 스토어 업데이트
       setAvailableMenus(allMenus);
@@ -105,6 +119,8 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
       setAvailableHeaderMenuIds(headerIds);
       setAvailableCampaignTenantContextMenus(campaignTenantContextMenus);
       setAvailableCampaignTenantContextMenuIds(campaignTenantContextIds);
+      setAvailableCampaignTabCampaignContextMenus(campaignTabCampaignContextMenus);
+      setAvailableCampaignTabCampaignContextMenuIds(campaignTabCampaignContextIds);
       
     } catch (err) {
       console.error('Error fetching authorized menus:', err);
@@ -137,6 +153,8 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
     headerMenuIds,
     campaignTenantContextMenuList,
     campaignTenantContextMenuIds,
+    campaignTabCampaignContextMenuList,
+    campaignTabCampaignContextMenuIds,
     isLoading,
     isError,
     error,
