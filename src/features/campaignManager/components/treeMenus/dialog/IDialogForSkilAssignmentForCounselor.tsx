@@ -17,7 +17,7 @@ import { useApiForGetRelatedInfoForAssignSkilToCounselor } from "@/features/pref
 import { useApiDeleteCounselorsFromSkills } from "@/features/campaignManager/hooks/useApiDeleteCounselorsFromSkills";
 import { useApiBatchSkillAssignment } from "@/features/campaignManager/hooks/useApiBatchSkillAssignment";
 import CustomAlert from "@/components/shared/layout/CustomAlert";
-
+import { CommonButton } from "@/components/shared/CommonButton";
 interface IDialogForSkilAssignmentForCounselorProps {
   isOpen: boolean;
   onClose: () => void;
@@ -193,7 +193,7 @@ export function IDialogForSkilAssignmentForCounselor({
     }
 
     return (
-      <div className="px-[20px] py-[15px]">
+      <div className="">
         <div className="text-sm text-[#333] mb-4">
           {isUnassignMode
             ? "할당된 스킬을 해제할 수 있습니다."
@@ -206,13 +206,13 @@ export function IDialogForSkilAssignmentForCounselor({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]">
+                <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>
                   선택
                 </TableHead>
-                <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]">
+                <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>
                   아이디
                 </TableHead>
-                <TableHead className="text-center bg-[#F8F8F8] text-[#333]">
+                <TableHead className="text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>
                   이름
                 </TableHead>
               </TableRow>
@@ -226,20 +226,20 @@ export function IDialogForSkilAssignmentForCounselor({
                   <TableRow
                     key={`${skill.tenant_id}-${skill.skill_id}`}
                     className={`custom-hover ${
-                      hasChanged ? "bg-blue-50" : ""
+                      hasChanged ? "bg-[#FFFAEE]" : ""
                     }`}
                   >
-                    <TableCell className="text-center text-[#444]">
+                    <TableCell className="text-center text-[#444]" style={{ height: '30px', padding: 0 }}>
                       <CustomCheckbox
                         checked={selectedSkills.includes(skill.skill_id)}
                         onCheckedChange={() => handleSkillToggle(skill.skill_id)}
                         disabled={isProcessing}
                       />
                     </TableCell>
-                    <TableCell className="text-center text-[#444]">
+                    <TableCell className="text-center text-[#444]" style={{ height: '30px', padding: 0 }}>
                       {skill.skill_id}
                     </TableCell>
-                    <TableCell className="text-center text-[#444]">
+                    <TableCell className="text-center text-[#444]" style={{ height: '30px', padding: 0 }}>
                       {skill.skill_name}
                       {hasChanged && (
                         <span className="ml-2 text-xs text-blue-500">
@@ -256,10 +256,9 @@ export function IDialogForSkilAssignmentForCounselor({
           </Table>
         </div>
 
-        <div className="mt-6 flex justify-center gap-2">
-          <Button
+        <div className="mt-6 flex justify-end gap-1.5">
+          <CommonButton
             onClick={handleConfirm}
-            className="px-6 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
             disabled={
               isProcessing ||
               (pendingChanges.added.length === 0 &&
@@ -267,15 +266,14 @@ export function IDialogForSkilAssignmentForCounselor({
             }
           >
             {isProcessing ? "처리 중..." : getConfirmButtonText()}
-          </Button>
-          <Button
+          </CommonButton>
+          <CommonButton
             variant="outline"
             onClick={handleCancel}
-            className="px-6 py-1.5 border border-gray-300 rounded text-sm"
             disabled={isProcessing}
           >
             취소
-          </Button>
+          </CommonButton>
         </div>
       </div>
     );
@@ -291,7 +289,6 @@ export function IDialogForSkilAssignmentForCounselor({
       }
       message={renderContent()}
       type="custom"
-      width="w-[70%] max-w-[1200px] min-w-[800px]"
       showButtons={false} // 내부 커스텀 버튼 사용
     />
   );
