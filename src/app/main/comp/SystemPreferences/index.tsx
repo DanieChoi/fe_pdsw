@@ -37,7 +37,7 @@ const errorMessage = {
     isOpen: false,
     message: '',
     title: '로그인',
-    type: '0',
+    type: '2',
 };
 
 const SystemPreferences = () => {

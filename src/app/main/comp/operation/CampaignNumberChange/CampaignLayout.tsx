@@ -80,7 +80,8 @@ function CampaignLayout() {
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
       setCallingNumbers(data.result_data);
-    },onError: (data) => {      
+    },
+    onError: (data) => {      
       if (data.message.split('||')[0] === '5') {
         setAlertState({
           ...errorMessage,
@@ -94,7 +95,7 @@ function CampaignLayout() {
           router.push('/login');
         }, 1000);
       }
-  }
+    }
   });
 
   //캠페인 발신번호 추가 api 호출
