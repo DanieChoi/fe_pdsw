@@ -538,6 +538,9 @@ const MonitorPage = () => {
   
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
+
+      alert("여기야 여기 여기서 fetchTenants 실행!");
+
       if( tenant_id === 0){
         setTenants(data.result_data);
       }else{

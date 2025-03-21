@@ -24,6 +24,9 @@ export default function Header() {
   const router = useRouter();
   const _tenantId = Number(Cookies.get('tenant_id'));
   const { id, tenant_id, session_key: _sessionKey, role_id, menu_role_id } = useAuthStore();
+  
+  // 로그인 상태 확인
+  const isLoggedIn = !!_sessionKey && _sessionKey.length > 0;
 
   const [alertState, setAlertState] = useState(errorMessage);
   const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
@@ -133,7 +136,6 @@ export default function Header() {
     router.push('/login');
   }
 
-  // tofix  로그인 안했을때 미리 실행되서 에러 발생
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
       console.log('Tenants API response:', data);
@@ -176,12 +178,18 @@ export default function Header() {
     }
   }, [tenants]);
 
+  // 로그인 상태 확인 후 API 호출
   useEffect(() => {
-    fetchTenants({
-      session_key: _sessionKey,
-      tenant_id: _tenantId,
-    });
-  }, [fetchTenants, _sessionKey, _tenantId]);
+    if (isLoggedIn) {
+      fetchTenants({
+        session_key: _sessionKey,
+        tenant_id: _tenantId,
+      });
+    } else {
+      // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
+      router.push('/login');
+    }
+  }, [fetchTenants, _sessionKey, _tenantId, isLoggedIn, router]);
 
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
@@ -198,7 +206,7 @@ export default function Header() {
   const { data: dataForMenusInfoForRoleId, menuList, headerMenuIds, isLoading: isLoadingMenuInfo } =
     useApiForGetAuthorizedMenusInfoForMenuRoleId({
       roleId: menu_role_id || 1, // menu_role_id가 없을 경우 기본값 1
-      enabled: !!menu_role_id // menu_role_id가 있을 때만 활성화
+      enabled: !!menu_role_id && isLoggedIn // menu_role_id가 있고 로그인된 경우에만 활성화
     });
 
   console.log("dataForMenusInfoForRoleId : ", dataForMenusInfoForRoleId);
@@ -210,7 +218,7 @@ export default function Header() {
       tenant_id: tenant_id,
       roleId: menu_role_id
     },
-    // enabled: shouldFetchCounselors,  // fetchMain 완료 후에만 실행
+    enabled: isLoggedIn && shouldFetchCounselors // 로그인된 경우와 fetchMain 완료 후에만 실행
   });
 
   // console.log('counselorListData at header :', counselorListData);
@@ -220,6 +228,11 @@ export default function Header() {
       setCounselers(counselorListData.result_data);
     }
   }, [counselorListData]);
+
+  // 로그인되지 않은 경우 렌더링하지 않음
+  if (!isLoggedIn) {
+    return null; // 또는 로딩 컴포넌트를 표시
+  }
 
   return (
     <div className="flex flex-col">
