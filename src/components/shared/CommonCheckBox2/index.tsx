@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useRef, useEffect } from 'react';
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { Check, Minus } from "lucide-react";
 
 interface Props {
     checked: boolean;
@@ -21,64 +23,37 @@ const CommonCheckBox2 = ({
     size = 'sm',
     indeterminate = false
 }: Props) => {
-    const checkboxRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        if (checkboxRef.current) {
-            checkboxRef.current.indeterminate = indeterminate;
-        }
-    }, [indeterminate]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const sizeClasses = size === 'sm' ? 'h-4 w-4' : 'h-4 w-4';
+    
+    // Radix UI의 checked 상태에 대한 변환
+    // indeterminate가 true면 'indeterminate' 상태로 설정
+    // 그렇지 않으면 checked 값에 따라 true/false로 설정
+    const checkboxState = indeterminate ? 'indeterminate' : checked;
+    
+    const handleChange = (value: boolean | 'indeterminate') => {
         if (!disabled && onChange) {
-            onChange(e.target.checked);
+            // 'indeterminate'인 경우 false로 변환하여 전달
+            onChange(value === true);
         }
     };
-
-    // 크기 클래스를 더 크게 설정
-    const sizeClasses = size === 'sm' ? 'h-5 w-5' : 'h-6 w-6';
     
     return (
         <div className={`relative inline-block ${className}`}>
-            <input
-                ref={checkboxRef}
-                type="checkbox"
-                checked={checked}
-                onChange={handleChange}
+            <CheckboxPrimitive.Root
+                checked={checkboxState}
+                onCheckedChange={handleChange}
                 disabled={disabled}
                 title={title}
-                className={`${sizeClasses} appearance-none rounded border-2 border-gray-300 checked:bg-[#4a90e2] checked:border-transparent focus:outline-none focus:ring-0 cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-            />
-            {checked && !indeterminate && (
-                <svg
-                    className={`absolute left-0 top-0 ${sizeClasses} text-white pointer-events-none`}
-                    fill="none"
-                    strokeWidth="2"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        d="M5 13l4 4L19 7"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                </svg>
-            )}
-            {indeterminate && (
-                <svg
-                    className={`absolute left-0 top-0 ${sizeClasses} text-white pointer-events-none`}
-                    fill="none"
-                    strokeWidth="2"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        d="M5 12h14"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                </svg>
-            )}
+                className={`${sizeClasses} flex items-center justify-center rounded-none border border-[#b6b6b6] bg-white text-[#333] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                <CheckboxPrimitive.Indicator>
+                    {indeterminate ? (
+                        <Minus className={`${sizeClasses} text-[#333]`} strokeWidth={2} />
+                    ) : (
+                        <Check className={`${sizeClasses} text-[#333]`} strokeWidth={2} />
+                    )}
+                </CheckboxPrimitive.Indicator>
+            </CheckboxPrimitive.Root>
         </div>
     );
 };

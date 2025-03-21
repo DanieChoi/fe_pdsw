@@ -279,7 +279,7 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col">
       {isLoading ? (
         <div className="flex items-center justify-center h-full text-sm">로딩 중...</div>
       ) : hasError ? (
@@ -291,11 +291,11 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
           검색 결과가 없습니다.
         </div>
       ) : (
-        <div className="flex-1 overflow-auto" style={{ paddingBottom: '20px' }}>
+        <div className="overflow-y-auto"  style={{ height: '340px' }}>
           <table className="w-full border-collapse table-fixed text-xs">
             <thead>
-              <tr className="bg-gray-50 border-b sticky top-0 z-10">
-                <th className="w-12 py-2 px-3 text-center">
+              <tr className="bg-[#F8F8F8] border-b sticky top-0 z-10">
+                <th className="w-12 px-2 text-center border-r align-bottom" style={{ height: '30px' }}>
                   <CommonCheckBox2
                     checked={allSelected}
                     indeterminate={hasPartialSelection}
@@ -303,9 +303,9 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
                     title="전체 선택"
                   />
                 </th>
-                <th className="text-left py-2 px-3 font-medium text-gray-700">스킬</th>
-                <th className="text-left py-2 px-3 font-medium text-gray-700 w-1/4">캠페인ID</th>
-                <th className="text-left py-2 px-3 font-medium text-gray-700 w-1/2">캠페인 이름</th>
+                <th className="text-left px-2 font-medium text-[#333] border-r" style={{ height: '30px' }}>스킬</th>
+                <th className="text-left px-2 font-medium text-[#333] w-1/4 border-r" style={{ height: '30px' }}>캠페인ID</th>
+                <th className="text-left px-2 font-medium text-[#333] w-1/2" style={{ height: '30px' }}>캠페인 이름</th>
               </tr>
             </thead>
             <tbody>
@@ -317,7 +317,7 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
                   <React.Fragment key={`skill-${skill.skillId}`}>
                     {/* 스킬 행 */}
                     <tr className={`border-b ${isExpanded ? "bg-[#edf7fd]" : "bg-[#f5faff]"}`}>
-                      <td className="py-2 px-3 align-middle text-center">
+                      <td className="px-2 align-bottom text-center" style={{ height: '30px' }}>
                         {/* 스킬 레벨 체크박스 */}
                         <CommonCheckBox2
                           checked={checked}
@@ -325,18 +325,18 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
                           onChange={() => toggleSkillCampaigns(skill.skillId, !checked)}
                         />
                       </td>
-                      <td className="py-2 px-3 align-middle cursor-pointer" onClick={() => toggleSkill(skill.skillId)}>
+                      <td className="px-2 align-middle cursor-pointer text-[#444]" onClick={() => toggleSkill(skill.skillId)} style={{ height: '30px' }}>
                         <div className="flex items-center">
                           {isExpanded ? (
-                            <ChevronDown size={16} className="mr-2 flex-shrink-0 text-gray-600" />
+                            <ChevronDown size={16} className="mr-2 flex-shrink-0 text-[#444]" />
                           ) : (
-                            <ChevronRight size={16} className="mr-2 flex-shrink-0 text-gray-600" />
+                            <ChevronRight size={16} className="mr-2 flex-shrink-0 text-[#444]" />
                           )}
                           <span className="font-medium">{getSkillName(skill.skillId)}</span>
                         </div>
                       </td>
-                      <td className="py-2 px-3 align-middle"></td>
-                      <td className="py-2 px-3 align-middle"></td>
+                      <td className="px-2 align-middle text-[#444]" style={{ height: '30px' }}></td>
+                      <td className="px-2 align-middle text-[#444]" style={{ height: '30px' }}></td>
                     </tr>
 
                     {/* 캠페인 목록 (확장 시 표시) */}
@@ -346,22 +346,22 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
                         return (
                           <tr
                             key={`campaign-${compositeId}`}
-                            className="border-b bg-white hover:bg-gray-100"
+                            className="border-b bg-white hover:bg-[#FFFAEE]"
                           >
-                            <td className="py-2 px-3 align-middle text-center">
+                            <td className="px-2 align-middle text-center" style={{ height: '30px' }}>
                               <CommonCheckBox2
                                 checked={selectedLeftCampaigns.includes(compositeId)}
                                 onChange={() => handleToggleCampaign(compositeId)}
                               />
                             </td>
-                            <td className="py-2 px-3 align-middle text-gray-600">
+                            <td className="px-2 align-middle text-gray-600" style={{ height: '30px' }}>
                               <div className="flex items-center">
                                 <div className="w-5 mr-2"></div> {/* 아이콘 공간만큼 여백 추가 */}
                                 <span className="pl-2">{getSkillName(skill.skillId)}</span> {/* 왼쪽 여백 추가 */}
                               </div>
                             </td>
-                            <td className="py-2 px-3 align-middle font-medium">{campaign.campaignId}</td>
-                            <td className="py-2 px-3 align-middle text-blue-700">
+                            <td className="px-2 align-middle font-medium" style={{ height: '30px' }}>{campaign.campaignId}</td>
+                            <td className="px-2 align-middle text-blue-700" style={{ height: '30px' }}>
                               {getCampaignName(campaign.campaignId)}
                             </td>
                           </tr>
@@ -371,9 +371,9 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
                 );
               })}
               {/* 마지막 행 이후 추가 여백을 위한 빈 행 */}
-              <tr>
+              {/* <tr>
                 <td colSpan={4} className="h-16"></td>
-              </tr>
+              </tr> */}
             </tbody>
           </table>
         </div>

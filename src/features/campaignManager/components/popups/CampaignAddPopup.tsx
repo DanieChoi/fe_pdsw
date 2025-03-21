@@ -14,7 +14,9 @@ import useApiForAddCampaignToSpecificCampaignGroup from '../../hooks/useApiForAd
 import useApiForRemoveCampaignFromCampaignGroup from '../../hooks/useApiForRemoveCampaignFromCampaignGroup';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useSideMenuCampaignGroupTabStore } from '@/store/storeForSideMenuCampaignGroupTab';
-
+import TitleWrap from "@/components/shared/TitleWrap";
+import { CommonButton } from "@/components/shared/CommonButton";
+import { CustomInput } from "@/components/shared/CustomInput";
 interface SkillWithCampaigns {
   skillId: number;
   campaigns: { campaignId: number; tenantId: number }[];
@@ -263,13 +265,13 @@ const CampaignAddPopup: React.FC<Props> = ({
   const createCampaignListTable = (campaignIds: number[]) => {
     const groupCampaignIds = new Set(groupCampaignsData.map(item => item.campaign_id));
     return (
-      <div className="max-h-40 overflow-auto">
-        <table className="w-full border-collapse text-xs">
+      <div className="max-h-40 overflow-auto border rounded border-[#ebebeb] mb-4">
+        <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 p-1">캠페인 ID</th>
-              <th className="border border-gray-300 p-1">캠페인 이름</th>
-              <th className="border border-gray-300 p-1">중복</th>
+            <tr className="bg-[#F8F8F8] border-b">
+              <th className="border-r border-[#ebebeb] px-2 font-normal text-[#333]" style={{ height: '30px' }}>캠페인 ID</th>
+              <th className="border-r border-[#ebebeb] px-2 font-normal text-[#333]" style={{ height: '30px' }}>캠페인 이름</th>
+              <th className="px-2 font-normal text-[#333]" style={{ height: '30px' }}>중복</th>
             </tr>
           </thead>
           <tbody>
@@ -280,9 +282,9 @@ const CampaignAddPopup: React.FC<Props> = ({
                   key={id}
                   className={isDuplicate ? 'bg-orange-100' : (index % 2 === 0 ? 'bg-white' : 'bg-gray-50')}
                 >
-                  <td className="border border-gray-300 p-1">{id}</td>
-                  <td className="border border-gray-300 p-1">{getCampaignName(id)}</td>
-                  <td className="border border-gray-300 p-1 text-center">
+                  <td className="px-2 text-center" style={{ height: '30px' }}>{id}</td>
+                  <td className="px-2 text-center" style={{ height: '30px' }}>{getCampaignName(id)}</td>
+                  <td className="px-2 text-center" style={{ height: '30px' }}>
                     {isDuplicate && (
                       <button onClick={() => handleRemoveFromPopup(id)} className="text-red-500">
                         x
@@ -303,19 +305,19 @@ const CampaignAddPopup: React.FC<Props> = ({
       campaignIds.includes(item.campaign_id)
     );
     return (
-      <div className="max-h-40 overflow-auto">
-        <table className="w-full border-collapse text-xs">
+      <div className="max-h-40 overflow-auto border rounded mb-4 border-[#ebebeb]">
+        <table className="w-full border-collapse text-sm ">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 p-1">캠페인 ID</th>
-              <th className="border border-gray-300 p-1">캠페인 이름</th>
+            <tr className="bg-[#F8F8F8] border-b">
+              <th className="border-r border-[#ebebeb] px-2 font-normal text-[#333]" style={{ height: '30px' }}>캠페인 ID</th>
+              <th className="px-2 font-normal text-[#333]" style={{ height: '30px' }}>캠페인 이름</th>
             </tr>
           </thead>
           <tbody>
             {selectedCampaigns.map((campaign, index) => (
               <tr key={campaign.campaign_id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                <td className="border border-gray-300 p-1">{campaign.campaign_id}</td>
-                <td className="border border-gray-300 p-1">{getCampaignName(campaign.campaign_id)}</td>
+                <td className="border-r border-[#ebebeb] px-2 text-center" style={{ height: '30px' }}>{campaign.campaign_id}</td>
+                <td className="px-2 text-center" style={{ height: '30px' }}>{getCampaignName(campaign.campaign_id)}</td>
               </tr>
             ))}
           </tbody>
@@ -501,28 +503,22 @@ const CampaignAddPopup: React.FC<Props> = ({
         isOpen={isOpen}
         onClose={() => onClose?.()}
         message={
-          <div className="flex flex-col overflow-hidden">
-            <div className="px-4 py-2 border-b">
-              <input
+          <div className="">
+
+              <CustomInput
                 type="text"
-                placeholder="검색..."
+                placeholder="검색"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full py-1 px-2 text-xs border border-gray-300 rounded"
               />
-            </div>
+
             <div
-              className="flex flex-col p-4 overflow-hidden"
-              style={{ height: 'calc(100vh - 200px)' }}
+              className=""
             >
-              <div className="px-2 py-1 mb-2 border-b flex justify-between items-center bg-slate-50">
-                <h3 className="text-xs font-medium">
-                  전체 캠페인 목록 (총 {totalCampaigns}건)
-                </h3>
-              </div>
-              <div className="flex flex-1 h-full">
-                <div className="flex-1 h-full">
-                  <div className="border rounded h-full overflow-hidden">
+              <div className="flex gap-[15px] mt-[20px]">
+                <div className="flex-1 ">
+                  <TitleWrap title="전체 캠페인 목록" totalCount={totalCampaigns} />
+                  <div className="border rounded  overflow-hidden">
                     <ITableForSkillListWithCampaign
                       filteredSkills={filteredSkills}
                       expandedSkills={expandedSkills}
@@ -554,7 +550,7 @@ const CampaignAddPopup: React.FC<Props> = ({
                     {processingCampaigns || isAddingCampaign ? (
                       <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <ChevronRight size={14} />
+                      <span>→</span>
                     )}
                   </button>
                   <button
@@ -572,12 +568,13 @@ const CampaignAddPopup: React.FC<Props> = ({
                     {removingCampaigns || isRemovingCampaign ? (
                       <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <ChevronLeft size={14} />
+                      <span>←</span>
                     )}
                   </button>
                 </div>
-                <div className="flex-1 h-full">
-                  <div className="border rounded h-full overflow-hidden">
+                <div className="flex-1">
+                <TitleWrap title="그룹 소속 캠페인목록" totalCount={groupCampaignsData.length} />
+                  <div className="border rounded overflow-hidden">
                     <GroupCampaignList
                       isLoading={isLoadingGroup}
                       groupCampaigns={groupCampaignsData}
@@ -587,19 +584,14 @@ const CampaignAddPopup: React.FC<Props> = ({
                 </div>
               </div>
             </div>
-            <div className="h-5"></div>
-            <div className="py-2 px-4 border-t bg-gray-50 flex justify-between items-center">
-              <div className="text-xs text-gray-600">
-                현재 그룹에 {groupCampaignsData.length}개의 캠페인이 있습니다
-              </div>
-              <div className="space-x-2">
-                <button
+            <div className="flex justify-end space-x-2 mt-6">
+
+                <CommonButton
                   onClick={onClose}
-                  className="px-3 py-1 text-xs bg-gray-100 border border-gray-300 rounded hover:bg-gray-200"
                 >
                   취소
-                </button>
-              </div>
+                </CommonButton>
+
             </div>
           </div>
         }

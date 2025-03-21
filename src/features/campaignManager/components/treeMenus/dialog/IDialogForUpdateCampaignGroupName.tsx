@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useApiForCampaignGroupNameUpdate } from "@/features/campaignManager/hooks/useApiForCampaignGroupNameUpdate";
 import { toast } from "react-toastify";
 import CustomAlert from "@/components/shared/layout/CustomAlert";
-
+import { CommonButton } from "@/components/shared/CommonButton";
 interface IDialogForUpdateCampaignGroupNameProps {
   isOpen: boolean;
   onClose: () => void;
@@ -91,18 +91,17 @@ const IDialogForUpdateCampaignGroupName: FC<IDialogForUpdateCampaignGroupNamePro
         {error && <p className="text-sm text-red-500">{error}</p>}
       </div>
       <div className="flex justify-end space-x-2 mt-6">
-        <Button
+        <CommonButton
           type="button"
           variant="outline"
           onClick={onClose}
           disabled={isPending}
-          className="w-20"
         >
           취소
-        </Button>
-        <Button type="submit" disabled={isPending} className="w-20">
+        </CommonButton>
+        <CommonButton type="submit" disabled={isPending} >
           {isPending ? "저장 중..." : "저장"}
-        </Button>
+        </CommonButton>
       </div>
     </form>
   );
@@ -115,7 +114,7 @@ const IDialogForUpdateCampaignGroupName: FC<IDialogForUpdateCampaignGroupNamePro
       onClose={onClose}
       onCancle={onClose}
       type="1"
-      width="w-[30%] max-w-[1200px] min-w-[500px]"
+      showButtons={false} // 내부 커스텀 버튼 사용
     />
   );
 };
