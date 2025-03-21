@@ -101,11 +101,9 @@ const SystemPreferences = () => {
 
     // Footer에서 발생하는 이벤트 수신을 위한 이벤트 리스너 추가
     useEffect(() => {
-        console.log("Setting up device status change listener");
         
         // 장비 상태 변경 이벤트 수신 함수
         const handleDeviceStatusChange = (event: any) => {
-            console.log("Received device status change event:", event.detail);
             
             const { device_id, device_status } = event.detail;
             
@@ -139,7 +137,6 @@ const SystemPreferences = () => {
     // 장비 목록 조회
     const { mutate: fetchDialingDeviceList } = useApiForDialingDevice({
         onSuccess: (data) => {
-            console.log("시스템 모니터링 데이터: ", data.result_data);
             setDialingDeviceList(data.result_data);
             
             // 현재 저장된 장비를 찾아서 선택 상태로 설정
@@ -290,12 +287,30 @@ const SystemPreferences = () => {
     const getDeviceUsage = (deviceId: number): string => {
         const deviceIdStr = deviceId.toString();
         
-        // 실시간 상태가 있으면 확인 - "run"일 때만 "사용", 그 외에는 항상 "미사용"
+        // 실시간 상태가 있으면 확인
         if (deviceIdStr in deviceStatuses) {
-            return deviceStatuses[deviceIdStr] === "run" ? "사용" : "미사용";
+            if (deviceStatuses[deviceIdStr] === "run") {
+                return "사용";
+            } else if (deviceStatuses[deviceIdStr] === "down") {
+                return "미사용";
+            } else {
+                return "알수없음"; // null 또는 기타 값
+            }
         }
         
-        // 실시간 상태가 없으면 기본값은 항상 "미사용"
+        // 실시간 상태가 없으면 API에서 받은 초기 상태 확인
+        const device = dialingDeviceList.find(d => d.device_id.toString() === deviceIdStr);
+        if (device) {
+            if (device.device_state === "run") {
+                return "사용";
+            } else if (device.device_state === "down") {
+                return "미사용";
+            } else {
+                return "알수없음"; // null 또는 기타 값
+            }
+        }
+        
+        // 그 외에는 미사용
         return "미사용";
     };
 

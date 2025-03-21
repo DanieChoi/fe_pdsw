@@ -23,6 +23,7 @@ export interface DialingDeviceListDataResponse {
     device_id: number;
     device_name: string;
     channel_count: number;
+    device_state: string;
 }
   
 // 다이얼링 장비 데이터 타입

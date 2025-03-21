@@ -219,14 +219,14 @@ export default function Footer({
 
   // SSE 구독
   useEffect(() => {
-    if ( role_id < 4 ) {
-      console.log("No tenant ID available, skipping SSE connection");
-      return;
-    }
-    let tenantData = tenant_id;
-    if( role_id !== 4){
-      tenantData = 0;
-    }
+    // if ( role_id < 4 ) {
+    //   console.log("No tenant ID available, skipping SSE connection");
+    //   return;
+    // }
+    // let tenantData = tenant_id;
+    // if( role_id !== 4){
+    //   tenantData = 0;
+    // }
     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
     const eventSource = new EventSource(
       `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`

@@ -383,7 +383,9 @@ const errorMessage = {
   isOpen: false,
   message: '',
   title: '로그인',
-  type: '0',
+  type: '1',
+  onClose: () => {},
+  onCancle: () => {},
 };
 
 export default function Header() {
@@ -508,9 +510,9 @@ export default function Header() {
           ...errorMessage,
           isOpen: true,
           message: '로그인 정보가 없습니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        router.push('/login');
       } else {
         if (tenant_id === 0) {
           setTenants(data.result_data);
@@ -526,12 +528,16 @@ export default function Header() {
           ...errorMessage,
           isOpen: true,
           message: '로그인 정보가 없습니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        router.push('/login');
       }
     }
   });
+  const goLogin = () => {
+    Cookies.remove('session_key');
+    router.push('/login');
+  }
 
   useEffect(() => {
     if (tenants.length > 0) {
@@ -609,13 +615,7 @@ export default function Header() {
                 height={14}
                 priority
               />
-              <span>{id}({role_id === 1 ? '상담사'
-                : role_id === 2 ? '파트매니저'
-                  : role_id === 3 ? '그룹매니저'
-                    : role_id === 4 ? '테넌트메니저'
-                      : role_id === 5 ? '시스템 메니저'
-                        : role_id === 6 ? '전체'
-                          : ''})</span>
+              <span>{id}</span>
             </div>
             <CommonButton
               variant="ghost"
@@ -687,8 +687,10 @@ export default function Header() {
         title={alertState.title}
         type={alertState.type}
         isOpen={alertState.isOpen}
-        onClose={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
-      />
+        onClose={() => {
+          alertState.onClose()
+        }}
+        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}/>
     </div>
   );
 }
