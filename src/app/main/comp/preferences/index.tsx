@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-custom";
 import { CommonRadio, CommonRadioItem } from "@/components/shared/CommonRadio";
 import { Label } from "@/components/ui/label";
@@ -7,8 +7,10 @@ import { CommonButton } from "@/components/shared/CommonButton";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import TitleWrap from "@/components/shared/TitleWrap";
+import { useEnvironmentStore } from '@/store/environmentStore';
 
-interface PreferencesData {
+// UI에서 사용하는 데이터 구조
+interface PreferencesUIData {
   refreshCycle: string;
   monitoringType: string;
   retryCount: string;
@@ -18,6 +20,23 @@ interface PreferencesData {
   startTime: string;
   endTime: string;
   messageType: string;
+  dayOfWeek: string[];
+  personalCampaignAlertOnly: boolean;
+  unusedWorkHoursCalc: boolean;
+}
+
+// API에 전송할 데이터 구조
+interface PreferencesData {
+  campaignListAlram: number;
+  statisticsUpdateCycle: number;
+  serverConnectionTime: number;
+  showChannelCampaignDayScop: number;
+  personalCampaignAlertOnly: number;
+  useAlramPopup: number;
+  unusedWorkHoursCalc: number;
+  sendingWorkStartHours: string;
+  sendingWorkEndHours: string;
+  dayOfWeekSetting: string;
 }
 
 interface PreferencesBoardProps {
@@ -25,6 +44,10 @@ interface PreferencesBoardProps {
 }
 
 export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
+  // 환경설정 스토어에서 데이터 가져오기
+  const { environmentData } = useEnvironmentStore();
+  
+  // 상태 초기화
   const [refreshCycle, setRefreshCycle] = useState("5");
   const [monitoringType, setMonitoringType] = useState("periodic");
   const [retryCount, setRetryCount] = useState("30");
@@ -34,7 +57,59 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   const [startTime, setStartTime] = useState("0000");
   const [endTime, setEndTime] = useState("1300");
   const [messageType, setMessageType] = useState("알림과 없음");
+  const [personalCampaignAlertOnly, setPersonalCampaignAlertOnly] = useState(false);
+  const [unusedWorkHoursCalc, setUnusedWorkHoursCalc] = useState(false);
+  const [dayOfWeek, setDayOfWeek] = useState<string[]>(['f', 'f', 'f', 'f', 'f', 'f', 'f']);
   const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+
+  // 환경설정 데이터가 로드되면 상태 업데이트
+  useEffect(() => {
+    if (environmentData) {
+      // 환경설정 데이터에서 값 설정
+      setRefreshCycle(environmentData.showChannelCampaignDayScop.toString());
+      setMonitoringType(environmentData.campaignListAlram === 0 ? "periodic" : "oneTime");
+      setRetryCount(environmentData.statisticsUpdateCycle.toString());
+      setTimeout(environmentData.serverConnectionTime.toString());
+      setPersonalCampaignAlertOnly(environmentData.personalCampaignAlertOnly === 1);
+      setMessageType(environmentData.useAlramPopup === 0 ? "알림과 없음" : "알림만");
+      setUnusedWorkHoursCalc(environmentData.unusedWorkHoursCalc === 1);
+      setStartTime(environmentData.sendingWorkStartHours);
+      setEndTime(environmentData.sendingWorkEndHours);
+      
+      // 요일 설정 파싱
+      if (environmentData.dayOfWeekSetting) {
+        setDayOfWeek(environmentData.dayOfWeekSetting.split(','));
+      }
+    }
+  }, [environmentData]);
+
+  // 요일 체크박스 변경 핸들러
+  const handleDayChange = (index: number, checked: boolean) => {
+    const newDays = [...dayOfWeek];
+    newDays[index] = checked ? 't' : 'f';
+    setDayOfWeek(newDays);
+  };
+
+  // 폼 제출 핸들러
+  const handleSubmit = () => {
+    if (onSubmit) {
+      // API 요청을 위한 데이터 형식으로 변환
+      const requestData: PreferencesData = {
+        campaignListAlram: monitoringType === "periodic" ? 0 : 1,
+        statisticsUpdateCycle: parseInt(retryCount),
+        serverConnectionTime: parseInt(timeout),
+        showChannelCampaignDayScop: parseInt(refreshCycle),
+        personalCampaignAlertOnly: personalCampaignAlertOnly ? 1 : 0,
+        useAlramPopup: messageType === "알림과 없음" ? 0 : 1,
+        unusedWorkHoursCalc: unusedWorkHoursCalc ? 1 : 0,
+        sendingWorkStartHours: startTime,
+        sendingWorkEndHours: endTime,
+        dayOfWeekSetting: dayOfWeek.join(',')
+      };
+
+      onSubmit(requestData);
+    }
+  };
 
   return (
     <div className="w-full limit-width">
@@ -135,7 +210,11 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             <div className="flex items-center gap-8">
                 <h2 className="text-sm">알림</h2>
                 <div className='flex items-center gap-1'>
-                  <CustomCheckbox id="notification-enable" />
+                  <CustomCheckbox 
+                    id="notification-enable" 
+                    checked={personalCampaignAlertOnly}
+                    onCheckedChange={(checked) => setPersonalCampaignAlertOnly(checked as boolean)}
+                  />
                   <Label htmlFor="notification-enable" className="text-sm">본인 캠페인만 업링크 알림</Label>
                 </div>
             </div>
@@ -157,7 +236,6 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                     <SelectItem value="알림만">알림</SelectItem>
                   </SelectContent>
                   </Select>
-                {/* <span className="text-sm">초(sec)</span> */}
               </div>
               </TableCell>
               <TableCell>
@@ -167,33 +245,16 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             </tbody>
         </Table>
         </div>
-        {/* <div>
-        <TitleWrap title="로그" />
-        <Table className='text-[#333]'>
-           <tbody>
-            <TableRow>
-              <TableHeader className="w-[12.5rem] !py-[6px]">
-                <Label className="w-32">프로그램 로그설정</Label>
-              </TableHeader>
-              <TableCell className="w-[17rem]">
-                <div className="flex items-center gap-2">
-                  <CustomCheckbox id="logging" />
-                  <Label htmlFor="logging">프로그램 로그와 동시 로그를 설정합니다.</Label>
-                </div>
-              </TableCell>
-              <TableCell>
-                <span className="text-sm">NEXUSCUBE-C 프로그램의 로그를 설정합니다.</span>
-              </TableCell>
-            </TableRow>
-            </tbody>
-        </Table>
-        </div> */}
         <div>
         <div className="flex justify-between items-center mb-2">
             <div className="flex items-center gap-8">
                 <h2 className="text-sm">캠페인 가능 업무시간</h2>
                 <div className='flex items-center gap-1'>
-                  <CustomCheckbox id="worktime-enable" />
+                  <CustomCheckbox 
+                    id="worktime-enable" 
+                    checked={unusedWorkHoursCalc}
+                    onCheckedChange={(checked) => setUnusedWorkHoursCalc(checked as boolean)}
+                  />
                   <Label htmlFor="worktime-enable" className="text-sm">업무시간 계산 미사용</Label>
                 </div>
             </div>
@@ -211,12 +272,14 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
                     className="w-16"
+                    disabled={unusedWorkHoursCalc}
                   />
                   <Label>종료시간</Label>
                     <CustomInput
                       value={endTime}
                       onChange={(e) => setEndTime(e.target.value)}
                       className="w-16"
+                      disabled={unusedWorkHoursCalc}
                     />
                 </div>
               </TableCell>
@@ -230,9 +293,14 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
               </TableHeader>
               <TableCell className="w-[17rem]" colSpan={2}>
                   <div className="flex gap-4">
-                    {weekdays.map((day) => (
+                    {weekdays.map((day, index) => (
                       <div key={day} className="flex items-center gap-1">
-                        <CustomCheckbox id={`day-${day}`} />
+                        <CustomCheckbox 
+                          id={`day-${day}`} 
+                          checked={dayOfWeek[index] === 't'}
+                          onCheckedChange={(checked) => handleDayChange(index, checked as boolean)}
+                          disabled={unusedWorkHoursCalc}
+                        />
                         <Label htmlFor={`day-${day}`}>{day}</Label>
                       </div>
                     ))}
@@ -243,7 +311,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
         </Table>
         </div>
         <div className="flex justify-end gap-2">
-          <CommonButton>저장</CommonButton>
+          <CommonButton onClick={handleSubmit}>저장</CommonButton>
           <CommonButton>취소</CommonButton>
         </div>
       </div>
