@@ -11,6 +11,8 @@ import { useApiForLogin } from '@/features/auth/hooks/useApiForLogin';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from '@/store/authStore';
+import { useEnvironmentStore } from '@/store/environmentStore';
+import { useApirForEnvironmentList } from '@/features/auth/hooks/useApiForEnvironment';
 
 interface LoginFormData {
   user_name: string;
@@ -35,18 +37,37 @@ export default function LoginPage() {
   });
 
   const { setAuth } = useAuthStore();
+  const { setEnvironment } = useEnvironmentStore(); // 새로운 환경설정 스토어 사용
+
+  const { mutate: environment } = useApirForEnvironmentList({
+    onSuccess: (data) => {
+      console.log('환경설정 데이터:', data);
+      
+      // 환경설정 데이터를 별도 스토어에 저장
+      setEnvironment(data);
+    },
+    onError: (error) => {
+      console.error('환경설정 데이터 로드 실패:', error);
+      setAlertState({
+        isOpen: true,
+        message: '환경설정 데이터를 불러오는데 실패했습니다.',
+        title: '환경설정',
+        type: '2',
+      });
+    }
+  });
 
   const { mutate: login } = useApiForLogin({
     onSuccess: (data) => {
       setIsPending(false);
 
-      console.log('data (로그인 응답2)', data);
+      console.log('data (로그인 응답)', data);
 
       setAuth(
         formData.user_name,              // id
-        data.tenant_id,  // tenant_id
-        data.session_key, // session_key
-        data.role_id,     // role_id 추가
+        data.tenant_id,                  // tenant_id
+        data.session_key,                // session_key
+        data.role_id,                    // role_id 추가
         data.menu_role_id
       );
 
@@ -56,6 +77,13 @@ export default function LoginPage() {
       } else {
         localStorage.removeItem('remembered_username');
       }
+      
+      // 환경설정 정보 요청
+      environment({
+        centerId: 1,                 // 하드코딩된 값
+        tenantId: data.tenant_id,    // 로그인 응답에서 받은 tenant_id
+        employeeId: formData.user_name  // 로그인 시 입력한 user_name
+      });
 
       router.push('/main');
     },
@@ -110,6 +138,7 @@ export default function LoginPage() {
         title: '로그인',
         type: '2',
       });
+      setIsPending(false);
     }else if( formData.password === ''){
       setAlertState({
         isOpen: true,
@@ -117,6 +146,7 @@ export default function LoginPage() {
         title: '로그인',
         type: '2',
       });
+      setIsPending(false);
     }else{
       login(formData);
     }
