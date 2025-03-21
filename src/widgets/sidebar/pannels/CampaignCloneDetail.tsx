@@ -482,7 +482,7 @@ export default function CampaignDetail() {
         campaign_level: 0,
         outbound_sequence: ''
       });
-      if (schedules.length > 0) {
+      if (schedules && schedules.length > 0) {
         const tempCampaignSchedule = schedules.filter((schedule) => schedule.campaign_id === selectedCampaign?.campaign_id);
         if (tempCampaignSchedule.length > 0) {
           setTempCampaignSchedule({
@@ -947,14 +947,16 @@ export default function CampaignDetail() {
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       }
     }
   });
+  const goLogin = () => {
+    Cookies.remove('session_key');
+    router.push('/login');
+  };
 
   //캠페인 스케줄 등록 api 호출
   const { mutate: fetchCampaignScheduleInsert } = useApiForCampaignScheduleInsert({
