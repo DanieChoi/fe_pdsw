@@ -77,12 +77,12 @@ const GroupCampaignList: React.FC<Props> = ({
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="overflow-y-auto"  style={{ height: '340px' }}>
       <div className="flex-1 overflow-auto" style={{ paddingBottom: '20px' }}>
         <table className="w-full border-collapse table-fixed text-xs">
           <thead>
             <tr className="bg-gray-50 border-b sticky top-0 z-10">
-              <th className="w-12 py-2 px-3 text-center">
+              <th className="w-12  px-2 text-center border-r align-bottom" style={{ height: '30px',  }}>
                 <CommonCheckBox2
                   checked={allSelected}
                   indeterminate={hasPartialSelection}
@@ -90,34 +90,34 @@ const GroupCampaignList: React.FC<Props> = ({
                   title="전체 선택"
                 />
               </th>
-              <th className="text-left py-2 px-3 font-medium text-gray-700">캠페인ID</th>
-              <th className="text-left py-2 px-3 font-medium text-gray-700">캠페인 이름</th>
-              <th className="text-left py-2 px-3 font-medium text-gray-700">스킬ID</th>
-              <th className="text-left py-2 px-3 font-medium text-gray-700">스킬명</th>
+              <th className="text-left px-2 font-medium text-[#333] border-r" style={{ height: '30px' }}>캠페인ID</th>
+              <th className="text-left px-2 font-medium text-[#333] border-r" style={{ height: '30px' }}>캠페인 이름</th>
+              <th className="text-left px-2 font-medium text-[#333] border-r" style={{ height: '30px' }}>스킬ID</th>
+              <th className="text-left px-2 font-medium text-[#333]" style={{ height: '30px' }}>스킬명</th>
             </tr>
           </thead>
           <tbody>
             {groupCampaigns.map((campaign) => (
               <tr 
                 key={`campaign-${campaign.campaign_id}`}
-                className="border-b bg-white hover:bg-gray-100"
+                className="border-b bg-white hover:bg-[#FFFAEE]"
               >
-                <td className="py-2 px-3 align-middle text-center">
+                <td className="px-2 align-middle text-center" style={{ height: '30px' }}>
                   <CommonCheckBox2
                     checked={selectedRows.includes(campaign.campaign_id)}
                     onChange={() => toggleRow(campaign.campaign_id)}
                   />
                 </td>
-                <td className="py-2 px-3 align-middle font-medium">{campaign.campaign_id}</td>
-                <td className="py-2 px-3 align-middle text-blue-700">{`캠페인 ${campaign.campaign_id}`}</td>
-                <td className="py-2 px-3 align-middle">14</td>
-                <td className="py-2 px-3 align-middle">스킬1</td>
+                <td className="px-2 align-middle font-medium" style={{ height: '30px' }}>{campaign.campaign_id}</td>
+                <td className="px-2 align-middle text-blue-700" style={{ height: '30px' }}>{`캠페인 ${campaign.campaign_id}`}</td>
+                <td className="px-2 align-middle" style={{ height: '30px' }}>14</td>
+                <td className="px-2 align-middle" style={{ height: '30px' }}>스킬1</td>
               </tr>
             ))}
             {/* 마지막 행 이후 추가 여백을 위한 빈 행 */}
-            <tr>
+            {/* <tr>
               <td colSpan={5} className="h-16"></td>
-            </tr>
+            </tr> */}
           </tbody>
         </table>
       </div>
