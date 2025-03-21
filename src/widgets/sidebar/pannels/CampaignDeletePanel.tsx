@@ -83,7 +83,7 @@ const CampaignManagerInfo: CampaignInfoUpdateRequest = {
     announcement_id: 1,
     campaign_level: 0,
     outbound_sequence: '',
-  }
+}
 
 export const CampaignInfo: MainDataResponse = {
     campaign_id: 0,
@@ -257,7 +257,7 @@ const CampaignDeletePanel = ({ campaignId, campaignName }: Props) => {
         });
 
         refetchTreeData();
-        
+
     };
 
     // 현재 탭이 포함된 행과 섹션 ID 찾기
@@ -314,7 +314,10 @@ const CampaignDeletePanel = ({ campaignId, campaignName }: Props) => {
                 <div className="p-4">
                     <div className="text-center mb-4">
                         <p className="mb-4">
-                            정말로 {campaignName || ''} 을(를) 삭제하시겠습니까?
+                            캠페인 아이디: {campaignId} <br />
+                            캠페인 이름: {campaignName || ''} <br />
+                            삭제된 캠페인은 복구가 불가능합니다. <br />
+                            캠페인을 삭제하시겠습니까?
                         </p>
                         <p className="text-sm text-gray-500">
                             이 작업은 되돌릴 수 없습니다.

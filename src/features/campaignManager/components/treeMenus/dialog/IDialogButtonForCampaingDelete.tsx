@@ -203,7 +203,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
           isOpen={isDialogOpen}
           onClose={closeDialog}
           title="캠페인 삭제"
-          description={`정말로 '${campaignName}' 캠페인을 삭제하시겠습니까?`}
+          description={`캠페인 아이디: ${campaignId}\n캠페인 이름: ${campaignName}\n삭제된 캠페인은 복구가 불가능합니다.\n캠페인을 삭제하시겠습니까?`.replace(/\n/g, '<br />')}
         >
           <div className="space-y-4">
             <p className="text-destructive font-medium text-sm">
