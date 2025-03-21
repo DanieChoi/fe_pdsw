@@ -31,9 +31,7 @@ export const loginApi = {
       };
 
       const { data } = await axiosInstance.post<LoginResponse>('/login', loginData);
-
       console.log("✅ API Response Data:", data); // 로그인 응답 데이터 확인
-
 
       if (data.result_code !== 0) {
         throw new Error(data.result_msg || '로그인 실패');

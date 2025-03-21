@@ -20,6 +20,7 @@ export default function MainLayout({
   const isOpen = useSidebarWidthStore((state) => state.isOpen);
   
   // 푸터 관련 상태
+  // const [footerHeight, setFooterHeight] = useState(108);
   const [footerHeight, setFooterHeight] = useState(111);
   const [isFooterOpen, setIsFooterOpen] = useState(true);
   const [isFooterResizing, setIsFooterResizing] = useState(false);
