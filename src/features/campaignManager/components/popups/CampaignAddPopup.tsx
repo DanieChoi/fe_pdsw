@@ -362,49 +362,53 @@ const CampaignAddPopup: React.FC<Props> = ({
     // 중복 캠페인 ID 필터링
     const filteredCampaignIds = campaignIdsForPopup.filter(id => !existingCampaignIds.has(id));
 
-    // 모든 캠페인이 이미 그룹에 존재하는 경우 알림 후 종료
-    if (filteredCampaignIds.length === 0) {
-      toast.info("추가할 모든 캠페인이 이미 그룹에 존재합니다.");
-      setShowAlert(false);
-      return;
-    }
+    // 모든 캠페인이 이미 그룹에 존재하는 경우에도 계속 진행하고 알림만 표시
+    const duplicateCount = campaignIdsForPopup.length - filteredCampaignIds.length;
 
     setProcessingCampaigns(true);
     try {
-      addCampaignToGroup({
-        group_id: groupId,
-        campaign_ids: filteredCampaignIds,
-        tenant_id: Number(tenant_id)
-      }, {
-        onSuccess: (data: { result_code: string | number }) => {
-          const duplicateCount = campaignIdsForPopup.length - filteredCampaignIds.length;
-
-          if (Number(data.result_code) === 0) {
-            if (duplicateCount > 0) {
-              toast.success(
-                `${filteredCampaignIds.length}개의 캠페인이 "${groupName}" 그룹에 추가되었습니다. ${duplicateCount}개는 이미 존재하는 항목입니다.`
-              );
+      // 새로 추가할 캠페인이 있는 경우에만 API 호출
+      if (filteredCampaignIds.length > 0) {
+        addCampaignToGroup({
+          group_id: groupId,
+          campaign_ids: filteredCampaignIds,
+          tenant_id: Number(tenant_id)
+        }, {
+          onSuccess: (data: { result_code: string | number }) => {
+            if (Number(data.result_code) === 0) {
+              if (duplicateCount > 0) {
+                toast.success(
+                  `${filteredCampaignIds.length}개의 캠페인이 "${groupName}" 그룹에 추가되었습니다. ${duplicateCount}개는 이미 존재하는 항목입니다.`
+                );
+              } else {
+                toast.success(`${filteredCampaignIds.length}개의 캠페인이 "${groupName}" 그룹에 추가되었습니다.`);
+              }
             } else {
-              toast.success(`${filteredCampaignIds.length}개의 캠페인이 "${groupName}" 그룹에 추가되었습니다.`);
+              toast.error('캠페인 추가에 실패했습니다.');
             }
-          } else {
-            toast.error('캠페인 추가에 실패했습니다.');
+
+            refetchTreeData();
+
+            setSelectedLeftCampaigns([]);
+            setCampaignIdsForPopup([]);
+            setProcessingCampaigns(false);
+            setShowAlert(false);
+          },
+          onError: (error) => {
+            console.error('캠페인 추가 중 오류 발생:', error);
+            toast.error('캠페인 추가 과정에서 오류가 발생했습니다.');
+            setProcessingCampaigns(false);
+            setShowAlert(false);
           }
-
-          refetchTreeData();
-
-          setSelectedLeftCampaigns([]);
-          setCampaignIdsForPopup([]);
-          setProcessingCampaigns(false);
-          setShowAlert(false);
-        },
-        onError: (error) => {
-          console.error('캠페인 추가 중 오류 발생:', error);
-          toast.error('캠페인 추가 과정에서 오류가 발생했습니다.');
-          setProcessingCampaigns(false);
-          setShowAlert(false);
-        }
-      });
+        });
+      } else {
+        // 모든 캠페인이 이미 존재하는 경우
+        toast.info("추가할 모든 캠페인이 이미 그룹에 존재합니다.");
+        setSelectedLeftCampaigns([]);
+        setCampaignIdsForPopup([]);
+        setProcessingCampaigns(false);
+        setShowAlert(false);
+      }
     } catch (error) {
       console.error('캠페인 추가 중 오류 발생:', error);
       toast.error('캠페인 추가 과정에서 오류가 발생했습니다.');
@@ -617,7 +621,7 @@ const CampaignAddPopup: React.FC<Props> = ({
           }
           type="custom"
           width="max-w-md"
-          confirmDisabled={!confirmRemove && !hasUniqueSelections}
+          confirmDisabled={false} // 항상 확인 버튼 활성화
         />
       )}
     </>
