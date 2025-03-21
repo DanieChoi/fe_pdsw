@@ -348,6 +348,7 @@ export default function Header() {
                 <SplitScreenDialog2 tabs={openedTabs}/>
 
               </div> */}
+              
             </div>
           </div>
         </div>

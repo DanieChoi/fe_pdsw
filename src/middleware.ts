@@ -18,9 +18,15 @@ export function middleware(request: NextRequest) {
   return NextResponse.next()
 }
 
+// export const config = {
+//   matcher: [
+//     '/((?!pds|_next/static|_next/image|favicon.ico|login).*)',
+//   ],
+// }
+
 export const config = {
   matcher: [
-    '/((?!pds|_next/static|_next/image|favicon.ico|login).*)',
+    '/((?!pds|_next/static|_next/image|favicon.ico|login|logo).*)',
   ],
 }
 
