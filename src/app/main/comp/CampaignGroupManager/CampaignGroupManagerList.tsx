@@ -127,7 +127,11 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
         });
       }
       setTempCampaigns(_tempCampaignGroupList as unknown as DataProps[]);
-      onGroupSelect(_tempCampaignGroupList[0].campaignGroupId.toString());
+      if( _tempCampaignGroupList.length > 0 ){
+        onGroupSelect(_tempCampaignGroupList[0].campaignGroupId.toString());
+      }else{
+        onGroupSelect('');
+      }
     }else{
       setTempCampaigns(campaignGroupList as unknown as DataProps[]);
     }

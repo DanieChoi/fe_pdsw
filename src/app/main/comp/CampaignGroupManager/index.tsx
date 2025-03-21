@@ -69,9 +69,16 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   };
 
   const handleGroupSelect = (id: string) => {
-    _setGroupId(parseInt(id));
-    setGroupInfo(_campaignGroupList.find((item) => item.campaignGroupId === parseInt(id)) || initData);
-    setCampaignId(campaignGroupCampaignListData.find((item) => item.group_id === parseInt(id))?.campaign_id || 0);
+    if( id != ''){
+      _setGroupId(parseInt(id));
+      setGroupInfo(_campaignGroupList.find((item) => item.campaignGroupId === parseInt(id)) || initData);
+      setCampaignId(campaignGroupCampaignListData.find((item) => item.group_id === parseInt(id))?.campaign_id || 0);
+    }else{
+      _setGroupId(-1);
+      setGroupInfo(initData);
+      setCampaignId(0);
+      setTempCampaignListData([]);
+    }
   };
 
   const handleCampaignSelect = (id: string) => {
