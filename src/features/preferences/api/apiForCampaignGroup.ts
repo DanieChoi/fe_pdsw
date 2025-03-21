@@ -114,15 +114,15 @@ export const apiForCampaignListForCampaignGroup = async (
         console.log("Campaign list for campaign group response:", data);
         
         // Check if data exists and has the expected structure
-        if (!data || typeof data !== 'object') {
-            console.error("Invalid API response format:", data);
-            return {
-                result_data: [],
-                result_code: 0,
-                result_msg: "Invalid response",
-                result_count: 0
-            };
-        }
+        // if (!data || typeof data !== 'object') {
+        //     console.error("Invalid API response format:", data);
+        //     return {
+        //         result_data: [],
+        //         result_code: 0,
+        //         result_msg: "Invalid response",
+        //         result_count: 0
+        //     };
+        // }
 
         // Return the data as-is if it has result_data, otherwise return empty array
         return {
