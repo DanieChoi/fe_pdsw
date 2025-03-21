@@ -40,12 +40,16 @@ export const loginApi = {
       }
 
       //SSE 실시간 이벤트 구독
-      const tenant_id = (data.role_id === 5 || data.role_id === 6) ? 0 : data.tenant_id;
+      // const tenant_id = (data.role_id === 5 || data.role_id === 6) ? 0 : data.tenant_id;
       console.log("data.menu_role_id at login !!!!!!!!!!!!!!!!!!!!! : ", data.menu_role_id);
 
 
       // 특정 role_id에 대한 접근 제한
-      if (data.role_id === 1 || data.role_id === 2 || data.role_id === 3 || data.menu_role_id === null || data.menu_role_id === undefined) {
+      if (
+        // data.role_id === 1 || data.role_id === 2 || data.role_id === 3 || 
+        data.menu_role_id === null || 
+        data.menu_role_id === undefined
+      ) {
         throw new Error('접근권한이 없습니다.');
       }
 
