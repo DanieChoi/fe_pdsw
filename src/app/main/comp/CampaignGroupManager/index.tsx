@@ -25,6 +25,8 @@ const errorMessage = {
   message: '',
   title: '로그인',
   type: '0',
+  onClose: () => { },
+  onCancle: () => { },
 };
 
 const _addGroupParam = {
@@ -200,14 +202,17 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       }
     }
   });
+
+  const goLogin = () => {
+    Cookies.remove('session_key');
+    router.push('/login');
+  };
 
   // 캠페인 그룹 소속 캠페인 데이터 로드 시 
   const { mutate: fetchCampaignGroupCampaignList } = useApiForCampaignGroupCampaignList({
@@ -225,11 +230,9 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       }
     }
   });
@@ -243,11 +246,9 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       }
     }
   });
@@ -351,8 +352,10 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
         title={alertState.title}
         type={alertState.type}
         isOpen={alertState.isOpen}
-        onClose={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
-      />
+        onClose={() => {
+          alertState.onClose()
+        }}
+        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
     </div>
   )
 }

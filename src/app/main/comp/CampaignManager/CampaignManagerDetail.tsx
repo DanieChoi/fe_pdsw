@@ -1050,11 +1050,9 @@ export default function CampaignDetail() {
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       }
     }
   });
@@ -1075,11 +1073,9 @@ export default function CampaignDetail() {
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       }
     }
   });
@@ -1313,8 +1309,8 @@ export default function CampaignDetail() {
           ...errorMessage,
           isOpen: true,
           message: CheckCampaignSaveReturnCode(data.reason_code),
+          type: '2',
           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
-          onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
         });
       }
     },onError: (data) => {      
@@ -1323,14 +1319,16 @@ export default function CampaignDetail() {
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       }
     }
   });
+  const goLogin = () => {
+    Cookies.remove('session_key');
+    router.push('/login');
+  }
 
   //캠페인 발신 속도 수정 api 호출
   const { mutate: fetchDialSpeedUpdate } = useApiForDialSpeedUpdate({
@@ -1390,11 +1388,9 @@ export default function CampaignDetail() {
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       }
     }
   });

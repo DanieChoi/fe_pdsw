@@ -172,11 +172,9 @@ const ListManager: React.FC = () => {
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       } else {
         const now = new Date();
         const hours = now.getHours().toString().padStart(2, '0');
@@ -191,6 +189,10 @@ const ListManager: React.FC = () => {
       } 
     }
   });
+  const goLogin = () => {
+    Cookies.remove('session_key');
+    router.push('/login');
+  }
   
   // 블랙리스트 추가 api 호출
   const { mutate: fetchBlacklistInsert } = useApiForBlacklistInsert({
@@ -223,11 +225,9 @@ const ListManager: React.FC = () => {
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       } else {
         const now = new Date();
         const hours = now.getHours().toString().padStart(2, '0');
@@ -274,11 +274,9 @@ const ListManager: React.FC = () => {
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       } else {
         const now = new Date();
         const hours = now.getHours().toString().padStart(2, '0');
