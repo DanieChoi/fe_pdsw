@@ -75,6 +75,7 @@ export const apiForGetTenantList = async (tenant_id?: number): Promise<TenantLis
     if (data.result_code === 0 && data.result_msg === "Success") {
       return data;
     } else {
+      console.log("여기서 세션 에러 발생 ??? : ", data)
       throw new Error(`API Error: ${data.result_msg}`);
     }
   } catch (error) {
