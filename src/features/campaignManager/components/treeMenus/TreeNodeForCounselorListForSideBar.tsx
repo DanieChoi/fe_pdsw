@@ -259,40 +259,48 @@ export function TreeNodeForCounselorListForSideBar({
   );
 
   const renderWithContextMenu = (content: React.ReactNode) => {
-    if (type === 'tenant') {
+    // 1) organization 노드도 tenant와 동일한 컨텍스트 메뉴를 쓰고 싶다면
+    if (type === 'organization' || type === 'tenant') {
       return (
         <IContextMenuForTennantForCounselorTreeMenu>
           {content}
         </IContextMenuForTennantForCounselorTreeMenu>
       );
     }
-
+  
+    // 2) group, team, counselor는 기존 로직 그대로
     if (['group', 'team', 'counselor'].includes(type)) {
       const counselors = getCounselorsForNode();
       
       const contextMenuItem = {
-        id: type === 'counselor' ? data.counselorId :
-          type === 'team' ? data.teamId :
-            data.groupId,
-        name: type === 'counselor' ? data.counselorname :
-          type === 'team' ? data.teamName :
-            data.groupName,
+        id:
+          type === 'counselor'
+            ? data.counselorId
+            : type === 'team'
+            ? data.teamId
+            : data.groupId,
+        name:
+          type === 'counselor'
+            ? data.counselorname
+            : type === 'team'
+            ? data.teamName
+            : data.groupName,
         tenantId: currentTenantId,
         type: type as 'counselor' | 'team' | 'group',
         members: counselors
       };
-
-      // console.log(`ContextMenu 생성: ${type} ${contextMenuItem.name}, tenantId:`, currentTenantId);
-
+  
       return (
         <IContextMenuForGroupAndTeamAndCounselor item={contextMenuItem}>
           {content}
         </IContextMenuForGroupAndTeamAndCounselor>
       );
     }
-
+  
+    // 그 외에는 컨텍스트 메뉴를 적용하지 않음
     return content;
   };
+  
 
   return (
     <div className="select-none">
