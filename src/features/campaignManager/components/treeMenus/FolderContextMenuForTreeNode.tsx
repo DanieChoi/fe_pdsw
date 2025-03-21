@@ -46,7 +46,7 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
     },
     {
       id: 22,
-      menuId: 15,
+      menuId: 16,
       title: "상담원 상태 모니터",
       handler: () => {
         addTab({
@@ -65,6 +65,11 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
   const filteredMenuItems = menuItems.filter((menuItem) => 
     availableCampaignTenantContextMenuIds.includes(menuItem.menuId)
   );
+
+  console.log("availableCampaignTenantContextMenuIds : ", availableCampaignTenantContextMenuIds);
+  
+  console.log("filteredMenuItems : ", filteredMenuItems);
+  
 
   return (
     <ContextMenuContent>

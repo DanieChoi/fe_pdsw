@@ -109,7 +109,7 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
       const headerIds = headerMenus.map(menu => menu.menuId);
       
       // CTC 코드를 가진 캠페인 테넌트 컨텍스트 메뉴 필터링
-      const campaignTenantContextMenus = allMenus.filter(menu => menu.locationDistinctionCode === 'CTC');
+      const campaignTenantContextMenus = allMenus.filter(menu => menu.locationDistinctionCode === 'SCC');
       
       // 캠페인 테넌트 컨텍스트 메뉴 ID 배열 생성
       const campaignTenantContextIds = campaignTenantContextMenus.map(menu => menu.menuId);
