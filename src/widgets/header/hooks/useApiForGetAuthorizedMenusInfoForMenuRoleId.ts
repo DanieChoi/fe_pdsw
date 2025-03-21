@@ -143,7 +143,7 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
       const campaignGroupTabCampaignGroupIds = campaignGroupTabCampaignGroupMenus.map(menu => menu.menuId);
       
       // SSS 코드를 가진 캠페인 그룹 탭 캠페인 메뉴 필터링
-      const campaignGroupTabCampaignMenus = allMenus.filter(menu => menu.locationDistinctionCode === 'SSS');
+      const campaignGroupTabCampaignMenus = allMenus.filter(menu => menu.locationDistinctionCode === 'SGC');
       
       // 캠페인 그룹 탭 캠페인 메뉴 ID 배열 생성
       const campaignGroupTabCampaignIds = campaignGroupTabCampaignMenus.map(menu => menu.menuId);
