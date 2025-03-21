@@ -36,7 +36,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   async (response) => {
     const url = response.config.url || '';
-    if( url !== '/log/save' ) {
+    if( url !== '/login' ) {
       let activation = '';
       let eventName = '';
       let queryType = 'R';
@@ -50,7 +50,7 @@ axiosInstance.interceptors.response.use(
       } else if( url === '/collections/skill-campaign' ) {
         activation = '스킬할당캠페인';
         eventName = 'skill-campaign';
-      } else if( url === '/collections/skill' ) {
+      } else if( url === '/collections/skill' || url === 'collections/skill' ) {
         activation = '스킬마스터목록조회';
         eventName = 'skills';
       } else if( url === '/collections/campaign-schedule' ) {
