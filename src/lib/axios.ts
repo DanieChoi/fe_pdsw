@@ -130,10 +130,10 @@ axiosRedisInstance.interceptors.response.use(
   async (response) => {
     const url = response.config.url || '';
     if( url !== '/log/save' ) {
-    let activation = '';
-    let eventName = '';
-    let queryType = 'R';
-    let description = '';
+      const activation = '';
+      const eventName = '';
+      const queryType = 'R';
+      const description = '';
     // if( url === '/collections/campaign' ) {
     //   activation = '캠페인마스터목록조회';
     //   eventName = 'campaigns';
