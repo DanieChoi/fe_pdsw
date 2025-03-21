@@ -81,6 +81,23 @@ axiosInstance.interceptors.response.use(
           eventName = 'dialing-device';
           queryType = 'D';
         }
+      } else if( url === '/collections/channel-group' ) {
+        activation = '채널그룹조회';
+        eventName = 'channel-group';
+      } else if( url === '/channel-group' ) {
+        if( response.config.method === 'post' ) {
+          activation = '채널그룹생성';
+          eventName = 'channel-group';
+          queryType = 'C';
+        }else if( response.config.method === 'put' ) {
+          activation = '채널그룹수정';
+          eventName = 'channel-group';
+          queryType = 'U';
+        }else if( response.config.method === 'delete' ) {
+          activation = '채널그룹삭제';
+          eventName = 'channel-group';
+          queryType = 'D';
+        }
         
       } else if( url === '/collections/campaign' ) {
         activation = '캠페인마스터목록조회';
@@ -104,13 +121,13 @@ axiosInstance.interceptors.response.use(
         eventName = 'updateStatus';
         queryType = 'U';
         description = '캠페인 상태를 "' + status + '"으로 변경';
-      } else if( url === '/collections/campaign-skill' ) {
+      } else if( url === '/collections/campaign-skill' || url === 'collections/campaign-skill' ) {
         activation = '캠페인요구스킬조회';
         eventName = 'skill';
-      } else if( url === 'collections/campaign-group' ) {
+      } else if( url === '/collections/campaign-group' || url === 'collections/campaign-group' ) {
         activation = '캠페인그룹정보조회';
         eventName = 'campaignGroups';
-      } else if( url === 'collections/campaign-group-list' ) {
+      } else if( url === '/collections/campaign-group-list' || url === 'collections/campaign-group-list' ) {
         activation = '캠페인그룹소속캠페인조회';
         eventName = 'campaignGroupCampaigns';
       } else if( url === '/collections/campaign-agent' ) {
@@ -202,9 +219,9 @@ axiosRedisInstance.interceptors.response.use(
         activation = '캠페인별 진행정보 가져오기';
         eventName = 'statistics';
         description = '캠페인 아이디 : ' + url.split('/')[5] + '번 진행정보 가져오기';
-      // } else if( url === '/collections/phone-description' ) {
-      //   activation = '전화번호설명템플릿조회';
-      //   eventName = 'phone-description';
+      } else if( url === '/monitor/tenant/campaign/dial' ) {
+        activation = '발신진행상태조회';
+        eventName = 'dial';
       // } else if( url === '/login' ) {
       //   activation = '로그인';
       //   eventName = 'login';

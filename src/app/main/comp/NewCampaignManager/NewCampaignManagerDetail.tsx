@@ -417,8 +417,8 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         ...errorMessage,
         isOpen: true,
         message: '테넌트를 선택해 주세요.',
-        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
-        onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }else{
       setSkillPopupState({...skillPopupState,
@@ -825,14 +825,16 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       }
     }
   });
+  const goLogin = () => {
+    Cookies.remove('session_key');
+    router.push('/login');
+  }
 
   //캠페인 스킬 조회 api 호출
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({

@@ -20,6 +20,8 @@ const errorMessage = {
   message: '',
   title: '로그인',
   type: '0',
+  onClose: () => { },
+  onCancle: () => { },
 };
 
 interface AddCampaignGroupDialogProps {
@@ -68,27 +70,33 @@ export function AddCampaignGroupDialog({
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       }else if (data.message.split('||')[0] === '501') {
         setAlertState({
           ...errorMessage,
           isOpen: true,
           message: '이미 존재하는 그룹입니다.',
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
         });
       }else{
         setAlertState({
           ...errorMessage,
           isOpen: true,
           message: data.message.split('||')[1],
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
         });
       }
     }
   });
 
+  const goLogin = () => {
+    Cookies.remove('session_key');
+    router.push('/login');
+  };
   // 캠페인 그룹 생성 API 호출 훅 사용
   // const { mutate, isPending } = useApiForCreateCampaignGroup({
   //   onSuccess: (data, variables, context) => {
@@ -115,6 +123,8 @@ export function AddCampaignGroupDialog({
         ...errorMessage,
         isOpen: true,
         message: '이미 존재하는 그룹입니다.',
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
       });
       return;
     }
@@ -218,8 +228,10 @@ export function AddCampaignGroupDialog({
         title={alertState.title}
         type={alertState.type}
         isOpen={alertState.isOpen}
-        onClose={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
-      />
+        onClose={() => {
+          alertState.onClose()
+        }}
+        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
     </CommonDialogForSideMenu>
   );
 }
