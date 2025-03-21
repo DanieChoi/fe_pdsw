@@ -188,27 +188,27 @@ axiosRedisInstance.interceptors.response.use(
     //   description = '캠페인 그룹 아이디 : "' + url.split('/')[1] + '"번 소속캠페인 삭제';
     //   queryType = 'D';
     // }
-      const logData = {
-          "tenantId": Number(getCookie('tenant_id')),
-          "employeeId": getCookie('id'),
-          "userHost": getCookie('userHost'),
-          "queryId": response.config.url,
-          "queryType": queryType,
-          "activation": activation,
-          "description": description,
-          "successFlag": 1,
-          "eventName": eventName,
-          "queryRows": typeof response.data.result_data === 'undefined' ? 1 : response.data.result_data.length,
-          "targetId": response.config.url,
-          "userSessionType": 0,
-          "exportFlag": 1,
-          "memo": "",
-          "updateEmployeeId": getCookie('id')
-      };
-      const { data } = await axiosRedisInstance.post<{code:string;message:string;}>(
-        `/log/save`,
-        logData 
-      );
+      // const logData = {
+      //     "tenantId": Number(getCookie('tenant_id')),
+      //     "employeeId": getCookie('id'),
+      //     "userHost": getCookie('userHost'),
+      //     "queryId": response.config.url,
+      //     "queryType": queryType,
+      //     "activation": activation,
+      //     "description": description,
+      //     "successFlag": 1,
+      //     "eventName": eventName,
+      //     "queryRows": typeof response.data.result_data === 'undefined' ? 1 : response.data.result_data.length,
+      //     "targetId": response.config.url,
+      //     "userSessionType": 0,
+      //     "exportFlag": 1,
+      //     "memo": "",
+      //     "updateEmployeeId": getCookie('id')
+      // };
+      // const { data } = await axiosRedisInstance.post<{code:string;message:string;}>(
+      //   `/log/save`,
+      //   logData 
+      // );
     }
     return response;
   },
