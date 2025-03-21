@@ -34,30 +34,33 @@ export const loginApi = {
 
       console.log("✅ API Response Data:", data); // 로그인 응답 데이터 확인
 
+
       if (data.result_code !== 0) {
         throw new Error(data.result_msg || '로그인 실패');
       }
 
       //SSE 실시간 이벤트 구독
       const tenant_id = (data.role_id === 5 || data.role_id === 6) ? 0 : data.tenant_id;
+      console.log("data.menu_role_id at login !!!!!!!!!!!!!!!!!!!!! : ", data.menu_role_id);
+
 
       // 특정 role_id에 대한 접근 제한
-      if (data.role_id === 1 || data.role_id === 2 || data.role_id === 3) {
+      if (data.role_id === 1 || data.role_id === 2 || data.role_id === 3 || data.menu_role_id === null || data.menu_role_id === undefined) {
         throw new Error('접근권한이 없습니다.');
       }
 
       // IP 조회 API 호출 (외부)
-      const { data: dataSecond } = await axios.get<{ip:string}>(
+      const { data: dataSecond } = await axios.get<{ ip: string }>(
         `https://api.ipify.org?format=json`,
       );
       Cookies.set('userHost', String(dataSecond.ip), {
-        expires: 1, 
+        expires: 1,
         secure: false,
         sameSite: 'Lax',
         path: '/'
       });
       Cookies.set('id', String(dataFirst.id), {
-        expires: 1, 
+        expires: 1,
         secure: false,
         sameSite: 'Lax',
         path: '/'
@@ -68,7 +71,7 @@ export const loginApi = {
         id: dataFirst.id,
         tenant_id: data.tenant_id,
         session_key: data.session_key,
-        role_id: data.role_id, 
+        role_id: data.role_id,
         menu_role_id: data.menu_role_id // `menu_role_id` 확인
       };
 
@@ -92,7 +95,7 @@ export const loginApi = {
       });
 
       Cookies.set('tenant_id', String(data.tenant_id), {
-        expires: 1, 
+        expires: 1,
         secure: false,
         sameSite: 'Lax',
         path: '/'
