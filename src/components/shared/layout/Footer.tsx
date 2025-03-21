@@ -197,14 +197,14 @@ export default function Footer({
       }
     }
     //캠페인수정>동작시간 추가
-    // else if( announce === '/pds/campaign/schedule' ){
-    //   _message = '캠페인 스케쥴'
-    //   if( command === 'INSERT' ){
-    //     _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'];
-    //   }else{
-    //     _message = '';
-    //   }
-    // }
+    else if( announce === '/pds/campaign/schedule' ){
+      _message = '캠페인 스케쥴'
+      if( command === 'INSERT' ){
+        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'];
+      }else{
+        _message = '';
+      }
+    }
     if( _message !== ''){
       setFooterDataList((prev) => [
         {

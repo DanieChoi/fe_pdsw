@@ -654,14 +654,16 @@ const RebroadcastSettingsPanel = () => {
               ...errorMessage,
               isOpen: true,
               message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+              type: '2',
+              onClose: () => goLogin(),
             });
-            Cookies.remove('session_key');
-            setTimeout(() => {
-              router.push('/login');
-            }, 1000);
           }
         }
     });
+    const goLogin = () => {
+      Cookies.remove('session_key');
+      router.push('/login');
+    }
     
     // 캠페인 재발신 정보 추가
     const { mutate: fetchCampaignAutoRedialInsert } = useApiForCampaignAutoRedialInsert({
@@ -706,11 +708,9 @@ const RebroadcastSettingsPanel = () => {
               ...errorMessage,
               isOpen: true,
               message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+              type: '2',
+              onClose: () => goLogin(),
             });
-            Cookies.remove('session_key');
-            setTimeout(() => {
-              router.push('/login');
-            }, 1000);
           }
         }
     });
@@ -731,11 +731,9 @@ const RebroadcastSettingsPanel = () => {
               ...errorMessage,
               isOpen: true,
               message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+              type: '2',
+              onClose: () => goLogin(),
             });
-            Cookies.remove('session_key');
-            setTimeout(() => {
-              router.push('/login');
-            }, 1000);
           }
         }
     });
@@ -823,11 +821,9 @@ const RebroadcastSettingsPanel = () => {
                 ...errorMessage,
                 isOpen: true,
                 message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                type: '2',
+                onClose: () => goLogin(),
               });
-              Cookies.remove('session_key');
-              setTimeout(() => {
-                router.push('/login');
-              }, 1000);
             }else{
                 if( caseType === 1 ){     
                     setAlertState({
@@ -872,14 +868,12 @@ const RebroadcastSettingsPanel = () => {
         },onError: (data) => {      
         if (data.message.split('||')[0] === '5') {
             setAlertState({
-            ...errorMessage,
-            isOpen: true,
-            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                ...errorMessage,
+                isOpen: true,
+                message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                type: '2',
+                onClose: () => goLogin(),
             });
-            Cookies.remove('session_key');
-            setTimeout(() => {
-            router.push('/login');
-            }, 1000);
         }
         }
     });

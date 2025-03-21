@@ -1049,14 +1049,17 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       }
     }
   });
+  
+  const goLogin = () => {
+    Cookies.remove('session_key');
+    router.push('/login');
+  };
 
   //캠페인 스킬 조회 api 호출
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({

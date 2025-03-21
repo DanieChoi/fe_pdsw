@@ -18,6 +18,8 @@ const errorMessage = {
   message: '',
   title: '로그인',
   type: '0',
+  onClose: () => { },
+  onCancle: () => { },
 };
 
 type Props = {
@@ -53,14 +55,16 @@ const CampaignManager = ({campaignId}: Props) => {
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
       }
     }
   });
+  const goLogin = () => {
+    Cookies.remove('session_key');
+    router.push('/login');
+  }
   // 스킬 조회
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
@@ -131,8 +135,10 @@ const CampaignManager = ({campaignId}: Props) => {
         title={alertState.title}
         type={alertState.type}
         isOpen={alertState.isOpen}
-        onClose={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
-      />
+        onClose={() => {
+          alertState.onClose()
+        }}
+        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
     </div>
   )
 }
