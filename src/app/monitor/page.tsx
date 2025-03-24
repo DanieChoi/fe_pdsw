@@ -538,9 +538,6 @@ const MonitorPage = () => {
   
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
-
-      alert("여기야 여기 여기서 fetchTenants 실행!");
-
       if( tenant_id === 0){
         setTenants(data.result_data);
       }else{
@@ -555,6 +552,10 @@ const MonitorPage = () => {
       setSkills(data.result_data);
     }
   });
+
+  const handleCampaignPopupClose = () => {
+    setIsCampaignManagerOpen(false);
+  };
 
   useEffect(() => {     
     if( selectedCampaign !== '' ){
@@ -726,8 +727,8 @@ const renderBottomRow = () => {
         <CustomAlert
           isOpen={isCampaignManagerOpen}
           title="캠페인 수정"
-          message={<CampaignManager campaignId={selectedCampaign} />}
-          type="1"
+          message={<CampaignManager campaignId={selectedCampaign} isOpen={isCampaignManagerOpen} onCampaignPopupClose={handleCampaignPopupClose}/>}
+          type="3"
           onClose={() => setIsCampaignManagerOpen(false)}
           onCancle={() => setIsCampaignManagerOpen(false)}
           width="max-w-[1300px]"

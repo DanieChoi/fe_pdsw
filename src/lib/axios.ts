@@ -98,7 +98,77 @@ axiosInstance.interceptors.response.use(
           eventName = 'channel-group';
           queryType = 'D';
         }
-        
+      } else if( url === '/collections/channel-assign' ) {
+        activation = '채널할당조회';
+        eventName = 'channel-assign';
+      } else if( url === '/channel-assign' ) {
+        if( response.config.method === 'put' ) {
+          activation = '채널할당수정';
+          eventName = 'channel-assign';
+          queryType = 'U';
+        }
+      } else if( url === '/collections/skill' || url === 'collections/skill' ) {
+        activation = '스킬마스터목록조회';
+        eventName = 'skills';
+      } else if( url.indexOf('/skills') > -1 && url.indexOf('/agent-list') == -1 ) {
+        if( response.config.method === 'post' ) {
+          activation = '스킬마스터생성';
+          eventName = 'skills';
+          queryType = 'C';
+        } else if( response.config.method === 'put' ) {
+          activation = '스킬마스터수정';
+          eventName = 'skills';
+          queryType = 'U';
+        } else if( response.config.method === 'delete' ) {
+          activation = '스킬마스터삭제';
+          eventName = 'skills';
+          queryType = 'D';
+        }
+      } else if( url === '/collections/skill-agent' ) {
+        activation = '스킬할당상담사';
+        eventName = 'skill-agent';
+      } else if( url.indexOf('/skills') > -1 && url.indexOf('/agent-list') > -1 ) {
+        if( response.config.method === 'post' ) {
+          activation = '스킬할당상담사생성';
+          eventName = 'skill-agent';
+          queryType = 'C';
+        } else if( response.config.method === 'delete' ) {
+          activation = '스킬할당상담사삭제';
+          eventName = 'skill-agent';
+          queryType = 'D';
+        }
+      } else if( url === '/collections/skill-campaign' ) {
+        activation = '스킬할당캠페인';
+        eventName = 'skill-campaign';
+      } else if( url === '/collections/agent-skill' ) {
+        activation = '상담사보유스킬';
+        eventName = 'agent-skill';
+      } else if( url === '/collections/campaign-skill' || url === 'collections/campaign-skill' ) {
+        activation = '캠페인요구스킬조회';
+        eventName = 'skill';
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/skill') > -1 ) {
+        if( response.config.method === 'put' ) {
+          activation = '캠페인요구스킬수정';
+          eventName = 'campaign-skill';
+          queryType = 'U';
+        }
+      } else if( url === '/collections/maxcall-init-time' ) {
+        activation = '분배제한초기화시각조회';
+        eventName = 'maxcall-init-time';
+      } else if( url === '/maxcall-init-time' ) {
+        activation = '분배제한초기화시각수정';
+        eventName = 'maxcall-init-time';
+        queryType = 'U';
+      } else if( url === '/collections/suspended-skill' ) {
+        activation = '일지중지캠페인조회';
+        eventName = 'suspended-skill';
+      } else if( url === '/suspended-skill' ) {
+        activation = '일지중지캠페인삭제';
+        eventName = 'suspended-skill';
+        queryType = 'D';
+      } else if( url === 'collections/campaign-list' ) {
+        activation = '캠페인리스트조회';
+        eventName = 'campaign-list';
       } else if( url === '/collections/campaign' ) {
         activation = '캠페인마스터목록조회';
         eventName = 'campaigns';
@@ -116,13 +186,57 @@ axiosInstance.interceptors.response.use(
           eventName = 'campaigns';
           queryType = 'D';
         }
+      } else if( url.indexOf('/status') > -1 ) {
+        const status = JSON.parse(response.config.data).request_data.campaign_status === 1 ? '시작': 
+          JSON.parse(response.config.data).request_data.campaign_status === 2 ?'멈춤':'중지';
+        activation = '캠페인상태변경';
+        eventName = 'updateStatus';
+        queryType = 'U';
+        description = '캠페인 상태를 "' + status + '"으로 변경';
+      } else if( url === '/collections/campaign-reserved-call' ) {
+        activation = '예약호마스터조회';
+        eventName = 'campaign-reserved-call';
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/reserved-call') > -1 ) {
+        if( response.config.method === 'post' ) {
+          activation = '예약호마스터생성';
+          eventName = 'campaign-reserved-call';
+          queryType = 'C';
+        } else if( response.config.method === 'put' ) {
+          activation = '예약호마스터수정';
+          eventName = 'campaign-reserved-call';
+          queryType = 'U';
+        } else if( response.config.method === 'delete' ) {
+          activation = '예약호마스터삭제';
+          eventName = 'campaign-reserved-call';
+          queryType = 'D';
+        }
+      } else if( url === '/collections/campaign-scheduled-redial' ) {
+        activation = '캠페인예약재발신정보조회';
+        eventName = 'campaign-scheduled-redial';
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/scheduled-redial') > -1 ) {
+        if( response.config.method === 'post' ) {
+          activation = '캠페인예약재발신정보생성';
+          eventName = 'campaign-scheduled-redial';
+          queryType = 'C';
+        } else if( response.config.method === 'put' ) {
+          activation = '캠페인예약재발신정보수정';
+          eventName = 'campaign-scheduled-redial';
+          queryType = 'U';
+        } else if( response.config.method === 'delete' ) {
+          activation = '캠페인예약재발신정보삭제';
+          eventName = 'campaign-scheduled-redial';
+          queryType = 'D';
+        }
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/current-redial') > -1 ) {
+        activation = '캠페인재발신추출수정';
+        eventName = 'campaign-current-redial';
+        queryType = 'U';
 
-      } else if( url === '/collections/skill-campaign' ) {
-        activation = '스킬할당캠페인';
-        eventName = 'skill-campaign';
-      } else if( url === '/collections/skill' || url === 'collections/skill' ) {
-        activation = '스킬마스터목록조회';
-        eventName = 'skills';
+
+
+
+
+
       } else if( url === '/collections/campaign-schedule' ) {
         activation = '캠페인스케줄정보조회';
         eventName = 'campaign-schedule';
@@ -144,16 +258,6 @@ axiosInstance.interceptors.response.use(
       } else if( url === '/collections/campaign-calling-number' ) {
         activation = '캠페인발신번호조회';
         eventName = 'campaign-calling-number';
-      } else if( url.indexOf('/status') > -1 ) {
-        const status = JSON.parse(response.config.data).request_data.campaign_status === 1 ? '시작': 
-          JSON.parse(response.config.data).request_data.campaign_status === 2 ?'멈춤':'중지';
-        activation = '캠페인상태변경';
-        eventName = 'updateStatus';
-        queryType = 'U';
-        description = '캠페인 상태를 "' + status + '"으로 변경';
-      } else if( url === '/collections/campaign-skill' || url === 'collections/campaign-skill' ) {
-        activation = '캠페인요구스킬조회';
-        eventName = 'skill';
       } else if( url === '/collections/campaign-group' || url === 'collections/campaign-group' ) {
         activation = '캠페인그룹정보조회';
         eventName = 'campaignGroups';
@@ -173,24 +277,6 @@ axiosInstance.interceptors.response.use(
         eventName = 'campaignGroupCampaign';
         description = '캠페인 그룹 아이디 : "' + url.split('/')[1] + '"번 소속캠페인 삭제';
         queryType = 'D';
-      } else if( url === '/collections/channel-assign' ) {
-        activation = '채널할당조회';
-        eventName = 'channel-assign';
-      } else if( url === '/collections/maxcall-init-time' ) {
-        activation = '분배제한초기화시각조회';
-        eventName = 'maxcall-init-time';
-      } else if( url === '/collections/campaign-reserved-call' ) {
-        activation = '예약호마스터조회';
-        eventName = 'campaign-reserved-call';
-      } else if( url === '/collections/agent-skill' ) {
-        activation = '상담사보유스킬';
-        eventName = 'agent-skill';
-      } else if( url === 'collections/campaign-list' ) {
-        activation = '캠페인리스트조회';
-        eventName = 'campaign-list';
-      } else if( url === '/collections/campaign-scheduled-redial' ) {
-        activation = '캠페인예약재발신정보조회';
-        eventName = 'campaign-scheduled-redial';
       }
       const logData = {
           "tenantId": Number(getCookie('tenant_id')),
@@ -280,7 +366,77 @@ axiosInstance.interceptors.response.use(
           eventName = 'channel-group';
           queryType = 'D';
         }
-        
+      } else if( url === '/collections/channel-assign' ) {
+        activation = '채널할당조회';
+        eventName = 'channel-assign';
+      } else if( url === '/channel-assign' ) {
+        if( error.config.method === 'put' ) {
+          activation = '채널할당수정';
+          eventName = 'channel-assign';
+          queryType = 'U';
+        }
+      } else if( url === '/collections/skill' || url === 'collections/skill' ) {
+        activation = '스킬마스터목록조회';
+        eventName = 'skills';
+      } else if( url.indexOf('/skills') > -1 && url.indexOf('/agent-list') == -1 ) {
+        if( error.config.method === 'post' ) {
+          activation = '스킬마스터생성';
+          eventName = 'skills';
+          queryType = 'C';
+        } else if( error.config.method === 'put' ) {
+          activation = '스킬마스터수정';
+          eventName = 'skills';
+          queryType = 'U';
+        } else if( error.config.method === 'delete' ) {
+          activation = '스킬마스터삭제';
+          eventName = 'skills';
+          queryType = 'D';
+        }
+      } else if( url === '/collections/skill-agent' ) {
+        activation = '스킬할당상담사';
+        eventName = 'skill-agent';
+      } else if( url.indexOf('/skills') > -1 && url.indexOf('/agent-list') > -1 ) {
+        if( error.config.method === 'post' ) {
+          activation = '스킬할당상담사생성';
+          eventName = 'skill-agent';
+          queryType = 'C';
+        } else if( error.config.method === 'delete' ) {
+          activation = '스킬할당상담사삭제';
+          eventName = 'skill-agent';
+          queryType = 'D';
+        }
+      } else if( url === '/collections/skill-campaign' ) {
+        activation = '스킬할당캠페인';
+        eventName = 'skill-campaign';
+      } else if( url === '/collections/agent-skill' ) {
+        activation = '상담사보유스킬';
+        eventName = 'agent-skill';
+      } else if( url === '/collections/campaign-skill' || url === 'collections/campaign-skill' ) {
+        activation = '캠페인요구스킬조회';
+        eventName = 'skill';
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/skill') > -1 ) {
+        if( error.config.method === 'put' ) {
+          activation = '캠페인요구스킬수정';
+          eventName = 'campaign-skill';
+          queryType = 'U';
+        }
+      } else if( url === '/collections/maxcall-init-time' ) {
+        activation = '분배제한초기화시각조회';
+        eventName = 'maxcall-init-time';
+      } else if( url === '/maxcall-init-time' ) {
+        activation = '분배제한초기화시각수정';
+        eventName = 'maxcall-init-time';
+        queryType = 'U';
+      } else if( url === '/collections/suspended-skill' ) {
+        activation = '일지중지캠페인조회';
+        eventName = 'suspended-skill';
+      } else if( url === '/suspended-skill' ) {
+        activation = '일지중지캠페인삭제';
+        eventName = 'suspended-skill';
+        queryType = 'D';
+      } else if( url === 'collections/campaign-list' ) {
+        activation = '캠페인리스트조회';
+        eventName = 'campaign-list';
       } else if( url === '/collections/campaign' ) {
         activation = '캠페인마스터목록조회';
         eventName = 'campaigns';
@@ -298,13 +454,57 @@ axiosInstance.interceptors.response.use(
           eventName = 'campaigns';
           queryType = 'D';
         }
+      } else if( url.indexOf('/status') > -1 ) {
+        const status = JSON.parse(error.config.data).request_data.campaign_status === 1 ? '시작': 
+          JSON.parse(error.config.data).request_data.campaign_status === 2 ?'멈춤':'중지';
+        activation = '캠페인상태변경';
+        eventName = 'updateStatus';
+        queryType = 'U';
+        // description = '캠페인 상태를 "' + status + '"으로 변경';
+      } else if( url === '/collections/campaign-reserved-call' ) {
+        activation = '예약호마스터조회';
+        eventName = 'campaign-reserved-call';
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/reserved-call') > -1 ) {
+        if( error.config.method === 'post' ) {
+          activation = '예약호마스터생성';
+          eventName = 'campaign-reserved-call';
+          queryType = 'C';
+        } else if( error.config.method === 'put' ) {
+          activation = '예약호마스터수정';
+          eventName = 'campaign-reserved-call';
+          queryType = 'U';
+        } else if( error.config.method === 'delete' ) {
+          activation = '예약호마스터삭제';
+          eventName = 'campaign-reserved-call';
+          queryType = 'D';
+        }
+      } else if( url === '/collections/campaign-scheduled-redial' ) {
+        activation = '캠페인예약재발신정보조회';
+        eventName = 'campaign-scheduled-redial';
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/scheduled-redial') > -1 ) {
+        if( error.config.method === 'post' ) {
+          activation = '캠페인예약재발신정보생성';
+          eventName = 'campaign-scheduled-redial';
+          queryType = 'C';
+        } else if( error.config.method === 'put' ) {
+          activation = '캠페인예약재발신정보수정';
+          eventName = 'campaign-scheduled-redial';
+          queryType = 'U';
+        } else if( error.config.method === 'delete' ) {
+          activation = '캠페인예약재발신정보삭제';
+          eventName = 'campaign-scheduled-redial';
+          queryType = 'D';
+        }
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/current-redial') > -1 ) {
+        activation = '캠페인재발신추출수정';
+        eventName = 'campaign-current-redial';
+        queryType = 'U';
 
-      } else if( url === '/collections/skill-campaign' ) {
-        activation = '스킬할당캠페인';
-        eventName = 'skill-campaign';
-      } else if( url === '/collections/skill' || url === 'collections/skill' ) {
-        activation = '스킬마스터목록조회';
-        eventName = 'skills';
+
+
+
+
+
       } else if( url === '/collections/campaign-schedule' ) {
         activation = '캠페인스케줄정보조회';
         eventName = 'campaign-schedule';
@@ -326,16 +526,6 @@ axiosInstance.interceptors.response.use(
       } else if( url === '/collections/campaign-calling-number' ) {
         activation = '캠페인발신번호조회';
         eventName = 'campaign-calling-number';
-      } else if( url.indexOf('/status') > -1 ) {
-        const status = JSON.parse(error.config.data).request_data.campaign_status === 1 ? '시작': 
-          JSON.parse(error.config.data).request_data.campaign_status === 2 ?'멈춤':'중지';
-        activation = '캠페인상태변경';
-        eventName = 'updateStatus';
-        queryType = 'U';
-        // description = '캠페인 상태를 "' + status + '"으로 변경';
-      } else if( url === '/collections/campaign-skill' || url === 'collections/campaign-skill' ) {
-        activation = '캠페인요구스킬조회';
-        eventName = 'skill';
       } else if( url === '/collections/campaign-group' || url === 'collections/campaign-group' ) {
         activation = '캠페인그룹정보조회';
         eventName = 'campaignGroups';
@@ -355,24 +545,6 @@ axiosInstance.interceptors.response.use(
         eventName = 'campaignGroupCampaign';
         // description = '캠페인 그룹 아이디 : "' + url.split('/')[1] + '"번 소속캠페인 삭제';
         queryType = 'D';
-      } else if( url === '/collections/channel-assign' ) {
-        activation = '채널할당조회';
-        eventName = 'channel-assign';
-      } else if( url === '/collections/maxcall-init-time' ) {
-        activation = '분배제한초기화시각조회';
-        eventName = 'maxcall-init-time';
-      } else if( url === '/collections/campaign-reserved-call' ) {
-        activation = '예약호마스터조회';
-        eventName = 'campaign-reserved-call';
-      } else if( url === '/collections/agent-skill' ) {
-        activation = '상담사보유스킬';
-        eventName = 'agent-skill';
-      } else if( url === 'collections/campaign-list' ) {
-        activation = '캠페인리스트조회';
-        eventName = 'campaign-list';
-      } else if( url === '/collections/campaign-scheduled-redial' ) {
-        activation = '캠페인예약재발신정보조회';
-        eventName = 'campaign-scheduled-redial';
       }
       const logData = {
           "tenantId": Number(getCookie('tenant_id')),
