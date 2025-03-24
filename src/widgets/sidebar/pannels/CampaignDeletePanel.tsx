@@ -320,7 +320,7 @@ const CampaignDeletePanel = ({ campaignId, campaignName }: Props) => {
                             캠페인 아이디: {campaignId} <br />
                             캠페인 이름: {campaignName || ''} <br />
                             삭제된 캠페인은 복구가 불가능합니다. <br />
-                            캠페인을 삭제하시겠습니까?
+                            캠페인을 삭제하시겠습니까???????
                         </p>
                         <p className="text-sm text-gray-500">
                             이 작업은 되돌릴 수 없습니다.

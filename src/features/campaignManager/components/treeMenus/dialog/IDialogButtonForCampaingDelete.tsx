@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
 import CommonButton from '@/components/shared/CommonButton';
-import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDialogForSideMenu";
+import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useApiForCampaignManagerDelete } from '@/features/campaignManager/hooks/useApiForCampaignManagerDelete';
 import { useApiForCampaignScheduleDelete } from '@/features/campaignManager/hooks/useApiForCampaignScheduleDelete';
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
-import { useCampainManagerStore } from '@/store';
+import { useAuthStore, useCampainManagerStore } from '@/store';
 import { fetchCallingNumberDelete } from '@/features/campaignManager/api/mainCallingNumberDelete';
 import { fetchReservedCallDelete } from '@/features/campaignManager/api/mainReservedCallDelete';
 import { useSideMenuCampaignGroupTabStore } from '@/store/storeForSideMenuCampaignGroupTab';
@@ -22,17 +21,9 @@ interface Props {
   className?: string;
   buttonText?: string;
   isDisabled?: boolean;
-  tenant_id?: number;
-  // 외부 제어용 isOpen과 변경 콜백 추가
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
-
-const campaignInfoDelete = {
-  campaign_id: 0,
-  tenant_id: 0,
-  delete_dial_list: 1
-};
 
 const IDialogButtonForCampaingDelete: React.FC<Props> = ({
   campaignId,
@@ -42,7 +33,6 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
   className = '',
   buttonText = '삭제',
   isDisabled = false,
-  tenant_id = 0,
   isOpen: externalIsOpen,
   onOpenChange,
 }) => {
@@ -50,6 +40,8 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const isDialogOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
   const [isDeleting, setIsDeleting] = useState(false);
+  const { tenant_id } = useAuthStore();
+
 
   // 스토어 및 API 훅들
   const { refetchTreeData } = useSideMenuCampaignGroupTabStore();
@@ -154,6 +146,8 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
       tenant_id: tenant_id,
       delete_dial_list: 1
     });
+
+    refetchTreeData();
   };
 
   const openDialog = () => {
@@ -184,9 +178,10 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
     };
   }, []);
 
+  const alertMessage = `캠페인 아이디: ${campaignId}\n캠페인 이름: ${campaignName}\n삭제된 캠페인은 복구가 불가능합니다.\n캠페인을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`;
+
   return (
     <>
-      {/* 삭제 버튼 */}
       <CommonButton
         variant={variant}
         size={size}
@@ -197,40 +192,16 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
         {buttonText}
       </CommonButton>
 
-      {/* 삭제 확인 다이얼로그 */}
       {isDialogOpen && (
-        <CommonDialogForSideMenu
+        <CustomAlert
           isOpen={isDialogOpen}
-          onClose={closeDialog}
           title="캠페인 삭제"
-          description={`캠페인 아이디: ${campaignId}\n캠페인 이름: ${campaignName}\n삭제된 캠페인은 복구가 불가능합니다.\n캠페인을 삭제하시겠습니까?`.replace(/\n/g, '<br />')}
-        >
-          <div className="space-y-4">
-            <p className="text-destructive font-medium text-sm">
-              이 작업은 되돌릴 수 없습니다.
-            </p>
-            <div className="flex justify-end space-x-2 mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={closeDialog}
-                disabled={isDeleting}
-                className="w-20 text-xs"
-              >
-                취소
-              </Button>
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="w-20 text-xs"
-              >
-                {isDeleting ? "삭제 중..." : "삭제"}
-              </Button>
-            </div>
-          </div>
-        </CommonDialogForSideMenu>
+          message={alertMessage}
+          onClose={handleDelete}
+          onCancle={closeDialog}
+          type="1"
+          confirmDisabled={isDeleting}
+        />
       )}
     </>
   );
