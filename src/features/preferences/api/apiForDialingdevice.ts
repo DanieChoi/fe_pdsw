@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/lib/axios";
-import { DialingDeviceCreateRequest, SuccesResponse, TenantIdCredentials, DialingDeviceListResponse } from "../types/SystemPreferences";
+import { DialingDeviceCreateRequest, SuccesResponse, TenantIdCredentials, DialingDeviceListResponse, DialingDeviceDeleteRequest } from "../types/SystemPreferences";
 
 // 시스템 설정 장비 리스트 요청
 export const fetchDialingDeviceList = async (credentials: TenantIdCredentials): Promise<DialingDeviceListResponse> => {
@@ -78,6 +78,29 @@ export const updateDialingDevice = async (credentials: DialingDeviceCreateReques
         const { data } = await axiosInstance.put<SuccesResponse>(
             '/dialing-device',
             requestData
+        );
+        return data;
+    } catch (error: any) {
+        if (error.response?.status === 401) {
+          throw new Error('세션이 만료되었습니다. 다시 로그인해주세요.');
+        }
+        throw new Error(error.response?.data?.result_code + '||' + error.response?.data?.result_msg || '데이터 가져오기 실패');
+    }
+};
+
+// 삭제 API (DELETE)
+export const deleteDialingDevice = async (credentials: DialingDeviceDeleteRequest): Promise<SuccesResponse> => {
+    const requestData = {
+        request_data: {
+            tenant_id: credentials.tenant_id,
+            device_id: credentials.device_id
+        }
+    };
+    
+    try {
+        const { data } = await axiosInstance.delete<SuccesResponse>(
+            '/dialing-device',
+            { data: requestData }
         );
         return data;
     } catch (error: any) {

@@ -8,7 +8,7 @@ import { useMainStore } from '@/store';
 import { ChannelListDataResponse, DialingDeviceListDataResponse } from '@/features/preferences/types/SystemPreferences';
 import { useApiForChannelList } from '@/features/preferences/hooks/useApiForChannelList';
 import { useApiForChannelEdit } from '@/features/preferences/hooks/useApiForChannelEdit';
-import { useApiForDialingDevice, useApiForDialingDeviceCreate, useApiForDialingDeviceUpdate } from '@/features/preferences/hooks/useApiForDialingDevice';
+import { useApiForDialingDevice, useApiForDialingDeviceCreate, useApiForDialingDeviceDelete, useApiForDialingDeviceUpdate } from '@/features/preferences/hooks/useApiForDialingDevice';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
@@ -75,7 +75,7 @@ const SystemPreferences = () => {
             isOpen: true,
             message,
             title: '알림',
-            type: '1',
+            type: '2',
             onConfirm: closeAlert,
             onCancel: () => {}
         });
@@ -86,7 +86,7 @@ const SystemPreferences = () => {
             isOpen: true,
             message,
             title: '확인',
-            type: '2',
+            type: '1',
             onConfirm: () => {
                 onConfirm();
                 closeAlert();
@@ -221,7 +221,7 @@ const SystemPreferences = () => {
         }
     });
     
-    // 신규 등록 API
+    // 장비 신규 등록 API
     const { mutate: createDevice } = useApiForDialingDeviceCreate({
         onSuccess: (data) => {
             fetchChannelList();
@@ -247,7 +247,7 @@ const SystemPreferences = () => {
         }
     });
 
-    // 수정 API
+    // 장비 수정 API
     const { mutate: updateDevice } = useApiForDialingDeviceUpdate({
         onSuccess: (data) => {
             fetchChannelList();
@@ -274,6 +274,33 @@ const SystemPreferences = () => {
         }
     });
 
+    // 장비 삭제 API
+    const { mutate: deleteDevice } = useApiForDialingDeviceDelete({
+        onSuccess: (data) => {
+            fetchChannelList();
+            fetchDialingDeviceList({
+                tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+            });
+        },
+        onError: (error) => {
+            if (error.message.split('||')[0] === '5') {
+                setAlertState({
+                  ...errorMessage,
+                  isOpen: true,
+                  message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                  onConfirm: closeAlert,
+                  onCancel: () => {}
+                });
+                Cookies.remove('session_key');
+                setTimeout(() => {
+                  router.push('/login');
+                }, 1000);
+            } else {
+                showAlert('장비 정보 삭제 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+    });
+
     useEffect(() => {
         const _tenantId = tenants.map((tenant) => tenant.tenant_id);
         fetchDialingDeviceList({
@@ -294,7 +321,7 @@ const SystemPreferences = () => {
             } else if (deviceStatuses[deviceIdStr] === "down") {
                 return "미사용";
             } else {
-                return "알수없음"; // null 또는 기타 값
+                return "미사용"; // null 또는 기타 값
             }
         }
         
@@ -306,7 +333,7 @@ const SystemPreferences = () => {
             } else if (device.device_state === "down") {
                 return "미사용";
             } else {
-                return "알수없음"; // null 또는 기타 값
+                return "미사용"; // null 또는 기타 값
             }
         }
         
@@ -443,14 +470,14 @@ const SystemPreferences = () => {
 
         const handleApiResponse = (response: any) => {
             if (response.result_code === -1) {
-                showConfirm('[LICENSE FULL] CIOD 접속 라이선스를 초과하였습니다.\n라이선스 문의 후 다시 시도하여 주십시오.', () => {});
+                showAlert('[LICENSE FULL] CIOD 접속 라이선스를 초과하였습니다.\n라이선스 문의 후 다시 시도하여 주십시오.');
                 return;
             }
             
             if (selectedDevice) {
-                showConfirm('장비 정보가 성공적으로 수정되었습니다.', () => {});
+                showAlert('장비 정보가 성공적으로 수정되었습니다.');
             } else {
-                showConfirm('새로운 장비 정보가 성공적으로 저장되었습니다.', () => {});
+                showAlert('새로운 장비 정보가 성공적으로 저장되었습니다.');
             }
         };
 
@@ -464,6 +491,40 @@ const SystemPreferences = () => {
             });
         }
     };
+
+    // 장비 삭제 핸들러
+    const handleDeleteEquipment = () => {
+        // 선택된 장비가 없을 경우 경고 알림
+        if (!selectedDevice) {
+            showAlert('삭제할 장비를 먼저 선택해주세요.');
+            return;
+        }
+
+        // 삭제 확인 알림
+        showConfirm(
+            `장비 [${selectedDevice.device_name}]를 삭제하시겠습니까? \n\n ※주의: 삭제시 데이터베이스에서 완전 삭제됩니다. \n 다시 한번 확인해 주시고 삭제해 주세요.`, 
+            () => {
+                // 확인 버튼 클릭 시 실행될 함수
+                deleteDevice({
+                    tenant_id: tenants[0].tenant_id,
+                    device_id: parseInt(selectedDevice.device_id || "0")
+                }, {
+                    onSuccess: (data) => {
+                        showAlert('장비 삭제 요청이 성공적으로 처리되었습니다.');
+                        setSelectedDevice(null);
+                        setEquipmentNumber("");
+                        setEquipmentName("");
+                        setRefreshCycle("");
+                        setFilteredChannels([]);
+                        setSelectedChannel(null);
+                        setAllocationMode("");
+                        setAllocationOutboundMode("");
+                        setIsEditable(false);
+                    }
+                });
+            }
+        );
+    }
 
     const handleChannelEdit = () => {
         if (!selectedDevice) return;
@@ -496,7 +557,7 @@ const SystemPreferences = () => {
         };
     
         fetchChannelEdit(channelEditRequest);
-        showConfirm('채널 정보가 성공적으로 수정되었습니다.', () => {});
+        showAlert('채널 정보가 성공적으로 수정되었습니다.');
     };
 
     const getAllocationOutboundModeOptions = () => {
@@ -638,6 +699,9 @@ const SystemPreferences = () => {
                                 { 
                                     label: "저장", 
                                     onClick: handleSaveEquipment
+                                },{ 
+                                    label: "삭제", 
+                                    onClick: handleDeleteEquipment
                                 },
                             ]}
                         />

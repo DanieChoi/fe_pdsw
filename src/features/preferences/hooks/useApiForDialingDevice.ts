@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { DialingDeviceCreateRequest, SuccesResponse, TenantIdCredentials, DialingDeviceListResponse } from "../types/SystemPreferences";
+import { DialingDeviceCreateRequest, SuccesResponse, TenantIdCredentials, DialingDeviceListResponse, DialingDeviceDeleteRequest } from "../types/SystemPreferences";
 import { ApiError } from "next/dist/server/api-utils";
-import { createDialingDevice, fetchDialingDeviceList, updateDialingDevice } from "../api/apiForDialingdevice";
+import { createDialingDevice, deleteDialingDevice, fetchDialingDeviceList, updateDialingDevice } from "../api/apiForDialingdevice";
 
 // 장비 리스트 요청을 위한 hook
 export function useApiForDialingDevice(
@@ -48,6 +48,22 @@ export function useApiForDialingDeviceUpdate(
             options?.onSuccess?.(data, variables, context);
         },
         onError: (error: ApiError, variables: DialingDeviceCreateRequest, context: unknown) => {
+            options?.onError?.(error, variables, context);
+        }
+    });
+}
+
+// 삭제를를 위한 hook
+export function useApiForDialingDeviceDelete(
+    options?: UseMutationOptions<SuccesResponse, ApiError, DialingDeviceDeleteRequest>
+) {
+    return useMutation({
+        mutationKey: ['dialingDeviceDelete'],
+        mutationFn: deleteDialingDevice,
+        onSuccess: (data, variables, context) => {
+            options?.onSuccess?.(data, variables, context);
+        },
+        onError: (error: ApiError, variables: DialingDeviceDeleteRequest, context: unknown) => {
             options?.onError?.(error, variables, context);
         }
     });

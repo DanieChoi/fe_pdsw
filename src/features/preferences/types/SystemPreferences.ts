@@ -35,6 +35,13 @@ export interface DialingDeviceListResponse {
   result_data: DialingDeviceListDataResponse[];
 }
 
+// 다이얼링 장비 삭제
+export interface DialingDeviceDeleteRequest {
+  tenant_id: number;
+  device_id: number;
+}
+
+
 // 채널 리스트 데이터 타입
 export interface ChannelListDataResponse {
   device_id: number;
