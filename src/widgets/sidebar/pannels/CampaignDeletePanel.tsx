@@ -14,6 +14,8 @@ import { CallingNumberListDataResponse, CampaignInfoDeleteRequest, CampaignInfoU
 import { fetchReservedCallDelete } from '@/features/campaignManager/api/mainReservedCallDelete';
 import { toast } from 'react-toastify';
 import { useSideMenuCampaignGroupTabStore } from '@/store/storeForSideMenuCampaignGroupTab';
+import Cookies from 'js-cookie'
+
 
 interface Props {
     campaignId?: string;
@@ -157,6 +159,7 @@ const CampaignDeletePanel = ({ campaignId, campaignName }: Props) => {
     const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
     const [tempCallingNumberInfo, setTempCallingNumberInfo] = useState<CallingNumberListDataResponse>(CallingNumberInfo);
     const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
+    const _tenantId = Number(Cookies.get('tenant_id'));
 
     const { updateCampaignStatus, refetchTreeData } = useSideMenuCampaignGroupTabStore();
 
@@ -252,7 +255,7 @@ const CampaignDeletePanel = ({ campaignId, campaignName }: Props) => {
         // 단일 API 요청으로 캠페인 삭제 호출
         deleteCampaign({
             campaign_id: Number(campaignId),
-            tenant_id: 0, // 실제 tenant_id 값으로 교체 필요
+            tenant_id: _tenantId,
             delete_dial_list: 1
         });
 
