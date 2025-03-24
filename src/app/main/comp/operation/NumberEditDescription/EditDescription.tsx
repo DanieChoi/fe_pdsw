@@ -10,6 +10,7 @@ import { useApiForPhoneDescriptionUpdate } from '@/features/campaignManager/hook
 import { useApiForPhoneDescriptionInsert } from '@/features/campaignManager/hooks/useApiForPhoneDescriptionInsert';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import { useApiForPhoneDescriptionDelete } from '@/features/campaignManager/hooks/useApiForPhoneDescriptionDelete';
 
 interface PhoneRow {
   id: string;
@@ -132,6 +133,33 @@ const EditDescription = () => {
     }
   })
 
+  // 전화번호 설명 삭제
+  const { mutate: fetchPhoneDescriptionDelete } = useApiForPhoneDescriptionDelete({
+    onSuccess: (data) => {
+      fetchPhoneDescriptions({
+        session_key: '',
+        tenant_id: 0,
+      });
+      showAlert('삭제되었습니다');
+    },onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+            onConfirm: closeAlert,
+            onCancel: () => {}
+          });
+          Cookies.remove('session_key');
+          setTimeout(() => {
+            router.push('/login');
+          }, 1000);
+      } else {
+          showAlert('전화번호설명 저장 중 오류가 발생했습니다: ' + error.message);
+      }
+    }
+  })
+
   useEffect(() => {
     fetchPhoneDescriptions({
       session_key: '',
@@ -143,7 +171,7 @@ const EditDescription = () => {
     isOpen: false,
     message: '',
     title: '알림',
-    type: '1',
+    type: '2',
     onConfirm: () => {},
     onCancel: () => {}
   });
@@ -153,7 +181,7 @@ const EditDescription = () => {
       isOpen: true,
       message,
       title: '알림',
-      type: '1',
+      type: '2',
       onConfirm: closeAlert,
       onCancel: () => {}
     });
@@ -164,7 +192,7 @@ const EditDescription = () => {
       isOpen: true,
       message,
       title: '확인',
-      type: '2',
+      type: '1',
       onConfirm: () => {
         onConfirm();
         closeAlert();
@@ -188,17 +216,42 @@ const EditDescription = () => {
     if (selectedRow) {
       // 수정
       fetchPhoneDescriptionUpdate(saveData);
-      showConfirm('수정되었습니다', () => {});
+      showAlert('수정되었습니다');
     } else {
       // 신규 저장
       fetchPhoneDescriptionInsert(saveData);
-      showConfirm('저장되었습니다', () => {});
+      showAlert('저장되었습니다');
     }
   };
 
+  const handleDelete = () => {
+    // 선택된 행이 없는 경우 알림
+    if (!selectedRow) {
+      showAlert('삭제할 항목을 선택해주세요.');
+      return;
+    }
+  
+    // 삭제 확인 메시지 표시
+    showConfirm('선택된 전화번호 설명을 삭제하시겠습니까?\n\n ※주의:  삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해 주세요.', () => {
+      // 선택된 행의 ID를 숫자로 변환하여 직접 전달
+      fetchPhoneDescriptionDelete(Number(selectedRow.id), {
+        onSuccess: () => {
+          // 입력 필드 초기화
+          setSelectedRow(null);
+          setInputId('');
+          setInputPhone1('');
+          setInputPhone2('');
+          setInputPhone3('');
+          setInputPhone4('');
+          setInputPhone5('');
+        }
+      });
+    });
+  }
+
   const validateData = () => {
     if (!inputId || !inputPhone1 || !inputPhone2 || !inputPhone3 || !inputPhone4 || !inputPhone5) {
-      showConfirm('모든 필드를 입력해주세요.', () => {});
+      showAlert('모든 필드를 입력해주세요.');
       return false;
     }
     return true;
@@ -332,6 +385,7 @@ const EditDescription = () => {
             <div className="flex justify-end gap-2 pt-4">
             <CommonButton onClick={handleNew}>신규</CommonButton>
             <CommonButton onClick={handleSave}>저장</CommonButton>
+            <CommonButton onClick={handleDelete}>삭제</CommonButton>
             </div>
         </div>
       </div>
