@@ -225,7 +225,8 @@ export function ContextMenuForTreeNode({
     });
   };
 
-  const handleRebroadcastClick = () => {
+  const handleRebroadcastClick = (campaignId: any) => {
+    setCampaignIdForUpdateFromSideMenu(campaignId);
     addTab({
       id: 20,
       uniqueKey: '20',
@@ -398,7 +399,7 @@ export function ContextMenuForTreeNode({
     { key: "status", render: renderStatusSubMenu, menuId: 20 },
     { key: "progress", title: "캠페인 진행정보", onClick: () => handleProgressInfoClick(item.id, item.label), menuId: 24 },
     { key: "separator1", type: "separator" },
-    { key: "rebroadcast", title: "재발신", onClick: handleRebroadcastClick, menuId: 25 },
+    { key: "rebroadcast", title: "재발신", onClick: () => handleRebroadcastClick(item.id), menuId: 25 },
     { key: "separator2", type: "separator" },
     { key: "copy", title: "캠페인 복사", onClick: onHandleCampaignCopy, menuId: 26 },
     { key: "delete", title: "캠페인 삭제", onClick: () => onCampaignDelete(currentStatus, item.id, item.label), condition: !isFolder, className: "text-red-500", menuId: 27 },

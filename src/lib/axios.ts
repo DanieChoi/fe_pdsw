@@ -678,6 +678,7 @@ axiosInstance.interceptors.response.use(
       } else if( url === '/collections/callback-campaign' ) {
         activation = '콜백캠페인조회';
         eventName = 'callback-campaign';
+      } else if( url === '/collections/suspended-campaign' ) {
 
 
 

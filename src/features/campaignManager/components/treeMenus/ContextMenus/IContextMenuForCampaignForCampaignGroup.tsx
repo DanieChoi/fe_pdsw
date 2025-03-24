@@ -175,7 +175,8 @@ export function IContextMenuForCampaignForCampaignGroup({
     });
   };
 
-  const handleRebroadcastClick = () => {
+  const handleRebroadcastClick = (campaignId: any) => {
+    setCampaignIdForUpdateFromSideMenu(campaignId);
     addTab({
       id: 20,
       uniqueKey: '20',
@@ -388,7 +389,7 @@ export function IContextMenuForCampaignForCampaignGroup({
       group: 2,
       key: "rebroadcast",
       label: "재발신",
-      action: handleRebroadcastClick
+      action: () => handleRebroadcastClick(item.id)
     },
 
     // 세 번째 그룹

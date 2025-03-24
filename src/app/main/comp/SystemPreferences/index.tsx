@@ -56,6 +56,7 @@ const SystemPreferences = () => {
     // 디바이스 상태를 저장할 상태 변수 추가
     const [deviceStatuses, setDeviceStatuses] = useState<Record<string, "run" | "down">>({});
 
+    // 캠페인스에서 가져오는 creation_time으로 채널 리스트의 값이 환경설정에서 설정한 시간내에 만들어진것만 보이게 수정해야함.
     const { tenants, campaigns } = useMainStore();
     const [dialingDeviceList, setDialingDeviceList] = useState<DialingDeviceListDataResponse[]>([]);
     const [channelList, setChannelList] = useState<ChannelListDataResponse[]>([]);
@@ -662,6 +663,7 @@ const SystemPreferences = () => {
         if (selectedChannel) {
             setAllocationOutboundMode(selectedChannel.assignValue.toString());
         }
+        console.log("campaigns", campaigns);
     }, [selectedChannel]);
 
     return (
