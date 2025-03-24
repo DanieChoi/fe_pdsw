@@ -66,6 +66,7 @@ const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply,
     const [shouldShowAddDelete, setShouldShowDelete] = useState<boolean>(false);    //삭제 버튼.
 
     const [headerCampaignId, setHeaderCampaignId] = useState<string>('');
+    const [realtime, setRealtime] = useState<boolean>(false);
 
     //리스트 건수 확인 버튼 클릭 이벤트.
     const handleCheckListCountHeader = () => {
@@ -119,8 +120,15 @@ const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply,
     useEffect(() => {
         if( campaigns && campaignId !== '0' ){
             setHeaderCampaignId(campaignId+'');
+            const tempCampaign = campaigns.filter(data=>Number(campaignId) === data.campaign_id);
+            if( tempCampaign.length > 0 ){
+                setListCount(tempCampaign[0].list_count);
+            }
+            if( tempCampaign[0].start_flag === 1 ){
+                setRealtime(true);
+            }
             
-            setListCount(campaigns.filter(data=>Number(campaignId) === data.campaign_id)[0].list_count);
+            // setListCount(campaigns.filter(data=>Number(campaignId) === data.campaign_id)[0].list_count);
         }
     }, [campaignId,campaigns]);
 
@@ -157,6 +165,7 @@ const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply,
                             className="flex gap-5"
                             onValueChange={(value) => handleBroadcastType(value) }
                             value={broadcastType}
+                            disabled={realtime}
                         >
                             <div className="flex items-center space-x-2">
                                 <CommonRadioItem value="reservation" id="reservation" />
