@@ -18,6 +18,7 @@ import TitleWrap from "@/components/shared/TitleWrap";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { useCampainManagerStore } from '@/store/campainManagerStore';
+
 interface SkillWithCampaigns {
   skillId: number;
   campaigns: { campaignId: number; tenantId: number }[];
