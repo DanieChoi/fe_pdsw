@@ -813,12 +813,29 @@ const RebroadcastSettingsPanel = () => {
                 });
             }else if( caseType === 2 ){
                 if( data.result_data.redial_count > 0){           
+                    // setAlertState({
+                    //     isOpen: true,
+                    //     message: `캠페인 아이디 : ${campaignIdForUpdateFromSideMenu} \n캠페인을 바로 시작하시겠습니까?`,
+                    //     title: '재발신 적용',
+                    //     type: '1',
+                    //     onClose: handleCampaignCurrentRedial,
+                    //     onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    // });          
                     setAlertState({
                         isOpen: true,
-                        message: `캠페인 아이디 : ${campaignIdForUpdateFromSideMenu} \n캠페인을 바로 시작하시겠습니까?`,
-                        title: '재발신 적용',
+                        message: `현재 발신가능한 리스트가 남아있습니다. \n 그래도 재설정 하시겠습니까?`,
+                        title: '재발신 설정 경고',
                         type: '1',
-                        onClose: handleCampaignCurrentRedial,
+                        onClose: () => {                           
+                            setAlertState({
+                                isOpen: true,
+                                message: `캠페인 아이디 : ${campaignIdForUpdateFromSideMenu} \n캠페인을 바로 시작하시겠습니까?`,
+                                title: '재발신 적용',
+                                type: '1',
+                                onClose: handleCampaignCurrentRedial,
+                                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                            });  
+                        },
                         onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                     });
                 }else{        
