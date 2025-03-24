@@ -81,13 +81,13 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
 
     set({ isLoading: true, error: null, tenant_id: tenant_id });
   
-    console.log("fetchTreeData - 상태 업데이트 후 tenant_id:", get().tenant_id);
+    // console.log("fetchTreeData - 상태 업데이트 후 tenant_id:", get().tenant_id);
 
     try {
       const combinedData = await apiForCombinedTenantAndCampaignGroup(tenant_id);
       const transformedData = transformToTreeData(combinedData);
 
-      console.log("transformedData : ", transformedData);
+      // console.log("transformedData : ", transformedData);
 
       set({
         treeData: transformedData,

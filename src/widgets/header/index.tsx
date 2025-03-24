@@ -24,7 +24,7 @@
 //   const router = useRouter();
 //   const _tenantId = Number(Cookies.get('tenant_id'));
 //   const { id, tenant_id, session_key: _sessionKey, role_id, menu_role_id } = useAuthStore();
-  
+
 //   // 로그인 상태 확인
 //   const isLoggedIn = !!_sessionKey && _sessionKey.length > 0;
 
@@ -348,7 +348,7 @@
 //                 <SplitScreenDialog2 tabs={openedTabs}/>
 
 //               </div> */}
-              
+
 //             </div>
 //           </div>
 //         </div>
@@ -384,8 +384,8 @@ const errorMessage = {
   message: '',
   title: '로그인',
   type: '1',
-  onClose: () => {},
-  onCancle: () => {},
+  onClose: () => { },
+  onCancle: () => { },
 };
 
 export default function Header() {
@@ -504,7 +504,7 @@ export default function Header() {
   // tofix  로그인 안했을때 미리 실행되서 에러 발생
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
-      console.log('Tenants API response:', data);
+      // console.log('Tenants API response:', data);
       if (data.result_code === 5) {
         setAlertState({
           ...errorMessage,
@@ -572,8 +572,7 @@ export default function Header() {
       roleId: menu_role_id || 1, // menu_role_id가 없을 경우 기본값 1
       enabled: !!menu_role_id // menu_role_id가 있을 때만 활성화
     });
-
-  console.log("dataForMenusInfoForRoleId : ", dataForMenusInfoForRoleId);
+  // console.log("dataForMenusInfoForRoleId : ", dataForMenusInfoForRoleId);
 
   const { data: counselorListData } = useApiForFetchCounselorList({
     credentials: {
@@ -635,8 +634,8 @@ export default function Header() {
         </div>
       </div>
       <header className="bg-white border-b">
-      {/* menu_role_id : {menu_role_id} */}
-      tentant_id : {_tenantId}
+        {/* menu_role_id : {menu_role_id} */}
+        {/* tentant_id : {_tenantId} */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between header-padding">
             <nav className="flex overflow-x-auto gap-3">
@@ -692,7 +691,7 @@ export default function Header() {
         onClose={() => {
           alertState.onClose()
         }}
-        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}/>
+        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
     </div>
   );
 }

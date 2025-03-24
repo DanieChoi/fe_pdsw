@@ -29,7 +29,7 @@ const useStore = create<
         (set) => ({
             ...initialState,
             setUserInfo: (userInfo: UserInfoData) => {
-                console.log("🔹 setUserInfo 호출됨:", userInfo);
+                // console.log("🔹 setUserInfo 호출됨:", userInfo); 
                 
                 // 상태 업데이트
                 set({
@@ -43,8 +43,8 @@ const useStore = create<
                 // 디버깅: 상태 업데이트 후 확인
                 setTimeout(() => {
                     const state = useStore.getState();
-                    console.log("🔹 상태 업데이트 후:", state);
-                    console.log("🔹 menu_role_id 확인:", state.menu_role_id);
+                    // console.log("🔹 상태 업데이트 후:", state);
+                    // console.log("🔹 menu_role_id 확인:", state.menu_role_id);
                 }, 0);
             },
             resetUserInfo: () => {

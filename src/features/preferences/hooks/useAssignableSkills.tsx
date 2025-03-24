@@ -14,7 +14,7 @@ export const useAssignableSkills = (tenantId?: number) => {
   return useQuery({
     queryKey: ["assignableSkills", tenantId], // 쿼리 키 (캐싱을 위한 식별자)
     queryFn: async () => {
-      console.log("🟢 할당 가능한 스킬 목록을 불러오는 중...");
+      // console.log("🟢 할당 가능한 스킬 목록을 불러오는 중...");
 
       const response = await getAssignableSkillsForCounselor(tenantId!);
 

@@ -166,21 +166,21 @@ export const useApiForGetAuthorizedMenusInfoForMenuRoleId = ({
       setCampaignGroupTabCampaignMenuList(campaignGroupTabCampaignMenus);
       setCampaignGroupTabCampaignMenuIds(campaignGroupTabCampaignIds);
       
-      console.log("메뉴 권한 정보가 로컬 상태에 저장되었습니다:", allMenus);
-      console.log("헤더 메뉴 정보가 로컬 상태에 저장되었습니다:", headerMenus);
-      console.log("헤더 메뉴 ID가 로컬 상태에 저장되었습니다:", headerIds);
-      console.log("캠페인 테넌트 컨텍스트 메뉴가 로컬 상태에 저장되었습니다:", campaignTenantContextMenus);
-      console.log("캠페인 테넌트 컨텍스트 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignTenantContextIds);
-      console.log("캠페인 탭 캠페인 컨텍스트 메뉴가 로컬 상태에 저장되었습니다:", campaignTabCampaignContextMenus);
-      console.log("캠페인 탭 캠페인 컨텍스트 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignTabCampaignContextIds);
-      console.log("스킬 할당 메뉴가 로컬 상태에 저장되었습니다:", skillAssignmentMenus);
-      console.log("스킬 할당 메뉴 ID가 로컬 상태에 저장되었습니다:", skillAssignmentIds);
-      console.log("캠페인 그룹 탭 테넌트 메뉴가 로컬 상태에 저장되었습니다:", campaignGroupTabTenantMenus);
-      console.log("캠페인 그룹 탭 테넌트 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignGroupTabTenantIds);
-      console.log("캠페인 그룹 탭 캠페인 그룹 메뉴가 로컬 상태에 저장되었습니다:", campaignGroupTabCampaignGroupMenus);
-      console.log("캠페인 그룹 탭 캠페인 그룹 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignGroupTabCampaignGroupIds);
-      console.log("캠페인 그룹 탭 캠페인 메뉴가 로컬 상태에 저장되었습니다:", campaignGroupTabCampaignMenus);
-      console.log("캠페인 그룹 탭 캠페인 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignGroupTabCampaignIds);
+      // console.log("메뉴 권한 정보가 로컬 상태에 저장되었습니다:", allMenus);
+      // console.log("헤더 메뉴 정보가 로컬 상태에 저장되었습니다:", headerMenus);
+      // console.log("헤더 메뉴 ID가 로컬 상태에 저장되었습니다:", headerIds);
+      // console.log("캠페인 테넌트 컨텍스트 메뉴가 로컬 상태에 저장되었습니다:", campaignTenantContextMenus);
+      // console.log("캠페인 테넌트 컨텍스트 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignTenantContextIds);
+      // console.log("캠페인 탭 캠페인 컨텍스트 메뉴가 로컬 상태에 저장되었습니다:", campaignTabCampaignContextMenus);
+      // console.log("캠페인 탭 캠페인 컨텍스트 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignTabCampaignContextIds);
+      // console.log("스킬 할당 메뉴가 로컬 상태에 저장되었습니다:", skillAssignmentMenus);
+      // console.log("스킬 할당 메뉴 ID가 로컬 상태에 저장되었습니다:", skillAssignmentIds);
+      // console.log("캠페인 그룹 탭 테넌트 메뉴가 로컬 상태에 저장되었습니다:", campaignGroupTabTenantMenus);
+      // console.log("캠페인 그룹 탭 테넌트 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignGroupTabTenantIds);
+      // console.log("캠페인 그룹 탭 캠페인 그룹 메뉴가 로컬 상태에 저장되었습니다:", campaignGroupTabCampaignGroupMenus);
+      // console.log("캠페인 그룹 탭 캠페인 그룹 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignGroupTabCampaignGroupIds);
+      // console.log("캠페인 그룹 탭 캠페인 메뉴가 로컬 상태에 저장되었습니다:", campaignGroupTabCampaignMenus);
+      // console.log("캠페인 그룹 탭 캠페인 메뉴 ID가 로컬 상태에 저장되었습니다:", campaignGroupTabCampaignIds);
 
       // Zustand 스토어 업데이트
       setAvailableMenus(allMenus);

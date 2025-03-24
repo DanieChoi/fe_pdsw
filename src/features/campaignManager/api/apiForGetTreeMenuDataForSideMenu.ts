@@ -19,9 +19,7 @@ export async function apiForGetTreeMenuDataForSideMenu(tenant_id?: number, role_
     apiForGetCampaignList(),
     fetchskillCampaignList(),
   ]);
-
-  console.log("skillDataForCampaign", skillDataForCampaign);
-  
+  // console.log("skillDataForCampaign", skillDataForCampaign);
 
   if (!tenantsData?.result_data || !campaignData?.result_data) {
     return [];

@@ -65,11 +65,8 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
   const filteredMenuItems = menuItems.filter((menuItem) => 
     availableCampaignTenantContextMenuIds.includes(menuItem.menuId)
   );
-
-  console.log("availableCampaignTenantContextMenuIds : ", availableCampaignTenantContextMenuIds);
-  
-  console.log("filteredMenuItems : ", filteredMenuItems);
-  
+  // console.log("availableCampaignTenantContextMenuIds : ", availableCampaignTenantContextMenuIds);
+  // console.log("filteredMenuItems : ", filteredMenuItems);  
 
   return (
     <ContextMenuContent>

@@ -31,7 +31,7 @@ export const loginApi = {
       };
 
       const { data } = await axiosInstance.post<LoginResponse>('/login', loginData);
-      console.log("✅ API Response Data:", data); // 로그인 응답 데이터 확인
+      // console.log("✅ API Response Data:", data); // 로그인 응답 데이터 확인
 
       if (data.result_code !== 0) {
         throw new Error(data.result_msg || '로그인 실패');
@@ -39,7 +39,7 @@ export const loginApi = {
 
       //SSE 실시간 이벤트 구독
       // const tenant_id = (data.role_id === 5 || data.role_id === 6) ? 0 : data.tenant_id;
-      console.log("data.menu_role_id at login !!!!!!!!!!!!!!!!!!!!! : ", data.menu_role_id);
+      // console.log("data.menu_role_id at login !!!!!!!!!!!!!!!!!!!!! : ", data.menu_role_id);
 
 
       // 특정 role_id에 대한 접근 제한
@@ -77,14 +77,14 @@ export const loginApi = {
         menu_role_id: data.menu_role_id // `menu_role_id` 확인
       };
 
-      console.log("✅ Constructed userInfo before storing:", userInfo);
+      // console.log("✅ Constructed userInfo before storing:", userInfo);
 
       // Zustand store 업데이트
       useStore.getState().setUserInfo(userInfo);
 
       // 디버깅: 저장 후 스토어 상태 확인
       setTimeout(() => {
-        console.log("🟢 Current store state after setting (with timeout):", useStore.getState());
+        // console.log("🟢 Current store state after setting (with timeout):", useStore.getState());
       }, 0);
 
       // 쿠키 설정

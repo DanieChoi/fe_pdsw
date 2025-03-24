@@ -29,7 +29,6 @@ import CampaignGroupBulkUpdatePanel from "./CampaignGroupBulkUpdatePanel";
 
 // 탭 ID별 실제 화면을 매핑
 const renderContent = (tabId: number | null, campaignId?: string, campaignName?: string, params?: any) => {
-  console.log("params ??????????????????? : ", params);
 
   switch (tabId) {
     case 1:

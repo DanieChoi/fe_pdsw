@@ -22,10 +22,7 @@ export async function apiForGetAuthorizedMenusInfoForMenuRoleId({
 
     const response = await axiosRedisInstance.get(
     `/auth/availableMenuList?roleId=${roleId}`
-  );
-
-  
-  console.log("Available menu list response:", response.data);
-  
+  );  
+  // console.log("Available menu list response:", response.data);
   return response.data;
 }
