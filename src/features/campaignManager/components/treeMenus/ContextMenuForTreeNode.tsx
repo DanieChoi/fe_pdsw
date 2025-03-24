@@ -26,6 +26,10 @@ import { CheckCampaignSaveReturnCode } from '@/components/common/common';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
 import React from "react";
+import { useCampainManagerStore } from "@/store/campainManagerStore";
+import { useMainStore } from "@/store/mainStore";
+import { useApiForMain } from "@/features/auth/hooks/useApiForMain";
+import { useAuthStore } from "@/store/authStore";
 
 export type CampaignStatus = 'started' | 'pending' | 'stopped';
 
@@ -91,8 +95,29 @@ export function ContextMenuForTreeNode({
   const [blackListCount, setBlackListCount] = useState<number>(0);
   const preventCloseRef = useRef(false);
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
-
   const { availableCampaignTabCampaignContextMenuIds } = useAvailableMenuStore();
+
+  const { tenant_id, role_id, session_key } = useAuthStore();
+
+  const { tenants
+    , setCampaigns
+    , selectedCampaign
+    , setSelectedCampaign
+  } = useMainStore();
+
+  const { openedTabs } = useTabStore();
+
+  const { mutate: fetchMain } = useApiForMain({
+    onSuccess: (data) => {
+      setCampaigns(data.result_data);
+      // if( tenant_id === 0){
+      //   setCampaigns(data.result_data);
+      // }else{
+      //   setCampaigns(data.result_data.filter(data=>data.tenant_id === tenant_id));
+      // }
+      setSelectedCampaign(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
+    }
+  });
 
   // 상태 관련 정보
   const statusInfo = {
@@ -114,8 +139,12 @@ export function ContextMenuForTreeNode({
           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
           onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
         });
+
         // 로컬 상태 업데이트
         setCurrentStatus(tempStatus);
+
+
+
       } else {
         setAlertState({
           ...errorMessage,
@@ -253,7 +282,7 @@ export function ContextMenuForTreeNode({
     }
   };
 
-  const handleStartClick = async (status: CampaignStatus) => {
+  const handleCampaingProgressUpdate = async (status: CampaignStatus) => {
     if (currentStatus === status || updateCampaignStatusMutation.isPending) {
       return;
     }
@@ -264,6 +293,13 @@ export function ContextMenuForTreeNode({
         campaign_id: Number(item.id),
         campaign_status: getStatusNumber(status)
       });
+
+      // tofix:
+      fetchMain({
+        session_key: session_key,
+        tenant_id: tenant_id
+      });
+
     } catch (error) {
       console.error('Error changing campaign status:', {
         campaignId: item.id,
@@ -326,7 +362,7 @@ export function ContextMenuForTreeNode({
             key={status}
             onClick={(e) => {
               e.stopPropagation();
-              handleStartClick(status);
+              handleCampaingProgressUpdate(status);
               preventCloseRef.current = true;
             }}
             className={cn(

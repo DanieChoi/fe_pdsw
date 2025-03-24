@@ -13,11 +13,11 @@ export function useApiForCampaignStatusUpdate(
     mutationKey: ['mainCampaignStatusUpdate'],
     mutationFn: fetchCampaignStatusUpdate,
     onSuccess: (data, variables, context) => {
-      console.log('API Response:', {
-        code: data.result_code,
-        message: data.result_msg,
-        reasonCode: data.reason_code,
-      });
+      // console.log('API Response:', {
+      //   code: data.result_code,
+      //   message: data.result_msg,
+      //   reasonCode: data.reason_code,
+      // });
 
       // const errorMessage = getCampaignErrorMessage(data.result_code);
       // if (errorMessage) {

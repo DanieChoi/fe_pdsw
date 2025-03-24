@@ -215,13 +215,13 @@ export function TreeMenusForCampaigns() {
       // 여백 추가 (뷰 모드에 따라 다른 여백 추가)
       const idealWidth = maxContentWidth + (viewMode === 'tenant' ? 15 : 25);
 
-      console.log("캠페인 탭 측정:", {
-        campaignWidth: campaignMaxWidth,
-        folderWidth: folderMaxWidth,
-        treeWidth: treeMaxWidth,
-        finalWidth: idealWidth,
-        viewMode: viewMode
-      });
+      // console.log("캠페인 탭 측정:", {
+      //   campaignWidth: campaignMaxWidth,
+      //   folderWidth: folderMaxWidth,
+      //   treeWidth: treeMaxWidth,
+      //   finalWidth: idealWidth,
+      //   viewMode: viewMode
+      // });
 
       // 캠페인 탭 너비 설정
       setTabWidth("campaign", idealWidth);

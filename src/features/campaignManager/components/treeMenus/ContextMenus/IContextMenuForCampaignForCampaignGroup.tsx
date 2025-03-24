@@ -24,6 +24,10 @@ import useApiForCampaignListDelete from "@/features/listManager/hooks/useApiForC
 import { useApiForCampaignStatusUpdate } from "@/features/campaignManager/hooks/useApiForCampaignStatusUpdate";
 import IDialogButtonForCampaingDelete from "../dialog/IDialogButtonForCampaingDelete";
 import React from "react";
+import { useCampainManagerStore } from "@/store/campainManagerStore";
+import { useApiForMain } from "@/features/auth/hooks/useApiForMain";
+import { useMainStore } from "@/store/mainStore";
+import { useAuthStore } from "@/store/authStore";
 
 export type CampaignStatus = 'started' | 'pending' | 'stopped';
 
@@ -87,6 +91,26 @@ export function IContextMenuForCampaignForCampaignGroup({
   const [blackListCount, setBlackListCount] = useState<number>(0);
   const preventCloseRef = useRef(false);
 
+  const { tenant_id, role_id, session_key } = useAuthStore();
+
+  const { tenants
+    , setCampaigns
+    , selectedCampaign
+    , setSelectedCampaign
+  } = useMainStore();
+
+  const { mutate: fetchMain } = useApiForMain({
+    onSuccess: (data) => {
+      setCampaigns(data.result_data);
+      // if( tenant_id === 0){
+      //   setCampaigns(data.result_data);
+      // }else{
+      //   setCampaigns(data.result_data.filter(data=>data.tenant_id === tenant_id));
+      // }
+      setSelectedCampaign(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
+    }
+  });
+
   // 상태 관련 정보
   const statusInfo = {
     started: { label: "시작", color: "#22c55e" },
@@ -96,8 +120,14 @@ export function IContextMenuForCampaignForCampaignGroup({
 
   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
     onSuccess: (data) => {
-      toast.success("캠페인 상태가 변경되었습니다.");
+      toast.success("캠페인 상태가 변경되었습니다22.");
       preventCloseRef.current = true;
+
+      fetchMain({
+        session_key: session_key,
+        tenant_id: tenant_id
+      });
+
     },
     onError: (error) => {
       toast.error(error.message || "상태 변경 중 오류가 발생했습니다.");
@@ -351,7 +381,7 @@ export function IContextMenuForCampaignForCampaignGroup({
       label: "캠페인 진행정보",
       action: () => handleProgressInfoClick(item.id, item.label)
     },
-    
+
     // 두 번째 그룹
     {
       id: 52,
@@ -360,7 +390,7 @@ export function IContextMenuForCampaignForCampaignGroup({
       label: "재발신",
       action: handleRebroadcastClick
     },
-    
+
     // 세 번째 그룹
     {
       id: 53,
@@ -378,7 +408,7 @@ export function IContextMenuForCampaignForCampaignGroup({
       className: "text-red-500",
       condition: !isFolder
     },
-    
+
     // 네 번째 그룹
     {
       id: 55,
@@ -406,10 +436,10 @@ export function IContextMenuForCampaignForCampaignGroup({
 
   // 권한에 따라 메뉴 항목 필터링
   const visibleMenuItems = availableMenuIds?.length > 0
-    ? menuItems.filter(item => 
-        availableMenuIds.includes(item.id) && 
-        (item.condition === undefined || item.condition)
-      )
+    ? menuItems.filter(item =>
+      availableMenuIds.includes(item.id) &&
+      (item.condition === undefined || item.condition)
+    )
     : [];
 
   // 표시할 메뉴 항목이 없으면 기본 컨텍스트 메뉴만 표시
@@ -435,15 +465,15 @@ export function IContextMenuForCampaignForCampaignGroup({
             // 현재 아이템과 이전 아이템이 다른 그룹인 경우 구분선 추가
             const prevItem = index > 0 ? arr[index - 1] : null;
             const showSeparator = prevItem && prevItem.group !== item.group;
-            
+
             return (
               <React.Fragment key={item.key}>
                 {showSeparator && <ContextMenuSeparator className="my-1" />}
-                
+
                 {item.isSubmenu ? (
                   item.render()
                 ) : (
-                  <ContextMenuItem 
+                  <ContextMenuItem
                     onClick={item.action}
                     className={item.className}
                   >
