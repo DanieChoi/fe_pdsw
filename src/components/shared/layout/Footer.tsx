@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { ChevronUp, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { isEqual } from 'lodash';
-import { useAuthStore } from '@/store';
+import { useAuthStore, useMainStore } from '@/store';
 import { Resizable } from "re-resizable";
+import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 
 type FooterDataType = {
   time: string;
@@ -31,6 +32,7 @@ export default function Footer({
   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
   const [currentHeight, setCurrentHeight] = useState(footerHeight);
   const { tenant_id, role_id } = useAuthStore();
+  const { campaigns, setCampaigns } = useMainStore();
 
   // 부모 컴포넌트에 열림/닫힘 상태 변경 알림
   useEffect(() => {
@@ -60,6 +62,13 @@ export default function Footer({
     }
   };
   
+  //캠페인 정보 조회 api 호출
+  const { mutate: fetchMain } = useApiForMain({
+    onSuccess: (data) => {
+      setCampaigns(data.result_data);
+    }
+  });
+
   const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, tempEventData: any): void => {
     //시간.
     const today = new Date();
@@ -112,7 +121,12 @@ export default function Footer({
     else if( announce === '/pds/campaign/dial-speed' ){
       _message = '[콜페이싱] '
       if( command === 'UPDATE' ){
-        _message += '캠페인 아이디 ' + data['campaign_id'] + ' , 현재 설정값 ' + data['dial_speed'];
+        const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === data['campaign_id']);
+        if( tempCampaign && tempCampaign.dial_mode === 2){
+          _message += '캠페인 아이디 ' + data['campaign_id'] + ' , 현재 설정값 ' + data['dial_speed']*2;
+        }else{
+          _message += '캠페인 아이디 ' + data['campaign_id'] + ' , 현재 설정값 ' + data['dial_speed'];
+        }
       }
     }
     //캠페인.
@@ -139,6 +153,10 @@ export default function Footer({
       }else if( command === 'DELETE' ){
         _message += '삭제, 캠페인 아이디 : ' + data['campaign_id'];
       }
+      fetchMain({
+        session_key: '',
+        tenant_id: tenant_id,
+      });
       if( data['start_flag'] === 3){
         setFooterDataList((prev) => [
           {
