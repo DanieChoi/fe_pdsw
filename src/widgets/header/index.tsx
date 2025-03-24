@@ -636,7 +636,7 @@ export default function Header() {
       </div>
       <header className="bg-white border-b">
       {/* menu_role_id : {menu_role_id} */}
-      tentant_id : {_tenantId}
+      {/* tentant_id : {_tenantId} */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between header-padding">
             <nav className="flex overflow-x-auto gap-3">

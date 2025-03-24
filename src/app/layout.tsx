@@ -22,7 +22,6 @@ export const metadata: Metadata = {
   icons: {
     icon: 'nexpds.ico',           // /public/favicon.ico
     shortcut: 'nexpds.ico',
-    // apple: '/apple-touch-icon.png', // /public/apple-touch-icon.png
   }
 };
 
