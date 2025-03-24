@@ -337,28 +337,45 @@ axiosInstance.interceptors.response.use(
       } else if( url === '/collections/agent-ready-count' ) {
         activation = '캠페인대기상담사수조회';
         eventName = 'agent-ready-count';
-
-
-
-
-
-
+      } else if( url === '/collections/suspended-campaign' ) {
+        activation = '일지중지캠페인조회';
+        eventName = 'suspended-campaign';
+      } else if( url === '/suspended-campaign' ) {
+        activation = '일지중지캠페인삭제';
+        eventName = 'suspended-campaign';
+        queryType = 'D';
       } else if( url === '/collections/campaign-group' || url === 'collections/campaign-group' ) {
         activation = '캠페인그룹정보조회';
         eventName = 'campaignGroups';
+      } else if( url.split('/')[0] === 'campaign-groups' ) {
+        if( response.config.method === 'post' ) {
+          activation = '캠페인그룹정보생성';
+          eventName = 'campaignGroup';
+          queryType = 'C';
+        } else if( response.config.method === 'put' ) {
+          activation = '캠페인그룹정보수정';
+          eventName = 'campaignGroup';
+          queryType = 'U';
+        } else if( response.config.method === 'delete' ) {
+          activation = '캠페인그룹정보삭제';
+          eventName = 'campaignGroup';
+          queryType = 'D';
+          description = '캠페인 그룹 아이디 : "' + url.split('/')[1] + '"번 삭제';
+        }
       } else if( url === '/collections/campaign-group-list' || url === 'collections/campaign-group-list' ) {
         activation = '캠페인그룹소속캠페인조회';
         eventName = 'campaignGroupCampaigns';
-      } else if( url.split('/')[0] === 'campaign-groups' ) {
-        activation = '캠페인그룹정보삭제';
-        eventName = 'campaignGroup';
-        description = '캠페인 그룹 아이디 : "' + url.split('/')[1] + '"번 삭제';
-        queryType = 'D';
-      } else if( url.split('/')[0] === 'campaign-group' ) {
-        activation = '캠페인그룹소속캠페인정보삭제';
-        eventName = 'campaignGroupCampaign';
-        description = '캠페인 그룹 아이디 : "' + url.split('/')[1] + '"번 소속캠페인 삭제';
-        queryType = 'D';
+      } else if( url.split('/')[0] === 'campaign-group' && url.indexOf('/list') > -1 ) {
+        if( response.config.method === 'post' ) {
+          activation = '캠페인그룹소속캠페인생성';
+          eventName = 'campaignGroupCampaign';
+          queryType = 'C';
+        } else if( response.config.method === 'delete' ) {
+          activation = '캠페인그룹소속캠페인삭제';
+          eventName = 'campaignGroupCampaign';
+          queryType = 'D';
+          description = '캠페인 그룹 아이디 : "' + url.split('/')[1] + '"번 소속캠페인 삭제';
+        }
       }
       const logData = {
           "tenantId": Number(getCookie('tenant_id')),
@@ -678,30 +695,52 @@ axiosInstance.interceptors.response.use(
       } else if( url === '/collections/callback-campaign' ) {
         activation = '콜백캠페인조회';
         eventName = 'callback-campaign';
+      } else if( url === '/collections/campaign-history' ) {
+        activation = '캠페인운영이력조회';
+        eventName = 'campaign-history';
+      } else if( url === '/collections/dial-result' ) {
+        activation = '캠페인발신결과조회';
+        eventName = 'dial-result';
+      } else if( url === '/collections/agent-ready-count' ) {
+        activation = '캠페인대기상담사수조회';
+        eventName = 'agent-ready-count';
       } else if( url === '/collections/suspended-campaign' ) {
-
-
-
-
+        activation = '일지중지캠페인조회';
+        eventName = 'suspended-campaign';
+      } else if( url === '/suspended-campaign' ) {
+        activation = '일지중지캠페인삭제';
+        eventName = 'suspended-campaign';
+        queryType = 'D';
       } else if( url === '/collections/campaign-group' || url === 'collections/campaign-group' ) {
         activation = '캠페인그룹정보조회';
         eventName = 'campaignGroups';
+      } else if( url.split('/')[0] === 'campaign-groups' ) {
+        if( error.config.method === 'post' ) {
+          activation = '캠페인그룹정보생성';
+          eventName = 'campaignGroup';
+          queryType = 'C';
+        } else if( error.config.method === 'put' ) {
+          activation = '캠페인그룹정보수정';
+          eventName = 'campaignGroup';
+          queryType = 'U';
+        } else if( error.config.method === 'delete' ) {
+          activation = '캠페인그룹정보삭제';
+          eventName = 'campaignGroup';
+          queryType = 'D';
+        }
       } else if( url === '/collections/campaign-group-list' || url === 'collections/campaign-group-list' ) {
         activation = '캠페인그룹소속캠페인조회';
         eventName = 'campaignGroupCampaigns';
-      } else if( url === '/collections/campaign-agent' ) {
-        activation = '캠페인소속상담사조회';
-        eventName = 'campaignAgents';
-      } else if( url.split('/')[0] === 'campaign-groups' ) {
-        activation = '캠페인그룹정보삭제';
-        eventName = 'campaignGroup';
-        // description = '캠페인 그룹 아이디 : "' + url.split('/')[1] + '"번 삭제';
-        queryType = 'D';
-      } else if( url.split('/')[0] === 'campaign-group' ) {
-        activation = '캠페인그룹소속캠페인정보삭제';
-        eventName = 'campaignGroupCampaign';
-        // description = '캠페인 그룹 아이디 : "' + url.split('/')[1] + '"번 소속캠페인 삭제';
-        queryType = 'D';
+      } else if( url.split('/')[0] === 'campaign-group' && url.indexOf('/list') > -1 ) {
+        if( error.config.method === 'post' ) {
+          activation = '캠페인그룹소속캠페인생성';
+          eventName = 'campaignGroupCampaign';
+          queryType = 'C';
+        } else if( error.config.method === 'delete' ) {
+          activation = '캠페인그룹소속캠페인삭제';
+          eventName = 'campaignGroupCampaign';
+          queryType = 'D';
+        }
       }
       const logData = {
           "tenantId": Number(getCookie('tenant_id')),
@@ -763,38 +802,6 @@ axiosRedisInstance.interceptors.response.use(
       } else if( url === '/monitor/tenant/campaign/dial' ) {
         activation = '발신진행상태조회';
         eventName = 'dial';
-      // } else if( url === '/login' ) {
-      //   activation = '로그인';
-      //   eventName = 'login';
-      // } else if( url.indexOf('/status') > -1 ) {
-      //   const status = JSON.parse(response.config.data).request_data.campaign_status === 1 ? '시작': 
-      //     JSON.parse(response.config.data).request_data.campaign_status === 2 ?'멈춤':'중지';
-      //   activation = '캠페인상태변경';
-      //   eventName = 'updateStatus';
-      //   queryType = 'U';
-      //   description = '캠페인 상태를 "' + status + '"으로 변경';
-      // } else if( url === 'collections/campaign-skill' ) {
-      //   activation = '캠페인요구스킬조회';
-      //   eventName = 'skill';
-      // } else if( url === 'collections/campaign-group' ) {
-      //   activation = '캠페인그룹정보조회';
-      //   eventName = 'campaignGroups';
-      // } else if( url === 'collections/campaign-group-list' ) {
-      //   activation = '캠페인그룹소속캠페인조회';
-      //   eventName = 'campaignGroupCampaigns';
-      // } else if( url === '/collections/campaign-agent' ) {
-      //   activation = '캠페인소속상담사조회';
-      //   eventName = 'campaignAgents';
-      // } else if( url.split('/')[0] === 'campaign-groups' ) {
-      //   activation = '캠페인그룹정보삭제';
-      //   eventName = 'campaignGroup';
-      //   description = '캠페인 그룹 아이디 : "' + url.split('/')[1] + '"번 삭제';
-      //   queryType = 'D';
-      // } else if( url.split('/')[0] === 'campaign-group' ) {
-      //   activation = '캠페인그룹소속캠페인정보삭제';
-      //   eventName = 'campaignGroupCampaign';
-      //   description = '캠페인 그룹 아이디 : "' + url.split('/')[1] + '"번 소속캠페인 삭제';
-      //   queryType = 'D';
       }
       const logData = {
           "tenantId": Number(getCookie('tenant_id')),

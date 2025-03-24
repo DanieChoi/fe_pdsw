@@ -214,6 +214,15 @@ export default function Footer({
         _message = '';
       }
     }
+    //상담원 자원 수정/삭제
+    else if( announce === 'update-agent' ){
+      _message = '[상담원 자원 '
+      if( command === 'UPDATE' ){
+        _message += '수정] 상담원 아이디 : ' + data['employee_id'] + ' , 상담원 이름 : ' + data['agent_name'];
+      }else if( command === 'DELETE' ){
+        _message += '삭제] 상담원 아이디 : ' + data['employee_id'] + ' , 상담원 이름 : ' + data['agent_name'];
+      }
+    }
     //캠페인수정>동작시간 추가
     else if( announce === '/pds/campaign/schedule' ){
       _message = '캠페인 스케쥴'
