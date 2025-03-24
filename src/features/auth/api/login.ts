@@ -128,8 +128,8 @@ export const loginApi = {
       return data;
     } catch (error: Error | unknown) {
       const err = error as Error;
-      console.error("❌ Login error:", err);
-      throw new Error(err?.message || '로그인 중 오류가 발생했습니다.');
+      // console.error("❌ Login error:", err);
+      throw err;
     }
   }
 };
