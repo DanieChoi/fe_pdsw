@@ -231,12 +231,9 @@ axiosInstance.interceptors.response.use(
         activation = '캠페인재발신추출수정';
         eventName = 'campaign-current-redial';
         queryType = 'U';
-
-
-
-
-
-
+      } else if( url === '/collections/campaign-redial-preview' ) {
+        activation = '캠페인재발신미리보기';
+        eventName = 'campaign-redial-preview';
       } else if( url === '/collections/campaign-schedule' ) {
         activation = '캠페인스케줄정보조회';
         eventName = 'campaign-schedule';
@@ -254,19 +251,104 @@ axiosInstance.interceptors.response.use(
           eventName = 'campaign-schedule';
           queryType = 'D';
         }
-
       } else if( url === '/collections/campaign-calling-number' ) {
         activation = '캠페인발신번호조회';
         eventName = 'campaign-calling-number';
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/calling-number') > -1 ) {
+        if( response.config.method === 'post' ) {
+          activation = '캠페인발신번호생성';
+          eventName = 'campaign-calling-number';
+          queryType = 'C';
+        } else if( response.config.method === 'put' ) {
+          activation = '캠페인발신번호수정';
+          eventName = 'campaign-calling-number';
+          queryType = 'U';
+        } else if( response.config.method === 'delete' ) {
+          activation = '캠페인발신번호삭제';
+          eventName = 'campaign-calling-number';
+          queryType = 'D';
+        }
+      } else if( url === '/collections/maxcall-ext' ) {
+        activation = '캠페인분배제한조회';
+        eventName = 'maxcall-ext';
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/maxcall-ext') > -1 ) {
+        if( response.config.method === 'post' ) {
+          activation = '캠페인분배제한생성';
+          eventName = 'maxcall-ext';
+          queryType = 'C';
+        } else if( response.config.method === 'put' ) {
+          activation = '캠페인분배제한수정';
+          eventName = 'maxcall-ext';
+          queryType = 'U';
+        } else if( response.config.method === 'delete' ) {
+          activation = '캠페인분배제한삭제';
+          eventName = 'maxcall-ext';
+          queryType = 'D';
+        }
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/calling-list') > -1 ) {
+        if( response.config.method === 'post' ) {
+          activation = '발신리스트업로드추가';
+          eventName = 'campaign-calling-list';
+          queryType = 'C';
+        } else if( response.config.method === 'delete' ) {
+          activation = '발신리스트업로드삭제';
+          eventName = 'campaign-calling-list';
+          queryType = 'D';
+        }
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/black-list') > -1 ) {
+        if( response.config.method === 'post' ) {
+          activation = '블랙리스트업로드추가';
+          eventName = 'campaign-black-list';
+          queryType = 'C';
+        } else if( response.config.method === 'delete' ) {
+          activation = '블랙리스트업로드삭제';
+          eventName = 'campaign-black-list';
+          queryType = 'D';
+        }
+      } else if( url === '/collections/campaign-blacklist-max' ) {
+        activation = '블랙리스트최대수량조회';
+        eventName = 'campaign-blacklist-max';
+      } else if( url === '/collections/campaign-blacklist-count' ) {
+        activation = '블랙리스트수량조회';
+        eventName = 'campaign-blacklist-count';
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/dial-speed') > -1 ) {
+        activation = '캠페인발신속도수정';
+        eventName = 'campaign-black-list';
+        queryType = 'U';
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/callback-list') > -1 ) {
+        activation = '캠페인콜백리스트추가';
+        eventName = 'campaign-callback-list';
+        queryType = 'C';
+      } else if( url === '/collections/campaign-agent' ) {
+        activation = '캠페인소속상담사조회';
+        eventName = 'campaignAgents';
+      } else if( url === '/collections/agent-campaign' ) {
+        activation = '상담사소속캠페인조회';
+        eventName = 'agentCampaigns';
+      } else if( url === '/collections/callback-campaign' ) {
+        activation = '콜백캠페인조회';
+        eventName = 'callback-campaign';
+      } else if( url === '/collections/campaign-history' ) {
+        activation = '캠페인운영이력조회';
+        eventName = 'campaign-history';
+      } else if( url === '/collections/dial-result' ) {
+        activation = '캠페인발신결과조회';
+        eventName = 'dial-result';
+      } else if( url === '/collections/agent-ready-count' ) {
+        activation = '캠페인대기상담사수조회';
+        eventName = 'agent-ready-count';
+
+
+
+
+
+
       } else if( url === '/collections/campaign-group' || url === 'collections/campaign-group' ) {
         activation = '캠페인그룹정보조회';
         eventName = 'campaignGroups';
       } else if( url === '/collections/campaign-group-list' || url === 'collections/campaign-group-list' ) {
         activation = '캠페인그룹소속캠페인조회';
         eventName = 'campaignGroupCampaigns';
-      } else if( url === '/collections/campaign-agent' ) {
-        activation = '캠페인소속상담사조회';
-        eventName = 'campaignAgents';
       } else if( url.split('/')[0] === 'campaign-groups' ) {
         activation = '캠페인그룹정보삭제';
         eventName = 'campaignGroup';
@@ -428,10 +510,10 @@ axiosInstance.interceptors.response.use(
         eventName = 'maxcall-init-time';
         queryType = 'U';
       } else if( url === '/collections/suspended-skill' ) {
-        activation = '일지중지캠페인조회';
+        activation = '일지중지스킬조회';
         eventName = 'suspended-skill';
       } else if( url === '/suspended-skill' ) {
-        activation = '일지중지캠페인삭제';
+        activation = '일지중지스킬삭제';
         eventName = 'suspended-skill';
         queryType = 'D';
       } else if( url === 'collections/campaign-list' ) {
@@ -499,12 +581,9 @@ axiosInstance.interceptors.response.use(
         activation = '캠페인재발신추출수정';
         eventName = 'campaign-current-redial';
         queryType = 'U';
-
-
-
-
-
-
+      } else if( url === '/collections/campaign-redial-preview' ) {
+        activation = '캠페인재발신미리보기';
+        eventName = 'campaign-redial-preview';
       } else if( url === '/collections/campaign-schedule' ) {
         activation = '캠페인스케줄정보조회';
         eventName = 'campaign-schedule';
@@ -522,10 +601,87 @@ axiosInstance.interceptors.response.use(
           eventName = 'campaign-schedule';
           queryType = 'D';
         }
-
       } else if( url === '/collections/campaign-calling-number' ) {
         activation = '캠페인발신번호조회';
         eventName = 'campaign-calling-number';
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/calling-number') > -1 ) {
+        if( error.config.method === 'post' ) {
+          activation = '캠페인발신번호생성';
+          eventName = 'campaign-calling-number';
+          queryType = 'C';
+        } else if( error.config.method === 'put' ) {
+          activation = '캠페인발신번호수정';
+          eventName = 'campaign-calling-number';
+          queryType = 'U';
+        } else if( error.config.method === 'delete' ) {
+          activation = '캠페인발신번호삭제';
+          eventName = 'campaign-calling-number';
+          queryType = 'D';
+        }
+      } else if( url === '/collections/maxcall-ext' ) {
+        activation = '캠페인분배제한조회';
+        eventName = 'maxcall-ext';
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/maxcall-ext') > -1 ) {
+        if( error.config.method === 'post' ) {
+          activation = '캠페인분배제한생성';
+          eventName = 'maxcall-ext';
+          queryType = 'C';
+        } else if( error.config.method === 'put' ) {
+          activation = '캠페인분배제한수정';
+          eventName = 'maxcall-ext';
+          queryType = 'U';
+        } else if( error.config.method === 'delete' ) {
+          activation = '캠페인분배제한삭제';
+          eventName = 'maxcall-ext';
+          queryType = 'D';
+        }
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/calling-list') > -1 ) {
+        if( error.config.method === 'post' ) {
+          activation = '발신리스트업로드추가';
+          eventName = 'campaign-calling-list';
+          queryType = 'C';
+        } else if( error.config.method === 'delete' ) {
+          activation = '발신리스트업로드삭제';
+          eventName = 'campaign-calling-list';
+          queryType = 'D';
+        }
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/black-list') > -1 ) {
+        if( error.config.method === 'post' ) {
+          activation = '블랙리스트업로드추가';
+          eventName = 'campaign-black-list';
+          queryType = 'C';
+        } else if( error.config.method === 'delete' ) {
+          activation = '블랙리스트업로드삭제';
+          eventName = 'campaign-black-list';
+          queryType = 'D';
+        }
+      } else if( url === '/collections/campaign-blacklist-max' ) {
+        activation = '블랙리스트최대수량조회';
+        eventName = 'campaign-blacklist-max';
+      } else if( url === '/collections/campaign-blacklist-count' ) {
+        activation = '블랙리스트수량조회';
+        eventName = 'campaign-blacklist-count';
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/dial-speed') > -1 ) {
+        activation = '캠페인발신속도수정';
+        eventName = 'campaign-black-list';
+        queryType = 'U';
+      } else if( url.indexOf('/campaigns') > -1 && url.indexOf('/callback-list') > -1 ) {
+        activation = '캠페인콜백리스트추가';
+        eventName = 'campaign-callback-list';
+        queryType = 'C';
+      } else if( url === '/collections/campaign-agent' ) {
+        activation = '캠페인소속상담사조회';
+        eventName = 'campaignAgents';
+      } else if( url === '/collections/agent-campaign' ) {
+        activation = '상담사소속캠페인조회';
+        eventName = 'agentCampaigns';
+      } else if( url === '/collections/callback-campaign' ) {
+        activation = '콜백캠페인조회';
+        eventName = 'callback-campaign';
+
+
+
+
       } else if( url === '/collections/campaign-group' || url === 'collections/campaign-group' ) {
         activation = '캠페인그룹정보조회';
         eventName = 'campaignGroups';

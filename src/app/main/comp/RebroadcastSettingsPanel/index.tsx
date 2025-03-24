@@ -851,7 +851,7 @@ const RebroadcastSettingsPanel = () => {
     //캠페인 상태 변경 api 호출
     const { mutate: fetchCampaignStatusUpdate } = useApiForCampaignStatusUpdate({
         onSuccess: (data) => {
-            if (data.result_code === 0) {
+            if (data.result_code === 0 || data.result_code === -13) {
                 fetchCampaignCurrentRedial({
                     campaign_id: Number(campaignIdForUpdateFromSideMenu),
                     condition: MakeRedialPacket()
