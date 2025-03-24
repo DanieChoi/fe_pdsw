@@ -126,6 +126,8 @@ const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply,
             }
             if( tempCampaign[0].start_flag === 1 ){
                 setRealtime(true);
+            }else{
+                setRealtime(false);
             }
             
             // setListCount(campaigns.filter(data=>Number(campaignId) === data.campaign_id)[0].list_count);
