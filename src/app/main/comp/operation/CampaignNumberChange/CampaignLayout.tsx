@@ -13,6 +13,7 @@ import { useApiForCallingNumberInsert } from '@/features/campaignManager/hooks/u
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import { useApiForCallingNumberDelete } from '@/features/campaignManager/hooks/useApiForCallingNumberDelete';
 
 type GridRow = MainDataResponse & {
   calling_number: string;
@@ -42,17 +43,17 @@ function CampaignLayout() {
     isOpen: false,
     message: '',
     title: '알림',
-    type: '1',
+    type: '2',
     onConfirm: () => {},
     onCancel: () => {}
   });
 
-  const showConfirm = (message: string, onConfirm: () => void) => {
+  const showConfirm = (message: string, onConfirm: () => void) => { // 취소 버튼 있음
     setAlertState({
       isOpen: true,
       message,
       title: '확인',
-      type: '2',
+      type: '1',
       onConfirm: () => {
         onConfirm();
         closeAlert();
@@ -61,12 +62,12 @@ function CampaignLayout() {
     });
   };
 
-  const showAlert = (message: string) => {
+  const showAlert = (message: string) => { // 취소 버튼 없음
     setAlertState({
       isOpen: true,
       message,
       title: '알림',
-      type: '1',
+      type: '2',
       onConfirm: closeAlert,
       onCancel: () => {}
     });
@@ -124,8 +125,34 @@ function CampaignLayout() {
     }
   });
 
-    // 발신번호 수정
+  // 발신번호 수정
   const { mutate: fetchCallingNumberUpdate } = useApiForCallingNumberUpdate({
+    onSuccess: (data) => {
+      fetchCallingNumbers({
+        session_key: '',
+        tenant_id: 0,
+      })
+    },onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+            onConfirm: closeAlert,
+            onCancel: () => {}
+          });
+          Cookies.remove('session_key');
+          setTimeout(() => {
+            router.push('/login');
+          }, 1000);
+      } else {
+          showAlert('발신번호 수정 중 오류가 발생했습니다: ' + error.message);
+      }
+    }
+  })
+
+  // 발신번호 삭제
+  const { mutate: fetchCallingNumberDelete } = useApiForCallingNumberDelete({
     onSuccess: (data) => {
       fetchCallingNumbers({
         session_key: '',
@@ -238,12 +265,12 @@ function CampaignLayout() {
   // 발신번호 저장 버튼 핸들러
   const handleSave = () => {
     if (!selectedCampaignId) {
-      showConfirm('대상캠페인을 선택해주세요.', () => {})
+      showAlert('대상캠페인을 선택해주세요.')
       return;
     }
 
     if (!selectedCallingNumber || selectedCallingNumber.trim().length === 0) {
-      showConfirm('발신번호를 입력해주세요.', () => {})
+      showAlert('발신번호를 입력해주세요.')
       return;
     }
 
@@ -255,12 +282,53 @@ function CampaignLayout() {
 
     if (existingCallingNumber) {
       fetchCallingNumberUpdate(saveRequest);
-      showConfirm('발신번호가 성공적으로 수정되었습니다.', () => {});
+      showAlert('발신번호가 성공적으로 수정되었습니다.');
     } else {
       fetchCallingNumberInsert(saveRequest);
-      showConfirm('새로운 발신번호가 성공적으로 저장되었습니다.', () => {});
+      showAlert('새로운 발신번호가 성공적으로 저장되었습니다.');
     }
   };
+
+  const handleDelete = () => {
+    // 선택된 캠페인이 없을 경우 알림
+    if (!selectedCampaignId || selectedCampaignId.trim() === '') {
+      showAlert('삭제할 발신번호의 캠페인을 먼저 선택해주세요.');
+      return;
+    }
+  
+    // 발신번호가 없는 경우 알림
+    if (!selectedCallingNumber || selectedCallingNumber.trim() === '') {
+      showAlert('선택한 캠페인에 등록된 발신번호가 없습니다.');
+      return;
+    }
+  
+    // 삭제 확인 알림
+    showConfirm(
+      `선택된 캠페인 [${selectedCampaignName}]의 발신번호를 삭제하시겠습니까? \n\n ※주의: 삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해 주세요.`,
+      () => {
+        // 확인 버튼 클릭 시 실행될 함수
+        fetchCallingNumberDelete(
+          {
+            campaign_id: Number(selectedCampaignId),
+            calling_number: selectedCallingNumber
+          }, 
+          {
+            onSuccess: (data) => {
+              showAlert('발신번호가 성공적으로 삭제되었습니다.');
+              
+              // 삭제 후 데이터 초기화
+              setSelectedRow(null);
+              setSelectedCampaign(null);
+              setSelectedCampaignId('');
+              setSelectedCampaignName('');
+              setSelectedCallingNumber('');
+              setIsEditing(true);
+            }
+          }
+        );
+      }
+    );
+  }
 
   const handleReset = () => {
     setSelectedRow(null);
@@ -347,6 +415,9 @@ function CampaignLayout() {
             </CommonButton>
             <CommonButton onClick={handleSave}>
               저장
+            </CommonButton>
+            <CommonButton onClick={handleDelete}>
+              삭제
             </CommonButton>
           </div>
 
