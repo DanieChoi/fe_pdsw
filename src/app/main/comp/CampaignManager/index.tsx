@@ -24,9 +24,11 @@ const errorMessage = {
 
 type Props = {
   campaignId?: string;
+  isOpen?: boolean;
+  onCampaignPopupClose?: () => void;
 }
 
-const CampaignManager = ({campaignId}: Props) => {
+const CampaignManager = ({campaignId,isOpen,onCampaignPopupClose}: Props) => {
   
   const { tenants, campaigns, setCampaigns } = useMainStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
@@ -127,7 +129,7 @@ const CampaignManager = ({campaignId}: Props) => {
           <CampaignManagerHeader campaignId={_campaignId} onSearch={handleCampaignHeaderSearch}/>
           <div className="flex gap-[30px]">
             <CampaignManagerList campaignId={_campaignId} campaignHeaderSearchParam={campaignHeaderSearchParam}/>
-            <CampaignManagerDetail />
+            <CampaignManagerDetail isOpen={isOpen} onCampaignPopupClose={onCampaignPopupClose}/>
           </div>
         </div>
       <CustomAlert

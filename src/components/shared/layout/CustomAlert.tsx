@@ -86,6 +86,9 @@ const CustomAlert = ({
                                         닫기
                                     </CommonButton>
                                 </>
+                            ) : type === '3' ? (
+                                <>
+                                </>
                             ) : (
                                 <>
                                     <CommonButton 

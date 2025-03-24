@@ -322,7 +322,13 @@ export interface NotificationTabParam {
   supervisor_phone: string;
 }
 
-export default function CampaignDetail() {
+
+type Props = {
+  isOpen?: boolean;
+  onCampaignPopupClose?: () => void;
+}
+
+export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
@@ -881,13 +887,19 @@ export default function CampaignDetail() {
 
   //캠페인 취소
   const handleCampaignClosed = () => {
-    setAlertState({
-      ...errorMessage,
-      isOpen: true,
-      message: '캠페인 편집창을 종료하시겠습니까?',
-      onClose: handleCampaignClosedExecute,
-      onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
-    });
+    if( isOpen ){ //통합모니터에서 호출시
+      if (onCampaignPopupClose) {
+        onCampaignPopupClose();
+      }
+    }else{
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '캠페인 편집창을 종료하시겠습니까?',
+        onClose: handleCampaignClosedExecute,
+        onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
   }
 
   //캠페인 취소 실행.
