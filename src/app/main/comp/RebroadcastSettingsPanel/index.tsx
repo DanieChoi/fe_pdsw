@@ -45,6 +45,7 @@ interface RebroadcastItem {
         endDate: string;
     };
     redialCondition: string;
+    run_flag: number;
     isDummy?: boolean;
 }
 
@@ -314,6 +315,7 @@ const RebroadcastSettingsPanel = () => {
                 startDate: "",
                 endDate: ""
             },
+            run_flag: 0,
             redialCondition:'',
             isDummy: true
         };
@@ -402,6 +404,13 @@ const RebroadcastSettingsPanel = () => {
 
             if (selected.outgoingTime && selected.outgoingTime.endDate) {
                 setEndDate(new Date(selected.outgoingTime.endDate));
+            }
+            if( selected.run_flag === 2){
+                setTextType('Time out');
+            }else if( selected.run_flag === 1){
+                setTextType('실행');
+            }else if( selected.run_flag === 0){
+                setTextType('미실행');
             }
             setListRedialQuery(selected.redialCondition);
         } else {
@@ -611,6 +620,7 @@ const RebroadcastSettingsPanel = () => {
                         outgoingResults: [],
                         outgoingType: "",
                         outgoingTime: { type: "", startDate: "", endDate: "" },
+                        run_flag: item.run_flag,
                         redialCondition: item.redial_condition,
                         isDummy: false
                     }));
@@ -644,6 +654,13 @@ const RebroadcastSettingsPanel = () => {
                     }
                     if (selected.outgoingTime && selected.outgoingTime.endDate) {
                         setEndDate(new Date(selected.outgoingTime.endDate));
+                    }
+                    if( selected.run_flag === 2){
+                        setTextType('Time out');
+                    }else if( selected.run_flag === 1){
+                        setTextType('실행');
+                    }else if( selected.run_flag === 0){
+                        setTextType('미실행');
                     }
                     setListRedialQuery(selected.redialCondition);
                 }
@@ -682,6 +699,7 @@ const RebroadcastSettingsPanel = () => {
                         startDate: startDate ? startDate.toString() : '',
                         endDate: endDate ? endDate.toString() : '',
                     },
+                    run_flag: 0,
                     redialCondition:tempData.redial_condition,
                     isDummy: false
                 }));
