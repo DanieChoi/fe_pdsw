@@ -4,7 +4,7 @@ import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { Label } from "@/components/ui/label";
 
 export interface BlackListCountPopupProps {
-    campaignId?: string;
+    campaignId?: string | number;
     blackListCount?:number;
     isOpen?: boolean;
     onConfirm?: () => void;

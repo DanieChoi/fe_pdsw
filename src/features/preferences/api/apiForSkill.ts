@@ -104,7 +104,7 @@ export const fetchskillCampaignList = async() : Promise<SkillCampaignListRespons
         filter: {
             skill_id: {
                 "start": 1,
-                "end": 99
+                "end": 999999
             }
         },
         sort: {
