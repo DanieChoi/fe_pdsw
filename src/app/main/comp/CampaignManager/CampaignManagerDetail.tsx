@@ -1422,34 +1422,72 @@ export default function CampaignDetail() {
 
   //예약콜 제한건수설정 버튼 이벤트
   const handleReservedCall = () => {
-    if (openedTabs.some(tab => tab.id === 8)) {
-      setActiveTab(8, openedTabs.filter((data) => data.id === 8)[0].uniqueKey);
-    } else if (!openedTabs.some(tab => tab.id === 8)) {
-      addTab({
-        id: 8,
-        uniqueKey: '8',
-        title: '예약콜 제한 설정',
-        icon: '/header-menu/예약콜제한설정.svg',
-        href: '/reserve',
-        content: null,
-      });
-    }
+    // if (openedTabs.some(tab => tab.id === 8)) {
+    //   setActiveTab(8, openedTabs.filter((data) => data.id === 8)[0].uniqueKey);
+    // } else if (!openedTabs.some(tab => tab.id === 8)) {
+    //   addTab({
+    //     id: 8,
+    //     uniqueKey: '8',
+    //     title: '예약콜 제한 설정',
+    //     icon: '/header-menu/예약콜제한설정.svg',
+    //     href: '/reserve',
+    //     content: null,
+    //   });
+    // }
+    // 해당 아이템의 이전 탭들을 모두 찾아서 제거
+    const existingTabs = openedTabs.filter(tab => tab.id === 8);
+    existingTabs.forEach(tab => {
+      removeTab(tab.id, tab.uniqueKey);
+    });
+    const newTabKey = `8-${Date.now()}`;      
+    addTab({
+      id: 8,
+      campaignId: tempCampaignInfo.campaign_id+'',
+      campaignName: tempCampaignInfo.campaign_name,
+      uniqueKey: newTabKey,
+      title: '예약콜 제한 설정',
+      icon: '/header-menu/예약콜제한설정.svg',
+      href: '/reserve',
+      content: null,
+    });
+    setTimeout(function() {
+      setActiveTab(8, newTabKey);
+    }, 50);
   };
 
   //분배호수 제한설정 버튼 이벤트
   const handleMaxCall = () => {
-    if (openedTabs.some(tab => tab.id === 9)) {
-      setActiveTab(9, openedTabs.filter((data) => data.id === 9)[0].uniqueKey);
-    } else if (!openedTabs.some(tab => tab.id === 9)) {
-      addTab({
-        id: 9,
-        uniqueKey: '9',
-        title: '분배호수 제한 설정',
-        icon: '/header-menu/분배호수제한설정.svg',
-        href: '/distribute',
-        content: null,
-      });
-    }
+    // if (openedTabs.some(tab => tab.id === 9)) {
+    //   setActiveTab(9, openedTabs.filter((data) => data.id === 9)[0].uniqueKey);
+    // } else if (!openedTabs.some(tab => tab.id === 9)) {
+    //   addTab({
+    //     id: 9,
+    //     uniqueKey: '9',
+    //     title: '분배호수 제한 설정',
+    //     icon: '/header-menu/분배호수제한설정.svg',
+    //     href: '/distribute',
+    //     content: null,
+    //   });
+    // }
+    // 해당 아이템의 이전 탭들을 모두 찾아서 제거
+    const existingTabs = openedTabs.filter(tab => tab.id === 9);
+    existingTabs.forEach(tab => {
+      removeTab(tab.id, tab.uniqueKey);
+    });
+    const newTabKey = `9-${Date.now()}`;      
+    addTab({
+      id: 9,
+      campaignId: tempCampaignInfo.campaign_id+'',
+      campaignName: tempCampaignInfo.campaign_name,
+      uniqueKey: newTabKey,
+      title: '분배호수 제한 설정',
+      icon: '/header-menu/분배호수제한설정.svg',
+      href: '/distribute',
+      content: null,
+    });
+    setTimeout(function() {
+      setActiveTab(9, newTabKey);
+    }, 50);
   };
 
   //재발신 버튼 이벤트

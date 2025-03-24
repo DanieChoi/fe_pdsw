@@ -385,7 +385,7 @@ axiosInstance.interceptors.response.use(
           "successFlag": 0,
           "eventName": eventName,
           "queryRows": 0,
-          "targetId": error.config.url,
+          "targetId": error.config.url||0,
           "userSessionType": 0,
           "exportFlag": 1,
           "memo": "",

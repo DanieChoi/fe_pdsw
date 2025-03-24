@@ -5,7 +5,7 @@ import { CustomInput } from "@/components/shared/CustomInput";
 import { Label } from "@/components/ui/label";
 import CampaignModal from '../CampaignModal';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
-import { useMainStore } from '@/store';
+import { useMainStore, useTabStore } from '@/store';
 import { 
   useApiForCallLimitSettingCreate, 
   useApiForCallLimitSettingList, 
@@ -45,6 +45,7 @@ const CampaignSettings = () => {
   const [limitCount, setLimitCount] = useState('');
   const [limitSettings, setLimitSettings] = useState<LimitSettingItem[]>([]);
   const router = useRouter();
+  const { activeTabId, openedTabs } = useTabStore()
   
   const [alertState, setAlertState] = useState({
     isOpen: false,
@@ -252,7 +253,22 @@ const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
     }
   };
   
-  
+  useEffect(() => {
+    if (activeTabId === 8) {
+      const tempData = openedTabs.filter(tab => tab.id === 8);
+      if( tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
+        setCampaignId(tempData[0].campaignId);
+        setCampaignName(tempData[0].campaignName);
+      }
+    } else if (activeTabId === 9) {
+      const tempData = openedTabs.filter(tab => tab.id === 9);
+      if( tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
+        setCampaignId(tempData[0].campaignId);
+        setCampaignName(tempData[0].campaignName);
+      }
+    }
+  }, [activeTabId, openedTabs]);
+   
 
   const getRowClass = (row: Row) => {
     return selectedRow?.campaign_id === row.campaign_id && 
