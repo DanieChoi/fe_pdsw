@@ -17,6 +17,7 @@ import { useSideMenuCampaignGroupTabStore } from '@/store/storeForSideMenuCampai
 import TitleWrap from "@/components/shared/TitleWrap";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { CustomInput } from "@/components/shared/CustomInput";
+import { useCampainManagerStore } from '@/store/campainManagerStore';
 interface SkillWithCampaigns {
   skillId: number;
   campaigns: { campaignId: number; tenantId: number }[];
@@ -54,6 +55,9 @@ const CampaignAddPopup: React.FC<Props> = ({
   const [campaignLookup, setCampaignLookup] = useState<Record<number, CampaignInfo>>({});
   const [skillLookup, setSkillLookup] = useState<Record<number, SkillInfo>>({});
   const { refetchTreeData } = useSideMenuCampaignGroupTabStore();
+
+  const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions
+    , campaignGroupManagerInit, setCampaignGroupManagerInit } = useCampainManagerStore();  
 
   // ----------------------------
   //  Hooks
@@ -390,6 +394,7 @@ const CampaignAddPopup: React.FC<Props> = ({
             }
 
             refetchTreeData();
+            setCampaignGroupManagerInit(true);
 
             setSelectedLeftCampaigns([]);
             setCampaignIdsForPopup([]);
