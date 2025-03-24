@@ -8,6 +8,7 @@ import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useMainStore, useTabStore } from '@/store';
 import { 
   useApiForCallLimitSettingCreate, 
+  useApiForCallLimitSettingDelete, 
   useApiForCallLimitSettingList, 
   useApiForCallLimitSettingUpdate 
 } from '@/features/preferences/hooks/useApiForCallLimitSetting';
@@ -61,7 +62,7 @@ const CampaignSettings = () => {
       isOpen: true,
       message,
       title: '알림',
-      type: '1',
+      type: '2',
       onConfirm: closeAlert,
       onCancel: () => {}
     });
@@ -72,7 +73,7 @@ const CampaignSettings = () => {
       isOpen: true,
       message,
       title: '확인',
-      type: '2',
+      type: '1',
       onConfirm: () => {
         onConfirm();
         closeAlert();
@@ -106,57 +107,83 @@ const CampaignSettings = () => {
     }
   });
 
-// 제한건수 추가 API 
-const { mutate: createCallLimitSetting } = useApiForCallLimitSettingCreate({
-  onSuccess: () => {
-    fetchCallLimitSettingList({
-      tenant_id_array: tenants.map(tenant => tenant.tenant_id)
-    });
-  },
-  onError: (error) => {
-    if (error.message.split('||')[0] === '5') {
-      setAlertState({
-        ...errorMessage,
-        isOpen: true,
-        message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-        onConfirm: closeAlert,
-        onCancel: () => {}
+  // 제한건수 추가 API 
+  const { mutate: createCallLimitSetting } = useApiForCallLimitSettingCreate({
+    onSuccess: () => {
+      fetchCallLimitSettingList({
+        tenant_id_array: tenants.map(tenant => tenant.tenant_id)
       });
-      Cookies.remove('session_key');
-      setTimeout(() => {
-        router.push('/login');
-      }, 1000);
-    } else {
-        showAlert('저장에 실패했습니다: ' + error.message);
+    },
+    onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+          showAlert('저장에 실패했습니다: ' + error.message);
+      }
     }
-  }
-});
+  });
 
-// 제한건수 수정 API
-const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
-  onSuccess: () => {
-    fetchCallLimitSettingList({
-      tenant_id_array: tenants.map(tenant => tenant.tenant_id)
-    });
-  },
-  onError: (error) => {
-    if (error.message.split('||')[0] === '5') {
-      setAlertState({
-        ...errorMessage,
-        isOpen: true,
-        message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-        onConfirm: closeAlert,
-        onCancel: () => {}
+  // 제한건수 수정 API
+  const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
+    onSuccess: () => {
+      fetchCallLimitSettingList({
+        tenant_id_array: tenants.map(tenant => tenant.tenant_id)
       });
-      Cookies.remove('session_key');
-      setTimeout(() => {
-        router.push('/login');
-      }, 1000);
-    } else {
-        showAlert('수정에 실패했습니다: ' + error.message);
+    },
+    onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+          showAlert('수정에 실패했습니다: ' + error.message);
+      }
     }
-  }
-});
+  });
+
+  // 제한건수 삭제 API
+  const { mutate: deleteCallLimitSetting } = useApiForCallLimitSettingDelete({
+    onSuccess: () => {
+      fetchCallLimitSettingList({
+        tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+      });
+    },
+    onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+          showAlert('삭제에 실패했습니다: ' + error.message);
+      }
+    }
+  });
 
   useEffect(() => {
     fetchCallLimitSettingList({
@@ -208,13 +235,55 @@ const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
     if (selectedRow) {
       // 수정
       updateCallLimitSetting(saveData);
-      showConfirm('수정되었습니다.', () => {})
+      showAlert('수정되었습니다.')
     } else {
       // 신규 등록
       createCallLimitSetting(saveData);
-      showConfirm('저장되었습니다.', () => {});
+      showAlert('저장되었습니다.');
     }
   };
+
+  const handleDelete = () => {
+    // 선택된 항목이 없을 경우 알림
+    if (!campaignId || !selectedRow) {
+      showAlert('삭제할 캠페인을 먼저 선택해주세요.');
+      return;
+    }
+  
+    // 선택된 캠페인의 tenant_id 찾기
+    const selectedCampaign = campaigns?.find(camp => camp.campaign_id === Number(campaignId));
+    if (!selectedCampaign) {
+      showAlert('캠페인 정보를 찾을 수 없습니다.');
+      return;
+    }
+  
+    // 삭제 확인 알림
+    showConfirm(
+      `선택된된 캠페인 [${selectedCampaign.campaign_name}]의 제한건수 설정을 삭제하시겠습니까? \n\n ※주의: 삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해 주세요.`,
+      () => {
+        // 확인 버튼 클릭 시 실행될 함수
+        deleteCallLimitSetting(
+          {
+            campaign_id: Number(campaignId),
+            tenant_id: selectedCampaign.tenant_id
+          },
+          {
+            onSuccess: () => {
+              // showAlert('제한건수 설정이 성공적으로 삭제되었습니다.');
+              
+              // 삭제 후 데이터 초기화
+              setSelectedRow(null);
+              setCampaignId('');
+              setCampaignName('');
+              setLimitCount('');
+              
+              // 데이터 목록 새로고침 - 이미 onSuccess에서 처리됨
+            }
+          }
+        );
+      }
+    );
+  }
 
   const handleCellClick = ({ row }: { row: Row }) => {
     setSelectedRow(row);
@@ -335,6 +404,7 @@ const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
           <div className="flex justify-end gap-2 pt-4">
             <CommonButton onClick={handleNew}>신규</CommonButton>
             <CommonButton onClick={handleSave}>저장</CommonButton>
+            <CommonButton onClick={handleDelete}>삭제</CommonButton>
           </div>
           <div className="mt-[20px] text-sm">
             <ul className='space-y-1'>

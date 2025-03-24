@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/lib/axios";
-import { CallLimitSettingCreateRequest, CallLimitSettingListResponse, SuccesResponse, TenantIdCredentials } from "../types/SystemPreferences";
+import { CallLimitSettingCreateRequest, CallLimitSettingDeleteRequest, CallLimitSettingListResponse, SuccesResponse, TenantIdCredentials } from "../types/SystemPreferences";
 
 // 운영설정 예약콜 제한설정 리스트 요청
 export const fetchCallLimitSettingList = async (credentials: TenantIdCredentials): Promise<CallLimitSettingListResponse> => {
@@ -77,6 +77,27 @@ export const UpdateCallLimitSetting = async (credentials: CallLimitSettingCreate
         const { data } = await axiosInstance.put<SuccesResponse>(
             'campaigns/'+credentials.campaign_id+'/reserved-call',
             requestData
+        );
+        return data;
+    } catch (error: any) {
+        if (error.response?.status === 401) {
+          throw new Error('세션이 만료되었습니다. 다시 로그인해주세요.');
+        }
+        throw new Error(error.response?.data?.result_code + '||' + error.response?.data?.result_msg || '데이터 가져오기 실패');
+    }
+};
+
+// 삭제 API (DELETE)
+export const deleteCallLimitSetting = async (credentials: CallLimitSettingDeleteRequest): Promise<SuccesResponse> => {
+    const requestData = {
+        request_data: {
+            tenant_id: credentials.tenant_id
+        }
+    };
+    try {
+        const { data } = await axiosInstance.delete<SuccesResponse>(
+            'campaigns/'+credentials.campaign_id+'/reserved-call',
+            { data: requestData }
         );
         return data;
     } catch (error: any) {

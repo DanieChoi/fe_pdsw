@@ -103,6 +103,12 @@ export interface CallLimitSettingCreateRequest {
   max_criteria: number;
 }
 
+// 예약콜 제한설정 삭제 요청 타입
+export interface CallLimitSettingDeleteRequest {
+  campaign_id: number;
+  tenant_id: number;
+}
+
 // 상담사 리스트
 export interface CounselorListCredentials {
   tenantId: number;
