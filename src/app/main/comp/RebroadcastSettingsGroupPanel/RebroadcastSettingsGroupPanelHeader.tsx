@@ -57,7 +57,7 @@ const RebroadcastSettingsGroupPanelHeader = ({campaignGroupId,campaignGroupName,
 }:Props) => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
     const { campaigns } = useMainStore();
-    const { removeTab } = useTabStore();
+    const { removeTab, openedTabs } = useTabStore();
     
     const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
     const [broadcastType, setBroadcastType] = useState("realtime");
@@ -194,7 +194,11 @@ const RebroadcastSettingsGroupPanelHeader = ({campaignGroupId,campaignGroupName,
                             적용
                         </CommonButton>
                         <CommonButton 
-                            onClick={() => removeTab(24,'24')}
+                            onClick={() => {
+                                const existingTabs = openedTabs.filter(tab => tab.id === 24)[0];
+                                    removeTab(24, existingTabs.uniqueKey);
+                                }
+                            }
                         >
                             닫기
                         </CommonButton>

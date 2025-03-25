@@ -1300,23 +1300,43 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
 
   //새 캠페인 버튼 이벤트
   const handleNewCampaign = () => {
-    if (openedTabs.some(tab => tab.id === 13)) {
-      setActiveTab(13, '13');
-    } else if (!openedTabs.some(tab => tab.id === 13)) {
-      addTab({
-        id: 13,
-        uniqueKey: '13',
-        title: '새 캠페인',
-        icon: '',
-        href: '',
-        content: null,
-      });
+    // if (openedTabs.some(tab => tab.id === 13)) {
+    //   setActiveTab(13, '13');
+    // } else if (!openedTabs.some(tab => tab.id === 13)) {
+    //   addTab({
+    //     id: 13,
+    //     uniqueKey: '13',
+    //     title: '새 캠페인',
+    //     icon: '',
+    //     href: '',
+    //     content: null,
+    //   });
 
-    }
+    // }
+    // 해당 아이템의 이전 탭들을 모두 찾아서 제거
+    const existingTabs = openedTabs.filter(tab => tab.id === 13);
+    existingTabs.forEach(tab => {
+      removeTab(tab.id, tab.uniqueKey);
+    });
+    const newTabKey = `13-${Date.now()}`;      
+    addTab({
+      id: 13,
+      uniqueKey: '13',
+      title: '새 캠페인',
+      icon: '',
+      href: '',
+      content: null,
+    });
+    setTimeout(function() {
+      setActiveTab(13, newTabKey);
+    }, 50);
   };
 
   //리스트 적용 버튼 이벤트
   const handleListManager = () => {
+    if( campaignIdForUpdateFromSideMenu == null || campaignIdForUpdateFromSideMenu === ''){
+      setCampaignIdForUpdateFromSideMenu(tempCampaignInfo.campaign_id+'');
+    }
     if (openedTabs.some(tab => tab.id === 7)) {
       setActiveTab(7, openedTabs.filter((data) => data.id === 7)[0].uniqueKey);
     } else if (!openedTabs.some(tab => tab.id === 7)) {
