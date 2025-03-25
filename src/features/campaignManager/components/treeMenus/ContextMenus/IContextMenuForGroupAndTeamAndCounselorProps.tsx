@@ -525,16 +525,15 @@ export function IContextMenuForGroupAndTeamAndCounselor({
         <ContextMenu modal={false}> {/* modal 속성을 false로 설정하여 동작 개선 */}
           <ContextMenuTrigger 
             className="w-full h-full" 
-            style={triggerStyles} 
             disabled={isDialogActive} // 다이얼로그가 활성화된 상태에서는 트리거 비활성화
           >
             {children}
           </ContextMenuTrigger>
-          <ContextMenuContent className="min-w-[150px] bg-white shadow-md border border-gray-200 rounded py-1">
+          <ContextMenuContent className="min-w-[150px] rounded-[3px] border border-[#333]">
             {authorizedMenuItems.map((menuItem) => (
               <ContextMenuItem
                 key={menuItem.key}
-                className="px-3 py-1.5 text-sm cursor-pointer hover:bg-gray-100"
+                className="px-[6px] py-[4px] text-sm cursor-pointer hover:bg-gray-100"
                 onClick={() => handleItemClick(menuItem.isUnassign)}
               >
                 {menuItem.title}

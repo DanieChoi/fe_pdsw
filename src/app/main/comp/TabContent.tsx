@@ -14,6 +14,7 @@ import CampaignUpdatePanel from "./CampaignUpdatePanel";
 import CampaignGroupManager from "./CampaignGroupManager";
 import NewCampaignManager from "./NewCampaignManager";
 import RebroadcastSettingsPanel from "./RebroadcastSettingsPanel";
+import RebroadcastSettingsGroupPanel from "./RebroadcastSettingsGroupPanel";
 import CampaignManager from "./CampaignManager";
 import AgentStatusMonitoring from "./AgentStatusMonitoring";
 import SystemMonitoring from "./SystemMonitoring";
@@ -71,6 +72,8 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
       return <AgentStatusMonitoring campaignId={Number(campaignId)} />;
     case 23:
       return <SystemMonitoring />;
+    case 24:
+      return <RebroadcastSettingsGroupPanel />;
     case 100:
       return <>잘못된 스킬 할당 탭입니다.</>;
     case 130: // 캠페인 복사 화면 리턴

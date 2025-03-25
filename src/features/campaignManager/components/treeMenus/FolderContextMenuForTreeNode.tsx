@@ -74,7 +74,7 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
         <ContextMenuItem
           key={menuItem.id}
           onClick={menuItem.handler}
-          className="cursor-pointer hover:bg-[#F4F6F9] focus:bg-[#F4F6F9] flex items-center text-[#333] px-2 py-1.5"
+          className="cursor-pointer hover:bg-[#F4F6F9] focus:bg-[#F4F6F9] flex items-center text-[#333] px-[6px] py-[4px]"
         >
           <span>{menuItem.title}</span>
         </ContextMenuItem>

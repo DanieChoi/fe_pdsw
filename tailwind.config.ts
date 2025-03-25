@@ -13,6 +13,9 @@ export default {
 		screens: {
 			'bp': {'max': '1706px'} // 1200px 이하에서 적용
 		  },
+		  fontFamily: {
+			myFont: ['Pretendard', 'sans-serif'],
+		  },
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
