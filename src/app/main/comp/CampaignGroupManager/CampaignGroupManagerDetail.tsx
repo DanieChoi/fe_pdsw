@@ -983,7 +983,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
             fetchCampaignSkillUpdate({
               ...tempCampaignSkills
               , campaign_id: selectCampaignGroupList[i].campaign_id
-              , skill_id: []
+              , skill_id: inputSkills.split(',').map(Number)
             });
           // }
           // if (campaignScheduleChangeYn) {
@@ -1017,6 +1017,11 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
       }
     }
   }
+  //캠페인 삭제 실행.
+  const handleCampaignDeleteExecute = () => {
+    setAlertState((prev) => ({ ...prev, isOpen: false }));
+    onGroupDelete({tenant_id: groupInfo.tenantId,group_id: groupInfo.campaignGroupId })
+  };
 
   //변경여부 체크
   useEffect(() => {
@@ -1145,19 +1150,40 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
   //재발신 버튼 이벤트
   const handleRebroadcast = () => {
     if (campaignId > 0) {
-      setCampaignIdForUpdateFromSideMenu(campaignId + '');
-      if (openedTabs.some(tab => tab.id === 20)) {
-        setActiveTab(20, openedTabs.filter((data) => data.id === 20)[0].uniqueKey);
-      } else if (!openedTabs.some(tab => tab.id === 20)) {
-        addTab({
-          id: 20,
-          uniqueKey: '20',
-          title: '재발신 설정',
-          icon: '',
-          href: '',
-          content: null,
-        });
-      }
+      // setCampaignIdForUpdateFromSideMenu(campaignId + '');
+      // if (openedTabs.some(tab => tab.id === 24)) {
+      //   setActiveTab(24, openedTabs.filter((data) => data.id === 24)[0].uniqueKey);
+      // } else if (!openedTabs.some(tab => tab.id === 24)) {
+      //   addTab({
+      //     id: 24,
+      //     campaignId: groupInfo.campaignGroupId+'',
+      //     campaignName: groupInfo.campaignGroupName,
+      //     uniqueKey: '24',
+      //     title: '재발신 설정',
+      //     icon: '',
+      //     href: '',
+      //     content: null,
+      //   });
+      // }
+      // 해당 아이템의 이전 탭들을 모두 찾아서 제거
+      const existingTabs = openedTabs.filter(tab => tab.id === 24);
+      existingTabs.forEach(tab => {
+        removeTab(tab.id, tab.uniqueKey);
+      });
+      const newTabKey = `24-${Date.now()}`;      
+      addTab({
+        id: 24,
+        campaignId: groupInfo.campaignGroupId+'',
+        campaignName: groupInfo.campaignGroupName,
+        uniqueKey: newTabKey,
+        title: '재발신 설정',
+        icon: '',
+        href: '',
+        content: null,
+      });
+      setTimeout(function() {
+        setActiveTab(24, newTabKey);
+      }, 50);
     } else {
       setCampaignIdForUpdateFromSideMenu('');
       setAlertState({
@@ -1195,10 +1221,16 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
             { label: "소속 캠페인 추가/삭제", onClick: () => handleCloseGroupAddCampaignOpen() },
             { label: "일괄 저장", onClick: () => handleCampaignSave(), },
             {
-              label: "캠페인 그룹 삭제", onClick: () => onGroupDelete({
-                tenant_id: groupInfo.tenantId,
-                group_id: groupInfo.campaignGroupId
-              })
+              label: "캠페인 그룹 삭제", onClick: () => {
+                setAlertState({
+                  ...errorMessage,
+                  isOpen: true,
+                  message: '정말로 캠페인 그룹 '+groupInfo.campaignGroupName+'을(를) 삭제하시겠습니까?'
+                    + '\n 이 작업은 되돌릴 수 없습니다.',
+                  onClose: handleCampaignDeleteExecute,
+                  onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+                });
+              }
             },
             { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue", disabled: campaignId > 0 ? false : true },
           ]}

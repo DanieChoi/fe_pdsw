@@ -10,6 +10,7 @@ import OperationBoard from "@/app/main/comp/operation";
 import CampaignGroupManager from "@/app/main/comp/CampaignGroupManager";
 import NewCampaignManager from "@/app/main/comp/NewCampaignManager";
 import RebroadcastSettingsPanel from "@/app/main/comp/RebroadcastSettingsPanel";
+import RebroadcastSettingsGroupPanel from "@/app/main/comp/RebroadcastSettingsGroupPanel";
 import CampaignManager from "@/app/main/comp/CampaignManager";
 
 export const renderTabContent = (tabId: number | null) => {
@@ -44,6 +45,8 @@ export const renderTabContent = (tabId: number | null) => {
       return <StatusCampaign />;
     case 20:
       return <RebroadcastSettingsPanel />;
+    case 24:
+      return <RebroadcastSettingsGroupPanel />;
     case 100:
       return <>잘못된 스킬 할당 탭입니다.</>;
     default:
