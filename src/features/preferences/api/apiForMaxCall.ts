@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/lib/axios";
-import { CreateMaxCallRequest, CreateMaxCallResponse, MaxCallInitTimeListResponse, MaxCallInitTimeUpdateRequest, MaxCallInitTimeUpdateResponse, MaxCallListCredentials, MaxCallListResponse } from "../types/SystemPreferences";
+import { CreateMaxCallRequest, CreateMaxCallResponse, MaxCallDeleteRequest, MaxCallDeleteResponse, MaxCallInitTimeListResponse, MaxCallInitTimeUpdateRequest, MaxCallInitTimeUpdateResponse, MaxCallListCredentials, MaxCallListResponse } from "../types/SystemPreferences";
 
 // 운영설정 분배호수 제한 설정 리스트 요청
 export const fetchMaxCallList = async (credentials: MaxCallListCredentials): Promise<MaxCallListResponse> => {
@@ -77,6 +77,30 @@ export const updateMaxCall = async (credentials: CreateMaxCallRequest): Promise<
         const { data } = await axiosInstance.put<CreateMaxCallResponse>(
             '/campaigns/'+credentials.campaign_id+'/maxcall-ext',
             requestData
+        );
+        return data;
+    } catch (error: any) {
+        if (error.response?.status === 401) {
+          throw new Error('세션이 만료되었습니다. 다시 로그인해주세요.');
+        }
+        throw new Error(error.response?.data?.result_code + '||' + error.response?.data?.result_msg || '데이터 가져오기 실패');
+    }
+};
+
+// 운영설정 분배호수 제한 설정 삭제 API
+export const deleteMaxCall = async (credentials: MaxCallDeleteRequest): Promise<MaxCallDeleteResponse> => {
+    const requestData = {
+        request_data: [
+            {
+                agent_id: credentials.agent_id
+            }
+        ]
+    };
+
+    try {
+        const { data } = await axiosInstance.delete<MaxCallDeleteResponse>(
+            '/campaigns/'+credentials.campaign_id+'/maxcall-ext',
+            { data: requestData }
         );
         return data;
     } catch (error: any) {
