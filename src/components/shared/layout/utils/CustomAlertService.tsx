@@ -1,5 +1,5 @@
 
-// customAlertService.ts
+// src\components\shared\layout\utils\CustomAlertService.tsx
 import React, { ReactNode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
