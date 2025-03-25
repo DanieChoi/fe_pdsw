@@ -1,3 +1,4 @@
+// \nproject\fe_pdsw\src\features\campaignManager\hooks\useApiForCampaignStatusUpdate.ts
 import { useMutation, useQueryClient, UseMutationOptions } from '@tanstack/react-query';
 import { fetchCampaignStatusUpdate } from '../api/mainCampaignStatusUpdate';
 import { CampaignStatusDataRequest, CampaignStatusResponse, CampaignApiError } from '../types/campaignManagerIndex';
