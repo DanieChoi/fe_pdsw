@@ -1337,18 +1337,37 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     if( campaignIdForUpdateFromSideMenu == null || campaignIdForUpdateFromSideMenu === ''){
       setCampaignIdForUpdateFromSideMenu(tempCampaignInfo.campaign_id+'');
     }
-    if (openedTabs.some(tab => tab.id === 7)) {
-      setActiveTab(7, openedTabs.filter((data) => data.id === 7)[0].uniqueKey);
-    } else if (!openedTabs.some(tab => tab.id === 7)) {
-      addTab({
-        id: 7,
-        uniqueKey: '7',
-        title: '리스트매니저',
-        icon: '',
-        href: '',
-        content: null,
-      });
-    }
+    // if (openedTabs.some(tab => tab.id === 7)) {
+    //   setActiveTab(7, openedTabs.filter((data) => data.id === 7)[0].uniqueKey);
+    // } else if (!openedTabs.some(tab => tab.id === 7)) {
+    //   addTab({
+    //     id: 7,
+    //     uniqueKey: '7',
+    //     title: '리스트매니저',
+    //     icon: '',
+    //     href: '',
+    //     content: null,
+    //   });
+    // }
+    // 해당 아이템의 이전 탭들을 모두 찾아서 제거
+    const existingTabs = openedTabs.filter(tab => tab.id === 7);
+    existingTabs.forEach(tab => {
+      removeTab(tab.id, tab.uniqueKey);
+    });
+    const newTabKey = `7-${Date.now()}`;      
+    addTab({
+      id: 7,
+      campaignId: tempCampaignInfo.campaign_id+'',
+      campaignName: tempCampaignInfo.campaign_name,
+      uniqueKey: '7',
+      title: '리스트매니저',
+      icon: '',
+      href: '',
+      content: null,
+    });
+    setTimeout(function() {
+      setActiveTab(7, newTabKey);
+    }, 50);
   };
   
   // 발신리스트 업로드 취소 api 호출
@@ -1469,18 +1488,37 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     if( campaignIdForUpdateFromSideMenu == null || campaignIdForUpdateFromSideMenu === ''){
       setCampaignIdForUpdateFromSideMenu(tempCampaignInfo.campaign_id+'');
     }
-    if (openedTabs.some(tab => tab.id === 20)) {
-      setActiveTab(20, openedTabs.filter((data) => data.id === 20)[0].uniqueKey);
-    } else if (!openedTabs.some(tab => tab.id === 20)) {
-      addTab({
-        id: 20,
-        uniqueKey: '20',
-        title: '재발신 설정',
-        icon: '',
-        href: '',
-        content: null,
-      });
-    }
+    // if (openedTabs.some(tab => tab.id === 20)) {
+    //   setActiveTab(20, openedTabs.filter((data) => data.id === 20)[0].uniqueKey);
+    // } else if (!openedTabs.some(tab => tab.id === 20)) {
+    //   addTab({
+    //     id: 20,
+    //     uniqueKey: '20',
+    //     title: '재발신 설정',
+    //     icon: '',
+    //     href: '',
+    //     content: null,
+    //   });
+    // }
+    // 해당 아이템의 이전 탭들을 모두 찾아서 제거
+    const existingTabs = openedTabs.filter(tab => tab.id === 20);
+    existingTabs.forEach(tab => {
+      removeTab(tab.id, tab.uniqueKey);
+    });
+    const newTabKey = `20-${Date.now()}`;      
+    addTab({
+      id: 20,
+      campaignId: tempCampaignInfo.campaign_id+'',
+      campaignName: tempCampaignInfo.campaign_name,
+      uniqueKey: '20',
+      title: '재발신 설정',
+      icon: '',
+      href: '',
+      content: null,
+    });
+    setTimeout(function() {
+      setActiveTab(20, newTabKey);
+    }, 50);
   };
 
   return (
