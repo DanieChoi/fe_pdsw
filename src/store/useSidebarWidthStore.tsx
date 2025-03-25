@@ -128,8 +128,8 @@ export const useSidebarWidthStore = create<SidebarWidthState>((set, get) => {
     currentTabId: "campaign",
     tabWidths: {
       "campaign": 240,
-      "agent": 320,
-      "campaign-group": 280,
+      "agent": 240,
+      "campaign-group": 240,
     },
     isResizing: false,
     

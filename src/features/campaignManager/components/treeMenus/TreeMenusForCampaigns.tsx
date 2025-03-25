@@ -224,7 +224,7 @@ export function TreeMenusForCampaigns() {
       // });
 
       // 캠페인 탭 너비 설정
-      setTabWidth("campaign", idealWidth);
+      //setTabWidth("campaign", idealWidth);
     }, 300);
   };
 
