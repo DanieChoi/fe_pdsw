@@ -621,23 +621,23 @@ export function ContextMenuForTreeNode({
   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
     onSuccess: (data) => {
       preventCloseRef.current = true;
-      if (data.result_code === 0) {
-        // 성공 시
-        setCurrentStatus(tempStatus);
-        showAlertDialog("캠페인 상태가 성공적으로 변경되었습니다.", "캠페인");
+      // if (data.result_code === 0) {
+      //   // 성공 시
+      //   setCurrentStatus(tempStatus);
+      //   showAlertDialog("캠페인 상태가 성공적으로 변경되었습니다.", "캠페인");
 
-        // CampaignManager 탭(ID: 2)이 열려 있는 경우만 다시 fetch
-        const isCampaignManagerTabOpen = openedTabs.some(tab => tab.id === 2);
-        if (isCampaignManagerTabOpen) {
-          fetchMain({ session_key, tenant_id });
-        }
-      } else {
-        // 실패 시
-        showAlertDialog(
-          CheckCampaignSaveReturnCode(data.reason_code),
-          "캠페인 상태 변경 오류"
-        );
-      }
+      //   // CampaignManager 탭(ID: 2)이 열려 있는 경우만 다시 fetch
+      //   const isCampaignManagerTabOpen = openedTabs.some(tab => tab.id === 2);
+      //   if (isCampaignManagerTabOpen) {
+      //     fetchMain({ session_key, tenant_id });
+      //   }
+      // } else {
+      //   // 실패 시
+      //   showAlertDialog(
+      //     CheckCampaignSaveReturnCode(data.reason_code),
+      //     "캠페인 상태 변경 오류"
+      //   );
+      // }
     },
     onError: (error) => {
       toast.error(error.message || "상태 변경 중 오류가 발생했습니다.", {

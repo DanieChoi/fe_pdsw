@@ -122,7 +122,9 @@ export function IContextMenuForCampaignForCampaignGroup({
     onSuccess: (data) => {
       toast.success("캠페인 상태가 변경되었습니다22.");
       preventCloseRef.current = true;
-
+      
+      console.log("캠페인 상태 업데이트");
+    
       fetchMain({
         session_key: session_key,
         tenant_id: tenant_id
