@@ -230,8 +230,16 @@ export default function Footer({
     else if (announce === '/pds/campaign/status') {
       _message = '캠페인 동작상태 '
       if (command === 'UPDATE') {
-        const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === data['campaign_id']);
-        _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + tempCampaign?.campaign_name + ' , 동작상태 : ' + data['campaign_status'] + ' , 완료구분 : 진행중';
+        let _start_flag = '';
+        if (data['campaign_status'] === 1) {
+          _start_flag = '시작';
+        } else if (data['campaign_status'] === 2) {
+          _start_flag = '멈춤';
+        } else if (data['campaign_status'] === 3) {
+          _start_flag = '중지';
+        }
+        const tempCampaign = campaigns.filter((campaign) => campaign.campaign_id === Number(data['campaign_id']));
+        _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + tempCampaign[0].campaign_name + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
       }
     }
     if (_message !== '') {
@@ -311,6 +319,15 @@ export default function Footer({
     }
   };
 
+  useEffect(() => {
+      if (campaigns && campaigns.length === 0) {
+        fetchMain({
+          session_key: '',
+          tenant_id: tenant_id,
+        });
+      }
+  }, []);
+  
   return (
     <Resizable
       size={{

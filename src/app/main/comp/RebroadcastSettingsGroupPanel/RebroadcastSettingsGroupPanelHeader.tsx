@@ -36,7 +36,8 @@ const errorMessage: CustomAlertRequest = {
 };
 
 type Props = {
-  campaignId?: string;
+    campaignGroupId: string;
+    campaignGroupName: string;
   reservationShouldShowApply: boolean;
   reservationShouldShowAdd:boolean;
   reservationShouldShowDelete:boolean;
@@ -47,7 +48,7 @@ type Props = {
   handleCheckListCount:() => void;
 }
 
-const RebroadcastSettingsGroupPanelHeader = ({campaignId, reservationShouldShowApply,reservationShouldShowAdd, reservationShouldShowDelete
+const RebroadcastSettingsGroupPanelHeader = ({campaignGroupId,campaignGroupName, reservationShouldShowApply,reservationShouldShowAdd, reservationShouldShowDelete
     , handleBroadcastTypeChange
     , handleAddRebroadcast
     , handleRemoveRebroadcast
@@ -117,50 +118,40 @@ const RebroadcastSettingsGroupPanelHeader = ({campaignId, reservationShouldShowA
         setShouldShowDelete(reservationShouldShowDelete);
     }, [reservationShouldShowApply,reservationShouldShowAdd,reservationShouldShowDelete]);
 
-    useEffect(() => {
-        setShouldShowApply(true);
-        if( campaigns && campaignId !== '0' ){
-            setHeaderCampaignId(campaignId+'');
-            const tempCampaign = campaigns.filter(data=>Number(campaignId) === data.campaign_id);
-            if( tempCampaign.length > 0 ){
-                setListCount(tempCampaign[0].list_count);
-            }
-            if( tempCampaign[0].start_flag === 1 ){
-                setRealtime(true);
-            }else{
-                setRealtime(false);
-            }
+    // useEffect(() => {
+    //     setShouldShowApply(true);
+    //     if( campaigns && campaignId !== '0' ){
+    //         setHeaderCampaignId(campaignId+'');
+    //         const tempCampaign = campaigns.filter(data=>Number(campaignId) === data.campaign_id);
+    //         if( tempCampaign.length > 0 ){
+    //             setListCount(tempCampaign[0].list_count);
+    //         }
+    //         if( tempCampaign[0].start_flag === 1 ){
+    //             setRealtime(true);
+    //         }else{
+    //             setRealtime(false);
+    //         }
             
-            // setListCount(campaigns.filter(data=>Number(campaignId) === data.campaign_id)[0].list_count);
-        }
-    }, [campaignId,campaigns]);
+    //     }
+    // }, [campaignId,campaigns]);
 
     return (
                 <div className="flex title-background justify-between">
                     <div className="flex gap-4 items-center">
                         <div className="flex items-center gap-2">
                             <Label className="w-30 min-w-20">캠페인 그룹 아이디</Label>
-                            <Select defaultValue='0' value={headerCampaignId}  onValueChange={setHeaderCampaignId} disabled>
-                                <SelectTrigger className="w-[140px]">
-                                    <SelectValue placeholder="캠페인선택" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem key='0' value='0'>-선택-</SelectItem>
-                                    {campaigns.map(option => (
-                                        <SelectItem key={option.campaign_id} value={option.campaign_id+''}>
-                                        {option.campaign_id}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-
+                            <CustomInput 
+                                className="w-[140px]"
+                                disabled
+                                value={campaignGroupId}
+                            />
                         </div>
                         <div className="flex items-center gap-2">
                             <Label className="w-30 min-w-20">캠페인 그룹명</Label>
                             <CustomInput 
                                 className="w-[140px]"
                                 disabled
-                                value={headerCampaignId === ''?'':campaigns.filter(data=>Number(headerCampaignId) === data.campaign_id)[0].campaign_name||''}
+                                value={campaignGroupName}
                             />
                         </div>
                         <CommonRadio
