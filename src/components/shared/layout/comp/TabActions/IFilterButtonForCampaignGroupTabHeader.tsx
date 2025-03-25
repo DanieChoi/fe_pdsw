@@ -45,7 +45,7 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
   const getExpansionButtonClass = (mode: 'tenant' | 'group' | 'all') => {
     const baseClass = "h-6 min-w-6 px-1 text-xs border rounded";
     return currentExpansionMode === mode 
-      ? `${baseClass} bg-green-100 text-green-700 border-green-200` 
+      ? `${baseClass} bg-[#56CAD6] text-[#fff] ` 
       : `${baseClass} hover:bg-gray-50`;
   };
 
@@ -92,30 +92,30 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
           </CommonButton>
         </PopoverTrigger>
         <PopoverContent className="w-auto min-w-[180px] p-0 py-[10px] px-[12px] rounded-[3px] border border-[#333]" align="start">
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col">
             {/* 정렬 기준 헤더와 필드 토글 */}
-            <div className="mb-2">
+            <div className="">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">정렬 기준</span>
+                <span className="text-sm text-[#333]">정렬 기준</span>
                 {renderExpansionButtons()}
               </div>
 
               <div className="flex gap-2">
                 <button
-                  className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md border ${
+                  className={`flex-1 px-[6px] py-[4px] text-sm rounded-md border ${
                     sortField === "id" 
-                      ? "bg-green-100 text-green-700 border-green-200" 
-                      : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                      ? "bg-[#56CAD6] text-[#fff] " 
+                      : "bg-white text-[#333] border-gray-200 hover:bg-gray-50"
                   }`}
                   onClick={() => toggleSortField("id")}
                 >
                   ID
                 </button>
                 <button
-                  className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md border ${
+                  className={`flex-1 px-[6px] py-[4px] text-sm rounded-md border ${
                     sortField === "name" 
-                      ? "bg-green-100 text-green-700 border-green-200" 
-                      : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                      ? "bg-[#56CAD6] text-[#fff] " 
+                      : "bg-white text-[#333] border-gray-200 hover:bg-gray-50"
                   }`}
                   onClick={() => toggleSortField("name")}
                 >
@@ -128,13 +128,13 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
             <div className="border-t border-gray-200 my-2"></div>
 
             {/* 전체 정렬 옵션 */}
-            <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-3 py-2">
-              <div className="flex-1 text-sm">전체 보기</div>
+            <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-[6px] py-[4px]">
+              <div className="flex-1 text-sm text-[#333]">전체 보기</div>
               <div className="flex gap-2">
                 <button
                   className={`p-1.5 rounded-md ${
                     isActiveSort('all', 'asc')
-                      ? 'bg-green-100 text-green-700'
+                      ? 'bg-[#56CAD6] text-[#fff]'
                       : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                   }`}
                   onClick={() => handleNodeTypeSort('all', 'asc')}
@@ -145,7 +145,7 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
                 <button
                   className={`p-1.5 rounded-md ${
                     isActiveSort('all', 'desc')
-                      ? 'bg-green-100 text-green-700'
+                      ? 'bg-[#56CAD6] text-[#fff]'
                       : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                   }`}
                   onClick={() => handleNodeTypeSort('all', 'desc')}
@@ -160,13 +160,13 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
             <div className="border-t border-gray-200 my-2"></div>
 
             {/* 테넌트 정렬 옵션 */}
-            <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-3 py-2">
-              <div className="flex-1 text-sm">테넌트 보기</div>
+            <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-[6px] py-[4px]">
+              <div className="flex-1 text-sm text-[#333]">테넌트 보기</div>
               <div className="flex gap-2">
                 <button
                   className={`p-1.5 rounded-md ${
                     isActiveSort('tenant', 'asc')
-                      ? 'bg-green-100 text-green-700'
+                      ? 'bg-[#56CAD6] text-[#fff]'
                       : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                   }`}
                   onClick={() => handleNodeTypeSort('tenant', 'asc')}
@@ -177,7 +177,7 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
                 <button
                   className={`p-1.5 rounded-md ${
                     isActiveSort('tenant', 'desc')
-                      ? 'bg-green-100 text-green-700'
+                      ? 'bg-[#56CAD6] text-[#fff]'
                       : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                   }`}
                   onClick={() => handleNodeTypeSort('tenant', 'desc')}
@@ -189,13 +189,13 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
             </div>
 
             {/* 그룹 정렬 옵션 */}
-            <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-3 py-2">
-              <div className="flex-1 text-sm">그룹 보기</div>
+            <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-[6px] py-[4px]">
+              <div className="flex-1 text-sm text-[#333]">그룹 보기</div>
               <div className="flex gap-2">
                 <button
                   className={`p-1.5 rounded-md ${
                     isActiveSort('group', 'asc')
-                      ? 'bg-green-100 text-green-700'
+                      ? 'bg-[#56CAD6] text-[#fff]'
                       : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                   }`}
                   onClick={() => handleNodeTypeSort('group', 'asc')}
@@ -206,7 +206,7 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
                 <button
                   className={`p-1.5 rounded-md ${
                     isActiveSort('group', 'desc')
-                      ? 'bg-green-100 text-green-700'
+                      ? 'bg-[#56CAD6] text-[#fff]'
                       : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                   }`}
                   onClick={() => handleNodeTypeSort('group', 'desc')}
@@ -218,13 +218,13 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
             </div>
 
             {/* 캠페인 정렬 옵션 */}
-            <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-3 py-2">
-              <div className="flex-1 text-sm">캠페인 보기</div>
+            <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-[6px] py-[4px]">
+              <div className="flex-1 text-sm text-[#333]">캠페인 보기</div>
               <div className="flex gap-2">
                 <button
                   className={`p-1.5 rounded-md ${
                     isActiveSort('campaign', 'asc')
-                      ? 'bg-green-100 text-green-700'
+                      ? 'bg-[#56CAD6] text-[#fff]'
                       : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                   }`}
                   onClick={() => handleNodeTypeSort('campaign', 'asc')}
@@ -235,7 +235,7 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
                 <button
                   className={`p-1.5 rounded-md ${
                     isActiveSort('campaign', 'desc')
-                      ? 'bg-green-100 text-green-700'
+                      ? 'bg-[#56CAD6] text-[#fff]'
                       : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                   }`}
                   onClick={() => handleNodeTypeSort('campaign', 'desc')}
@@ -245,9 +245,6 @@ const IFilterButtonForCampaignGroupTabHeader = () => {
                 </button>
               </div>
             </div>
-
-            {/* 구분선 */}
-            <div className="border-t border-gray-200 my-2"></div>
 
           </div>
         </PopoverContent>
