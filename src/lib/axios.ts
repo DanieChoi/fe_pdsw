@@ -110,7 +110,7 @@ axiosInstance.interceptors.response.use(
       } else if( url === '/collections/skill' || url === 'collections/skill' ) {
         activation = '스킬마스터목록조회';
         eventName = 'skills';
-      } else if( url.indexOf('/skills') > -1 && url.indexOf('/agent-list') == -1 ) {
+      } else if( url.indexOf('skills') > -1 && url.indexOf('/agent-list') == -1 ) {
         if( response.config.method === 'post' ) {
           activation = '스킬마스터생성';
           eventName = 'skills';
@@ -127,7 +127,7 @@ axiosInstance.interceptors.response.use(
       } else if( url === '/collections/skill-agent' ) {
         activation = '스킬할당상담사';
         eventName = 'skill-agent';
-      } else if( url.indexOf('/skills') > -1 && url.indexOf('/agent-list') > -1 ) {
+      } else if( url.indexOf('skills') > -1 && url.indexOf('/agent-list') > -1 ) {
         if( response.config.method === 'post' ) {
           activation = '스킬할당상담사생성';
           eventName = 'skill-agent';
@@ -477,7 +477,7 @@ axiosInstance.interceptors.response.use(
       } else if( url === '/collections/skill' || url === 'collections/skill' ) {
         activation = '스킬마스터목록조회';
         eventName = 'skills';
-      } else if( url.indexOf('/skills') > -1 && url.indexOf('/agent-list') == -1 ) {
+      } else if( url.indexOf('skills') > -1 && url.indexOf('/agent-list') == -1 ) {
         if( error.config.method === 'post' ) {
           activation = '스킬마스터생성';
           eventName = 'skills';
@@ -494,7 +494,7 @@ axiosInstance.interceptors.response.use(
       } else if( url === '/collections/skill-agent' ) {
         activation = '스킬할당상담사';
         eventName = 'skill-agent';
-      } else if( url.indexOf('/skills') > -1 && url.indexOf('/agent-list') > -1 ) {
+      } else if( url.indexOf('skills') > -1 && url.indexOf('/agent-list') > -1 ) {
         if( error.config.method === 'post' ) {
           activation = '스킬할당상담사생성';
           eventName = 'skill-agent';
