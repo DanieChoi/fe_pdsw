@@ -226,6 +226,14 @@ export default function Footer({
         _message = '';
       }
     }
+    //캠페인 동작상태 변경
+    else if (announce === '/pds/campaign/status') {
+      _message = '캠페인 동작상태 '
+      if (command === 'UPDATE') {
+        const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === data['campaign_id']);
+        _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + tempCampaign?.campaign_name + ' , 동작상태 : ' + data['campaign_status'] + ' , 완료구분 : 진행중';
+      }
+    }
     if (_message !== '') {
       setFooterDataList((prev) => [
         {
