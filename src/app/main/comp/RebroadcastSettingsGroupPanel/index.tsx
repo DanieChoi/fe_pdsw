@@ -438,6 +438,16 @@ const RebroadcastSettingsGroupPanel = () => {
         //     campaign_id: Number(campaignIdForUpdateFromSideMenu),
         //     condition: MakeRedialPacket()
         // });
+        if(tempCampaignsCount === 0){            
+            setAlertState({
+                isOpen: true,
+                message: '재발신할 캠페인이 없습니다.',
+                title: '캠페인 건수',
+                type: '2',
+                onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+            });
+        }
         for( let i=0;i<tempCampaignsCount;i++){
             fetchCampaignRedialPreviewSearch({
                 campaign_id: Number(tempCampaigns[i].campaign_id),
