@@ -7,9 +7,9 @@ import { CustomInput } from "@/components/shared/CustomInput";
 import { Label } from "@/components/ui/label";
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import CampaignModal from '../CampaignModal';
-import { useAuthStore, useMainStore } from '@/store';
+import { useAuthStore, useMainStore, useTabStore } from '@/store';
 import { useApiForCounselorList } from '@/features/preferences/hooks/useApiForCounselorList';
-import { useApiForCreateMaxCall, useApiForMaxCallInitTimeList, useApiForMaxCallInitTimeUpdate, useApiForMaxCallList, useApiForUpdateMaxCall } from '@/features/preferences/hooks/useApiForMaxCall';
+import { useApiForCreateMaxCall, useApiForDeleteMaxCall, useApiForMaxCallInitTimeList, useApiForMaxCallInitTimeUpdate, useApiForMaxCallList, useApiForUpdateMaxCall } from '@/features/preferences/hooks/useApiForMaxCall';
 import { useApiForCampaignAgentList } from '@/features/preferences/hooks/useApiForCampaignAgent';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
@@ -53,6 +53,7 @@ const DistributionLimit = () => {
   const [rawAgentData, setRawAgentData] = useState<Row[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { activeTabId, openedTabs } = useTabStore()
   
   const [formData, setFormData] = useState({
     center: '',
@@ -62,7 +63,7 @@ const DistributionLimit = () => {
     agentName: '',
     maxDist: '',
     currentResp: '',
-    fix_flag: 'N'
+    fix_flag: ''
   });
 
   const [alertState, setAlertState] = useState({
@@ -530,13 +531,85 @@ const DistributionLimit = () => {
     }
   });
 
-  const { mutate: createMaxCallMutation } = useApiForCreateMaxCall();
-  const { mutate: updateMaxCallMutation } = useApiForUpdateMaxCall();
+  const { mutate: createMaxCallMutation } = useApiForCreateMaxCall({
+    onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert('운영설정 분배호수 제한 설정 리스트 조회 실패: ' + error.message);
+      }
+    }
+  });
+  const { mutate: updateMaxCallMutation } = useApiForUpdateMaxCall({
+    onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert('운영설정 분배호수 제한 설정 리스트 조회 실패: ' + error.message);
+      }
+    }
+  });
   const { mutate: fetchMaxCallInitTimeList } = useApiForMaxCallInitTimeList({
     onSuccess: (data) => {
       setInitTime(data.result_data.init_time);
+    },
+    onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert('운영설정 분배호수 제한 설정 리스트 조회 실패: ' + error.message);
+      }
     }
   });
+  const { mutate: deleteMaxCallMutation } = useApiForDeleteMaxCall({
+    onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      } else {
+        showAlert('운영설정 분배호수 제한 설정 리스트 조회 실패: ' + error.message);
+      }
+    }
+  })
 
   // 응답호수 초기화 시각 수정
   const { mutate: updateMaxCallInitTime } = useApiForMaxCallInitTimeUpdate({
@@ -629,6 +702,65 @@ const DistributionLimit = () => {
   const closeAlert = () => {
     setAlertState(prev => ({ ...prev, isOpen: false }));
   };
+
+  const handleDelete = () => {
+    // 선택된 상담원이 없는 경우 알림
+    if (!selectedRow || !formData.agentId) {
+      showAlert('삭제할 상담원을 먼저 선택해주세요.');
+      return;
+    }
+    
+    // 캠페인이 선택되지 않은 경우 알림
+    if (!selectedCampaignId) {
+      showAlert('캠페인을 먼저 선택해주세요.');
+      return;
+    }
+    
+    // 최대 분배호수가 설정되지 않은 경우 알림
+    if (formData.maxDist === '0' || formData.maxDist === '') {
+      showAlert('이 상담원에게는 설정된 분배호수 제한이 없습니다.');
+      return;
+    }
+    
+    // 삭제 확인 대화상자 표시
+    showConfirm(
+      `정말로 상담원 [${formData.agentName}]의 분배호수 제한 설정을 삭제하시겠습니까?`,
+      () => {
+        // 삭제 API 호출 - 기본 onError 사용 (훅에 이미 정의되어 있음)
+        deleteMaxCallMutation(
+          {
+            campaign_id: parseInt(selectedCampaignId),
+            agent_id: formData.agentId
+          },
+          {
+            onSuccess: (response) => {
+              if (response.result_code === 0) {
+                showAlert('분배호수 제한 설정이 성공적으로 삭제되었습니다.');
+                
+                // 폼 데이터 초기화
+                handleNew();
+                
+                // 데이터 다시 가져오기
+                if (selectedCampaignId) {
+                  // 전체 상담원 데이터를 새로 조회
+                  fetchCampaignAgentList({
+                    campaign_id: [Number(selectedCampaignId)]
+                  });
+                  
+                  // 분배 호수 제한 설정 정보 갱신
+                  fetchMaxCallList({
+                    campaign_id: [Number(selectedCampaignId)]
+                  });
+                }
+              } else {
+                showAlert(`삭제 실패: ${response.result_msg}`);
+              }
+            }
+          }
+        );
+      }
+    );
+  }
 
   const handleSave = () => {
     if (!selectedCampaignId) {
@@ -923,7 +1055,7 @@ const DistributionLimit = () => {
       agentName: '',
       maxDist: '',
       currentResp: '',
-      fix_flag: 'N'
+      fix_flag: ''
     });
   };
 
@@ -946,6 +1078,22 @@ const DistributionLimit = () => {
     
     return '';
   };
+
+  useEffect(() => {
+    if (activeTabId === 9) {
+      const tempData = openedTabs.filter(tab => tab.id === 9);
+      if (tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
+        setSelectedCampaignId(tempData[0].campaignId);
+        setSelectedCampaignName(tempData[0].campaignName);
+        
+        // 캠페인 객체도 업데이트
+        const campaign = campaigns.find(c => c.campaign_id.toString() === tempData[0].campaignId);
+        if (campaign) {
+          setSelectedCampaign(campaign);
+        }
+      }
+    }
+  }, [activeTabId, openedTabs, campaigns, setSelectedCampaign]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -1097,9 +1245,11 @@ const DistributionLimit = () => {
             <div className="flex items-center gap-2">
               <Label className="w-[8rem] min-w-[8rem]">최대 분배호수</Label>
               <CustomInput 
+                type="number"
                 value={formData.maxDist}
                 onChange={(e) => handleInputChange('maxDist', e.target.value)}
                 className="w-full"
+                disabled={!selectedRow}
               />
             </div>
 
@@ -1118,6 +1268,7 @@ const DistributionLimit = () => {
               <Select 
                 value={formData.fix_flag}
                 onValueChange={(value) => handleInputChange('fix_flag', value)}
+                disabled={!selectedRow}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="선택" />
@@ -1131,6 +1282,7 @@ const DistributionLimit = () => {
 
             <div className="flex justify-end gap-2 pt-4">
               {/* <CommonButton onClick={handleNew}>신규</CommonButton> */}
+              <CommonButton onClick={handleDelete}>삭제</CommonButton>
               <CommonButton onClick={handleSave}>저장</CommonButton>
             </div>
 

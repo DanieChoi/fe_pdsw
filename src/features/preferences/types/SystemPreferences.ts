@@ -155,6 +155,11 @@ export interface MaxCallListCredentials {
   campaign_id: number[];
 }
 
+export interface MaxCallDeleteRequest {
+  campaign_id: number;
+  agent_id: string;
+}
+
 export interface MaxCallListDataResponse {
   agent_id: string; 
   campaign_id: number;
@@ -192,6 +197,20 @@ export interface CreateMaxCallResponse {
   request_count: number;
   result_data: MaxCallDataResponse[];
 }
+
+export interface MaxCallDeleteResponse {
+  result_code: number;
+  result_msg: string;
+  result_count: number;
+  request_count: number;
+  result_data: MaxCallDeleteDataResponse[];
+}
+
+export interface MaxCallDeleteDataResponse {
+  agent_id: string;
+  campaign_id: number;
+}
+
 
 export interface CampaignAgentListCredentials {
   campaign_id: number[];

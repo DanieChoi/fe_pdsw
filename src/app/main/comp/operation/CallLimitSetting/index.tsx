@@ -329,12 +329,6 @@ const CampaignSettings = () => {
         setCampaignId(tempData[0].campaignId);
         setCampaignName(tempData[0].campaignName);
       }
-    } else if (activeTabId === 9) {
-      const tempData = openedTabs.filter(tab => tab.id === 9);
-      if( tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
-        setCampaignId(tempData[0].campaignId);
-        setCampaignName(tempData[0].campaignName);
-      }
     }
   }, [activeTabId, openedTabs]);
    
