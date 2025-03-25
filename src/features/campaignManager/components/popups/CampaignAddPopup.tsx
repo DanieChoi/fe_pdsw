@@ -595,7 +595,7 @@ const CampaignAddPopup: React.FC<Props> = ({
                 <CommonButton
                   onClick={onClose}
                 >
-                  취소
+                  닫기
                 </CommonButton>
 
             </div>
