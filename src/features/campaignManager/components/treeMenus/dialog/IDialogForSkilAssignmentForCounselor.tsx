@@ -154,7 +154,7 @@ export function IDialogForSkilAssignmentForCounselor({
           tenantId,
         });
         if (removeResult.success) {
-          toast.success(`${removed.length}개 스킬이 해제되었습니다.`);
+          // toast.success(`${removed.length}개 스킬이 해제되었습니다.`);
         } else {
           toast.warning(
             `${removeResult.successCount}개 스킬만 해제되었습니다. ${removeResult.failedSkills.length}개 실패.`
