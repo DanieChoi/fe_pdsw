@@ -59,7 +59,7 @@ export const getCampaignGroupMenuItems = (
       style={itemStyle}
       onClick={() => console.log(`캠페인 그룹 일괄 완료: ${node.name}`)}
     >
-      캠페인 그룹 일괄 완료
+      캠페인 그룹 일괄 멈춤
     </Item>,
 
     <Item

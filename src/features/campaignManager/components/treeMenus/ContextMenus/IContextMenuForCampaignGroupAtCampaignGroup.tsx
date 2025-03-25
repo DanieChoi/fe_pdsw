@@ -192,8 +192,8 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
       id: 40,
       group: 1,
       key: "bulk-complete",
-      label: "캠페인 그룹 일괄 완료",
-      action: () => console.log(`캠페인 그룹 일괄 완료: ${node.name}`)
+      label: "캠페인 그룹 일괄 멈춤",
+      action: () => console.log(`캠페인 그룹 일괄 멈춤: ${node.name}`)
     },
     {
       id: 41,
