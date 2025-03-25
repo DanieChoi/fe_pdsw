@@ -241,7 +241,20 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
       group: 3,
       key: "resend",
       label: "캠페인 그룹 실시간 재발신",
-      action: () => console.log(`캠페인 그룹 실시간 재발신: ${node.name}`)
+      action: () => {
+        console.log(`캠페인 그룹 실시간 재발신: ${node.name}`)
+        addTabCurrentOnly({
+          id: 24,
+          title: `재발신: ${node.name}`,
+          campaignId: node.group_id,
+          campaignName: node.name,
+          uniqueKey: `groupBulkUpdate_${node.group_id}_${Date.now()}`,
+          params: {
+            groupId: node.group_id,
+            groupName: node.name,
+          },
+        });
+      }
     }
   ];
 
