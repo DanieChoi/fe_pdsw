@@ -210,7 +210,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
               {statusHeaderItems.map(item => (
                 <TableHeader 
                   key={item.status}
-                  className={`${item.bg} !text-center text-sm font-normal ${getStatusColor(item.status)}`}
+                  className={`${item.bg} !text-center text-sm font-normal !h-[30px] ${getStatusColor(item.status)}`}
                 >
                   <div className="flex items-center gap-2 justify-center">
                     <Image 
@@ -227,7 +227,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
             </TableRow>
             <TableRow>
               {statusHeaderItems.map(item => (
-                <TableCell key={item.status} className="!text-center text-sm">
+                <TableCell key={item.status} className="!text-center text-sm !h-[30px]">
                   {getStatusCount(item.status)}
                 </TableCell>
               ))}
@@ -235,7 +235,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
           </tbody>
         </Table>
       </div>
-      <div className="h-[calc(100%-100px)]">
+      <div className="h-[calc(100%-115px)]">
         <TitleWrap
           title="상담원 상태"
           className="border-b border-gray-300 pb-1"
