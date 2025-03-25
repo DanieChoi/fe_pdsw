@@ -84,9 +84,9 @@ const ISortButtonForSideMenuCounselorTab = () => {
 
   // 현재 선택된 확장 레벨에 따라 버튼 스타일 결정
   const getExpansionButtonClass = (level: number) => {
-    const baseClass = "h-6 min-w-6 px-1 text-xs border rounded";
+    const baseClass = "flex-1 px-[6px] py-[4px] text-xs font-medium rounded-md border";
     return currentExpansionLevel === level 
-      ? `${baseClass} bg-green-100 text-green-700 border-green-200` 
+      ? `${baseClass} bg-[#56CAD6] text-[#fff]` 
       : `${baseClass} hover:bg-gray-50`;
   };
 
@@ -114,11 +114,11 @@ const ISortButtonForSideMenuCounselorTab = () => {
         </CommonButton>
       </PopoverTrigger>
       <PopoverContent className="w-auto min-w-[180px] p-0 py-[10px] px-[12px] rounded-[3px] border border-[#333]" align="start">
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col">
           {/* 정렬 기준 헤더와 필드 토글 */}
-          <div className="mb-2">
+          <div className="">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">정렬 기준</span>
+              <span className="text-sm text-[#333]">정렬 기준</span>
               <div className="flex gap-1">
                 <button
                   className={getExpansionButtonClass(2)}
@@ -146,9 +146,9 @@ const ISortButtonForSideMenuCounselorTab = () => {
 
             <div className="flex gap-2">
               <button
-                className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md border ${
+                className={`flex-1 px-[6px] py-[4px] text-sm rounded-md border ${
                   sortOption.type === "id" 
-                    ? "bg-green-100 text-green-700 border-green-200" 
+                    ? "bg-[#56CAD6] text-[#fff] " 
                     : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
                 }`}
                 onClick={() => handleSortTypeSelect("id")}
@@ -156,9 +156,9 @@ const ISortButtonForSideMenuCounselorTab = () => {
                 ID
               </button>
               <button
-                className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md border ${
+                className={`flex-1 px-[6px] py-[4px] text-sm rounded-md border ${
                   sortOption.type === "name" 
-                    ? "bg-green-100 text-green-700 border-green-200" 
+                    ? "bg-[#56CAD6] text-[#fff] " 
                     : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
                 }`}
                 onClick={() => handleSortTypeSelect("name")}
@@ -171,15 +171,48 @@ const ISortButtonForSideMenuCounselorTab = () => {
           {/* 구분선 */}
           <div className="border-t border-gray-200 my-2"></div>
 
+          {/* 전체 정렬 옵션 */}
+          <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-[6px] py-[4px]">
+            <div className="flex-1 text-sm text-[#333]">전체 보기</div>
+            <div className="flex gap-2">
+              <button
+                className={`p-1.5 rounded-md ${
+                  isActiveSort('all', 'asc')
+                    ? 'bg-[#56CAD6] text-[#fff]'
+                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                }`}
+                onClick={(e) => handleNodeTypeSort('all', 'asc', e)}
+                title={`${sortOption.type === 'name' ? '이름' : 'ID'} 오름차순`}
+              >
+                <ArrowUp className="h-4 w-4" />
+              </button>
+              <button
+                className={`p-1.5 rounded-md ${
+                  isActiveSort('all', 'desc')
+                    ? 'bg-[#56CAD6] text-[#fff]'
+                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                }`}
+                onClick={(e) => handleNodeTypeSort('all', 'desc', e)}
+                title={`${sortOption.type === 'name' ? '이름' : 'ID'} 내림차순`}
+              >
+                <ArrowDown className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          
+          {/* 구분선 */}
+          <div className="border-t border-gray-200 my-2"></div>
+
           {/* 테넌트 정렬 옵션 */}
-          <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-3 py-2">
-            <div className="flex-1 text-sm">테넌트 보기</div>
+          <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-[6px] py-[4px]">
+            <div className="flex-1 text-sm text-[#333]">테넌트 보기</div>
             <div className="flex gap-2">
               <button
                 className={`p-1.5 rounded-md ${
                   isActiveSort('tenant', 'asc')
-                    ? 'bg-green-100 text-green-700'
-                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                    ? 'bg-[#56CAD6] text-[#fff]'
+                    : 'text-gray-400 hover:text-gray-600 hover:text-gray-600 hover:bg-gray-100'
                 }`}
                 onClick={(e) => handleNodeTypeSort('tenant', 'asc', e)}
                 title={`${sortOption.type === 'name' ? '이름' : 'ID'} 오름차순`}
@@ -189,7 +222,7 @@ const ISortButtonForSideMenuCounselorTab = () => {
               <button
                 className={`p-1.5 rounded-md ${
                   isActiveSort('tenant', 'desc')
-                    ? 'bg-green-100 text-green-700'
+                    ? 'bg-[#56CAD6] text-[#fff]'
                     : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                 }`}
                 onClick={(e) => handleNodeTypeSort('tenant', 'desc', e)}
@@ -201,14 +234,14 @@ const ISortButtonForSideMenuCounselorTab = () => {
           </div>
 
           {/* 그룹 정렬 옵션 */}
-          <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-3 py-2">
-            <div className="flex-1 text-sm">그룹 보기</div>
+          <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-[6px] py-[4px]">
+            <div className="flex-1 text-sm text-[#333]">그룹 보기</div>
             <div className="flex gap-2">
               <button
                 className={`p-1.5 rounded-md ${
                   isActiveSort('group', 'asc')
-                    ? 'bg-green-100 text-green-700'
-                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                    ? 'bg-[#56CAD6] text-[#fff]'
+                    : 'text-gray-400 hover:text-gray-600  hover:bg-gray-100'
                 }`}
                 onClick={(e) => handleNodeTypeSort('group', 'asc', e)}
                 title={`${sortOption.type === 'name' ? '이름' : 'ID'} 오름차순`}
@@ -218,7 +251,7 @@ const ISortButtonForSideMenuCounselorTab = () => {
               <button
                 className={`p-1.5 rounded-md ${
                   isActiveSort('group', 'desc')
-                    ? 'bg-green-100 text-green-700'
+                    ? 'bg-[#56CAD6] text-[#fff]'
                     : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                 }`}
                 onClick={(e) => handleNodeTypeSort('group', 'desc', e)}
@@ -230,13 +263,13 @@ const ISortButtonForSideMenuCounselorTab = () => {
           </div>
 
           {/* 팀 정렬 옵션 */}
-          <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-3 py-2">
-            <div className="flex-1 text-sm">팀 보기</div>
+          <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-[6px] py-[4px]">
+            <div className="flex-1 text-sm text-[#333]">팀 보기</div>
             <div className="flex gap-2">
               <button
                 className={`p-1.5 rounded-md ${
                   isActiveSort('team', 'asc')
-                    ? 'bg-green-100 text-green-700'
+                    ? 'bg-[#56CAD6] text-[#fff]'
                     : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                 }`}
                 onClick={(e) => handleNodeTypeSort('team', 'asc', e)}
@@ -247,7 +280,7 @@ const ISortButtonForSideMenuCounselorTab = () => {
               <button
                 className={`p-1.5 rounded-md ${
                   isActiveSort('team', 'desc')
-                    ? 'bg-green-100 text-green-700'
+                    ? 'bg-[#56CAD6] text-[#fff]'
                     : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                 }`}
                 onClick={(e) => handleNodeTypeSort('team', 'desc', e)}
@@ -259,13 +292,13 @@ const ISortButtonForSideMenuCounselorTab = () => {
           </div>
 
           {/* 상담원 정렬 옵션 */}
-          <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-3 py-2">
-            <div className="flex-1 text-sm">상담원 보기</div>
+          <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-[6px] py-[4px]">
+            <div className="flex-1 text-sm text-[#333]">상담원 보기</div>
             <div className="flex gap-2">
               <button
                 className={`p-1.5 rounded-md ${
                   isActiveSort('counselor', 'asc')
-                    ? 'bg-green-100 text-green-700'
+                    ? 'bg-[#56CAD6] text-[#fff]'
                     : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                 }`}
                 onClick={(e) => handleNodeTypeSort('counselor', 'asc', e)}
@@ -276,7 +309,7 @@ const ISortButtonForSideMenuCounselorTab = () => {
               <button
                 className={`p-1.5 rounded-md ${
                   isActiveSort('counselor', 'desc')
-                    ? 'bg-green-100 text-green-700'
+                    ? 'bg-[#56CAD6] text-[#fff]'
                     : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                 }`}
                 onClick={(e) => handleNodeTypeSort('counselor', 'desc', e)}
@@ -287,37 +320,8 @@ const ISortButtonForSideMenuCounselorTab = () => {
             </div>
           </div>
 
-          {/* 구분선 */}
-          <div className="border-t border-gray-200 my-2"></div>
 
-          {/* 전체 정렬 옵션 */}
-          <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-3 py-2">
-            <div className="flex-1 text-sm">전체 보기</div>
-            <div className="flex gap-2">
-              <button
-                className={`p-1.5 rounded-md ${
-                  isActiveSort('all', 'asc')
-                    ? 'bg-green-100 text-green-700'
-                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                }`}
-                onClick={(e) => handleNodeTypeSort('all', 'asc', e)}
-                title={`${sortOption.type === 'name' ? '이름' : 'ID'} 오름차순`}
-              >
-                <ArrowUp className="h-4 w-4" />
-              </button>
-              <button
-                className={`p-1.5 rounded-md ${
-                  isActiveSort('all', 'desc')
-                    ? 'bg-green-100 text-green-700'
-                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                }`}
-                onClick={(e) => handleNodeTypeSort('all', 'desc', e)}
-                title={`${sortOption.type === 'name' ? '이름' : 'ID'} 내림차순`}
-              >
-                <ArrowDown className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+
         </div>
       </PopoverContent>
     </Popover>
