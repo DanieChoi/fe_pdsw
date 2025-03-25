@@ -777,3 +777,53 @@ html, body {
   margin-bottom: 10px;
   background: #F8F8F8;
 }
+
+
+/* // custom toast message */
+
+/* globals.css에 추가할 스타일 */
+
+/* 커스텀 토스트 메세지 start */
+@keyframes toast-slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-slide-out-right {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.toast-enter {
+  animation: toast-slide-in-right 0.3s ease-out forwards;
+}
+
+.toast-exit {
+  animation: toast-slide-out-right 0.2s ease-in forwards;
+}
+
+/* 프로그레스 바 스타일 */
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.6));
+  z-index: 1;
+  transition: width linear;
+}
+
+/* 커스텀 토스트 메세지 end */
