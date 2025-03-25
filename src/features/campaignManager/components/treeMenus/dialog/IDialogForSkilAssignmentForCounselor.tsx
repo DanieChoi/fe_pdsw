@@ -138,7 +138,7 @@ export function IDialogForSkilAssignmentForCounselor({
           isUnassignment: false,
         });
         if (addResult.success) {
-          toast.success(`${added.length}개 스킬이 할당되었습니다.`);
+          // toast.success(`${added.length}개 스킬이 할당되었습니다.`);
         } else {
           toast.warning(
             `${addResult.successCount}개 스킬만 할당되었습니다. ${addResult.failedSkills.length}개 실패.`

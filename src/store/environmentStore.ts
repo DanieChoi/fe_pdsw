@@ -43,7 +43,7 @@ interface EnvironmentState {
   environmentData: EnvironmentListResponse | null;
 
   // 환경설정 데이터 - 명시적으로 각 필드 정의
-  campaignListAlram: number;
+  campaignListAlram: number;  // 알람 다이어로그 출력 여부
   statisticsUpdateCycle: number;
   serverConnectionTime: number;
   showChannelCampaignDayScop: number;
