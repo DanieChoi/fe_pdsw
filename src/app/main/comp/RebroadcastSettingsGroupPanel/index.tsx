@@ -132,6 +132,8 @@ const RebroadcastSettingsGroupPanel = () => {
     const [sequenceNumber, setSequenceNumber] = useState<number>(1);
     const [caseType, setCaseType] = useState<number>(0);
     const [textType, setTextType] = useState<string>('');
+    const [campaignGroupId, setCampaignGroupId] = useState<string>('');
+    const [campaignGroupName, setCampaignGroupName] = useState<string>('');
 
     // 발신결과 체크박스 상태 관리
     const [selectedOutgoingResults, setSelectedOutgoingResults] = useState<{ [key: string]: boolean }>(initOutgoingResult);
@@ -958,8 +960,8 @@ const RebroadcastSettingsGroupPanel = () => {
             handleBroadcastTypeChange('realtime');
             const tempData = openedTabs.filter(tab => tab.id === 24);
             if( tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
-                // setCampaignId(tempData[0].campaignId);
-                // setCampaignName(tempData[0].campaignName);
+                setCampaignGroupId(tempData[0].campaignId);
+                setCampaignGroupName(tempData[0].campaignName);
             }
         }
     }, [activeTabId, openedTabs]);
@@ -967,7 +969,7 @@ const RebroadcastSettingsGroupPanel = () => {
     return (
         <div className="limit-width">
             <div className="flex flex-col gap-6">
-                <RebroadcastSettingsGroupPanelHeader campaignId={_campaignId} 
+                <RebroadcastSettingsGroupPanelHeader campaignGroupId={campaignGroupId} campaignGroupName={campaignGroupName}
                     reservationShouldShowApply={reservationShouldShowApply}
                     reservationShouldShowAdd={reservationShouldShowAdd}
                     reservationShouldShowDelete={reservationShouldShowDelete}
