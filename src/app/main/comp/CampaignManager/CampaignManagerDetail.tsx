@@ -349,7 +349,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     , setSelectedCampaign
   } = useMainStore();
   const { tenant_id
-    , role_id
+    , menu_role_id
   } = useAuthStore();
   const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab
     , campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
@@ -1528,16 +1528,79 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
         <TitleWrap
           className='border-b border-gray-300 pb-1'
           title="상세내역"
-          buttons={[
-            { label: "새 캠페인", onClick: () => handleNewCampaign() },
-            // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
-            { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
-            { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
-            { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
-            { label: "리스트 삭제", onClick: () => handleListManagerDelete(), variant: "customblue" },
-            { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
-            { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
-          ]}
+          buttons={
+            menu_role_id === 1?
+            selectedCampaign?.start_flag === 3?
+            [
+              { label: "새 캠페인", onClick: () => handleNewCampaign() },
+              // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+              { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+              { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+              { label: "리스트 삭제", onClick: () => handleListManagerDelete(), variant: "customblue" },
+              { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
+              { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
+            ]
+            :
+            [
+              { label: "새 캠페인", onClick: () => handleNewCampaign() },
+              // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+              { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+              { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+              { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
+              { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
+            ]
+            :
+            menu_role_id === 2?
+            selectedCampaign?.start_flag === 3?
+            [
+              { label: "새 캠페인", onClick: () => handleNewCampaign() },
+              // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+              { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+              { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+              { label: "리스트 삭제", onClick: () => handleListManagerDelete(), variant: "customblue" },
+            ]
+            :
+            [
+              { label: "새 캠페인", onClick: () => handleNewCampaign() },
+              // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+              { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+              { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+            ]
+            :
+            menu_role_id === 3?
+            [
+              { label: "새 캠페인", onClick: () => handleNewCampaign() },
+              // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+              { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+            ]
+            :
+            selectedCampaign?.start_flag === 3?
+            [
+              { label: "새 캠페인", onClick: () => handleNewCampaign() },
+              // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+              { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+              { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+              { label: "리스트 삭제", onClick: () => handleListManagerDelete(), variant: "customblue" },
+              { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
+              { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
+            ]
+            :
+            [
+              { label: "새 캠페인", onClick: () => handleNewCampaign() },
+              // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+              { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+              { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+              { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
+              { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
+            ]
+        }
         />
         <div className="grid grid-cols-3 gap-x-[26px] gap-y-2">
           <div className='flex items-center gap-2'>
@@ -1623,12 +1686,16 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
             <CustomInput value={inputCallingNumber} className="w-full"
               disabled={selectedCampaign !== null} readOnly
             />
-            <CommonButton variant="outline" className='h-[24px]' onClick={() =>
-              setCallingNumberPopupState({
-                ...callingNumberPopupState,
-                isOpen: true,
-              })
-            }>발신번호 변경</CommonButton>
+            {menu_role_id === 1?
+              <CommonButton variant="outline" className='h-[24px]' onClick={() =>
+                setCallingNumberPopupState({
+                  ...callingNumberPopupState,
+                  isOpen: true,
+                })
+              }>발신번호 변경</CommonButton>
+              :
+              null
+            }
           </div>
           <div className="flex items-center gap-2 col-span-3">
             <Label className="w-[90px] min-w-[90px]">설명</Label>
