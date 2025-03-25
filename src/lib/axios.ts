@@ -778,7 +778,7 @@ axiosRedisInstance.interceptors.response.use(
     if( url !== '/log/save' ) {
       let activation = '';
       let eventName = '';
-      const queryType = 'R';
+      let queryType = 'R';
       let description = '';
       if( url === '/auth/environment' ) {
         activation = '사용자별 환경설정 가져오기';
@@ -786,9 +786,31 @@ axiosRedisInstance.interceptors.response.use(
       } else if( url.indexOf('/auth/availableMenuList') > -1 ) {
         activation = '사용가능한 메뉴 리스트 가져오기';
         eventName = 'availableMenuList';
+      } else if( url.indexOf('/auth/environment') > -1 ) {
+        activation = '사용자별 환경설정 가져오기';
+        eventName = 'environment';
+      } else if( url.indexOf('/auth/environment/save') > -1 ) {
+        activation = '사용자별 환경설정 저장하기';
+        eventName = 'environment-save';
+        queryType = 'C';
       } else if( url.indexOf('/counselor/list') > -1 ) {
         activation = '상담사 리스트 가져오기';
-        eventName = 'counselorList';
+        eventName = 'counselor-list';
+      } else if( url.indexOf('/counselor/state') > -1 ) {
+        activation = '상담사 상태정보 가져오기';
+        eventName = 'counselor-state';
+      } else if( url.indexOf('/counselor/counselorInfo') > -1 ) {
+        activation = '캠페인 할당 상담사정보 가져오기';
+        eventName = 'counselor-state';
+      } else if( url.indexOf('/counselor/sillAssigned/list') > -1 ) {
+        activation = '스킬 할당 상담사 목록 가져오기';
+        eventName = 'counselor-sillAssigned-list';
+      } else if( url.indexOf('/notification') > -1 && url.indexOf('/subscribe') > -1 ) {
+        activation = '실시간 이벤트 구독';
+        eventName = 'notification-subscribe';
+      } else if( url.indexOf('/notification/publish') > -1 ) {
+        activation = '실시간 이벤트 발행';
+        eventName = 'notification-publish';
       } else if( url === '/monitor/process' ) {
         activation = '타 시스템 프로세스 상태정보 가져오기';
         eventName = 'process';
@@ -827,10 +849,83 @@ axiosRedisInstance.interceptors.response.use(
     }
     return response;
   },
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401) {
       window.location.href = '/login';
       return Promise.reject(new Error('세션이 만료되었습니다. 다시 로그인해주세요.'));
+    }
+    const url = error.config.url || '';
+    if( url !== '/log/save' ) {
+      let activation = '';
+      let eventName = '';
+      let queryType = 'R';
+      let description = '';
+      if( url === '/auth/environment' ) {
+        activation = '사용자별 환경설정 가져오기';
+        eventName = 'environment';
+      } else if( url.indexOf('/auth/availableMenuList') > -1 ) {
+        activation = '사용가능한 메뉴 리스트 가져오기';
+        eventName = 'availableMenuList';
+      } else if( url.indexOf('/auth/environment') > -1 ) {
+        activation = '사용자별 환경설정 가져오기';
+        eventName = 'environment';
+      } else if( url.indexOf('/auth/environment/save') > -1 ) {
+        activation = '사용자별 환경설정 저장하기';
+        eventName = 'environment-save';
+        queryType = 'C';
+      } else if( url.indexOf('/counselor/list') > -1 ) {
+        activation = '상담사 리스트 가져오기';
+        eventName = 'counselor-list';
+      } else if( url.indexOf('/counselor/state') > -1 ) {
+        activation = '상담사 상태정보 가져오기';
+        eventName = 'counselor-state';
+      } else if( url.indexOf('/counselor/counselorInfo') > -1 ) {
+        activation = '캠페인 할당 상담사정보 가져오기';
+        eventName = 'counselor-state';
+      } else if( url.indexOf('/counselor/sillAssigned/list') > -1 ) {
+        activation = '스킬 할당 상담사 목록 가져오기';
+        eventName = 'counselor-sillAssigned-list';
+      } else if( url.indexOf('/notification') > -1 && url.indexOf('/subscribe') > -1 ) {
+        activation = '실시간 이벤트 구독';
+        eventName = 'notification-subscribe';
+      } else if( url.indexOf('/notification/publish') > -1 ) {
+        activation = '실시간 이벤트 발행';
+        eventName = 'notification-publish';
+      } else if( url === '/monitor/process' ) {
+        activation = '타 시스템 프로세스 상태정보 가져오기';
+        eventName = 'process';
+      } else if( url === '/monitor/dialer/channel' ) {
+        activation = '채널 상태 정보 가져오기';
+        eventName = 'channel';
+      } else if( url.indexOf('/statistics') > -1 ) {
+        activation = '캠페인별 진행정보 가져오기';
+        eventName = 'statistics';
+        description = '캠페인 아이디 : ' + url.split('/')[5] + '번 진행정보 가져오기';
+      } else if( url === '/monitor/tenant/campaign/dial' ) {
+        activation = '발신진행상태조회';
+        eventName = 'dial';
+      }
+      const logData = {
+          "tenantId": Number(getCookie('tenant_id')),
+          "employeeId": getCookie('id'),
+          "userHost": getCookie('userHost'),
+          "queryId": error.config.url,
+          "queryType": queryType,
+          "activation": activation,
+          "description": description,          
+          "successFlag": 0,
+          "eventName": eventName,
+          "queryRows": 0,
+          "targetId": error.config.url||0,
+          "userSessionType": 0,
+          "exportFlag": 1,
+          "memo": "",
+          "updateEmployeeId": getCookie('id')
+      };
+      const { data } = await axiosRedisInstance.post<{code:string;message:string;}>(
+        `/log/save`,
+        logData 
+      );
     }
     return Promise.reject(error);
   }
