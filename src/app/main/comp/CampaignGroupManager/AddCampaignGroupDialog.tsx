@@ -128,8 +128,31 @@ export function AddCampaignGroupDialog({
       });
       return;
     }
-    
-    if (groupName.trim() && groupId.trim() ) {
+    if( _tenantId === 'all'){      
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '테넌트를 선택해 주세요.',
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+      });
+    }else if( groupId.trim() === ''){
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '그룹아이디를 입력해 주세요.',
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+      });
+    }else if( groupName.trim() === ''){
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '그룹명을을 입력해 주세요.',
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+      });
+    }else{
       fetchCampaignGroupCreate({
         group_id: Number(groupId),
         tenant_id: Number(_tenantId), 
