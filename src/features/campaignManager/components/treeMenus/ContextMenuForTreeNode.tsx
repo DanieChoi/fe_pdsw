@@ -655,6 +655,9 @@ export function ContextMenuForTreeNode({
       });
       // 삭제 후 메인 목록 갱신
       fetchMain({ session_key, tenant_id });
+
+      
+
     },
     onError: (error) => {
       toast.error(error.message || "리스트 삭제 중 오류가 발생했습니다.", {

@@ -19,13 +19,29 @@ const useApiForCampaignListDelete = (
       });
 
       // 캐시 무효화 (트리 메뉴 데이터 갱신을 위해)
-      queryClient.invalidateQueries({ queryKey: ['treeMenuDataForSideMenu'] });
+      // 전체 트리 메뉴 데이터 무효화
+      queryClient.invalidateQueries({ 
+        queryKey: ['treeMenuDataForSideMenu'] 
+      });
+      
+      // 모든 캠페인 진행 정보 무효화 (모든 캠페인 ID에 대해)
+      queryClient.invalidateQueries({
+        queryKey: ['mainCampaignProgressInformation']
+      });
+      
+      // 삭제된 특정 캠페인 진행 정보 무효화 (variables는 삭제된 캠페인 ID)
+      if (variables) {
+        queryClient.invalidateQueries({
+          queryKey: ['mainCampaignProgressInformation', undefined, variables]
+        });
+      }
 
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: ListManagerApiError, variables: number, context: unknown) => {
-      // console.error('API Error:', error);
-      // toast.error(error.message || '데이터 로드에 실패했습니다.');
+      console.error('API Error:', error);
+      // UI에 에러 메시지 표시 (필요한 경우 toast 주석 해제)
+      // toast.error(error.message || '데이터 삭제에 실패했습니다.');
       options?.onError?.(error, variables, context);
     },
   });
