@@ -333,6 +333,8 @@ const RebroadcastSettingsPanel = () => {
         //발신결과 disabled 설정.
         setOutgoingResultDisabled(false);   
 
+        setSelectedRebroadcastId(sequenceNumber);
+
         setTextType('재발신 추가중');
         setRebroadcastList([...rebroadcastList, newRebroadcast]);
         resetAllStates();
@@ -994,6 +996,7 @@ const RebroadcastSettingsPanel = () => {
                     handleApplyRebroadcast={handleApplyRebroadcast}
                     handleCheckListCount={handleCheckListCount}
                     textType = {textType}
+                    selectedRebroadcastId = {selectedRebroadcastId}
                 />
 
                 <div className="flex gap-5 h-[580px]">

@@ -45,10 +45,17 @@ type Props = {
     handleRemoveRebroadcast: () => void;
     handleApplyRebroadcast: () => void;
     handleCheckListCount: () => void;
+    selectedRebroadcastId: any;
     textType: string;
 }
 
-const RebroadcastSettingsPanelHeader = ({ campaignId, reservationShouldShowApply, reservationShouldShowAdd, reservationShouldShowDelete, textType
+const RebroadcastSettingsPanelHeader = ({
+    campaignId,
+    reservationShouldShowApply,
+    reservationShouldShowAdd,
+    reservationShouldShowDelete,
+    selectedRebroadcastId,
+    textType
     , handleBroadcastTypeChange
     , handleAddRebroadcast
     , handleRemoveRebroadcast
@@ -180,9 +187,15 @@ const RebroadcastSettingsPanelHeader = ({ campaignId, reservationShouldShowApply
                     </div>
                 </CommonRadio>
             </div>
-            <div className="flex gap-2">
 
-                <div className="text-md font-medium text-slate-700 dark:text-slate-300 px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-md inline-flex items-center">
+            <div className="flex gap-2 items-center">
+                <div className="text-md font-medium text-slate-700 dark:text-slate-300 rounded-md inline-flex items-center mr-2">
+                    {selectedRebroadcastId !== null ?
+                        textType
+                        : ""}
+                </div>
+
+                <div>
                     {textType}
                 </div>
 
