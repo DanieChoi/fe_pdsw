@@ -193,7 +193,7 @@ const RebroadcastSettingsPanel = () => {
     };
 
     const MakeRedialPacket = () => {
-        let returnValue = '';
+        let returnValue = '00';
         //발신결과.
         if( outgoingResultChecked ){            
             if( selectedOutgoingResults['outgoing-success-ok'] && selectedOutgoingResults['outgoing-success-no'] ){
@@ -363,7 +363,17 @@ const RebroadcastSettingsPanel = () => {
         setOutgoingResultChecked(false);
         setOutgoingTypeChecked(false);
         setOutgoingTimeChecked(false);
-        setOutgoingResultDisabled(true);   
+        setOutgoingResultDisabled(true);  
+        if( tempRebroadcastList.length > 0 ){
+            setSelectedRebroadcastId(tempRebroadcastList[0].id);
+            if( tempRebroadcastList[0].run_flag === 2){
+                setTextType('Time out');
+            }else if( tempRebroadcastList[0].run_flag === 1){
+                setTextType('실행');
+            }else if( tempRebroadcastList[0].run_flag === 0){
+                setTextType('미실행');
+            }
+        }
     };
 
     //그리드 클릭이벤트..
@@ -1016,7 +1026,7 @@ const RebroadcastSettingsPanel = () => {
                                         dayPlaceholder="dd"
                                         monthPlaceholder="mm"
                                         yearPlaceholder="yyyy"
-                                        disabled={broadcastType === "realtime"}
+                                        disabled={ textType !== '재발신 추가중'}
                                     />
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -1028,7 +1038,7 @@ const RebroadcastSettingsPanel = () => {
                                         onChange={handleTimeChange}
                                         maxLength={4}
                                         placeholder="0000"
-                                        disabled={broadcastType === "realtime"}                                        
+                                        disabled={ textType !== '재발신 추가중'}                                        
                                     />
                                 </div>
                             </div>

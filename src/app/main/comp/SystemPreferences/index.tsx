@@ -12,6 +12,7 @@ import { useApiForDialingDevice, useApiForDialingDeviceCreate, useApiForDialingD
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import { useEnvironmentStore } from '@/store/environmentStore';
 
 interface EquipmentRow {
     device_id: string;
@@ -56,8 +57,10 @@ const SystemPreferences = () => {
     // 디바이스 상태를 저장할 상태 변수 추가
     const [deviceStatuses, setDeviceStatuses] = useState<Record<string, "run" | "down">>({});
 
-    // 캠페인스에서 가져오는 creation_time으로 채널 리스트의 값이 환경설정에서 설정한 시간내에 만들어진것만 보이게 수정해야함.
+    // useMainStore의 campaigns에서 가져오는 creation_time으로 채널 리스트의 값이 useEnvironmentStore에서 가져오는 환경설정에서 설정한 
+    // showChannelCampaignDayScop 시간내에 만들어진것만 보이게 수정해야함.
     const { tenants, campaigns } = useMainStore();
+    const { environmentData } = useEnvironmentStore();
     const [dialingDeviceList, setDialingDeviceList] = useState<DialingDeviceListDataResponse[]>([]);
     const [channelList, setChannelList] = useState<ChannelListDataResponse[]>([]);
     const router = useRouter();
@@ -102,6 +105,7 @@ const SystemPreferences = () => {
 
     // Footer에서 발생하는 이벤트 수신을 위한 이벤트 리스너 추가
     useEffect(() => {
+        console.log("campaigns", campaigns);
         
         // 장비 상태 변경 이벤트 수신 함수
         const handleDeviceStatusChange = (event: any) => {
@@ -138,16 +142,36 @@ const SystemPreferences = () => {
     // 장비 목록 조회
     const { mutate: fetchDialingDeviceList } = useApiForDialingDevice({
         onSuccess: (data) => {
+            
+            // 응답 데이터 구조 확인 및 방어적 처리
+            if (!data) {
+                setDialingDeviceList([]);
+                return;
+            }
+            
+            if (!data.result_data) {
+                setDialingDeviceList([]);
+                return;
+            }
+            
+            // result_data가 배열인지 확인
+            if (!Array.isArray(data.result_data)) {
+                setDialingDeviceList([]);
+                return;
+            }
+            
             setDialingDeviceList(data.result_data);
             
             // 현재 저장된 장비를 찾아서 선택 상태로 설정
+            if (!equipmentNumber) return;
+            
             const currentDeviceId = equipmentNumber;
             const savedDevice = data.result_data.find(device => 
-                device.device_id.toString() === currentDeviceId
+                device && device.device_id && device.device_id.toString() === currentDeviceId
             );
             
             if (savedDevice) {
-                const deviceRow: EquipmentRow = {
+                const deviceRow = {
                     device_id: savedDevice.device_id.toString(),
                     channel_count: savedDevice.channel_count,
                     device_name: savedDevice.device_name,
@@ -156,21 +180,22 @@ const SystemPreferences = () => {
                 setSelectedDevice(deviceRow);
                 setIsEditable(true);
             }
-        },onError: (data) => {      
-            if (data.message.split('||')[0] === '5') {
-              setAlertState({
-                ...errorMessage,
-                isOpen: true,
-                message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                onConfirm: closeAlert,
-                onCancel: () => {}
-              });
-              Cookies.remove('session_key');
-              setTimeout(() => {
-                router.push('/login');
-              }, 1000);
+        },
+        onError: (error) => {      
+            if (error.message && error.message.split('||')[0] === '5') {
+                setAlertState({
+                    ...errorMessage,
+                    isOpen: true,
+                    message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                    onConfirm: closeAlert,
+                    onCancel: () => {}
+                });
+                Cookies.remove('session_key');
+                setTimeout(() => {
+                    router.push('/login');
+                }, 1000);
             } else {
-                showAlert(`시스템 모니터링 조회 실패: ${data.message}`);
+                showAlert(`시스템 모니터링 조회 실패: ${error.message || '알 수 없는 오류'}`);
             }
         }
     });
@@ -303,13 +328,13 @@ const SystemPreferences = () => {
     });
 
     useEffect(() => {
-        const _tenantId = tenants.map((tenant) => tenant.tenant_id);
-        fetchDialingDeviceList({
-            tenant_id_array: _tenantId
-        });
-        fetchChannelList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        if (tenants && tenants.length > 0) {
+            fetchDialingDeviceList({
+                tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+            });
+            fetchChannelList();
+        } 
+    }, [tenants]);
 
     // 장비의 사용여부를 확인하는 함수 (실시간 상태 반영)
     const getDeviceUsage = (deviceId: number): string => {
@@ -327,7 +352,12 @@ const SystemPreferences = () => {
         }
         
         // 실시간 상태가 없으면 API에서 받은 초기 상태 확인
-        const device = dialingDeviceList.find(d => d.device_id.toString() === deviceIdStr);
+        // 수정: dialingDeviceList가 없는 경우 예외 처리 추가
+        if (!dialingDeviceList || !Array.isArray(dialingDeviceList)) {
+            return "미사용";
+        }
+        
+        const device = dialingDeviceList.find(d => d && d.device_id && d.device_id.toString() === deviceIdStr);
         if (device) {
             if (device.device_state === "run") {
                 return "사용";
@@ -351,7 +381,12 @@ const SystemPreferences = () => {
                 case 0:
                     return "회선사용안함";
                 default: {
-                    const campaign = campaigns.find(camp => camp.campaign_id === assignValue);
+                    // 수정: campaigns가 비어있지 않은지 확인
+                    if (!campaigns || !Array.isArray(campaigns)) {
+                        return "미할당";
+                    }
+                    
+                    const campaign = campaigns.find(camp => camp && camp.campaign_id === assignValue);
                     if (campaign) {
                         return `ID[${campaign.campaign_id}] : ${campaign.campaign_name}`;
                     }
@@ -389,8 +424,13 @@ const SystemPreferences = () => {
         return "미할당";
     };
 
-    // 장비 목록 데이터 구성 (deviceStatuses 추가로 변경 사항 반영)
+    // 장비 목록 데이터 구성
     const equipmentRows = useMemo(() => {
+        // dialingDeviceList가 없을 경우 빈 배열 반환
+        if (!dialingDeviceList || !Array.isArray(dialingDeviceList) || dialingDeviceList.length === 0) {
+            return [];
+        }
+        
         return dialingDeviceList.map(device => ({
             device_id: device.device_id.toString(),
             channel_count: device.channel_count,
@@ -414,24 +454,35 @@ const SystemPreferences = () => {
     ];
 
     const handleEquipmentCellClick = ({ row }: CellClickArgs<EquipmentRow>) => {
-        setSelectedDevice(row);
+        if (row) {
+            setSelectedDevice(row);
+        }
     };
 
     const handleChannelCellClick = ({ row }: CellClickArgs<ChannelRow>) => {
-        setSelectedChannel(row);
+        if (row) {
+            setSelectedChannel(row);
+        }
     };
 
     // 장비 상세내역의 신규 버튼 클릭 핸들러
     const handleNewEquipment = () => {
-        const lastDeviceId = dialingDeviceList
-            .map(device => device.device_id)
-            .sort((a, b) => a - b)
-            .pop() || 0;
-        
-        const newDeviceId = (lastDeviceId + 1).toString();
-
+        // dialingDeviceList 안전 검사 추가
+        if (!dialingDeviceList || !Array.isArray(dialingDeviceList) || dialingDeviceList.length === 0) {
+            // 장비가 없는 경우 첫 번호는 1로 설정
+            setEquipmentNumber("1");
+        } else {
+            const deviceIds = dialingDeviceList
+                .filter(device => device && device.device_id) // 유효한 device_id만 필터링
+                .map(device => device.device_id)
+                .sort((a, b) => a - b);
+                
+            const lastDeviceId = deviceIds.length > 0 ? deviceIds[deviceIds.length - 1] : 0;
+            const newDeviceId = (lastDeviceId + 1).toString();
+            setEquipmentNumber(newDeviceId);
+        }
+    
         setSelectedDevice(null);
-        setEquipmentNumber(newDeviceId);
         setEquipmentName("");
         setRefreshCycle("");
         setMonitoringType("periodic");
@@ -441,6 +492,7 @@ const SystemPreferences = () => {
         setAllocationOutboundMode("");
         setIsEditable(true);
     };
+    
 
     // 장비 저장 핸들러 (신규/수정 공통 검증)
     const validateEquipmentData = () => {
@@ -530,11 +582,36 @@ const SystemPreferences = () => {
     const handleChannelEdit = () => {
         if (!selectedDevice) return;
         
+        // channelList 안전 검사 추가
+        if (!channelList || !Array.isArray(channelList)) {
+            showAlert('채널 정보를 불러올 수 없습니다.');
+            return;
+        }
+        
         const deviceChannels = channelList.find(
-            channel => channel.device_id.toString() === selectedDevice.device_id
+            channel => channel && channel.device_id && 
+            channel.device_id.toString() === selectedDevice.device_id
         );
+
+        if (!deviceChannels) {
+            showAlert('이 장비에 대한 채널 정보가 없습니다. 시스템 관리자에게 문의하세요.');
+            return;
+        }
     
-        if (!deviceChannels) return;
+        // if (!deviceChannels) {
+        //     // 해당 장비의 채널 정보가 없으면 새로 생성
+        //     const newChannelAssign = new Array(selectedDevice.channel_count).fill(0);
+        //     const channelEditRequest = {
+        //         device_id: parseInt(selectedDevice.device_id),
+        //         assign_kind: parseInt(allocationMode || "0"),
+        //         channel_count: selectedDevice.channel_count,
+        //         channel_assign: newChannelAssign
+        //     };
+            
+        //     fetchChannelEdit(channelEditRequest);
+        //     showAlert('새 채널 정보가 생성되었습니다.');
+        //     return;
+        // }
     
         let updatedChannelAssign: number[];
     
@@ -563,20 +640,59 @@ const SystemPreferences = () => {
 
     const getAllocationOutboundModeOptions = () => {
         if (allocationMode === "1") {
-            // 캠페인으로 할당일 때 기존 옵션
+            // 캠페인으로 할당일 때 기본 옵션
             const defaultOptions = [
                 { value: "2147483647", label: "모든 캠페인사용" },
                 { value: "0", label: "회선사용안함" },
             ];
             
-            const campaignOptions = campaigns.map(campaign => ({
+            // 수정: campaigns가 비어있지 않은지 확인
+            if (!campaigns || !Array.isArray(campaigns) || campaigns.length === 0) {
+                return defaultOptions;
+            }
+            
+            // 필터링: 현재 날짜 기준으로 showChannelCampaignDayScop 일 이내의 캠페인만 표시
+            const currentDate = new Date();
+            const dayScope = environmentData?.showChannelCampaignDayScop || 0; // 설정 값이 없으면 기본값 0
+            
+            const filteredCampaigns = campaigns.filter(campaign => {
+                // 캠페인 객체가 유효한지 확인
+                if (!campaign) {
+                    return false;
+                }
+                
+                // update_time이 없는 경우에는 포함시키지 않음
+                if (!campaign.update_time) {
+                    return false;
+                }
+                
+                // "0000-00-00 00:00:00"인 경우는 항상 포함
+                if (campaign.update_time === "0000-00-00 00:00:00") {
+                    return true;
+                }
+                
+                // 정상적인 날짜인 경우 기존 로직으로 필터링
+                const creationDate = new Date(campaign.update_time);
+                
+                // 현재 날짜와의 차이 계산 (밀리초 단위)
+                const timeDiff = currentDate.getTime() - creationDate.getTime();
+                
+                // 일 단위로 변환
+                const dayDiff = timeDiff / (1000 * 60 * 60 * 24);
+                
+                // dayScope 이내인지 확인 (dayScope가 0이면 모든 캠페인 표시)
+                return dayScope === 0 || dayDiff <= dayScope;
+            });
+            
+            // 필터링된 캠페인을 드롭다운 옵션으로 변환
+            const campaignOptions = filteredCampaigns.map(campaign => ({
                 value: campaign.campaign_id.toString(),
                 label: `ID[${campaign.campaign_id}] : ${campaign.campaign_name}`
             }));
-
+    
             return [...defaultOptions, ...campaignOptions];
         } else if (allocationMode === "2") {
-            // 발신모드로 할당일 때 새로운 옵션
+            // 발신모드로 할당일 때 옵션
             return [
                 { value: "0", label: "회선사용안함" },
                 { value: "2147483647", label: "발신방법 모두사용" },
@@ -593,6 +709,7 @@ const SystemPreferences = () => {
         }
         return [];
     };
+    
 
     // 장비 목록용 rowClass 함수
     const getEquipmentRowClass = (row: EquipmentRow) => {
@@ -613,39 +730,47 @@ const SystemPreferences = () => {
             setMonitoringType(selectedDevice.usage === "사용" ? "oneTime" : "periodic");
             setIsEditable(true);
             
-            const selectedDeviceChannels = channelList.find(
-                channel => channel.device_id.toString() === selectedDevice.device_id
-            );
-
-            if (selectedDeviceChannels) {
-                const channels: ChannelRow[] = selectedDeviceChannels.channel_assign
-                    .map((assignValue, index) => ({
-                        channelNumber: index,
-                        channelName: `Channel No ${index}`,
-                        mode: getChannelMode(assignValue, selectedDeviceChannels.assign_kind),
-                        assignValue: assignValue
-                    }));
-
-                setFilteredChannels(channels);
-                setAllocationMode(selectedDeviceChannels.assign_kind.toString());
-                
-                // 이전에 선택된 채널 번호 확인
-                const prevChannelNumber = selectedChannel?.channelNumber;
-                if (prevChannelNumber !== undefined) {
-                    const existingChannel = channels.find(c => c.channelNumber === prevChannelNumber);
-                    if (existingChannel) {
-                        setSelectedChannel(existingChannel);
-                        setAllocationOutboundMode(existingChannel.assignValue.toString());
-                        return;
+            // 수정: channelList가 비어있지 않은지 확인
+            if (channelList && Array.isArray(channelList)) {
+                const selectedDeviceChannels = channelList.find(
+                    channel => channel && channel.device_id && channel.device_id.toString() === selectedDevice.device_id
+                );
+    
+                if (selectedDeviceChannels) {
+                    const channels: ChannelRow[] = selectedDeviceChannels.channel_assign
+                        .map((assignValue, index) => ({
+                            channelNumber: index,
+                            channelName: `Channel No ${index}`,
+                            mode: getChannelMode(assignValue, selectedDeviceChannels.assign_kind),
+                            assignValue: assignValue
+                        }));
+    
+                    setFilteredChannels(channels);
+                    setAllocationMode(selectedDeviceChannels.assign_kind.toString());
+                    
+                    // 이전에 선택된 채널 번호 확인
+                    const prevChannelNumber = selectedChannel?.channelNumber;
+                    if (prevChannelNumber !== undefined) {
+                        const existingChannel = channels.find(c => c.channelNumber === prevChannelNumber);
+                        if (existingChannel) {
+                            setSelectedChannel(existingChannel);
+                            setAllocationOutboundMode(existingChannel.assignValue.toString());
+                            return;
+                        }
                     }
-                }
-
-                // 첫 번째 채널 선택
-                if (channels.length > 0) {
-                    setSelectedChannel(channels[0]);
-                    setAllocationOutboundMode(channels[0].assignValue.toString());
+    
+                    // 첫 번째 채널 선택
+                    if (channels.length > 0) {
+                        setSelectedChannel(channels[0]);
+                        setAllocationOutboundMode(channels[0].assignValue.toString());
+                    } else {
+                        setSelectedChannel(null);
+                        setAllocationOutboundMode("");
+                    }
                 } else {
+                    setFilteredChannels([]);
                     setSelectedChannel(null);
+                    setAllocationMode("");
                     setAllocationOutboundMode("");
                 }
             } else {
@@ -663,7 +788,6 @@ const SystemPreferences = () => {
         if (selectedChannel) {
             setAllocationOutboundMode(selectedChannel.assignValue.toString());
         }
-        console.log("campaigns", campaigns);
     }, [selectedChannel]);
 
     return (
@@ -672,7 +796,7 @@ const SystemPreferences = () => {
                 <div className="w-1/2 flex-1 flex flex-col gap-5">
                     {/* 장비 목록 섹션 */}
                     <div className="flex flex-col gap-2">
-                        <TitleWrap title="장비 목록" totalCount={dialingDeviceList.length} />
+                        <TitleWrap title="장비 목록" totalCount={dialingDeviceList?.length || 0} />
                         <div className="grid-custom-wrap h-[300px]">
                             <DataGrid<EquipmentRow>
                                 columns={equipmentColumns}
@@ -745,7 +869,7 @@ const SystemPreferences = () => {
                 <div className="w-1/2 flex-1 flex flex-col gap-5">
                     {/* 채널목록 섹션 */}
                     <div className="flex flex-col gap-2">
-                        <TitleWrap title="채널목록" totalCount={filteredChannels.length} />
+                        <TitleWrap title="채널목록" totalCount={filteredChannels?.length || 0} />
                         <div className="grid-custom-wrap h-[300px]">
                             <DataGrid<ChannelRow>
                                 columns={channelColumns}
