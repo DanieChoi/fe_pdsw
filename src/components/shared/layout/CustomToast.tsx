@@ -131,7 +131,7 @@ const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
       <div 
         className={`
           ${bgColorClass}
-          shadow-md rounded-lg max-w-sm w-72 mb-3
+          shadow-md rounded-lg max-w-xs w-56 mb-3
           transform transition-all duration-300 ease-in-out
           overflow-hidden
         `}

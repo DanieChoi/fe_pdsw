@@ -1095,9 +1095,22 @@ export default function Footer({
         // Toast 알림 처리 - useAlramPopup이 1일 경우에만
         if (useAlramPopup === 1) {
           // 푸른색 계열의 이벤트 토스트 표시
-          toast.event('캠페인 동작상태 변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag, {
-            colors: themeColors.event
-          });
+          // toast.event(
+          //   // '캠페인 동작상태 변경, 캠페인 아이디 : ' + data['campaign_id'] + 
+          //   ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag ,
+          //   // + ', 완료구분 : ' + _end_flag,
+          //   {
+          //     colors: themeColors.event
+          //   }
+          // );
+
+          toast.event(
+            ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag,
+            {
+              colors: themeColors.event
+            }
+          );
+
         }
       }
     }
@@ -1130,11 +1143,14 @@ export default function Footer({
       if (useAlramPopup === 1) {
         // 한 번의 알림으로 모든 상담원 정보 요약해서 표시
         const actionType = command === 'UPDATE' || command === 'INSERT' ? '추가' : '해제';
-        const toastMessage = `[스킬 ${actionType}] 스킬 아이디 : ${_skillId}, ${tempAgentIdList.length}명의 상담원 변경됨`;
+        const toastMessage = `[스킬 ${actionType}] 스킬 아이디 : ${_skillId}\n${tempAgentIdList.length}명의 상담원 변경됨`;
 
-        toast.event(toastMessage, {
-          colors: themeColors.event
-        });
+
+        toast.event(
+          toastMessage,
+          {
+            colors: themeColors.event
+          });
       }
 
       _message = '';
@@ -1205,7 +1221,22 @@ export default function Footer({
 
       // Toast 알림 처리 - useAlramPopup이 1일 경우에만
       if (useAlramPopup === 1 && _message !== '') {
-        toast.event(_message, {
+
+        let _start_flag = '';
+        if (data['campaign_status'] === 1) {
+          _start_flag = '시작';
+        } else if (data['campaign_status'] === 2) {
+          _start_flag = '멈춤';
+        } else if (data['campaign_status'] === 3) {
+          _start_flag = '중지';
+        }
+
+        const tempCampaign = campaigns.filter((campaign) => campaign.campaign_id === Number(data['campaign_id']));
+        const toastMessage =
+          `캠페인 이름 : ${tempCampaign[0].campaign_name}\n동작상태 : ${_start_flag}`;
+
+
+        toast.event(toastMessage, {
           colors: themeColors.event
         });
       }
