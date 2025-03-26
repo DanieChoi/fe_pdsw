@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { TreeNodeForSideBarCampaignGroupTab } from "./TreeNodeForSideBarCampaignGroupTab";
 import { useAuthStore } from "@/store/authStore";
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
-
+import SearchBarForSideMenuForCampaignGroupTab from "./searchbar/SearchBarForSideMenuForCampaignGroupTab";
 export function TreeMenusForCampaignGroupTab() {
   const { tenant_id } = useAuthStore();
   
@@ -37,19 +37,24 @@ export function TreeMenusForCampaignGroupTab() {
   }, [treeData]);
   
   return (
-    <div className="flex flex-grow overflow-y-auto min-h-0 tree-node">
-      <div className="w-full">
-        {treeData.map((node) => (
-          <TreeNodeForSideBarCampaignGroupTab
-            key={node.id}
-            node={node}
-            level={0}
-            expandedNodes={expandedNodes}
-            selectedNodeId={selectedNodeId}
-            onNodeToggle={toggleNode}
-            onNodeSelect={selectNode}
-          />
-        ))}
+    <div className="flex flex-col h-full">
+      <div className="flex items-center border-b">
+        <SearchBarForSideMenuForCampaignGroupTab/>
+      </div>
+      <div className="flex flex-grow overflow-y-auto min-h-0 tree-node">
+        <div className="w-full">
+          {treeData.map((node) => (
+            <TreeNodeForSideBarCampaignGroupTab
+              key={node.id}
+              node={node}
+              level={0}
+              expandedNodes={expandedNodes}
+              selectedNodeId={selectedNodeId}
+              onNodeToggle={toggleNode}
+              onNodeSelect={selectNode}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -299,7 +299,7 @@ export function SearchBarForSideMenuForCounselorTab({
             }
           }}
           placeholder={placeholder}
-          className="w-full pl-2 pr-7 py-1 text-xs border rounded focus:outline-none focus:border-[#5BC2C1]"
+          className="w-full pl-2 pr-7 py-1 text-sm border rounded focus:outline-none focus:border-[#5BC2C1]"
         />
         <button 
           onClick={() => {
