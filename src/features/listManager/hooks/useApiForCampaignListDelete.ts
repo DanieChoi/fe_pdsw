@@ -18,6 +18,8 @@ const useApiForCampaignListDelete = (
         message: data.result_msg,
       });
 
+      // alert("캠페인 리스트 삭제 그리고 나는 기대 한다 뭐를? 발신 목록2의 실시간 삭제를 !!");
+
       // 캐시 무효화 (트리 메뉴 데이터 갱신을 위해)
       // 전체 트리 메뉴 데이터 무효화
       queryClient.invalidateQueries({ 

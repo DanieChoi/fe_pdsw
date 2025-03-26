@@ -17,7 +17,7 @@ export function useApiForCampaignStatusUpdate(
       if (data.result_code === 0) {
         // 성공 시 성공 메시지 표시
         customAlertService.success(
-          '캠페인 상태가 성공적으로 변경되었습니다.',
+          '캠페인 상태가 성공적으로 변경되었습니다. 22222222',
           '캠페인 상태 변경 완료'
         );
       } else {
@@ -30,6 +30,10 @@ export function useApiForCampaignStatusUpdate(
 
       // 상태 업데이트 성공 후 관련 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ['treeMenuDataForSideMenu'] });
+
+      queryClient.invalidateQueries({ 
+        queryKey: ['mainCampaignProgressInformation'] 
+      });
 
       options?.onSuccess?.(data, variables, context);
     },
