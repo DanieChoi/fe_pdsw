@@ -618,26 +618,42 @@ export function ContextMenuForTreeNode({
     },
   });
 
+  // const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
+  //   onSuccess: (data) => {
+  //     preventCloseRef.current = true;
+
+  //   },
+  //   onError: (error) => {
+  //     toast.error(error.message || "상태 변경 중 오류가 발생했습니다.", {
+  //       position: "top-center",
+  //       autoClose: 3000,
+  //     });
+  //   },
+  // });
+
   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
     onSuccess: (data) => {
+      // API 호출 완료 후에도 창이 닫히지 않도록 플래그 유지
       preventCloseRef.current = true;
-      // if (data.result_code === 0) {
-      //   // 성공 시
-      //   setCurrentStatus(tempStatus);
-      //   showAlertDialog("캠페인 상태가 성공적으로 변경되었습니다.", "캠페인");
-
-      //   // CampaignManager 탭(ID: 2)이 열려 있는 경우만 다시 fetch
-      //   const isCampaignManagerTabOpen = openedTabs.some(tab => tab.id === 2);
-      //   if (isCampaignManagerTabOpen) {
-      //     fetchMain({ session_key, tenant_id });
-      //   }
-      // } else {
-      //   // 실패 시
-      //   showAlertDialog(
-      //     CheckCampaignSaveReturnCode(data.reason_code),
-      //     "캠페인 상태 변경 오류"
-      //   );
-      // }
+      if (data.result_code === 0) {
+        // 성공 시
+        setCurrentStatus(tempStatus); // Update the current status state
+        // showAlertDialog("캠페인 상태가 성공적으로 변경되었습니다.", "캠페인");
+  
+        // CampaignManager 탭(ID: 2)이 열려 있는 경우만 다시 fetch
+        const isCampaignManagerTabOpen = openedTabs.some(tab => tab.id === 2);
+        if (isCampaignManagerTabOpen) {
+          fetchMain({ session_key, tenant_id });
+        }
+      } else {
+        // 실패 시
+        showAlertDialog(
+          CheckCampaignSaveReturnCode(data.reason_code),
+          "캠페인 상태 변경 오류"
+        );
+        // 실패 시 상태를 원래대로 되돌리기
+        setCurrentStatus(currentStatus);
+      }
     },
     onError: (error) => {
       toast.error(error.message || "상태 변경 중 오류가 발생했습니다.", {
@@ -786,21 +802,51 @@ export function ContextMenuForTreeNode({
     }
   };
 
+  // const handleCampaingProgressUpdate = async (status: CampaignStatus) => {
+
   const handleCampaingProgressUpdate = async (status: CampaignStatus) => {
     if (currentStatus === status || updateCampaignStatusMutation.isPending) {
       return;
     }
+    
+    // 상태 변경 시도 전에 임시 저장
     setTempStatus(status);
+    
+    // UI를 먼저 업데이트하여 사용자에게 즉각적인 피드백 제공
+    // 이 부분을 추가하면 UI가 바로 반영됨
+    setCurrentStatus(status);
+    
     try {
       preventCloseRef.current = true;
       await updateCampaignStatusMutation.mutateAsync({
         campaign_id: Number(item.id),
         campaign_status: getStatusNumber(status)
       });
+      
+      // API 호출 완료 후 fetchMain은 onSuccess 콜백에서 처리됨
+      
     } catch (error) {
       console.error('Error changing campaign status:', error);
+      // 오류 발생 시 원래 상태로 되돌리기
+      setCurrentStatus(currentStatus);
     }
   };
+
+
+  //   if (currentStatus === status || updateCampaignStatusMutation.isPending) {
+  //     return;
+  //   }
+  //   setTempStatus(status);
+  //   try {
+  //     preventCloseRef.current = true;
+  //     await updateCampaignStatusMutation.mutateAsync({
+  //       campaign_id: Number(item.id),
+  //       campaign_status: getStatusNumber(status)
+  //     });
+  //   } catch (error) {
+  //     console.error('Error changing campaign status:', error);
+  //   }
+  // };
 
   // ------------------------------------------
   // 블랙리스트 건수 조회
