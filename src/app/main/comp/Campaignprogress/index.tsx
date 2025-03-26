@@ -695,6 +695,7 @@ import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkill
 import * as XLSX from 'xlsx';
 // 모달
 import ColumnSet, { defaultColumnsData,ColumnSettingItem } from './ColumnSet';
+import { useEnvironmentStore } from '@/store/environmentStore';
 
 interface TreeRow extends DispatchStatusDataType {
   parentId?: string;
@@ -812,6 +813,7 @@ export default function Campaignprogress() {
   const [isColumnSetOpen, setIsColumnSetOpen] = useState(false);
   const [initData, setInitData] = useState<TreeRow[]>([]);
   const [columns, setColumns] = useState<Column<TreeRow>[]>(defaultColumnsData);
+  const { statisticsUpdateCycle } = useEnvironmentStore();
   
   // 캠페인 진행 정보 API 호출 (useQuery 사용)
   const { 
@@ -825,11 +827,11 @@ export default function Campaignprogress() {
   });
 
   // 데이터 갱신 함수
-  const refreshData = useCallback(() => {
-    if (refetchData) {
-      refetchData();
-    }
-  }, [refetchData]);
+  // const refreshData = useCallback(() => {
+  //   if (refetchData) {
+  //     refetchData();
+  //   }
+  // }, [refetchData]);
 
   // 수정된 transformToTreeData 함수 - 고유한 ID 생성 보장
   const transformToTreeData = (dataList: DispatchStatusDataType[]) => {
@@ -1275,11 +1277,21 @@ export default function Campaignprogress() {
     if (selectedCampaignId > 0 && campaigns.length > 0 && selectedCampaignIdIndex < campaigns.length) {
       // useQuery를 사용하므로 별도 호출 불필요 (params가 바뀌면 자동 호출됨)
       // 필요 시 수동으로 refetch 가능:
-      if (refetchData) {
-        refetchData();
+      // if (refetchData) {
+      //   refetchData();
+      // }
+      if( statisticsUpdateCycle > 0 ){        
+        const interval = setInterval(() => {  
+          setSelectedCampaignId(campaigns[0].campaign_id);
+          setSelectedCampaignIdIndex(0);
+          setTempCampaignInfoList([]);
+          setCampaignInfoList([]);
+          refetchData();
+        }, statisticsUpdateCycle * 1000);  
+        return () => clearInterval(interval);
       }
     }
-  }, [selectedCampaignId, selectedCampaignIdIndex, campaigns, refetchData]);
+  }, [selectedCampaignId, selectedCampaignIdIndex, campaigns, statisticsUpdateCycle]);
 
   useEffect(() => {
     if (campaigns.length > 0) {
@@ -1294,7 +1306,7 @@ export default function Campaignprogress() {
     <div className="limit-width">
       <TitleWrap
         className="border-b border-gray-300 pb-3"
-        title="상담원 상태"
+        title="캠페인 총 진행상황"
       />
       <div className="flex items-center justify-between pb-3">
         <div className="flex gap-5">
@@ -1355,7 +1367,7 @@ export default function Campaignprogress() {
           </button>
         </div>
         <div className="flex justify-end gap-2">
-          <CommonButton variant="secondary" onClick={refreshData}>새로고침</CommonButton>
+          {/* <CommonButton variant="secondary" onClick={refreshData}>새로고침</CommonButton> */}
           <CommonButton variant="secondary" onClick={handleExcelDownload}>엑셀로 저장</CommonButton>
           <CommonButton variant="secondary" onClick={() => setIsColumnSetOpen(true)}>칼럼 설정</CommonButton>
         </div>

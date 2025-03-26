@@ -264,6 +264,7 @@ import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkill
 import { useCampainManagerStore, useMainStore } from '@/store';
 import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
 import { CommonButton } from "@/components/shared/CommonButton";
+import { useEnvironmentStore } from '@/store/environmentStore';
 
 interface ChartDataItem {
   name: string;
@@ -308,6 +309,7 @@ const StatusCampaign: React.FC = () => {
   const [maxDispatchCount, setMaxDispatchCount] = useState<number>(0);
   const [dispatchTypeList, setDispatchTypeList] = useState<DispatchDataType[]>([]);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const { statisticsUpdateCycle } = useEnvironmentStore();
 
   // 캠페인 진행 정보 API 호출 (useQuery 사용)
   const { 
@@ -324,6 +326,9 @@ const StatusCampaign: React.FC = () => {
   const refreshData = useCallback(() => {
     setIsRefreshing(true);
     if (refetchData) {
+      setSelectedCampaignId(campaigns[0].campaign_id);
+      setSelectedCampaignIdIndex(0);
+      setCampaignInfoList([]);       
       refetchData().finally(() => {
         setIsRefreshing(false);
       });
@@ -463,11 +468,20 @@ const StatusCampaign: React.FC = () => {
     if (selectedCampaignId > 0 && campaigns.length > 0 && selectedCampaignIdIndex < campaigns.length) {
       // useQuery를 사용하므로 별도 호출 불필요 (params가 바뀌면 자동 호출됨)
       // 필요 시 수동으로 refetch 가능:
-      if (refetchData) {
-        refetchData();
+      // if (refetchData) {
+      //   refetchData();
+      // }
+      if( statisticsUpdateCycle > 0 ){        
+        const interval = setInterval(() => {  
+          setSelectedCampaignId(campaigns[0].campaign_id);
+          setSelectedCampaignIdIndex(0);
+          setCampaignInfoList([]);         
+          refetchData();
+        }, statisticsUpdateCycle * 1000);  
+        return () => clearInterval(interval);
       }
     }
-  }, [selectedCampaignId, selectedCampaignIdIndex, campaigns, refetchData]);
+  }, [selectedCampaignId, selectedCampaignIdIndex, campaigns, refetchData, statisticsUpdateCycle]);
 
   // 캠페인 목록 변경 시 초기 데이터 설정
   useEffect(() => {

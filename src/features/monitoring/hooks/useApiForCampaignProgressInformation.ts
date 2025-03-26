@@ -40,7 +40,7 @@ export function useApiForCampaignProgressInformation(params: CampaignProgressInf
   const query = useQuery<CampaignProgressInformationResponse, MonitoringApiError>({
     queryKey: ['mainCampaignProgressInformation', params.tenantId, params.campaignId],
     queryFn: () => fetchCampaignProgressInformation(params),
-    enabled: !!params.campaignId && !!params.tenantId,
+    // enabled: !!params.campaignId && !!params.tenantId,
     // staleTime: 5 * 60 * 1000, // 5분 캐싱 (필요에 따라 주석 해제)
   });
   

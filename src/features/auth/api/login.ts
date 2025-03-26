@@ -27,7 +27,7 @@ export const loginApi = {
         grant_type: "password",
         device_id: "api_test",
         user_name: credentials.user_name,
-        password: credentials.password,
+        password: dataFirst.passwd,
       };
 
       const { data } = await axiosInstance.post<LoginResponse>('/login', loginData);
