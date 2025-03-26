@@ -28,12 +28,14 @@ const NotificationTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onHa
   const [alertSound, setAlertSound] = useState(false);      // 소리로 알림
   const [alertCall, setAlertCall] = useState(false);        // 관리자에게 전화로 알림
   const [tempNotificationTabParam, setTempNotificationTabParam] = useState<NotificationTabParam>(tempNotificationTab);
+  const [tempCampaignInfoChangeYn, setTempCampaignInfoChangeYn] = useState<boolean>(false);
 
   // 숫자 입력만 허용하는 핸들러
   const handleNumericInput = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = e.target.value;
+    setTempCampaignInfoChangeYn(true);
     if (/^\d*$/.test(value)) {
       onHandleNotificationTabChange({...tempNotificationTabParam
         , campaignInfoChangeYn : true
@@ -134,7 +136,7 @@ const NotificationTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onHa
         , use_list_alarm: campaignInfo.use_list_alarm
         , supervisor_phone: campaignInfo.supervisor_phone
       });
-      if( campaignInfo.use_list_alarm === 0 ){
+      if( campaignInfo.use_list_alarm === 0 && !tempCampaignInfoChangeYn ){
         setIsChecked( false );
         setAlertMessage(true);
         setAlertSound(false);
@@ -172,7 +174,7 @@ const NotificationTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onHa
         }
       }
     }
-  }, [campaignInfo]);
+  }, [campaignInfo,tempCampaignInfoChangeYn]);
 
   return (
     <div className="pt-[50px]">
