@@ -1209,6 +1209,23 @@ export default function Footer({
         _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + tempCampaign[0].campaign_name + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
       }
     }
+    //발신리스트등록
+    else if (announce === '/pds/campaign/calling-list') {
+      _message = '발신리스트등록, '
+      if (command === 'INSERT') {
+        let list_flag = '';
+        if (data['list_flag'] === 'I') {
+          list_flag = '신규리스트';
+        } else if (data['list_flag'] === 'A') {
+          list_flag = '추가리스트';
+        } else if (data['list_flag'] === 'D') {
+          list_flag = '삭제리스트';
+        } else if (data['list_flag'] === 'L') {
+          list_flag = '초기화';
+        }
+        _message += '캠페인 아이디 : ' + data['campaign_id'] + ' , 리스트구분 : ' + list_flag;
+      }
+    }
     if (_message !== '') {
       setFooterDataList((prev) => [
         {
