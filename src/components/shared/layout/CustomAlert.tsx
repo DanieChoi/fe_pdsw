@@ -57,7 +57,7 @@ const CustomAlert = ({
                             : message}
                     </div>
                     {showButtons && (
-                        <div className="flex justify-end gap-1.5">
+                        <div className="flex justify-end gap-1.5 mt-[20px]">
                             {type === '1' ? (
                                 <>
                                     <CommonButton 
