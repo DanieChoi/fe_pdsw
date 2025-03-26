@@ -101,6 +101,14 @@ export default function Footer({
   });
 
   const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, tempEventData: any): void => {
+
+    console.log("1111111footerDataSet announce = ", announce);
+    console.log("222222222footerDataSet command = ", command);
+    console.log("33333333footerDataSet data = ", data);
+    console.log("444444444footerDataSet kind = ", kind);
+    console.log("555555555footerDataSet tempEventData = ", tempEventData);
+    
+
     //시간.
     const today = new Date();
     const _time = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0') + ':' + String(today.getSeconds()).padStart(2, '0');
@@ -184,10 +192,14 @@ export default function Footer({
       }
       if (command === 'INSERT') {
         _message += '추가, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
+        queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
       } else if (command === 'UPDATE') {
         _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
+        // tofix
+        queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
       } else if (command === 'DELETE') {
         _message += '삭제, 캠페인 아이디 : ' + data['campaign_id'];
+        queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
       }
       fetchMain({
         session_key: '',
