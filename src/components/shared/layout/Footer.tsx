@@ -1000,8 +1000,11 @@ export default function Footer({
     //타입.
     let _type = 'Event';
     if (kind === 'event') {
+      alert("announce1 = " + announce);
+      alert("data : " + data)
       _type = 'Event';
     } else if (kind === 'alram') {
+      alert("announce2 = " + announce);
       _type = 'Event';
     }
     //메시지.
@@ -1062,6 +1065,7 @@ export default function Footer({
         _start_flag = '시작';
       } else if (data['start_flag'] === 2) {
         _start_flag = '멈춤';
+        alert("멈춤 실행 했지렁 1111111  ")
       } else if (data['start_flag'] === 3) {
         _start_flag = '중지';
       }
@@ -1094,18 +1098,11 @@ export default function Footer({
 
         // Toast 알림 처리 - useAlramPopup이 1일 경우에만
         if (useAlramPopup === 1) {
-          // 푸른색 계열의 이벤트 토스트 표시
-          // toast.event(
-          //   // '캠페인 동작상태 변경, 캠페인 아이디 : ' + data['campaign_id'] + 
-          //   ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag ,
-          //   // + ', 완료구분 : ' + _end_flag,
-          //   {
-          //     colors: themeColors.event
-          //   }
-          // );
 
           toast.event(
-            ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag,
+            ' , 캠페인 이름 : '
+            // + data['campaign_name'] 
+            + ' , 동작상태 : ' + _start_flag,
             {
               colors: themeColors.event
             }
@@ -1199,10 +1196,13 @@ export default function Footer({
       if (command === 'UPDATE') {
         let _start_flag = '';
         if (data['campaign_status'] === 1) {
+          alert("실행 했지렁 333333  ")
           _start_flag = '시작';
         } else if (data['campaign_status'] === 2) {
+          alert("멈춤 실행 했지렁 222222  ")
           _start_flag = '멈춤';
         } else if (data['campaign_status'] === 3) {
+          alert("멈춤 실행 했지렁 55555  ")
           _start_flag = '중지';
         }
         const tempCampaign = campaigns.filter((campaign) => campaign.campaign_id === Number(data['campaign_id']));
@@ -1248,6 +1248,7 @@ export default function Footer({
           _start_flag = '시작';
         } else if (data['campaign_status'] === 2) {
           _start_flag = '멈춤';
+          // alert("멈춤 실행 했지렁 333333  ")
         } else if (data['campaign_status'] === 3) {
           _start_flag = '중지';
         }
