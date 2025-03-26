@@ -189,14 +189,10 @@ const RebroadcastSettingsPanelHeader = ({
             </div>
 
             <div className="flex gap-2 items-center">
-                <div className="text-md font-medium text-slate-700 dark:text-slate-300 rounded-md inline-flex items-center mr-2">
+                <div className="px-2 py-1 text-sm font-medium text-gray-700 bg-blue-100 border border-blue-200 rounded-md shadow-sm inline-flex items-center mr-[200px]">
                     {selectedRebroadcastId !== null ?
                         textType
                         : ""}
-                </div>
-
-                <div>
-                    {textType}
                 </div>
 
                 <CommonButton onClick={handleCheckListCountHeader}>
