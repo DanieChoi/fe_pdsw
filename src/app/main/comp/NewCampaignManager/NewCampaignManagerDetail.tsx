@@ -727,7 +727,11 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   //캠페인 취소 실행.
   const handleCampaignClosedExecute = () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
-    removeTab(Number(activeTabId),activeTabKey+'');
+    // removeTab(Number(activeTabId),activeTabKey+'');
+    const existingTabs = openedTabs.filter(tab => tab.id === 13);
+    existingTabs.forEach(tab => {
+      removeTab(tab.id, tab.uniqueKey);
+    });
   }
 
   //캠페인 저장
