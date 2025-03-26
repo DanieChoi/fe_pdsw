@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { UseMutationOptions } from '@tanstack/react-query';
 import { DeleteResponse, ListManagerApiError } from '../types/listManagerIndex';
 import { fetchCallingListDelete } from '../api/mainCallingListDelete';
+import { toast } from 'react-toastify';
 
 const useApiForCampaignListDelete = (
   options?: UseMutationOptions<DeleteResponse, ListManagerApiError, number> // number 타입 유지
@@ -18,6 +19,7 @@ const useApiForCampaignListDelete = (
         message: data.result_msg,
       });
 
+      toast.success('캠페인 리스트 삭제 성공 check !!!!!!!!!!!');
       // alert("캠페인 리스트 삭제 그리고 나는 기대 한다 뭐를? 발신 목록2의 실시간 삭제를 !!");
 
       // 캐시 무효화 (트리 메뉴 데이터 갱신을 위해)

@@ -137,12 +137,12 @@ export function IContextMenuForCampaignForCampaignGroup({
   });
 
   const { mutate: deleteCampaignList } = useApiForCampaignListDelete({
-    onSuccess: (data) => {
-      toast.success("캠페인 리스트가 삭제되었습니다.");
-    },
-    onError: (error) => {
-      toast.error(error.message || "리스트 삭제 중 오류가 발생했습니다.");
-    },
+    // onSuccess: (data) => {
+    //   toast.success(".");
+    // },
+    // onError: (error) => {
+    //   toast.error(error.message || "리스트 삭제 중 오류가 발생했습니다.");
+    // },
   });
 
   const handleCampaignListDelete = (campaignId: any) => {

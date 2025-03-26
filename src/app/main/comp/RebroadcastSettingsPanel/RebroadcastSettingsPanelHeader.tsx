@@ -13,51 +13,52 @@ import 'react-calendar/dist/Calendar.css';
 import { useMainStore, useTabStore } from '@/store';
 
 interface RebroadcastItem {
-  id: number;
-  scheduleStartDate: string;
-  scheduleStartTime: string;
-  outgoingResults: string[];
-  outgoingType: string;
-  outgoingTime: {
-    type: string;
-    startDate: string;
-    endDate: string;
-  };
-  isDummy?: boolean;
+    id: number;
+    scheduleStartDate: string;
+    scheduleStartTime: string;
+    outgoingResults: string[];
+    outgoingType: string;
+    outgoingTime: {
+        type: string;
+        startDate: string;
+        endDate: string;
+    };
+    isDummy?: boolean;
 }
 
 const errorMessage: CustomAlertRequest = {
-  isOpen: false,
-  message: '',
-  title: '재발신 설정',
-  type: '0',
-  onClose: () => {},
-  onCancle: () => {},
+    isOpen: false,
+    message: '',
+    title: '재발신 설정',
+    type: '0',
+    onClose: () => { },
+    onCancle: () => { },
 };
 
 type Props = {
-  campaignId?: string;
-  reservationShouldShowApply: boolean;
-  reservationShouldShowAdd:boolean;
-  reservationShouldShowDelete:boolean;
-  handleBroadcastTypeChange: (param:string) => void;
-  handleAddRebroadcast:() => void;
-  handleRemoveRebroadcast:() => void;
-  handleApplyRebroadcast:() => void;
-  handleCheckListCount:() => void;
+    campaignId?: string;
+    reservationShouldShowApply: boolean;
+    reservationShouldShowAdd: boolean;
+    reservationShouldShowDelete: boolean;
+    handleBroadcastTypeChange: (param: string) => void;
+    handleAddRebroadcast: () => void;
+    handleRemoveRebroadcast: () => void;
+    handleApplyRebroadcast: () => void;
+    handleCheckListCount: () => void;
+    textType: string;
 }
 
-const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply,reservationShouldShowAdd, reservationShouldShowDelete
+const RebroadcastSettingsPanelHeader = ({ campaignId, reservationShouldShowApply, reservationShouldShowAdd, reservationShouldShowDelete, textType
     , handleBroadcastTypeChange
     , handleAddRebroadcast
     , handleRemoveRebroadcast
     , handleApplyRebroadcast
     , handleCheckListCount
-}:Props) => {
+}: Props) => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
     const { campaigns } = useMainStore();
     const { removeTab } = useTabStore();
-    
+
     const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
     const [broadcastType, setBroadcastType] = useState("reservation");
     const [listCount, setListCount] = useState<number>(0);
@@ -70,7 +71,7 @@ const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply,
 
     //리스트 건수 확인 버튼 클릭 이벤트.
     const handleCheckListCountHeader = () => {
-        if( broadcastType === 'reservation'){   //예약인 경우.
+        if (broadcastType === 'reservation') {   //예약인 경우.
             setAlertState({
                 isOpen: true,
                 message: `선택된 재발신 조건에 해당되는 리스트 수 : ${listCount}`,
@@ -79,7 +80,7 @@ const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply,
                 onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
                 onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
             });
-        }else{  //실시간인 경우.
+        } else {  //실시간인 경우.
             handleCheckListCount();
         }
     };
@@ -98,9 +99,9 @@ const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply,
     const handleBroadcastType = (value: string) => {
         setBroadcastType(value);
         handleBroadcastTypeChange(value);
-        if( value === 'realtime' ){
+        if (value === 'realtime') {
             setShouldShowApply(true);
-        }else{
+        } else {
             setShouldShowApply(reservationShouldShowApply);
         }
     };
@@ -115,108 +116,113 @@ const RebroadcastSettingsPanelHeader = ({campaignId, reservationShouldShowApply,
         setShouldShowApply(reservationShouldShowApply);
         setShouldShowAdd(reservationShouldShowAdd);
         setShouldShowDelete(reservationShouldShowDelete);
-    }, [reservationShouldShowApply,reservationShouldShowAdd,reservationShouldShowDelete]);
+    }, [reservationShouldShowApply, reservationShouldShowAdd, reservationShouldShowDelete]);
 
     useEffect(() => {
-        if( campaigns && campaignId !== '0' ){
-            setHeaderCampaignId(campaignId+'');
-            const tempCampaign = campaigns.filter(data=>Number(campaignId) === data.campaign_id);
-            if( tempCampaign.length > 0 ){
+        if (campaigns && campaignId !== '0') {
+            setHeaderCampaignId(campaignId + '');
+            const tempCampaign = campaigns.filter(data => Number(campaignId) === data.campaign_id);
+            if (tempCampaign.length > 0) {
                 setListCount(tempCampaign[0].list_count);
             }
-            if( tempCampaign[0].start_flag === 1 ){
+            if (tempCampaign[0].start_flag === 1) {
                 setRealtime(true);
-            }else{
+            } else {
                 setRealtime(false);
             }
-            
+
             // setListCount(campaigns.filter(data=>Number(campaignId) === data.campaign_id)[0].list_count);
         }
-    }, [campaignId,campaigns]);
+    }, [campaignId, campaigns]);
 
     return (
-                <div className="flex title-background justify-between">
-                    <div className="flex gap-4 items-center">
-                        <div className="flex items-center gap-2">
-                            <Label className="w-20 min-w-20">캠페인 아이디</Label>
-                            <Select defaultValue='0' value={headerCampaignId}  onValueChange={setHeaderCampaignId} disabled>
-                                <SelectTrigger className="w-[140px]">
-                                    <SelectValue placeholder="캠페인선택" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem key='0' value='0'>-선택-</SelectItem>
-                                    {campaigns.map(option => (
-                                        <SelectItem key={option.campaign_id} value={option.campaign_id+''}>
-                                        {option.campaign_id}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+        <div className="flex title-background justify-between">
+            <div className="flex gap-4 items-center">
+                <div className="flex items-center gap-2">
+                    <Label className="w-20 min-w-20">캠페인 아이디</Label>
+                    <Select defaultValue='0' value={headerCampaignId} onValueChange={setHeaderCampaignId} disabled>
+                        <SelectTrigger className="w-[140px]">
+                            <SelectValue placeholder="캠페인선택" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem key='0' value='0'>-선택-</SelectItem>
+                            {campaigns.map(option => (
+                                <SelectItem key={option.campaign_id} value={option.campaign_id + ''}>
+                                    {option.campaign_id}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
 
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Label className="w-20 min-w-20">캠페인 이름</Label>
-                            <CustomInput 
-                                className="w-[140px]"
-                                disabled
-                                value={headerCampaignId === ''?'':campaigns.filter(data=>Number(headerCampaignId) === data.campaign_id)[0].campaign_name||''}
-                            />
-                        </div>
-                        <CommonRadio
-                            defaultValue="reservation"
-                            className="flex gap-5"
-                            onValueChange={(value) => handleBroadcastType(value) }
-                            value={broadcastType}
-                            disabled={realtime}
-                        >
-                            <div className="flex items-center space-x-2">
-                                <CommonRadioItem value="reservation" id="reservation" />
-                                <Label htmlFor="reservation">예약</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <CommonRadioItem value="realtime" id="realtime" />
-                                <Label htmlFor="realtime">실시간</Label>
-                            </div>
-                        </CommonRadio>
-                    </div>
-                    <div className="flex gap-2">
-                        <CommonButton onClick={handleCheckListCountHeader}>
-                            리스트 건수 확인
-                        </CommonButton>
-                        <CommonButton 
-                            onClick={handleAddRebroadcastClick} 
-                            disabled={!shouldShowAdd}
-                        >
-                            추가
-                        </CommonButton>
-                        <CommonButton 
-                            onClick={handleRemoveRebroadcastClick}
-                            disabled={!shouldShowAddDelete}
-                        >
-                            삭제
-                        </CommonButton>
-                        <CommonButton 
-                            onClick={handleApplyRebroadcastClick}
-                            disabled={!shouldShowApply}
-                        >
-                            적용
-                        </CommonButton>
-                        <CommonButton 
-                            onClick={() => removeTab(20,'20')}
-                        >
-                            닫기
-                        </CommonButton>
-                    </div>
-                    <CustomAlert
-                        message={alertState.message}
-                        title={alertState.title}
-                        type={alertState.type}
-                        isOpen={alertState.isOpen}
-                        onClose={() => {
-                        alertState.onClose()
-                        }}
-                        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}/>
                 </div>
+                <div className="flex items-center gap-2">
+                    <Label className="w-20 min-w-20">캠페인 이름</Label>
+                    <CustomInput
+                        className="w-[140px]"
+                        disabled
+                        value={headerCampaignId === '' ? '' : campaigns.filter(data => Number(headerCampaignId) === data.campaign_id)[0].campaign_name || ''}
+                    />
+                </div>
+                <CommonRadio
+                    defaultValue="reservation"
+                    className="flex gap-5"
+                    onValueChange={(value) => handleBroadcastType(value)}
+                    value={broadcastType}
+                    disabled={realtime}
+                >
+                    <div className="flex items-center space-x-2">
+                        <CommonRadioItem value="reservation" id="reservation" />
+                        <Label htmlFor="reservation">예약</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <CommonRadioItem value="realtime" id="realtime" />
+                        <Label htmlFor="realtime">실시간</Label>
+                    </div>
+                </CommonRadio>
+            </div>
+            <div className="flex gap-2">
+
+                <div className="text-md font-medium text-slate-700 dark:text-slate-300 px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-md inline-flex items-center">
+                    {textType}
+                </div>
+
+                <CommonButton onClick={handleCheckListCountHeader}>
+                    리스트 건수 확인
+                </CommonButton>
+                <CommonButton
+                    onClick={handleAddRebroadcastClick}
+                    disabled={!shouldShowAdd}
+                >
+                    추가
+                </CommonButton>
+                <CommonButton
+                    onClick={handleRemoveRebroadcastClick}
+                    disabled={!shouldShowAddDelete}
+                >
+                    삭제
+                </CommonButton>
+                <CommonButton
+                    onClick={handleApplyRebroadcastClick}
+                    disabled={!shouldShowApply}
+                >
+                    적용
+                </CommonButton>
+                <CommonButton
+                    onClick={() => removeTab(20, '20')}
+                >
+                    닫기
+                </CommonButton>
+            </div>
+            <CustomAlert
+                message={alertState.message}
+                title={alertState.title}
+                type={alertState.type}
+                isOpen={alertState.isOpen}
+                onClose={() => {
+                    alertState.onClose()
+                }}
+                onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
+        </div>
 
     );
 };

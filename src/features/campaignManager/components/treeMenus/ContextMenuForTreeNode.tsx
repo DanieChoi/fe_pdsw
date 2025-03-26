@@ -145,27 +145,27 @@ export function ContextMenuForTreeNode({
   });
 
   const { mutate: deleteCampaignList } = useApiForCampaignListDelete({
-    onSuccess: (data) => {
-      console.log('캠페인 리스트 삭제 성공 : ', data);
-      toast.success("캠페인 리스트가 성공적으로 삭제되었습니다.", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-    },
-    onError: (error) => {
-      toast.error(error.message || "리스트 삭제 중 오류가 발생했습니다.", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-    },
+    // onSuccess: (data) => {
+    //   console.log('캠페인 리스트 삭제 성공 : ', data);
+    //   toast.success("캠페인 리스트가 성공적으로 삭제되었습니다.", {
+    //     position: "top-center",
+    //     autoClose: 3000,
+    //     hideProgressBar: false,
+    //     closeOnClick: true,
+    //     pauseOnHover: true,
+    //     draggable: true,
+    //   });
+    // },
+    // onError: (error) => {
+    //   toast.error(error.message || "리스트 삭제 중 오류가 발생했습니다.", {
+    //     position: "top-center",
+    //     autoClose: 3000,
+    //     hideProgressBar: false,
+    //     closeOnClick: true,
+    //     pauseOnHover: true,
+    //     draggable: true,
+    //   });
+    // },
   });
 
   const handleCampaignListDelete = (campaignId: any) => {

@@ -63,6 +63,9 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
     campaignId: numericCampaignId || 0
   });
 
+  console.log("progressData 확인 : ", progressData);
+  
+
   // 데이터 갱신 함수
   const refreshData = useCallback(() => {
     // invalidateCache 함수가 있으면 사용하고, 없으면 refetch 사용
@@ -76,7 +79,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   // 데이터가 변경될 때마다 처리
   // fix 
   useEffect(() => {
-    if (progressData && progressData.progressInfoList) {
+    if (progressData) {
       console.log("캠페인 진행 정보 check !!");
 
       const tempList = [...progressData.progressInfoList].sort((a, b) => a.reuseCnt - b.reuseCnt);
@@ -92,7 +95,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
       
       console.log("API 응답 데이터:", tempList);
     }
-  }, [progressData]);
+  }, [refetch, progressData, selectedCall]);
 
   // 컴포넌트 마운트 시 캠페인 정보 로드
   useEffect(() => {
@@ -173,7 +176,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
                   <tr>
                     <td className="p-4 text-center text-gray-500">데이터 로드 오류</td>
                   </tr>
-                ) : dataList.length > 0 ? dataList.map((item, index) => (
+                ) : dataList ? dataList.map((item, index) => (
                   <tr
                     key={item.reuseCnt}
                     onClick={() => setSelectedCall(item)}

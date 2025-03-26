@@ -1109,6 +1109,7 @@ const RebroadcastSettingsPanel = () => {
                     handleRemoveRebroadcast={handleRemoveRebroadcast}
                     handleApplyRebroadcast={handleApplyRebroadcast}
                     handleCheckListCount={handleCheckListCount}
+                    textType = {textType}
                 />
 
                 <div className="flex gap-5 h-[580px]">
@@ -1210,9 +1211,10 @@ const RebroadcastSettingsPanel = () => {
                                 <Label htmlFor="outgoing-type" className="text-sm">
                                     발신구분
                                 </Label>
-                                <Label className="text-sm">
+                                {/* tofix */}
+                                {/* <Label className="text-sm">
                                     {textType}
-                                </Label>
+                                </Label> */}
                             </div>
                             <div className={`border p-2 rounded py-[20px] px-[20px] flex flex-col gap-6 ${!outgoingTypeChecked ? "opacity-50 pointer-events-none" : ""}`} style={{ height: "calc(100% - 29px)" }}>
                                 <div className="text-sm">재콜 구분을 선택합니다.</div>
