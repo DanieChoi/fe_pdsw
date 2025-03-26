@@ -59,7 +59,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
     refetch,
     invalidateCache 
   } = useApiForCampaignProgressInformation({
-    tenantId: 1,
+    tenantId: campaigns.find(data => data.campaign_id === numericCampaignId)?.tenant_id || 1,
     campaignId: numericCampaignId || 0
   });
 
