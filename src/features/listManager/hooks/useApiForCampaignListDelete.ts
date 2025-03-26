@@ -32,7 +32,7 @@ const useApiForCampaignListDelete = (
       // 삭제된 특정 캠페인 진행 정보 무효화 (variables는 삭제된 캠페인 ID)
       if (variables) {
         queryClient.invalidateQueries({
-          queryKey: ['mainCampaignProgressInformation', undefined, variables]
+          queryKey: ['mainCampaignProgressInformation', 1, variables]
         });
       }
 

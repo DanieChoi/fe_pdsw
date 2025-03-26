@@ -36,12 +36,17 @@ import { CampaignProgressInformationRequest, CampaignProgressInformationResponse
  */
 export function useApiForCampaignProgressInformation(params: CampaignProgressInformationRequest) {
   const queryClient = useQueryClient();
-  
+  // alert("useApiForCampaignProgressInformation 실행 check")
+
   const query = useQuery<CampaignProgressInformationResponse, MonitoringApiError>({
-    queryKey: ['mainCampaignProgressInformation', params.tenantId, params.campaignId],
+    // queryKey: ['mainCampaignProgressInformation', params.tenantId, params.campaignId],
+    queryKey: ['mainCampaignProgressInformation'],
     queryFn: () => fetchCampaignProgressInformation(params),
-    enabled: !!params.campaignId && !!params.tenantId,
+    // enabled: !!params.campaignId && !!params.tenantId,
     // staleTime: 5 * 60 * 1000, // 5분 캐싱 (필요에 따라 주석 해제)
+    staleTime: 0,         // 데이터가 즉시 stale 상태가 되도록 설정
+    refetchOnMount: true, // 컴포넌트가 마운트될 때마다 다시 요청
+    refetchOnWindowFocus: true, //
   });
   
   // 캐시 무효화 함수 추가

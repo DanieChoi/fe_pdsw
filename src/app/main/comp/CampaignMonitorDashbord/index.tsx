@@ -289,7 +289,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
       
       console.log("API 응답 데이터:", tempList);
     }
-  }, [progressData, selectedCall]);
+  }, [progressData, selectedCall, progressData]);
 
   // 컴포넌트 마운트 시 캠페인 정보 로드
   useEffect(() => {
@@ -358,7 +358,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         </div>
 
         <div className="flex-1 h-full">
-          <TitleWrap title="발신구분" />
+          <TitleWrap title="발신구분2" />
           <div className="border rounded overflow-y-auto h-[calc(100%-20px)]">
             <table className="w-full text-sm border-collapse">
               <tbody>

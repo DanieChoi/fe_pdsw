@@ -1239,6 +1239,9 @@ export default function Footer({
         toast.event(toastMessage, {
           colors: themeColors.event
         });
+
+        // TOFIX 0326 sidebar2 refetch
+
       }
     }
   }, [campaigns, setFooterDataList, useAlramPopup, tenant_id, fetchMain]);
