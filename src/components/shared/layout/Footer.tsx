@@ -1230,6 +1230,15 @@ export default function Footer({
         _message += '캠페인 아이디 : ' + data['campaign_id'] + ' , 리스트구분 : ' + list_flag;
       }
     }
+    //예약재발신 추가/삭제
+    else if (announce === '/pds/campaign/scheduled-redial') {
+      _message = '예약재발신 '
+      if (command === 'INSERT') {
+        _message += '추가, 캠페인 아이디 : ' + data['campaign_id'] + ' , 실행구분 : 미실행';
+      }else if (command === 'DELETE') {
+        _message += '삭제, 캠페인 아이디 : ' + data['campaign_id'];
+      }
+    }
     if (_message !== '') {
       setFooterDataList((prev) => [
         {

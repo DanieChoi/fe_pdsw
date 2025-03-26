@@ -189,11 +189,12 @@ const RebroadcastSettingsPanelHeader = ({
             </div>
 
             <div className="flex gap-2 items-center">
-                <div className="px-2 py-1 text-sm font-medium text-gray-700 bg-blue-100 border border-blue-200 rounded-md shadow-sm inline-flex items-center mr-[200px]">
-                    {selectedRebroadcastId !== null ?
-                        textType
-                        : ""}
-                </div>
+                {broadcastType === 'reservation' && textType !== '' ?
+                    <div className="px-2 py-1 text-sm font-medium text-gray-700 bg-blue-100 border border-blue-200 rounded-md shadow-sm inline-flex items-center mr-[200px]">
+                        {textType}
+                    </div>
+                    :null
+                }
 
                 <CommonButton onClick={handleCheckListCountHeader}>
                     리스트 건수 확인

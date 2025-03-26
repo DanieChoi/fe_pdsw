@@ -7,6 +7,7 @@ import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { Label } from "@/components/ui/label";
 import { useApiForAgentStateMonitoringList } from '@/features/monitoring/hooks/useApiForAgentStateMonitoringList';
 import { useMainStore } from '@/store';
+import { useEnvironmentStore } from '@/store/environmentStore';
 
 // 타입 정의
 interface AgentStatus {
@@ -56,6 +57,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
 
   const [agentData, setAgentData] = useState<AgentData[]>([]);
   const [_agentData, _setAgentData] = useState<AgentData[]>([]);
+  const { statisticsUpdateCycle } = useEnvironmentStore();
 
   const handleStatusChange = (status: keyof AgentStatus): void => {
     setSelectedStatuses(prev => ({
@@ -193,9 +195,18 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
           tenantId: tenantId,
           campaignId: Number(campaignId)
         });
+        if( statisticsUpdateCycle > 0 ){        
+          const interval = setInterval(() => {  
+            fetchAgentStateMonitoringList({
+              tenantId: tenantId,
+              campaignId: Number(campaignId)
+            });
+          }, statisticsUpdateCycle * 1000);  
+          return () => clearInterval(interval);
+        }
       }
     }
-  }, [campaignId,campaigns]);
+  }, [campaignId,campaigns,statisticsUpdateCycle]);
 
   return (
     <div className="w-full h-full flex flex-col gap-4">
