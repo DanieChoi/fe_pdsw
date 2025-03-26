@@ -93,15 +93,15 @@ export function ContextMenuForTreeNode({
       // API 호출 완료 후에도 창이 닫히지 않도록 플래그 유지
       preventCloseRef.current = true;
       if (data.result_code === 0) {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          type: '2',
-          message: '캠페인 상태가 성공적으로 변경되었습니다.',
-          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
-          onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        // setAlertState({
+        //   ...errorMessage,
+        //   isOpen: true,
+        //   type: '2',
+        //   message: '캠페인 상태가 성공적으로 변경되었습니다.',
+        //   onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+        //   onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
           
-        });
+        // });
         // 로컬 상태 업데이트
         setCurrentStatus(tempStatus);
   

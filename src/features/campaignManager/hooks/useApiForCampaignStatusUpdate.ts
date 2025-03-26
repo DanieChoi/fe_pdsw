@@ -36,7 +36,7 @@ export function useApiForCampaignStatusUpdate(
     onError: (error: CampaignApiError, variables: CampaignStatusDataRequest, context: unknown) => {
       console.error('API Error:', error);
       // API 오류 시 에러 메시지 표시
-      customAlertService.error(error.message || '데이터 로드에 실패했습니다.', 'API 오류');
+      // customAlertService.error(error.message || '데이터 로드에 실패했습니다.', 'API 오류');
       options?.onError?.(error, variables, context);
     },
   });
