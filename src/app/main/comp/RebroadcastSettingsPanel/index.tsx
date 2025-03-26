@@ -193,7 +193,7 @@ const RebroadcastSettingsPanel = () => {
     };
 
     const MakeRedialPacket = () => {
-        let returnValue = '';
+        let returnValue = '00';
         //발신결과.
         if( outgoingResultChecked ){            
             if( selectedOutgoingResults['outgoing-success-ok'] && selectedOutgoingResults['outgoing-success-no'] ){
@@ -333,6 +333,8 @@ const RebroadcastSettingsPanel = () => {
         //발신결과 disabled 설정.
         setOutgoingResultDisabled(false);   
 
+        setSelectedRebroadcastId(sequenceNumber);
+
         setTextType('재발신 추가중');
         setRebroadcastList([...rebroadcastList, newRebroadcast]);
         resetAllStates();
@@ -361,7 +363,17 @@ const RebroadcastSettingsPanel = () => {
         setOutgoingResultChecked(false);
         setOutgoingTypeChecked(false);
         setOutgoingTimeChecked(false);
-        setOutgoingResultDisabled(true);   
+        setOutgoingResultDisabled(true);  
+        if( tempRebroadcastList.length > 0 ){
+            setSelectedRebroadcastId(tempRebroadcastList[0].id);
+            if( tempRebroadcastList[0].run_flag === 2){
+                setTextType('Time out');
+            }else if( tempRebroadcastList[0].run_flag === 1){
+                setTextType('실행');
+            }else if( tempRebroadcastList[0].run_flag === 0){
+                setTextType('미실행');
+            }
+        }
     };
 
     //그리드 클릭이벤트..
@@ -993,6 +1005,8 @@ const RebroadcastSettingsPanel = () => {
                     handleRemoveRebroadcast={handleRemoveRebroadcast}
                     handleApplyRebroadcast={handleApplyRebroadcast}
                     handleCheckListCount={handleCheckListCount}
+                    textType = {textType}
+                    selectedRebroadcastId = {selectedRebroadcastId}
                 />
 
                 <div className="flex gap-5 h-[580px]">
@@ -1012,7 +1026,7 @@ const RebroadcastSettingsPanel = () => {
                                         dayPlaceholder="dd"
                                         monthPlaceholder="mm"
                                         yearPlaceholder="yyyy"
-                                        disabled={broadcastType === "realtime"}
+                                        disabled={ textType !== '재발신 추가중'}
                                     />
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -1024,7 +1038,7 @@ const RebroadcastSettingsPanel = () => {
                                         onChange={handleTimeChange}
                                         maxLength={4}
                                         placeholder="0000"
-                                        disabled={broadcastType === "realtime"}                                        
+                                        disabled={ textType !== '재발신 추가중'}                                        
                                     />
                                 </div>
                             </div>
@@ -1094,9 +1108,10 @@ const RebroadcastSettingsPanel = () => {
                                 <Label htmlFor="outgoing-type" className="text-sm">
                                     발신구분
                                 </Label>
-                                <Label className="text-sm">
+                                {/* tofix */}
+                                {/* <Label className="text-sm">
                                     {textType}
-                                </Label>
+                                </Label> */}
                             </div>
                             <div className={`border p-2 rounded py-[20px] px-[20px] flex flex-col gap-6 ${!outgoingTypeChecked ? "opacity-50 pointer-events-none" : ""}`} style={{ height: "calc(100% - 29px)" }}>
                                 <div className="text-sm">재콜 구분을 선택합니다.</div>
