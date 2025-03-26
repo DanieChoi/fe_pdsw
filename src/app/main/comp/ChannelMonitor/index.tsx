@@ -4,6 +4,7 @@ import DataGrid from 'react-data-grid';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import 'react-data-grid/lib/styles.css';
 import { useApiForChannelStateMonitoringList } from '@/features/monitoring/hooks/useApiForChannelStateMonitoringList';
+import { useEnvironmentStore } from '@/store/environmentStore';
 
 type ChannelStatus = 'IDLE' | 'BUSY' | 'NONE';
 
@@ -56,6 +57,7 @@ const ChannelMonitor: React.FC = () => {
   const [thirdSelect, setThirdSelect] = useState<string>('상태전체');
   const [channelData, setChannelData] = useState<ChannelData[]>([]);
   const [filteredData, setFilteredData] = useState<ChannelData[]>([]);
+  const { statisticsUpdateCycle } = useEnvironmentStore();
 
   // 첫 번째 Select의 옵션
   const firstSelectOptions = ['전체', '장비번호', '캠페인 모드', '발신 모드', '채널 그룹 모드'];
@@ -168,7 +170,13 @@ const ChannelMonitor: React.FC = () => {
 
   useEffect(() => {    
     fetchChannelStateMonitoringList({deviceId:0});
-  }, []);
+    if( statisticsUpdateCycle > 0 ){        
+      const interval = setInterval(() => {  
+        fetchChannelStateMonitoringList({deviceId:0});
+      }, statisticsUpdateCycle * 1000);  
+      return () => clearInterval(interval);
+    }
+  }, [statisticsUpdateCycle]);
 
   return (
     <div className="h-full">
