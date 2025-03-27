@@ -273,12 +273,9 @@ export default function Footer({
       {
         isDrawerOpen && (
           <div className="flex-1 flex overflow-hidden">
-            {/* D(1단) -> w-full, W(2단) -> w-1/2 + 오른쪽 테이블 */}
             <div
               className={`
-              ${isExpanded ? "w-1/2" : "w-full"}
               overflow-auto py-[7px] px-[20px]
-              ${isExpanded ? "border-r" : ""}
             `}
             >
               <table className="w-full text-sm">
