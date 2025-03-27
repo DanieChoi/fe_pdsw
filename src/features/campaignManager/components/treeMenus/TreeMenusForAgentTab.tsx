@@ -293,9 +293,60 @@ export function TreeMenusForAgentTab() {
     });
   };
 
-  const handleSearch = () => {
-    if (!searchTerm.trim() || !data?.organizationList) return;
+  // const handleSearch = () => {
+  //   if (!searchTerm.trim() || !data?.organizationList) return;
 
+  //   const counselorInfo = findCounselorInfo(data.organizationList, searchTerm);
+  //   if (counselorInfo) {
+  //     selectCounselor(counselorInfo.counselorId, counselorInfo.counselorName, counselorInfo.tenantId);
+  //   } else {
+  //     toast.error("상담원을 찾을 수 없습니다.");
+  //   }
+  // };
+
+  // 상담원 선택 처리 공통 함수
+  // const selectCounselor = (counselorId: string, counselorName: string, tenantId: string) => {
+  //   // 상담원 선택 상태 업데이트
+  //   setSelectedNodeId(counselorId);
+  //   setSelectedCounselor(counselorId, counselorName, tenantId);
+    
+  //   if (data?.organizationList) {
+  //     // 경로 찾기
+  //     const counselorInfo = findCounselorInfo(data.organizationList, counselorName);
+      
+  //     if (counselorInfo) {
+  //       // 경로상의 모든 노드 확장
+  //       const newExpanded = new Set(expandedNodes);
+  //       counselorInfo.paths.forEach(path => newExpanded.add(path));
+  //       setExpandedNodes(newExpanded);
+
+  //       // DOM 업데이트를 위한 짧은 지연 후 스크롤 실행
+  //       setTimeout(() => {
+  //         const scrollContainer = document.querySelector('.tree-node');
+  //         const targetElement = document.getElementById(`counselor-${counselorId}`);
+
+  //         if (scrollContainer && targetElement) {
+  //           scrollContainer.scrollTop = (
+  //             targetElement.offsetTop -
+  //             (scrollContainer as HTMLElement).offsetTop -
+  //             (scrollContainer.clientHeight / 2) +
+  //             (targetElement.clientHeight / 2)
+  //           );
+  //         }
+  //       }, 100);
+  //     }
+  //   }
+  // };
+
+  const handleSearch = () => {
+    // 검색어가 비어있으면 전체 목록 표시
+    if (!searchTerm.trim()) {
+      selectCounselor('', '', '');
+      return;
+    }
+  
+    if (!data?.organizationList) return;
+  
     const counselorInfo = findCounselorInfo(data.organizationList, searchTerm);
     if (counselorInfo) {
       selectCounselor(counselorInfo.counselorId, counselorInfo.counselorName, counselorInfo.tenantId);
@@ -304,8 +355,18 @@ export function TreeMenusForAgentTab() {
     }
   };
 
-  // 상담원 선택 처리 공통 함수
   const selectCounselor = (counselorId: string, counselorName: string, tenantId: string) => {
+    // 빈 ID가 전달되면 전체 목록 표시 모드로 설정
+    if (!counselorId) {
+      // 선택된 노드 초기화
+      setSelectedNodeId(undefined);
+      // 스토어에도 선택 해제 상태 설정
+      setSelectedCounselor('', '', '');
+      // 기본 확장 상태로 복원
+      applyDefaultExpansion();
+      return;
+    }
+  
     // 상담원 선택 상태 업데이트
     setSelectedNodeId(counselorId);
     setSelectedCounselor(counselorId, counselorName, tenantId);
@@ -319,12 +380,12 @@ export function TreeMenusForAgentTab() {
         const newExpanded = new Set(expandedNodes);
         counselorInfo.paths.forEach(path => newExpanded.add(path));
         setExpandedNodes(newExpanded);
-
+  
         // DOM 업데이트를 위한 짧은 지연 후 스크롤 실행
         setTimeout(() => {
           const scrollContainer = document.querySelector('.tree-node');
           const targetElement = document.getElementById(`counselor-${counselorId}`);
-
+  
           if (scrollContainer && targetElement) {
             scrollContainer.scrollTop = (
               targetElement.offsetTop -
