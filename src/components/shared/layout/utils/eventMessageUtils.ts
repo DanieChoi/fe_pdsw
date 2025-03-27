@@ -70,11 +70,11 @@ export const processEventMessage = (
     const time = formatCurrentTime();
 
     // 메시지 타입 설정
-    let type = 'Event';
+    const type = 'Event';
 
     // 메시지 및 결과 초기화
     let message = '';
-    let messageList: FooterDataType[] = [];
+    const messageList: FooterDataType[] = [];
     let shouldFetchMain = false;
     let toastMessage = '';
 
@@ -274,7 +274,7 @@ export const processEventMessage = (
 
     return {
         message,
-        messageList: messageList || [], // 또는 그냥 빈 배열로 초기화하여 사용
+        messageList,
         shouldFetchMain,
         toastMessage
     };
