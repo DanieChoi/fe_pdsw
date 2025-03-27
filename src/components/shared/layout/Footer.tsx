@@ -107,7 +107,6 @@ export default function Footer({
     console.log("33333333footerDataSet data = ", data);
     console.log("444444444footerDataSet kind = ", kind);
     console.log("555555555footerDataSet tempEventData = ", tempEventData);
-    
 
     //시간.
     const today = new Date();

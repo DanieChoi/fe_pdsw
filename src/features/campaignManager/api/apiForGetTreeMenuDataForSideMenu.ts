@@ -100,9 +100,6 @@ export async function apiForGetTreeMenuDataForSideMenu(tenant_id?: number, role_
     }
   ];
 
-  console.log("tabData : ", tabData);
-  
-
   return tabData;
 }
 
