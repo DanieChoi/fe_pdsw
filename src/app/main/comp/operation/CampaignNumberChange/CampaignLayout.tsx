@@ -80,7 +80,7 @@ function CampaignLayout() {
     // 발신번호 조회
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
-      setCallingNumbers(data.result_data);
+      setCallingNumbers(data.result_data||[]);
     },
     onError: (data) => {      
       if (data.message.split('||')[0] === '5') {

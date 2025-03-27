@@ -80,7 +80,7 @@ const CampaignManager = ({campaignId,isOpen,onCampaignPopupClose}: Props) => {
   // 전화번호 조회
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
-      setCallingNumbers(data.result_data);
+      setCallingNumbers(data.result_data||[]);
       fetchCampaignSkills({
         session_key: '',
         tenant_id: 0,

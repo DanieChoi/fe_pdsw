@@ -55,7 +55,7 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
   // 발신번호
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
-      setCallingNumbers(data.result_data);
+      setCallingNumbers(data.result_data||[]);
     }
   });
 

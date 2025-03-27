@@ -12,6 +12,7 @@ import ChartView from './ChartView';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
 import { CampaignProgressInformationResponseDataType } from '@/features/monitoring/types/monitoringIndex';
+import { useEnvironmentStore } from '@/store/environmentStore';
 
 interface CallItem {
   id: number;
@@ -33,6 +34,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   const numericCampaignId = campaignId ? Number(campaignId) : null;
 
   const { campaigns } = useMainStore();
+  const { statisticsUpdateCycle } = useEnvironmentStore();
   const [campaignInfo, setCampaignInfo] = useState<MainDataResponse | null>(null);
   const [dataList, setDataList] = useState<CampaignProgressInformationResponseDataType[]>([]);
   const [campaignIdList, setCampaignIdList] = useState<number[]>([]);
@@ -115,7 +117,13 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
     } else {
       console.warn("캠페인 ID가 없어 API 호출이 비활성화됩니다.");
     }
-  }, [numericCampaignId, campaigns]);
+    if( statisticsUpdateCycle > 0 ){        
+      const interval = setInterval(() => {  
+        refreshData();
+      }, statisticsUpdateCycle * 1000);  
+      return () => clearInterval(interval);
+    }
+  }, [numericCampaignId, campaigns,statisticsUpdateCycle]);
 
   return (
     <div className="flex gap-4 w-full limit-width">
@@ -201,7 +209,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         <div className="flex justify-end gap-2">
           <CommonButton
             variant="outline"
-            // onClick={refreshData}
+            onClick={refreshData}
             disabled={isLoading}
           >
             새로고침
