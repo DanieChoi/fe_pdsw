@@ -340,8 +340,14 @@ const CampaignSettings = () => {
         setCampaignId(tempData[0].campaignId);
         setCampaignName(tempData[0].campaignName);
       }
+      if( limitSettings.length > 0 && tempData.length > 0 ){
+        const templimitSetting = limitSettings.filter(data=> data.campaign_id === Number(tempData[0].campaignId));
+        if( templimitSetting.length >  0){
+          setLimitCount(templimitSetting[0].max_call+'');
+        }
+      }
     }
-  }, [activeTabId, openedTabs]);
+  }, [activeTabId, openedTabs,limitSettings]);
    
   // 필드가 비활성화되어야 하는지 결정하는 함수
   const isFieldDisabled = () => {
