@@ -1142,7 +1142,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
   // 전화번호 조회
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
-      setCallingNumbers(data.result_data);
+      setCallingNumbers(data.result_data||[]);
       setCallingNumberChangeYn(false);
     }
   });

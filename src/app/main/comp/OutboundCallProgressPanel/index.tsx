@@ -10,6 +10,7 @@ import { useApiForCallProgressStatus } from '@/features/monitoring/hooks/useApiF
 import { useMainStore, useCampainManagerStore } from '@/store';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
+import { useEnvironmentStore } from '@/store/environmentStore';
 
 // 타입 정의
 interface Stats {
@@ -98,6 +99,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const { campaignSkills, setCampaignSkills,phoneDescriptions, setPhoneDescriptions } = useCampainManagerStore();
   const [ _campaignData, _setCampaignData ] = useState<CampaignDataMap>({});
   const [ waitingCounselorCnt, setWaitingCounselorCnt ] = useState<number>(0);
+  const { statisticsUpdateCycle } = useEnvironmentStore();
 
   // 실제 사용할 캠페인 ID 결정
   const selectedCampaign = externalCampaignId ?? internalSelectedCampaign;
