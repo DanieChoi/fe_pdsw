@@ -30,7 +30,11 @@ const SkilFilterOptionPannelForCampaignTab = ({
   const { tenant_id } = useAuthStore();
   
   // 통합 스토어에서 스킬 ID 목록 가져오기
-  const { skilIdsForCampaignTreeMenu, setSkilIdsForCampaignTreeMenu, setFilterMode } = useTreeMenuStore();
+  const { 
+    skilIdsForCampaignTreeMenu, 
+    setSkilIdsForCampaignTreeMenu, 
+    setFilterMode 
+  } = useTreeMenuStore();
   
   // 할당 가능한 스킬 목록 가져오기
   const { data: skills = [] as Skill[], isLoading, isError } = useAssignableSkills();
@@ -43,7 +47,9 @@ const SkilFilterOptionPannelForCampaignTab = ({
     if (externalSelectedSkills) {
       setLocalSelectedSkills(externalSelectedSkills);
     } else {
-      setLocalSelectedSkills(skilIdsForCampaignTreeMenu);
+      // 스토어의 문자열 배열을 숫자 배열로 변환
+      const numericSkillIds = skilIdsForCampaignTreeMenu.map(id => Number(id));
+      setLocalSelectedSkills(numericSkillIds);
     }
   }, [externalSelectedSkills, skilIdsForCampaignTreeMenu]);
 
@@ -69,6 +75,7 @@ const SkilFilterOptionPannelForCampaignTab = ({
     } 
     // 외부에서 관리되지 않는 경우 스토어 직접 업데이트
     else {
+      // 선택된 스킬 ID 배열을 스토어에 저장
       setSkilIdsForCampaignTreeMenu(localSelectedSkills);
       // 선택된 스킬이 있으면 필터 모드를 'skill'로, 없으면 'all'로 설정
       setFilterMode(localSelectedSkills.length > 0 ? 'skill' : 'all');
@@ -89,7 +96,9 @@ const SkilFilterOptionPannelForCampaignTab = ({
     if (externalSelectedSkills) {
       setLocalSelectedSkills(externalSelectedSkills);
     } else {
-      setLocalSelectedSkills(skilIdsForCampaignTreeMenu);
+      // 스토어의 문자열 배열을 숫자 배열로 변환
+      const numericSkillIds = skilIdsForCampaignTreeMenu.map(id => Number(id));
+      setLocalSelectedSkills(numericSkillIds);
     }
     
     if (closePanel) {

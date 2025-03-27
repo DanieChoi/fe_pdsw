@@ -191,10 +191,16 @@ export default function Footer({
         _end_flag = '완료';
       }
       if (command === 'INSERT') {
-        _message += '추가, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
+        _message += '추가, 캠페인 아이디 : ' + data['campaign_id'] 
+        + ' , 캠페인 이름 : ' + data['campaign_name'] 
+        + ' , 동작상태 : ' + _start_flag 
+        + ', 완료구분 : ' + _end_flag;
         queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
       } else if (command === 'UPDATE') {
-        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
+        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' 
+        + data['campaign_name'] 
+        + ' , 동작상태 : ' + _start_flag 
+        + ', 완료구분 : ' + _end_flag;
         // tofix
         queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
       } else if (command === 'DELETE') {

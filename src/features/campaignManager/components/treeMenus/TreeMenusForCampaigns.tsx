@@ -423,7 +423,7 @@ export function TreeMenusForCampaigns() {
       return items;
     }
 
-    // 스킬 기반 필터링
+    // 스킬 기반 필터링 (filterMode가 'skill' 또는 'filter'인 경우)
     const filteredItems = items.reduce((acc: TreeItem[], node: TreeItem) => {
       if (node.type === "campaign") {
         const campaignSkillIds = Array.isArray(node.children)

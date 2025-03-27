@@ -35,7 +35,7 @@ const IFilterButtonForCampaignTabHeader = () => {
   // 팝오버가 열릴 때 스토어 값으로 로컬 상태 초기화
   useEffect(() => {
     if (isPopoverOpen) {
-      setLocalSelectedSkills([...skilIdsForCampaignTreeMenu]);
+      setLocalSelectedSkills([...skilIdsForCampaignTreeMenu].map(id => Number(id)));
     }
   }, [isPopoverOpen, skilIdsForCampaignTreeMenu]);
 
