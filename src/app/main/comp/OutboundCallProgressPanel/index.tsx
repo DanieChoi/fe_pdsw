@@ -100,6 +100,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const [ _campaignData, _setCampaignData ] = useState<CampaignDataMap>({});
   const [ waitingCounselorCnt, setWaitingCounselorCnt ] = useState<number>(0);
   const { statisticsUpdateCycle } = useEnvironmentStore();
+  const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // 실제 사용할 캠페인 ID 결정
   const selectedCampaign = externalCampaignId ?? internalSelectedCampaign;
@@ -282,12 +283,19 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     } else {
       setInternalSelectedCampaign(value);
     }
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
     if( value !== 'all'){
       const campaignInfo = campaigns.find(data => data.campaign_id === Number(value));
-      fetchCallProgressStatus({
-        tenantId: campaignInfo?.tenant_id+'' || '1',
-        campaignId: campaignInfo?.campaign_id+'' || '0'
-      });
+      const tenantId = campaignInfo?.tenant_id + '' || '1';
+      const campaignId = campaignInfo?.campaign_id + '' || '0';
+      fetchCallProgressStatus({ tenantId, campaignId });
+      if( statisticsUpdateCycle > 0 ){  
+        intervalRef.current = setInterval(() => {
+          fetchCallProgressStatus({ tenantId, campaignId });
+        }, statisticsUpdateCycle * 1000);     
+      }
     }else{
       fetchCallProgressStatus({
         tenantId: '1',
@@ -401,7 +409,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   // 전화번호설명 템플릿 조회
   const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
     onSuccess: (data) => {
-      setPhoneDescriptions(data.result_data);
+      setPhoneDescriptions(data.result_data||[]);
     }
   });
 
@@ -412,6 +420,19 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     }
   });
   
+  useEffect(() => {
+    if( externalCampaignId ){
+      const campaignInfo = campaigns.find(data => data.campaign_id === Number(externalCampaignId));
+      fetchCallProgressStatus({
+        tenantId: campaignInfo?.tenant_id+'' || '1',
+        campaignId: campaignInfo?.campaign_id+'' || '0'
+      });
+      setShouldRenderSelect(false);
+    }else{
+      setShouldRenderSelect(true);
+    }
+  }, [externalCampaignId]);
+
   useEffect(() => {
     if( externalCampaignId ){
       const campaignInfo = campaigns.find(data => data.campaign_id === Number(externalCampaignId));
