@@ -61,6 +61,7 @@ export default function LoginPage() {
   const { mutate: login } = useApiForLogin({
     onSuccess: (data) => {
       setIsPending(false);
+
       // console.log('data (로그인 응답)', data);
 
       setAuth(

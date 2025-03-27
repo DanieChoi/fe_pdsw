@@ -10,6 +10,7 @@ import { useEnvironmentStore } from "@/store/environmentStore";
 import { initToasts, toast } from './CustomToast';
 import { useQueryClient } from "@tanstack/react-query";
 import CommonMiniButton from "../CommonMiniButton";
+import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
 
 type FooterDataType = {
   time: string;
@@ -62,6 +63,7 @@ export default function Footer({
   const { tenant_id, role_id } = useAuthStore();
   const { campaigns, setCampaigns } = useMainStore();
   const { useAlramPopup } = useEnvironmentStore(); // Get useAlramPopup value
+  // const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
 
   const queryClient = useQueryClient();
 
@@ -196,6 +198,8 @@ export default function Footer({
           + ' , 동작상태 : ' + _start_flag
           + ', 완료구분 : ' + _end_flag;
         queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
+        queryClient.invalidateQueries({ queryKey: ["campaignTreeDataForCampaignGroupTab", tenant_id] });
+        // refetchTreeDataForCampaignGroupTab(tenant_id)
       } else if (command === 'UPDATE') {
         _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : '
           + data['campaign_name']
@@ -203,9 +207,12 @@ export default function Footer({
           + ', 완료구분 : ' + _end_flag;
         // tofix
         queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
+        queryClient.invalidateQueries({ queryKey: ["campaignTreeDataForCampaignGroupTab", tenant_id] });
       } else if (command === 'DELETE') {
         _message += '삭제, 캠페인 아이디 : ' + data['campaign_id'];
         queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
+        queryClient.invalidateQueries({ queryKey: ["campaignTreeDataForCampaignGroupTab", tenant_id] });
+
       }
       fetchMain({
         session_key: '',
