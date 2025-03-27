@@ -11,29 +11,8 @@ import { initToasts, toast } from './CustomToast';
 import { useQueryClient } from "@tanstack/react-query";
 import CommonMiniButton from "../CommonMiniButton";
 import { FooterDataType, processEventMessage } from "./utils/eventMessageUtils";
-// Import the utility function
+import { themeColors } from "@/features/auth/hooks/useSseSubscribe";
 
-// NEXPOS 테마 색상 - 애플리케이션 테마에 맞게 지정
-const themeColors = {
-  primary: {
-    bgColor: 'bg-[#5BC2C1]',
-    gradientFrom: 'from-[#5BC2C1]',
-    gradientTo: 'to-[#4A9E9D]',
-    textColor: 'text-white'
-  },
-  secondary: {
-    bgColor: 'bg-[#4A90E2]',
-    gradientFrom: 'from-[#5A9FE8]',
-    gradientTo: 'to-[#3A80D2]',
-    textColor: 'text-white'
-  },
-  event: {
-    bgColor: 'bg-[#4A90E2]', // 푸른색 계열로 변경
-    gradientFrom: 'from-[#5A9FE8]',
-    gradientTo: 'to-[#3A80D2]',
-    textColor: 'text-white'
-  }
-};
 
 interface FooterProps {
   footerHeight: number;
@@ -62,10 +41,8 @@ export default function Footer({
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    // 컴포넌트 마운트 시 토스트 초기화 확인
     const toastContainer = document.getElementById('headless-toast-container');
     if (!toastContainer) {
-      // 토스트 컨테이너가 없으면 초기화
       initToasts();
       console.log('Toast container initialized from Footer component');
     }
@@ -317,22 +294,6 @@ export default function Footer({
               </table>
             </div>
 
-            {/* 2단(W) 모드일 때만 오른쪽 테이블 표시 */}
-            {isExpanded && (
-              <div className="w-1/2 overflow-auto py-[7px] px-[20px]">
-                <table className="w-full text-sm">
-                  <tbody>
-                    {footerDataList.map((log, index) => (
-                      <tr key={`right-${index}`}>
-                        <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
-                        <td className="whitespace-nowrap text-[13px] px-1">[{log.type}]</td>
-                        <td className="text-[13px]">{log.message}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
           </div>
         )
       }

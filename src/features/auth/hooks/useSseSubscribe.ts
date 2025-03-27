@@ -1,5 +1,26 @@
 import { useEffect } from 'react';
 
+export const themeColors = {
+    primary: {
+      bgColor: 'bg-[#5BC2C1]',
+      gradientFrom: 'from-[#5BC2C1]',
+      gradientTo: 'to-[#4A9E9D]',
+      textColor: 'text-white'
+    },
+    secondary: {
+      bgColor: 'bg-[#4A90E2]',
+      gradientFrom: 'from-[#5A9FE8]',
+      gradientTo: 'to-[#3A80D2]',
+      textColor: 'text-white'
+    },
+    event: {
+      bgColor: 'bg-[#4A90E2]', // 푸른색 계열로 변경
+      gradientFrom: 'from-[#5A9FE8]',
+      gradientTo: 'to-[#3A80D2]',
+      textColor: 'text-white'
+    }
+  };
+
 type SseEventHandler = (
   announce: string,
   command: string,
