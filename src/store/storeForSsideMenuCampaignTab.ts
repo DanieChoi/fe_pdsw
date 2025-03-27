@@ -263,16 +263,8 @@ export const useTreeMenuStore = create<TreeMenuState>()(
           filterMode: mode,
         })),
     }),
-    // {
-    //   name: "treeMenu-storage", // 로컬 스토리지 키 이름
-    //   partialize: (state) => ({
-    //     campaignSort: state.campaignSort,
-    //     selectedNodeType: state.selectedNodeType,
-    //     viewMode: state.viewMode,
-    //     selectedMenus: state.selectedMenus,
-    //     skilIdsForCampaignTreeMenu: state.skilIdsForCampaignTreeMenu,
-    //     filterMode: state.filterMode,
-    //   }),
-    // }
+    {
+      name: "tree-menu-storage", // localStorage에 저장될 키 이름
+    }
   )
 );
