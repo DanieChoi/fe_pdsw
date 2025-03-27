@@ -473,10 +473,7 @@ const StatusCampaign: React.FC = () => {
       // }
       if( statisticsUpdateCycle > 0 ){        
         const interval = setInterval(() => {  
-          setSelectedCampaignId(campaigns[0].campaign_id);
-          setSelectedCampaignIdIndex(0);
-          setCampaignInfoList([]);         
-          refetchData();
+          refreshData();
         }, statisticsUpdateCycle * 1000);  
         return () => clearInterval(interval);
       }
