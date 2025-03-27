@@ -304,6 +304,14 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     }
   };
 
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
+
   // Select 컴포넌트 렌더링 여부 결정
   const [ shouldRenderSelect , setShouldRenderSelect ] = useState<boolean>(false);
 
@@ -435,6 +443,11 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         }, statisticsUpdateCycle * 1000);     
       }
       setShouldRenderSelect(false);
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      };
     }else{
       setShouldRenderSelect(true);
     }
