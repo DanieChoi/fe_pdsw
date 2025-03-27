@@ -423,15 +423,22 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   useEffect(() => {
     if( externalCampaignId ){
       const campaignInfo = campaigns.find(data => data.campaign_id === Number(externalCampaignId));
-      fetchCallProgressStatus({
-        tenantId: campaignInfo?.tenant_id+'' || '1',
-        campaignId: campaignInfo?.campaign_id+'' || '0'
-      });
+      const tenantId = campaignInfo?.tenant_id+'' || '1';
+      const campaignId = campaignInfo?.campaign_id+'' || '0';
+      fetchCallProgressStatus({ tenantId, campaignId });
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      if( statisticsUpdateCycle > 0 ){  
+        intervalRef.current = setInterval(() => {
+          fetchCallProgressStatus({ tenantId, campaignId });
+        }, statisticsUpdateCycle * 1000);     
+      }
       setShouldRenderSelect(false);
     }else{
       setShouldRenderSelect(true);
     }
-  }, [externalCampaignId]);
+  }, [externalCampaignId,statisticsUpdateCycle]);
 
   useEffect(() => {
     if( externalCampaignId ){
