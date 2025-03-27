@@ -65,7 +65,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const recentlyClosedDialogRef = useRef(false);
-  const { updateCampaignStatus, refetchTreeData } = useSideMenuCampaignGroupTabStore();
+  const { updateCampaignStatus, refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
 
   const [isBrowser, setIsBrowser] = useState(false);
   useEffect(() => {
@@ -76,7 +76,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     onSuccess: () => {
       toast.success("캠페인 그룹이 삭제되었습니다.");
       setIsDeleteDialogOpen(false);
-      refetchTreeData();
+      refetchTreeDataForCampaignGroupTab();
     },
     onError: (error) => {
       alert(`캠페인 그룹 삭제 실패: ${error.message}`);
@@ -132,7 +132,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     setTimeout(() => {
       recentlyClosedDialogRef.current = false;
     }, 300);
-    await refetchTreeData();
+    await refetchTreeDataForCampaignGroupTab();
   }, []);
 
   const handleRenameSuccess = useCallback(() => {

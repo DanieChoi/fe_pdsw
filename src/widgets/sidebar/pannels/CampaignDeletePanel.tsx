@@ -161,7 +161,7 @@ const CampaignDeletePanel = ({ campaignId, campaignName }: Props) => {
     const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
     const _tenantId = Number(Cookies.get('tenant_id'));
 
-    const { updateCampaignStatus, refetchTreeData } = useSideMenuCampaignGroupTabStore();
+    const { updateCampaignStatus, refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
 
 
     //캠페인 스킬 수정 api 호출
@@ -259,7 +259,7 @@ const CampaignDeletePanel = ({ campaignId, campaignName }: Props) => {
             delete_dial_list: 1
         });
 
-        refetchTreeData();
+        refetchTreeDataForCampaignGroupTab();
 
     };
 

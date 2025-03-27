@@ -28,7 +28,7 @@ interface SideMenuCampaignGroupTabState {
 
   // Actions
   fetchTreeData: (tenant_id: number) => Promise<void>;
-  refetchTreeData: (tenant_id?: number) => Promise<void>;
+  refetchTreeDataForCampaignGroupTab: (tenant_id?: number) => Promise<void>;
   toggleNode: (nodeId: string) => void;
   selectNode: (nodeId: string) => void;
   expandAllNodes: () => void;
@@ -55,7 +55,6 @@ interface SideMenuCampaignGroupTabState {
   removeCampaignFromGroup: (campaignId: string) => void;
   updateNodeName: (nodeId: string, newName: string) => void;
   currentExpansionMode: 'tenant' | 'group' | 'all' | null;
-
   updateCampaignStatus: (campaignId: string, status: number) => void;
 }
 
@@ -122,11 +121,11 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
     }
   },
 
-  refetchTreeData: async (tenant_id?: number) => {
+  refetchTreeDataForCampaignGroupTab: async (tenant_id?: number) => {
     // tenant_id가 없으면 저장된 값 사용 시도
     const savedTenantId = tenant_id || get().tenant_id;
     
-    console.log("refetchTreeData - 사용할 tenant_id:", savedTenantId);
+    console.log("refetchTreeDataForCampaignGroupTab - 사용할 tenant_id:", savedTenantId);
     
     // 0도 유효한 tenant_id로 간주하도록 조건 수정
     // 조건을 !savedTenantId 대신 savedTenantId === undefined || savedTenantId === null로 변경

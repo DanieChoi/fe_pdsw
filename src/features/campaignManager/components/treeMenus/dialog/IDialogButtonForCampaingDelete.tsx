@@ -44,7 +44,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
 
 
   // 스토어 및 API 훅들
-  const { refetchTreeData } = useSideMenuCampaignGroupTabStore();
+  const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
   const { callingNumbers, campaignSkills } = useCampainManagerStore();
   const { activeTabKey, closeAllTabs, rows } = useTabStore();
 
@@ -89,7 +89,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
       });
 
       // 트리 데이터 리패치 및 탭 닫기
-      refetchTreeData();
+      refetchTreeDataForCampaignGroupTab();
       closeCurrentTab();
     }
   });
@@ -147,7 +147,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
       delete_dial_list: 1
     });
 
-    refetchTreeData();
+    refetchTreeDataForCampaignGroupTab();
   };
 
   const openDialog = () => {

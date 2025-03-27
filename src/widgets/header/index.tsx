@@ -169,7 +169,6 @@ export default function Header() {
       // alert("에러 발생 여기!")
       console.log("error 에러 발생 여기 !!!!!! : ", error);
       
-      
       if (error.message.split('||')[0] === '5') {
         setAlertState({
           ...errorMessage,

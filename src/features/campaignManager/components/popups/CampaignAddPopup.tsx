@@ -55,7 +55,7 @@ const CampaignAddPopup: React.FC<Props> = ({
   const [removingCampaigns, setRemovingCampaigns] = useState(false);
   const [campaignLookup, setCampaignLookup] = useState<Record<number, CampaignInfo>>({});
   const [skillLookup, setSkillLookup] = useState<Record<number, SkillInfo>>({});
-  const { refetchTreeData } = useSideMenuCampaignGroupTabStore();
+  const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions
     , campaignGroupManagerInit, setCampaignGroupManagerInit } = useCampainManagerStore();  
@@ -394,7 +394,7 @@ const CampaignAddPopup: React.FC<Props> = ({
               toast.error('캠페인 추가에 실패했습니다.');
             }
 
-            refetchTreeData();
+            refetchTreeDataForCampaignGroupTab();
             setCampaignGroupManagerInit(true);
 
             setSelectedLeftCampaigns([]);
