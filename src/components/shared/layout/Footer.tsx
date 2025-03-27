@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { ChevronUp, ChevronDown, Trash } from "lucide-react";
 import { isEqual } from 'lodash';
@@ -73,6 +72,7 @@ export default function Footer({
     if (!toastContainer) {
       // 토스트 컨테이너가 없으면 초기화
       initToasts();
+      console.log('Toast container initialized from Footer component');
     }
   }, []);
 
@@ -230,16 +230,23 @@ export default function Footer({
 
         // Toast 알림 처리 - useAlramPopup이 1일 경우에만
         if (useAlramPopup === 1) {
-
-          toast.event(
-            ' , 캠페인 이름 : '
-            // + data['campaign_name'] 
-            + ' , 동작상태 : ' + _start_flag,
-            {
-              colors: themeColors.event
-            }
-          );
-
+          alert("여기 1")
+          try {
+            setTimeout(() => {
+              toast.event(
+                ' , 캠페인 이름 : '
+                // + data['campaign_name'] 
+                + ' , 동작상태 : ' + _start_flag,
+                {
+                  colors: themeColors.event,
+                  duration: 5000 // 명시적 지정
+                }
+              );
+              console.log('Campaign status change toast triggered');
+            }, 0);
+          } catch (err) {
+            console.error('Error showing toast:', err);
+          }
         }
       }
     }
@@ -270,16 +277,25 @@ export default function Footer({
 
       // Toast 알림 처리 - useAlramPopup이 1일 경우에만
       if (useAlramPopup === 1) {
-        // 한 번의 알림으로 모든 상담원 정보 요약해서 표시
-        const actionType = command === 'UPDATE' || command === 'INSERT' ? '추가' : '해제';
-        const toastMessage = `[스킬 ${actionType}] 스킬 아이디 : ${_skillId}\n${tempAgentIdList.length}명의 상담원 변경됨`;
+        alert("여기 2")
+        try {
+          // 한 번의 알림으로 모든 상담원 정보 요약해서 표시
+          const actionType = command === 'UPDATE' || command === 'INSERT' ? '추가' : '해제';
+          const toastMessage = `[스킬 ${actionType}] 스킬 아이디 : ${_skillId}\n${tempAgentIdList.length}명의 상담원 변경됨`;
 
-
-        toast.event(
-          toastMessage,
-          {
-            colors: themeColors.event
-          });
+          setTimeout(() => {
+            toast.event(
+              toastMessage,
+              {
+                colors: themeColors.event,
+                duration: 5000 // 명시적 지정
+              }
+            );
+            console.log('Skill change toast triggered');
+          }, 0);
+        } catch (err) {
+          console.error('Error showing skill toast:', err);
+        }
       }
 
       _message = '';
@@ -343,8 +359,9 @@ export default function Footer({
           queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
 
         }
-        const tempCampaign = campaigns.filter((campaign) => campaign.campaign_id === Number(data['campaign_id']));
-        _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + tempCampaign[0].campaign_name + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
+        const tempCampaign = campaigns.filter((campaign) => campaign && campaign.campaign_id === Number(data['campaign_id']));
+        const campaignName = tempCampaign && tempCampaign.length > 0 ? tempCampaign[0].campaign_name : '';
+        _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + campaignName + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
       }
       fetchMain({
         session_key: '',
@@ -380,32 +397,40 @@ export default function Footer({
 
       // Toast 알림 처리 - useAlramPopup이 1일 경우에만
       if (useAlramPopup === 1 && _message !== '') {
+        try {
+          // 캠페인 상태 정보 안전하게 추출
+          let _start_flag = '';
+          if (data['campaign_status'] === 1) {
+            _start_flag = '시작';
+          } else if (data['campaign_status'] === 2) {
+            _start_flag = '멈춤';
+          } else if (data['campaign_status'] === 3) {
+            _start_flag = '중지';
+          }
 
-        let _start_flag = '';
-        if (data['campaign_status'] === 1) {
-          _start_flag = '시작';
-        } else if (data['campaign_status'] === 2) {
-          _start_flag = '멈춤';
-          // console.log("멈춤 실행 했지렁 333333  ")
-        } else if (data['campaign_status'] === 3) {
-          _start_flag = '중지';
+          // 안전하게 캠페인 정보 찾기
+          const tempCampaign = campaigns.filter((campaign) => 
+            campaign && campaign.campaign_id === Number(data['campaign_id'])
+          );
+          
+          // 안전하게 캠페인 이름 추출
+          const campaignName = tempCampaign && tempCampaign.length > 0 ? tempCampaign[0].campaign_name : '';
+          const toastMessage = `캠페인 이름 : ${campaignName}\n동작상태 : ${_start_flag}`;
+
+          // 타이밍 이슈 해결을 위해 setTimeout 사용
+          setTimeout(() => {
+            toast.event(toastMessage, {
+              colors: themeColors.event,
+              duration: 5000 // 명시적으로 지정
+            });
+            console.log('Toast message triggered:', toastMessage);
+          }, 0);
+        } catch (err) {
+          console.error('Error showing toast:', err);
         }
-
-        const tempCampaign = campaigns.filter((campaign) => campaign.campaign_id === Number(data['campaign_id']));
-        // tofix 0327
-        const toastMessage =
-          `캠페인 이름 : ${tempCampaign[0]?.campaign_name}\n동작상태 : ${_start_flag}`;
-
-
-        toast.event(toastMessage, {
-          colors: themeColors.event
-        });
-
-        // TOFIX 0326 sidebar2 refetch
-
       }
     }
-  }, [campaigns, setFooterDataList, useAlramPopup, tenant_id, fetchMain]);
+  }, [campaigns, setFooterDataList, useAlramPopup, tenant_id, role_id, queryClient, fetchMain]);
 
   // SSE 구독
   useEffect(() => {
@@ -422,28 +447,39 @@ export default function Footer({
     eventSource.addEventListener("message", (event) => {
       console.log("footer sse event = ", event.data);
       if (event.data !== "Connected!!") {
-        const tempEventData = JSON.parse(event.data);
-        if (
-          announce !== tempEventData["announce"] ||
-          !isEqual(data, tempEventData.data) ||
-          !isEqual(data, tempEventData["data"]) ||
-          kind !== tempEventData["kind"]
-        ) {
-          announce = tempEventData["announce"];
-          command = tempEventData["command"];
-          data = tempEventData["data"];
-          kind = tempEventData["kind"];
+        try {
+          const tempEventData = JSON.parse(event.data);
+          if (
+            announce !== tempEventData["announce"] ||
+            !isEqual(data, tempEventData.data) ||
+            !isEqual(data, tempEventData["data"]) ||
+            kind !== tempEventData["kind"]
+          ) {
+            announce = tempEventData["announce"];
+            command = tempEventData["command"];
+            data = tempEventData["data"];
+            kind = tempEventData["kind"];
 
-          footerDataSet(
-            tempEventData["announce"],
-            tempEventData["command"],
-            tempEventData["data"],
-            tempEventData["kind"],
-            tempEventData
-          );
+            footerDataSet(
+              tempEventData["announce"],
+              tempEventData["command"],
+              tempEventData["data"],
+              tempEventData["kind"],
+              tempEventData
+            );
+          }
+        } catch (err) {
+          console.error('Error processing SSE event:', err);
         }
       }
     });
+    
+    // 에러 처리 추가
+    eventSource.addEventListener("error", (err) => {
+      console.error('SSE connection error:', err);
+      // 재연결 시도 (선택적)
+    });
+    
     return () => {
       eventSource.close();
     };
@@ -569,6 +605,6 @@ export default function Footer({
           </div>
         )
       }
-    </Resizable >
+    </Resizable>
   );
 }
