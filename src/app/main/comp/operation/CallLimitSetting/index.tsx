@@ -45,6 +45,7 @@ const CampaignSettings = () => {
   const [campaignName, setCampaignName] = useState('');
   const [limitCount, setLimitCount] = useState('');
   const [limitSettings, setLimitSettings] = useState<LimitSettingItem[]>([]);
+  const [isNewMode, setIsNewMode] = useState(false); // 신규 모드 상태 추가
   const router = useRouter();
   const { activeTabId, openedTabs } = useTabStore()
   
@@ -90,6 +91,7 @@ const CampaignSettings = () => {
   const { mutate: fetchCallLimitSettingList } = useApiForCallLimitSettingList({
     onSuccess: (data) => {
       setLimitSettings(data.result_data);
+      setIsNewMode(false); // 데이터 로드 시 신규 모드 해제
     },onError: (data) => {      
       if (data.message.split('||')[0] === '5') {
         setAlertState({
@@ -113,6 +115,7 @@ const CampaignSettings = () => {
       fetchCallLimitSettingList({
         tenant_id_array: tenants.map(tenant => tenant.tenant_id)
       });
+      setIsNewMode(false); // 저장 후 신규 모드 해제
     },
     onError: (error) => {
       if (error.message.split('||')[0] === '5') {
@@ -139,6 +142,7 @@ const CampaignSettings = () => {
       fetchCallLimitSettingList({
         tenant_id_array: tenants.map(tenant => tenant.tenant_id)
       });
+      setIsNewMode(false); // 수정 후 신규 모드 해제
     },
     onError: (error) => {
       if (error.message.split('||')[0] === '5') {
@@ -165,6 +169,7 @@ const CampaignSettings = () => {
       fetchCallLimitSettingList({
         tenant_id_array: tenants.map(tenant => tenant.tenant_id)
       });
+      setIsNewMode(false); // 삭제 후 신규 모드 해제
     },
     onError: (error) => {
       if (error.message.split('||')[0] === '5') {
@@ -189,6 +194,8 @@ const CampaignSettings = () => {
     fetchCallLimitSettingList({
       tenant_id_array: tenants.map(tenant => tenant.tenant_id)
     });
+    // 초기 로딩 시 신규 모드 비활성화
+    setIsNewMode(false);
   }, [fetchCallLimitSettingList, tenants])
 
   const columns = useMemo(() => [
@@ -276,6 +283,7 @@ const CampaignSettings = () => {
               setCampaignId('');
               setCampaignName('');
               setLimitCount('');
+              setIsNewMode(false);
               
               // 데이터 목록 새로고침 - 이미 onSuccess에서 처리됨
             }
@@ -297,6 +305,7 @@ const CampaignSettings = () => {
     setCampaignId('');
     setCampaignName('');
     setLimitCount('');
+    setIsNewMode(true); 
   };
 
   const handleCampaignSelect = (id: string, name: string) => {
@@ -315,10 +324,12 @@ const CampaignSettings = () => {
         campaign_name: name,
         limit_number: limitStr
       });
+      setIsNewMode(false);
     } else {
       // 제한건수가 없으면 입력 필드와 그리드 선택 모두 초기화
       setLimitCount('');
       setSelectedRow(null);
+      setIsNewMode(true); 
     }
   };
   
@@ -332,6 +343,11 @@ const CampaignSettings = () => {
     }
   }, [activeTabId, openedTabs]);
    
+  // 필드가 비활성화되어야 하는지 결정하는 함수
+  const isFieldDisabled = () => {
+    // 선택된 행이 없고 신규 모드도 아니면 비활성화
+    return !selectedRow && !isNewMode;
+  };
 
   const getRowClass = (row: Row) => {
     return selectedRow?.campaign_id === row.campaign_id && 
@@ -392,6 +408,7 @@ const CampaignSettings = () => {
               value={limitCount}
               className="w-full"
               onChange={(e) => setLimitCount(e.target.value)}
+              disabled={isFieldDisabled()} 
             />
           </div>
 
