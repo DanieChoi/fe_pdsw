@@ -78,26 +78,37 @@ function CampaignLayout() {
   };
 
     // 발신번호 조회
-  const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
-    onSuccess: (data) => {
-      setCallingNumbers(data.result_data||[]);
-    },
-    onError: (data) => {      
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
+    const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
+      onSuccess: (data) => {
+        // setCallingNumbers(data.result_data||[]);
+        // 데이터 유효성 검사 추가
+        if (data && data.result_data && Array.isArray(data.result_data)) {
+          setCallingNumbers(data.result_data);
+        } else {
+          // 빈 데이터나 잘못된 형식의 데이터가 왔을 때 빈 배열로 설정
+          setCallingNumbers([]);
+        }
+      },
+      onError: (data) => {
+        // 에러 발생 시 callingNumbers를 빈 배열로 설정
+        setCallingNumbers([]);
+        showAlert('발신번호 조회 중 오류가 발생했습니다: ' + data.message);
+        
+        if (data.message.split('||')[0] === '5') {
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+            onConfirm: closeAlert,
+            onCancel: () => {}
+          });
+          Cookies.remove('session_key');
+          setTimeout(() => {
+            router.push('/login');
+          }, 1000);
+        }
       }
-    }
-  });
+    });
 
   //캠페인 발신번호 추가 api 호출
   const { mutate: fetchCallingNumberInsert } = useApiForCallingNumberInsert({
@@ -220,17 +231,31 @@ function CampaignLayout() {
     }
   ], []);
 
-  const rows = useMemo(() => 
-    campaigns.map(campaign => {
-      const callingNumber = callingNumbers.find(
-        num => num.campaign_id === campaign.campaign_id
+  const rows = useMemo(() => {
+    // campaigns나 callingNumbers가 없거나 빈 배열인 경우 빈 배열 반환
+    if (!campaigns || !Array.isArray(campaigns) || campaigns.length === 0) {
+      return [];
+    }
+    
+    // callingNumbers가 없는 경우 빈 발신번호로 처리
+    const safeCallingNumbers = Array.isArray(callingNumbers) ? callingNumbers : [];
+    
+    return campaigns.map(campaign => {
+      // campaign이 유효한지 확인
+      if (!campaign || typeof campaign !== 'object') return null;
+      
+      const callingNumber = safeCallingNumbers.find(
+        num => num && campaign && num.campaign_id === campaign.campaign_id
       );
+      
       return {
         ...campaign,
         calling_number: callingNumber?.calling_number || ''
       };
-    }).filter(row => row.calling_number !== '') // 발신번호가 있는 행만 필터링
-  , [campaigns, callingNumbers]);
+    })
+    .filter(Boolean) // null 값 제거
+    .filter((row): row is GridRow => row !== null && row.calling_number !== ''); // 발신번호가 있는 행만 필터링
+  }, [campaigns, callingNumbers]);
 
   const handleCellClick = (args: { row: GridRow }) => {
     setSelectedRow(args.row);

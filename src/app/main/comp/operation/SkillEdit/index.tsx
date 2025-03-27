@@ -973,6 +973,11 @@ const SkillEdit = () => {
     return '';
   };
 
+  const isFieldDisabled = () => {
+    // 선택된 스킬이 없고 신규 모드도 아니면 비활성화
+    return !selectedSkill && !isNewMode;
+  };
+
   useEffect(() => {
     if (campaignData && selectedSkill) {
       
@@ -1267,6 +1272,7 @@ const SkillEdit = () => {
                 value={editableFields.skillName}
                 onChange={(e) => handleInputChange('skillName', e.target.value)}
                 className="w-full"
+                disabled={isFieldDisabled()} // 비활성화 조건 추가
               />
             </div>
             <div className="flex items-center gap-2">
@@ -1275,6 +1281,7 @@ const SkillEdit = () => {
                 value={editableFields.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 className="w-full"
+                disabled={isFieldDisabled()} // 비활성화 조건 추가
               />
             </div>
           </div>

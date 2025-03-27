@@ -42,6 +42,7 @@ const EditDescription = () => {
   const [inputPhone3, setInputPhone3] = useState('');
   const [inputPhone4, setInputPhone4] = useState('');
   const [inputPhone5, setInputPhone5] = useState('');
+  const [isNewMode, setIsNewMode] = useState(false); // 신규 모드 상태 추가
 
   const router = useRouter();
 
@@ -60,8 +61,7 @@ const EditDescription = () => {
   //전화번호설명 템플릿 조회
   const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
     onSuccess: (data) => {
-      const sortedData = [...data.result_data].sort((a, b) => a.description_id - b.description_id);
-      setPhoneDescriptions(sortedData);
+      setPhoneDescriptions(data.result_data || []);
     },onError: (data) => {      
       if (data.message.split('||')[0] === '5') {
         setAlertState({
@@ -86,7 +86,7 @@ const EditDescription = () => {
         session_key: '',
         tenant_id: 0,
       })
-      showConfirm('저장되었습니다', () => {});
+      showAlert('저장되었습니다');
     },onError: (error) => {
       if (error.message.split('||')[0] === '5') {
           setAlertState({
@@ -234,9 +234,12 @@ const EditDescription = () => {
     // 삭제 확인 메시지 표시
     showConfirm('선택된 전화번호 설명을 삭제하시겠습니까?\n\n ※주의:  삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해 주세요.', () => {
       // 선택된 행의 ID를 숫자로 변환하여 직접 전달
-      fetchPhoneDescriptionDelete(Number(selectedRow.id), {
+      const idToDelete = Number(selectedRow.id);
+      
+      fetchPhoneDescriptionDelete(idToDelete, {
         onSuccess: () => {
-          // 입력 필드 초기화
+          
+          // 2. 입력 필드 초기화
           setSelectedRow(null);
           setInputId('');
           setInputPhone1('');
@@ -244,10 +247,11 @@ const EditDescription = () => {
           setInputPhone3('');
           setInputPhone4('');
           setInputPhone5('');
+          setIsNewMode(false);
         }
       });
     });
-  }
+  };
 
   const validateData = () => {
     if (!inputId || !inputPhone1 || !inputPhone2 || !inputPhone3 || !inputPhone4 || !inputPhone5) {
@@ -267,7 +271,8 @@ const EditDescription = () => {
   ], []);
 
   const rows = useMemo(() => {
-    return transformToGridData(phoneDescriptions || []);
+    const phoneData = phoneDescriptions || [];
+    return phoneData.length > 0 ? transformToGridData(phoneData) : [];
   }, [phoneDescriptions]);
 
   const handleCellClick = ({ row }: CellClickArgs<PhoneRow>) => {
@@ -278,6 +283,7 @@ const EditDescription = () => {
     setInputPhone3(row.phone3);
     setInputPhone4(row.phone4);
     setInputPhone5(row.phone5);
+    setIsNewMode(false);
   };
 
   const handleNew = () => {
@@ -294,10 +300,17 @@ const EditDescription = () => {
     setInputPhone3('');
     setInputPhone4('');
     setInputPhone5('');
+    setIsNewMode(true);
   };
   
   const getRowClass = (row: PhoneRow) => {
     return selectedRow?.id === row.id ? 'bg-[#FFFAEE]' : '';
+  };
+
+  // 필드가 비활성화되어야 하는지 결정하는 함수
+  const isFieldDisabled = () => {
+    // 선택된 행이 없고 신규 모드도 아니면 비활성화
+    return !selectedRow && !isNewMode;
   };
 
   return (
@@ -339,6 +352,7 @@ const EditDescription = () => {
                 value={inputPhone1}
                 onChange={(e) => setInputPhone1(e.target.value)}
                 className="w-full"
+                disabled={isFieldDisabled()}
             />
             </div>
             
@@ -349,6 +363,7 @@ const EditDescription = () => {
                 value={inputPhone2}
                 onChange={(e) => setInputPhone2(e.target.value)}
                 className="w-full"
+                disabled={isFieldDisabled()}
             />
             </div>
             
@@ -359,6 +374,7 @@ const EditDescription = () => {
                 value={inputPhone3}
                 onChange={(e) => setInputPhone3(e.target.value)}
                 className="w-full"
+                disabled={isFieldDisabled()}
             />
             </div>
 
@@ -369,6 +385,7 @@ const EditDescription = () => {
                 value={inputPhone4}
                 onChange={(e) => setInputPhone4(e.target.value)}
                 className="w-full"
+                disabled={isFieldDisabled()}
             />
             </div>
 
@@ -379,6 +396,7 @@ const EditDescription = () => {
                 value={inputPhone5}
                 onChange={(e) => setInputPhone5(e.target.value)}
                 className="w-full"
+                disabled={isFieldDisabled()}
             />
             </div>
 
