@@ -17,7 +17,7 @@ export function useApiForCampaignStatusUpdate(
       if (data.result_code === 0) {
         // 성공 시 성공 메시지 표시
         customAlertService.success(
-          '캠페인 상태가 성공적으로 변경되었습니다. 22222222',
+          '캠페인 상태가 성공적으로 변경되었습니다.',
           '캠페인 상태 변경 완료'
         );
       } else {

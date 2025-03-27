@@ -11,7 +11,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 
-export function TreeNode({
+export function TreeNodeForCampaignTab({
   item,
   level,
   expandedNodes,
@@ -216,7 +216,7 @@ export function TreeNode({
       {hasChildren && isExpanded && (
         <div className="space-y-0.5">
           {item.children?.map((child: typeof item) => (
-            <TreeNode
+            <TreeNodeForCampaignTab
               key={child.id}
               item={child}
               level={level + 1}

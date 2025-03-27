@@ -347,7 +347,7 @@
 import { useEffect, useRef } from "react";
 import { create } from "zustand";
 import { TreeItem } from "@/features/campaignManager/types/typeForSidebar2";
-import { TreeNode } from "./TreeNode";
+import { TreeNodeForCampaignTab } from "./TreeNodeForCampaignTab";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { getStatusIcon } from "@/components/shared/layout/utils/utils";
 import { useSidebarWidthStore } from "@/store/useSidebarWidthStore";
@@ -681,7 +681,7 @@ export function TreeMenusForCampaigns() {
   return (
     <div className="flex-1 overflow-auto tree-node text-sm" ref={containerRef}>
       {sortedItems.map((item: TreeItem) => (
-        <TreeNode
+        <TreeNodeForCampaignTab
           key={item.id}
           item={item}
           level={0}
