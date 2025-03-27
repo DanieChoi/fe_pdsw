@@ -340,7 +340,7 @@ export function SortButtonForCampaign() {
         >
           C
         </button>
-        {viewMode}
+        {/* {viewMode} */}
       </div>
     );
   };
