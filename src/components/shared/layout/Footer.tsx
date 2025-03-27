@@ -191,7 +191,7 @@ export default function Footer({
       }
       if (command === 'INSERT') {
         _message += '추가, 캠페인 아이디 : ' + data['campaign_id'] 
-        + ' , 캠페인 이름 : ' + data['campaign_name'] 
+        + ' , 캠페인 이름 : ' + data['campaign_name']
         + ' , 동작상태 : ' + _start_flag 
         + ', 완료구분 : ' + _end_flag;
         queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });

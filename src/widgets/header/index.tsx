@@ -147,7 +147,6 @@ export default function Header() {
   // tofix  로그인 안했을때 미리 실행되서 에러 발생
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
-      // console.log('Tenants API response:', data);
       if (data.result_code === 5) {
         setAlertState({
           ...errorMessage,
@@ -165,7 +164,9 @@ export default function Header() {
       }
     },
     onError: (error) => {
-      console.error('Tenants API error:', error);
+      // tofix 로그인 에러 발생
+      // console.error('Tenants API error:', error);
+      
       if (error.message.split('||')[0] === '5') {
         setAlertState({
           ...errorMessage,

@@ -260,12 +260,12 @@ export function SortButtonForCampaign() {
     }
   }, [viewMode, setSelectedNodeType]);
 
-  // 초기 설정
+  // 초기 설정 - 기본값을 캠페인 모드로 변경
   useEffect(() => {
     if (viewMode === null) {
-      // 초기 상태 설정
-      useTreeMenuStore.getState().setViewMode('tenant');
-      useTreeMenuStore.getState().setSelectedNodeType('tenant');
+      // 초기 상태를 캠페인 보기('campaign')로 설정
+      useTreeMenuStore.getState().setViewMode('campaign');
+      useTreeMenuStore.getState().setSelectedNodeType('campaign');
     }
   }, [viewMode]);
 
@@ -340,6 +340,7 @@ export function SortButtonForCampaign() {
         >
           C
         </button>
+        {viewMode}
       </div>
     );
   };
