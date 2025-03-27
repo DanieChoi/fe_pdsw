@@ -166,6 +166,7 @@ export default function Header() {
     onError: (error) => {
       // tofix 로그인 에러 발생
       // console.error('Tenants API error:', error);
+      alert("에러 발생 여기!")
       
       if (error.message.split('||')[0] === '5') {
         setAlertState({

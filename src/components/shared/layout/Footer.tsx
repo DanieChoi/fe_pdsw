@@ -9,6 +9,7 @@ import { useEnvironmentStore } from "@/store/environmentStore";
 // Headless UI 토스트 가져오기
 import { initToasts, toast } from './CustomToast';
 import { useQueryClient } from "@tanstack/react-query";
+import CommonMiniButton from "../CommonMiniButton";
 
 type FooterDataType = {
   time: string;
@@ -190,16 +191,16 @@ export default function Footer({
         _end_flag = '완료';
       }
       if (command === 'INSERT') {
-        _message += '추가, 캠페인 아이디 : ' + data['campaign_id'] 
-        + ' , 캠페인 이름 : ' + data['campaign_name']
-        + ' , 동작상태 : ' + _start_flag 
-        + ', 완료구분 : ' + _end_flag;
+        _message += '추가, 캠페인 아이디 : ' + data['campaign_id']
+          + ' , 캠페인 이름 : ' + data['campaign_name']
+          + ' , 동작상태 : ' + _start_flag
+          + ', 완료구분 : ' + _end_flag;
         queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
       } else if (command === 'UPDATE') {
-        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' 
-        + data['campaign_name'] 
-        + ' , 동작상태 : ' + _start_flag 
-        + ', 완료구분 : ' + _end_flag;
+        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : '
+          + data['campaign_name']
+          + ' , 동작상태 : ' + _start_flag
+          + ', 완료구분 : ' + _end_flag;
         // tofix
         queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
       } else if (command === 'DELETE') {
@@ -384,8 +385,9 @@ export default function Footer({
         }
 
         const tempCampaign = campaigns.filter((campaign) => campaign.campaign_id === Number(data['campaign_id']));
+        // tofix 0327
         const toastMessage =
-          `캠페인 이름 : ${tempCampaign[0].campaign_name}\n동작상태 : ${_start_flag}`;
+          `캠페인 이름 : ${tempCampaign[0]?.campaign_name}\n동작상태 : ${_start_flag}`;
 
 
         toast.event(toastMessage, {
@@ -489,23 +491,21 @@ export default function Footer({
       onResizeStop={handleResizeStop}
     >
       {/* 상단 바 영역 */}
-      <div className="flex-none pt-[5px] pb-[4px] px-[20px] border-b bg-white flex justify-between items-center">
+      <div className="flex-none pt-[5px] pb-[4px] pl-[15px] pr-[15px] border-b bg-white flex justify-between items-center">
         <span className="text-[13px] text-[#333]">현재 진행 상태</span>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-[5px]">
           {/* 모든 알림 삭제 버튼 */}
-          <button
+          <CommonMiniButton
             onClick={clearAllMessages}
-            className="flex items-center"
             title="모든 알림 삭제"
           >
             <Trash className="w-4 h-4" />
-          </button>
+          </CommonMiniButton>
 
           {/* 열기/닫기 버튼 */}
-          <button
+          <CommonMiniButton
             onClick={toggleDrawer}
-            className=""
             title={isDrawerOpen ? "닫기" : "열기"}
           >
             {isDrawerOpen ? (
@@ -513,41 +513,26 @@ export default function Footer({
             ) : (
               <ChevronUp className="w-4 h-4" />
             )}
-          </button>
+          </CommonMiniButton>
         </div>
       </div>
 
       {/* 푸터 내부 콘텐츠: isDrawerOpen이 true일 때만 렌더링 */}
-      {isDrawerOpen && (
-        <div className="flex-1 flex overflow-hidden">
-          {/* D(1단) -> w-full, W(2단) -> w-1/2 + 오른쪽 테이블 */}
-          <div
-            className={`
+      {
+        isDrawerOpen && (
+          <div className="flex-1 flex overflow-hidden">
+            {/* D(1단) -> w-full, W(2단) -> w-1/2 + 오른쪽 테이블 */}
+            <div
+              className={`
               ${isExpanded ? "w-1/2" : "w-full"}
               overflow-auto py-[7px] px-[20px]
               ${isExpanded ? "border-r" : ""}
             `}
-          >
-            <table className="w-full text-sm">
-              <tbody>
-                {footerDataList.map((log, index) => (
-                  <tr key={`left-${index}`}>
-                    <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
-                    <td className="whitespace-nowrap text-[13px] px-1">[{log.type}]</td>
-                    <td className="text-[13px]">{log.message}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* 2단(W) 모드일 때만 오른쪽 테이블 표시 */}
-          {isExpanded && (
-            <div className="w-1/2 overflow-auto py-[7px] px-[20px]">
+            >
               <table className="w-full text-sm">
                 <tbody>
                   {footerDataList.map((log, index) => (
-                    <tr key={`right-${index}`}>
+                    <tr key={`left-${index}`}>
                       <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
                       <td className="whitespace-nowrap text-[13px] px-1">[{log.type}]</td>
                       <td className="text-[13px]">{log.message}</td>
@@ -555,11 +540,28 @@ export default function Footer({
                   ))}
                 </tbody>
               </table>
-
             </div>
-          )}
-        </div>
-      )}
-    </Resizable>
+
+            {/* 2단(W) 모드일 때만 오른쪽 테이블 표시 */}
+            {isExpanded && (
+              <div className="w-1/2 overflow-auto py-[7px] px-[20px]">
+                <table className="w-full text-sm">
+                  <tbody>
+                    {footerDataList.map((log, index) => (
+                      <tr key={`right-${index}`}>
+                        <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
+                        <td className="whitespace-nowrap text-[13px] px-1">[{log.type}]</td>
+                        <td className="text-[13px]">{log.message}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+              </div>
+            )}
+          </div>
+        )
+      }
+    </Resizable >
   );
 }
