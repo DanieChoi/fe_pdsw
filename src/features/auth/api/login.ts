@@ -26,7 +26,7 @@ export const loginApi = {
       const loginData: LoginRequest = {
         grant_type: "password",
         device_id: "api_test",
-        user_name: credentials.user_name,
+        user_name: dataFirst.id,
         password: dataFirst.passwd,
       };
 
