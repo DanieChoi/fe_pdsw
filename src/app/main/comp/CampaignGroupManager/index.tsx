@@ -158,7 +158,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   // 전화번호설명 템플릿 조회
   const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
     onSuccess: (data) => {
-      setPhoneDescriptions(data.result_data);
+      setPhoneDescriptions(data.result_data||[]);
       handleInit();
     }
   });

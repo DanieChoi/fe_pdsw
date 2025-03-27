@@ -245,7 +245,7 @@ const OutgoingOrderTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onC
             <Label className="w-[5rem] min-w-[5rem]">Phone ID</Label>
             <Select 
               onValueChange={(value) => handleSelectChange(value, 'dialMode')}
-              value={tempCampaignOutgoingOrderTab.dial_phone_id > 0 ?tempCampaignOutgoingOrderTab.dial_phone_id+'': phoneDescriptions[0].description_id+''}
+              value={tempCampaignOutgoingOrderTab.dial_phone_id > 0 ?tempCampaignOutgoingOrderTab.dial_phone_id+'': phoneDescriptions.length > 0? phoneDescriptions[0].description_id+'':''}
             >
               <SelectTrigger className="">
                 <SelectValue placeholder=" " />
