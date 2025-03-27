@@ -1,3 +1,5 @@
+
+
 import { useState, useEffect, useCallback } from "react";
 import { ChevronUp, ChevronDown, Trash } from "lucide-react";
 import { isEqual } from 'lodash';
@@ -5,26 +7,11 @@ import { useAuthStore, useMainStore } from '@/store';
 import { Resizable } from "re-resizable";
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useEnvironmentStore } from "@/store/environmentStore";
-// Headless UI 토스트 가져오기
 import { initToasts, toast } from './CustomToast';
 import { useQueryClient } from "@tanstack/react-query";
 import CommonMiniButton from "../CommonMiniButton";
-import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
-
-type FooterDataType = {
-  time: string;
-  type: string;
-  message: string;
-};
-
-interface FooterProps {
-  footerHeight: number;
-  startResizing?: () => void;
-  onToggleDrawer?: (isOpen: boolean) => void;
-  onResizeHeight?: (height: number) => void;
-  onResizeStart?: () => void;
-  onResizeEnd?: (height: number) => void;
-}
+import { FooterDataType, processEventMessage } from "./utils/eventMessageUtils";
+// Import the utility function
 
 // NEXPOS 테마 색상 - 애플리케이션 테마에 맞게 지정
 const themeColors = {
@@ -48,6 +35,15 @@ const themeColors = {
   }
 };
 
+interface FooterProps {
+  footerHeight: number;
+  startResizing?: () => void;
+  onToggleDrawer?: (isOpen: boolean) => void;
+  onResizeHeight?: (height: number) => void;
+  onResizeStart?: () => void;
+  onResizeEnd?: (height: number) => void;
+}
+
 export default function Footer({
   footerHeight,
   onToggleDrawer,
@@ -62,7 +58,6 @@ export default function Footer({
   const { tenant_id, role_id } = useAuthStore();
   const { campaigns, setCampaigns } = useMainStore();
   const { useAlramPopup } = useEnvironmentStore(); // Get useAlramPopup value
-  // const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
 
   const queryClient = useQueryClient();
 
@@ -96,341 +91,78 @@ export default function Footer({
     }
   };
 
-  //캠페인 정보 조회 api 호출
+  // 캠페인 정보 조회 api 호출
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
     }
   });
 
+  // 유틸리티 함수를 사용하여 이벤트 처리
   const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, tempEventData: any): void => {
+    console.log("footerDataSet announce = ", announce);
+    console.log("footerDataSet command = ", command);
+    console.log("footerDataSet data = ", data);
+    console.log("footerDataSet kind = ", kind);
+    console.log("footerDataSet tempEventData = ", tempEventData);
 
-    console.log("1111111footerDataSet announce = ", announce);
-    console.log("222222222footerDataSet command = ", command);
-    console.log("33333333footerDataSet data = ", data);
-    console.log("444444444footerDataSet kind = ", kind);
-    console.log("555555555footerDataSet tempEventData = ", tempEventData);
+    // 유틸리티 함수 호출하여 이벤트 처리 결과 가져오기
+    const result = processEventMessage(
+      announce,
+      command,
+      data,
+      kind,
+      campaigns,
+      queryClient,
+      tenant_id,
+      role_id
+    );
 
-    //시간.
-    const today = new Date();
-    const _time = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0') + ':' + String(today.getSeconds()).padStart(2, '0');
-    //타입.
-    let _type = 'Event';
-    if (kind === 'event') {
-      console.log("announce1 = " + announce);
-      console.log("data : " + data)
-      _type = 'Event';
-    } else if (kind === 'alram') {
-      console.log("announce2 = " + announce);
-      _type = 'Event';
-    }
-    //메시지.
-    let _message = '';
-
-    //운영설정>캠페인별 발신번호설정
-    if (announce === '/pds/campaign/calling-number') {
-      _message = '캠페인 : '
-      if (command === 'INSERT') {
-        _message += '[' + data['campaign_id'] + '], 사용자 발신번호 설정 추가 성공';
-      } else if (command === 'DELETE') {
-        _message += '[' + data['campaign_id'] + '], 사용자 발신번호 설정 삭제 성공';
-      } else if (command === 'UPDATE') {
-        _message += '[' + data['campaign_id'] + '], 사용자 발신번호 설정 변경 성공';
-      }
-    }
-    //장비 사용, 장비 사용중지
-    else if (announce === 'dialing-device') {
-      if (command === 'UPDATE' && data['device_status'] === 'run') {
-        _message = 'CIDS 작동중';
-        // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
-        const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
-          detail: {
-            device_id: data['device_id'].toString(),
-            device_status: 'run'
-          }
-        });
-        window.dispatchEvent(deviceStatusEvent);
-      } else if (command === 'UPDATE' && data['device_status'] === 'down') {
-        _message = 'CIDS 작동중지';
-        // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
-        const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
-          detail: {
-            device_id: data['device_id'].toString(),
-            device_status: 'down'
-          }
-        });
-        window.dispatchEvent(deviceStatusEvent);
-      }
-    }
-    //캠페인수정>콜페이싱 수정
-    else if (announce === '/pds/campaign/dial-speed') {
-      _message = '[콜페이싱] '
-      if (command === 'UPDATE') {
-        const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === data['campaign_id']);
-        if (tempCampaign && tempCampaign.dial_mode === 2) {
-          _message += '캠페인 아이디 ' + data['campaign_id'] + ' , 현재 설정값 ' + data['dial_speed'] * 2;
-        } else {
-          _message += '캠페인 아이디 ' + data['campaign_id'] + ' , 현재 설정값 ' + data['dial_speed'];
-        }
-      }
-    }
-    //캠페인.
-    else if (announce === '/pds/campaign') {
-      _message = '캠페인 '
-      let _start_flag = '';
-      if (data['start_flag'] === 1) {
-        _start_flag = '시작';
-      } else if (data['start_flag'] === 2) {
-        _start_flag = '멈춤';
-        console.log("멈춤 실행 했지렁 1111111  ")
-      } else if (data['start_flag'] === 3) {
-        _start_flag = '중지';
-      }
-      let _end_flag = '';
-      if (data['end_flag'] === 1) {
-        _end_flag = '진행중';
-      } else if (data['end_flag'] === 2) {
-        _end_flag = '완료';
-      }
-      if (command === 'INSERT') {
-        _message += '추가, 캠페인 아이디 : ' + data['campaign_id']
-          + ' , 캠페인 이름 : ' + data['campaign_name']
-          + ' , 동작상태 : ' + _start_flag
-          + ', 완료구분 : ' + _end_flag;
-        queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
-        queryClient.invalidateQueries({ queryKey: ["campaignTreeDataForCampaignGroupTab", tenant_id] });
-        // refetchTreeDataForCampaignGroupTab(tenant_id)
-      } else if (command === 'UPDATE') {
-        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : '
-          + data['campaign_name']
-          + ' , 동작상태 : ' + _start_flag
-          + ', 완료구분 : ' + _end_flag;
-        // tofix
-        queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
-        queryClient.invalidateQueries({ queryKey: ["campaignTreeDataForCampaignGroupTab", tenant_id] });
-      } else if (command === 'DELETE') {
-        _message += '삭제, 캠페인 아이디 : ' + data['campaign_id'];
-        queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
-        queryClient.invalidateQueries({ queryKey: ["campaignTreeDataForCampaignGroupTab", tenant_id] });
-
-      }
-      fetchMain({
-        session_key: '',
-        tenant_id: tenant_id,
-      });
-      if (data['start_flag'] === 3) {
-        setFooterDataList((prev) => [
-          {
-            time: _time,
-            type: _type,
-            message: '캠페인 동작상태 변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag
-          },
-          ...prev
-        ]);
-
-        // Toast 알림 처리 - useAlramPopup이 1일 경우에만
-        if (useAlramPopup === 1) {
-          alert("여기 1")
-          try {
-            setTimeout(() => {
-              toast.event(
-                ' , 캠페인 이름 : '
-                // + data['campaign_name'] 
-                + ' , 동작상태 : ' + _start_flag,
-                {
-                  colors: themeColors.event,
-                  duration: 5000 // 명시적 지정
-                }
-              );
-              console.log('Campaign status change toast triggered');
-            }, 0);
-          } catch (err) {
-            console.error('Error showing toast:', err);
-          }
-        }
-      }
-    }
-    //스킬.
-    else if (announce === '/pds/skill/agent-list') {
-      const tempAgentIdList = data['agent_id'];
-      const _skillId = data['skill_id'];
-      const tempFooterDataList: FooterDataType[] = [];
-      for (let i = 0; i < tempAgentIdList.length; i++) {
-        let __message = '[스킬 '
-        if (command === 'UPDATE') {
-          __message += '추가] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
-        } else if (command === 'DELETE') {
-          __message += '해제] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
-        } else if (command === 'INSERT') {
-          __message += '추가] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
-        }
-        tempFooterDataList.push({
-          time: _time,
-          type: _type,
-          message: __message
-        });
-      }
+    // Footer 데이터 업데이트
+    if (result.messageList && result.messageList.length > 0) {
       setFooterDataList((prev) => [
-        ...tempFooterDataList,
-        ...prev.slice(0, 9) // 상위 10개만 보이게.
+        ...result.messageList,
+        ...prev.slice(0, Math.max(0, 10 - result.messageList.length))
       ]);
-
-      // Toast 알림 처리 - useAlramPopup이 1일 경우에만
-      if (useAlramPopup === 1) {
-        alert("여기 2")
-        try {
-          // 한 번의 알림으로 모든 상담원 정보 요약해서 표시
-          const actionType = command === 'UPDATE' || command === 'INSERT' ? '추가' : '해제';
-          const toastMessage = `[스킬 ${actionType}] 스킬 아이디 : ${_skillId}\n${tempAgentIdList.length}명의 상담원 변경됨`;
-
-          setTimeout(() => {
-            toast.event(
-              toastMessage,
-              {
-                colors: themeColors.event,
-                duration: 5000 // 명시적 지정
-              }
-            );
-            console.log('Skill change toast triggered');
-          }, 0);
-        } catch (err) {
-          console.error('Error showing skill toast:', err);
-        }
-      }
-
-      _message = '';
     }
-    //스킬편집
-    else if (announce === '/pds/skill') {
-      _message = '[스킬 '
-      if (command === 'INSERT') {
-        _message += '추가] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
-      } else if (command === 'DELETE') {
-        _message += '삭제] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
-      } else if (command === 'UPDATE') {
-        _message += '수정] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
-      }
-    }
-    //캠페인 요구스킬 수정
-    else if (announce === '/pds/campaign/skill') {
-      _message = '캠페인 요구스킬 '
-      if (command === 'UPDATE') {
-        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'];
-      } else {
-        _message = '';
-      }
-    }
-    //상담원 자원 수정/삭제
-    else if (announce === 'update-agent') {
-      _message = '[상담원 자원 '
-      if (command === 'UPDATE') {
-        _message += '수정] 상담원 아이디 : ' + data['employee_id'] + ' , 상담원 이름 : ' + data['agent_name'];
-      } else if (command === 'DELETE') {
-        _message += '삭제] 상담원 아이디 : ' + data['employee_id'] + ' , 상담원 이름 : ' + data['agent_name'];
-      }
-    }
-    //캠페인수정>동작시간 추가
-    else if (announce === '/pds/campaign/schedule') {
-      _message = '캠페인 스케쥴'
-      if (command === 'INSERT') {
-        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'];
-      } else {
-        _message = '';
-      }
-    }
-    //캠페인 동작상태 변경
-    else if (announce === '/pds/campaign/status') {
-      _message = '캠페인 동작상태 '
-      if (command === 'UPDATE') {
-        let _start_flag = '';
-        if (data['campaign_status'] === 1) {
-          console.log("실행 했지렁 333333  ")
-          _start_flag = '시작';
-        } else if (data['campaign_status'] === 2) {
-          console.log("시작작 실행 했지렁 start start start  :", data['campaign_id'])
-          queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
 
-          _start_flag = '멈춤';
-        } else if (data['campaign_status'] === 3) {
-          console.log("멈춤 실행 했지렁 pause pause pause ", data['campaign_id'])
-          queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
-          _start_flag = '중지';
-          console.log("중지 실행 했지렁 stop stop stop", data['campaign_id']);
-          queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu", tenant_id, role_id] });
-
-        }
-        const tempCampaign = campaigns.filter((campaign) => campaign && campaign.campaign_id === Number(data['campaign_id']));
-        const campaignName = tempCampaign && tempCampaign.length > 0 ? tempCampaign[0].campaign_name : '';
-        _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + campaignName + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
-      }
-      fetchMain({
-        session_key: '',
-        tenant_id: tenant_id,
-      });
-    }
-    //발신리스트등록
-    else if (announce === '/pds/campaign/calling-list') {
-      _message = '발신리스트등록, '
-      if (command === 'INSERT') {
-        let list_flag = '';
-        if (data['list_flag'] === 'I') {
-          list_flag = '신규리스트';
-        } else if (data['list_flag'] === 'A') {
-          list_flag = '추가리스트';
-        } else if (data['list_flag'] === 'D') {
-          list_flag = '삭제리스트';
-        } else if (data['list_flag'] === 'L') {
-          list_flag = '초기화';
-        }
-        _message += '캠페인 아이디 : ' + data['campaign_id'] + ' , 리스트구분 : ' + list_flag;
-      }
-    }
-    if (_message !== '') {
-      setFooterDataList((prev) => [
-        {
-          time: _time,
-          type: _type,
-          message: _message
-        },
-        ...prev.slice(0, 9) // 상위 10개만 보이게.
-      ]);
-
-      // Toast 알림 처리 - useAlramPopup이 1일 경우에만
-      if (useAlramPopup === 1 && _message !== '') {
-        try {
-          // 캠페인 상태 정보 안전하게 추출
-          let _start_flag = '';
-          if (data['campaign_status'] === 1) {
-            _start_flag = '시작';
-          } else if (data['campaign_status'] === 2) {
-            _start_flag = '멈춤';
-          } else if (data['campaign_status'] === 3) {
-            _start_flag = '중지';
-          }
-
-          // 안전하게 캠페인 정보 찾기
-          const tempCampaign = campaigns.filter((campaign) => 
-            campaign && campaign.campaign_id === Number(data['campaign_id'])
-          );
-          
-          // 안전하게 캠페인 이름 추출
-          const campaignName = tempCampaign && tempCampaign.length > 0 ? tempCampaign[0].campaign_name : '';
-          const toastMessage = `캠페인 이름 : ${campaignName}\n동작상태 : ${_start_flag}`;
-
-          // 타이밍 이슈 해결을 위해 setTimeout 사용
-          setTimeout(() => {
-            toast.event(toastMessage, {
+    // 토스트 알림 처리 - useAlramPopup이 1일 경우에만
+    if (useAlramPopup === 1 && result.toastMessage) {
+      try {
+        setTimeout(() => {
+          toast.event(
+            result.toastMessage,
+            {
               colors: themeColors.event,
-              duration: 5000 // 명시적으로 지정
-            });
-            console.log('Toast message triggered:', toastMessage);
-          }, 0);
-        } catch (err) {
-          console.error('Error showing toast:', err);
-        }
+              duration: 5000
+            }
+          );
+          console.log('Toast message triggered:', result.toastMessage);
+        }, 0);
+      } catch (err) {
+        console.error('Error showing toast:', err);
       }
     }
-  }, [campaigns, setFooterDataList, useAlramPopup, tenant_id, role_id, queryClient, fetchMain]);
+
+    // 필요한 경우 캠페인 정보 다시 가져오기
+    if (result.shouldFetchMain) {
+      fetchMain({
+        session_key: '',
+        tenant_id: tenant_id,
+      });
+    }
+
+    // 장비 상태 변경 이벤트 처리
+    if (result.shouldFireDeviceEvent && result.deviceEventDetails) {
+      const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
+        detail: {
+          device_id: result.deviceEventDetails.device_id,
+          device_status: result.deviceEventDetails.device_status
+        }
+      });
+      window.dispatchEvent(deviceStatusEvent);
+    }
+  }, [campaigns, queryClient, tenant_id, role_id, useAlramPopup, fetchMain]);
 
   // SSE 구독
   useEffect(() => {
@@ -599,7 +331,6 @@ export default function Footer({
                     ))}
                   </tbody>
                 </table>
-
               </div>
             )}
           </div>
