@@ -4,10 +4,14 @@ import { fetchTenants } from '../api/mainTenants';
 import { toast } from 'react-toastify';
 import { UseMutationOptions } from '@tanstack/react-query';
 import { MainCredentials, TenantListResponse, AuthApiError } from '../types/mainIndex';
+// import Router, { useRouter } from 'next/router';
 
 export function useApiForTenants(
   options?: UseMutationOptions<TenantListResponse, AuthApiError, MainCredentials>
 ) {
+
+  // const router = useRouter();
+
   return useMutation({
     mutationKey: ['mainTenants'],
     mutationFn: fetchTenants,
@@ -21,9 +25,17 @@ export function useApiForTenants(
       // });
       options?.onSuccess?.(data, variables, context);
     },
-    onError: (error: AuthApiError, variables: MainCredentials, context: unknown) => {
+    onError: (error: any, variables: MainCredentials, context: unknown) => {
       console.error('API Error:', error);
-      // toast.error(error.message || '데이터 로드에 실패했습니다.');
+      
+      if(error.response?.data?.result_code === 5) {
+        console.log("세션 만료, 로그인으로 이동");
+        // Next.js Router 대신 window.location 사용
+        window.location.href = '/login';
+      } else {
+        console.log("다른 에러:", error.response?.data?.result_code);
+      }
+      
       options?.onError?.(error, variables, context);
     },
   });
