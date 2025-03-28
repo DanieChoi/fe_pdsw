@@ -11,13 +11,6 @@ export function useApiForCampaignSkill(
     mutationKey: ['mainCampaignSkills'],
     mutationFn: fetchCampaignSkills,
     onSuccess: (data, variables, context) => {
-      console.log('API Response:', {
-        code: data.result_code,
-        message: data.result_msg,
-        count: data.result_count,
-        total: data.total_count,
-        data: data.result_data
-      });
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: CampaignApiError, variables: CampaignCredentials, context: unknown) => {

@@ -12,10 +12,6 @@ export function useApiForReservedCallDelete(
     mutationKey: ['mainReservedCallDelete'],
     mutationFn: fetchReservedCallDelete,
     onSuccess: (data, variables, context) => {
-      console.log('API Response:', {
-        code: data.result_code,
-        message: data.result_msg,
-      });
       options?.onSuccess?.(data, variables, context);
 
     queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu"] });
