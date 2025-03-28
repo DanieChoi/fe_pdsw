@@ -8,7 +8,7 @@ import Sidebar2 from '@/components/shared/layout/Sidebar2';
 import '@/app/globals.css';
 import Header from '@/widgets/header';
 import { useSidebarWidthStore } from '@/store/useSidebarWidthStore';
-import Footer2 from '@/components/shared/layout/Footer2';
+import Footer2 from '@/components/shared/layout/Footer3';
 
 const inter = Inter({ subsets: ['latin'] });
 
