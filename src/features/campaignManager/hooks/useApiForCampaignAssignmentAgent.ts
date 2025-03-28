@@ -11,11 +11,6 @@ export function useApiForCampaignAssignmentAgent(
     mutationKey: ['mainCampaignAssignmentAgents'],
     mutationFn: fetchCampaignAssignmentAgents,
     onSuccess: (data, variables, context) => {
-      console.log('API Response:', {
-        code: data.code,
-        message: data.message,
-        data: data.assignedCounselorList
-      });
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: CampaignApiError, variables: CampaignAssignmentAgentCredentials, context: unknown) => {
