@@ -66,6 +66,7 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
   const { schedules, callingNumbers, campaignSkills  } = useCampainManagerStore();
   const [tempCampaigns, setTempCampaigns] = useState<MainDataResponse[]>([]);
   const [tempData, setTempData] = useState<DataProps[]>([]);
+  const [selectedCampaignRow, setSelectedCampaignRow] = useState<DataProps | null>(null);
   
   const handleRowClick = (campaign: MainDataResponse) => {
     setSelectedCampaign(campaign);
@@ -111,6 +112,7 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
       });
       
       setSelectedCampaign(tempCampaigns[0]);
+      setSelectedCampaignRow(tempData[0]);
     }else{
       setTempData([]);
     }
@@ -151,8 +153,13 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
   }, [campaignHeaderSearchParam,campaignId]);
 
   const handleCellClick = ({ row }: CellClickArgs<Row>) => {
-    setSelectedCampaign(campaigns.filter((campaign) => campaign.campaign_id === Number(row.campaignId))[0]);    
+    setSelectedCampaign(campaigns.filter((campaign) => campaign.campaign_id === Number(row.campaignId))[0]);
+    setSelectedCampaignRow(row);
     // setCampaignIdForUpdateFromSideMenu(row.campaignId+'');
+  };
+
+  const getCampaignRowClass = (row: DataProps) => {
+    return selectedCampaignRow?.campaignId === row.campaignId ? 'bg-[#FFFAEE]' : '';
   };
 
   return (
@@ -165,8 +172,10 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
             rows={tempData} 
             className="grid-custom text-align-left" 
             rowHeight={30}
+            rowClass={getCampaignRowClass}
             headerRowHeight={30}
             onCellClick={handleCellClick}
+            selectedRows={selectedCampaignRow ? new Set<number>([selectedCampaignRow.campaignId]) : new Set<number>()}
             />
         </div>
       </div>
