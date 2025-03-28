@@ -105,8 +105,6 @@ const SystemPreferences = () => {
 
     // Footer에서 발생하는 이벤트 수신을 위한 이벤트 리스너 추가
     useEffect(() => {
-        console.log("campaigns", campaigns);
-        
         // 장비 상태 변경 이벤트 수신 함수
         const handleDeviceStatusChange = (event: any) => {
             
@@ -592,26 +590,11 @@ const SystemPreferences = () => {
             channel => channel && channel.device_id && 
             channel.device_id.toString() === selectedDevice.device_id
         );
-
+    
         if (!deviceChannels) {
             showAlert('이 장비에 대한 채널 정보가 없습니다. 시스템 관리자에게 문의하세요.');
             return;
         }
-    
-        // if (!deviceChannels) {
-        //     // 해당 장비의 채널 정보가 없으면 새로 생성
-        //     const newChannelAssign = new Array(selectedDevice.channel_count).fill(0);
-        //     const channelEditRequest = {
-        //         device_id: parseInt(selectedDevice.device_id),
-        //         assign_kind: parseInt(allocationMode || "0"),
-        //         channel_count: selectedDevice.channel_count,
-        //         channel_assign: newChannelAssign
-        //     };
-            
-        //     fetchChannelEdit(channelEditRequest);
-        //     showAlert('새 채널 정보가 생성되었습니다.');
-        //     return;
-        // }
     
         let updatedChannelAssign: number[];
     
@@ -619,6 +602,11 @@ const SystemPreferences = () => {
         if (deviceChannels.assign_kind.toString() !== allocationMode) {
             // 할당모드가 변경된 경우 모든 채널을 0으로 설정
             updatedChannelAssign = new Array(selectedDevice.channel_count).fill(0);
+            
+            // 현재 선택된 채널과 할당발신모드가 있다면 해당 채널만 선택된 값으로 업데이트
+            if (selectedChannel && allocationOutboundMode) {
+                updatedChannelAssign[selectedChannel.channelNumber] = parseInt(allocationOutboundMode);
+            }
         } else {
             // 할당모드가 변경되지 않은 경우 기존 로직 유지
             updatedChannelAssign = [...deviceChannels.channel_assign];
