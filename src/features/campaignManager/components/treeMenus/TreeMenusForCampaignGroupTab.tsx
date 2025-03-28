@@ -5,28 +5,25 @@ import { TreeNodeForSideBarCampaignGroupTab } from "./TreeNodeForSideBarCampaign
 import { useAuthStore } from "@/store/authStore";
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
 import SearchBarForSideMenuForCampaignGroupTab from "./searchbar/SearchBarForSideMenuForCampaignGroupTab";
+import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
+
 export function TreeMenusForCampaignGroupTab() {
   const { tenant_id } = useAuthStore();
   
+  // TanStack Query 커스텀 훅 사용 (tenant_id 자동 적용)
+  const { isLoading, error, data } = useApiForGetTreeDataForCampaignGroupTab(tenant_id);
+  
+  // Zustand 스토어에서 UI 상태 가져오기
   const { 
     treeData, 
-    isLoading, 
-    error, 
     expandedNodes, 
     selectedNodeId,
-    fetchTreeData, 
     toggleNode, 
     selectNode,
-    expandAllLevels // 모든 레벨을 확장하는 함수 추가
+    expandTenantAndGroup
   } = useSideMenuCampaignGroupTabStore();
 
   console.log("treeData : ", treeData);
-
-  // 초기 데이터 로드
-  useEffect(() => {
-    console.log("tenant_id is exist ?: ", tenant_id);
-    fetchTreeData(tenant_id);
-  }, [tenant_id, fetchTreeData]);
   
   // 데이터가 로드된 후 테넌트와 그룹 레벨 확장
   useEffect(() => {
@@ -43,17 +40,25 @@ export function TreeMenusForCampaignGroupTab() {
       </div>
       <div className="flex flex-grow overflow-y-auto min-h-0 tree-node">
         <div className="w-full">
-          {treeData.map((node) => (
-            <TreeNodeForSideBarCampaignGroupTab
-              key={node.id}
-              node={node}
-              level={0}
-              expandedNodes={expandedNodes}
-              selectedNodeId={selectedNodeId}
-              onNodeToggle={toggleNode}
-              onNodeSelect={selectNode}
-            />
-          ))}
+          {isLoading ? (
+            <div className="p-4 text-center text-gray-500">데이터를 불러오는 중...</div>
+          ) : error ? (
+            <div className="p-4 text-center text-red-500">오류 발생: {error.message}</div>
+          ) : treeData.length === 0 ? (
+            <div className="p-4 text-center text-gray-500">표시할 데이터가 없습니다</div>
+          ) : (
+            treeData.map((node) => (
+              <TreeNodeForSideBarCampaignGroupTab
+                key={node.id}
+                node={node}
+                level={0}
+                expandedNodes={expandedNodes}
+                selectedNodeId={selectedNodeId}
+                onNodeToggle={toggleNode}
+                onNodeSelect={selectNode}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

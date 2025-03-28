@@ -78,7 +78,7 @@ export function IContextMenuForCampaignForCampaignGroup({
   const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, setCampaignIdForCopyCampaign, addTab, addMultiTab } = useTabStore();
 
   // Zustand 스토어에서 updateCampaignStatus 함수 가져오기
-  const { updateCampaignStatus, refetchTreeData } = useSideMenuCampaignGroupTabStore();
+  const { updateCampaignStatus, refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
 
   // 권한 관리 스토어에서 사용 가능한 메뉴 ID 가져오기
   const availableMenuIds = useAvailableMenuStore(
@@ -270,7 +270,7 @@ export function IContextMenuForCampaignForCampaignGroup({
       updateCampaignStatus(item.id, statusNumber);
 
       // 전체 트리 데이터 다시 가져오기 (렌더링 강제)
-      await refetchTreeData();
+      await refetchTreeDataForCampaignGroupTab();
 
     } catch (error) {
       console.error('Error changing campaign status:', error);

@@ -34,7 +34,7 @@ export function AddCampaignGroupDialog({
   const [isValidated, setIsValidated] = useState(false);
   const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
 
-    const { refetchTreeData } = useSideMenuCampaignGroupTabStore();
+    const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
   
 
   // 다이얼로그가 열릴 때마다 폼 초기화
@@ -128,7 +128,7 @@ export function AddCampaignGroupDialog({
         onAddGroup(groupName, groupId);
       }
 
-      refetchTreeData();
+      refetchTreeDataForCampaignGroupTab();
 
       handleClose();
     },

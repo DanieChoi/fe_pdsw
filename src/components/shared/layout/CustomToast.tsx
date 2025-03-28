@@ -1,4 +1,4 @@
-// CustomToast.tsx
+// CustomToast.tsx - 수정 버전
 import React, { Fragment, useState, useEffect } from 'react';
 import { Transition } from '@headlessui/react';
 import { CheckCircle, AlertCircle, Info, AlertTriangle, X, User } from 'lucide-react';
@@ -23,6 +23,16 @@ export interface ToastMessage {
   duration?: number;
   // 색상 커스터마이징 추가
   colors?: ToastColors;
+}
+
+// 커스텀 이벤트 인터페이스 정의
+interface ToastEventDetail {
+  toast: ToastMessage;
+}
+
+// 토스트 이벤트를 위한 타입 정의
+interface CustomToastEvent extends CustomEvent {
+  detail: ToastEventDetail;
 }
 
 // 토스트 컴포넌트 props
@@ -57,6 +67,9 @@ const defaultColors: Record<ToastType, ToastColors> = {
     textColor: 'text-white',
   },
 };
+
+// 글로벌 토스트 상태 (싱글톤 패턴)
+let toastUpdateCallback: ((toast: ToastMessage) => void) | null = null;
 
 // 토스트 컴포넌트
 const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
@@ -149,7 +162,8 @@ const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
           </div>
           <button
             onClick={() => onClose(id)}
-            className={`${textColor} hover:${textColor}/80 focus:outline-none mr-1`}
+            className={`${textColor} hover:opacity-80 focus:outline-none mr-1`}
+            type="button"
           >
             <X size={14} />
           </button>
@@ -174,18 +188,34 @@ export const ToastContainer: React.FC = () => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   };
 
+  // 토스트 추가 함수
+  const addToast = (toast: ToastMessage) => {
+    setToasts((prev) => [toast, ...prev.slice(0, 4)]); // 최대 5개만 표시
+  };
+
+  // 싱글톤 콜백 설정
+  useEffect(() => {
+    toastUpdateCallback = addToast;
+    
+    return () => {
+      toastUpdateCallback = null;
+    };
+  }, []);
+
   // 전역 토스트 이벤트 리스너
   useEffect(() => {
-    const handleToast = (event: CustomEvent) => {
-      const { toast } = event.detail;
-      setToasts((prev) => [toast, ...prev.slice(0, 4)]); // 최대 5개만 표시
+    const handleToast = (event: Event) => {
+      const customEvent = event as CustomToastEvent;
+      if (customEvent.detail && customEvent.detail.toast) {
+        addToast(customEvent.detail.toast);
+      }
     };
 
     // 커스텀 이벤트 리스너 등록
-    window.addEventListener('toast' as any, handleToast as any);
+    window.addEventListener('toast-message', handleToast);
 
     return () => {
-      window.removeEventListener('toast' as any, handleToast as any);
+      window.removeEventListener('toast-message', handleToast);
     };
   }, []);
 
@@ -194,7 +224,7 @@ export const ToastContainer: React.FC = () => {
   return (
     <div
       aria-live="assertive"
-      className="fixed inset-0 flex items-end justify-end px-4 py-6 pointer-events-none sm:p-6 z-50"
+      className="fixed inset-0 flex items-end justify-end px-4 py-6 pointer-events-none sm:p-6 z-[9999]"
     >
       <div className="flex flex-col items-end space-y-2">
         {toasts.map((toast) => (
@@ -218,19 +248,30 @@ const createToast = (
 ) => {
   // 고유한 ID 생성 방식으로 변경 - 타임스탬프와 랜덤 문자열 조합
   const toast: ToastMessage = {
-    id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
     type,
     message,
     duration: options.duration || 5000,
     colors: options.colors
   };
 
-  // 커스텀 이벤트 발생시켜 토스트 생성
-  window.dispatchEvent(
-    new CustomEvent('toast', {
+  // 직접 콜백으로 등록 (가장 안정적인 방법)
+  if (toastUpdateCallback) {
+    toastUpdateCallback(toast);
+    return;
+  }
+
+  // 백업 방식: 커스텀 이벤트 발생시켜 토스트 생성
+  try {
+    const toastEvent = new CustomEvent('toast-message', {
       detail: { toast },
-    })
-  );
+      bubbles: true,
+      composed: true
+    });
+    window.dispatchEvent(toastEvent);
+  } catch (err) {
+    console.error('Failed to dispatch toast event:', err);
+  }
 };
 
 // 토스트 API
@@ -257,7 +298,12 @@ export const initToasts = () => {
   toastContainer.id = 'headless-toast-container';
   document.body.appendChild(toastContainer);
 
-  // 컨테이너에 렌더링
-  const root = createRoot(toastContainer);
-  root.render(<ToastContainer />);
+  try {
+    // 컨테이너에 렌더링
+    const root = createRoot(toastContainer);
+    root.render(<ToastContainer />);
+    console.log('Toast container initialized successfully');
+  } catch (err) {
+    console.error('Failed to initialize toast container:', err);
+  }
 };

@@ -465,7 +465,7 @@ const CampaignAddPopup: React.FC<Props> = ({ isOpen = true, onClose, onSelect, g
 
   const tenant_id = useAuthStore(state => state.tenant_id);
 
-  const { refetchTreeData } = useSideMenuCampaignGroupTabStore();
+  const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
 
   useEffect(() => {
     if (campaignListData?.result_data) {
