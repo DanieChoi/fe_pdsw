@@ -1,113 +1,86 @@
-// // C:\nproject\fe_pdsw\src\features\listManager\hooks\useApiForCampaignListDelete.ts
-// import { useMutation, useQueryClient } from '@tanstack/react-query';
-// import { UseMutationOptions } from '@tanstack/react-query';
-// import { DeleteResponse, ListManagerApiError } from '../types/listManagerIndex';
-// import { fetchCallingListDelete } from '../api/mainCallingListDelete';
-// import { toast } from 'react-toastify';
-
-// const useApiForCampaignListDelete = (
-//   options?: UseMutationOptions<DeleteResponse, ListManagerApiError, number> // number 타입 유지
-// ) => {
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationKey: ['campaignListDelete'],
-//     mutationFn: fetchCallingListDelete, // campaignId를 인자로 받음
-//     onSuccess: (data, variables, context) => {
-//       console.log('API Response:', {
-//         code: data.result_code,
-//         message: data.result_msg,
-//       });
-
-//       toast.success('캠페인 리스트 삭제 성공 check !!!!!!!!!!!');
-//       // alert("캠페인 리스트 삭제 그리고 나는 기대 한다 뭐를? 발신 목록2의 실시간 삭제를 !!");
-
-//       // 캐시 무효화 (트리 메뉴 데이터 갱신을 위해)
-//       // 전체 트리 메뉴 데이터 무효화
-//       queryClient.invalidateQueries({ 
-//         queryKey: ['treeMenuDataForSideMenu'] 
-//       });
-      
-//       // 모든 캠페인 진행 정보 무효화 (모든 캠페인 ID에 대해)
-//       queryClient.refetchQueries({ 
-//         queryKey: ['mainCampaignProgressInformation'],
-//         exact: false  // 정확한 일치가 아닌 부분 일치도 포함
-//       });
-      
-//       // 삭제된 특정 캠페인 진행 정보 무효화 (variables는 삭제된 캠페인 ID)
-//       if (variables) {
-//         queryClient.invalidateQueries({
-//           queryKey: ['mainCampaignProgressInformation', 1, variables],
-//           exact: false
-//         });
-//       }
-
-//       options?.onSuccess?.(data, variables, context);
-//     },
-//     onError: (error: ListManagerApiError, variables: number, context: unknown) => {
-//       console.error('API Error:', error);
-//       // UI에 에러 메시지 표시 (필요한 경우 toast 주석 해제)
-//       // toast.error(error.message || '데이터 삭제에 실패했습니다.');
-//       options?.onError?.(error, variables, context);
-//     },
-//   });
-// };
-
-// export default useApiForCampaignListDelete;
-
 // C:\nproject\fe_pdsw\src\features\listManager\hooks\useApiForCampaignListDelete.ts
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query';
 import { DeleteResponse, ListManagerApiError } from '../types/listManagerIndex';
 import { fetchCallingListDelete } from '../api/mainCallingListDelete';
 import { toast } from 'react-toastify';
-// ... other imports
+import { customAlertService } from '@/components/shared/layout/utils/CustomAlertService';
 
 const useApiForCampaignListDelete = (
   options?: UseMutationOptions<DeleteResponse, ListManagerApiError, number>
 ): ReturnType<typeof useMutation<DeleteResponse, ListManagerApiError, number>> => {
   const queryClient = useQueryClient();
-  // Assuming you can get the tenantId, maybe from authStore?
-  // If it's always 1, you can hardcode it.
-  // const { tenant_id } = useAuthStore.getState(); // Example if needed dynamically
 
-  return useMutation({
+  const mutation = useMutation({
     mutationKey: ['campaignListDelete'],
-    mutationFn: fetchCallingListDelete,
-    onSuccess: (data, deletedCampaignId, context) => { // Renamed 'variables' for clarity
-      console.log('API Response (Delete):', { /* ... */ });
+    mutationFn: async (campaignId: number) => {
+      // 삭제 전 확인 다이얼로그 표시
+      return new Promise<DeleteResponse>((resolve, reject) => {
+        customAlertService.show({
+          message: '발신리스트 삭제시 발신리스트와 캠페인 진행정보가 초기화 됩니다.\n삭제된 발신리스트와 캠페인 진행정보는 복구가 불가능합니다.\n발신리스트를 삭제하시겠습니까?',
+          title: '캠페인',
+          type: '1',
+          onClose: async () => {
+            try {
+              // 사용자가 확인을 누르면 실제 API 호출 실행
+              const result = await fetchCallingListDelete(campaignId);
+              resolve(result);
+            } catch (error) {
+              reject(error);
+            }
+          },
+          onCancle: () => {
+            // 사용자가 취소를 누르면 작업 취소
+            reject(new Error('사용자가 삭제를 취소했습니다.'));
+          }
+        });
+      });
+    },
+    onSuccess: (data, deletedCampaignId, context) => {
+      console.log('API Response (Delete):', {
+        code: data.result_code,
+        message: data.result_msg
+      });
+      
       toast.success('캠페인 리스트 삭제 성공 check !!!!!!!!!!!');
 
       // --- Cache Invalidation ---
-
       // 1. Invalidate the side menu tree data
       queryClient.invalidateQueries({
         queryKey: ['treeMenuDataForSideMenu']
       });
 
       // 2. Invalidate the specific campaign's progress information
-      //    Make sure tenantId is correct (using 1 as per previous code)
       const tenantIdForQueryKey = 1; // Or get dynamically if needed
-
-      // alert("deletedCampaignId 확인 : " + deletedCampaignId);
-      // alert("typeof deletedCampaignId 확인 : " + typeof deletedCampaignId);
 
       queryClient.invalidateQueries({
         queryKey: ['mainCampaignProgressInformation', tenantIdForQueryKey, deletedCampaignId]
       });
 
-      // Optional: Invalidate the general key if other parts of the app
-      // display aggregated progress info not tied to a specific campaignId in the key.
-      // queryClient.invalidateQueries({ queryKey: ['mainCampaignProgressInformation'] });
+      // 전체 진행 정보 다시 불러오기 (필요한 경우)
+      queryClient.refetchQueries({ 
+        queryKey: ['mainCampaignProgressInformation'],
+        exact: false
+      });
 
       // Call original onSuccess if provided
       options?.onSuccess?.(data, deletedCampaignId, context);
     },
     onError: (error: ListManagerApiError, variables: number, context: unknown) => {
       console.error('API Error (Delete):', error);
-      // toast.error(...)
+      
+      // 사용자가 의도적으로 취소한 경우가 아니라면 에러 메시지 표시
+      if (error.message !== '사용자가 삭제를 취소했습니다.') {
+        customAlertService.error(
+          error.message || '캠페인 리스트 삭제에 실패했습니다.', 
+          '오류'
+        );
+      }
+      
       options?.onError?.(error, variables, context);
     },
   });
+
+  return mutation;
 };
 
 export default useApiForCampaignListDelete;
