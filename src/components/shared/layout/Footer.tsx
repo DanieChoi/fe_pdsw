@@ -1,10 +1,18 @@
 
+
 import { useState, useEffect, useCallback } from "react";
-import { ChevronUp, ChevronDown, Trash, Signal, Bell } from "lucide-react";
+import { ChevronUp, ChevronDown, Trash } from "lucide-react";
+import { isEqual } from 'lodash';
+import { useAuthStore, useMainStore } from '@/store';
 import { Resizable } from "re-resizable";
-import { initToasts } from './CustomToast';
+import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
+import { useEnvironmentStore } from "@/store/environmentStore";
+import { initToasts, toast } from './CustomToast';
+import { useQueryClient } from "@tanstack/react-query";
 import CommonMiniButton from "../CommonMiniButton";
-import { useSseSubscribe } from '@/features/auth/hooks/useSseSubscribe';
+import { FooterDataType, processEventMessage } from "./utils/eventMessageUtils";
+import { themeColors } from "@/features/auth/hooks/useSseSubscribe";
+
 
 interface FooterProps {
   footerHeight: number;
@@ -22,17 +30,16 @@ export default function Footer({
   onResizeStart,
   onResizeEnd
 }: FooterProps) {
-  // 모든 상태는 컴포넌트 최상위 레벨에서 선언
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
   const [currentHeight, setCurrentHeight] = useState(footerHeight);
-  const [previousHeight, setPreviousHeight] = useState(footerHeight);
-  const [autoAdjustHeight, setAutoAdjustHeight] = useState(false);
+  const { tenant_id, role_id } = useAuthStore();
+  const { campaigns, setCampaigns } = useMainStore();
+  const { useAlramPopup } = useEnvironmentStore(); // Get useAlramPopup value
 
-  // useSseSubscribe 훅 사용 - 항상 최상위 레벨에서만 호출
-  const { footerDataList, clearAllMessages, isConnected } = useSseSubscribe();
+  const queryClient = useQueryClient();
 
-  // Toast 컨테이너 초기화
   useEffect(() => {
     const toastContainer = document.getElementById('headless-toast-container');
     if (!toastContainer) {
@@ -47,106 +54,168 @@ export default function Footer({
       onToggleDrawer(isDrawerOpen);
     }
   }, [isDrawerOpen, onToggleDrawer]);
-  
-  // 메시지 목록이 변경되어도 자동 높이 조정하지 않음
-  // (빈 의존성 배열을 사용하지 않고, 명시적으로 의존성을 표시)
-  useEffect(() => {
-    // 자동 조정 모드가 비활성화되면 아무 것도 하지 않음
-  }, [footerDataList.length, autoAdjustHeight, isDrawerOpen]);
+
+  const clearAllMessages = () => {
+    setFooterDataList([]);
+  };
 
   // 열기/닫기
-  const toggleDrawer = useCallback(() => {
-    setIsDrawerOpen(prevState => {
-      const newState = !prevState;
-      if (onToggleDrawer) {
-        onToggleDrawer(newState);
-      }
-      return newState;
-    });
-  }, [onToggleDrawer]);
+  const toggleDrawer = () => {
+    const newState = !isDrawerOpen;
+    setIsDrawerOpen(newState);
+    if (onToggleDrawer) {
+      onToggleDrawer(newState);
+    }
+  };
 
-  // 높이 변경 핸들러 - 메모이제이션하여 성능 최적화
-  const handleResizeStop = useCallback((e: MouseEvent | TouchEvent, direction: string, ref: HTMLElement, d: { height: number; width: number }) => {
+  // 캠페인 정보 조회 api 호출
+  const { mutate: fetchMain } = useApiForMain({
+    onSuccess: (data) => {
+      setCampaigns(data.result_data);
+    }
+  });
+
+  // 유틸리티 함수를 사용하여 이벤트 처리
+  const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, tempEventData: any): void => {
+    console.log("footerDataSet announce = ", announce);
+    console.log("footerDataSet command = ", command);
+    console.log("footerDataSet data = ", data);
+    console.log("footerDataSet kind = ", kind);
+    console.log("footerDataSet tempEventData = ", tempEventData);
+
+    // 유틸리티 함수 호출하여 이벤트 처리 결과 가져오기
+    const result = processEventMessage(
+      announce,
+      command,
+      data,
+      kind,
+      campaigns,
+      queryClient,
+      tenant_id,
+      role_id
+    );
+
+    // Footer 데이터 업데이트
+    if (result.messageList && result.messageList.length > 0) {
+      setFooterDataList((prev) => [
+        ...result.messageList,
+        ...prev.slice(0, Math.max(0, 10 - result.messageList.length))
+      ]);
+    }
+
+    // 토스트 알림 처리 - useAlramPopup이 1일 경우에만
+    if (useAlramPopup === 1 && result.toastMessage) {
+      try {
+        setTimeout(() => {
+          toast.event(
+            result.toastMessage,
+            {
+              colors: themeColors.event,
+              duration: 5000
+            }
+          );
+          console.log('Toast message triggered:', result.toastMessage);
+        }, 0);
+      } catch (err) {
+        console.error('Error showing toast:', err);
+      }
+    }
+
+    // 필요한 경우 캠페인 정보 다시 가져오기
+    if (result.shouldFetchMain) {
+      fetchMain({
+        session_key: '',
+        tenant_id: tenant_id,
+      });
+    }
+
+    // 장비 상태 변경 이벤트 처리
+    if (result.shouldFireDeviceEvent && result.deviceEventDetails) {
+      const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
+        detail: {
+          device_id: result.deviceEventDetails.device_id,
+          device_status: result.deviceEventDetails.device_status
+        }
+      });
+      window.dispatchEvent(deviceStatusEvent);
+    }
+  }, [campaigns, queryClient, tenant_id, role_id, useAlramPopup, fetchMain]);
+
+  // SSE 구독
+  useEffect(() => {
+    const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+    const eventSource = new EventSource(
+      `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
+    );
+
+    let data: any = {};
+    let announce = "";
+    let command = "";
+    let kind = "";
+
+    eventSource.addEventListener("message", (event) => {
+      console.log("footer sse event = ", event.data);
+      if (event.data !== "Connected!!") {
+        try {
+          const tempEventData = JSON.parse(event.data);
+          if (
+            announce !== tempEventData["announce"] ||
+            !isEqual(data, tempEventData.data) ||
+            !isEqual(data, tempEventData["data"]) ||
+            kind !== tempEventData["kind"]
+          ) {
+            announce = tempEventData["announce"];
+            command = tempEventData["command"];
+            data = tempEventData["data"];
+            kind = tempEventData["kind"];
+
+            footerDataSet(
+              tempEventData["announce"],
+              tempEventData["command"],
+              tempEventData["data"],
+              tempEventData["kind"],
+              tempEventData
+            );
+          }
+        } catch (err) {
+          console.error('Error processing SSE event:', err);
+        }
+      }
+    });
+
+    // 에러 처리 추가
+    eventSource.addEventListener("error", (err) => {
+      console.error('SSE connection error:', err);
+      // 재연결 시도 (선택적)
+    });
+
+    return () => {
+      eventSource.close();
+    };
+  }, [tenant_id, role_id, footerDataSet]);
+
+  // 높이 변경 핸들러
+  const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
     const newHeight = currentHeight + d.height;
     setCurrentHeight(newHeight);
-    
-    // 수동으로 높이 변경 시 자동 조정 모드 비활성화
-    if (autoAdjustHeight) {
-      setAutoAdjustHeight(false);
-    }
-    
+
     if (onResizeHeight) {
       onResizeHeight(newHeight);
     }
-    
+
     if (onResizeEnd) {
       onResizeEnd(newHeight);
     }
-  }, [currentHeight, autoAdjustHeight, onResizeHeight, onResizeEnd]);
+  };
 
-  // 리사이즈 중 매 프레임마다 높이 업데이트 (드래그 중 실시간 반영)
-  const handleResize = useCallback((e: MouseEvent | TouchEvent, direction: string, ref: HTMLElement) => {
-    const height = parseInt(ref.style.height, 10);
-    if (onResizeHeight) {
-      onResizeHeight(height);
+  useEffect(() => {
+    if (campaigns && campaigns.length === 0) {
+      fetchMain({
+        session_key: '',
+        tenant_id: tenant_id,
+      });
     }
-  }, [onResizeHeight]);
-  
-  // 벨 아이콘 클릭 시 메시지 개수에 맞게 높이 조정 토글
-  const handleBellClick = useCallback(() => {
-    // 드로어가 닫혀있으면 열기
-    if (!isDrawerOpen) {
-      setIsDrawerOpen(true);
-      if (onToggleDrawer) {
-        onToggleDrawer(true);
-      }
-    }
-    
-    // 자동 조정 토글
-    const newAutoAdjustState = !autoAdjustHeight;
-    setAutoAdjustHeight(newAutoAdjustState);
-    
-    if (newAutoAdjustState) {
-      // 현재 높이를 저장
-      setPreviousHeight(currentHeight);
-      
-      // 메시지 개수에 따라 높이 계산
-      const headerHeight = 35; // 헤더 높이
-      const tablePadding = 20; // 테이블 패딩
-      const messageHeight = 26; // 한 메시지 높이
-      const extraSpace = 15; // 여유 공간
-      
-      // 새 높이 계산
-      const newHeight = Math.max(
-        headerHeight + tablePadding + (footerDataList.length * messageHeight) + extraSpace,
-        100 // 최소 높이
-      );
-      
-      // 상태 업데이트
-      setCurrentHeight(newHeight);
-      
-      // 부모 컴포넌트에 알림
-      if (onResizeHeight) {
-        onResizeHeight(newHeight);
-      }
-      
-      if (onResizeEnd) {
-        onResizeEnd(newHeight);
-      }
-    } else {
-      // 원래 높이로 복원
-      setCurrentHeight(previousHeight);
-      
-      // 부모 컴포넌트에 알림
-      if (onResizeHeight) {
-        onResizeHeight(previousHeight);
-      }
-      
-      if (onResizeEnd) {
-        onResizeEnd(previousHeight);
-      }
-    }
-  }, [footerDataList.length, isDrawerOpen, autoAdjustHeight, currentHeight, previousHeight, onToggleDrawer, onResizeHeight, onResizeEnd]);
+  }, [campaigns, fetchMain, tenant_id]);
 
   return (
     <Resizable
@@ -167,62 +236,36 @@ export default function Footer({
         topLeft: false
       }}
       className={`
-        border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col group relative h-[1px] before:content-[''] before:absolute hover:before:bg-[#5BC2C1]
+        border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col duration-300 ease-in-out group relative h-[1px] before:content-[''] before:absolute hover:before:bg-[#5BC2C1]
         ${isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative"}
       `}
       onResizeStart={onResizeStart}
-      onResize={handleResize}
       onResizeStop={handleResizeStop}
     >
       {/* 상단 바 영역 */}
       <div className="flex-none pt-[5px] pb-[4px] pl-[15px] pr-[15px] border-b bg-white flex justify-between items-center">
-        <div className="flex items-center">
-          <span className="text-[13px] text-[#333] mr-2">현재 진행 상태</span>
-          
-          {/* 알림 메시지 개수 표시 */}
-          {footerDataList.length > 0 && (
-            <div 
-              className={`flex items-center py-[3px] px-[8px] rounded-full ${autoAdjustHeight ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'} cursor-pointer hover:bg-blue-50 transition-colors mr-2`}
-              onClick={handleBellClick}
-              title={autoAdjustHeight ? "자동 높이 조정 해제" : "메시지 개수에 맞게 높이 조정"}
-            >
-              <Bell size={13} className={`${autoAdjustHeight ? 'text-blue-500' : 'text-gray-500'} mr-1`} />
-              <span className="text-[11px] font-medium">
-                {footerDataList.length > 999 ? '999+' : footerDataList.length}
-              </span>
-            </div>
-          )}
-          
-          {/* 연결 상태 아이콘 - 연결되면 표시 */}
-          {isConnected && (
-            <div className="flex items-center" title="SSE 연결됨">
-              <Signal size={14} className="text-green-600" />
-            </div>
-          )}
-        </div>
+        <span className="text-[13px] text-[#333]">현재 진행 상태</span>
 
-        <div className="flex items-center">
+        <div className="flex items-center gap-[5px]">
           {/* 모든 알림 삭제 버튼 */}
-          <button
+          <CommonMiniButton
             onClick={clearAllMessages}
             title="모든 알림 삭제"
-            className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded"
           >
-            <Trash size={14} />
-          </button>
+            <Trash className="w-4 h-4" />
+          </CommonMiniButton>
 
           {/* 열기/닫기 버튼 */}
-          <button
+          <CommonMiniButton
             onClick={toggleDrawer}
             title={isDrawerOpen ? "닫기" : "열기"}
-            className="p-1 ml-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded"
           >
             {isDrawerOpen ? (
-              <ChevronDown size={14} />
+              <ChevronDown className="w-4 h-4" />
             ) : (
-              <ChevronUp size={14} />
+              <ChevronUp className="w-4 h-4" />
             )}
-          </button>
+          </CommonMiniButton>
         </div>
       </div>
 
