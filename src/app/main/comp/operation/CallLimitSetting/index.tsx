@@ -390,6 +390,10 @@ const CampaignSettings = () => {
    
   // 필드가 비활성화되어야 하는지 결정하는 함수
   const isFieldDisabled = () => {
+    // 캠페인 아이디가 있으면 항상 입력 가능하게 설정
+    if (campaignId) {
+      return false;
+    }
     // 선택된 행이 없고 신규 모드도 아니면 비활성화
     return !selectedRow && !isNewMode;
   };
