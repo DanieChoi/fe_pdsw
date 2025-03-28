@@ -1,6 +1,6 @@
 "use client";
 // components/CampaignManager/CampaignManagerDetail.tsx
-import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
+import { useMainStore, useCampainManagerStore, useTabStore, useAuthStore } from '@/store';
 import Image from 'next/image'
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
@@ -31,8 +31,7 @@ import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSc
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 import CampaignTab from '@/app/main/comp/CampaignManager/CampaignTab';
-import { DataProps, downDataProps } from './CampaignGroupManagerList';
-import AddCampaignGroupDialog from "./AddCampaignGroupDialog";
+import { DataProps } from './CampaignGroupManagerList';
 import CampaignAddPopup from '@/features/campaignManager/components/popups/CampaignAddPopup';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
@@ -325,6 +324,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
     , selectedCampaign
     , setSelectedCampaign
   } = useMainStore();
+    const { menu_role_id } = useAuthStore();
   const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab
     , campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
@@ -1321,12 +1321,16 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
               <CustomInput value={inputCallingNumber} className="w-full"
                 disabled={selectedCampaign !== null} readOnly
               />
+            {menu_role_id === 1?
               <CommonButton variant="outline" className='h-[24px]' onClick={() =>
                 setCallingNumberPopupState({
                   ...callingNumberPopupState,
                   isOpen: true,
                 })
               }>발신번호 변경</CommonButton>
+              :
+              null
+            }
             </div>
             : ''}
           <div className="flex items-center gap-2 col-span-3">
