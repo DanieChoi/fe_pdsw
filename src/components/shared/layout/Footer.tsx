@@ -237,7 +237,7 @@ export default function Footer({
   }, [onToggleDrawer]);
 
   // 높이 변경 핸들러 - 메모이제이션하여 성능 최적화
-  const handleResizeStop = useCallback((e: React.MouseEvent, direction: string, ref: HTMLElement, d: { height: number; width: number }) => {
+  const handleResizeStop = useCallback((e: MouseEvent | TouchEvent, direction: string, ref: HTMLElement, d: { height: number; width: number }) => {
     const newHeight = currentHeight + d.height;
     setCurrentHeight(newHeight);
     
