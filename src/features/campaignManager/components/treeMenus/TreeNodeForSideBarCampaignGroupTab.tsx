@@ -195,7 +195,8 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
   useEffect(() => {
     if (campaignGroupManagerInit) {
-      refetchTreeDataForCampaignGroupTab();
+      // refetchTreeDataForCampaignGroupTab();
+      // setCampaignGroupManagerInit(false);
     }
   }, [campaignGroupManagerInit]);
 
