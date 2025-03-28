@@ -8,6 +8,7 @@ import "react-contexify/dist/ReactContexify.css";
 import { TreeNode } from "@/features/campaignManager/types/typeForCampaignGroupForSideBar";
 import AddCampaignGroupDialog from "./dialog/AddCampaignGroupDialog";
 import { useTabStore } from "@/store/tabStore";
+import { useCampainManagerStore } from '@/store/campainManagerStore';
 import CampaignAddPopup from '@/features/campaignManager/components/popups/CampaignAddPopup';
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const recentlyClosedDialogRef = useRef(false);
   const { updateCampaignStatus, refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
+  const { campaignGroupManagerInit, setCampaignGroupManagerInit } = useCampainManagerStore();
 
   const [isBrowser, setIsBrowser] = useState(false);
   useEffect(() => {
@@ -77,6 +79,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       toast.success("캠페인 그룹이 삭제되었습니다.");
       setIsDeleteDialogOpen(false);
       refetchTreeDataForCampaignGroupTab();
+      setCampaignGroupManagerInit(true);
     },
     onError: (error) => {
       alert(`캠페인 그룹 삭제 실패: ${error.message}`);
@@ -122,6 +125,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     recentlyClosedDialogRef.current = true;
     setTimeout(() => {
       recentlyClosedDialogRef.current = false;
+      setCampaignGroupManagerInit(true);
     }, 300);
   }, []);
 
@@ -132,6 +136,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     setTimeout(() => {
       recentlyClosedDialogRef.current = false;
     }, 300);
+    setCampaignGroupManagerInit(true);
     await refetchTreeDataForCampaignGroupTab();
   }, []);
 
@@ -187,6 +192,12 @@ export function TreeNodeForSideBarCampaignGroupTab({
         return <Building className="h-4 w-4 text-gray-500" />;
     }
   }, [node.type]);
+
+  useEffect(() => {
+    if (campaignGroupManagerInit) {
+      refetchTreeDataForCampaignGroupTab();
+    }
+  }, [campaignGroupManagerInit]);
 
   const renderAllDialogs = () => {
     if (!isBrowser) return null;
