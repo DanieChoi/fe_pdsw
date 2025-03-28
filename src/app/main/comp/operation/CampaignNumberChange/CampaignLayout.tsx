@@ -35,7 +35,7 @@ function CampaignLayout() {
   const [selectedCampaignId, setSelectedCampaignId] = useState('');
   const [selectedCampaignName, setSelectedCampaignName] = useState('');
   const [selectedCallingNumber, setSelectedCallingNumber] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
+  const [isNewMode, setIsNewMode] = useState(false); 
 
   const router = useRouter();
 
@@ -77,38 +77,37 @@ function CampaignLayout() {
     setAlertState(prev => ({ ...prev, isOpen: false }));
   };
 
-    // 발신번호 조회
-    const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
-      onSuccess: (data) => {
-        // setCallingNumbers(data.result_data||[]);
-        // 데이터 유효성 검사 추가
-        if (data && data.result_data && Array.isArray(data.result_data)) {
-          setCallingNumbers(data.result_data);
-        } else {
-          // 빈 데이터나 잘못된 형식의 데이터가 왔을 때 빈 배열로 설정
-          setCallingNumbers([]);
-        }
-      },
-      onError: (data) => {
-        // 에러 발생 시 callingNumbers를 빈 배열로 설정
+  // 발신번호 조회
+  const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
+    onSuccess: (data) => {
+      // 데이터 유효성 검사 추가
+      if (data && data.result_data && Array.isArray(data.result_data)) {
+        setCallingNumbers(data.result_data);
+      } else {
+        // 빈 데이터나 잘못된 형식의 데이터가 왔을 때 빈 배열로 설정
         setCallingNumbers([]);
-        showAlert('발신번호 조회 중 오류가 발생했습니다: ' + data.message);
-        
-        if (data.message.split('||')[0] === '5') {
-          setAlertState({
-            ...errorMessage,
-            isOpen: true,
-            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-            onConfirm: closeAlert,
-            onCancel: () => {}
-          });
-          Cookies.remove('session_key');
-          setTimeout(() => {
-            router.push('/login');
-          }, 1000);
-        }
       }
-    });
+    },
+    onError: (data) => {
+      // 에러 발생 시 callingNumbers를 빈 배열로 설정
+      setCallingNumbers([]);
+      showAlert('발신번호 조회 중 오류가 발생했습니다: ' + data.message);
+      
+      if (data.message.split('||')[0] === '5') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
+      }
+    }
+  });
 
   //캠페인 발신번호 추가 api 호출
   const { mutate: fetchCallingNumberInsert } = useApiForCallingNumberInsert({
@@ -116,22 +115,26 @@ function CampaignLayout() {
       fetchCallingNumbers({
         session_key: '',
         tenant_id: 0,
-      });      
-    },onError: (error) => {
+      });
+      // 신규 모드 해제하고 선택 상태 유지
+      setIsNewMode(false);
+      showAlert('새로운 발신번호가 성공적으로 저장되었습니다.');
+    },
+    onError: (error) => {
       if (error.message.split('||')[0] === '5') {
-          setAlertState({
-            ...errorMessage,
-            isOpen: true,
-            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-            onConfirm: closeAlert,
-            onCancel: () => {}
-          });
-          Cookies.remove('session_key');
-          setTimeout(() => {
-            router.push('/login');
-          }, 1000);
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
       } else {
-          showAlert('발신번호 저장 중 오류가 발생했습니다: ' + error.message);
+        showAlert('발신번호 저장 중 오류가 발생했습니다: ' + error.message);
       }
     }
   });
@@ -142,25 +145,29 @@ function CampaignLayout() {
       fetchCallingNumbers({
         session_key: '',
         tenant_id: 0,
-      })
-    },onError: (error) => {
+      });
+      // 신규 모드 해제하고 선택 상태 유지
+      setIsNewMode(false);
+      showAlert('발신번호가 성공적으로 수정되었습니다.');
+    },
+    onError: (error) => {
       if (error.message.split('||')[0] === '5') {
-          setAlertState({
-            ...errorMessage,
-            isOpen: true,
-            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-            onConfirm: closeAlert,
-            onCancel: () => {}
-          });
-          Cookies.remove('session_key');
-          setTimeout(() => {
-            router.push('/login');
-          }, 1000);
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
       } else {
-          showAlert('발신번호 수정 중 오류가 발생했습니다: ' + error.message);
+        showAlert('발신번호 수정 중 오류가 발생했습니다: ' + error.message);
       }
     }
-  })
+  });
 
   // 발신번호 삭제
   const { mutate: fetchCallingNumberDelete } = useApiForCallingNumberDelete({
@@ -168,25 +175,26 @@ function CampaignLayout() {
       fetchCallingNumbers({
         session_key: '',
         tenant_id: 0,
-      })
-    },onError: (error) => {
+      });
+    },
+    onError: (error) => {
       if (error.message.split('||')[0] === '5') {
-          setAlertState({
-            ...errorMessage,
-            isOpen: true,
-            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-            onConfirm: closeAlert,
-            onCancel: () => {}
-          });
-          Cookies.remove('session_key');
-          setTimeout(() => {
-            router.push('/login');
-          }, 1000);
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          onConfirm: closeAlert,
+          onCancel: () => {}
+        });
+        Cookies.remove('session_key');
+        setTimeout(() => {
+          router.push('/login');
+        }, 1000);
       } else {
-          showAlert('발신번호 수정 중 오류가 발생했습니다: ' + error.message);
+        showAlert('발신번호 수정 중 오류가 발생했습니다: ' + error.message);
       }
     }
-  })
+  });
 
   useEffect(() => {
     fetchCallingNumbers({
@@ -198,7 +206,7 @@ function CampaignLayout() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowDown') {
-        handleReset();
+        handleNew();
       }
     };
 
@@ -207,7 +215,34 @@ function CampaignLayout() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []); 
+  }, []);
+  
+  // 목록 새로고침 후 현재 선택된 캠페인 정보를 유지하는 useEffect 추가
+  useEffect(() => {
+    // callingNumbers가 업데이트되고 selectedCampaignId가 있을 때
+    if (selectedCampaignId && !isNewMode) {
+      const campaignIdNum = Number(selectedCampaignId);
+      
+      // 새로운 목록에서 현재 선택된 캠페인 찾기
+      const updatedCallingNumber = callingNumbers.find(
+        num => num.campaign_id === campaignIdNum
+      );
+      
+      if (updatedCallingNumber) {
+        // 발신번호 업데이트
+        setSelectedCallingNumber(updatedCallingNumber.calling_number);
+        
+        // 해당 행을 그리드에서 선택 상태로 유지
+        const campaign = campaigns.find(c => c.campaign_id === campaignIdNum);
+        if (campaign) {
+          setSelectedRow({
+            ...campaign,
+            calling_number: updatedCallingNumber.calling_number
+          });
+        }
+      }
+    }
+  }, [callingNumbers, selectedCampaignId, isNewMode, campaigns]);
 
   const updateCallingNumber = (campaignId: number) => {
     const callingNumber = callingNumbers.find(
@@ -257,13 +292,14 @@ function CampaignLayout() {
     .filter((row): row is GridRow => row !== null && row.calling_number !== ''); // 발신번호가 있는 행만 필터링
   }, [campaigns, callingNumbers]);
 
+  // 그리드 셀 클릭 핸들러
   const handleCellClick = (args: { row: GridRow }) => {
     setSelectedRow(args.row);
     setSelectedCampaign(args.row);
     setSelectedCampaignId(args.row.campaign_id.toString());
     setSelectedCampaignName(args.row.campaign_name);
-    updateCallingNumber(args.row.campaign_id);
-    setIsEditing(false); // 그리드 선택 시 편집 모드 비활성화
+    setSelectedCallingNumber(args.row.calling_number || '');
+    setIsNewMode(false); // 그리드 선택 시 신규 모드 해제
   };
 
   const getRowClass = (row: GridRow) => {
@@ -307,10 +343,10 @@ function CampaignLayout() {
 
     if (existingCallingNumber) {
       fetchCallingNumberUpdate(saveRequest);
-      showAlert('발신번호가 성공적으로 수정되었습니다.');
+      // showAlert은 mutate의 onSuccess에서 처리
     } else {
       fetchCallingNumberInsert(saveRequest);
-      showAlert('새로운 발신번호가 성공적으로 저장되었습니다.');
+      // showAlert은 mutate의 onSuccess에서 처리
     }
   };
 
@@ -347,21 +383,33 @@ function CampaignLayout() {
               setSelectedCampaignId('');
               setSelectedCampaignName('');
               setSelectedCallingNumber('');
-              setIsEditing(true);
+              setIsNewMode(true); // 삭제 후 신규 모드로 변경
             }
           }
         );
       }
     );
-  }
+  };
 
-  const handleReset = () => {
+  // 신규 버튼 핸들러
+  const handleNew = () => {
     setSelectedRow(null);
     setSelectedCampaign(null);
     setSelectedCampaignId('');
     setSelectedCampaignName('');
     setSelectedCallingNumber('');
-    setIsEditing(true); // 신규 버튼 클릭 시 편집 모드 활성화
+    setIsNewMode(true); // 신규 모드 활성화
+  };
+
+  // 필드 비활성화 여부를 결정하는 함수
+  const isCampaignFieldDisabled = () => {
+    // 신규 모드가 아니면 캠페인 필드 비활성화
+    return !isNewMode;
+  };
+
+  const isCallingNumberDisabled = () => {
+    // 캠페인이 선택되지 않았으면 발신번호 필드 비활성화
+    return !selectedCampaignId;
   };
 
   return (
@@ -393,22 +441,14 @@ function CampaignLayout() {
               type="text" 
               value={selectedCampaignId}
               readOnly
-              disabled={!isEditing}
+              disabled={isCampaignFieldDisabled()}
               className="w-[140px]"
             />
             <CommonButton 
               variant="outline" 
               size="sm"
-              onClick={() => {
-                // 모달 열기 전 상세 정보 초기화
-                setSelectedRow(null);
-                setSelectedCampaign(null);
-                setSelectedCampaignId('');
-                setSelectedCampaignName('');
-                setSelectedCallingNumber('');
-                setIsModalOpen(true);
-              }}
-              disabled={!isEditing}
+              onClick={() => setIsModalOpen(true)}
+              disabled={isCampaignFieldDisabled()}
             >
               캠페인조회
             </CommonButton>
@@ -416,7 +456,7 @@ function CampaignLayout() {
               type="text" 
               value={selectedCampaignName} 
               readOnly 
-              disabled={!isEditing}
+              disabled={isCampaignFieldDisabled()}
               className=""
             />
           </div>
@@ -428,14 +468,14 @@ function CampaignLayout() {
               type="text" 
               value={selectedCallingNumber}
               onChange={(e) => setSelectedCallingNumber(e.target.value)}
-              readOnly={!selectedCampaignId}
+              disabled={isCallingNumberDisabled()}
               className=""
             />
           </div>
 
           {/* 버튼 영역 */}
           <div className="flex justify-end gap-2 pt-4">
-            <CommonButton onClick={handleReset}>
+            <CommonButton onClick={handleNew}>
               신규
             </CommonButton>
             <CommonButton onClick={handleSave}>
@@ -464,12 +504,12 @@ function CampaignLayout() {
         onSelect={handleModalSelect}
       />
       <CustomAlert
-          isOpen={alertState.isOpen}
-          message={alertState.message}
-          title={alertState.title}
-          type={alertState.type}
-          onClose={alertState.onConfirm}
-          onCancle={alertState.onCancel}
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        title={alertState.title}
+        type={alertState.type}
+        onClose={alertState.onConfirm}
+        onCancle={alertState.onCancel}
       />
     </div>
   );
