@@ -75,6 +75,8 @@
 //   }, [tenantId, onEvent]);
 // };
 
+"use client";
+
 import { useState, useEffect, useCallback } from 'react';
 import { isEqual } from 'lodash';
 import { useAuthStore, useMainStore } from '@/store';
@@ -207,47 +209,34 @@ export const useSseSubscribe = (): UseSseSubscribeReturn => {
     }
   }, [campaigns, queryClient, tenant_id, role_id, useAlramPopup, fetchMain]);
 
-  // SSE 구독 설정
+  // SSE 연결 및 재연결 로직
   useEffect(() => {
-    const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-    const eventSource = new EventSource(
-      `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
-    );
+    let eventSource: EventSource | null = null;
+    let retryTimeout: ReturnType<typeof setTimeout>;
 
-    let data: any = {};
-    let announce = "";
-    let command = "";
-    let kind = "";
+    const connectSSE = () => {
+      const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+      eventSource = new EventSource(
+        `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
+      );
 
-    // 연결 시 처리
-    eventSource.addEventListener("open", () => {
-      console.log("SSE connection opened");
-      setIsConnected(true);
-    });
-
-    eventSource.addEventListener("message", (event) => {
-      console.log("sse event message = ", event.data);
-      
-      // Connected!! 메시지 처리
-      if (event.data === "Connected!!") {
-        console.log("SSE Connected successfully");
+      eventSource.addEventListener("open", () => {
+        console.log("SSE connection opened");
         setIsConnected(true);
-        return;
-      }
-      
-      try {
-        const tempEventData = JSON.parse(event.data);
-        if (
-          announce !== tempEventData["announce"] ||
-          !isEqual(data, tempEventData.data) ||
-          !isEqual(data, tempEventData["data"]) ||
-          kind !== tempEventData["kind"]
-        ) {
-          announce = tempEventData["announce"];
-          command = tempEventData["command"];
-          data = tempEventData["data"];
-          kind = tempEventData["kind"];
+      });
 
+      eventSource.addEventListener("message", (event) => {
+        console.log("sse event message = ", event.data);
+
+        // Connected!! 메시지 처리
+        if (event.data === "Connected!!") {
+          console.log("SSE Connected successfully");
+          setIsConnected(true);
+          return;
+        }
+
+        try {
+          const tempEventData = JSON.parse(event.data);
           footerDataSet(
             tempEventData["announce"],
             tempEventData["command"],
@@ -255,23 +244,34 @@ export const useSseSubscribe = (): UseSseSubscribeReturn => {
             tempEventData["kind"],
             tempEventData
           );
+        } catch (err) {
+          console.error('Error processing SSE event:', err);
         }
-      } catch (err) {
-        console.error('Error processing SSE event:', err);
-      }
-    });
+      });
 
-    // 에러 처리 추가
-    eventSource.addEventListener("error", (err) => {
-      console.error('SSE connection error:', err);
-      setIsConnected(false);
-      
-      // 재연결 시도 로직
-      // 필요한 경우 여기에 재연결 로직 구현
-    });
+      eventSource.addEventListener("error", (err) => {
+        console.error('SSE connection error:', err);
+        setIsConnected(false);
+        if (eventSource) {
+          eventSource.close();
+        }
+        // 재연결 시도 로직: 5초 후 재연결
+        retryTimeout = setTimeout(() => {
+          console.log("Reconnecting SSE...");
+          connectSSE();
+        }, 5000);
+      });
+    };
 
+    // 최초 연결
+    connectSSE();
+
+    // 컴포넌트 언마운트 시 정리
     return () => {
-      eventSource.close();
+      if (eventSource) {
+        eventSource.close();
+      }
+      clearTimeout(retryTimeout);
       setIsConnected(false);
     };
   }, [tenant_id, role_id, footerDataSet]);
