@@ -1,4 +1,4 @@
-// CustomToast.tsx - 수정 버전
+// CustomToast.tsx - 최종 수정 버전
 import React, { Fragment, useState, useEffect } from 'react';
 import { Transition } from '@headlessui/react';
 import { CheckCircle, AlertCircle, Info, AlertTriangle, X, User } from 'lucide-react';
@@ -28,6 +28,8 @@ export interface ToastMessage {
 // 커스텀 이벤트 인터페이스 정의
 interface ToastEventDetail {
   toast: ToastMessage;
+  action?: 'add' | 'remove';
+  id?: string;
 }
 
 // 토스트 이벤트를 위한 타입 정의
@@ -68,12 +70,14 @@ const defaultColors: Record<ToastType, ToastColors> = {
   },
 };
 
-// 글로벌 토스트 상태 (싱글톤 패턴)
+// 글로벌 토스트 상태 관리를 위한 콜백 함수들
 let toastUpdateCallback: ((toast: ToastMessage) => void) | null = null;
+let toastRemoveCallback: ((id: string) => void) | null = null;
 
 // 토스트 컴포넌트
 const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
   const { id, type, message, duration = 5000, colors } = toast;
+  const [isVisible, setIsVisible] = useState(true);
 
   // 타입별 스타일 및 아이콘 설정
   const config = {
@@ -116,11 +120,29 @@ const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
     bgColorClass = `bg-gradient-to-br ${gradientFrom} ${gradientTo}`;
   }
 
+  // 닫기 핸들러
+  const handleClose = (e: React.MouseEvent) => {
+    // 이벤트 버블링 방지
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('Close button clicked for toast:', id);
+    setIsVisible(false);
+    
+    // 애니메이션 완료 후 onClose 호출
+    setTimeout(() => {
+      onClose(id);
+    }, 200); // 트랜지션 시간에 맞춰 설정
+  };
+
   // 자동 닫힘 타이머
   useEffect(() => {
     if (duration) {
       const timer = setTimeout(() => {
-        onClose(id);
+        setIsVisible(false);
+        setTimeout(() => {
+          onClose(id);
+        }, 200);
       }, duration);
 
       return () => {
@@ -132,7 +154,7 @@ const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
   return (
     <Transition
       appear
-      show={true}
+      show={isVisible}
       as={Fragment}
       enter="transform ease-out duration-300 transition"
       enterFrom="translate-y-2 opacity-0"
@@ -146,7 +168,7 @@ const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
           ${bgColorClass}
           shadow-md rounded-lg max-w-xs w-56 mb-3
           transform transition-all duration-300 ease-in-out
-          overflow-hidden
+          overflow-hidden pointer-events-auto
         `}
         style={{ height: 'auto', maxHeight: '6rem' }} // 높이 조절
       >
@@ -161,9 +183,10 @@ const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
             </span>
           </div>
           <button
-            onClick={() => onClose(id)}
-            className={`${textColor} hover:opacity-80 focus:outline-none mr-1`}
+            onClick={handleClose}
+            className={`${textColor} hover:opacity-80 focus:outline-none mr-1 p-1 z-10`}
             type="button"
+            aria-label="Close notification"
           >
             <X size={14} />
           </button>
@@ -185,20 +208,31 @@ export const ToastContainer: React.FC = () => {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   const removeToast = (id: string) => {
+    console.log('Removing toast:', id);
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   };
 
   // 토스트 추가 함수
   const addToast = (toast: ToastMessage) => {
-    setToasts((prev) => [toast, ...prev.slice(0, 4)]); // 최대 5개만 표시
+    console.log('Adding toast:', toast.id);
+    setToasts((prev) => {
+      // 중복 ID 확인
+      const exists = prev.some(t => t.id === toast.id);
+      if (exists) {
+        return prev; // 중복된 ID가 있으면 상태를 변경하지 않음
+      }
+      return [toast, ...prev.slice(0, 4)]; // 최대 5개만 표시
+    });
   };
 
   // 싱글톤 콜백 설정
   useEffect(() => {
     toastUpdateCallback = addToast;
+    toastRemoveCallback = removeToast;
     
     return () => {
       toastUpdateCallback = null;
+      toastRemoveCallback = null;
     };
   }, []);
 
@@ -206,8 +240,12 @@ export const ToastContainer: React.FC = () => {
   useEffect(() => {
     const handleToast = (event: Event) => {
       const customEvent = event as CustomToastEvent;
-      if (customEvent.detail && customEvent.detail.toast) {
-        addToast(customEvent.detail.toast);
+      if (customEvent.detail) {
+        if (customEvent.detail.action === 'remove' && customEvent.detail.id) {
+          removeToast(customEvent.detail.id);
+        } else if (customEvent.detail.toast) {
+          addToast(customEvent.detail.toast);
+        }
       }
     };
 
@@ -258,19 +296,44 @@ const createToast = (
   // 직접 콜백으로 등록 (가장 안정적인 방법)
   if (toastUpdateCallback) {
     toastUpdateCallback(toast);
-    return;
+    return toast.id; // ID 반환
   }
 
   // 백업 방식: 커스텀 이벤트 발생시켜 토스트 생성
   try {
     const toastEvent = new CustomEvent('toast-message', {
-      detail: { toast },
+      detail: { toast, action: 'add' },
+      bubbles: true,
+      composed: true
+    });
+    window.dispatchEvent(toastEvent);
+    return toast.id; // ID 반환
+  } catch (err) {
+    console.error('Failed to dispatch toast event:', err);
+    return null;
+  }
+};
+
+// 수동으로 토스트 제거하는 함수 추가
+const removeToast = (id: string) => {
+  console.log('Manual toast remove called with ID:', id);
+  
+  // 콜백 함수가 있으면 직접 호출
+  if (toastRemoveCallback) {
+    toastRemoveCallback(id);
+    return;
+  }
+
+  // 백업 방식: 커스텀 이벤트 발생
+  try {
+    const toastEvent = new CustomEvent('toast-message', {
+      detail: { action: 'remove', id },
       bubbles: true,
       composed: true
     });
     window.dispatchEvent(toastEvent);
   } catch (err) {
-    console.error('Failed to dispatch toast event:', err);
+    console.error('Failed to dispatch toast remove event:', err);
   }
 };
 
@@ -286,6 +349,13 @@ export const toast = {
     createToast('warning', message, options),
   event: (message: string, options?: CreateToastOptions) => 
     createToast('event', message, options),
+  remove: (id: string) => removeToast(id), // 수동 제거 메소드 추가
+};
+
+// 테스트용 토스트 생성 함수 (개발 환경에서만 사용)
+export const testToast = () => {
+  const id = toast.event('이것은 테스트 토스트입니다. 닫기 버튼을 눌러보세요.', { duration: 10000 });
+  console.log('Created test toast with ID:', id);
 };
 
 // 앱 시작 시 토스트 컨테이너 생성
