@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import DataGrid from "react-data-grid";
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
-import { useMainStore, useCampainManagerStore } from '@/store';
+import { useMainStore, useCampainManagerStore, useAuthStore } from '@/store';
 import CampaignModal from '../CampaignModal';
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
 
@@ -27,6 +27,7 @@ const errorMessage = {
 };
 
 function CampaignLayout() {
+  const { tenant_id } = useAuthStore();
   const { campaigns, setSelectedCampaign } = useMainStore();
   const { callingNumbers, setCallingNumbers } = useCampainManagerStore();
   
@@ -114,7 +115,7 @@ function CampaignLayout() {
     onSuccess: (data) => {
       fetchCallingNumbers({
         session_key: '',
-        tenant_id: 0,
+        tenant_id: tenant_id,
       });
       // 신규 모드 해제하고 선택 상태 유지
       setIsNewMode(false);
@@ -144,7 +145,7 @@ function CampaignLayout() {
     onSuccess: (data) => {
       fetchCallingNumbers({
         session_key: '',
-        tenant_id: 0,
+        tenant_id: tenant_id,
       });
       // 신규 모드 해제하고 선택 상태 유지
       setIsNewMode(false);
@@ -174,7 +175,7 @@ function CampaignLayout() {
     onSuccess: (data) => {
       fetchCallingNumbers({
         session_key: '',
-        tenant_id: 0,
+        tenant_id: tenant_id,
       });
     },
     onError: (error) => {
@@ -199,7 +200,7 @@ function CampaignLayout() {
   useEffect(() => {
     fetchCallingNumbers({
       session_key: '',
-      tenant_id: 0,
+      tenant_id: tenant_id,
     });
   }, [fetchCallingNumbers]);
 
