@@ -999,7 +999,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
       // }
       setSelectedCampaign(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
       setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
-      // setCampaignInfoChangeYn(true);
+      setCampaignInfoChangeYn(true);
       // if( rtnMessage !== ''){
         setRtnMessage('');        
       //   setAlertState({
@@ -1010,8 +1010,15 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
       //     onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       //   });
       // }else{
-        removeTab(Number(activeTabId), activeTabKey + '');
+        // removeTab(Number(activeTabId), activeTabKey + '');
       // }
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '작업이 완료되었습니다.',
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+      });
     }
   });
 
@@ -1241,7 +1248,14 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
               session_key: '',
               tenant_id: 0,
             });
-            removeTab(Number(activeTabId), activeTabKey + '');
+            // removeTab(Number(activeTabId), activeTabKey + '');
+            setAlertState({
+              ...errorMessage,
+              isOpen: true,
+              message: '작업이 완료되었습니다.',
+              type: '2',
+              onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+            });
           }
         } else {
           //캠페인관리 화면 닫기.
@@ -1249,7 +1263,14 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
             session_key: '',
             tenant_id: 0,
           });
-          removeTab(Number(activeTabId), activeTabKey + '');
+          // removeTab(Number(activeTabId), activeTabKey + '');
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: '작업이 완료되었습니다.',
+            type: '2',
+            onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+          });
         }
       } else {
         //캠페인관리 화면 닫기.
@@ -1257,7 +1278,14 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
           session_key: '',
           tenant_id: 0,
         });
-        removeTab(Number(activeTabId), activeTabKey + '');
+        // removeTab(Number(activeTabId), activeTabKey + '');
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: '작업이 완료되었습니다.',
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+        });
       }
     },onError: (data) => {
       // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
@@ -1266,7 +1294,14 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
         session_key: '',
         tenant_id: 0,
       });
-      removeTab(Number(activeTabId), activeTabKey + '');
+      // removeTab(Number(activeTabId), activeTabKey + '');
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '작업이 완료되었습니다.',
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+      });
     }
   });
 
@@ -1278,7 +1313,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
         session_key: '',
         tenant_id: 0,
       });
-      removeTab(Number(activeTabId), activeTabKey + '');
+      // removeTab(Number(activeTabId), activeTabKey + '');
     }
   });
 

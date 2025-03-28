@@ -226,8 +226,10 @@ export const processEventMessage = (
   // 캠페인수정>동작시간 추가
   else if (announce === '/pds/campaign/schedule') {
     message = '캠페인 스케쥴';
+    const tempCampaign = campaigns.filter((campaign) => campaign && campaign.campaign_id === Number(data['campaign_id']));
+    const campaignName = tempCampaign && tempCampaign.length > 0 ? tempCampaign[0].campaign_name : '';
     if (command === 'INSERT') {
-      message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'];
+      message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + campaignName;
     } else {
       message = '';
     }
