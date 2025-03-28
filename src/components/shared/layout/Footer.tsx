@@ -185,9 +185,9 @@ export default function Footer({
   onResizeStart,
   onResizeEnd
 }: FooterProps) {
+  // 모든 상태는 컴포넌트 최상위 레벨에서 선언
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-  const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
   const [currentHeight, setCurrentHeight] = useState(footerHeight);
   const [previousHeight, setPreviousHeight] = useState(footerHeight);
   const [autoAdjustHeight, setAutoAdjustHeight] = useState(false);
@@ -196,6 +196,7 @@ export default function Footer({
   // useSseSubscribe 훅 사용 - 항상 최상위 레벨에서만 호출
   const { footerDataList, clearAllMessages, isConnected, forceReconnect } = useSseSubscribe();
 
+  // Toast 컨테이너 초기화
   useEffect(() => {
     const toastContainer = document.getElementById('headless-toast-container');
     if (!toastContainer) {
@@ -236,160 +237,40 @@ export default function Footer({
   }, [footerDataList.length, autoAdjustHeight, isDrawerOpen, onResizeHeight]);
 
   // 열기/닫기
-  const toggleDrawer = () => {
-    const newState = !isDrawerOpen;
-    setIsDrawerOpen(newState);
-    if (onToggleDrawer) {
-      onToggleDrawer(newState);
-    }
-  };
-
-  // 캠페인 정보 조회 api 호출
-  const { mutate: fetchMain } = useApiForMain({
-    onSuccess: (data) => {
-      setCampaigns(data.result_data);
-    }
-  });
-
-  // 유틸리티 함수를 사용하여 이벤트 처리
-  const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, tempEventData: any): void => {
-    console.log("footerDataSet announce = ", announce);
-    console.log("footerDataSet command = ", command);
-    console.log("footerDataSet data = ", data);
-    console.log("footerDataSet kind = ", kind);
-    console.log("footerDataSet tempEventData = ", tempEventData);
-
-    // 유틸리티 함수 호출하여 이벤트 처리 결과 가져오기
-    const result = processEventMessage(
-      announce,
-      command,
-      data,
-      kind,
-      campaigns,
-      queryClient,
-      tenant_id,
-      role_id
-    );
-
-    // Footer 데이터 업데이트
-    if (result.messageList && result.messageList.length > 0) {
-      setFooterDataList((prev) => [
-        ...result.messageList,
-        ...prev.slice(0, Math.max(0, 10 - result.messageList.length))
-      ]);
-    }
-
-    // 토스트 알림 처리 - useAlramPopup이 1일 경우에만
-    if (useAlramPopup === 1 && result.toastMessage) {
-      try {
-        setTimeout(() => {
-          toast.event(
-            result.toastMessage,
-            {
-              colors: themeColors.event,
-              duration: 5000
-            }
-          );
-          console.log('Toast message triggered:', result.toastMessage);
-        }, 0);
-      } catch (err) {
-        console.error('Error showing toast:', err);
+  const toggleDrawer = useCallback(() => {
+    setIsDrawerOpen(prevState => {
+      const newState = !prevState;
+      if (onToggleDrawer) {
+        onToggleDrawer(newState);
       }
-    }
-
-    // 필요한 경우 캠페인 정보 다시 가져오기
-    if (result.shouldFetchMain) {
-      fetchMain({
-        session_key: '',
-        tenant_id: tenant_id,
-      });
-    }
-
-    // 장비 상태 변경 이벤트 처리
-    if (result.shouldFireDeviceEvent && result.deviceEventDetails) {
-      const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
-        detail: {
-          device_id: result.deviceEventDetails.device_id,
-          device_status: result.deviceEventDetails.device_status
-        }
-      });
-      window.dispatchEvent(deviceStatusEvent);
-    }
-  }, [campaigns, queryClient, tenant_id, role_id, useAlramPopup, fetchMain]);
-
-  // SSE 구독
-  useEffect(() => {
-    const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-    const eventSource = new EventSource(
-      `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
-    );
-
-    let data: any = {};
-    let announce = "";
-    let command = "";
-    let kind = "";
-
-    eventSource.addEventListener("message", (event) => {
-      console.log("footer sse event = ", event.data);
-      if (event.data !== "Connected!!") {
-        try {
-          const tempEventData = JSON.parse(event.data);
-          if (
-            announce !== tempEventData["announce"] ||
-            !isEqual(data, tempEventData.data) ||
-            !isEqual(data, tempEventData["data"]) ||
-            kind !== tempEventData["kind"]
-          ) {
-            announce = tempEventData["announce"];
-            command = tempEventData["command"];
-            data = tempEventData["data"];
-            kind = tempEventData["kind"];
-
-            footerDataSet(
-              tempEventData["announce"],
-              tempEventData["command"],
-              tempEventData["data"],
-              tempEventData["kind"],
-              tempEventData
-            );
-          }
-        } catch (err) {
-          console.error('Error processing SSE event:', err);
-        }
-      }
+      return newState;
     });
+  }, [onToggleDrawer]);
 
-    // 에러 처리 추가
-    eventSource.addEventListener("error", (err) => {
-      console.error('SSE connection error:', err);
-      // 재연결 시도 (선택적)
-    });
-
-    return () => {
-      eventSource.close();
-    };
-  }, [tenant_id, role_id, footerDataSet]);
-
-  // 높이 변경 핸들러
-  const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
+  // 높이 변경 핸들러 - 메모이제이션하여 성능 최적화
+  const handleResizeStop = useCallback((e: MouseEvent | TouchEvent, direction: string, ref: HTMLElement, d: { height: number; width: number }) => {
     const newHeight = currentHeight + d.height;
     setCurrentHeight(newHeight);
-
+    
+    // 수동으로 높이 변경 시 자동 조정 모드 비활성화
+    if (autoAdjustHeight) {
+      setAutoAdjustHeight(false);
+    }
+    
     if (onResizeHeight) {
       onResizeHeight(newHeight);
     }
-
+    
     if (onResizeEnd) {
       onResizeEnd(newHeight);
     }
-  };
+  }, [currentHeight, autoAdjustHeight, onResizeHeight, onResizeEnd]);
 
-  useEffect(() => {
-    if (campaigns && campaigns.length === 0) {
-      fetchMain({
-        session_key: '',
-        tenant_id: tenant_id,
-      });
+  // 리사이즈 중 매 프레임마다 높이 업데이트 (드래그 중 실시간 반영)
+  const handleResize = useCallback((e: MouseEvent | TouchEvent, direction: string, ref: HTMLElement) => {
+    const height = parseInt(ref.style.height, 10);
+    if (onResizeHeight) {
+      onResizeHeight(height);
     }
   }, [onResizeHeight]);
   
@@ -495,10 +376,11 @@ export default function Footer({
         topLeft: false
       }}
       className={`
-        border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col duration-300 ease-in-out group relative h-[1px] before:content-[''] before:absolute hover:before:bg-[#5BC2C1]
+        border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col group relative h-[1px] before:content-[''] before:absolute hover:before:bg-[#5BC2C1]
         ${isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative"}
       `}
       onResizeStart={onResizeStart}
+      onResize={handleResize}
       onResizeStop={handleResizeStop}
     >
       {/* 상단 바 영역 */}
@@ -540,26 +422,28 @@ export default function Footer({
           )}
         </div>
 
-        <div className="flex items-center gap-[5px]">
+        <div className="flex items-center">
           {/* 모든 알림 삭제 버튼 */}
-          <CommonMiniButton
+          <button
             onClick={clearAllMessages}
             title="모든 알림 삭제"
+            className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded"
           >
-            <Trash className="w-4 h-4" />
-          </CommonMiniButton>
+            <Trash size={14} />
+          </button>
 
           {/* 열기/닫기 버튼 */}
-          <CommonMiniButton
+          <button
             onClick={toggleDrawer}
             title={isDrawerOpen ? "닫기" : "열기"}
+            className="p-1 ml-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded"
           >
             {isDrawerOpen ? (
-              <ChevronDown className="w-4 h-4" />
+              <ChevronDown size={14} />
             ) : (
-              <ChevronUp className="w-4 h-4" />
+              <ChevronUp size={14} />
             )}
-          </CommonMiniButton>
+          </button>
         </div>
       </div>
 
