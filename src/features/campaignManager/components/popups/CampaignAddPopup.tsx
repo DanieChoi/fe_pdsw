@@ -57,8 +57,7 @@ const CampaignAddPopup: React.FC<Props> = ({
   const [skillLookup, setSkillLookup] = useState<Record<number, SkillInfo>>({});
   const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
 
-  const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions
-    , campaignGroupManagerInit, setCampaignGroupManagerInit } = useCampainManagerStore();  
+  const { setCampaignGroupManagerInit } = useCampainManagerStore();  
 
   // ----------------------------
   //  Hooks
@@ -466,6 +465,8 @@ const CampaignAddPopup: React.FC<Props> = ({
           setShowAlert(false);
           setConfirmRemove(false);
           setSelectedRightCampaigns([]);
+          refetchTreeDataForCampaignGroupTab();
+          setCampaignGroupManagerInit(true);
         },
         onError: (error) => {
           console.error('캠페인 제거 중 오류 발생:', error);
