@@ -30,7 +30,10 @@ const useApiForCampaignListDelete = (
           },
           onCancle: () => {
             // 사용자가 취소를 누르면 작업 취소
-            reject(new Error('사용자가 삭제를 취소했습니다.'));
+            toast.info('캠페인 리스트 삭제가 취소되었습니다.', {
+              autoClose: 3000
+            });
+            // reject(new Error('사용자가 삭제를 취소했습니다.'));
           }
         });
       });
