@@ -173,13 +173,13 @@ const ChannelMonitor: React.FC = () => {
         CHNO: `CH${item.id}`,
         status: item.state === '0' ? 'NONE' : item.state === '1' ? 'IDLE' : 'BUSY' as ChannelStatus,
         ChannelMode: item.assign_kind,
-        campaignMode: item.assign_kind === '0' ? item.dial_mode === '2147483647' ? '모든캠페인사용' : item.dial_mode === '0' ?'회선사용안함':item.dial_mode : '', 
-        callMode: item.assign_kind === '1' ?item.dial_mode === '2147483647' ? '발신방법모두사용':item.dial_mode:'',
+        campaignMode: item.assign_kind === '1' ? item.dial_mode === '2147483647' ? '모든캠페인사용' : item.dial_mode === '0' ?'회선사용안함':item.dial_mode : '', 
+        callMode: item.assign_kind === '2' ?item.dial_mode === '2147483647' ? '발신방법모두사용':item.dial_mode:'',
         channelGroupMode: item.assign_kind === '3' ? item.dial_mode === '2147483647' ? '모든그룹아이디사용' : item.dial_mode === '0' ?'회선사용안함':item.dial_mode : '',
       }));
       setChannelData(dataList);  
 
-      const dataCampaignList = data.dialerChannelStatusList.filter(item => item.assign_kind === '0' && !(item.dial_mode == '0' || item.dial_mode == '2147483647') );
+      const dataCampaignList = data.dialerChannelStatusList.filter(item => item.assign_kind === '1' && !(item.dial_mode == '0' || item.dial_mode == '2147483647') );
       if( dataCampaignList.length > 0){
         const tempData: ItemType[] = dataCampaignList.map(item => ({
           key: `${item.dial_mode}`,
