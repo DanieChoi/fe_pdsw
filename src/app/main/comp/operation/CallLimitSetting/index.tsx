@@ -112,10 +112,17 @@ const CampaignSettings = () => {
   // 제한건수 추가 API 
   const { mutate: createCallLimitSetting } = useApiForCallLimitSettingCreate({
     onSuccess: () => {
+      // 저장 성공 후 리스트를 새로 가져오기
       fetchCallLimitSettingList({
         tenant_id_array: tenants.map(tenant => tenant.tenant_id)
       });
-      setIsNewMode(false); // 저장 후 신규 모드 해제
+      
+      // 저장 후에도 현재 선택된 캠페인 정보 유지
+      // 신규 모드는 해제하지만, 선택 상태는 유지
+      setIsNewMode(false);
+      
+      // 저장 성공 메시지 표시
+      showAlert('저장되었습니다.');
     },
     onError: (error) => {
       if (error.message.split('||')[0] === '5') {
@@ -143,6 +150,7 @@ const CampaignSettings = () => {
         tenant_id_array: tenants.map(tenant => tenant.tenant_id)
       });
       setIsNewMode(false); // 수정 후 신규 모드 해제
+      showAlert('수정되었습니다.');
     },
     onError: (error) => {
       if (error.message.split('||')[0] === '5') {
@@ -190,6 +198,37 @@ const CampaignSettings = () => {
     }
   });
 
+  // API 호출 후에 새로 가져온 데이터에서 현재 캠페인을 찾아 선택 상태로 설정
+  const updateSelectionAfterAPICall = () => {
+    // API 호출 후 새로 불러온 데이터에서 현재 선택된 캠페인ID에 해당하는 항목을 찾음
+    const updatedSetting = limitSettings.find(
+      setting => setting.campaign_id === Number(campaignId)
+    );
+    
+    if (updatedSetting) {
+      const campaign = campaigns?.find(
+        camp => camp.campaign_id === updatedSetting.campaign_id
+      );
+      
+      // 찾은 데이터로 선택 상태 업데이트
+      setSelectedRow({
+        campaign_id: updatedSetting.campaign_id.toString(),
+        campaign_name: campaign?.campaign_name || '',
+        limit_number: updatedSetting.max_call.toString()
+      });
+      
+      // 제한건수도 최신 데이터로 업데이트
+      setLimitCount(updatedSetting.max_call.toString());
+    }
+  };
+
+  // useEffect 추가: limitSettings가 업데이트되면 선택 상태 업데이트
+  useEffect(() => {
+    if (campaignId && !isNewMode) {
+      updateSelectionAfterAPICall();
+    }
+  }, [limitSettings]);
+
   useEffect(() => {
     fetchCallLimitSettingList({
       tenant_id_array: tenants.map(tenant => tenant.tenant_id)
@@ -223,7 +262,7 @@ const CampaignSettings = () => {
       showAlert('모든 필드를 입력해주세요.');
       return;
     }
-
+  
     // 선택된 캠페인의 tenant_id 찾기
     const selectedCampaign = campaigns?.find(camp => camp.campaign_id === Number(campaignId));
     if (!selectedCampaign) {
@@ -242,11 +281,11 @@ const CampaignSettings = () => {
     if (selectedRow) {
       // 수정
       updateCallLimitSetting(saveData);
-      showAlert('수정되었습니다.')
+      // showAlert은 mutate의 onSuccess에서 처리
     } else {
       // 신규 등록
       createCallLimitSetting(saveData);
-      showAlert('저장되었습니다.');
+      // showAlert은 mutate의 onSuccess에서 처리
     }
   };
 
