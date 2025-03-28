@@ -61,14 +61,14 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
     onCancel: () => { }
   });
 
-  // 상태 초기화
-  const [refreshCycle, setRefreshCycle] = useState("5");
-  const [monitoringType, setMonitoringType] = useState("periodic");
-  const [retryCount, setRetryCount] = useState("30");
-  const [timeout, setCustomTimeout] = useState("100");
-  const [startTime, setStartTime] = useState("0000");
-  const [endTime, setEndTime] = useState("1300");
-  const [messageType, setMessageType] = useState("알림과 없음");
+  // 상태 초기화 - 기본값 없이 environmentData에서만 가져오도록 수정
+  const [refreshCycle, setRefreshCycle] = useState("");
+  const [monitoringType, setMonitoringType] = useState("");
+  const [retryCount, setRetryCount] = useState("");
+  const [timeout, setCustomTimeout] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [messageType, setMessageType] = useState("");
   const [personalCampaignAlertOnly, setPersonalCampaignAlertOnly] = useState(false);
   const [unusedWorkHoursCalc, setUnusedWorkHoursCalc] = useState(false);
   const [dayOfWeek, setDayOfWeek] = useState<string[]>(['f', 'f', 'f', 'f', 'f', 'f', 'f']);
@@ -77,7 +77,6 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
   const { activeTabId, activeTabKey, removeTab } = useTabStore();
-
 
   // 알림 유틸리티 함수
   const showAlert = (message: string) => {
@@ -112,12 +111,12 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
       if (environmentData) {
         const updatedData = {
           ...environmentData,
-          campaignListAlram: monitoringType === "periodic" ? 0 : 1,
+          campaignListAlram: monitoringType === "oneTime" ? 1 : 0,
           statisticsUpdateCycle: parseInt(retryCount),
           serverConnectionTime: parseInt(timeout),
           showChannelCampaignDayScop: parseInt(refreshCycle),
           personalCampaignAlertOnly: personalCampaignAlertOnly ? 1 : 0,
-          useAlramPopup: messageType === "알림과 없음" ? 0 : 1,
+          useAlramPopup: messageType === "알림만" ? 1 : 0,
           unusedWorkHoursCalc: unusedWorkHoursCalc ? 1 : 0,
           sendingWorkStartHours: startTime,
           sendingWorkEndHours: endTime,
@@ -125,9 +124,6 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
         };
         setEnvironment(updatedData);
       }
-
-      // 저장 후 현재 탭 닫기
-      // closeCurrentTab();
     },
     onError: (error) => {
       setIsSaving(false);
@@ -139,15 +135,15 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   useEffect(() => {
     if (environmentData) {
       // 환경설정 데이터에서 값 설정
-      setRefreshCycle(environmentData.showChannelCampaignDayScop.toString());
-      setMonitoringType(environmentData.campaignListAlram === 0 ? "periodic" : "oneTime");
-      setRetryCount(environmentData.statisticsUpdateCycle.toString());
-      setCustomTimeout(environmentData.serverConnectionTime.toString());
+      setRefreshCycle(environmentData.showChannelCampaignDayScop?.toString() || "");
+      setMonitoringType(environmentData.campaignListAlram === 1 ? "oneTime" : "periodic");
+      setRetryCount(environmentData.statisticsUpdateCycle?.toString() || "");
+      setCustomTimeout(environmentData.serverConnectionTime?.toString() || "");
       setPersonalCampaignAlertOnly(environmentData.personalCampaignAlertOnly === 1);
-      setMessageType(environmentData.useAlramPopup === 0 ? "알림과 없음" : "알림만");
+      setMessageType(environmentData.useAlramPopup === 1 ? "알림만" : "알림과 없음");
       setUnusedWorkHoursCalc(environmentData.unusedWorkHoursCalc === 1);
-      setStartTime(environmentData.sendingWorkStartHours);
-      setEndTime(environmentData.sendingWorkEndHours);
+      setStartTime(environmentData.sendingWorkStartHours || "");
+      setEndTime(environmentData.sendingWorkEndHours || "");
 
       // 요일 설정 파싱
       if (environmentData.dayOfWeekSetting) {
@@ -169,20 +165,25 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
 
   // 폼 제출 핸들러
   const handleSubmit = () => {
+    if (!environmentData) {
+      showAlert('환경설정 데이터를 불러올 수 없습니다.');
+      return;
+    }
+
     setIsSaving(true);
 
     // API 요청을 위한 데이터 형식으로 변환
     const requestData = {
       employeeId: userId,
-      campaignListAlram: monitoringType === "periodic" ? 0 : 1,
-      statisticsUpdateCycle: parseInt(retryCount),
-      serverConnectionTime: parseInt(timeout),
-      showChannelCampaignDayScop: parseInt(refreshCycle),
+      campaignListAlram: monitoringType === "oneTime" ? 1 : 0,
+      statisticsUpdateCycle: parseInt(retryCount) || environmentData.statisticsUpdateCycle,
+      serverConnectionTime: parseInt(timeout) || environmentData.serverConnectionTime,
+      showChannelCampaignDayScop: parseInt(refreshCycle) || environmentData.showChannelCampaignDayScop,
       personalCampaignAlertOnly: personalCampaignAlertOnly ? 1 : 0,
-      useAlramPopup: messageType === "알림과 없음" ? 0 : 1,
+      useAlramPopup: messageType === "알림만" ? 1 : 0,
       unusedWorkHoursCalc: unusedWorkHoursCalc ? 1 : 0,
-      sendingWorkStartHours: startTime,
-      sendingWorkEndHours: endTime,
+      sendingWorkStartHours: startTime || environmentData.sendingWorkStartHours,
+      sendingWorkEndHours: endTime || environmentData.sendingWorkEndHours,
       dayOfWeekSetting: dayOfWeek.join(',')
     };
 
@@ -226,7 +227,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   <Label className="w-32">일람설정</Label>
                 </TableHeader>
                 <TableCell className="w-[17rem]">
-                  <CommonRadio defaultValue={monitoringType} onValueChange={setMonitoringType} className="flex gap-8">
+                  <CommonRadio value={monitoringType} onValueChange={setMonitoringType} className="flex gap-8">
                     <div className="flex items-center space-x-2">
                       <CommonRadioItem value="oneTime" id="oneTime" />
                       <Label htmlFor="oneTime">한번만</Label>
@@ -313,7 +314,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   <div className="flex items-center gap-3">
                     <Select value={messageType} onValueChange={setMessageType}>
                       <SelectTrigger className="w-40">
-                        <SelectValue placeholder="알리지 않음" />
+                        <SelectValue placeholder="알림 설정" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="알림과 없음">알리지 않음</SelectItem>
