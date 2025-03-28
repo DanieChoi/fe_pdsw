@@ -72,6 +72,7 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
   const memoizedColumns = useMemo(() => columns, [columns]);
   const memoizedRows = useMemo(() => campaignGroupList || [], [campaignGroupList]);
   const memoizedDownDataRows = useMemo(() => groupCampaignListData || [], [groupCampaignListData]);
+  const [selectedGroupRow, setSelectedGroupRow] = useState<DataProps | null>(null);
     
   // 캠페인 소속 상담사 리스트 요청
   const { mutate: fetchCampaignAgents } = useApiForCampaignAgent({
@@ -128,16 +129,26 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
       }
       setTempCampaigns(_tempCampaignGroupList as unknown as DataProps[]);
       if( _tempCampaignGroupList.length > 0 ){
+        setSelectedGroupRow(_tempCampaignGroupList[0]);
         onGroupSelect(_tempCampaignGroupList[0].campaignGroupId.toString());
       }else{
+        setSelectedGroupRow(null);
         onGroupSelect('');
       }
     }else{
       setTempCampaigns(campaignGroupList as unknown as DataProps[]);
+      if( (campaignGroupList ?? []).length > 0 ){
+        if( selectedGroupRow != null){
+          onGroupSelect(selectedGroupRow.campaignGroupId.toString());
+        }else{
+          setSelectedGroupRow((campaignGroupList ?? [])[0]);
+        }
+      }
     }
   }, [campaignGroupHeaderSearchParam, campaignGroupList]);
 
   const handleCellClick = ({ row }: CellClickArgs<Row>) => {
+    setSelectedGroupRow(row);
     onGroupSelect(row.campaignGroupId.toString());
   };
   const handleDownCellClick = ({ row }: CellClickArgs<downDataProps>) => {
@@ -153,6 +164,10 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
     onSelectCampaignList(filteredSelection);
   };
 
+  const getGroupRowClass = (row: DataProps) => {
+    return selectedGroupRow?.campaignGroupId === row.campaignGroupId ? 'bg-[#FFFAEE]' : '';
+  };
+
   return (
     <div className="w-[40%] shrink-0">
       <TitleWrap title="캠페인 그룹 검색목록" totalCount={tempCampaigns.length} />
@@ -163,8 +178,10 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
             rows={tempCampaigns} 
             className="grid-custom" 
             rowHeight={30}
+            rowClass={getGroupRowClass}
             headerRowHeight={30}
             onCellClick={handleCellClick}
+            selectedRows={selectedGroupRow ? new Set<number>([selectedGroupRow.campaignGroupId]) : new Set<number>()}
             />
         </div>
       </div>
