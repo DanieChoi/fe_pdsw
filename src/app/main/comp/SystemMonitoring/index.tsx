@@ -88,15 +88,19 @@ const SystemMonitoring: React.FC = () => {
     onSuccess: (data: ApiResponse) => {
       // API 응답 데이터를 컴포넌트 데이터 형식으로 변환
       if (data && data.processStatusList && Array.isArray(data.processStatusList)) {
-        const formattedData: SystemData[] = data.processStatusList.map((item, index) => ({
-          id: index + 1,
-          title: item.name, // name을 title로 매핑
-          status: item.state === 1 ? "normal" : "abnormal", // state 1은 normal, 그 외는 abnormal
-          pdi: item.pid.toString(), // pid를 문자열로 변환하여 pdi에 매핑
-          time: item.time // time은 그대로 사용
-        }));
-        
-        setSystemsData(formattedData);
+        if (data.processStatusList.length === 0) {
+          setSystemsData([]);
+        } else {
+          const formattedData: SystemData[] = data.processStatusList.map((item, index) => ({
+            id: index + 1,
+            title: item.name, // name을 title로 매핑
+            status: item.state === 1 ? "normal" : "abnormal", // state 1은 normal, 그 외는 abnormal
+            pdi: item.pid.toString(), // pid를 문자열로 변환하여 pdi에 매핑
+            time: item.time // time은 그대로 사용
+          }));
+          
+          setSystemsData(formattedData);
+        }
       }
     },
     onError: (error) => {
@@ -115,16 +119,24 @@ const SystemMonitoring: React.FC = () => {
   }, [systemMonitoring,statisticsUpdateCycle]);
 
   return (
-    <div className="w-full limit-width grid grid-cols-3 grid-rows-3 gap-[30px]">
-      {systemsData.map((system) => (
-        <SystemCard
-          key={system.id}
-          title={system.title}
-          status={system.status}
-          pdi={system.pdi}
-          time={system.time}
-        />
-      ))}
+    <div className="w-full limit-width">
+      {systemsData.length > 0 ? (
+        <div className="grid grid-cols-3 grid-rows-3 gap-[30px]">
+          {systemsData.map((system) => (
+            <SystemCard
+              key={system.id}
+              title={system.title}
+              status={system.status}
+              pdi={system.pdi}
+              time={system.time}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex justify-center items-center h-[300px]">
+          <p className="text-lg text-gray-500">데이터가 없습니다</p>
+        </div>
+      )}
     </div>
   );
 };
