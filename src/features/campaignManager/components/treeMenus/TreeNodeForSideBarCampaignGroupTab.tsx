@@ -11,8 +11,6 @@ import { useTabStore } from "@/store/tabStore";
 import { useCampainManagerStore } from '@/store/campainManagerStore';
 import CampaignAddPopup from '@/features/campaignManager/components/popups/CampaignAddPopup';
 import { createPortal } from "react-dom";
-import { Button } from "@/components/ui/button";
-import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDialogForSideMenu";
 import IDialogForUpdateCampaignGroupName from "./dialog/IDialogForUpdateCampaignGroupName";
 import { toast } from "react-toastify";
 import { useApiForDeleteCampaignGroup } from "@/features/campaignManager/hooks/useApiForDeleteCampaignGroup";
@@ -66,8 +64,8 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const recentlyClosedDialogRef = useRef(false);
-  const { updateCampaignStatus, refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
-  const { campaignGroupManagerInit, setCampaignGroupManagerInit } = useCampainManagerStore();
+  const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
+  const { setCampaignGroupManagerInit } = useCampainManagerStore();
 
   const [isBrowser, setIsBrowser] = useState(false);
   useEffect(() => {
@@ -192,12 +190,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
         return <Building className="h-4 w-4 text-gray-500" />;
     }
   }, [node.type]);
-
-  useEffect(() => {
-    if (campaignGroupManagerInit) {
-      refetchTreeDataForCampaignGroupTab();
-    }
-  }, [campaignGroupManagerInit]);
 
   const renderAllDialogs = () => {
     if (!isBrowser) return null;
