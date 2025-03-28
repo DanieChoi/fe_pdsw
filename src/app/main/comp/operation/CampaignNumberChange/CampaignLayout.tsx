@@ -451,7 +451,7 @@ function CampaignLayout() {
               variant="outline" 
               size="sm"
               onClick={() => setIsModalOpen(true)}
-              disabled={isCampaignFieldDisabled()}
+              // disabled={isCampaignFieldDisabled()}
             >
               캠페인조회
             </CommonButton>
