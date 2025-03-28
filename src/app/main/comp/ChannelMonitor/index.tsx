@@ -5,6 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import 'react-data-grid/lib/styles.css';
 import { useApiForChannelStateMonitoringList } from '@/features/monitoring/hooks/useApiForChannelStateMonitoringList';
 import { useEnvironmentStore } from '@/store/environmentStore';
+import { useMainStore } from '@/store';
+import { useApiForDialingDevice, useApiForDialingDeviceCreate, useApiForDialingDeviceDelete, useApiForDialingDeviceUpdate } from '@/features/preferences/hooks/useApiForDialingDevice';
 
 type ChannelStatus = 'IDLE' | 'BUSY' | 'NONE';
 
@@ -16,6 +18,12 @@ interface ChannelData {
   campaignMode?: string;
   callMode?: string;
   channelGroupMode?:string;
+  ChannelMode:string;
+}
+
+interface ItemType {
+  key: string;
+  name: string;
 }
 
 type FilterMode = '전체' | '장비번호' | '캠페인 모드' | '발신 모드' | '채널 그룹 모드';
@@ -30,15 +38,10 @@ const secondModeAll = [
   {key:' ', name: '선택'},
 ];
 
-const secondModeEquipment = [
-  {key:' ', name: '전체장비'},
-  {key:'[1]IPPDS-148', name: '[1]IPPDS-148'},
-];
-
-const secondModeCampaign = [
-  {key:' ', name: '전체캠페인'},
+const secondModeCampaignGroup = [
+  {key:' ', name: '전체 채널그룹'},
   {key:'회선사용안함', name: '회선사용안함'},
-  {key:'모든캠페인사용', name: '모든캠페인사용'},
+  {key:'모든그룹아이디사용', name: '모든 그룹아이디 사용'},
 ];
 
 const secondModeSender = [
@@ -58,6 +61,10 @@ const ChannelMonitor: React.FC = () => {
   const [channelData, setChannelData] = useState<ChannelData[]>([]);
   const [filteredData, setFilteredData] = useState<ChannelData[]>([]);
   const { statisticsUpdateCycle } = useEnvironmentStore();
+  const { tenants, campaigns } = useMainStore();
+  const [ secondModeEquipment, setSecondModeEquipment ] = useState<ItemType[]>([]);
+  const [ secondModeCampaign, setSecondModeCampaign ] = useState<ItemType[]>([]);
+  const [ secondModeCampaignGroup, setSecondModeCampaignGroup ] = useState<ItemType[]>([]);
 
   // 첫 번째 Select의 옵션
   const firstSelectOptions = ['전체', '장비번호', '캠페인 모드', '발신 모드', '채널 그룹 모드'];
@@ -81,13 +88,13 @@ const ChannelMonitor: React.FC = () => {
 
   // 필터링 로직
   useEffect(() => {
-    let newData:ChannelData[] = channelData;
+    let newData:ChannelData[] = channelData.sort((a,b)=>(parseInt(a.CIDSNO) - parseInt(b.CIDSNO)));
     if( channelData.length > 0 ){
       if (firstSelect !== '전체') {
         if (secondSelect && secondSelect !== ' ') {
           switch (firstSelect) {
             case '장비번호':
-              // newData = channelData.filter(item => item.equipmentNo === secondSelect);
+              newData = channelData.filter(item => item.CIDSNO && item.CIDSNO === secondSelect);
               break;
             case '캠페인 모드':
               newData = channelData.filter(item => item.campaignMode === secondSelect);
@@ -95,12 +102,19 @@ const ChannelMonitor: React.FC = () => {
             case '발신 모드':
               newData = channelData.filter(item => item.callMode === secondSelect);
               break;
+            case '채널 그룹 모드':
+              newData = channelData.filter(item => item.channelGroupMode === secondSelect);
+              break;
           }
+        }else if(firstSelect === '캠페인 모드'){
+          newData = channelData.filter(item => item.campaignMode != '');
         }else if(firstSelect === '발신 모드'){
-          newData = channelData.filter(item => item.callMode === secondSelect);
+          newData = channelData.filter(item => item.callMode != '');
         }else if(firstSelect === '채널 그룹 모드'){
-          newData = channelData.filter(item => item.channelGroupMode === secondSelect);
+          newData = channelData.filter(item => item.channelGroupMode != '');
         }
+      }else{
+
       }
 
       if (thirdSelect !== '상태전체') {
@@ -155,24 +169,62 @@ const ChannelMonitor: React.FC = () => {
     onSuccess: (data) => {  
       const dataList = data.dialerChannelStatusList.sort((a, b) => parseInt(a.id) - parseInt(b.id))
       .map(item => ({
-        CIDSNO: '1',
+        CIDSNO: item.deviceId,
         CHNO: `CH${item.id}`,
         status: item.state === '0' ? 'NONE' : item.state === '1' ? 'IDLE' : 'BUSY' as ChannelStatus,
-        equipmentNo: '[1]]IPPDS-148',
-        campaignMode: item.assign_kind === '1' ? item.dial_mode === '2147483647' ? '모든캠페인사용' : item.dial_mode === '0' ?'회선사용안함':'' : '', 
-        callMode: item.assign_kind === '2' ?item.dial_mode === '2147483647' ? '발신방법모두사용':item.dial_mode:'',
-        channelGroupMode: item.assign_kind === '3' ? item.dial_mode === '2147483647' ? '모든캠페인사용' : item.dial_mode === '0' ?'회선사용안함':'' : ''
+        ChannelMode: item.assign_kind,
+        campaignMode: item.assign_kind === '0' ? item.dial_mode === '2147483647' ? '모든캠페인사용' : item.dial_mode === '0' ?'회선사용안함':item.dial_mode : '', 
+        callMode: item.assign_kind === '1' ?item.dial_mode === '2147483647' ? '발신방법모두사용':item.dial_mode:'',
+        channelGroupMode: item.assign_kind === '3' ? item.dial_mode === '2147483647' ? '모든그룹아이디사용' : item.dial_mode === '0' ?'회선사용안함':item.dial_mode : '',
       }));
+      setChannelData(dataList);  
 
-      setChannelData(dataList);      
+      const dataCampaignList = data.dialerChannelStatusList.filter(item => item.assign_kind === '0' && !(item.dial_mode == '0' || item.dial_mode == '2147483647') );
+      if( dataCampaignList.length > 0){
+        const tempData: ItemType[] = dataCampaignList.map(item => ({
+          key: `${item.dial_mode}`,
+          name: campaigns.filter(data => data.campaign_id === Number(item.dial_mode ))[0].campaign_name
+        }));
+        setSecondModeCampaign(tempData.sort((a,b) => parseInt(a.key) - parseInt(b.key)));
+      }
+      
+      const dataGroupList = data.dialerChannelStatusList.filter(item => item.assign_kind === '3' && !(item.dial_mode == '0' || item.dial_mode == '2147483647') );
+      if( dataGroupList.length > 0){
+        const tempData: ItemType[] = dataGroupList.map(item => ({
+          key: `${item.dial_mode}`,
+          name: campaigns.filter(data => data.campaign_id === Number(item.dial_mode ))[0].campaign_name
+        }));
+        setSecondModeCampaignGroup(tempData.sort((a,b) => parseInt(a.key) - parseInt(b.key)));
+      }
+      
     }
   });
 
-  useEffect(() => {    
-    fetchChannelStateMonitoringList({deviceId:0});
+  // 장비 목록 조회
+  const { mutate: fetchDialingDeviceList } = useApiForDialingDevice({
+      onSuccess: (data) => {
+        if( data.result_data.length > 0 ){
+          const tempData: ItemType[] = data.result_data.map(item => ({
+            key: `${item.device_id}`,
+            name: item.device_name
+          }));
+          setSecondModeEquipment(tempData);
+        }
+        fetchChannelStateMonitoringList({deviceId:0});
+      }
+  });
+
+  useEffect(() => {   
+    fetchDialingDeviceList({
+        tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+    });     
+    // fetchChannelStateMonitoringList({deviceId:0});
     if( statisticsUpdateCycle > 0 ){        
       const interval = setInterval(() => {  
-        fetchChannelStateMonitoringList({deviceId:0});
+        fetchDialingDeviceList({
+            tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+        });     
+        // fetchChannelStateMonitoringList({deviceId:0});
       }, statisticsUpdateCycle * 1000);  
       return () => clearInterval(interval);
     }
@@ -244,9 +296,26 @@ const ChannelMonitor: React.FC = () => {
                 <SelectValue placeholder={secondSelect || "선택"} />
               </SelectTrigger>
               <SelectContent>
+                {firstSelect === '장비번호' &&
+                  <SelectItem key={' '} value={' '}>{'전체장비'}</SelectItem> 
+                }
+                {firstSelect === '캠페인 모드' &&
+                <>
+                  <SelectItem key={' '} value={' '}>{'전체캠페인'}</SelectItem> 
+                  <SelectItem key={'회선사용안함'} value={'회선사용안함'}>{'회선사용안함'}</SelectItem> 
+                  <SelectItem key={'모든캠페인사용'} value={'모든캠페인사용'}>{'모든캠페인사용'}</SelectItem> 
+                </>
+                }
+                {firstSelect === '채널 그룹 모드' &&
+                <>
+                  <SelectItem key={' '} value={' '}>{'전체 채널그룹'}</SelectItem> 
+                  <SelectItem key={'회선사용안함'} value={'회선사용안함'}>{'회선사용안함'}</SelectItem> 
+                  <SelectItem key={'모든그룹아이디사용'} value={'모든그룹아이디사용'}>{'모든 그룹아이디 사용'}</SelectItem> 
+                </>
+                }
                 {firstSelect === '장비번호'?
                   secondModeEquipment.map(option => (
-                    <SelectItem key={option.key} value={option.key}>{option.name}</SelectItem>
+                    <SelectItem key={option.key} value={option.key}>[{option.key}]{option.name}</SelectItem>
                   ))
                   :
                   firstSelect === '캠페인 모드'?
@@ -260,7 +329,7 @@ const ChannelMonitor: React.FC = () => {
                   ))
                   :
                   firstSelect === '채널 그룹 모드'?
-                  secondModeCampaign.map(option => (
+                  secondModeCampaignGroup.map(option => (
                     <SelectItem key={option.key} value={option.key}>{option.name}</SelectItem>
                   ))
                   :

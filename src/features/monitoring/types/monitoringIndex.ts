@@ -126,6 +126,7 @@ export interface AgentStateMonitoringListResponse {
 // 채널 모니터링 데이터 타입
 export interface ChannelStatusMonitoringListDataResponse {
   id: string;             //채널번호
+  deviceId: string;       //장치번호
   state: string;          //채널 상태 : 0(NONE), 1(IDLE), 2(BUSY)
   event: string;          //채널에 발생한 마지막 이벤트
   assign_kind: string;    //채널 할당 유형 : 1(CAMPAIGN), 2(DIAL_MODE), 3(CHANNEL_GROUPP)
