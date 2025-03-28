@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { CommonButton } from "@/components/shared/CommonButton";
 import CustomAlert from '@/components/shared/layout/CustomAlert';
-import { useCampainManagerStore } from '@/store';
+import { useAuthStore, useCampainManagerStore } from '@/store';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useApiForPhoneDescriptionUpdate } from '@/features/campaignManager/hooks/useApiForPhoneDescriptionUpdate';
 import { useApiForPhoneDescriptionInsert } from '@/features/campaignManager/hooks/useApiForPhoneDescriptionInsert';
@@ -43,6 +43,7 @@ const EditDescription = () => {
   const [inputPhone4, setInputPhone4] = useState('');
   const [inputPhone5, setInputPhone5] = useState('');
   const [isNewMode, setIsNewMode] = useState(false); // 신규 모드 상태 추가
+  const { tenant_id } = useAuthStore();
 
   const router = useRouter();
 
@@ -84,7 +85,7 @@ const EditDescription = () => {
     onSuccess: (data) => {
       fetchPhoneDescriptions({
         session_key: '',
-        tenant_id: 0,
+        tenant_id: tenant_id,
       })
       showAlert('저장되었습니다');
     },onError: (error) => {
@@ -111,7 +112,7 @@ const EditDescription = () => {
     onSuccess: (data) => {
       fetchPhoneDescriptions({
         session_key: '',
-        tenant_id: 0,
+        tenant_id: tenant_id,
       });
       showConfirm('수정되었습니다', () => {});
     },onError: (error) => {
@@ -138,7 +139,7 @@ const EditDescription = () => {
     onSuccess: (data) => {
       fetchPhoneDescriptions({
         session_key: '',
-        tenant_id: 0,
+        tenant_id: tenant_id,
       });
       showAlert('삭제되었습니다');
     },onError: (error) => {
@@ -163,7 +164,7 @@ const EditDescription = () => {
   useEffect(() => {
     fetchPhoneDescriptions({
       session_key: '',
-      tenant_id: 0,
+      tenant_id: tenant_id,
     });
   }, [fetchPhoneDescriptions])
   
