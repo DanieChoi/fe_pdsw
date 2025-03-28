@@ -11,7 +11,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 
-export function TreeNode({
+export function TreeNodeForCampaignTab({
   item,
   level,
   expandedNodes,
@@ -29,8 +29,12 @@ export function TreeNode({
     addTab,
   } = useTabStore();
 
-  // 캠페인 타입일 경우 hasChildren은 항상 false로 처리
-  const hasChildren = item.type === "campaign" ? false : (item.children && item.children.length > 0);
+  // 중요: 폴더 타입일 경우에는 children 배열을 확인, 캠페인 타입일 경우에는 항상 false
+  // 이 부분이 + 및 - 버튼 표시에 영향을 줌
+  const hasChildren = item.type === "campaign" 
+    ? false 
+    : Boolean(item.children && item.children.length > 0);
+
   const isExpanded = expandedNodes.has(item.id);
   const isSelected = selectedNodeId === item.id;
   const statusIcon = item.type === "campaign" ? getStatusIcon(item.status) : null;
@@ -42,7 +46,6 @@ export function TreeNode({
     }
   }, [item.id, hasChildren, onNodeSelect, onNodeToggle]);
 
-  // 우클릭 시 노드 선택을 처리하는 함수 추가
   const handleContextMenu = useCallback(() => {
     onNodeSelect(item.id);
   }, [item.id, onNodeSelect]);
@@ -80,6 +83,7 @@ export function TreeNode({
     return null;
   }
 
+  // 아이템이 명시적으로 보이지 않게 설정된 경우 렌더링하지 않음
   if (item.visible === false) {
     return null;
   }
@@ -216,7 +220,7 @@ export function TreeNode({
       {hasChildren && isExpanded && (
         <div className="space-y-0.5">
           {item.children?.map((child: typeof item) => (
-            <TreeNode
+            <TreeNodeForCampaignTab
               key={child.id}
               item={child}
               level={level + 1}
