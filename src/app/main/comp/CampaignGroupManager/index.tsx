@@ -19,6 +19,7 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import AddCampaignGroupDialog from "./AddCampaignGroupDialog";
+import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
 
 const errorMessage = {
   isOpen: false,
@@ -59,6 +60,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   const router = useRouter();
   // const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
   const [ addGroupParam, setAddGroupParam ] = useState(_addGroupParam);
+  const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions
     , campaignGroupManagerInit, setCampaignGroupManagerInit } = useCampainManagerStore();
@@ -102,6 +104,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
 
   const handleInit = () => {
     setCampaignGroupManagerInit(true);
+    refetchTreeDataForCampaignGroupTab();
   };
 
   const handleSelectCampaignList = (data: Set<number>) => {
