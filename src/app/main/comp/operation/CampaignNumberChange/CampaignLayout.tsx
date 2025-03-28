@@ -202,7 +202,8 @@ function CampaignLayout() {
       session_key: '',
       tenant_id: tenant_id,
     });
-  }, [fetchCallingNumbers]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -216,6 +217,7 @@ function CampaignLayout() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
   // 목록 새로고침 후 현재 선택된 캠페인 정보를 유지하는 useEffect 추가
