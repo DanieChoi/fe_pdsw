@@ -182,13 +182,13 @@ export default function Footer({
         }
       }
     });
-    
+
     // 에러 처리 추가
     eventSource.addEventListener("error", (err) => {
       console.error('SSE connection error:', err);
       // 재연결 시도 (선택적)
     });
-    
+
     return () => {
       eventSource.close();
     };
@@ -270,30 +270,23 @@ export default function Footer({
       </div>
 
       {/* 푸터 내부 콘텐츠: isDrawerOpen이 true일 때만 렌더링 */}
-      {
-        isDrawerOpen && (
-          <div className="flex-1 flex overflow-hidden">
-            <div
-              className={`
-              overflow-auto py-[7px] px-[20px]
-            `}
-            >
-              <table className="w-full text-sm">
-                <tbody>
-                  {footerDataList.map((log, index) => (
-                    <tr key={`left-${index}`}>
-                      <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
-                      <td className="whitespace-nowrap text-[13px] px-1">[{log.type}]</td>
-                      <td className="text-[13px]">{log.message}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
+      {isDrawerOpen && (
+        <div className="flex-1 overflow-hidden">
+          <div className="w-full h-full overflow-auto py-[7px] px-[20px]">
+            <table className="w-full text-sm table-fixed">
+              <tbody>
+                {footerDataList.map((log, index) => (
+                  <tr key={`log-${index}`}>
+                    <td className="whitespace-nowrap text-[13px] w-[120px]">[{log.time}]</td>
+                    <td className="whitespace-nowrap text-[13px] px-1 w-[100px]">[{log.type}]</td>
+                    <td className="text-[13px] break-words">{log.message}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )
-      }
+        </div>
+      )}
     </Resizable>
   );
 }
