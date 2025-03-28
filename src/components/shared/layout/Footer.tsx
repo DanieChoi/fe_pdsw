@@ -1,18 +1,10 @@
 
-
-// import { useState, useEffect, useCallback } from "react";
-// import { ChevronUp, ChevronDown, Trash } from "lucide-react";
-// import { isEqual } from 'lodash';
-// import { useAuthStore, useMainStore } from '@/store';
+// import { useState, useEffect } from "react";
+// import { ChevronUp, ChevronDown, Trash, Signal } from "lucide-react";
 // import { Resizable } from "re-resizable";
-// import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
-// import { useEnvironmentStore } from "@/store/environmentStore";
-// import { initToasts, toast } from './CustomToast';
-// import { useQueryClient } from "@tanstack/react-query";
+// import { initToasts } from './CustomToast';
 // import CommonMiniButton from "../CommonMiniButton";
-// import { FooterDataType, processEventMessage } from "./utils/eventMessageUtils";
-// import { themeColors } from "@/features/auth/hooks/useSseSubscribe";
-
+// import { useSseSubscribe } from '@/features/auth/hooks/useSseSubscribe';
 
 // interface FooterProps {
 //   footerHeight: number;
@@ -32,13 +24,10 @@
 // }: FooterProps) {
 //   const [isExpanded, setIsExpanded] = useState(false);
 //   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-//   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
 //   const [currentHeight, setCurrentHeight] = useState(footerHeight);
-//   const { tenant_id, role_id } = useAuthStore();
-//   const { campaigns, setCampaigns } = useMainStore();
-//   const { useAlramPopup } = useEnvironmentStore(); // Get useAlramPopup value
 
-//   const queryClient = useQueryClient();
+//   // useSseSubscribe 훅 사용
+//   const { footerDataList, clearAllMessages, isConnected } = useSseSubscribe();
 
 //   useEffect(() => {
 //     const toastContainer = document.getElementById('headless-toast-container');
@@ -55,10 +44,6 @@
 //     }
 //   }, [isDrawerOpen, onToggleDrawer]);
 
-//   const clearAllMessages = () => {
-//     setFooterDataList([]);
-//   };
-
 //   // 열기/닫기
 //   const toggleDrawer = () => {
 //     const newState = !isDrawerOpen;
@@ -67,132 +52,6 @@
 //       onToggleDrawer(newState);
 //     }
 //   };
-
-//   // 캠페인 정보 조회 api 호출
-//   const { mutate: fetchMain } = useApiForMain({
-//     onSuccess: (data) => {
-//       setCampaigns(data.result_data);
-//     }
-//   });
-
-//   // 유틸리티 함수를 사용하여 이벤트 처리
-//   const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, tempEventData: any): void => {
-//     console.log("footerDataSet announce = ", announce);
-//     console.log("footerDataSet command = ", command);
-//     console.log("footerDataSet data = ", data);
-//     console.log("footerDataSet kind = ", kind);
-//     console.log("footerDataSet tempEventData = ", tempEventData);
-
-//     // 유틸리티 함수 호출하여 이벤트 처리 결과 가져오기
-//     const result = processEventMessage(
-//       announce,
-//       command,
-//       data,
-//       kind,
-//       campaigns,
-//       queryClient,
-//       tenant_id,
-//       role_id
-//     );
-
-//     // Footer 데이터 업데이트
-//     if (result.messageList && result.messageList.length > 0) {
-//       setFooterDataList((prev) => [
-//         ...result.messageList,
-//         ...prev.slice(0, Math.max(0, 10 - result.messageList.length))
-//       ]);
-//     }
-
-//     // 토스트 알림 처리 - useAlramPopup이 1일 경우에만
-//     if (useAlramPopup === 1 && result.toastMessage) {
-//       try {
-//         setTimeout(() => {
-//           toast.event(
-//             result.toastMessage,
-//             {
-//               colors: themeColors.event,
-//               duration: 5000
-//             }
-//           );
-//           console.log('Toast message triggered:', result.toastMessage);
-//         }, 0);
-//       } catch (err) {
-//         console.error('Error showing toast:', err);
-//       }
-//     }
-
-//     // 필요한 경우 캠페인 정보 다시 가져오기
-//     if (result.shouldFetchMain) {
-//       fetchMain({
-//         session_key: '',
-//         tenant_id: tenant_id,
-//       });
-//     }
-
-//     // 장비 상태 변경 이벤트 처리
-//     if (result.shouldFireDeviceEvent && result.deviceEventDetails) {
-//       const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
-//         detail: {
-//           device_id: result.deviceEventDetails.device_id,
-//           device_status: result.deviceEventDetails.device_status
-//         }
-//       });
-//       window.dispatchEvent(deviceStatusEvent);
-//     }
-//   }, [campaigns, queryClient, tenant_id, role_id, useAlramPopup, fetchMain]);
-
-//   // SSE 구독
-//   useEffect(() => {
-//     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-//     const eventSource = new EventSource(
-//       `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
-//     );
-
-//     let data: any = {};
-//     let announce = "";
-//     let command = "";
-//     let kind = "";
-
-//     eventSource.addEventListener("message", (event) => {
-//       console.log("footer sse event = ", event.data);
-//       if (event.data !== "Connected!!") {
-//         try {
-//           const tempEventData = JSON.parse(event.data);
-//           if (
-//             announce !== tempEventData["announce"] ||
-//             !isEqual(data, tempEventData.data) ||
-//             !isEqual(data, tempEventData["data"]) ||
-//             kind !== tempEventData["kind"]
-//           ) {
-//             announce = tempEventData["announce"];
-//             command = tempEventData["command"];
-//             data = tempEventData["data"];
-//             kind = tempEventData["kind"];
-
-//             footerDataSet(
-//               tempEventData["announce"],
-//               tempEventData["command"],
-//               tempEventData["data"],
-//               tempEventData["kind"],
-//               tempEventData
-//             );
-//           }
-//         } catch (err) {
-//           console.error('Error processing SSE event:', err);
-//         }
-//       }
-//     });
-
-//     // 에러 처리 추가
-//     eventSource.addEventListener("error", (err) => {
-//       console.error('SSE connection error:', err);
-//       // 재연결 시도 (선택적)
-//     });
-
-//     return () => {
-//       eventSource.close();
-//     };
-//   }, [tenant_id, role_id, footerDataSet]);
 
 //   // 높이 변경 핸들러
 //   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
@@ -207,15 +66,6 @@
 //       onResizeEnd(newHeight);
 //     }
 //   };
-
-//   useEffect(() => {
-//     if (campaigns && campaigns.length === 0) {
-//       fetchMain({
-//         session_key: '',
-//         tenant_id: tenant_id,
-//       });
-//     }
-//   }, [campaigns, fetchMain, tenant_id]);
 
 //   return (
 //     <Resizable
@@ -244,7 +94,17 @@
 //     >
 //       {/* 상단 바 영역 */}
 //       <div className="flex-none pt-[5px] pb-[4px] pl-[15px] pr-[15px] border-b bg-white flex justify-between items-center">
-//         <span className="text-[13px] text-[#333]">현재 진행 상태</span>
+//         <div className="flex items-center">
+//           <span className="text-[13px] text-[#333]">현재 진행 상태</span>
+          
+//           {/* 연결 상태 아이콘 - 연결되면 표시 */}
+//           {isConnected && (
+//             <span className="ml-[5px] flex items-center text-[12px] text-green-600" title="SSE 연결됨">
+//               <Signal size={14} className="mr-1" />
+//               {/* 연결됨 */}
+//             </span>
+//           )}
+//         </div>
 
 //         <div className="flex items-center gap-[5px]">
 //           {/* 모든 알림 삭제 버튼 */}
@@ -291,7 +151,7 @@
 //   );
 // }
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ChevronUp, ChevronDown, Trash, Signal } from "lucide-react";
 import { Resizable } from "re-resizable";
 import { initToasts } from './CustomToast';
@@ -337,27 +197,37 @@ export default function Footer({
   }, [isDrawerOpen, onToggleDrawer]);
 
   // 열기/닫기
-  const toggleDrawer = () => {
-    const newState = !isDrawerOpen;
-    setIsDrawerOpen(newState);
-    if (onToggleDrawer) {
-      onToggleDrawer(newState);
-    }
-  };
+  const toggleDrawer = useCallback(() => {
+    setIsDrawerOpen(prevState => {
+      const newState = !prevState;
+      if (onToggleDrawer) {
+        onToggleDrawer(newState);
+      }
+      return newState;
+    });
+  }, [onToggleDrawer]);
 
-  // 높이 변경 핸들러
-  const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
+  // 높이 변경 핸들러 - 메모이제이션하여 성능 최적화
+  const handleResizeStop = useCallback((e: any, direction: any, ref: any, d: any) => {
     const newHeight = currentHeight + d.height;
     setCurrentHeight(newHeight);
-
+    
     if (onResizeHeight) {
       onResizeHeight(newHeight);
     }
-
+    
     if (onResizeEnd) {
       onResizeEnd(newHeight);
     }
-  };
+  }, [currentHeight, onResizeHeight, onResizeEnd]);
+
+  // 리사이즈 중 매 프레임마다 높이 업데이트 (드래그 중 실시간 반영)
+  const handleResize = useCallback((_e: any, _direction: any, ref: any, _d: any) => {
+    const height = parseInt(ref.style.height, 10);
+    if (onResizeHeight) {
+      onResizeHeight(height);
+    }
+  }, [onResizeHeight]);
 
   return (
     <Resizable
@@ -378,10 +248,11 @@ export default function Footer({
         topLeft: false
       }}
       className={`
-        border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col duration-300 ease-in-out group relative h-[1px] before:content-[''] before:absolute hover:before:bg-[#5BC2C1]
+        border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col group relative h-[1px] before:content-[''] before:absolute hover:before:bg-[#5BC2C1]
         ${isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative"}
       `}
       onResizeStart={onResizeStart}
+      onResize={handleResize}
       onResizeStop={handleResizeStop}
     >
       {/* 상단 바 영역 */}
