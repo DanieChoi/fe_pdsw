@@ -268,7 +268,6 @@
 //     </div>
 //   );
 // }
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -294,12 +293,21 @@ export function SortButtonForCampaign() {
     setSelectedNodeType,
   } = useTreeMenuStore();
 
-  // 초기 설정
+  // 초기 설정 - 캠페인 모드로 설정하고 모든 노드 확장
   useEffect(() => {
     if (viewMode === null) {
       // 초기 상태를 캠페인 보기로 설정
       useTreeMenuStore.getState().setViewMode('campaign');
       useTreeMenuStore.getState().setSelectedNodeType('campaign');
+      
+      // 초기 로딩 시 모든 노드 확장
+      setTimeout(() => {
+        // @ts-ignore - 전역 함수 호출
+        if (window.expandAllNodes) {
+          // @ts-ignore
+          window.expandAllNodes();
+        }
+      }, 100);
     }
   }, [viewMode]);
 
@@ -313,14 +321,41 @@ export function SortButtonForCampaign() {
   const handleNodeTypeSort = (nodeType: NodeType, direction: SortDirection) => {
     console.log("정렬 버튼 클릭:", { nodeType, direction });
     
-    // 정렬 파라미터 업데이트 (viewMode는 변경하지 않음)
+    // 정렬 파라미터 업데이트
     sortByNodeType(nodeType, campaignSort.type, direction);
+    
+    // 정렬 노드 타입에 맞게 뷰 모드 설정 (중요: 버튼 UI 상태 동기화)
+    if (nodeType === 'tenant') {
+      // 테넌트 버튼 활성화
+      setViewMode('tenant');
+      
+      // 테넌트 레벨까지만 확장하는 함수 호출
+      setTimeout(() => {
+        // @ts-ignore - 전역 함수 호출
+        if (window.expandTenantsOnly) {
+          // @ts-ignore
+          window.expandTenantsOnly();
+        }
+      }, 50);
+    } else {
+      // 캠페인 버튼 활성화
+      setViewMode('campaign');
+      
+      // 캠페인 정렬인 경우, 모든 노드 확장
+      setTimeout(() => {
+        // @ts-ignore - 전역 함수 호출
+        if (window.expandAllNodes) {
+          // @ts-ignore
+          window.expandAllNodes();
+        }
+      }, 50);
+    }
     
     // UI 갱신을 위한 강제 리렌더링 수행
     setTimeout(() => {
       // 이벤트 발생 시키기 (강제 리렌더링)
       window.dispatchEvent(new Event('resize'));
-    }, 50);
+    }, 100);
     
     setIsPopoverOpen(false);
   };
@@ -338,11 +373,27 @@ export function SortButtonForCampaign() {
       : `${baseClass} hover:bg-gray-50`;
   };
 
-  // 뷰 모드 변경 핸들러 (단, 정렬 타입은 변경하지 않음)
+  // 뷰 모드 변경 핸들러 (버튼 클릭 시)
   const handleViewModeChange = (mode: ViewMode) => {
     console.log("뷰 모드 변경:", mode);
     setViewMode(mode);
-    // 노드 타입은 변경하지 않음 (정렬 기준 유지)
+    
+    // 뷰 모드에 따른 확장 설정
+    setTimeout(() => {
+      if (mode === 'tenant') {
+        // @ts-ignore - 전역 함수 호출
+        if (window.expandTenantsOnly) {
+          // @ts-ignore
+          window.expandTenantsOnly();
+        }
+      } else {
+        // @ts-ignore - 전역 함수 호출
+        if (window.expandAllNodes) {
+          // @ts-ignore
+          window.expandAllNodes();
+        }
+      }
+    }, 50);
   };
 
   // 뷰 모드 버튼 렌더링
@@ -421,38 +472,6 @@ export function SortButtonForCampaign() {
 
             {/* 구분선 */}
             <div className="border-t border-gray-200 my-2"></div>
-
-            {/* 전체 정렬 옵션 */}
-            {/* <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-[6px] py-[4px]">
-              <div className="flex-1 text-sm text-[#333]">전체 보기</div>
-              <div className="flex gap-2">
-                <button
-                  className={`p-1.5 rounded-md ${
-                    isActiveSort('all', 'asc')
-                      ? 'bg-[#56CAD6] text-[#fff]'
-                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                  }`}
-                  onClick={() => handleNodeTypeSort('all', 'asc')}
-                  title={`${campaignSort.type === 'name' ? '이름' : 'ID'} 오름차순`}
-                >
-                  <ArrowUp className="h-4 w-4" />
-                </button>
-                <button
-                  className={`p-1.5 rounded-md ${
-                    isActiveSort('all', 'desc')
-                      ? 'bg-[#56CAD6] text-[#fff]'
-                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
-                  }`}
-                  onClick={() => handleNodeTypeSort('all', 'desc')}
-                  title={`${campaignSort.type === 'name' ? '이름' : 'ID'} 내림차순`}
-                >
-                  <ArrowDown className="h-4 w-4" />
-                </button>
-              </div>
-            </div> */}
-
-            {/* 구분선 */}
-            {/* <div className="border-t border-gray-200 my-2"></div> */}
 
             {/* 테넌트 정렬 옵션 */}
             <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-[6px] py-[4px]">

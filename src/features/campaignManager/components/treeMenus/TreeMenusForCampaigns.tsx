@@ -498,11 +498,16 @@ export function TreeMenusForCampaigns() {
   // 트리 노드 선택/확장 상태 관리
   const { selectedNodeId, expandedNodes, setSelectedNodeId, toggleNode, expandNodes } = useTreeStore();
   
-  // expandNodes 함수를 전역으로 사용할 수 있도록 저장
+  // 전역 변수에 원본 아이템 저장 (정렬과 확장 로직에서 사용)
+  const originalItems = treeData?.[0]?.items || [];
+  
+  // expandNodes 함수와 원본 아이템을 전역으로 사용할 수 있도록 저장
   useEffect(() => {
     // @ts-ignore - 전역 객체에 함수 추가
     window.treeExpandNodes = expandNodes;
-  }, [expandNodes]);
+    // @ts-ignore - 전역 객체에 원본 아이템 추가
+    window.originalTreeItems = originalItems;
+  }, [expandNodes, originalItems]);
 
   // 통합 스토어에서 정렬 및 필터링 상태 가져오기
   const {
@@ -735,17 +740,8 @@ export function TreeMenusForCampaigns() {
       //setTabWidth("campaign", idealWidth);
     }, 300);
   };
-
-  // 원본 항목 및 필터링/정렬 적용
-  const originalItems = treeData?.[0]?.items || [];
   
-  // 디버깅: 원본 데이터 구조 확인
-  useEffect(() => {
-    if (originalItems.length > 0) {
-      console.log("원본 트리 데이터 구조 확인 중...");
-    }
-  }, [originalItems]);
-  
+  // 필터링/정렬 적용
   const filteredItems = filterTreeItems(originalItems);
   const sortedItems = sortTreeItems(filteredItems);
 
@@ -780,69 +776,62 @@ export function TreeMenusForCampaigns() {
     };
   }, []);
 
-  // 초기 펼침 설정과 노드 타입 변경 시 펼침 상태 업데이트
+  // 노드 확장 헬퍼 함수들 - 전역 함수로 등록
   useEffect(() => {
     if (!isLoading && !error && treeData && treeData.length > 0) {
       const items = originalItems;
-      const newExpanded = new Set<string>();
-
-      // NEXUS와 모든 하위 노드(테넌트 및 캠페인)를 확장하는 함수
-      const expandAllNodes = (nodes: TreeItem[]) => {
-        for (const node of nodes) {
-          // 모든 노드 확장
-          newExpanded.add(node.id);
-          if (node.children) {
-            expandAllNodes(node.children);
-          }
-        }
-      };
-
-      // 루트와 테넌트 노드만 확장하는 함수
-      const expandTenantsOnly = (nodes: TreeItem[]) => {
-        for (const node of nodes) {
-          if (node.id === "nexus" || node.type === "folder") {
-            newExpanded.add(node.id);
-            
-            // 자식이 있으면 확장 (단, 캠페인이 아닌 경우만)
-            if (node.children) {
-              node.children.forEach(child => {
-                if (child.type !== "campaign") {
-                  newExpanded.add(child.id);
-                }
-              });
+      
+      // NEXUS와 테넌트 노드까지만 확장하는 함수
+      const expandTenantsOnly = () => {
+        const newExpanded = new Set<string>();
+        
+        const expandUpToLevel = (nodes: TreeItem[], currentLevel: number, maxLevel: number) => {
+          for (const node of nodes) {
+            if (currentLevel <= maxLevel) {
+              newExpanded.add(node.id);
+            }
+            if (node.children && currentLevel < maxLevel) {
+              expandUpToLevel(node.children, currentLevel + 1, maxLevel);
             }
           }
-        }
+        };
+        
+        // 루트(0)와 테넌트(1) 레벨까지만 확장
+        expandUpToLevel(items, 0, 1);
+        expandNodes(newExpanded);
+        console.log("테넌트만 확장: 노드 수", newExpanded.size);
       };
 
-      // 선택된 노드 타입에 따라 확장 설정
+      // 모든 노드 확장 함수
+      const expandAllNodes = () => {
+        const newExpanded = new Set<string>();
+        
+        const expandAll = (nodes: TreeItem[]) => {
+          for (const node of nodes) {
+            newExpanded.add(node.id);
+            if (node.children) {
+              expandAll(node.children);
+            }
+          }
+        };
+        
+        expandAll(items);
+        expandNodes(newExpanded);
+        console.log("모든 노드 확장: 노드 수", newExpanded.size);
+      };
+      
+      // 초기 확장 상태 설정
       if (selectedNodeType === 'tenant') {
-        console.log("테넌트 정렬 모드: 테넌트까지만 확장");
-        expandTenantsOnly(items);
+        expandTenantsOnly();
       } else {
-        console.log("캠페인/전체 정렬 모드: 캠페인까지 확장");
-        expandAllNodes(items);
+        expandAllNodes();
       }
       
-      expandNodes(newExpanded);
-      console.log("확장 노드 수:", newExpanded.size);
-      
-      // 전역에 확장 함수 등록
+      // 함수를 전역 객체에 등록
       // @ts-ignore
-      window.expandTenantsOnly = () => {
-        const tenantsExpanded = new Set<string>();
-        expandTenantsOnly(items);
-        expandNodes(newExpanded);
-        console.log("테넌트만 확장 함수 호출됨");
-      };
-      
+      window.expandTenantsOnly = expandTenantsOnly;
       // @ts-ignore
-      window.expandAllNodes = () => {
-        const allExpanded = new Set<string>();
-        expandAllNodes(items);
-        expandNodes(newExpanded);
-        console.log("모든 노드 확장 함수 호출됨");
-      };
+      window.expandAllNodes = expandAllNodes;
     }
   }, [isLoading, error, treeData, expandNodes, originalItems, selectedNodeType]);
 
@@ -861,7 +850,7 @@ export function TreeMenusForCampaigns() {
     <div className="flex-1 overflow-auto tree-node text-sm" ref={containerRef}>
       {sortedItems.map((item: TreeItem) => (
         <TreeNodeForCampaignTab
-          key={`${item.id}-${forceUpdate}`} // 키에 forceUpdate 추가하여 리렌더링 강제
+          key={`${item.id}-${forceUpdate}`}
           item={item}
           level={0}
           expandedNodes={expandedNodes}
@@ -869,7 +858,7 @@ export function TreeMenusForCampaigns() {
           getStatusIcon={getStatusIcon}
           onNodeToggle={toggleNode}
           onNodeSelect={setSelectedNodeId}
-          compact={true} // 컴팩트 모드 활성화
+          compact={true}
         />
       ))}
     </div>
