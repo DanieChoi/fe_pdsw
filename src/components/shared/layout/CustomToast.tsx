@@ -46,7 +46,7 @@ interface ToastProps {
 // 기본 색상 설정
 const defaultColors: Record<ToastType, ToastColors> = {
   success: {
-    bgColor: 'bg-[#5BC2C1]', // NEXPOS 테마 색상 (청록색)
+    bgColor: 'bg-[#4A90E2]', // NEXPOS 테마 색상 (청록색)
     textColor: 'text-white',
   },
   error: {

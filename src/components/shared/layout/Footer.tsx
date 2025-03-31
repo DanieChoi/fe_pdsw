@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-// import { ChevronUp, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { ChevronUp, ChevronDown, PanelLeftClose, PanelLeftOpen, Bell, BellOff } from "lucide-react";
+
 
 import { isEqual } from 'lodash';
 import { useAuthStore, useMainStore } from '@/store';
@@ -8,7 +8,7 @@ import { Resizable } from "re-resizable";
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { customAlertService } from "./utils/CustomAlertService";
 import { useEnvironmentStore } from "@/store/environmentStore";
-import { toast, ToastContainer } from 'react-toastify';
+import { toast, initToasts } from "./CustomToast";
 
 
 type FooterDataType = {
@@ -41,14 +41,9 @@ export default function Footer({
   const { campaigns, setCampaigns } = useMainStore();
   const { useAlramPopup } = useEnvironmentStore();
 
-  // toast.success("알림 설정이 활성화되었습니다.", {
-  //   position: "bottom-right",
-  //   autoClose: 3000,
-  //   hideProgressBar: false,
-  //   closeOnClick: true,
-  //   pauseOnHover: true,
-  //   draggable: true
-  // });
+  useEffect(() => {
+    initToasts();
+  }, []);
 
   // 부모 컴포넌트에 열림/닫힘 상태 변경 알림
   useEffect(() => {
@@ -197,13 +192,8 @@ export default function Footer({
 
         // 알림 설정이 활성화되어 있으면 토스트 표시
         if (useAlramPopup === 1) {
-          toast.info(`[${_time}] ${statusMessage}`, {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true
+          toast.success(`[${_time}] ${statusMessage}`, {
+            duration: 3000,
           });
         }
 
@@ -239,18 +229,26 @@ export default function Footer({
       // alert("스킬 상담원 변경!")
 
       // 알림 설정이 활성화되어 있으면 각 메시지에 대해 토스트 표시
+      // if (useAlramPopup === 1) {
+      //   tempFooterDataList.forEach(item => {
+      //     toast.info(`[${item.time}] ${item.message}`, {
+      //       position: "bottom-right",
+      //       autoClose: 3000,
+      //       hideProgressBar: false,
+      //       closeOnClick: true,
+      //       pauseOnHover: true,
+      //       draggable: true
+      //     });
+      //   });
+      // }
       if (useAlramPopup === 1) {
         tempFooterDataList.forEach(item => {
-          toast.info(`[${item.time}] ${item.message}`, {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true
+          toast.success(`[${item.time}] ${item.message}`, {
+            duration: 3000
           });
         });
       }
+
 
       _message = '';
     }
@@ -353,16 +351,11 @@ export default function Footer({
 
     // alert("여기야 여기1")
     console.log("useAlramPopup : ", useAlramPopup);
-    
+
 
     if (useAlramPopup === 1) {
       toast.success(`[${_time}] ${_message}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true
+        duration: 3000
       });
     }
 
