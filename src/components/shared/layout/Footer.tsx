@@ -309,16 +309,16 @@ export default function Footer({
       }
 
       // alert("캠페인 동작 상태 변경2")
-      if (useAlramPopup === 1) {
-        toast.success(`[${_time}] ${_message}`, {
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true
-        });
-      }
+      // if (useAlramPopup === 1) {
+      //   toast.success(`[${_time}] ${_message}`, {
+      //     position: "bottom-right",
+      //     autoClose: 3000,
+      //     hideProgressBar: false,
+      //     closeOnClick: true,
+      //     pauseOnHover: true,
+      //     draggable: true
+      //   });
+      // }
 
     }
     //발신리스트등록
