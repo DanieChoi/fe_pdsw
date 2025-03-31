@@ -96,6 +96,7 @@ export default function Footer({
 
     //메시지.
     let _message = '';
+    let _message2 = '';
     //운영설정>캠페인별 발신번호설정
     if (announce === '/pds/campaign/calling-number') {
       _message = '캠페인 : '
@@ -163,8 +164,10 @@ export default function Footer({
       }
       if (command === 'INSERT') {
         _message += '추가, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
+        _message2 += '추가 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag;
       } else if (command === 'UPDATE') {
         _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
+        _message2 += '수정 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag;
       } else if (command === 'DELETE') {
         _message += '삭제, 캠페인 아이디 : ' + data['campaign_id'];
       }
@@ -174,6 +177,9 @@ export default function Footer({
       });
       if (data['start_flag'] === 3) {
         const statusMessage = '캠페인 동작상태 변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
+        const statusMessage2 = '캠페인 동작상태 변경\n' +
+          '캠페인 이름 : ' + data['campaign_name'] + '\n' +
+          '동작상태 : ';
 
         // tofix
         setFooterDataList((prev) => [
@@ -192,7 +198,11 @@ export default function Footer({
 
         // 알림 설정이 활성화되어 있으면 토스트 표시
         if (useAlramPopup === 1) {
-          toast.success(`[${_time}] ${statusMessage}`, {
+          // alert("여기 !")
+          console.log("statusMessage2 : ", statusMessage2);
+          
+          console.log("여기야 여기 22222222");
+          toast.success(`[ ${statusMessage2}`, {
             duration: 3000,
           });
         }
@@ -242,8 +252,12 @@ export default function Footer({
       //   });
       // }
       if (useAlramPopup === 1) {
+        // alert("here")
         tempFooterDataList.forEach(item => {
-          toast.success(`[${item.time}] ${item.message}`, {
+          // alert("여기5")
+          console.log("여기야 여기 333333333");
+
+          toast.success(`${item.message}`, {
             duration: 3000
           });
         });
@@ -292,7 +306,7 @@ export default function Footer({
     }
     //캠페인 동작상태 변경
     else if (announce === '/pds/campaign/status') {
-      _message = '캠페인 동작상태 '
+      _message = '캠페인 동작상태'
       if (command === 'UPDATE') {
         let _start_flag = '';
         if (data['campaign_status'] === 1) {
@@ -304,19 +318,8 @@ export default function Footer({
         }
         const tempCampaign = campaigns.filter((campaign) => campaign.campaign_id === Number(data['campaign_id']));
         _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
+        _message2 += '캠페인 아이디 : ' + data['campaign_id'] + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
       }
-
-      // alert("캠페인 동작 상태 변경2")
-      // if (useAlramPopup === 1) {
-      //   toast.success(`[${_time}] ${_message}`, {
-      //     position: "bottom-right",
-      //     autoClose: 3000,
-      //     hideProgressBar: false,
-      //     closeOnClick: true,
-      //     pauseOnHover: true,
-      //     draggable: true
-      //   });
-      // }
 
     }
     //발신리스트등록
@@ -334,6 +337,9 @@ export default function Footer({
           list_flag = '초기화';
         }
         _message += '캠페인 아이디 : ' + data['campaign_id'] + ' , 리스트구분 : ' + list_flag;
+        _message2 += '캠페인 아이디 : ' + data['campaign_id'] + '\n' +
+          '리스트구분 : ' + list_flag + '\n' +
+          '';
       }
     }
 
@@ -354,7 +360,9 @@ export default function Footer({
 
 
     if (useAlramPopup === 1) {
-      toast.success(`[${_time}] ${_message}`, {
+      console.log("여기야 여기 11111111");
+      // alert("hi2")
+      toast.success(`${_message2}`, {
         duration: 3000
       });
     }
@@ -449,9 +457,20 @@ export default function Footer({
     >
       {/* 상단 바 영역 */}
       <div className="flex-none pt-[5px] pb-[4px] px-[20px] border-b bg-white flex justify-between items-center">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <span className="text-[13px] text-[#333]">현재 진행 상태 </span>
-          <span className="text-[12px] text-[#666] bg-gray-100 px-1 rounded">알람상태: {useAlramPopup}</span>
+          <span className="text-[12px] text-[#666] bg-gray-100 px-1 rounded">
+            {/* 알림 개수 작은 outline 버튼으로 출력 */}
+            {footerDataList.length > 0 ? (
+              <span className="text-[#666] bg-gray-100 px-1 rounded">
+                {footerDataList.length}건
+              </span>
+            ) : (
+              <span className="text-[#666] bg-gray-100 px-1 rounded">
+                0건
+              </span>
+            )}
+          </span>
         </div>
 
         <div className="flex items-center gap-2">
