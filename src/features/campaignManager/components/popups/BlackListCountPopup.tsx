@@ -1,11 +1,12 @@
-// src\features\campaignManager\components\popups\BlackListCountPopup.tsx
 import React, { useState, useEffect, ReactNode } from 'react';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { Label } from "@/components/ui/label";
 
 export interface BlackListCountPopupProps {
     campaignId?: string | number;
-    blackListCount?:number;
+    blackListCount?: number;
+    maxBlacklistCount?: number;
+    commonBlacklistCount?: number;
     isOpen?: boolean;
     onConfirm?: () => void;
     onCancel?: () => void;
@@ -13,17 +14,13 @@ export interface BlackListCountPopupProps {
 
 const BlackListCountPopup = ({
     campaignId,
-    blackListCount,
+    blackListCount = 0,
+    maxBlacklistCount = 1000000,
+    commonBlacklistCount = 0,
     isOpen = false,
     onConfirm = () => {},
     onCancel
 }: BlackListCountPopupProps) => {
-    // 가짜 데이터를 위한 상태
-    const [mockData, setMockData] = useState({
-        blacklistCount: 0,
-        maxBlacklistCount: 1000000,
-        commonBlacklistCount: 0
-    });
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -54,7 +51,7 @@ const BlackListCountPopup = ({
                 {isLoading ? (
                     <span>로딩 중...</span>
                 ) : (
-                    <span>{blackListCount}</span>
+                    <span>{blackListCount.toLocaleString()}</span>
                 )}
             </div>
             <div className="flex items-center gap-2 justify-between">
@@ -62,7 +59,7 @@ const BlackListCountPopup = ({
                 {isLoading ? (
                     <span>로딩 중...</span>
                 ) : (
-                    <span>{mockData.maxBlacklistCount.toLocaleString()}</span>
+                    <span>{maxBlacklistCount.toLocaleString()}</span>
                 )}
             </div>
             <div className="flex items-center gap-2 justify-between">
@@ -70,7 +67,7 @@ const BlackListCountPopup = ({
                 {isLoading ? (
                     <span>로딩 중...</span>
                 ) : (
-                    <span>{mockData.commonBlacklistCount.toLocaleString()}</span>
+                    <span>{commonBlacklistCount.toLocaleString()}</span>
                 )}
             </div>
         </div>

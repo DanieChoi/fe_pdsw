@@ -93,6 +93,9 @@ export function ContextMenuForCampaignForCampaignTab({
   const [currentStatus, setCurrentStatus] = useState<CampaignStatus>(item.status);
   const [tempStatus, setTempStatus] = useState<CampaignStatus>(item.status);
   const [blackListCount, setBlackListCount] = useState<number>(0);
+  const [maxBlacklistCount, setMaxBlacklistCount] = useState<number>(1000000);
+  const [commonBlacklistCount, setCommonBlacklistCount] = useState<number>(0);
+
   const preventCloseRef = useRef(false);
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
   const { availableCampaignTabCampaignContextMenuIds } = useAvailableMenuStore();
@@ -308,7 +311,13 @@ export function ContextMenuForCampaignForCampaignTab({
   // 캠페인 블랙리스트 건수 조회 API 호출
   const { mutate: fetchCampaignBlacklistCount } = useApiForCampaignBlacklistCount({
     onSuccess: (data) => {
+      console.log("블랙리스트 건수 조회 성공 at 컴퍼넌트 :", data);
+
+      // Update all state values from the API response
       setBlackListCount(data.result_data.blacklist_count);
+      setMaxBlacklistCount(data.result_data.max_count);
+      setCommonBlacklistCount(data.result_data.common_count);
+
       setTimeout(() => {
         setIsBlacklistPopupOpen(true);
       }, 100);
@@ -446,11 +455,14 @@ export function ContextMenuForCampaignForCampaignTab({
         <BlackListCountPopup
           campaignId={item.id}
           blackListCount={blackListCount}
+          maxBlacklistCount={maxBlacklistCount}
+          commonBlacklistCount={commonBlacklistCount}
           isOpen={isBlacklistPopupOpen}
           onConfirm={() => setIsBlacklistPopupOpen(false)}
           onCancel={() => setIsBlacklistPopupOpen(false)}
         />
       )}
+
       <CustomAlert
         message={alertState.message}
         title={alertState.title}

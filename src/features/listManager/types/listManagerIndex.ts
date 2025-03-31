@@ -75,6 +75,9 @@ export interface ResultDataItem {
 export interface CampaignBlacklistCountResponseDataType {
   campaign_id: string;
   blacklist_count: number;
+  maxBlacklistCount: number;
+  max_count: number;
+  common_count: number;
 }
 
 // 캠페인 블랙 릭스트 건 수 조회 응답 타입
