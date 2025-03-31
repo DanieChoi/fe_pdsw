@@ -276,7 +276,7 @@ export function TreeNodeForCampaignTab({
   useEffect(() => {
     if (hasChildren && item.type === "folder" && level === 1) { // 테넌트 폴더만 확인
       console.log(`폴더 ${item.label} 자식 노드 목록:`, 
-        item.children?.map(child => `${child.label}(${child.type})`));
+        item.children?.map((child: typeof item) => `${child.label}(${child.type})`));
     }
   }, [item, hasChildren, level]);
 
