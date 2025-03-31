@@ -452,7 +452,7 @@ export function SortButtonForCampaign() {
             </div> */}
 
             {/* 구분선 */}
-            <div className="border-t border-gray-200 my-2"></div>
+            {/* <div className="border-t border-gray-200 my-2"></div> */}
 
             {/* 테넌트 정렬 옵션 */}
             <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-[6px] py-[4px]">
