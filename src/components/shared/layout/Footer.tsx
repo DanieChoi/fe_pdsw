@@ -240,7 +240,7 @@ export default function Footer({
           _start_flag = '중지';
         }
         const tempCampaign = campaigns.filter((campaign) => campaign.campaign_id === Number(data['campaign_id']));
-        _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + tempCampaign[0].campaign_name + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
+        _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ', 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
       }
     }
     //발신리스트등록
