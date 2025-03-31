@@ -281,7 +281,7 @@ export default function Footer({
   useEffect(() => {
     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
     const eventSource = new EventSource(
-      `${DOMAIN}/api/v1/notification/0/subscribe`
+      `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
     );
     
     let data: any = {};
