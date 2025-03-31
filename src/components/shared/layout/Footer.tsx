@@ -232,6 +232,39 @@ export default function Footer({
         _message = '';
       }
     }
+    //캠페인 동작상태 변경
+    else if (announce === '/pds/campaign/status') {
+      _message = '캠페인 동작상태 '
+      if (command === 'UPDATE') {
+        let _start_flag = '';
+        if (data['campaign_status'] === 1) {
+          _start_flag = '시작';
+        } else if (data['campaign_status'] === 2) {
+          _start_flag = '멈춤';
+        } else if (data['campaign_status'] === 3) {
+          _start_flag = '중지';
+        }
+        const tempCampaign = campaigns.filter((campaign) => campaign.campaign_id === Number(data['campaign_id']));
+        _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + tempCampaign[0].campaign_name + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
+      }
+    }
+    //발신리스트등록
+    else if (announce === '/pds/campaign/calling-list') {
+      _message = '발신리스트등록, '
+      if (command === 'INSERT') {
+        let list_flag = '';
+        if (data['list_flag'] === 'I') {
+          list_flag = '신규리스트';
+        } else if (data['list_flag'] === 'A') {
+          list_flag = '추가리스트';
+        } else if (data['list_flag'] === 'D') {
+          list_flag = '삭제리스트';
+        } else if (data['list_flag'] === 'L') {
+          list_flag = '초기화';
+        }
+        _message += '캠페인 아이디 : ' + data['campaign_id'] + ' , 리스트구분 : ' + list_flag;
+      }
+    }
     if( _message !== ''){
       setFooterDataList((prev) => [
         {
@@ -245,55 +278,42 @@ export default function Footer({
   }, [setFooterDataList]);
 
   // SSE 구독
-  useEffect(() => {
-    // if ( role_id < 4 ) {
-    //   console.log("No tenant ID available, skipping SSE connection");
-    //   return;
-    // }
-    // let tenantData = tenant_id;
-    // if( role_id !== 4){
-    //   tenantData = 0;
-    // }
-    const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-    const eventSource = new EventSource(
-      `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
-    );
-    
-    let data: any = {};
-    let announce = "";
-    let command = "";
-    let kind = "";
+  const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+  const eventSource = new EventSource(
+    `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
+  );
+  
+  let data: any = {};
+  let announce = "";
+  let command = "";
+  let kind = "";
 
-    eventSource.addEventListener("message", (event) => {
-      //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
-      console.log("footer sse event = ", event.data);
-      if (event.data !== "Connected!!") {
-        const tempEventData = JSON.parse(event.data);
-        if (
-          announce !== tempEventData["announce"] ||
-          !isEqual(data, tempEventData.data) ||
-          !isEqual(data, tempEventData["data"]) ||
-          kind !== tempEventData["kind"]
-        ) {
-          announce = tempEventData["announce"];
-          command = tempEventData["command"];
-          data = tempEventData["data"];
-          kind = tempEventData["kind"];
+  eventSource.addEventListener("message", (event) => {
+    //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
+    console.log("footer sse event = ", event.data);
+    if (event.data !== "Connected!!") {
+      const tempEventData = JSON.parse(event.data);
+      if (
+        announce !== tempEventData["announce"] ||
+        !isEqual(data, tempEventData.data) ||
+        !isEqual(data, tempEventData["data"]) ||
+        kind !== tempEventData["kind"]
+      ) {
+        announce = tempEventData["announce"];
+        command = tempEventData["command"];
+        data = tempEventData["data"];
+        kind = tempEventData["kind"];
 
-          footerDataSet(
-            tempEventData["announce"],
-            tempEventData["command"],
-            tempEventData["data"],
-            tempEventData["kind"],
-            tempEventData
-          );
-        }
+        footerDataSet(
+          tempEventData["announce"],
+          tempEventData["command"],
+          tempEventData["data"],
+          tempEventData["kind"],
+          tempEventData
+        );
       }
-    });
-    return () => {
-      eventSource.close();
-    };
-  }, [tenant_id]);
+    }
+  })
 
   // 높이 변경 핸들러
   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
