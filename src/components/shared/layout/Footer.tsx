@@ -278,42 +278,47 @@ export default function Footer({
   }, [setFooterDataList]);
 
   // SSE 구독
-  const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-  const eventSource = new EventSource(
-    `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
-  );
-  
-  let data: any = {};
-  let announce = "";
-  let command = "";
-  let kind = "";
+  useEffect(() => {
+    const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+    const eventSource = new EventSource(
+      `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
+    );
+    
+    let data: any = {};
+    let announce = "";
+    let command = "";
+    let kind = "";
 
-  eventSource.addEventListener("message", (event) => {
-    //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
-    console.log("footer sse event = ", event.data);
-    if (event.data !== "Connected!!") {
-      const tempEventData = JSON.parse(event.data);
-      if (
-        announce !== tempEventData["announce"] ||
-        !isEqual(data, tempEventData.data) ||
-        !isEqual(data, tempEventData["data"]) ||
-        kind !== tempEventData["kind"]
-      ) {
-        announce = tempEventData["announce"];
-        command = tempEventData["command"];
-        data = tempEventData["data"];
-        kind = tempEventData["kind"];
+    eventSource.addEventListener("message", (event) => {
+      //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
+      console.log("footer sse event = ", event.data);
+      if (event.data !== "Connected!!") {
+        const tempEventData = JSON.parse(event.data);
+        if (
+          announce !== tempEventData["announce"] ||
+          !isEqual(data, tempEventData.data) ||
+          !isEqual(data, tempEventData["data"]) ||
+          kind !== tempEventData["kind"]
+        ) {
+          announce = tempEventData["announce"];
+          command = tempEventData["command"];
+          data = tempEventData["data"];
+          kind = tempEventData["kind"];
 
-        footerDataSet(
-          tempEventData["announce"],
-          tempEventData["command"],
-          tempEventData["data"],
-          tempEventData["kind"],
-          tempEventData
-        );
+          footerDataSet(
+            tempEventData["announce"],
+            tempEventData["command"],
+            tempEventData["data"],
+            tempEventData["kind"],
+            tempEventData
+          );
+        }
       }
-    }
-  })
+    });
+    return () => {
+      eventSource.close();
+    };
+  }, [tenant_id, role_id]);
 
   // 높이 변경 핸들러
   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
