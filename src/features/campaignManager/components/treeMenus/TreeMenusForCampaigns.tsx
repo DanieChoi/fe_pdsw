@@ -123,8 +123,6 @@ export function TreeMenusForCampaigns() {
     const sortFactor = direction === 'asc' ? 1 : -1;
     const nodeType = selectedNodeType; // 'all', 'tenant', 'campaign'
 
-    console.log("정렬 적용:", { sortType, direction, nodeType, viewMode });
-
     return items.map(item => {
       // NEXUS 루트 노드 처리
       if (item.id === "nexus" && item.children) {
