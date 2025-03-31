@@ -1,12 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-// import { ChevronUp, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { ChevronUp, ChevronDown, Trash } from "lucide-react"; // PanelLeftClose, PanelLeftOpen 대신 Trash로 변경
-
+import { ChevronUp, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { isEqual } from 'lodash';
 import { useAuthStore, useMainStore } from '@/store';
 import { Resizable } from "re-resizable";
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
-import CommonMiniButton from "../CommonMiniButton";
 
 type FooterDataType = {
   time: string;
@@ -23,9 +20,9 @@ interface FooterProps {
   onResizeEnd?: (height: number) => void; // 리사이즈 종료 이벤트 - height 매개변수 추가
 }
 
-export default function Footer({
-  footerHeight,
-  onToggleDrawer,
+export default function Footer({ 
+  footerHeight, 
+  onToggleDrawer, 
   onResizeHeight,
   onResizeStart,
   onResizeEnd
@@ -44,8 +41,16 @@ export default function Footer({
     }
   }, [isDrawerOpen, onToggleDrawer]);
 
-  const clearAllMessages = () => {
-    setFooterDataList([]); // 모든 메시지 삭제
+  // D(1단) <-> W(2단) 전환
+  const toggleExpanded = () => {
+    setIsExpanded((prev) => !prev);
+    // 만약 닫혀 있었다면(32px 상태) W 모드 누를 때 자동 열기 (원치 않으면 제거)
+    if (!isDrawerOpen) {
+      setIsDrawerOpen(true);
+      if (onToggleDrawer) {
+        onToggleDrawer(true);
+      }
+    }
   };
 
   // 열기/닫기
@@ -56,7 +61,7 @@ export default function Footer({
       onToggleDrawer(newState);
     }
   };
-
+  
   //캠페인 정보 조회 api 호출
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
@@ -67,30 +72,30 @@ export default function Footer({
   const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, tempEventData: any): void => {
     //시간.
     const today = new Date();
-    const _time = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0') + ':' + String(today.getSeconds()).padStart(2, '0');
+    const _time = String(today.getHours()).padStart(2, '0')+':'+String(today.getMinutes()).padStart(2, '0')+':'+String(today.getSeconds()).padStart(2, '0');
     //타입.
     let _type = 'Event';
-    if (kind === 'event') {
+    if( kind === 'event' ){
       _type = 'Event';
-    } else if (kind === 'alram') {
+    }else if( kind === 'alram' ){
       _type = 'Event';
     }
     //메시지.
     let _message = '';
     //운영설정>캠페인별 발신번호설정
-    if (announce === '/pds/campaign/calling-number') {
+    if( announce === '/pds/campaign/calling-number' ){
       _message = '캠페인 : '
-      if (command === 'INSERT') {
+      if( command === 'INSERT' ){
         _message += '[' + data['campaign_id'] + '], 사용자 발신번호 설정 추가 성공';
-      } else if (command === 'DELETE') {
+      }else if( command === 'DELETE' ){
         _message += '[' + data['campaign_id'] + '], 사용자 발신번호 설정 삭제 성공';
-      } else if (command === 'UPDATE') {
+      }else if( command === 'UPDATE' ){
         _message += '[' + data['campaign_id'] + '], 사용자 발신번호 설정 변경 성공';
       }
     }
     //장비 사용, 장비 사용중지
-    else if (announce === 'dialing-device') {
-      if (command === 'UPDATE' && data['device_status'] === 'run') {
+    else if( announce === 'dialing-device' ){
+      if( command === 'UPDATE' && data['device_status'] === 'run' ){
         _message = 'CIDS 작동중';
         // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
         const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
@@ -100,7 +105,7 @@ export default function Footer({
           }
         });
         window.dispatchEvent(deviceStatusEvent);
-      } else if (command === 'UPDATE' && data['device_status'] === 'down') {
+      }else if( command === 'UPDATE' && data['device_status'] === 'down' ){
         _message = 'CIDS 작동중지';
         // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
         const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
@@ -113,68 +118,68 @@ export default function Footer({
       }
     }
     //캠페인수정>콜페이싱 수정
-    else if (announce === '/pds/campaign/dial-speed') {
+    else if( announce === '/pds/campaign/dial-speed' ){
       _message = '[콜페이싱] '
-      if (command === 'UPDATE') {
+      if( command === 'UPDATE' ){
         const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === data['campaign_id']);
-        if (tempCampaign && tempCampaign.dial_mode === 2) {
-          _message += '캠페인 아이디 ' + data['campaign_id'] + ' , 현재 설정값 ' + data['dial_speed'] * 2;
-        } else {
+        if( tempCampaign && tempCampaign.dial_mode === 2){
+          _message += '캠페인 아이디 ' + data['campaign_id'] + ' , 현재 설정값 ' + data['dial_speed']*2;
+        }else{
           _message += '캠페인 아이디 ' + data['campaign_id'] + ' , 현재 설정값 ' + data['dial_speed'];
         }
       }
     }
     //캠페인.
-    else if (announce === '/pds/campaign') {
+    else if( announce === '/pds/campaign' ){
       _message = '캠페인 '
       let _start_flag = '';
-      if (data['start_flag'] === 1) {
+      if( data['start_flag'] === 1){
         _start_flag = '시작';
-      } else if (data['start_flag'] === 2) {
+      }else if( data['start_flag'] === 2){
         _start_flag = '멈춤';
-      } else if (data['start_flag'] === 3) {
+      }else if( data['start_flag'] === 3){
         _start_flag = '중지';
       }
       let _end_flag = '';
-      if (data['end_flag'] === 1) {
+      if( data['end_flag'] === 1){
         _end_flag = '진행중';
-      } else if (data['end_flag'] === 2) {
+      }else if( data['end_flag'] === 2){
         _end_flag = '완료';
       }
-      if (command === 'INSERT') {
-        _message += '추가, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
-      } else if (command === 'UPDATE') {
-        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
-      } else if (command === 'DELETE') {
+      if( command === 'INSERT' ){
+        _message += '추가, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag;
+      }else if( command === 'UPDATE' ){
+        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag;
+      }else if( command === 'DELETE' ){
         _message += '삭제, 캠페인 아이디 : ' + data['campaign_id'];
       }
       fetchMain({
         session_key: '',
         tenant_id: tenant_id,
       });
-      if (data['start_flag'] === 3) {
+      if( data['start_flag'] === 3){
         setFooterDataList((prev) => [
           {
             time: _time,
             type: _type,
-            message: '캠페인 동작상태 변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag
+            message: '캠페인 동작상태 변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : '+_start_flag+', 완료구분 : '+_end_flag
           },
           ...prev
         ]);
       }
     }
     //스킬.
-    else if (announce === '/pds/skill/agent-list') {
+    else if( announce === '/pds/skill/agent-list' ){
       const tempAgentIdList = data['agent_id'];
       const _skillId = data['skill_id'];
-      const tempFooterDataList: FooterDataType[] = [];
-      for (let i = 0; i < tempAgentIdList.length; i++) {
+      const tempFooterDataList:FooterDataType[] = [];
+      for( let i=0;i<tempAgentIdList.length;i++){
         let __message = '[스킬 '
-        if (command === 'UPDATE') {
+        if( command === 'UPDATE' ){
           __message += '추가] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
-        } else if (command === 'DELETE') {
+        }else if( command === 'DELETE' ){
           __message += '해제] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
-        } else if (command === 'INSERT') {
+        }else if( command === 'INSERT' ){
           __message += '추가] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
         }
         tempFooterDataList.push({
@@ -190,77 +195,44 @@ export default function Footer({
       _message = '';
     }
     //스킬편집
-    else if (announce === '/pds/skill') {
+    else if( announce === '/pds/skill' ){
       _message = '[스킬 '
-      if (command === 'INSERT') {
+      if( command === 'INSERT' ){
         _message += '추가] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
-      } else if (command === 'DELETE') {
+      }else if( command === 'DELETE' ){
         _message += '삭제] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
-      } else if (command === 'UPDATE') {
+      }else if( command === 'UPDATE' ){
         _message += '수정] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
       }
     }
     //캠페인 요구스킬 수정
-    else if (announce === '/pds/campaign/skill') {
+    else if( announce === '/pds/campaign/skill' ){
       _message = '캠페인 요구스킬 '
-      if (command === 'UPDATE') {
+      if( command === 'UPDATE' ){
         _message += '수정, 캠페인 아이디 : ' + data['campaign_id'];
-      } else {
+      }else{
         _message = '';
       }
     }
     //상담원 자원 수정/삭제
-    else if (announce === 'update-agent') {
+    else if( announce === 'update-agent' ){
       _message = '[상담원 자원 '
-      if (command === 'UPDATE') {
+      if( command === 'UPDATE' ){
         _message += '수정] 상담원 아이디 : ' + data['employee_id'] + ' , 상담원 이름 : ' + data['agent_name'];
-      } else if (command === 'DELETE') {
+      }else if( command === 'DELETE' ){
         _message += '삭제] 상담원 아이디 : ' + data['employee_id'] + ' , 상담원 이름 : ' + data['agent_name'];
       }
     }
     //캠페인수정>동작시간 추가
-    else if (announce === '/pds/campaign/schedule') {
+    else if( announce === '/pds/campaign/schedule' ){
       _message = '캠페인 스케쥴'
-      if (command === 'INSERT') {
+      if( command === 'INSERT' ){
         _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'];
-      } else {
+      }else{
         _message = '';
       }
     }
-    //캠페인 동작상태 변경
-    else if (announce === '/pds/campaign/status') {
-      _message = '캠페인 동작상태 '
-      if (command === 'UPDATE') {
-        let _start_flag = '';
-        if (data['campaign_status'] === 1) {
-          _start_flag = '시작';
-        } else if (data['campaign_status'] === 2) {
-          _start_flag = '멈춤';
-        } else if (data['campaign_status'] === 3) {
-          _start_flag = '중지';
-        }
-        const tempCampaign = campaigns.filter((campaign) => campaign.campaign_id === Number(data['campaign_id']));
-        _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ', 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
-      }
-    }
-    //발신리스트등록
-    else if (announce === '/pds/campaign/calling-list') {
-      _message = '발신리스트등록, '
-      if (command === 'INSERT') {
-        let list_flag = '';
-        if (data['list_flag'] === 'I') {
-          list_flag = '신규리스트';
-        } else if (data['list_flag'] === 'A') {
-          list_flag = '추가리스트';
-        } else if (data['list_flag'] === 'D') {
-          list_flag = '삭제리스트';
-        } else if (data['list_flag'] === 'L') {
-          list_flag = '초기화';
-        }
-        _message += '캠페인 아이디 : ' + data['campaign_id'] + ' , 리스트구분 : ' + list_flag;
-      }
-    }
-    if (_message !== '') {
+    if( _message !== ''){
       setFooterDataList((prev) => [
         {
           time: _time,
@@ -286,7 +258,7 @@ export default function Footer({
     const eventSource = new EventSource(
       `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
     );
-
+    
     let data: any = {};
     let announce = "";
     let command = "";
@@ -321,35 +293,26 @@ export default function Footer({
     return () => {
       eventSource.close();
     };
-  }, [tenant_id, role_id]);
+  }, [tenant_id]);
 
   // 높이 변경 핸들러
   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
     const newHeight = currentHeight + d.height;
     setCurrentHeight(newHeight);
-
+    
     if (onResizeHeight) {
       onResizeHeight(newHeight);
     }
-
+    
     if (onResizeEnd) {
       onResizeEnd(newHeight); // 수정: 높이 값을 인자로 전달
     }
   };
 
-  useEffect(() => {
-      if (campaigns && campaigns.length === 0) {
-        fetchMain({
-          session_key: '',
-          tenant_id: tenant_id,
-        });
-      }
-  }, []);
-  
   return (
     <Resizable
-      size={{
-        width: '100%',
+      size={{ 
+        width: '100%', 
         height: isDrawerOpen ? currentHeight : 32
       }}
       minHeight={100}
@@ -378,16 +341,20 @@ export default function Footer({
         <div className="flex items-center gap-2">
           {/* 모드 전환 버튼 - 아이콘으로 변경 */}
           <button
-            onClick={clearAllMessages}
+            onClick={toggleExpanded}
             className="flex items-center"
-            title="모든 알림 삭제"
+            title={isExpanded ? "default mode" : "wide mode"}
           >
-            <Trash className="w-4 h-4" />
+            {isExpanded ? (
+              <PanelLeftOpen className="w-4 h-4" />
+            ) : (
+              <PanelLeftClose className="w-4 h-4" />
+            )}
           </button>
 
           {/* 열기/닫기 버튼 */}
-          <CommonMiniButton
-            onClick={toggleDrawer}
+          <button 
+            onClick={toggleDrawer} 
             className=""
             title={isDrawerOpen ? "닫기" : "열기"}
           >
@@ -396,7 +363,7 @@ export default function Footer({
             ) : (
               <ChevronUp className="w-4 h-4" />
             )}
-          </CommonMiniButton>
+          </button>
         </div>
       </div>
 
