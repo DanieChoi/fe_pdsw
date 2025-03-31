@@ -30,7 +30,7 @@ const buttonVariants = cva(
        menuOpened:
          "bg-[#E5F3F3]/50 hover:bg-[#E5F3F3]/70 rounded-md min-w-[76px] py-1.5 h-auto flex flex-col items-center justify-center text-[#333]",
         login: 
-         'w-full h-12 bg-black hover:bg-[#55BEC8] text-white text-sm rounded-none font-16',
+         'w-full h-12 bg-[#55BEC8] hover:bg-[#009EAD] text-white text-sm rounded-none font-16',
        customblue:"rounded-[3px] bg-[#51ADD4] text-white text-[13px]"
      },
      size: {
