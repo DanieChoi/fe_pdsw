@@ -6,6 +6,7 @@ import { isEqual } from 'lodash';
 import { useAuthStore, useMainStore } from '@/store';
 import { Resizable } from "re-resizable";
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
+import CommonMiniButton from "../CommonMiniButton";
 
 type FooterDataType = {
   time: string;
@@ -385,7 +386,7 @@ export default function Footer({
           </button>
 
           {/* 열기/닫기 버튼 */}
-          <button
+          <CommonMiniButton
             onClick={toggleDrawer}
             className=""
             title={isDrawerOpen ? "닫기" : "열기"}
@@ -395,7 +396,7 @@ export default function Footer({
             ) : (
               <ChevronUp className="w-4 h-4" />
             )}
-          </button>
+          </CommonMiniButton>
         </div>
       </div>
 
