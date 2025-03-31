@@ -740,18 +740,21 @@ const DistributionLimit = () => {
                 // 폼 데이터 초기화
                 handleNew();
                 
-                // 데이터 다시 가져오기
-                if (selectedCampaignId) {
-                  // 전체 상담원 데이터를 새로 조회
-                  fetchCampaignAgentList({
-                    campaign_id: [Number(selectedCampaignId)]
-                  });
-                  
-                  // 분배 호수 제한 설정 정보 갱신
-                  fetchMaxCallList({
-                    campaign_id: [Number(selectedCampaignId)]
-                  });
-                }
+                // 상태 초기화 후 데이터 다시 가져오기
+                setIsLoading(true); // 로딩 상태 시작
+                setRawAgentData([]); // 기존 에이전트 데이터 초기화
+                
+                // 순차적 데이터 로드를 위한 타임아웃 설정
+                setTimeout(() => {
+                  if (selectedCampaignId) {
+                    // 전체 상담원 데이터를 새로 조회
+                    fetchCampaignAgentList({
+                      campaign_id: [Number(selectedCampaignId)]
+                    });
+                    
+                    // fetchMaxCallList는 useEffect를 통해 rawAgentData가 준비된 후 자동 호출됨
+                  }
+                }, 100);
               } else {
                 showAlert(`삭제 실패: ${response.result_msg}`);
               }
