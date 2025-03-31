@@ -11,7 +11,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 
-export function TreeNodeForCampaignTab({
+export function TreeNode({
   item,
   level,
   expandedNodes,
@@ -29,22 +29,14 @@ export function TreeNodeForCampaignTab({
     addTab,
   } = useTabStore();
 
-  // 중요: 폴더 타입일 경우에는 children 배열을 확인, 캠페인 타입일 경우에는 항상 false
-  // 이 부분이 + 및 - 버튼 표시에 영향을 줌
-  const hasChildren = item.type === "campaign" 
-    ? false 
-    : Boolean(item.children && item.children.length > 0);
-
-  const isExpanded = expandedNodes.has(item.id);
-  const isSelected = selectedNodeId === item.id;
-  const statusIcon = item.type === "campaign" ? getStatusIcon(item.status) : null;
-
+  // Create all callback hooks regardless of visibility
   const handleClick = useCallback(() => {
+    const hasChildren = item.type === "campaign" ? false : (item.children && item.children.length > 0);
     onNodeSelect(item.id);
     if (hasChildren) {
       onNodeToggle(item.id);
     }
-  }, [item.id, hasChildren, onNodeSelect, onNodeToggle]);
+  }, [item.id, item.type, item.children, onNodeSelect, onNodeToggle]);
 
   const handleContextMenu = useCallback(() => {
     onNodeSelect(item.id);
@@ -78,15 +70,16 @@ export function TreeNodeForCampaignTab({
     });
   }, [item, setCampaignIdForUpdateFromSideMenu, setCampaignIdForCopyCampaign, addTab]);
 
-  // 뷰 모드가 tenant이고 item.type이 campaign인 경우 렌더링하지 않음
-  if (viewMode === 'tenant' && item.type === 'campaign') {
-    return null;
-  }
-
-  // 아이템이 명시적으로 보이지 않게 설정된 경우 렌더링하지 않음
+  // Return null after creating all hooks if item should not be visible
   if (item.visible === false) {
     return null;
   }
+
+  // 캠페인 타입일 경우 hasChildren은 항상 false로 처리
+  const hasChildren = item.type === "campaign" ? false : (item.children && item.children.length > 0);
+  const isExpanded = expandedNodes.has(item.id);
+  const isSelected = selectedNodeId === item.id;
+  const statusIcon = item.type === "campaign" ? getStatusIcon(item.status) : null;
 
   // 아이콘 크기 조정 (컴팩트 모드일 경우 더 작게)
   const iconSize = compact ? 10 : 14;
@@ -193,7 +186,7 @@ export function TreeNodeForCampaignTab({
               onContextMenu={handleContextMenu}
               style={{ paddingLeft }}
             >
-              {nodeContent}
+              {nodeContent} 
             </div>
           </ContextMenuTrigger>
           <FolderContextMenu item={item} />
@@ -220,7 +213,7 @@ export function TreeNodeForCampaignTab({
       {hasChildren && isExpanded && (
         <div className="space-y-0.5">
           {item.children?.map((child: typeof item) => (
-            <TreeNodeForCampaignTab
+            <TreeNode
               key={child.id}
               item={child}
               level={level + 1}

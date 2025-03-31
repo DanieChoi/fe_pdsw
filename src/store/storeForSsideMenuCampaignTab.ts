@@ -1,5 +1,3 @@
-
-// storeForSsideMenuCampaignTab.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -62,8 +60,8 @@ export const useTreeMenuStore = create<TreeMenuState>()(
         type: 'name',
         direction: 'asc',
       },
-      selectedNodeType: 'campaign',
-      viewMode: 'campaign',
+      selectedNodeType: 'all',     // 기본값 'all'
+      viewMode: 'campaign',        // 기본값 'campaign'
       selectedMenus: [],
       skilIdsForCampaignTreeMenu: [],
       filterMode: 'all',
@@ -76,11 +74,8 @@ export const useTreeMenuStore = create<TreeMenuState>()(
             direction: option.direction
           },
           selectedNodeType: option.nodeType || 'all',
-          // 노드 타입에 맞게 뷰 모드 동기화
-          ...(option.nodeType === 'tenant' && { viewMode: 'tenant' }),
-          ...(option.nodeType === 'campaign' && { viewMode: 'campaign' }),
-          // 'all' 타입일 경우 캠페인 뷰 모드로 설정
-          ...(option.nodeType === 'all' && { viewMode: 'campaign' }),
+          // 노드 타입이 변경되어도 뷰 모드는 현재 상태 유지
+          // 이렇게 하면 테넌트 정렬 시 캠페인이 계속 보이게 됨
         })),
       
       // 정렬 액션 - 노드 타입별 정렬 설정
@@ -91,31 +86,22 @@ export const useTreeMenuStore = create<TreeMenuState>()(
             direction: direction,
           },
           selectedNodeType: nodeType,
-          // 노드 타입에 맞게 뷰 모드 동기화
-          ...(nodeType === 'tenant' && { viewMode: 'tenant' }),
-          ...(nodeType === 'campaign' && { viewMode: 'campaign' }),
-          // 'all' 타입일 경우 캠페인 뷰 모드로 설정
-          ...(nodeType === 'all' && { viewMode: 'campaign' }),
+          // 뷰 모드는 변경하지 않음 (테넌트 정렬 시에도 캠페인이 보이게 함)
         })),
       
       // 뷰 모드 설정
       setViewMode: (mode) => 
         set((state) => ({
           viewMode: mode,
-          // 뷰 모드에 따라 노드 타입 동기화
-          ...(mode === 'tenant' && { selectedNodeType: 'tenant' }),
-          ...(mode === 'campaign' && { 
-            // 전체 모드인 경우 그대로 유지, 아니면 캠페인 모드로 설정
-            selectedNodeType: state.selectedNodeType === 'all' 
-              ? 'all' 
-              : 'campaign' 
-          }),
+          // 뷰 모드 변경은 정렬 타입에 영향을 주지 않도록 변경
+          // 이렇게 하면 테넌트 뷰에서도 캠페인이 정렬됨
         })),
       
       // 노드 타입 직접 설정
       setSelectedNodeType: (nodeType) => 
         set(() => ({
           selectedNodeType: nodeType,
+          // 여기서는 viewMode를 변경하지 않음 - 분리된 개념으로 처리
         })),
       
       // 필터링용 스킬 ID 설정 (신규 인터페이스)
