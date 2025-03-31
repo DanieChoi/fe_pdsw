@@ -23,3 +23,21 @@ export const fetchCampaignBlacklistCount = async (credentials: number): Promise<
     throw new Error(error.response?.data?.result_code + '||' + error.response?.data?.result_msg || '데이터 가져오기 실패');
   }
 };
+
+// 블랙 리스트 최대치 조회
+// pds/collections/campaign-blacklist-max
+// apiForGetCampaignMaximumBlacklistCount
+
+// request:
+// 없음
+
+// reponse:
+// ```
+// {
+//     "result_code": 0,
+//     "result_msg": "Success",
+//     "result_data": {
+//         "max_count": 100000
+//     }
+// }
+// ```
