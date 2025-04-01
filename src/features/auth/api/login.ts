@@ -7,9 +7,11 @@ import axios from 'axios';
 export const loginApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
+      const LOGIN_URL = process.env.NEXT_PUBLIC_LOGIN_API_URL;
+      console.log(LOGIN_URL);
       // 첫 번째 로그인 API 호출 (외부)
       const { data: dataFirst } = await externalAxiosInstance.get<LoginResponseFirst>(
-        `https://jedai-qa-web.nexuscommunity.net:9443/agent/loginCubeC`,
+        `${LOGIN_URL}`,
         {
           params: {
             id: credentials.user_name,

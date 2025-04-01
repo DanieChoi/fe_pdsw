@@ -172,7 +172,7 @@ export default function LoginPage() {
         <div className="flex mb-8 mb-70">
           <Image
             src="/logo/pds-logo.svg"
-            alt="NEXPDS"
+            alt="UPDS"
             width={230}
             height={51}
             priority

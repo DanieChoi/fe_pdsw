@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NEXPDS",
-  description: "NEXPDS project",
+  title: "UPDS",
+  description: "UPDS project",
   icons: {
     icon: 'nexpds.ico',           // /public/favicon.ico
     shortcut: 'nexpds.ico',

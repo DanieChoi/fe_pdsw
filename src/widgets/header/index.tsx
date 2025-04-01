@@ -246,7 +246,7 @@ export default function Header() {
           <div className="flex items-center">
             <Image
               src="/header-menu/nexpds-logo.svg"
-              alt="NEXPDS"
+              alt="UPDS"
               width={66}
               height={11}
               priority

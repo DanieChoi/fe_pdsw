@@ -7,9 +7,9 @@ const TitleHeader = () => {
   return (
     <div className="bg-[#5BC2C1] h-[28px] w-full flex items-center">
       <div className="px-4 flex justify-between items-center w-full">
-        {/* NEXPDS Logo */}
+        {/* UPDS Logo */}
         <div className="flex items-center">
-          <span className="text-white font-semibold">NEXPDS</span>
+          <span className="text-white font-semibold">UPDS</span>
         </div>
         {/* 오른쪽 사용자 정보 */}
         <div className="flex items-center space-x-4 text-white text-sm">
