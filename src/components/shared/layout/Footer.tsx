@@ -258,7 +258,7 @@ export default function Footer({
           console.log("여기야 여기 333333333");
 
           toast.success(`${item.message}`, {
-            duration: 3000
+            duration: 18000
           });
         });
       }
@@ -316,7 +316,6 @@ export default function Footer({
         } else if (data['campaign_status'] === 3) {
           _start_flag = '중지';
         }
-        const tempCampaign = campaigns.filter((campaign) => campaign.campaign_id === Number(data['campaign_id']));
         _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
         _message2 += '캠페인 아이디 : ' + data['campaign_id'] + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
       }
@@ -325,6 +324,7 @@ export default function Footer({
     //발신리스트등록
     else if (announce === '/pds/campaign/calling-list') {
       _message = '발신리스트등록, '
+      _message2 = '발신리스트등록' + '\n'
       if (command === 'INSERT') {
         let list_flag = '';
         if (data['list_flag'] === 'I') {
@@ -337,9 +337,9 @@ export default function Footer({
           list_flag = '초기화';
         }
         _message += '캠페인 아이디 : ' + data['campaign_id'] + ' , 리스트구분 : ' + list_flag;
-        _message2 += '캠페인 아이디 : ' + data['campaign_id'] + '\n' +
-          '리스트구분 : ' + list_flag + '\n' +
-          '';
+        _message2 += '캠페인 아이디 : ' + data['campaign_id'] //+ '\n' +
+        //   '리스트구분 : ' + list_flag + '\n' +
+        //   '';
       }
     }
 
@@ -360,10 +360,10 @@ export default function Footer({
 
 
     if (useAlramPopup === 1) {
-      console.log("여기야 여기 11111111");
+      // console.log("여기야 여기 11111111");
       // alert("hi2")
       toast.success(`${_message2}`, {
-        duration: 3000
+        duration: 5000
       });
     }
 
