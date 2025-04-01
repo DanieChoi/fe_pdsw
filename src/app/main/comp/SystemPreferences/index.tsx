@@ -13,6 +13,7 @@ import CustomAlert from '@/components/shared/layout/CustomAlert';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { useEnvironmentStore } from '@/store/environmentStore';
+import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 
 interface EquipmentRow {
     device_id: string;
@@ -53,6 +54,7 @@ const SystemPreferences = () => {
     const [selectedChannel, setSelectedChannel] = useState<ChannelRow | null>(null);
     const [filteredChannels, setFilteredChannels] = useState<ChannelRow[]>([]);
     const [isEditable, setIsEditable] = useState(false);
+    const [scheduleData, setScheduleData] = useState<any[]>([]);
 
     // 디바이스 상태를 저장할 상태 변수 추가
     const [deviceStatuses, setDeviceStatuses] = useState<Record<string, "run" | "down">>({});
@@ -325,12 +327,43 @@ const SystemPreferences = () => {
         }
     });
 
+    // 스케줄 조회
+    const { mutate: fetchSchedules } = useApiForSchedules({
+        onSuccess: (data) => {
+            // 스케줄 데이터 처리 및 저장
+            if (data && data.result_data && Array.isArray(data.result_data)) {
+                setScheduleData(data.result_data);
+            }
+        },
+        onError: (error) => {
+            if (error.message.split('||')[0] === '5') {
+                setAlertState({
+                    ...errorMessage,
+                    isOpen: true,
+                    message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                    onConfirm: closeAlert,
+                    onCancel: () => {}
+                });
+                Cookies.remove('session_key');
+                setTimeout(() => {
+                    router.push('/login');
+                }, 1000);
+            } else {
+                showAlert('오류 발생: ' + error.message);
+            }
+        }
+    });
+
     useEffect(() => {
         if (tenants && tenants.length > 0) {
             fetchDialingDeviceList({
                 tenant_id_array: tenants.map(tenant => tenant.tenant_id)
             });
             fetchChannelList();
+            
+            fetchSchedules({
+                tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+            });
         } 
     }, [tenants]);
 
@@ -350,7 +383,6 @@ const SystemPreferences = () => {
         }
         
         // 실시간 상태가 없으면 API에서 받은 초기 상태 확인
-        // 수정: dialingDeviceList가 없는 경우 예외 처리 추가
         if (!dialingDeviceList || !Array.isArray(dialingDeviceList)) {
             return "미사용";
         }
@@ -628,59 +660,102 @@ const SystemPreferences = () => {
 
     const getAllocationOutboundModeOptions = () => {
         if (allocationMode === "1") {
-            // 캠페인으로 할당일 때 기본 옵션
-            const defaultOptions = [
-                { value: "2147483647", label: "모든 캠페인사용" },
-                { value: "0", label: "회선사용안함" },
-            ];
-            
-            // 수정: campaigns가 비어있지 않은지 확인
-            if (!campaigns || !Array.isArray(campaigns) || campaigns.length === 0) {
-                return defaultOptions;
+          // 캠페인으로 할당일 때 기본 옵션
+          const defaultOptions = [
+            { value: "2147483647", label: "모든 캠페인사용" },
+            { value: "0", label: "회선사용안함" },
+          ];
+          
+          // campaigns가 비어있는지 확인
+          if (!campaigns || !Array.isArray(campaigns) || campaigns.length === 0) {
+            return defaultOptions;
+          }
+          
+          // 현재 날짜
+          const currentDate = new Date();
+          const dayScope = environmentData?.showChannelCampaignDayScop || 0; // 설정 값이 없으면 기본값 0
+          
+          // dayScope가 0이면 모든 캠페인 표시
+          if (dayScope === 0) {
+            const allCampaignOptions = campaigns.map(campaign => ({
+              value: campaign.campaign_id.toString(),
+              label: `ID[${campaign.campaign_id}] : ${campaign.campaign_name}`
+            }));
+            return [...defaultOptions, ...allCampaignOptions];
+          }
+          
+          // scheduleData가 없으면 모든 캠페인 표시
+          if (!scheduleData || !Array.isArray(scheduleData) || scheduleData.length === 0) {
+            const allCampaignOptions = campaigns.map(campaign => ({
+              value: campaign.campaign_id.toString(),
+              label: `ID[${campaign.campaign_id}] : ${campaign.campaign_name}`
+            }));
+            return [...defaultOptions, ...allCampaignOptions];
+          }
+          
+          // 캠페인 ID를 key로, end_date를 value로 맵 생성
+          const campaignEndDateMap = new Map();
+          
+          // 스케줄 데이터에서 각 캠페인의 end_date 추출
+          scheduleData.forEach(schedule => {
+            if (schedule && schedule.campaign_id !== undefined && schedule.end_date) {
+              const campaignId = typeof schedule.campaign_id === 'number' ? 
+                schedule.campaign_id : parseInt(schedule.campaign_id);
+              
+              // YYYYMMDD 형식의 end_date를 Date 객체로 변환
+              let endDateStr = schedule.end_date;
+              
+              // YYYYMMDD 형식을 YYYY-MM-DD 형식으로 변환
+              if (endDateStr && endDateStr.length === 8) {
+                endDateStr = `${endDateStr.substring(0, 4)}-${endDateStr.substring(4, 6)}-${endDateStr.substring(6, 8)}`;
+              }
+              
+              campaignEndDateMap.set(campaignId, endDateStr);
+            }
+          });
+          
+          // 필터링: end_date가 현재 날짜 기준으로 showChannelCampaignDayScop 일 이내인 캠페인만 표시
+          const filteredCampaigns = campaigns.filter(campaign => {
+            // 캠페인 객체가 유효한지 확인
+            if (!campaign || campaign.campaign_id === undefined) {
+              return false;
             }
             
-            // 필터링: 현재 날짜 기준으로 showChannelCampaignDayScop 일 이내의 캠페인만 표시
-            const currentDate = new Date();
-            const dayScope = environmentData?.showChannelCampaignDayScop || 0; // 설정 값이 없으면 기본값 0
+            // 캠페인에 대한 end_date 가져오기
+            const endDateStr = campaignEndDateMap.get(campaign.campaign_id);
             
-            const filteredCampaigns = campaigns.filter(campaign => {
-                // 캠페인 객체가 유효한지 확인
-                if (!campaign) {
-                    return false;
-                }
-                
-                // update_time이 없는 경우에는 포함시키지 않음
-                if (!campaign.update_time) {
-                    return false;
-                }
-                
-                // "0000-00-00 00:00:00"인 경우는 항상 포함
-                if (campaign.update_time === "0000-00-00 00:00:00") {
-                    return true;
-                }
-                
-                // 정상적인 날짜인 경우 기존 로직으로 필터링
-                const creationDate = new Date(campaign.update_time);
-                
-                // 현재 날짜와의 차이 계산 (밀리초 단위)
-                const timeDiff = currentDate.getTime() - creationDate.getTime();
-                
-                // 일 단위로 변환
-                const dayDiff = timeDiff / (1000 * 60 * 60 * 24);
-                
-                // dayScope 이내인지 확인 (dayScope가 0이면 모든 캠페인 표시)
-                return dayScope === 0 || dayDiff <= dayScope;
-            });
+            // end_date가 없으면 포함 (이 부분이 수정됨)
+            if (!endDateStr) {
+              return true;
+            }
             
-            // 필터링된 캠페인을 드롭다운 옵션으로 변환
-            const campaignOptions = filteredCampaigns.map(campaign => ({
-                value: campaign.campaign_id.toString(),
-                label: `ID[${campaign.campaign_id}] : ${campaign.campaign_name}`
-            }));
-    
-            return [...defaultOptions, ...campaignOptions];
+            // 날짜 문자열을 Date 객체로 변환
+            const endDate = new Date(endDateStr);
+            
+            // 유효한 날짜인지 확인
+            if (isNaN(endDate.getTime())) {
+              return true; // 날짜가 유효하지 않아도 포함 (이 부분도 수정됨)
+            }
+            
+            // 현재 날짜와의 차이 계산 (밀리초 단위)
+            const timeDiff = endDate.getTime() - currentDate.getTime();
+            
+            // 일 단위로 변환 (미래 날짜면 양수, 과거 날짜면 음수)
+            const dayDiff = timeDiff / (1000 * 60 * 60 * 24);
+            
+            // dayScope 이내인지 확인
+            return dayDiff >= -dayScope;
+          });
+          
+          // 필터링된 캠페인을 드롭다운 옵션으로 변환
+          const campaignOptions = filteredCampaigns.map(campaign => ({
+            value: campaign.campaign_id.toString(),
+            label: `ID[${campaign.campaign_id}] : ${campaign.campaign_name}`
+          }));
+      
+          return [...defaultOptions, ...campaignOptions];
         } else if (allocationMode === "2") {
-            // 발신모드로 할당일 때 옵션
+            // 발신모드로 할당일 때 옵션 (변경 없음)
             return [
                 { value: "0", label: "회선사용안함" },
                 { value: "2147483647", label: "발신방법 모두사용" },
@@ -690,6 +765,7 @@ const SystemPreferences = () => {
                 { value: "5", label: "System Preview" }
             ];
         } else if (allocationMode === "3") {
+            // 채널그룹으로 할당일 때 옵션 (변경 없음)
             return [
                 { value: "0", label: "회선사용안함" },
                 { value: "2147483647", label: "모든 그룹아이디 사용" }
