@@ -1,4 +1,4 @@
-// CustomToast.tsx - 최종 수정 버전
+// CustomToast.tsx - 수정 버전
 import React, { Fragment, useState, useEffect } from 'react';
 import { Transition } from '@headlessui/react';
 import { CheckCircle, AlertCircle, Info, AlertTriangle, X, User } from 'lucide-react';
@@ -76,7 +76,7 @@ let toastRemoveCallback: ((id: string) => void) | null = null;
 
 // 토스트 컴포넌트
 const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
-  const { id, type, message, duration = 5000, colors } = toast;
+  const { id, type, message, duration = 18000, colors } = toast;
   const [isVisible, setIsVisible] = useState(true);
 
   // 타입별 스타일 및 아이콘 설정
@@ -126,7 +126,6 @@ const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('Close button clicked for toast:', id);
     setIsVisible(false);
     
     // 애니메이션 완료 후 onClose 호출
@@ -192,12 +191,14 @@ const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
           </button>
         </div>
         
-        {/* 컨텐츠 */}
-        <div className="p-2 text-xs">
-          <p className={`font-medium leading-5 whitespace-pre-line ${textColor} line-clamp-2`}>
-            {message}
-          </p>
-        </div>
+        {/* 컨텐츠 - 메시지가 있을 때만 렌더링 */}
+        {message && (
+          <div className="p-2 text-xs">
+            <p className={`font-medium leading-5 whitespace-pre-line ${textColor} line-clamp-2`}>
+              {message}
+            </p>
+          </div>
+        )}
       </div>
     </Transition>
   );
@@ -208,13 +209,17 @@ export const ToastContainer: React.FC = () => {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   const removeToast = (id: string) => {
-    console.log('Removing toast:', id);
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   };
 
-  // 토스트 추가 함수
+  // 토스트 추가 함수 - 중복 체크 및 빈 메시지 필터링 추가
   const addToast = (toast: ToastMessage) => {
-    console.log('Adding toast:', toast.id);
+    
+    // 빈 메시지가 아닌지 확인
+    if (!toast.message || toast.message.trim() === '') {
+      return;
+    }
+    
     setToasts((prev) => {
       // 중복 ID 확인
       const exists = prev.some(t => t.id === toast.id);
@@ -284,16 +289,21 @@ const createToast = (
   message: string, 
   options: CreateToastOptions = {}
 ) => {
-  // 고유한 ID 생성 방식으로 변경 - 타임스탬프와 랜덤 문자열 조합
+  // 메시지가 비어있는지 확인
+  if (!message || message.trim() === '') {
+    return null;
+  }
+  
+  // 고유한 ID 생성 - 타임스탬프와 랜덤 문자열 조합
   const toast: ToastMessage = {
-    id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+    id: `toast-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
     type,
     message,
     duration: options.duration || 5000,
     colors: options.colors
   };
 
-  // 직접 콜백으로 등록 (가장 안정적인 방법)
+  // 콜백 함수가 설정되어 있으면 직접 호출
   if (toastUpdateCallback) {
     toastUpdateCallback(toast);
     return toast.id; // ID 반환
@@ -314,9 +324,8 @@ const createToast = (
   }
 };
 
-// 수동으로 토스트 제거하는 함수 추가
+// 수동으로 토스트 제거하는 함수
 const removeToast = (id: string) => {
-  console.log('Manual toast remove called with ID:', id);
   
   // 콜백 함수가 있으면 직접 호출
   if (toastRemoveCallback) {
@@ -349,13 +358,7 @@ export const toast = {
     createToast('warning', message, options),
   event: (message: string, options?: CreateToastOptions) => 
     createToast('event', message, options),
-  remove: (id: string) => removeToast(id), // 수동 제거 메소드 추가
-};
-
-// 테스트용 토스트 생성 함수 (개발 환경에서만 사용)
-export const testToast = () => {
-  const id = toast.event('이것은 테스트 토스트입니다. 닫기 버튼을 눌러보세요.', { duration: 10000 });
-  console.log('Created test toast with ID:', id);
+  remove: (id: string) => removeToast(id), // 수동 제거 메소드
 };
 
 // 앱 시작 시 토스트 컨테이너 생성
@@ -372,7 +375,6 @@ export const initToasts = () => {
     // 컨테이너에 렌더링
     const root = createRoot(toastContainer);
     root.render(<ToastContainer />);
-    console.log('Toast container initialized successfully');
   } catch (err) {
     console.error('Failed to initialize toast container:', err);
   }
