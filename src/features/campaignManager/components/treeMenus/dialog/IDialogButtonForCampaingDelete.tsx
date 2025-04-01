@@ -97,7 +97,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
   const { mutate: deleteCampaign, isPending } = useApiForCampaignManagerDelete({
     onSuccess: (data) => {
       console.log('캠페인 삭제 성공:', data);
-      toast.success(`'${campaignName}' 캠페인이 삭제되었습니다.`);
+      // toast.success(`'${campaignName}' 캠페인이 삭제되었습니다.`);
 
       // 삭제 후 스케줄 삭제 등 처리
       deleteCampaignSchedule({

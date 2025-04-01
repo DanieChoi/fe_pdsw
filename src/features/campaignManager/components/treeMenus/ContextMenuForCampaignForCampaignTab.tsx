@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState, useRef, JSX } from "react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -11,36 +12,34 @@ import {
   ContextMenuSeparator,
 } from "@/components/ui/context-menu";
 import { useTabStore } from "@/store/tabStore";
-import {
-  Check,
-} from "lucide-react";
-import { useState, useRef, JSX } from "react";
-import BlackListCountPopup from '@/features/campaignManager/components/popups/BlackListCountPopup';
-import { toast } from 'react-toastify';
-import { useApiForCampaignStatusUpdate } from "../../hooks/useApiForCampaignStatusUpdate";
-import { useApiForCampaignBlacklistCount } from "@/features/listManager/hooks/useApiForCampaignBlacklistCount";
+import { Check } from "lucide-react";
+import { toast } from "react-toastify";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import useApiForCampaignListDelete from "@/features/listManager/hooks/useApiForCampaignListDelete";
-import { CheckCampaignSaveReturnCode } from '@/components/common/common';
-import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
-import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
-import React from "react";
-import { useCampainManagerStore } from "@/store/campainManagerStore";
-import { useMainStore } from "@/store/mainStore";
-import { useApiForMain } from "@/features/auth/hooks/useApiForMain";
-import { useAuthStore } from "@/store/authStore";
 
-export type CampaignStatus = 'started' | 'pending' | 'stopped';
+import { useState as useReactState } from "react";
+import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
+import { useMainStore } from "@/store/mainStore";
+import { useAuthStore } from "@/store/authStore";
+import { useApiForMain } from "@/features/auth/hooks/useApiForMain";
+import { useApiForCampaignStatusUpdate } from "@/features/campaignManager/hooks/useApiForCampaignStatusUpdate";
+import { useApiForCampaignBlacklistCount } from "@/features/listManager/hooks/useApiForCampaignBlacklistCount";
+import useApiForCampaignListDelete from "@/features/listManager/hooks/useApiForCampaignListDelete";
+import BlackListCountPopup from "@/features/campaignManager/components/popups/BlackListCountPopup";
+import CustomAlert, { CustomAlertRequest } from "@/components/shared/layout/CustomAlert";
+import IDialogButtonForCampaingDelete from "./dialog/IDialogButtonForCampaingDelete";
+
+
+export type CampaignStatus = "started" | "pending" | "stopped";
 
 export const getStatusIcon = (status?: string) => {
   switch (status) {
-    case 'started':
-      return '/sidebar-menu/tree_play.svg';
-    case 'pending':
-      return '/sidebar-menu/tree_pause.svg';
-    case 'stopped':
-      return '/sidebar-menu/tree_stop.svg';
+    case "started":
+      return "/sidebar-menu/tree_play.svg";
+    case "pending":
+      return "/sidebar-menu/tree_pause.svg";
+    case "stopped":
+      return "/sidebar-menu/tree_stop.svg";
     default:
       return null;
   }
@@ -68,7 +67,6 @@ interface ContextMenuForTreeNodeProps {
   onHandleCampaignCopy: () => void;
 }
 
-// 메뉴 아이템 정의 인터페이스
 interface MenuItemDefinition {
   menuId?: number;
   key: string;
@@ -91,7 +89,6 @@ export function ContextMenuForCampaignForCampaignTab({
   const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab, addMultiTab } = useTabStore();
   const [isBlacklistPopupOpen, setIsBlacklistPopupOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<CampaignStatus>(item.status);
-  const [tempStatus, setTempStatus] = useState<CampaignStatus>(item.status);
   const [blackListCount, setBlackListCount] = useState<number>(0);
   const [maxBlacklistCount, setMaxBlacklistCount] = useState<number>(1000000);
   const [commonBlacklistCount, setCommonBlacklistCount] = useState<number>(0);
@@ -101,67 +98,59 @@ export function ContextMenuForCampaignForCampaignTab({
   const { availableCampaignTabCampaignContextMenuIds } = useAvailableMenuStore();
 
   const { tenant_id, role_id, session_key } = useAuthStore();
+  const { setCampaigns, selectedCampaign, setSelectedCampaign } = useMainStore();
 
-  const { tenants
-    , setCampaigns
-    , selectedCampaign
-    , setSelectedCampaign
-  } = useMainStore();
-
-  const { openedTabs } = useTabStore();
-
+  // ====== API HOOKS ======
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
-      // if( tenant_id === 0){
-      //   setCampaigns(data.result_data);
-      // }else{
-      //   setCampaigns(data.result_data.filter(data=>data.tenant_id === tenant_id));
-      // }
-      setSelectedCampaign(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
-    }
+      setSelectedCampaign(
+        data.result_data.find(
+          (c: any) => c.campaign_id === selectedCampaign?.campaign_id
+        ) || null
+      );
+    },
   });
 
-  // 상태 관련 정보
+  const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
+    onSuccess: () => {
+      preventCloseRef.current = true;
+    },
+    onError: (error) => {
+      toast.error(error.message || "상태 변경 중 오류가 발생했습니다.");
+    },
+  });
+
+  const { mutate: deleteCampaignList } = useApiForCampaignListDelete({});
+  const { mutate: fetchCampaignBlacklistCount } = useApiForCampaignBlacklistCount({
+    onSuccess: (data) => {
+      setBlackListCount(data.result_data.blacklist_count);
+      setMaxBlacklistCount(data.result_data.max_count);
+      setCommonBlacklistCount(data.result_data.common_count);
+      setTimeout(() => {
+        setIsBlacklistPopupOpen(true);
+      }, 100);
+    },
+  });
+
+  // ====== HELPER FUNCTIONS ======
   const statusInfo = {
     started: { label: "시작", color: "#22c55e" },
     pending: { label: "멈춤", color: "#eab308" },
     stopped: { label: "중지", color: "#ef4444" },
   };
 
-  const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
-    onSuccess: (data) => {
-      // API 호출 완료 후에도 창이 닫히지 않도록 플래그 유지
-      preventCloseRef.current = true;
-
-    },
-    onError: (error) => {
-      toast.error(error.message || "상태 변경 중 오류가 발생했습니다.", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-    },
-  });
-
-  const { mutate: deleteCampaignList } = useApiForCampaignListDelete({});
-
-  const handleCampaignListDelete = (campaignId: any) => {
-    if (currentStatus !== 'stopped') {
-      toast.error("캠페인이 중지 상태일 때만 리스트를 삭제할 수 있습니다.", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-      return;
+  const getStatusNumber = (status: CampaignStatus): number => {
+    switch (status) {
+      case "started":
+        return 1;
+      case "pending":
+        return 2;
+      case "stopped":
+        return 3;
+      default:
+        return 0;
     }
-    deleteCampaignList(campaignId);
   };
 
   const handleEditMenuClick = () => {
@@ -178,7 +167,7 @@ export function ContextMenuForCampaignForCampaignTab({
       icon: '',
       href: '',
       content: null,
-      campaignId: campaignId
+      campaignId: campaignId,
     });
   };
 
@@ -203,137 +192,51 @@ export function ContextMenuForCampaignForCampaignTab({
       icon: '',
       href: '',
       content: null,
-      campaignId: campaignId
+      campaignId: campaignId,
     });
   };
 
-  const onCampaignDelete = (status: string, campaignId: any, campaignName: string) => {
-    if (status !== 'stopped') {
-      toast.error("캠페인이 중지 상태일 때만 삭제할 수 있습니다.", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+  const handleCampaignListDelete = (campaignId: any) => {
+    if (currentStatus !== "stopped") {
+      toast.error("캠페인이 중지 상태일 때만 리스트를 삭제할 수 있습니다.");
       return;
     }
-    addTab({
-      id: 131,
-      uniqueKey: `monitor-${Date.now()}`,
-      title: `상담원 삭제 - ${campaignName}`,
-      icon: '',
-      href: '',
-      content: null,
-      campaignId: campaignId,
-      campaignName: campaignName
-    });
+    deleteCampaignList(campaignId);
   };
 
-  const getStatusNumber = (status: CampaignStatus): number => {
-    switch (status) {
-      case 'started': return 1;
-      case 'pending': return 2;
-      case 'stopped': return 3;
-      default: return 0;
-    }
-  };
-
-  // const handleCampaingProgressUpdate = async (status: CampaignStatus) => {
-  //   if (currentStatus === status || updateCampaignStatusMutation.isPending) {
-  //     return;
-  //   }
-  //   // setTempStatus(status);
-  //   try {
-  //     preventCloseRef.current = true;
-  //     await updateCampaignStatusMutation.mutateAsync({
-  //       campaign_id: Number(item.id),
-  //       campaign_status: getStatusNumber(status)
-  //     });
-
-  //     // tofix:
-  //     fetchMain({
-  //       session_key: session_key,
-  //       tenant_id: tenant_id
-  //     });
-
-  //   } catch (error) {
-  //     console.error('Error changing campaign status:', {
-  //       campaignId: item.id,
-  //       campaignName: item.label,
-  //       attemptedStatus: status,
-  //       error: error
-  //     });
-  //   }
-  // };
-
-  // handleCampaingProgressUpdate 함수 수정
   const handleCampaingProgressUpdate = async (status: CampaignStatus) => {
     if (currentStatus === status || updateCampaignStatusMutation.isPending) {
       return;
     }
-
     try {
       preventCloseRef.current = true;
-
-      // 먼저 로컬 상태를 업데이트하여 UI에 즉시 반영
       setCurrentStatus(status);
-
-      // API 호출로 서버 상태 업데이트
       await updateCampaignStatusMutation.mutateAsync({
         campaign_id: Number(item.id),
-        campaign_status: getStatusNumber(status)
+        campaign_status: getStatusNumber(status),
       });
-
-      // 데이터 새로고침
-      fetchMain({
-        session_key: session_key,
-        tenant_id: tenant_id
-      });
-
+      fetchMain({ session_key, tenant_id });
     } catch (error) {
-      // 에러 발생 시 원래 상태로 되돌림
       setCurrentStatus(item.status);
       console.error('Error changing campaign status:', {
         campaignId: item.id,
         campaignName: item.label,
         attemptedStatus: status,
-        error: error
+        error: error,
       });
     }
   };
-
-
-
-
-
-  // 캠페인 블랙리스트 건수 조회 API 호출
-  const { mutate: fetchCampaignBlacklistCount } = useApiForCampaignBlacklistCount({
-    onSuccess: (data) => {
-      console.log("블랙리스트 건수 조회 성공 at 컴퍼넌트 :", data);
-
-      // Update all state values from the API response
-      setBlackListCount(data.result_data.blacklist_count);
-      setMaxBlacklistCount(data.result_data.max_count);
-      setCommonBlacklistCount(data.result_data.common_count);
-
-      setTimeout(() => {
-        setIsBlacklistPopupOpen(true);
-      }, 100);
-    }
-  });
 
   const handleBlacklistCountCheckClick = () => {
     fetchCampaignBlacklistCount(Number(item.id));
   };
 
-  // 상태 서브메뉴 렌더링
+  // ====== SUB MENU FOR STATUS ======
   const renderStatusSubMenu = () => (
     <ContextMenuSub>
       <ContextMenuSubTrigger
         className="flex items-center text-sm"
-        onPointerDown={(e) => {
+        onPointerDown={() => {
           preventCloseRef.current = false;
         }}
       >
@@ -396,34 +299,96 @@ export function ContextMenuForCampaignForCampaignTab({
     </ContextMenuSub>
   );
 
-  // 메인 메뉴 아이템들을 배열로 분리
+  // ====== MAIN MENU ======
   const mainMenuItems: MenuItemDefinition[] = [
-    { key: "edit", title: "캠페인 수정", onClick: handleEditMenuClick, menuId: 19 },
-    { key: "status", render: renderStatusSubMenu, menuId: 20 },
-    { key: "progress", title: "캠페인 진행정보", onClick: () => handleProgressInfoClick(item.id, item.label), menuId: 24 },
-    { key: "separator1", type: "separator" },
-    { key: "rebroadcast", title: "재발신", onClick: () => handleRebroadcastClick(item.id), menuId: 25 },
-    { key: "separator2", type: "separator" },
-    { key: "copy", title: "캠페인 복사", onClick: onHandleCampaignCopy, menuId: 26 },
-    { key: "delete", title: "캠페인 삭제", onClick: () => onCampaignDelete(currentStatus, item.id, item.label), condition: !isFolder, className: "text-red-500", menuId: 27 },
-    { key: "separator3", type: "separator" },
-    { key: "listDelete", title: "캠페인 리스트 삭제", onClick: () => handleCampaignListDelete(item.id), condition: currentStatus === 'stopped', menuId: 28 },
-    { key: "monitor", title: "상담원 상태 모니터", onClick: () => handleMonitorClick(item.id, item.label), menuId: 29 },
-    { key: "blacklist", title: "블랙리스트 건수 조회", onClick: handleBlacklistCountCheckClick, menuId: 30 },
+    {
+      key: "edit",
+      title: "캠페인 수정",
+      onClick: handleEditMenuClick,
+      menuId: 19,
+    },
+    {
+      key: "status",
+      render: renderStatusSubMenu,
+      menuId: 20,
+    },
+    {
+      key: "progress",
+      title: "캠페인 진행정보",
+      onClick: () => handleProgressInfoClick(item.id, item.label),
+      menuId: 24,
+    },
+    {
+      key: "separator1",
+      type: "separator",
+    },
+    {
+      key: "rebroadcast",
+      title: "재발신",
+      onClick: () => handleRebroadcastClick(item.id),
+      menuId: 25,
+    },
+    {
+      key: "separator2",
+      type: "separator",
+    },
+    {
+      key: "copy",
+      title: "캠페인 복사",
+      onClick: onHandleCampaignCopy,
+      menuId: 26,
+    },
+    {
+      key: "delete",
+      // 캠페인 삭제를 다이얼로그 버튼으로 대체
+      render: () => (
+        <div className="py-1" key="delete">
+          <IDialogButtonForCampaingDelete
+            campaignId={item.id}
+            campaignName={item.label}
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start text-left text-red-500"
+            buttonText="캠페인 삭제"
+            isDisabled={currentStatus !== 'stopped'}
+          />
+        </div>
+      ),
+      condition: !isFolder,
+      className: "",
+      menuId: 27,
+    },
+    {
+      key: "separator3",
+      type: "separator",
+    },
+    {
+      key: "listDelete",
+      title: "캠페인 리스트 삭제",
+      onClick: () => handleCampaignListDelete(item.id),
+      condition: currentStatus === 'stopped',
+      menuId: 28,
+    },
+    {
+      key: "monitor",
+      title: "상담원 상태 모니터",
+      onClick: () => handleMonitorClick(item.id, item.label),
+      menuId: 29,
+    },
+    {
+      key: "blacklist",
+      title: "블랙리스트 건수 조회",
+      onClick: handleBlacklistCountCheckClick,
+      menuId: 30,
+    },
   ];
 
   const filteredMenuItems = mainMenuItems.filter((menuItem) => {
-    // separator는 권한 체크 없이 포함
     if (menuItem.type === "separator") return true;
-
-    // menuId가 없는 항목은 무조건 표시 (이전 코드의 호환성 유지)
     if (menuItem.menuId === undefined) return true;
-
-    // 권한이 있는 메뉴만 표시
     return availableCampaignTabCampaignContextMenuIds.includes(menuItem.menuId);
   });
 
-  // 수정이 필요한 부분만 변경했습니다.
   return (
     <>
       <ContextMenu>
@@ -432,11 +397,19 @@ export function ContextMenuForCampaignForCampaignTab({
           {filteredMenuItems.map((menuItem) => {
             if (menuItem.condition === false) return null;
             if (menuItem.type === "separator") {
-              return <ContextMenuSeparator key={menuItem.key} className="my-1" />;
+              return (
+                <ContextMenuSeparator
+                  key={menuItem.key}
+                  className="my-1"
+                />
+              );
             }
             if (menuItem.render) {
-              // key 속성을 추가하여 React 오류 해결
-              return <React.Fragment key={menuItem.key}>{menuItem.render()}</React.Fragment>;
+              return (
+                <React.Fragment key={menuItem.key}>
+                  {menuItem.render()}
+                </React.Fragment>
+              );
             }
             return (
               <ContextMenuItem
@@ -476,4 +449,3 @@ export function ContextMenuForCampaignForCampaignTab({
     </>
   );
 }
-
