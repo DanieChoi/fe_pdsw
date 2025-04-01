@@ -141,7 +141,7 @@ export default function Footer({
         if (tempCampaign && tempCampaign.dial_mode === 2) {
           _message += '캠페인 아이디 ' + data['campaign_id'] + ' , 현재 설정값 ' + data['dial_speed'] * 2;
         } else {
-          _message += '캠페인 아이디 ' + data['campaign_id'] + ' , 현재 설정값 ' + data['dial_speed'];
+          _message += '캠페인 아이디 ' + data['campaign_id'] + ' , 현재 설정값 ' + data['dial_speed'] * 2;
         }
       }
     }
@@ -215,13 +215,21 @@ export default function Footer({
       const _skillId = data['skill_id'];
       const tempFooterDataList: FooterDataType[] = [];
       for (let i = 0; i < tempAgentIdList.length; i++) {
-        let __message = '[스킬 '
+        // let __message = '[스킬 '
+        // if (command === 'UPDATE') {
+        //   __message += '추가] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
+        // } else if (command === 'DELETE') {
+        //   __message += '해제] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
+        // } else if (command === 'INSERT') {
+        //   __message += '추가] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
+        // }
+        let __message = '[EVENT] '
         if (command === 'UPDATE') {
-          __message += '추가] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
+          __message += '상담원 스킬 할당';
         } else if (command === 'DELETE') {
-          __message += '해제] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
+          __message += '상담원 스킬 해제';
         } else if (command === 'INSERT') {
-          __message += '추가] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
+          __message += '상담원 스킬 할당';
         }
         tempFooterDataList.push({
           time: _time,
@@ -268,13 +276,14 @@ export default function Footer({
     }
     //스킬편집
     else if (announce === '/pds/skill') {
+      console.log("Skill event:", command, data);
       _message = '[스킬 '
       if (command === 'INSERT') {
         _message += '추가] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
+      } else if (command === 'UPDATE') {
+        _message += '변경] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
       } else if (command === 'DELETE') {
         _message += '삭제] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
-      } else if (command === 'UPDATE') {
-        _message += '수정] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
       }
     }
     //캠페인 요구스킬 수정
@@ -316,6 +325,7 @@ export default function Footer({
         } else if (data['campaign_status'] === 3) {
           _start_flag = '중지';
         }
+        const tempCampaign = campaigns.filter((campaign) => campaign.campaign_id === Number(data['campaign_id']));
         _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
         _message2 += '캠페인 아이디 : ' + data['campaign_id'] + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
       }
@@ -324,7 +334,6 @@ export default function Footer({
     //발신리스트등록
     else if (announce === '/pds/campaign/calling-list') {
       _message = '발신리스트등록, '
-      _message2 = '발신리스트등록' + '\n'
       if (command === 'INSERT') {
         let list_flag = '';
         if (data['list_flag'] === 'I') {
@@ -337,9 +346,9 @@ export default function Footer({
           list_flag = '초기화';
         }
         _message += '캠페인 아이디 : ' + data['campaign_id'] + ' , 리스트구분 : ' + list_flag;
-        _message2 += '캠페인 아이디 : ' + data['campaign_id'] //+ '\n' +
-        //   '리스트구분 : ' + list_flag + '\n' +
-        //   '';
+        _message2 += '캠페인 아이디 : ' + data['campaign_id'] + '\n' +
+          '리스트구분 : ' + list_flag + '\n' +
+          '';
       }
     }
 
@@ -360,10 +369,10 @@ export default function Footer({
 
 
     if (useAlramPopup === 1) {
-      // console.log("여기야 여기 11111111");
+      console.log("여기야 여기 11111111");
       // alert("hi2")
       toast.success(`${_message2}`, {
-        duration: 5000
+        duration: 6000
       });
     }
 

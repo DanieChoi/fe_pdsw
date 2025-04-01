@@ -87,7 +87,14 @@ export const UpdateSkill = async (credentials: CreateSkillCredentials): Promise<
 export const DeleteSkill = async (credentials: DeleteSkillCredentials): Promise<SuccesResponse> => {
     try {
         const { data } = await axiosInstance.delete<SuccesResponse>(
-            `skills/${credentials.skill_id}`
+            `skills/${credentials.skill_id}`,
+            {
+                data: {
+                    request_data: {
+                        skill_name: credentials.skill_name
+                    }
+                }
+            }
         );
         return data;
     } catch (error: any) {

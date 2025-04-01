@@ -338,6 +338,7 @@ export interface  CreateSkillCredentials {
 
 export interface DeleteSkillCredentials {
   skill_id: number;
+  skill_name: string;
 }
 
 export interface DeleteAgentSkillCredentials {

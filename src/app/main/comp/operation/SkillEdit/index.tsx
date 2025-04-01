@@ -519,7 +519,7 @@ const SkillEdit = () => {
         for (const skillId of selectedSkillIds) {
           try {
             await new Promise<void>((resolve, reject) => {
-              deleteSkill({ skill_id: Number(skillId) }, {
+              deleteSkill({ skill_id: Number(skillId), skill_name: editableFields.skillName}, {
                 onSuccess: () => {
                   successCount++;
                   resolve();
@@ -586,7 +586,7 @@ const SkillEdit = () => {
       }
     
       showConfirm('선택한 스킬을 삭제하시겠습니까?\n\n※주의 : 삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해주세요.', () => {
-        deleteSkill({ skill_id: Number(selectedSkill.skillId) }, {
+        deleteSkill({ skill_id: Number(selectedSkill.skillId), skill_name: editableFields.skillName}, {
           onSuccess: () => {
             // 스킬 리스트 새로고침
             fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
