@@ -102,6 +102,7 @@ export const CampaignInfo: MainDataResponse = {
   delete_flag: 0,
   list_count: 0,
   list_redial_query: '',
+  campaign_status: 0,
   next_campaign: 0,
   token_id: 0,
   phone_order: '',

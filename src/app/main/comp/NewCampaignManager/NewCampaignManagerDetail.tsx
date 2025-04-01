@@ -179,7 +179,8 @@ export const CampaignInfo: MainDataResponse = {
     "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0"
 ],
   dial_mode_option: 0,
-  user_option: '',  
+  user_option: '',
+  campaign_status: 0
 }
 
 export interface OperationTimeParam {

@@ -1,4 +1,3 @@
-// \nproject\fe_pdsw\src\features\campaignManager\hooks\useApiForCampaignStatusUpdate.ts
 import { useMutation, useQueryClient, UseMutationOptions } from '@tanstack/react-query';
 import { fetchCampaignStatusUpdate } from '../api/mainCampaignStatusUpdate';
 import { CampaignStatusDataRequest, CampaignStatusResponse, CampaignApiError } from '../types/campaignManagerIndex';
@@ -30,17 +29,17 @@ export function useApiForCampaignStatusUpdate(
 
       // 상태 업데이트 성공 후 관련 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ['treeMenuDataForSideMenu'] });
-
-      queryClient.invalidateQueries({ 
-        queryKey: ['mainCampaignProgressInformation'] 
-      });
+      queryClient.invalidateQueries({ queryKey: ['mainCampaignProgressInformation'] });
+      
+      // mainData 쿼리 무효화하여 캠페인 목록 새로고침
+      queryClient.invalidateQueries({ queryKey: ['mainData'] });
 
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: CampaignApiError, variables: CampaignStatusDataRequest, context: unknown) => {
       console.error('API Error:', error);
       // API 오류 시 에러 메시지 표시
-      // customAlertService.error(error.message || '데이터 로드에 실패했습니다.', 'API 오류');
+      customAlertService.error(error.message || '데이터 로드에 실패했습니다.', 'API 오류');
       options?.onError?.(error, variables, context);
     },
   });

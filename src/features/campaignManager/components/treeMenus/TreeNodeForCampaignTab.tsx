@@ -10,6 +10,7 @@ import { FolderContextMenu } from "./FolderContextMenuForTreeNode";
 import Image from "next/image";
 import clsx from "clsx";
 import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
+import { useMainStore } from "@/store/mainStore";
 
 export function TreeNodeForCampaignTab({
   item,
@@ -22,6 +23,7 @@ export function TreeNodeForCampaignTab({
   compact = false, // 컴팩트 모드 기본값 추가
 }: TreeNodeProps) {
   const { skilIdsForCampaignTreeMenu, viewMode } = useTreeMenuStore(); // 통합 스토어 사용
+  const { campaigns } = useMainStore(); // Get campaigns from MainStore for real-time status
   const {
     simulateHeaderMenuClick,
     setCampaignIdForUpdateFromSideMenu,
@@ -29,11 +31,30 @@ export function TreeNodeForCampaignTab({
     addTab,
   } = useTabStore();
 
+  // Get the most current status from the campaigns store
+  const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
+  const currentStatus = currentCampaign ? 
+    (() => {
+      switch (currentCampaign.campaign_status) {
+        case 1: return "started";
+        case 2: return "pending";
+        case 3: return "stopped";
+        default: return item.status;
+      }
+    })() : 
+    item.status;
+
+  // Update the item with the current status to ensure it's passed to the ContextMenu
+  const updatedItem = {
+    ...item,
+    status: currentStatus
+  };
+
   // 캠페인 타입일 경우 hasChildren은 항상 false로 처리
   const hasChildren = item.type === "campaign" ? false : (item.children && item.children.length > 0);
   const isExpanded = expandedNodes.has(item.id);
   const isSelected = selectedNodeId === item.id;
-  const statusIcon = item.type === "campaign" ? getStatusIcon(item.status) : null;
+  const statusIcon = item.type === "campaign" ? getStatusIcon(currentStatus) : null;
 
   const handleClick = useCallback(() => {
     onNodeSelect(item.id);
@@ -196,7 +217,7 @@ export function TreeNodeForCampaignTab({
         </ContextMenu>
       ) : (
         <ContextMenuForCampaignForCampaignTab
-          item={item}
+          item={updatedItem}
           onEdit={handleEdit}
           onMonitor={handleMonitor}
           onHandleCampaignCopy={onHandleCampaignCopy}

@@ -180,6 +180,7 @@ export const CampaignInfo: MainDataResponse = {
   ],
   dial_mode_option: 0,
   user_option: '',
+  campaign_status: 0,
 }
 
 export interface OperationTimeParam {

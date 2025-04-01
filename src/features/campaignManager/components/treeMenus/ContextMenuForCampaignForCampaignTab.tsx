@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, JSX } from "react";
+import React, { useState, useRef, JSX, useEffect } from "react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -17,7 +17,6 @@ import { toast } from "react-toastify";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
-import { useState as useReactState } from "react";
 import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
 import { useMainStore } from "@/store/mainStore";
 import { useAuthStore } from "@/store/authStore";
@@ -88,7 +87,6 @@ export function ContextMenuForCampaignForCampaignTab({
   const isFolder = item.type === "folder";
   const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab, addMultiTab } = useTabStore();
   const [isBlacklistPopupOpen, setIsBlacklistPopupOpen] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState<CampaignStatus>(item.status);
   const [blackListCount, setBlackListCount] = useState<number>(0);
   const [maxBlacklistCount, setMaxBlacklistCount] = useState<number>(1000000);
   const [commonBlacklistCount, setCommonBlacklistCount] = useState<number>(0);
@@ -98,7 +96,26 @@ export function ContextMenuForCampaignForCampaignTab({
   const { availableCampaignTabCampaignContextMenuIds } = useAvailableMenuStore();
 
   const { tenant_id, role_id, session_key } = useAuthStore();
-  const { setCampaigns, selectedCampaign, setSelectedCampaign } = useMainStore();
+  const { campaigns, setCampaigns, selectedCampaign, setSelectedCampaign } = useMainStore();
+
+  // Get current status directly from the campaigns store to ensure we always have the latest status
+  const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
+  const [displayStatus, setDisplayStatus] = useState<CampaignStatus>(item.status);
+
+  // Update the displayed status whenever the item prop or campaigns state changes
+  useEffect(() => {
+    if (currentCampaign) {
+      const statusMap: Record<number, CampaignStatus> = {
+        1: "started",
+        2: "pending", 
+        3: "stopped"
+      };
+      const updatedStatus = statusMap[currentCampaign.campaign_status] || item.status;
+      setDisplayStatus(updatedStatus);
+    } else {
+      setDisplayStatus(item.status);
+    }
+  }, [currentCampaign, item.status, campaigns]);
 
   // ====== API HOOKS ======
   const { mutate: fetchMain } = useApiForMain({
@@ -115,6 +132,8 @@ export function ContextMenuForCampaignForCampaignTab({
   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
     onSuccess: () => {
       preventCloseRef.current = true;
+      // Refresh campaigns data after status update
+      fetchMain({ session_key, tenant_id });
     },
     onError: (error) => {
       toast.error(error.message || "상태 변경 중 오류가 발생했습니다.");
@@ -197,7 +216,7 @@ export function ContextMenuForCampaignForCampaignTab({
   };
 
   const handleCampaignListDelete = (campaignId: any) => {
-    if (currentStatus !== "stopped") {
+    if (displayStatus !== "stopped") {
       toast.error("캠페인이 중지 상태일 때만 리스트를 삭제할 수 있습니다.");
       return;
     }
@@ -205,19 +224,34 @@ export function ContextMenuForCampaignForCampaignTab({
   };
 
   const handleCampaingProgressUpdate = async (status: CampaignStatus) => {
-    if (currentStatus === status || updateCampaignStatusMutation.isPending) {
+    if (displayStatus === status || updateCampaignStatusMutation.isPending) {
       return;
     }
+    
     try {
       preventCloseRef.current = true;
-      setCurrentStatus(status);
+      // Set optimistic update for better UX
+      setDisplayStatus(status);
+      
       await updateCampaignStatusMutation.mutateAsync({
         campaign_id: Number(item.id),
         campaign_status: getStatusNumber(status),
       });
-      fetchMain({ session_key, tenant_id });
+      
+      // The fetchMain will be called in onSuccess callback
     } catch (error) {
-      setCurrentStatus(item.status);
+      // Revert to the actual status if there's an error
+      if (currentCampaign) {
+        const statusMap: Record<number, CampaignStatus> = {
+          1: "started",
+          2: "pending", 
+          3: "stopped"
+        };
+        setDisplayStatus(statusMap[currentCampaign.campaign_status] || item.status);
+      } else {
+        setDisplayStatus(item.status);
+      }
+      
       console.error('Error changing campaign status:', {
         campaignId: item.id,
         campaignName: item.label,
@@ -245,13 +279,13 @@ export function ContextMenuForCampaignForCampaignTab({
           <span className="ml-1 flex items-center">
             <div className="w-4 h-4 mr-1">
               <Image
-                src={getStatusIcon(currentStatus) || ''}
-                alt={currentStatus}
+                src={getStatusIcon(displayStatus) || ''}
+                alt={displayStatus}
                 width={16}
                 height={16}
               />
             </div>
-            {statusInfo[currentStatus].label}
+            {statusInfo[displayStatus].label}
           </span>
         </span>
       </ContextMenuSubTrigger>
@@ -274,7 +308,7 @@ export function ContextMenuForCampaignForCampaignTab({
             }}
             className={cn(
               "flex items-center justify-between text-sm px-2 py-1.5",
-              currentStatus === status ? "bg-gray-50" : "",
+              displayStatus === status ? "bg-gray-50" : "",
               updateCampaignStatusMutation.isPending ? "opacity-70" : ""
             )}
             disabled={updateCampaignStatusMutation.isPending}
@@ -290,7 +324,7 @@ export function ContextMenuForCampaignForCampaignTab({
               </div>
               <span>{statusInfo[status].label}</span>
             </div>
-            {currentStatus === status && (
+            {displayStatus === status && (
               <Check className="h-4 w-4 text-green-500" />
             )}
           </ContextMenuItem>
@@ -350,7 +384,7 @@ export function ContextMenuForCampaignForCampaignTab({
             size="sm"
             className="w-full justify-start text-left text-red-500"
             buttonText="캠페인 삭제"
-            isDisabled={currentStatus !== 'stopped'}
+            isDisabled={displayStatus !== 'stopped'}
           />
         </div>
       ),
@@ -366,7 +400,7 @@ export function ContextMenuForCampaignForCampaignTab({
       key: "listDelete",
       title: "캠페인 리스트 삭제",
       onClick: () => handleCampaignListDelete(item.id),
-      condition: currentStatus === 'stopped',
+      condition: displayStatus === 'stopped',
       menuId: 28,
     },
     {
