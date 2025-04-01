@@ -170,7 +170,7 @@ export default function SidebarContainer() {
         {/* Main Content Area */}
         <div className="flex-1 relative flex flex-col min-h-0">
           <div className={`absolute inset-0 flex flex-col transition-all duration-300 ease-in-out
-                        ${!storeIsOpen ? 'invisible' : ''}`}>
+              ${!storeIsOpen ? 'invisible' : ''}`}>
             {/* 상단 헤더 */}
             <div className="flex-none flex items-center justify-between py-1.5 px-[20px] border-b">
               <div className="flex items-center gap-2">
