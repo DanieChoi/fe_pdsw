@@ -245,10 +245,10 @@ export default function Header() {
         <div className="flex justify-between items-center w-full">
           <div className="flex items-center">
             <Image
-              src="/header-menu/nexpds-logo.svg"
+              src="/header-menu/header-logo.svg"
               alt="UPDS"
-              width={66}
-              height={11}
+              width={54}
+              height={18}
               priority
             />
           </div>
