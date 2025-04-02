@@ -336,6 +336,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     type: '1',
   });
   const router = useRouter();
+  const [campaignNewId, setCampaignNewId] = useState<number>(0);
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
@@ -819,6 +820,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   const { mutate: fetchCampaignManagerInsert } = useApiForCampaignManagerInsert({
     onSuccess: (data) => {
       setCampaignInfoChangeYn(false);
+      setCampaignNewId(data.result_data.campaign_id);
       const _tempCampaignSchedule = {...tempCampaignSchedule,
         campaign_id: data.result_data.campaign_id
       }
@@ -866,12 +868,18 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
       setCampaignScheduleChangeYn(false);  
       if( changeYn ){
         if( campaignSkillChangeYn ){
+          const _tempCampaignSkills = {...tempCampaignSkills,
+            campaign_id: campaignNewId
+          }
           //캠페인 스킬 수정 api 호출
-          fetchCampaignSkillUpdate(tempCampaignSkills);
+          fetchCampaignSkillUpdate(_tempCampaignSkills);
         }
         if( campaignDialSpeedChangeYn ){
+          const _tempCampaignDialSpeedInfo = {...tempCampaignDialSpeedInfo,
+            campaign_id: campaignNewId
+          }
           //캠페인 발신 속도 수정 api 호출
-          fetchDialSpeedUpdate( tempCampaignDialSpeedInfo );
+          fetchDialSpeedUpdate( _tempCampaignDialSpeedInfo );
         }
       }
     }
