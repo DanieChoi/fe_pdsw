@@ -458,8 +458,8 @@ export function TreeNodeForCounselorListForSideBar({
     switch (type) {
       case 'organization': return data.centerName;
       case 'tenant': return data.tenantName;
-      case 'group': return data.groupName;
-      case 'team': return data.teamName;
+      case 'group': return '[' + data.groupId + ']' + data.groupName;
+      case 'team': return '[' + data.teamId + ']' + data.teamName;
       case 'counselor': return data.counselorname;
     }
   };
