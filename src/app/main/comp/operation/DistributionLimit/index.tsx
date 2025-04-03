@@ -13,6 +13,7 @@ import { useApiForCreateMaxCall, useApiForDeleteMaxCall, useApiForMaxCallInitTim
 import { useApiForCampaignAgentList } from '@/features/preferences/hooks/useApiForCampaignAgent';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import TimePickerComponent from './TimePicker';
 
 interface Row {
   id: string;
@@ -676,6 +677,18 @@ const DistributionLimit = () => {
   const [isTimeRemoveOpen, setIsTimeRemoveOpen] = useState(false);
   const [timeValue, setTimeValue] = useState('');
 
+  // 모달 열 때 시간 상태 초기화 함수 개선
+  const openTimeSettingModal = () => {
+    // 기존 설정 값이 있고 유효한 경우 기본값으로 설정
+    if (initTime && initTime !== "9999") {
+      setTimeValue(initTime);
+    } else {
+      // 기본값으로 00시 00분 설정
+      setTimeValue("0000");
+    }
+    setIsTimeSettingOpen(true);
+  };
+
   const handleTimeSettingSave = () => {
     if (!timeValue) {
       showAlert('시간을 입력해주세요.');
@@ -683,9 +696,14 @@ const DistributionLimit = () => {
     }
 
     // 시간 형식 검증 (0000-2359 사이의 4자리 숫자)
-    const timeRegex = /^([0-1][0-9]|2[0-3])[0-5][0-9]$/;
-    if (!timeRegex.test(timeValue)) {
-      showAlert('올바른 시간 형식이 아닙니다. (예: 2300)');
+    // const timeRegex = /^([0-1][0-9]|2[0-3])[0-5][0-9]$/;
+    // if (!timeRegex.test(timeValue)) {
+    //   showAlert('올바른 시간 형식이 아닙니다. (예: 2300)');
+    //   return;
+    // }
+
+    if (timeValue.length !== 4) {
+      showAlert('올바른 시간 형식이 아닙니다.');
       return;
     }
 
@@ -923,7 +941,7 @@ const DistributionLimit = () => {
     { 
       key: 'center', 
       name: '센터',
-      width: 140, 
+      width: 200, 
       renderCell: ({ row }: { row: Row }) => {
         const indent = row.level * 20;
         const hasToggle = row.hasChildren;
@@ -1146,7 +1164,8 @@ const DistributionLimit = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <CommonButton onClick={() => setIsTimeSettingOpen(true)}>초기화시간 변경</CommonButton>
+          {/* <CommonButton onClick={() => setIsTimeSettingOpen(true)}>초기화시간 변경</CommonButton> */}
+          <CommonButton onClick={openTimeSettingModal}>초기화시간 변경</CommonButton>
           <CommonButton onClick={() => setIsTimeRemoveOpen(true)}>초기화시간 설정해제</CommonButton>
         </div>
       </div>
@@ -1305,7 +1324,7 @@ const DistributionLimit = () => {
           onSelect={handleModalSelect}
         />
 
-        <CustomAlert
+        {/* <CustomAlert
           isOpen={isTimeSettingOpen}
           message={
             <div className="flex flex-col gap-4">
@@ -1322,6 +1341,30 @@ const DistributionLimit = () => {
                 placeholder="예) 23시00분은 2300"
                 className="w-full"
               />
+            </div>
+          }
+          title="초기화 시간 설정"
+          type="1"
+          onClose={handleTimeSettingSave}
+          onCancle={() => setIsTimeSettingOpen(false)}
+        /> */}
+
+        <CustomAlert
+          isOpen={isTimeSettingOpen}
+          message={
+            <div className="flex flex-col gap-4">
+              <div className="text-center">
+                {initTime === "9999" 
+                  ? "현재 설정 값이 없습니다. 시간을 입력하세요" 
+                  : `현재설정값 : ${initTime.slice(0, 2)}시 ${initTime.slice(2)}분`
+                }
+              </div>
+              <div className="flex justify-center pt-2">
+                <TimePickerComponent
+                  value={timeValue}
+                  onChange={setTimeValue}
+                />
+              </div>
             </div>
           }
           title="초기화 시간 설정"
