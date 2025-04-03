@@ -849,6 +849,7 @@ const SystemPreferences = () => {
 
     // 채널 선택 시 상세 정보 업데이트
     useEffect(() => {
+        // console.log("campaigns", campaigns);
         if (selectedChannel) {
             setAllocationOutboundMode(selectedChannel.assignValue.toString());
         }
