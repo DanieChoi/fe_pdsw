@@ -197,6 +197,7 @@ function CampaignLayout() {
     }
   });
 
+  // 컴포넌트 마운트 시 발신번호 조회
   useEffect(() => {
     fetchCallingNumbers({
       session_key: '',
@@ -205,6 +206,7 @@ function CampaignLayout() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 키보드 이벤트 리스너 추가
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowDown') {
@@ -247,6 +249,7 @@ function CampaignLayout() {
     }
   }, [callingNumbers, selectedCampaignId, isNewMode, campaigns]);
 
+  // 발신번호 업데이트 함수
   const updateCallingNumber = (campaignId: number) => {
     const callingNumber = callingNumbers.find(
       num => num.campaign_id === campaignId
@@ -254,6 +257,7 @@ function CampaignLayout() {
     setSelectedCallingNumber(callingNumber?.calling_number || '');
   };
 
+  // 그리드 열 정의
   const columns = useMemo(() => [
     {
       key: 'campaign_id',
@@ -269,6 +273,7 @@ function CampaignLayout() {
     }
   ], []);
 
+  // 그리드 행 데이터 생성
   const rows = useMemo(() => {
     // campaigns나 callingNumbers가 없거나 빈 배열인 경우 빈 배열 반환
     if (!campaigns || !Array.isArray(campaigns) || campaigns.length === 0) {
@@ -282,6 +287,7 @@ function CampaignLayout() {
       // campaign이 유효한지 확인
       if (!campaign || typeof campaign !== 'object') return null;
       
+      // callingNumbers에서 캠페인 ID에 해당하는 발신번호 찾기
       const callingNumber = safeCallingNumbers.find(
         num => num && campaign && num.campaign_id === campaign.campaign_id
       );
@@ -309,6 +315,8 @@ function CampaignLayout() {
     return selectedRow?.campaign_id === row.campaign_id ? 'bg-[#FFFAEE]' : ''; 
   };
 
+  // 모달에서 캠페인 선택 시 호출되는 핸들러
+  // 캠페인 아이디와 이름을 받아서 상태 업데이트 및 발신번호 조회
   const handleModalSelect = (campaignId: string, campaignName: string) => {
     setSelectedCampaignId(campaignId);
     setSelectedCampaignName(campaignName);
@@ -338,6 +346,7 @@ function CampaignLayout() {
       return;
     }
 
+    // 발신번호가 이미 존재하는지 확인
     const existingCallingNumber = callingNumbers.find(num => num.campaign_id === Number(selectedCampaignId));
     const saveRequest = {
       campaign_id: Number(selectedCampaignId),

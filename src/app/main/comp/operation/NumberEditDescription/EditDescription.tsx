@@ -161,12 +161,14 @@ const EditDescription = () => {
     }
   })
 
+  // 전화번호설명 템플릿 조회
   useEffect(() => {
     fetchPhoneDescriptions({
       session_key: '',
       tenant_id: tenant_id,
     });
-  }, [fetchPhoneDescriptions])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tenant_id]);
   
   const [alertState, setAlertState] = useState({
     isOpen: false,
@@ -206,6 +208,7 @@ const EditDescription = () => {
     setAlertState(prev => ({ ...prev, isOpen: false }));
   };
 
+  // 전화번호 설명 저장
   const handleSave = () => {
     if (!validateData()) return;
 
@@ -225,6 +228,7 @@ const EditDescription = () => {
     }
   };
 
+  // 전화번호 설명 삭제
   const handleDelete = () => {
     // 선택된 행이 없는 경우 알림
     if (!selectedRow) {
@@ -254,6 +258,7 @@ const EditDescription = () => {
     });
   };
 
+  // 전화번호 설명 데이터 유효성 검사
   const validateData = () => {
     if (!inputId || !inputPhone1 || !inputPhone2 || !inputPhone3 || !inputPhone4 || !inputPhone5) {
       showAlert('모든 필드를 입력해주세요.');
@@ -262,6 +267,7 @@ const EditDescription = () => {
     return true;
   };
 
+  // 전화번호 설명 데이터 그리드 열 정의
   const columns = useMemo(() => [
     { key: 'id', name: '아이디' },
     { key: 'phone1', name: '전화번호1' },
@@ -271,11 +277,13 @@ const EditDescription = () => {
     { key: 'phone5', name: '전화번호5' },
   ], []);
 
+  // 전화번호 설명 데이터 그리드 행 정의
   const rows = useMemo(() => {
     const phoneData = phoneDescriptions || [];
     return phoneData.length > 0 ? transformToGridData(phoneData) : [];
   }, [phoneDescriptions]);
 
+  // 셀 클릭 핸들러
   const handleCellClick = ({ row }: CellClickArgs<PhoneRow>) => {
     setSelectedRow(row);
     setInputId(row.id);
@@ -287,6 +295,7 @@ const EditDescription = () => {
     setIsNewMode(false);
   };
 
+  // 신규 버튼 핸들러
   const handleNew = () => {
     setSelectedRow(null);
     // 그리드의 마지막 ID를 찾아서 +1 한 값을 설정

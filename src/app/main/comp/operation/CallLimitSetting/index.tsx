@@ -198,13 +198,14 @@ const CampaignSettings = () => {
     }
   });
 
-  // API 호출 후에 새로 가져온 데이터에서 현재 캠페인을 찾아 선택 상태로 설정
+  // 예약콜 제한건수 조회 API 호출 후 선택된 캠페인ID에 해당하는 항목을 찾아서 선택 상태 업데이트
   const updateSelectionAfterAPICall = () => {
-    // API 호출 후 새로 불러온 데이터에서 현재 선택된 캠페인ID에 해당하는 항목을 찾음
+    // limitSettings에서 선택된 캠페인 ID에 해당하는 항목 찾기
     const updatedSetting = limitSettings.find(
       setting => setting.campaign_id === Number(campaignId)
     );
     
+    // 찾은 항목이 있을 경우 선택 상태 업데이트
     if (updatedSetting) {
       const campaign = campaigns?.find(
         camp => camp.campaign_id === updatedSetting.campaign_id
@@ -222,7 +223,6 @@ const CampaignSettings = () => {
     }
   };
 
-  // useEffect 추가: limitSettings가 업데이트되면 선택 상태 업데이트
   useEffect(() => {
     if (campaignId && !isNewMode) {
       updateSelectionAfterAPICall();
@@ -243,6 +243,7 @@ const CampaignSettings = () => {
     { key: 'limit_number', name: '제한건수' }
   ], []);
 
+  // 그리드에 표시할 데이터
   const rows = useMemo(() => 
     limitSettings?.map(setting => {
       const campaign = campaigns?.find(
@@ -257,6 +258,8 @@ const CampaignSettings = () => {
   , [limitSettings, campaigns]);
 
 
+  // 저장 버튼 클릭 시 호출되는 함수
+  // 캠페인 아이디, 캠페인 이름, 제한건수 모두 입력되어야 저장 가능
   const handleSave = () => {
     if (!campaignId || !campaignName || !limitCount) {
       showAlert('모든 필드를 입력해주세요.');
@@ -289,6 +292,8 @@ const CampaignSettings = () => {
     }
   };
 
+  // 삭제 버튼 클릭 시 호출되는 함수
+  // 선택된 캠페인 아이디가 없을 경우 알림
   const handleDelete = () => {
     // 선택된 항목이 없을 경우 알림
     if (!campaignId || !selectedRow) {
@@ -332,6 +337,7 @@ const CampaignSettings = () => {
     );
   }
 
+  // 그리드 셀 클릭 시 호출되는 함수
   const handleCellClick = ({ row }: { row: Row }) => {
     setSelectedRow(row);
     setCampaignId(row.campaign_id);
@@ -339,6 +345,8 @@ const CampaignSettings = () => {
     setLimitCount(row.limit_number);
   };
 
+  // 신규 버튼 클릭 시 호출되는 함수
+  // 입력 필드 초기화 및 신규 모드 활성화
   const handleNew = () => {
     setSelectedRow(null);
     setCampaignId('');
@@ -347,6 +355,8 @@ const CampaignSettings = () => {
     setIsNewMode(true); 
   };
 
+  // 캠페인 선택 모달에서 캠페인 선택 시 호출되는 함수
+  // 선택된 캠페인 아이디와 이름을 상태에 저장하고, 그리드 로우도 선택
   const handleCampaignSelect = (id: string, name: string) => {
     setCampaignId(id);
     setCampaignName(name);

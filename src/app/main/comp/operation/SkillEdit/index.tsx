@@ -250,6 +250,8 @@ const SkillEdit = () => {
       }, {
         onSuccess: async (data) => {
           const campaignSkillData = data.result_data || [];
+          // console.log("최신 캠페인 스킬 데이터", data);
+          // console.log("선택된 캠페인 ID", selectedCampaignIds);
           
           // 진행 상태 추적
           let successCount = 0;

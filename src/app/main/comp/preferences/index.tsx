@@ -308,7 +308,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             <tbody>
               <TableRow>
                 <TableHeader className="w-[12.5rem] !py-[6px]">
-                  <Label className="w-32">매시지 알림창</Label>
+                  <Label className="w-32">메세지 알림창</Label>
                 </TableHeader>
                 <TableCell className="w-[17rem]">
                   <div className="flex items-center gap-3">
