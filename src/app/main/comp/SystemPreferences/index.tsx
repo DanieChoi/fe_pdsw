@@ -143,7 +143,7 @@ const SystemPreferences = () => {
     const { mutate: fetchDialingDeviceList } = useApiForDialingDevice({
         onSuccess: (data) => {
             
-            // 응답 데이터 구조 확인 및 방어적 처리
+            // 응답 데이터 구조 확인 및 예외 처리
             if (!data) {
                 setDialingDeviceList([]);
                 return;
@@ -354,6 +354,7 @@ const SystemPreferences = () => {
         }
     });
 
+    // 장비 목록 조회 시 테넌트 정보가 변경될 때마다 호출
     useEffect(() => {
         if (tenants && tenants.length > 0) {
             fetchDialingDeviceList({
@@ -402,6 +403,7 @@ const SystemPreferences = () => {
         return "미사용";
     };
 
+    // 할당 발신모드에 따른 채널 모드 반환
     const getChannelMode = (assignValue: number, assignKind: number): string => {
         if (assignKind === 1) {
             // 캠페인으로 할당일 때 기존 로직
@@ -467,9 +469,9 @@ const SystemPreferences = () => {
             device_name: device.device_name,
             usage: getDeviceUsage(device.device_id)
         }));
-    // deviceStatuses 의존성 추가
     }, [dialingDeviceList, channelList, deviceStatuses]);
 
+    // 장비 목록 데이터 구성
     const equipmentColumns = [
         { key: "device_id", name: "장비번호" },
         { key: "channel_count", name: "채널수" },
@@ -477,18 +479,21 @@ const SystemPreferences = () => {
         { key: "usage", name: "사용여부" }
     ];
 
+    // 채널 목록 데이터 구성
     const channelColumns = [
         { key: "channelNumber", name: "채널번호" },
         { key: "channelName", name: "채널이름" },
         { key: "mode", name: "할당 발신모드" },
     ];
 
+    // 장비 목록 클릭 핸들러
     const handleEquipmentCellClick = ({ row }: CellClickArgs<EquipmentRow>) => {
         if (row) {
             setSelectedDevice(row);
         }
     };
 
+    // 채널 목록 클릭 핸들러
     const handleChannelCellClick = ({ row }: CellClickArgs<ChannelRow>) => {
         if (row) {
             setSelectedChannel(row);
@@ -609,6 +614,7 @@ const SystemPreferences = () => {
         );
     }
 
+    // 채널 수정 핸들러
     const handleChannelEdit = () => {
         if (!selectedDevice) return;
         
@@ -658,6 +664,7 @@ const SystemPreferences = () => {
         showAlert('채널 정보가 성공적으로 수정되었습니다.');
     };
 
+    // 할당 발신모드 옵션 생성
     const getAllocationOutboundModeOptions = () => {
         if (allocationMode === "1") {
           // 캠페인으로 할당일 때 기본 옵션
@@ -785,7 +792,7 @@ const SystemPreferences = () => {
         return selectedChannel?.channelNumber === row.channelNumber ? 'bg-[#FFFAEE]' : '';
     };
 
-    // useEffect for handling channel selection and updates
+    // 장비 목록에서 선택된 장비가 변경될 때마다 채널 목록 업데이트
     useEffect(() => {
         if (selectedDevice) {
             setEquipmentNumber(selectedDevice.device_id);
