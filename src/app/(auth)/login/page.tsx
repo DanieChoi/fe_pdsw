@@ -173,8 +173,8 @@ export default function LoginPage() {
           <Image
             src="/logo/pds-logo.svg"
             alt="UPDS"
-            width={230}
-            height={51}
+            width={200}
+            height={70}
             priority
           />
         </div>
