@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import DataGrid from "react-data-grid";
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import DataGrid, { SelectCellFormatter } from "react-data-grid";
 import 'react-data-grid/lib/styles.css';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { CommonButton } from "@/components/shared/CommonButton";
@@ -14,6 +14,7 @@ import { useApiForCampaignAgentList } from '@/features/preferences/hooks/useApiF
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import TimePickerComponent from './TimePicker';
+import ContextMenu from './context_menu';
 
 interface Row {
   id: string;
@@ -30,6 +31,19 @@ interface Row {
   children?: Row[];
   isExpanded?: boolean;
   hasChildren?: boolean;
+  isEditing?: boolean;
+  hasChanges?: boolean;
+}
+
+interface EditData {
+  [key: string]: {
+    max_dist: string;
+    fix_flag: string;
+    original: {
+      max_dist: string;
+      fix_flag: string;
+    }
+  }
 }
 
 const errorMessage = {
@@ -44,7 +58,6 @@ const DistributionLimit = () => {
   const { campaigns, setSelectedCampaign } = useMainStore();
   const [treeData, setTreeData] = useState<Row[]>([]);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set([]));
-  const [selectedRow, setSelectedRow] = useState<Row | null>(null);
   const [selectedCampaignId, setSelectedCampaignId] = useState('');
   const [selectedCampaignName, setSelectedCampaignName] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,19 +67,41 @@ const DistributionLimit = () => {
   const [rawAgentData, setRawAgentData] = useState<Row[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { activeTabId, openedTabs } = useTabStore()
-  
-  const [formData, setFormData] = useState({
-    center: '',
-    group: '',
-    part: '',
-    agentId: '',
-    agentName: '',
-    maxDist: '',
-    currentResp: '',
-    fix_flag: ''
+  const { activeTabId, openedTabs } = useTabStore();
+  const [editedRows, setEditedRows] = useState<EditData>({});
+  const [hasChanges, setHasChanges] = useState(false);
+
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  // 우클릭 컨텍스트 메뉴 상태
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    rowId: string | null;
+    agentId: string | null;
+    level?: number;    // 레벨 정보 추가
+    group?: string;    // 그룹 정보 추가
+    part?: string;     // 파트 정보 추가
+  }>({
+    visible: false,
+    x: 0,
+    y: 0,
+    rowId: null,
+    agentId: null
   });
 
+  // 컨텍스트 메뉴 닫기 함수
+  const handleCloseContextMenu = () => {
+    setContextMenu({
+      visible: false,
+      x: 0,
+      y: 0,
+      rowId: null,
+      agentId: null
+    });
+  };
+  
   const [alertState, setAlertState] = useState({
     isOpen: false,
     message: '',
@@ -307,7 +342,18 @@ const DistributionLimit = () => {
           }
           
           if (shouldInclude) {
-            flat.push({ ...node, isExpanded });
+            // 편집된 데이터가 있으면 그 값으로 업데이트
+            if (editedRows[node.id]) {
+              flat.push({ 
+                ...node, 
+                isExpanded, 
+                max_dist: editedRows[node.id].max_dist,
+                fix_flag: editedRows[node.id].fix_flag,
+                hasChanges: true
+              });
+            } else {
+              flat.push({ ...node, isExpanded });
+            }
           }
         }
       });
@@ -333,19 +379,6 @@ const DistributionLimit = () => {
       setTreeData([]);
     }
   }, [filteredAgentData]);
-
-  // 처음에는 첫 번째 레벨만 확장
-  // useEffect(() => {
-  //   if (treeData.length > 0) {
-  //     // 최상위 노드만 확장 (센터 레벨)
-  //     const topLevelIds = new Set<string>();
-  //     treeData.forEach(row => {
-  //       topLevelIds.add(row.id);
-  //     });
-      
-  //     setExpandedRows(topLevelIds);
-  //   }
-  // }, [treeData]);
   
   // 처음에 모든 레벨 확장
   const collectAllNodeIds = (nodes: Row[], ids: Set<string>) => {
@@ -371,12 +404,25 @@ const DistributionLimit = () => {
   
   // 캠페인 ID Select 변경 핸들러
   const handleCampaignIdChange = (value: string) => {
+    // 변경된 데이터가 있으면 확인 창 표시
+    if (hasChanges) {
+      showConfirm("저장되지 않은 변경사항이 있습니다. 계속하시겠습니까?", () => {
+        proceedWithCampaignChange(value);
+      });
+    } else {
+      proceedWithCampaignChange(value);
+    }
+  };
+
+  const proceedWithCampaignChange = (value: string) => {
     setIsLoading(true); // 로딩 시작
 
     // 상태 초기화 추가
     setRawAgentData([]);  // 기존 에이전트 데이터 초기화
     setCampaignAgents([]); // 캠페인 에이전트 초기화
     setTreeData([]); // 트리 데이터 초기화
+    setEditedRows({}); // 편집 데이터 초기화
+    setHasChanges(false); // 변경사항 플래그 초기화
     
     setSelectedCampaignId(value);
     const campaign = campaigns.find(c => c.campaign_id.toString() === value);
@@ -384,18 +430,30 @@ const DistributionLimit = () => {
       setSelectedCampaignName(campaign.campaign_name);
       setSelectedCampaign(campaign);
     }
-    handleNew();
   };
 
   // 캠페인 모달에서 선택 시 핸들러
   const handleModalSelect = (campaignId: string, campaignName: string) => {
-    setSelectedCampaignId(campaignId);
-    setSelectedCampaignName(campaignName);
-    const campaign = campaigns.find(c => c.campaign_id === Number(campaignId));
-    if (campaign) {
-      setSelectedCampaign(campaign);
+    if (hasChanges) {
+      showConfirm("저장되지 않은 변경사항이 있습니다. 계속하시겠습니까?", () => {
+        setSelectedCampaignId(campaignId);
+        setSelectedCampaignName(campaignName);
+        const campaign = campaigns.find(c => c.campaign_id === Number(campaignId));
+        if (campaign) {
+          setSelectedCampaign(campaign);
+        }
+        // 편집 데이터와 변경사항 초기화
+        setEditedRows({});
+        setHasChanges(false);
+      });
+    } else {
+      setSelectedCampaignId(campaignId);
+      setSelectedCampaignName(campaignName);
+      const campaign = campaigns.find(c => c.campaign_id === Number(campaignId));
+      if (campaign) {
+        setSelectedCampaign(campaign);
+      }
     }
-    handleNew(); 
   };
 
   // 캠페인별 상담원 목록 조회
@@ -529,6 +587,7 @@ const DistributionLimit = () => {
       } else {
         showAlert('운영설정 분배호수 제한 설정 리스트 조회 실패: ' + error.message);
       }
+      setIsLoading(false);
     }
   });
 
@@ -547,10 +606,11 @@ const DistributionLimit = () => {
           router.push('/login');
         }, 1000);
       } else {
-        showAlert('운영설정 분배호수 제한 설정 리스트 조회 실패: ' + error.message);
+        showAlert('운영설정 분배호수 제한 설정 저장 실패: ' + error.message);
       }
     }
   });
+  
   const { mutate: updateMaxCallMutation } = useApiForUpdateMaxCall({
     onError: (error) => {
       if (error.message.split('||')[0] === '5') {
@@ -566,10 +626,11 @@ const DistributionLimit = () => {
           router.push('/login');
         }, 1000);
       } else {
-        showAlert('운영설정 분배호수 제한 설정 리스트 조회 실패: ' + error.message);
+        showAlert('운영설정 분배호수 제한 설정 수정 실패: ' + error.message);
       }
     }
   });
+  
   const { mutate: fetchMaxCallInitTimeList } = useApiForMaxCallInitTimeList({
     onSuccess: (data) => {
       setInitTime(data.result_data.init_time);
@@ -588,10 +649,11 @@ const DistributionLimit = () => {
           router.push('/login');
         }, 1000);
       } else {
-        showAlert('운영설정 분배호수 제한 설정 리스트 조회 실패: ' + error.message);
+        showAlert('초기화 시간 설정 조회 실패: ' + error.message);
       }
     }
   });
+  
   const { mutate: deleteMaxCallMutation } = useApiForDeleteMaxCall({
     onError: (error) => {
       if (error.message.split('||')[0] === '5') {
@@ -607,10 +669,10 @@ const DistributionLimit = () => {
           router.push('/login');
         }, 1000);
       } else {
-        showAlert('운영설정 분배호수 제한 설정 리스트 조회 실패: ' + error.message);
+        showAlert('삭제 실패: ' + error.message);
       }
     }
-  })
+  });
 
   // 응답호수 초기화 시각 수정
   const { mutate: updateMaxCallInitTime } = useApiForMaxCallInitTimeUpdate({
@@ -671,6 +733,70 @@ const DistributionLimit = () => {
       });
     }
   }, [selectedCampaignId, rawAgentData.length, fetchMaxCallList]);
+
+  useEffect(() => {
+    const handleGridContextMenu = (e: MouseEvent) => {
+      // 기본 컨텍스트 메뉴 방지
+      e.preventDefault();
+      
+      // 마우스 위치 정확히 저장
+      const mouseX = e.clientX; 
+      const mouseY = e.clientY;
+      
+      // 우클릭된 요소 찾기
+      let targetElement = e.target as HTMLElement;
+      
+      // 행 찾기 - 각 행은 [role="row"] 속성을 가집니다
+      let rowElement = null;
+      while (targetElement && targetElement !== gridRef.current) {
+        if (targetElement.getAttribute('role') === 'row') {
+          rowElement = targetElement;
+          break;
+        }
+        targetElement = targetElement.parentElement as HTMLElement;
+      }
+      
+      // 유효한 행 요소를 찾지 못한 경우
+      if (!rowElement) return;
+      
+      // 현재 화면에 표시된 행만 포함된 배열
+      const visibleRows = flattenRows(treeData);
+      
+      // 행의 aria-rowindex는 1부터 시작하고 헤더 행도 포함하므로 -2를 해줍니다
+      const rowIndex = parseInt(rowElement.getAttribute('aria-rowindex') || '0') - 2;
+      
+      // 인덱스 범위 체크
+      if (rowIndex < 0 || rowIndex >= visibleRows.length) return;
+      
+      // 클릭된 행 데이터
+      const row = visibleRows[rowIndex];
+      
+      // 레벨에 따라 컨텍스트 메뉴 표시 (센터 제외)
+      if (row && (row.level === 1 || row.level === 2 || row.level === 3)) {
+        setContextMenu({
+          visible: true,
+          x: mouseX,
+          y: mouseY,
+          rowId: row.id,
+          agentId: row.agent_id,
+          level: row.level,
+          group: row.group,
+          part: row.part
+        });
+      }
+    };
+    
+    const gridElement = gridRef.current;
+    if (gridElement) {
+      gridElement.addEventListener('contextmenu', handleGridContextMenu);
+    }
+    
+    return () => {
+      if (gridElement) {
+        gridElement.removeEventListener('contextmenu', handleGridContextMenu);
+      }
+    };
+  }, [treeData, expandedRows]); // 확장 상태 변경 시에도 다시 실행되도록 의존성 추가
   
 
   const [isTimeSettingOpen, setIsTimeSettingOpen] = useState(false);
@@ -695,13 +821,6 @@ const DistributionLimit = () => {
       return;
     }
 
-    // 시간 형식 검증 (0000-2359 사이의 4자리 숫자)
-    // const timeRegex = /^([0-1][0-9]|2[0-3])[0-5][0-9]$/;
-    // if (!timeRegex.test(timeValue)) {
-    //   showAlert('올바른 시간 형식이 아닙니다. (예: 2300)');
-    //   return;
-    // }
-
     if (timeValue.length !== 4) {
       showAlert('올바른 시간 형식이 아닙니다.');
       return;
@@ -721,168 +840,299 @@ const DistributionLimit = () => {
     setAlertState(prev => ({ ...prev, isOpen: false }));
   };
 
-  const handleDelete = () => {
-    // 선택된 상담원이 없는 경우 알림
-    if (!selectedRow || !formData.agentId) {
-      showAlert('삭제할 상담원을 먼저 선택해주세요.');
-      return;
-    }
+  // 셀 값 변경 처리 함수
+  const handleCellChange = (row: Row, field: 'max_dist' | 'fix_flag', value: string) => {
+    // 상담원 행만 편집 가능
+    if (row.level !== 3) return;
     
-    // 캠페인이 선택되지 않은 경우 알림
-    if (!selectedCampaignId) {
-      showAlert('캠페인을 먼저 선택해주세요.');
-      return;
-    }
-    
-    // 최대 분배호수가 설정되지 않은 경우 알림
-    if (formData.maxDist === '0' || formData.maxDist === '') {
-      showAlert('이 상담원에게는 설정된 분배호수 제한이 없습니다.');
-      return;
-    }
-    
-    // 삭제 확인 대화상자 표시
-    showConfirm(
-      `정말로 상담원 [${formData.agentName}]의 분배호수 제한 설정을 삭제하시겠습니까?`,
-      () => {
-        // 삭제 API 호출 - 기본 onError 사용 (훅에 이미 정의되어 있음)
-        deleteMaxCallMutation(
-          {
-            campaign_id: parseInt(selectedCampaignId),
-            agent_id: formData.agentId
-          },
-          {
-            onSuccess: (response) => {
-              if (response.result_code === 0) {
-                showAlert('분배호수 제한 설정이 성공적으로 삭제되었습니다.');
-                
-                // 폼 데이터 초기화
-                handleNew();
-                
-                // 상태 초기화 후 데이터 다시 가져오기
-                setIsLoading(true); // 로딩 상태 시작
-                setRawAgentData([]); // 기존 에이전트 데이터 초기화
-                
-                // 순차적 데이터 로드를 위한 타임아웃 설정
-                setTimeout(() => {
-                  if (selectedCampaignId) {
-                    // 전체 상담원 데이터를 새로 조회
-                    fetchCampaignAgentList({
-                      campaign_id: [Number(selectedCampaignId)]
-                    });
-                    
-                    // fetchMaxCallList는 useEffect를 통해 rawAgentData가 준비된 후 자동 호출됨
-                  }
-                }, 100);
-              } else {
-                showAlert(`삭제 실패: ${response.result_msg}`);
-              }
-            }
-          }
-        );
+    // 값의 유효성 검사
+    if (field === 'max_dist') {
+      const numValue = parseInt(value);
+      if (isNaN(numValue) || numValue < 0) {
+        showAlert('최대 분배호수는 0 이상의 숫자여야 합니다.');
+        return;
       }
-    );
-  }
+    }
+    
+    // 편집된 데이터 추적
+    setEditedRows(prev => {
+      const newEditedRows = { ...prev };
+      
+      // 이 행에 대한 이전 편집 내용이 없는 경우 원본 값 저장
+      if (!newEditedRows[row.id]) {
+        newEditedRows[row.id] = {
+          max_dist: row.max_dist,
+          fix_flag: row.fix_flag,
+          original: {
+            max_dist: row.max_dist,
+            fix_flag: row.fix_flag
+          }
+        };
+      }
+      
+      // 편집된 값 업데이트
+      newEditedRows[row.id][field] = value;
+      
+      // 변경사항 없으면 해당 행 제거
+      if (
+        newEditedRows[row.id].max_dist === newEditedRows[row.id].original.max_dist && 
+        newEditedRows[row.id].fix_flag === newEditedRows[row.id].original.fix_flag
+      ) {
+        delete newEditedRows[row.id];
+      }
+      
+      // 변경사항 플래그 업데이트
+      setHasChanges(Object.keys(newEditedRows).length > 0);
+      
+      return newEditedRows;
+    });
+  };
 
-  const handleSave = () => {
+  // 그리드 데이터에서 편집된 셀 값을 가져오는 함수
+  const getCellValue = (row: Row, field: 'max_dist' | 'fix_flag'): string => {
+    if (row.level === 3 && editedRows[row.id]) {
+      return editedRows[row.id][field];
+    }
+    return row[field];
+  };
+
+  // 일괄 저장
+  const handleBulkSave = () => {
     if (!selectedCampaignId) {
       showAlert('캠페인을 선택해주세요.');
       return;
     }
-    if (!formData.center || !formData.agentId) {
-      showAlert('필수 필드를 입력해주세요.');
+    
+    if (Object.keys(editedRows).length === 0) {
+      showAlert('변경된 내용이 없습니다.');
       return;
     }
-  
-    const maxDist = parseInt(formData.maxDist);
-    if (isNaN(maxDist) || maxDist < 0) {
-      showAlert('최대 분배호수는 0 이상의 숫자로 입력해주세요.');
+    
+    // 유효성 검사
+    const invalidEntries = Object.entries(editedRows).filter(([_, data]) => {
+      const maxDist = parseInt(data.max_dist);
+      return isNaN(maxDist) || maxDist < 0 || (data.fix_flag === 'Y' && maxDist === 0);
+    });
+    
+    if (invalidEntries.length > 0) {
+      showAlert('최대 분배호수는 0 이상의 숫자여야 하며, 호수 고정이 설정된 경우 최대 분배호수는 0일 수 없습니다.');
       return;
     }
 
-    // 최대 분배호수가 0인 경우 차단
-    if (maxDist === 0) {
+    // 0값 검사를 별도로 먼저 수행
+    const zeroEntries = Object.entries(editedRows).filter(([_, data]) => {
+      return parseInt(data.max_dist) === 0;
+    });
+
+    if (zeroEntries.length > 0) {
       showAlert('최대 분배호수는 0으로 설정할 수 없습니다.');
       return;
     }
-
-    // 호수 고정이 'Y'로 설정되었는데 최대 분배호수가 0인 경우 차단
-    if (formData.fix_flag === 'Y' && maxDist === 0) {
-      showAlert('최대 분배호수를 설정해야 합니다.');
-      return;
-    }
-  
-    const saveData = {
-      campaign_id: parseInt(selectedCampaignId),
-      agent_id: formData.agentId,
-      max_call: maxDist,
-      fix_flag: formData.fix_flag === 'Y' ? 1 : 0
-    };
-  
-    const existingRow = rawAgentData.find(row => row.agent_id === formData.agentId);
-    const isUpdate = existingRow && existingRow.max_dist !== '0';
-  
-    showConfirm(`${isUpdate ? '수정' : '저장'}하시겠습니까?`, () => {
-      if (isUpdate) {
-        updateMaxCallMutation(saveData, {
-          onSuccess: (response) => {
-            if (response.result_code === 0) {
-              showAlert('성공적으로 수정되었습니다.');
-              fetchMaxCallList({
-                campaign_id: [parseInt(selectedCampaignId)]
+    
+    showConfirm(`${Object.keys(editedRows).length}개의 항목을 저장하시겠습니까?`, async () => {
+      setIsLoading(true);
+      let successCount = 0;
+      let failCount = 0;
+      
+      // 변경된 각 항목에 대해 저장 또는 업데이트 요청
+      for (const [rowId, data] of Object.entries(editedRows)) {
+        const agentId = rowId.replace('agent-', '');
+        const maxDist = parseInt(data.max_dist);
+        const fixFlag = data.fix_flag === 'Y' ? 1 : 0;
+        
+        const saveData = {
+          campaign_id: parseInt(selectedCampaignId),
+          agent_id: agentId,
+          max_call: maxDist,
+          fix_flag: fixFlag
+        };
+        
+        // 기존 설정 존재 여부 확인 (max_dist가 0이 아닌 경우)
+        const isExisting = parseInt(data.original.max_dist) > 0;
+        
+        try {
+          if (isExisting) {
+            // 기존 설정 수정
+            await new Promise<void>((resolve, reject) => {
+              updateMaxCallMutation(saveData, {
+                onSuccess: (response) => {
+                  if (response.result_code === 0) {
+                    successCount++;
+                    resolve();
+                  } else {
+                    failCount++;
+                    reject(new Error(response.result_msg));
+                  }
+                },
+                onError: (error) => {
+                  failCount++;
+                  reject(error);
+                }
               });
-            } else {
-              showAlert(`수정 실패: ${response.result_msg}`);
-            }
-          },
-          onError: (error: any) => {
-            if (error.message.split('||')[0] === '5') {
-              setAlertState({
-                ...errorMessage,
-                isOpen: true,
-                message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                onConfirm: closeAlert,
-                onCancel: () => {}
+            });
+          } else {
+            // 새 설정 생성
+            await new Promise<void>((resolve, reject) => {
+              createMaxCallMutation(saveData, {
+                onSuccess: (response) => {
+                  if (response.result_code === 0) {
+                    successCount++;
+                    resolve();
+                  } else {
+                    failCount++;
+                    reject(new Error(response.result_msg));
+                  }
+                },
+                onError: (error) => {
+                  failCount++;
+                  reject(error);
+                }
               });
-              Cookies.remove('session_key');
-              setTimeout(() => {
-                router.push('/login');
-              }, 1000);
-            } else {
-                showAlert(`수정 중 오류가 발생했습니다 : ${error.message}`);
-            }
+            });
           }
-        });
-      } else {
-        createMaxCallMutation(saveData, {
-          onSuccess: (response) => {
-            if (response.result_code === 0) {
-              showAlert('성공적으로 저장되었습니다.');
-              fetchMaxCallList({
-                campaign_id: [parseInt(selectedCampaignId)]
-              });
-            } else {
-              showAlert(`저장 실패: ${response.result_msg}`);
-            }
-          },
-          onError: (error: any) => {
-            if (error.message.split('||')[0] === '5') {
-              setAlertState({
-                ...errorMessage,
-                isOpen: true,
-                message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                onConfirm: closeAlert,
-                onCancel: () => {}
-              });
-              Cookies.remove('session_key');
-              setTimeout(() => {
-                router.push('/login');
-              }, 1000);
-            } else {
-                showAlert(`저장 중 오류가 발생했습니다: ${error.message}`);
-            }
-          }
+        } catch (error) {
+          console.error('저장 중 오류 발생:', error);
+          // 에러는 이미 각 API 호출의 onError에서 처리
+        }
+      }
+      
+      // 모든 요청 완료 후 결과 표시
+      setIsLoading(false);
+      // showAlert(`저장 완료: ${successCount}개 성공, ${failCount}개 실패`);
+      showAlert(`수정된 자원을 적용합니다.`);
+      
+      if (successCount > 0) {
+        // 변경된 데이터 초기화 및 목록 재조회
+        setEditedRows({});
+        setHasChanges(false);
+        fetchMaxCallList({
+          campaign_id: [parseInt(selectedCampaignId)]
         });
       }
+    });
+  };
+
+  // 변경사항 취소
+  const handleCancelChanges = () => {
+    if (Object.keys(editedRows).length === 0) {
+      return;
+    }
+    
+    showConfirm('모든 변경사항을 취소하시겠습니까?', () => {
+      setEditedRows({});
+      setHasChanges(false);
+    });
+  };
+
+  // 삭제 처리 함수
+  const handleDeleteMaxCall = () => {
+    if (!contextMenu.rowId || !selectedCampaignId) return;
+    
+    let confirmMessage = "";
+    let agentIds: string[] = [];
+    
+    // 삭제 대상에 따라 메시지와 상담원 ID 목록 설정
+    if (contextMenu.level === 3) {
+      // 상담원 개인 삭제
+      confirmMessage = `${contextMenu.agentId} 상담원의 분배 제한 정보를 삭제하시겠습니까?`;
+      if (contextMenu.agentId) {
+        agentIds = [contextMenu.agentId];
+      }
+    } else if (contextMenu.level === 2) {
+      // 상담파트 전체 삭제
+      confirmMessage = `파트 ${contextMenu.part} 의 모든 상담원의 분배 제한 정보를 삭제하시겠습니까?`;
+      
+      // 파트에 속한 모든 상담원 ID 수집
+      agentIds = rawAgentData
+        .filter(agent => agent.part === contextMenu.part)
+        .map(agent => agent.agent_id);
+        
+    } else if (contextMenu.level === 1) {
+      // 상담그룹 전체 삭제
+      confirmMessage = `그룹 ${contextMenu.group} 의 모든 상담원의 분배 제한 정보를 삭제하시겠습니까?`;
+      
+      // 그룹에 속한 모든 상담원 ID 수집
+      agentIds = rawAgentData
+        .filter(agent => agent.group === contextMenu.group)
+        .map(agent => agent.agent_id);
+    }
+    
+    if (agentIds.length === 0) {
+      showAlert('삭제할 상담원이 없습니다.');
+      handleCloseContextMenu();
+      return;
+    }
+    
+    showConfirm(confirmMessage, async () => {
+      setIsLoading(true);
+      let successCount = 0;
+      let failCount = 0;
+      
+      // 선택된 모든 상담원에 대해 삭제 처리
+      for (const agentId of agentIds) {
+        try {
+          await new Promise<void>((resolve, reject) => {
+            deleteMaxCallMutation({
+              campaign_id: parseInt(selectedCampaignId),
+              agent_id: agentId
+            }, {
+              onSuccess: (response) => {
+                if (response.result_code === 0) {
+                  successCount++;
+                  resolve();
+                } else {
+                  failCount++;
+                  reject(new Error(response.result_msg));
+                }
+              },
+              onError: (error) => {
+                failCount++;
+                reject(error);
+              }
+            });
+          });
+        } catch (error) {
+          console.error('삭제 중 오류 발생:', error);
+        }
+      }
+      
+      setIsLoading(false);
+      
+      // 화면 데이터 업데이트
+      setRawAgentData(prevData => 
+        prevData.map(row => {
+          if (agentIds.includes(row.agent_id)) {
+            return {
+              ...row,
+              max_dist: '0',
+              current_resp: '0',
+              fix_flag: 'N'
+            };
+          }
+          return row;
+        })
+      );
+      
+      // 편집 중인 데이터에서도 제거
+      if (Object.keys(editedRows).length > 0) {
+        const newEditedRows = { ...editedRows };
+        
+        // 해당하는 모든 행 ID에 대해 편집 데이터 제거
+        Object.keys(newEditedRows).forEach(rowId => {
+          const agentId = rowId.replace('agent-', '');
+          if (agentIds.includes(agentId)) {
+            delete newEditedRows[rowId];
+          }
+        });
+        
+        setEditedRows(newEditedRows);
+        setHasChanges(Object.keys(newEditedRows).length > 0);
+      }
+      
+      // showAlert(`삭제 완료`);
+      
+      // 컨텍스트 메뉴 닫기
+      handleCloseContextMenu();
     });
   };
 
@@ -937,6 +1187,7 @@ const DistributionLimit = () => {
 
   const rowKeyGetter = (row: Row) => row.id;
 
+  // 고급된 열 정의 - 이제 편집 가능한 셀 포함
   const columns = useMemo(() => [
     { 
       key: 'center', 
@@ -1025,13 +1276,28 @@ const DistributionLimit = () => {
     { 
       key: 'max_dist', 
       name: '최대 분배호수',
+      width: 120,
       renderCell: ({ row }: { row: Row }) => {
-        return row.level === 3 ? row.max_dist : '';
+        if (row.level !== 3) return '';
+        
+        // 편집 가능한 셀로 변경
+        return (
+          <div className={`px-2 flex justify-center w-full ${row.hasChanges ? 'bg-yellow-50' : ''}`}>
+            <input
+              type="number"
+              min="0"
+              value={getCellValue(row, 'max_dist')}
+              onChange={(e) => handleCellChange(row, 'max_dist', e.target.value)}
+              className="w-full h-full px-2 text-center border-0 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        );
       }
     },
     { 
       key: 'current_resp', 
       name: '현재 응답호수',
+      width: 120,
       renderCell: ({ row }: { row: Row }) => {
         return row.level === 3 ? row.current_resp : '';
       }
@@ -1039,54 +1305,37 @@ const DistributionLimit = () => {
     { 
       key: 'fix_flag', 
       name: '호수 고정',
+      width: 120,
       renderCell: ({ row }: { row: Row }) => {
-        return row.level === 3 ? row.fix_flag : '';
+        if (row.level !== 3) return '';
+        
+        // 편집 가능한 드롭다운으로 변경
+        return (
+          <div className={row.hasChanges ? 'bg-yellow-50' : ''}>
+            <select
+              value={getCellValue(row, 'fix_flag')}
+              onChange={(e) => handleCellChange(row, 'fix_flag', e.target.value)}
+              className="w-full h-full border-0 bg-transparent focus:outline-none"
+            >
+              <option value="Y">고정</option>
+              <option value="N">미고정</option>
+            </select>
+          </div>
+        );
       }
     }
-  ], [expandedRows]);
+  ], [editedRows]);
   
   const handleCellClick = ({ row }: { row: Row }) => {
-    // 상담원 행만 선택 가능
-    if (row.level === 3) {
-      setSelectedRow(row);
-      setFormData({
-        center: row.center,
-        group: row.group,
-        part: row.part,
-        agentId: row.agent_id,
-        agentName: row.agent_name,
-        maxDist: row.max_dist,
-        currentResp: row.current_resp,
-        fix_flag: row.fix_flag
-      });
-    } 
     // 계층 노드 클릭 시 확장/축소
-    else if (row.hasChildren) {
+    if (row.level !== 3 && row.hasChildren) {
       toggleRowExpand(row.id);
     }
   };
 
-  const handleNew = () => {
-    setSelectedRow(null);
-    setFormData({
-      center: '',
-      group: '',
-      part: '',
-      agentId: '',
-      agentName: '',
-      maxDist: '',
-      currentResp: '',
-      fix_flag: ''
-    });
-  };
-
-  const handleInputChange = (field: keyof typeof formData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
   const getRowClass = (row: Row) => {
-    // 선택된 행은 강조 표시
-    if (selectedRow && row.level === 3 && row.agent_id === selectedRow.agent_id) {
+    // 편집된 행은 강조 표시
+    if (row.level === 3 && editedRows[row.id]) {
       return 'bg-[#FFFAEE]';
     }
     
@@ -1145,10 +1394,21 @@ const DistributionLimit = () => {
             variant="outline" 
             size="sm"
             onClick={() => {
-              setSelectedCampaignId('');
-              setSelectedCampaignName('');
-              setSelectedCampaign(null);
-              setIsModalOpen(true);
+              if (hasChanges) {
+                showConfirm("저장되지 않은 변경사항이 있습니다. 계속하시겠습니까?", () => {
+                  setSelectedCampaignId('');
+                  setSelectedCampaignName('');
+                  setSelectedCampaign(null);
+                  setEditedRows({});
+                  setHasChanges(false);
+                  setIsModalOpen(true);
+                });
+              } else {
+                setSelectedCampaignId('');
+                setSelectedCampaignName('');
+                setSelectedCampaign(null);
+                setIsModalOpen(true);
+              }
             }}
           >
             캠페인조회
@@ -1164,233 +1424,129 @@ const DistributionLimit = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          {/* <CommonButton onClick={() => setIsTimeSettingOpen(true)}>초기화시간 변경</CommonButton> */}
           <CommonButton onClick={openTimeSettingModal}>초기화시간 변경</CommonButton>
           <CommonButton onClick={() => setIsTimeRemoveOpen(true)}>초기화시간 설정해제</CommonButton>
+          {hasChanges && (
+            <>
+              <CommonButton variant="outline" onClick={handleCancelChanges}>변경취소</CommonButton>
+              <CommonButton onClick={handleBulkSave}>저장</CommonButton>
+            </>
+          )}
         </div>
       </div>
 
-      <div className="flex gap-8">
-        <div className="w-[800px] flex flex-col gap-2">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <div className="text-sm">할당 상담원 목록</div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Label className="w-12 min-w-12">보기설정</Label>
-              <Select 
-                value={viewFilter}
-                onValueChange={setViewFilter}
-                defaultValue='all'
-              >
-                <SelectTrigger className="w-[250px]">
-                  <SelectValue placeholder="해당 상담원 전체" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>해당 상담원 전체</SelectItem>
-                  <SelectItem value='remaining'>잔여 호수가 남은 상담원</SelectItem>
-                  <SelectItem value='no-remaining'>잔여 호수가 없는 상담원</SelectItem>
-                  <SelectItem value='no-limit'>최대 분배호수가 설정되지 않은 상담원</SelectItem>
-                  <SelectItem value='has-limit'>최대 분배호수가 설정된 상담원</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className='grid-custom-wrap h-[400px]'>
-            <DataGrid
-              columns={columns}
-              rows={flattenRows(treeData)} 
-              className="grid-custom"
-              onCellClick={handleCellClick}
-              rowKeyGetter={rowKeyGetter}
-              rowHeight={30}
-              headerRowHeight={30}
-              rowClass={getRowClass}
-              selectedRows={selectedRow ? new Set<string>([selectedRow.id]) : new Set<string>()}
-              enableVirtualization={false}
-            />
+      <div className="flex flex-col gap-2">
+        <div className="flex justify-between items-center">
+          <div className="text-sm">할당 상담원 목록</div>
+          <div className="flex items-center gap-2">
+            <Label className="w-12 min-w-12">보기설정</Label>
+            <Select 
+              value={viewFilter}
+              onValueChange={setViewFilter}
+              defaultValue='all'
+            >
+              <SelectTrigger className="w-[250px]">
+                <SelectValue placeholder="해당 상담원 전체" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='all'>해당 상담원 전체</SelectItem>
+                <SelectItem value='remaining'>잔여 호수가 남은 상담원</SelectItem>
+                <SelectItem value='no-remaining'>잔여 호수가 없는 상담원</SelectItem>
+                <SelectItem value='no-limit'>최대 분배호수가 설정되지 않은 상담원</SelectItem>
+                <SelectItem value='has-limit'>최대 분배호수가 설정된 상담원</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
-
-        <div className="w-[513px]">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Label className="w-[8rem] min-w-[8rem]">상담센터</Label>
-              <CustomInput 
-                value={formData.center}
-                onChange={(e) => handleInputChange('center', e.target.value)}
-                className="w-full"
-                disabled
+        <div className='grid-custom-wrap h-[560px]' ref={gridRef} onContextMenu={(e) => e.preventDefault()}>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-lg">데이터 로딩중...</div>
+            </div>
+          ) : (
+            <>
+              <DataGrid
+                columns={columns}
+                rows={flattenRows(treeData)} 
+                className="grid-custom"
+                onCellClick={handleCellClick}
+                rowKeyGetter={rowKeyGetter}
+                rowHeight={30}
+                headerRowHeight={30}
+                rowClass={getRowClass}
+                enableVirtualization={false}
               />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Label className="w-[8rem] min-w-[8rem]">상담그룹</Label>
-              <CustomInput 
-                value={formData.group}
-                onChange={(e) => handleInputChange('group', e.target.value)}
-                className="w-full"
-                disabled
-              />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Label className="w-[8rem] min-w-[8rem]">상담파트</Label>
-              <CustomInput 
-                value={formData.part}
-                onChange={(e) => handleInputChange('part', e.target.value)}
-                className="w-full"
-                disabled
-              />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Label className="w-[8rem] min-w-[8rem]">상담원 아이디</Label>
-              <CustomInput 
-                value={formData.agentId}
-                onChange={(e) => handleInputChange('agentId', e.target.value)}
-                className="w-full"
-                disabled
-              />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Label className="w-[8rem] min-w-[8rem]">상담원 이름</Label>
-              <CustomInput 
-                value={formData.agentName}
-                onChange={(e) => handleInputChange('agentName', e.target.value)}
-                className="w-full"
-                disabled
-              />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Label className="w-[8rem] min-w-[8rem]">최대 분배호수</Label>
-              <CustomInput 
-                type="number"
-                value={formData.maxDist}
-                onChange={(e) => handleInputChange('maxDist', e.target.value)}
-                className="w-full"
-                disabled={!selectedRow}
-              />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Label className="w-[8rem] min-w-[8rem]">현재 응답호수</Label>
-              <CustomInput 
-                value={formData.currentResp}
-                onChange={(e) => handleInputChange('currentResp', e.target.value)}
-                className="w-full"
-                disabled
-              />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Label className="w-[8rem] min-w-[8rem]">호수 고정</Label>
-              <Select 
-                value={formData.fix_flag}
-                onValueChange={(value) => handleInputChange('fix_flag', value)}
-                disabled={!selectedRow}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='Y'>고정</SelectItem>
-                  <SelectItem value='N'>미고정</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex justify-end gap-2 pt-4">
-              {/* <CommonButton onClick={handleNew}>신규</CommonButton> */}
-              <CommonButton onClick={handleDelete}>삭제</CommonButton>
-              <CommonButton onClick={handleSave}>저장</CommonButton>
-            </div>
-
-            <div className="mt-[20px] text-sm">
-              <ul className='space-y-1 notice-li'>
-                <li>• 상담원에게 분배하는 콜 수를 제한합니다.</li>
-                <li>• 운영시간 중의 일괄처리(Batch)작업은 많은 부하를 발생시켜 정상적인 운영이 불가능 할 수 있습니다.</li>
-                <li>• 일괄처리작업의 경우, 발신 량이 적은 시간이나, 업무 종료 후 작업하시기를 권장합니다.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <CampaignModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSelect={handleModalSelect}
-        />
-
-        {/* <CustomAlert
-          isOpen={isTimeSettingOpen}
-          message={
-            <div className="flex flex-col gap-4">
-              <div>
-                {initTime === "9999" 
-                  ? "현재 설정 값이 없습니다. 시간을 입력하세요" 
-                  : `현재설정값 : ${initTime.slice(0, 2)}:${initTime.slice(2)}`
-                }
-              </div>
-              <CustomInput 
-                type="text" 
-                value={timeValue}
-                onChange={(e) => setTimeValue(e.target.value)}
-                placeholder="예) 23시00분은 2300"
-                className="w-full"
-              />
-            </div>
-          }
-          title="초기화 시간 설정"
-          type="1"
-          onClose={handleTimeSettingSave}
-          onCancle={() => setIsTimeSettingOpen(false)}
-        /> */}
-
-        <CustomAlert
-          isOpen={isTimeSettingOpen}
-          message={
-            <div className="flex flex-col gap-4">
-              <div className="text-center">
-                {initTime === "9999" 
-                  ? "현재 설정 값이 없습니다. 시간을 입력하세요" 
-                  : `현재설정값 : ${initTime.slice(0, 2)}시 ${initTime.slice(2)}분`
-                }
-              </div>
-              <div className="flex justify-center pt-2">
-                <TimePickerComponent
-                  value={timeValue}
-                  onChange={setTimeValue}
+              
+              {/* 컨텍스트 메뉴 컴포넌트 추가 */}
+              {contextMenu.visible && (
+                <ContextMenu
+                  x={contextMenu.x}
+                  y={contextMenu.y}
+                  onDelete={handleDeleteMaxCall}
+                  onClose={handleCloseContextMenu}
+                  level={contextMenu.level}
                 />
-              </div>
-            </div>
-          }
-          title="초기화 시간 설정"
-          type="1"
-          onClose={handleTimeSettingSave}
-          onCancle={() => setIsTimeSettingOpen(false)}
-        />
-
-        <CustomAlert
-          isOpen={isTimeRemoveOpen}
-          message="초기화 시간 설정을 해제 하시겠습니까?"
-          title="초기화 시간 설정해제"
-          type="1"
-          onClose={handleTimeRemove}
-          onCancle={() => setIsTimeRemoveOpen(false)}
-        />
-
-        <CustomAlert
-          isOpen={alertState.isOpen}
-          message={alertState.message}
-          title={alertState.title}
-          type={alertState.type}
-          onClose={alertState.onConfirm}
-          onCancle={alertState.onCancel}
-        />
+              )}
+            </>
+          )}
+        </div>
+        
+        <div className="mt-[20px] text-sm">
+          <ul className='space-y-1 notice-li'>
+            <li>• 상담원에게 분배하는 콜 수를 제한합니다.</li>
+            <li>• 운영시간 중의 일괄처리(Batch)작업은 많은 부하를 발생시켜 정상적인 운영이 불가능 할 수 있습니다.</li>
+            <li>• 일괄처리작업의 경우, 발신 량이 적은 시간이나, 업무 종료 후 작업하시기를 권장합니다.</li>
+          </ul>
+        </div>
       </div>
+
+      <CampaignModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelect={handleModalSelect}
+      />
+
+      <CustomAlert
+        isOpen={isTimeSettingOpen}
+        message={
+          <div className="flex flex-col gap-4">
+            <div className="text-center">
+              {initTime === "9999" 
+                ? "현재 설정 값이 없습니다. 시간을 입력하세요" 
+                : `현재설정값 : ${initTime.slice(0, 2)}시 ${initTime.slice(2)}분`
+              }
+            </div>
+            <div className="flex justify-center pt-2">
+              <TimePickerComponent
+                value={timeValue}
+                onChange={setTimeValue}
+              />
+            </div>
+          </div>
+        }
+        title="초기화 시간 설정"
+        type="1"
+        onClose={handleTimeSettingSave}
+        onCancle={() => setIsTimeSettingOpen(false)}
+      />
+
+      <CustomAlert
+        isOpen={isTimeRemoveOpen}
+        message="초기화 시간 설정을 해제 하시겠습니까?"
+        title="초기화 시간 설정해제"
+        type="1"
+        onClose={handleTimeRemove}
+        onCancle={() => setIsTimeRemoveOpen(false)}
+      />
+
+      <CustomAlert
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        title={alertState.title}
+        type={alertState.type}
+        onClose={alertState.onConfirm}
+        onCancle={alertState.onCancel}
+      />
     </div>
   );
 };
