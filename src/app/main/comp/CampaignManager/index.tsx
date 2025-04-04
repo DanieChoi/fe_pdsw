@@ -1,6 +1,6 @@
 // src\app\main\comp\CampaignManager\index.tsx
 import React, { useState, useEffect } from 'react'
-import CampaignManagerHeader, {CampaignHeaderSearch} from './CampaignManagerHeader';
+import CampaignManagerHeader, { CampaignHeaderSearch } from './CampaignManagerHeader';
 import CampaignManagerDetail from './CampaignManagerDetail';
 import CampaignManagerList from './CampaignManagerList';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
@@ -28,8 +28,8 @@ type Props = {
   onCampaignPopupClose?: () => void;
 }
 
-const CampaignManager = ({campaignId,isOpen,onCampaignPopupClose}: Props) => {
-  
+const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) => {
+
   const { tenants, campaigns, setCampaigns } = useMainStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
   const [_campaignId, _setCampaignId] = useState<string>('');
@@ -37,21 +37,21 @@ const CampaignManager = ({campaignId,isOpen,onCampaignPopupClose}: Props) => {
   const router = useRouter();
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
-  
-  const [campaignHeaderSearchParam,setCampaignHeaderSearchParam] = useState<CampaignHeaderSearch>();
-  const handleCampaignHeaderSearch = (param:CampaignHeaderSearch) => {
+
+  const [campaignHeaderSearchParam, setCampaignHeaderSearchParam] = useState<CampaignHeaderSearch>();
+  const handleCampaignHeaderSearch = (param: CampaignHeaderSearch) => {
     setCampaignHeaderSearchParam(param);
   };
-  
+
   // 스케줄 조회
   const { mutate: fetchSchedules } = useApiForSchedules({
     onSuccess: (data) => {
-      setSchedules(data.result_data);  
-      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id); 
+      setSchedules(data.result_data);
+      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       fetchSkills({
         tenant_id_array: tempTenantIdArray
-      });   
-    },onError: (data) => {      
+      });
+    }, onError: (data) => {
       if (data.message.split('||')[0] === '5') {
         setAlertState({
           ...errorMessage,
@@ -80,7 +80,7 @@ const CampaignManager = ({campaignId,isOpen,onCampaignPopupClose}: Props) => {
   // 전화번호 조회
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
-      setCallingNumbers(data.result_data||[]);
+      setCallingNumbers(data.result_data || []);
       fetchCampaignSkills({
         session_key: '',
         tenant_id: 0,
@@ -100,12 +100,12 @@ const CampaignManager = ({campaignId,isOpen,onCampaignPopupClose}: Props) => {
   // 전화번호설명 템플릿 조회
   const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
     onSuccess: (data) => {
-      setPhoneDescriptions(data.result_data||[]);
+      setPhoneDescriptions(data.result_data || []);
     }
   });
-  
+
   useEffect(() => {
-    if( tenants && campaigns ){
+    if (tenants && campaigns) {
       const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       fetchSchedules({
         tenant_id_array: tempTenantIdArray
@@ -114,24 +114,24 @@ const CampaignManager = ({campaignId,isOpen,onCampaignPopupClose}: Props) => {
   }, [tenants, campaigns]);
 
   useEffect(() => {
-    console.log('campaignIdForUpdateFromSideMenu:',campaignIdForUpdateFromSideMenu);
-    console.log('campaignId:',campaignId);
-    if( typeof campaignId === 'undefined' ){
-      _setCampaignId(campaignIdForUpdateFromSideMenu||'');
-    }else{
+    console.log('campaignIdForUpdateFromSideMenu:', campaignIdForUpdateFromSideMenu);
+    console.log('campaignId:', campaignId);
+    if (typeof campaignId === 'undefined') {
+      _setCampaignId(campaignIdForUpdateFromSideMenu || '');
+    } else {
       _setCampaignId(campaignId);
     }
-  }, [campaignIdForUpdateFromSideMenu,campaignId]);
+  }, [campaignIdForUpdateFromSideMenu, campaignId]);
 
   return (
     <div className='compaign-wrap'>
       <div className='flex flex-col gap-[15px] limit-width'>
-          <CampaignManagerHeader campaignId={_campaignId} onSearch={handleCampaignHeaderSearch}/>
-          <div className="flex gap-[30px]">
-            <CampaignManagerList campaignId={_campaignId} campaignHeaderSearchParam={campaignHeaderSearchParam}/>
-            <CampaignManagerDetail isOpen={isOpen} onCampaignPopupClose={onCampaignPopupClose}/>
-          </div>
+        <CampaignManagerHeader campaignId={_campaignId} onSearch={handleCampaignHeaderSearch} />
+        <div className="flex gap-[30px]">
+          <CampaignManagerList campaignId={_campaignId} campaignHeaderSearchParam={campaignHeaderSearchParam} />
+          <CampaignManagerDetail isOpen={isOpen} onCampaignPopupClose={onCampaignPopupClose} />
         </div>
+      </div>
       <CustomAlert
         message={alertState.message}
         title={alertState.title}

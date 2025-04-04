@@ -102,7 +102,6 @@ export const CampaignInfo: MainDataResponse = {
   delete_flag: 0,
   list_count: 0,
   list_redial_query: '',
-  campaign_status: 0,
   next_campaign: 0,
   token_id: 0,
   phone_order: '',
@@ -290,6 +289,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     , setCampaigns
     , selectedCampaign
     , setSelectedCampaign
+    , setSelectedCampaignRow
   } = useMainStore();
   const { tenant_id
     , menu_role_id
@@ -662,6 +662,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     if (value.onSave) {
       // setChangeYn(true);
       // setCampaignInfoChangeYn(true);
+      // alert("캠페인 수정 확인 버튼 클릭?")
       handleCampaignSave();
     }
     if (value.onClosed) {
@@ -671,6 +672,9 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
 
   //캠페인 발신순서 탭 변경
   const handleCampaignOutgoingOrderChange = (value: OutgoingOrderTabParam) => {
+
+    alert("확인 버튼 클릭!")
+
     if (value.campaignInfoChangeYn) {
       // setChangeYn(true);
       // setCampaignInfoChangeYn(true);
@@ -923,17 +927,23 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     });
   }
 
+  // tofix 0404
   //캠페인 저장 실행.
   const handleCampaignSaveExecute = () => {
     setRtnMessage('캠페인 수정이 완료되었습니다.');
     setAlertState((prev) => ({ ...prev, isOpen: false }));
+    
     if (changeYn) {
       if (campaignInfoChangeYn) {
         if (tempCampaignManagerInfo.start_flag === 1 && oriCampaignManagerInfo.start_flag != 1) {
+
+          // tofix 0404 캠페인 수정후 캠페인 리스트에서 선택된 캠페인 원래 그대로 이어야함
           fetchCampaignStatusUpdate({
             campaign_id: tempCampaignManagerInfo.campaign_id
             , campaign_status: tempCampaignManagerInfo.start_flag
           });
+          // setSelectedCampaignRow(tempCampaignManagerInfo.campaign_id);
+          
         } else {
           fetchCampaignManagerUpdate(tempCampaignManagerInfo);
         }
@@ -1026,6 +1036,10 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   //캠페인 정보 수정 api 호출
   const { mutate: fetchCampaignManagerUpdate } = useApiForCampaignManagerUpdate({
     onSuccess: (data) => {
+      
+      // tofix 0404 캠페인 선택 row 업데이트 here
+      // setSelectedCampaignRow()
+
       setCampaignInfoChangeYn(false);
       if (campaignSkillChangeYn) {
         //캠페인 스킬 수정 api 호출
@@ -1353,6 +1367,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     onSuccess: (data) => {
       if (data.result_code === 0) {
         fetchCampaignManagerUpdate(tempCampaignManagerInfo);
+        // setSelectedCampaign(tempCampaignInfo)
       } else {
         setAlertState({
           ...errorMessage,
@@ -1815,6 +1830,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
           onHandleCallbackTabChange={(value) => handleCallbackTabChange(value)}
           onHandleNotificationTabChange={(value) => handleNotificationTabChange(value)}
         />
+        {/* hi */}
       </div>
       <SkillListPopup
         param={tempCampaignSkills.skill_id || []}
