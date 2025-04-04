@@ -9,6 +9,7 @@ import { customAlertService } from "./utils/CustomAlertService";
 import { useEnvironmentStore } from "@/store/environmentStore";
 import { toast, initToasts } from "./CustomToast";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
+import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
 
 type FooterDataType = {
   time: string;
@@ -41,12 +42,15 @@ export default function Footer({
   const { useAlramPopup } = useEnvironmentStore();
 
   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
+  const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
+
 
   const debouncedInvalidate = useCallback(
     debounce(() => {
       invalidateTreeMenuData();
+      invalidateCampaignGroupTreeData();
     }, 500),
-    [invalidateTreeMenuData]
+    [invalidateTreeMenuData, invalidateCampaignGroupTreeData]
   );
 
   useEffect(() => {
