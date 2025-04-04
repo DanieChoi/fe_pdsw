@@ -97,9 +97,9 @@ export function TreeNodeForCampaignTab({
   }, [item, setCampaignIdForUpdateFromSideMenu, setCampaignIdForCopyCampaign, addTab]);
 
   // 뷰 모드가 tenant이고 item.type이 campaign인 경우 렌더링하지 않음
-  if (viewMode === 'tenant' && item.type === 'campaign') {
-    return null;
-  }
+  // if (viewMode === 'tenant' && item.type === 'campaign') {
+  //   return null;
+  // }
 
   if (item.visible === false) {
     return null;
