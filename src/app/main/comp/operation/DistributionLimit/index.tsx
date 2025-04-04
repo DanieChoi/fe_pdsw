@@ -73,6 +73,31 @@ const DistributionLimit = () => {
 
   const gridRef = useRef<HTMLDivElement>(null);
 
+  // 최대분배호수 일괄 변경 모달 상태
+  const [bulkLimitModal, setBulkLimitModal] = useState({
+    isOpen: false,
+    maxLimit: '',
+    fixFlag: false,
+    targetLevel: 0,
+    targetGroup: '',
+    targetPart: ''
+  });
+
+  // 최대분배호수 일괄 변경 모달 열기
+  const handleOpenBulkLimitModal = () => {
+    // 컨텍스트 메뉴 닫기
+    handleCloseContextMenu();
+    
+    setBulkLimitModal({
+      isOpen: true,
+      maxLimit: '',
+      fixFlag: false,
+      targetLevel: contextMenu.level || 0,
+      targetGroup: contextMenu.group || '',
+      targetPart: contextMenu.part || ''
+    });
+  };
+
   // 우클릭 컨텍스트 메뉴 상태
   const [contextMenu, setContextMenu] = useState<{
     visible: boolean;
@@ -1034,26 +1059,33 @@ const DistributionLimit = () => {
     // 삭제 대상에 따라 메시지와 상담사 ID 목록 설정
     if (contextMenu.level === 3) {
       // 상담사 개인 삭제
-      confirmMessage = `${contextMenu.agentId} 상담사의 분배 제한 정보를 삭제하시겠습니까?`;
+      // confirmMessage = `${contextMenu.agentId} 상담사의 분배 제한 정보를 삭제하시겠습니까?`;
+      confirmMessage = '분배 제한 정보를 삭제 하시겠습니까?';
       if (contextMenu.agentId) {
         agentIds = [contextMenu.agentId];
       }
     } else if (contextMenu.level === 2) {
-      // 상담파트 전체 삭제
-      confirmMessage = `파트 ${contextMenu.part} 의 모든 상담사의 분배 제한 정보를 삭제하시겠습니까?`;
+      // 상담파트 전체 삭제 - 분배호수가 설정된 상담사만 삭제
+      confirmMessage = `파트 ${contextMenu.part} 의 할당된 콜수를 삭제하시겠습니까?`;
       
-      // 파트에 속한 모든 상담사 ID 수집
+      // 파트에 속한 상담사 중 최대분배호수가 0보다 큰 상담사만 ID 수집
       agentIds = rawAgentData
-        .filter(agent => agent.part === contextMenu.part)
+        .filter(agent => 
+          agent.part === contextMenu.part && 
+          parseInt(agent.max_dist) > 0
+        )
         .map(agent => agent.agent_id);
         
     } else if (contextMenu.level === 1) {
-      // 상담그룹 전체 삭제
-      confirmMessage = `그룹 ${contextMenu.group} 의 모든 상담사의 분배 제한 정보를 삭제하시겠습니까?`;
+      // 상담그룹 전체 삭제 - 분배호수가 설정된 상담사만 삭제
+      confirmMessage = `그룹 ${contextMenu.group} 의 할당된 콜수를 삭제하시겠습니까?`;
       
-      // 그룹에 속한 모든 상담사 ID 수집
+      // 그룹에 속한 상담사 중 최대분배호수가 0보다 큰 상담사만 ID 수집
       agentIds = rawAgentData
-        .filter(agent => agent.group === contextMenu.group)
+        .filter(agent => 
+          agent.group === contextMenu.group && 
+          parseInt(agent.max_dist) > 0
+        )
         .map(agent => agent.agent_id);
     }
     
@@ -1136,6 +1168,162 @@ const DistributionLimit = () => {
     });
   };
 
+  // 최대분배호수 일괄 변경 적용 및 즉시 저장
+  const handleApplyBulkLimit = async () => {
+    if (!bulkLimitModal.maxLimit) {
+      showAlert('최대 발신 건수를 입력해주세요.');
+      return;
+    }
+    
+    const maxLimit = parseInt(bulkLimitModal.maxLimit);
+    if (isNaN(maxLimit) || maxLimit <= 0) {
+      showAlert('최대 발신 건수는 0보다 큰 숫자여야 합니다.');
+      return;
+    }
+    
+    // 영향을 받는 상담사 ID 찾기 - 정확한 필터링으로 수정
+    let targetAgents: Row[] = [];
+    
+    if (bulkLimitModal.targetLevel === 1) {
+      // 상담그룹에 속한 모든 상담사만 정확히 필터링
+      targetAgents = rawAgentData.filter(agent => 
+        agent.group === bulkLimitModal.targetGroup
+      );
+      // console.log(`그룹 ${bulkLimitModal.targetGroup}에 속한 상담사 ${targetAgents.length}명 선택됨`);
+    } else if (bulkLimitModal.targetLevel === 2) {
+      // 상담파트에 속한 모든 상담사만 정확히 필터링
+      targetAgents = rawAgentData.filter(agent => 
+        agent.part === bulkLimitModal.targetPart
+      );
+      // console.log(`파트 ${bulkLimitModal.targetPart}에 속한 상담사 ${targetAgents.length}명 선택됨`);
+    }
+    
+    if (targetAgents.length === 0) {
+      showAlert('변경할 상담사가 없습니다.');
+      return;
+    }
+    
+    // 모달 닫기
+    setBulkLimitModal(prev => ({ ...prev, isOpen: false }));
+    
+    // 로딩 시작
+    setIsLoading(true);
+    
+    // 지연 추가
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    let successCount = 0;
+    let failCount = 0;
+    
+    // 변경할 상담사 ID 목록
+    const agentIds = targetAgents.map(agent => agent.agent_id);
+    // console.log('변경 대상 상담사 ID:', agentIds);
+    
+    // 모든 대상 상담사에 대해 API 호출로 바로 저장
+    for (const agent of targetAgents) {
+      const saveData = {
+        campaign_id: parseInt(selectedCampaignId),
+        agent_id: agent.agent_id,
+        max_call: maxLimit,
+        fix_flag: bulkLimitModal.fixFlag ? 1 : 0
+      };
+      
+      // 기존 설정 존재 여부 확인 (max_dist가 0이 아닌 경우)
+      const isExisting = parseInt(agent.max_dist) > 0;
+      
+      try {
+        if (isExisting) {
+          // 기존 설정 수정
+          await new Promise<void>((resolve, reject) => {
+            updateMaxCallMutation(saveData, {
+              onSuccess: (response) => {
+                if (response.result_code === 0) {
+                  successCount++;
+                  resolve();
+                } else {
+                  // 이미 적용된 설정이라면 성공으로 처리
+                  if (response.result_msg && response.result_msg.includes("No action is needed")) {
+                    successCount++;
+                    resolve();
+                  } else {
+                    failCount++;
+                    reject(new Error(response.result_msg));
+                  }
+                }
+              },
+              onError: (error) => {
+                // "No action is needed" 오류는 무시하고 성공으로 처리
+                if (error.message && error.message.includes("No action is needed")) {
+                  successCount++;
+                  resolve();
+                } else {
+                  failCount++;
+                  reject(error);
+                }
+              }
+            });
+          });
+        } else {
+          // 새 설정 생성
+          await new Promise<void>((resolve, reject) => {
+            createMaxCallMutation(saveData, {
+              onSuccess: (response) => {
+                if (response.result_code === 0) {
+                  successCount++;
+                  resolve();
+                } else {
+                  // 이미 적용된 설정이라면 성공으로 처리
+                  if (response.result_msg && response.result_msg.includes("No action is needed")) {
+                    successCount++;
+                    resolve();
+                  } else {
+                    failCount++;
+                    reject(new Error(response.result_msg));
+                  }
+                }
+              },
+              onError: (error) => {
+                // "No action is needed" 오류는 무시하고 성공으로 처리
+                if (error.message && error.message.includes("No action is needed")) {
+                  successCount++;
+                  resolve();
+                } else {
+                  failCount++;
+                  reject(error);
+                }
+              }
+            });
+          });
+        }
+      } catch (error) {
+        console.error('저장 중 오류 발생:', error);
+      }
+    }
+    
+    // 화면 데이터 직접 업데이트 (API 응답을 기다리지 않고)
+    setRawAgentData(prevData => 
+      prevData.map(row => {
+        // 선택된 상담사 ID에 포함된 경우에만 업데이트
+        if (agentIds.includes(row.agent_id)) {
+          return {
+            ...row,
+            max_dist: maxLimit.toString(),
+            fix_flag: bulkLimitModal.fixFlag ? 'Y' : 'N'
+          };
+        }
+        return row;
+      })
+    );
+    
+    // 변경 후 목록 다시 조회
+    await fetchMaxCallList({
+      campaign_id: [parseInt(selectedCampaignId)]
+    });
+    
+    // 로딩 종료
+    setIsLoading(false);
+  };
+
   // Toggle row expansion - 행 확장/축소 토글 개선
   const toggleRowExpand = (rowId: string) => {
     // 새로운 확장 상태 세트 생성
@@ -1216,11 +1404,12 @@ const DistributionLimit = () => {
           <div style={{ marginLeft: `${indent}px` }} className="flex items-center">
             {hasToggle && (
               <span
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleRowExpand(row.id);
-                }}
-                className="cursor-pointer mr-2"
+                // onClick={(e) => {
+                //   e.stopPropagation();
+                //   toggleRowExpand(row.id);
+                // }}
+                // className="cursor-pointer mr-2"
+                className="mr-2"
                 style={{
                   display: 'inline-block',
                   width: '9px',
@@ -1311,11 +1500,11 @@ const DistributionLimit = () => {
         
         // 편집 가능한 드롭다운으로 변경
         return (
-          <div className={row.hasChanges ? 'bg-yellow-50' : ''}>
+          <div className= {row.hasChanges ? 'bg-yellow-50' : ''}>
             <select
               value={getCellValue(row, 'fix_flag')}
               onChange={(e) => handleCellChange(row, 'fix_flag', e.target.value)}
-              className="w-full h-full border-0 bg-transparent focus:outline-none"
+              className="w-full h-full text-center border-0 bg-transparent focus:outline-none"
             >
               <option value="Y">고정</option>
               <option value="N">미고정</option>
@@ -1459,36 +1648,31 @@ const DistributionLimit = () => {
           </div>
         </div>
         <div className='grid-custom-wrap h-[560px]' ref={gridRef} onContextMenu={(e) => e.preventDefault()}>
-          {isLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-lg">데이터 로딩중...</div>
-            </div>
-          ) : (
-            <>
-              <DataGrid
-                columns={columns}
-                rows={flattenRows(treeData)} 
-                className="grid-custom"
-                onCellClick={handleCellClick}
-                rowKeyGetter={rowKeyGetter}
-                rowHeight={30}
-                headerRowHeight={30}
-                rowClass={getRowClass}
-                enableVirtualization={false}
+          <>
+            <DataGrid
+              columns={columns}
+              rows={flattenRows(treeData)} 
+              className="grid-custom"
+              onCellClick={handleCellClick}
+              rowKeyGetter={rowKeyGetter}
+              rowHeight={30}
+              headerRowHeight={30}
+              rowClass={getRowClass}
+              enableVirtualization={false}
+            />
+            
+            {/* 컨텍스트 메뉴 컴포넌트 추가 */}
+            {contextMenu.visible && (
+              <ContextMenu
+                x={contextMenu.x}
+                y={contextMenu.y}
+                onDelete={handleDeleteMaxCall}
+                onChangeBulkLimit={handleOpenBulkLimitModal}
+                onClose={handleCloseContextMenu}
+                level={contextMenu.level}
               />
-              
-              {/* 컨텍스트 메뉴 컴포넌트 추가 */}
-              {contextMenu.visible && (
-                <ContextMenu
-                  x={contextMenu.x}
-                  y={contextMenu.y}
-                  onDelete={handleDeleteMaxCall}
-                  onClose={handleCloseContextMenu}
-                  level={contextMenu.level}
-                />
-              )}
-            </>
-          )}
+            )}
+          </>
         </div>
         
         <div className="mt-[20px] text-sm">
@@ -1528,6 +1712,46 @@ const DistributionLimit = () => {
         type="1"
         onClose={handleTimeSettingSave}
         onCancle={() => setIsTimeSettingOpen(false)}
+      />
+
+      {/* 최대분배호수 일괄 변경 모달 */}
+      <CustomAlert
+        isOpen={bulkLimitModal.isOpen}
+        message={
+          <div className="flex flex-col gap-4">
+            <div className="text-center mb-2">
+              {bulkLimitModal.targetLevel === 1
+                ? `그룹 ${bulkLimitModal.targetGroup}의 할당된 콜수를 일괄 변경합니다.`
+                : bulkLimitModal.targetLevel === 2
+                ? `파트 ${bulkLimitModal.targetPart}의 할당된 콜수를 일괄 변경합니다.`
+                : ''}
+            </div>
+            <div className="flex items-center gap-2">
+              <Label className="w-32 min-w-32">최대 발신 건수</Label>
+              <CustomInput
+                type="number"
+                min="1"
+                value={bulkLimitModal.maxLimit}
+                onChange={(e) => setBulkLimitModal(prev => ({ ...prev, maxLimit: e.target.value }))}
+                className="w-[140px]"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="fixFlagCheckbox"
+                checked={bulkLimitModal.fixFlag}
+                onChange={(e) => setBulkLimitModal(prev => ({ ...prev, fixFlag: e.target.checked }))}
+                className="mr-2"
+              />
+              <Label htmlFor="fixFlagCheckbox">호수 일괄고정</Label>
+            </div>
+          </div>
+        }
+        title="최대분배호수 일괄 변경"
+        type="1"
+        onClose={handleApplyBulkLimit}
+        onCancle={() => setBulkLimitModal(prev => ({ ...prev, isOpen: false }))}
       />
 
       <CustomAlert
