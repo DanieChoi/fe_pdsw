@@ -236,6 +236,10 @@ type Props = {
 
 export default function CampaignManagerList({campaignId,campaignHeaderSearchParam}: Props) {
   // Use global state for selectedCampaign and selectedCampaignRow
+
+  console.log("campaignHeaderSearchParam : ", campaignHeaderSearchParam);
+  
+
   const { 
     campaigns, 
     setSelectedCampaign, 
@@ -299,13 +303,15 @@ export default function CampaignManagerList({campaignId,campaignHeaderSearchPara
     }
   }, [tempCampaigns, schedules, campaignSkills, dialModeList, callingNumbers]);
 
+  // tofix
   useEffect(() => {
     if (typeof campaignHeaderSearchParam != 'undefined' && campaignId === '') {
       let _tempCampaigns = campaigns;
       
-      if (campaignHeaderSearchParam.tenantId > 0) {
+      if (campaignHeaderSearchParam.tenantId > -1) {
         _tempCampaigns = _tempCampaigns.filter((campaign) => campaign.tenant_id === Number(campaignHeaderSearchParam.tenantId));
       }
+      
       if (campaignHeaderSearchParam.dailMode > 0) {
         _tempCampaigns = _tempCampaigns.filter((campaign) => campaign.dial_mode === Number(campaignHeaderSearchParam.dailMode));
       }
