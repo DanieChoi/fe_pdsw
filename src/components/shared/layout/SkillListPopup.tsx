@@ -1,8 +1,8 @@
-import React, { useEffect, useState} from 'react';
-import { useCampainManagerStore } from '@/store';
+import React, { useEffect, useState } from 'react';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import DataGrid, { SelectColumn } from 'react-data-grid';
 import 'react-data-grid/lib/styles.css';
+import { useApiForGetSkills2 } from '@/features/campaignManager/hooks/useApiForGetSkills2';
 
 interface Skill {
     skill_id: number;
@@ -14,24 +14,26 @@ export interface SkillListPopupProps {
     param: number[];
     tenantId: number;
     isOpen?: boolean;
-    type: string; 
+    type: string;
     onConfirm: (param: string) => void;
     onCancle?: () => void;
 }
 
-const SkillListPopup = ({ 
-    param, 
+const SkillListPopup = ({
+    param,
     tenantId,
-    type, 
+    type,
     isOpen = true,
     onConfirm,
     onCancle
 }: SkillListPopupProps) => {
-    const { skills } = useCampainManagerStore();
+    const { data: skillsData, isLoading, error } = useApiForGetSkills2(
+        { tenant_id_array: [tenantId] },
+    );
     const [selectedSkills, setSelectedSkills] = useState<Set<number>>(new Set(param));
-    
+
     useEffect(() => {
-        if(param !== null){
+        if (param !== null) {
             setSelectedSkills(new Set(param));
         }
     }, [param]);
@@ -41,9 +43,9 @@ const SkillListPopup = ({
     };
 
     // skill_id가 0인 항목 제외
-    const rows = skills.filter((skill) => 
+    const rows = skillsData && skillsData.result_data ? skillsData.result_data.filter((skill) =>
         skill.tenant_id === tenantId && skill.skill_id !== 0
-    );
+    ) : [];
 
     const handleSelectedRowsChange = (newSelection: Set<number>) => {
         // 혹시 모를 0값이 포함되는 것을 방지
@@ -77,6 +79,17 @@ const SkillListPopup = ({
 
     const gridContent = (
         <div className="grid-custom-wrap w-full">
+            {/* 스킬 리스트 팝업 여기야! */}
+            {/* <div>
+                데이터 확인:
+                tenantId: {tenantId}
+                <br />
+                param: {param}
+                <br />
+                selectedSkills: {Array.from(selectedSkills).sort().join(',')}
+                rows.length: {rows.length}
+            </div> */}
+
             <DataGrid
                 columns={columns}
                 rows={rows}

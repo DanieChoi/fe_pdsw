@@ -39,6 +39,7 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
       />;
     case 2:
       return <CampaignManager />;
+
     case 3:
       return <IntegratedMonitoringDashboard />;
     case 4:

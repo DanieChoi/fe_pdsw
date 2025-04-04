@@ -67,16 +67,22 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     Cookies.remove('session_key');
     router.push('/login');
   }
+
+  // tofix: 새캠페인추가0404
   // 스킬 조회
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data);
+
+      console.log("스킬 패치 결과 : ", data.result_data);
+
       fetchCallingNumbers({
         session_key: '',
         tenant_id: 0,
       });
     }
   });
+
   // 전화번호 조회
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
@@ -87,6 +93,7 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
       });
     }
   });
+
   // 캠페인스킬 조회
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
@@ -117,8 +124,10 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     console.log('campaignIdForUpdateFromSideMenu:', campaignIdForUpdateFromSideMenu);
     console.log('campaignId:', campaignId);
     if (typeof campaignId === 'undefined') {
+      // alert("here 1")
       _setCampaignId(campaignIdForUpdateFromSideMenu || '');
     } else {
+      // alert("here 2")
       _setCampaignId(campaignId);
     }
   }, [campaignIdForUpdateFromSideMenu, campaignId]);
@@ -126,6 +135,7 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   return (
     <div className='compaign-wrap'>
       <div className='flex flex-col gap-[15px] limit-width'>
+        {/* campaignId: {_campaignId} */}
         <CampaignManagerHeader campaignId={_campaignId} onSearch={handleCampaignHeaderSearch} />
         <div className="flex gap-[30px]">
           <CampaignManagerList campaignId={_campaignId} campaignHeaderSearchParam={campaignHeaderSearchParam} />

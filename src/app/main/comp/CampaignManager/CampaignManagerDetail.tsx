@@ -1,5 +1,6 @@
-"use client";
 // components/CampaignManager/CampaignManagerDetail.tsx
+// 캠페인 관리 탭의 캠페인 상세 정보 부분
+"use client";
 import { useMainStore, useCampainManagerStore, useTabStore,useAuthStore } from '@/store';
 import Image from 'next/image'
 import TitleWrap from "@/components/shared/TitleWrap";

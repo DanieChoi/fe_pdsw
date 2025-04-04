@@ -25,6 +25,7 @@ export interface CampaignListDataResponse {
   start_flag: number;
   end_flag: number;
   tenant_id: number;
+  dial_mode: number; // 추가된 필드: dial_mode 속성
   // ... 기타 필요한 필드들
 }
 

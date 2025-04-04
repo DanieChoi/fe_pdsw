@@ -24,6 +24,16 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
   // 체크박스가 필요한 메뉴 ID
   const checkableMenuIds = [14, 23];
 
+  // addTab({
+  //   id: 700,
+  //   title: 캠페인 그룹 일괄 수정: ${node.name},
+  //   uniqueKey: groupBulkUpdate_${node.id},
+  //   params: {
+  //     groupId: node.id,
+  //     groupName: node.name
+  //   }
+  // });
+
   const menuItems = [
     {
       id: 13,
@@ -40,6 +50,7 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
             icon: "",
             href: "",
             content: null,
+
           });
         }
       },
@@ -62,7 +73,7 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
   ];
 
   // 사용자가 접근 권한이 있는 메뉴 아이템만 필터링
-  const filteredMenuItems = menuItems.filter((menuItem) => 
+  const filteredMenuItems = menuItems.filter((menuItem) =>
     availableCampaignTenantContextMenuIds.includes(menuItem.menuId)
   );
   // console.log("availableCampaignTenantContextMenuIds : ", availableCampaignTenantContextMenuIds);
