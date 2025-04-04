@@ -178,7 +178,8 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
     };
   }, []);
 
-  const alertMessage = `캠페인 아이디: ${campaignId}\n캠페인 이름: ${campaignName}\n삭제된 캠페인은 복구가 불가능합니다.\n캠페인을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`;
+  // const alertMessage = `캠페인 아이디: ${campaignId}\n캠페인 이름: ${campaignName}\n삭제된 캠페인은 복구가 불가능합니다.\n캠페인을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`;
+  const alertMessage = `캠페인 아이디: ${campaignId} 캠페인 이름: ${campaignName} 삭제된 캠페인은 복구가 불가능합니다 캠페인을 삭제하시겠습니까?`;
 
   return (
     <>
