@@ -37,7 +37,7 @@ export default function Footer({
   const [isDrawerOpen, setIsDrawerOpen] = useState(true); // 푸터 열기/닫기 토글
   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
   const [currentHeight, setCurrentHeight] = useState(footerHeight);
-  const { tenant_id, role_id } = useAuthStore();
+  const { id, tenant_id, role_id } = useAuthStore();
   const { campaigns, setCampaigns } = useMainStore();
   const { useAlramPopup } = useEnvironmentStore();
 
@@ -417,7 +417,7 @@ export default function Footer({
     if (typeof window !== 'undefined' && window.EventSource) {
       const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
       const eventSource = new EventSource(
-        `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
+        `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe/${id}`
       );
 
       let data: any = {};
@@ -460,7 +460,7 @@ export default function Footer({
         eventSource.close();
       };
     }
-  }, [footerDataSet, tenant_id, role_id, useAlramPopup]);
+  }, [tenant_id, role_id]);
 
   // 높이 변경 핸들러
   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
