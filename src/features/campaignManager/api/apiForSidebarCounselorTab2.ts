@@ -70,7 +70,7 @@ export async function apiToFetchCounselorTreeData(credentials: MainCredentials2)
  
   return [{
     id: 'agent',
-    label: '상담원',
+    label: '상담사',
     items: [...tenantMap.values()]
   }];
  }

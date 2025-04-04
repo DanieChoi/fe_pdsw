@@ -286,7 +286,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     addMultiTab({
       id: 22,
       uniqueKey: uniqueKey,
-      title: `상담원 상태 모니터 - ${node.name}`,
+      title: `상담사 상태 모니터 - ${node.name}`,
       icon: '',
       href: '',
       content: null,

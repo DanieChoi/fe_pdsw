@@ -83,7 +83,7 @@ export function useApiForSkillCampaignList (
     });
 }
 
-// 스킬 할당 상담원 리스트 조회 요청을 위한 hook
+// 스킬 할당 상담사 리스트 조회 요청을 위한 hook
 export function useApiForSkillAgentList (
     option?: UseMutationOptions<SkillAgentListResponse, ApiError, unknown>
 ) {
@@ -115,7 +115,7 @@ export function useApiForCampaignList(
     });
 }
 
-// 선택 상담원 스킬할당 해제를 위한 hook
+// 선택 상담사 스킬할당 해제를 위한 hook
 export function useApiForDeleteAgentSkill (
     option?: UseMutationOptions<SuccesResponse, ApiError, DeleteAgentSkillCredentials>
 ) {

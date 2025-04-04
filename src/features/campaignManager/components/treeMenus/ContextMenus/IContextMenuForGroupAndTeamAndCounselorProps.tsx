@@ -17,7 +17,7 @@
 //     name: string;
 //     tenantId: string;
 //     type: "counselor" | "team" | "group";
-//     members?: any[]; // 상담원 목록
+//     members?: any[]; // 상담사 목록
 //   };
 // }
 
@@ -76,11 +76,11 @@
 //     return true;
 //   };
 
-//   // ====== 상담원(개인) 관련 함수 ======
+//   // ====== 상담사(개인) 관련 함수 ======
 //   const handleCounselorSkillAssignment = (isUnassign: boolean) => {
 //     if (!validateTenantId()) return;
 
-//     logDebugInfo(isUnassign ? "상담원 스킬 해제" : "상담원 스킬 할당", {
+//     logDebugInfo(isUnassign ? "상담사 스킬 해제" : "상담사 스킬 할당", {
 //       counselorId: item.id,
 //       counselorName: item.name,
 //       tenantId: item.tenantId,
@@ -170,7 +170,7 @@
     
 //     switch (item.type) {
 //       case "counselor":
-//         return "상담원 스킬 할당";
+//         return "상담사 스킬 할당";
 //       case "team":
 //         return "팀 스킬 할당";
 //       case "group":
@@ -185,7 +185,7 @@
 //     const actionText = isUnassignment ? "해제" : "할당";
 //     switch (item.type) {
 //       case "counselor":
-//         return `상담원 스킬 ${actionText} - ${item.name}`;
+//         return `상담사 스킬 ${actionText} - ${item.name}`;
 //       case "team":
 //         return `팀 스킬 ${actionText} - ${item.name}`;
 //       case "group":
@@ -210,7 +210,7 @@
 //         </div>
 //       </Menu>
 
-//       {/* ===== 상담원 스킬 할당 다이얼로그 ===== */}
+//       {/* ===== 상담사 스킬 할당 다이얼로그 ===== */}
 //       {item.type === "counselor" && isSkillDialogOpen && (
 //         <IDialogForSkilAssignmentForCounselor
 //           isOpen={isSkillDialogOpen}
@@ -278,7 +278,7 @@ interface IContextMenuForGroupAndTeamAndCounselorProps {
     name: string;
     tenantId: string;
     type: "counselor" | "team" | "group";
-    members?: any[]; // 상담원 목록
+    members?: any[]; // 상담사 목록
   };
 }
 
@@ -341,11 +341,11 @@ export function IContextMenuForGroupAndTeamAndCounselor({
     return true;
   };
 
-  // ====== 상담원(개인) 관련 함수 ======
+  // ====== 상담사(개인) 관련 함수 ======
   const handleCounselorSkillAssignment = (isUnassign: boolean) => {
     if (!validateTenantId()) return;
     
-    logDebugInfo(isUnassign ? "상담원 스킬 해제" : "상담원 스킬 할당", {
+    logDebugInfo(isUnassign ? "상담사 스킬 해제" : "상담사 스킬 할당", {
       counselorId: item.id,
       counselorName: item.name,
       tenantId: item.tenantId,
@@ -435,7 +435,7 @@ export function IContextMenuForGroupAndTeamAndCounselor({
     }
     switch (item.type) {
       case "counselor":
-        return "상담원 스킬 할당";
+        return "상담사 스킬 할당";
       case "team":
         return "팀 스킬 할당";
       case "group":
@@ -450,7 +450,7 @@ export function IContextMenuForGroupAndTeamAndCounselor({
     const actionText = isUnassignment ? "해제" : "할당";
     switch (item.type) {
       case "counselor":
-        return `상담원 스킬 ${actionText} - ${item.name}`;
+        return `상담사 스킬 ${actionText} - ${item.name}`;
       case "team":
         return `팀 스킬 ${actionText} - ${item.name}`;
       case "group":
@@ -545,7 +545,7 @@ export function IContextMenuForGroupAndTeamAndCounselor({
         <>{children}</>
       )}
 
-      {/* ===== 상담원 스킬 할당 다이얼로그 ===== */}
+      {/* ===== 상담사 스킬 할당 다이얼로그 ===== */}
       {item.type === "counselor" && isSkillDialogOpen && (
         <IDialogForSkilAssignmentForCounselor
           isOpen={isSkillDialogOpen}

@@ -98,7 +98,7 @@ const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
       title: '주의'
     },
     event: {
-      icon: User, // 상담원 아이콘으로 사용
+      icon: User, // 상담사 아이콘으로 사용
       title: 'EVENT'
     },
   };

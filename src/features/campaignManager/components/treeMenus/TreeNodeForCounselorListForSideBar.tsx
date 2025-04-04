@@ -47,14 +47,14 @@
 //       case 'counselor':
 //         return [{
 //           ...data,
-//           tenantId: currentTenantId // 상담원 정보에 현재 tenantId 추가
+//           tenantId: currentTenantId // 상담사 정보에 현재 tenantId 추가
 //         }];
 //       case 'team': {
 //         let counselors = data.counselorInfo?.map((counselor: any) => ({
 //           type: 'counselor',
 //           data: {
 //             ...counselor,
-//             tenantId: currentTenantId // 상담원에 tenantId 추가
+//             tenantId: currentTenantId // 상담사에 tenantId 추가
 //           }
 //         })) || [];
         
@@ -65,7 +65,7 @@
 //           );
 //         }
         
-//         // store의 sortOption에 따라 상담원 정렬 (이름 또는 아이디 기준)
+//         // store의 sortOption에 따라 상담사 정렬 (이름 또는 아이디 기준)
 //         counselors.sort((a: { data: { counselorname: string; counselorId: string } }, b: { data: { counselorname: string; counselorId: string } }) => {
 //           if (sortOption.type === 'name') {
 //             if (a.data.counselorname < b.data.counselorname) return sortOption.direction === 'asc' ? -1 : 1;
@@ -80,7 +80,7 @@
 //         return counselors;
 //       }
 //       case 'group':
-//         // 그룹 내 모든 팀의 상담원 정보에 tenantId 추가
+//         // 그룹 내 모든 팀의 상담사 정보에 tenantId 추가
 //         return data.teamInfo?.reduce((acc: any[], team: any) => {
 //           const counselors = team.counselorInfo?.map((counselor: any) => ({
 //             ...counselor,
@@ -141,7 +141,7 @@
 //           type: 'counselor',
 //           data: {
 //             ...counselor,
-//             tenantId: currentTenantId // 상담원에 tenantId 추가
+//             tenantId: currentTenantId // 상담사에 tenantId 추가
 //           }
 //         })) || [];
         
@@ -151,7 +151,7 @@
 //           );
 //         }
         
-//         // 상담원 정렬
+//         // 상담사 정렬
 //         counselors.sort((a: { data: { counselorname: string; counselorId: string } }, b: { data: { counselorname: string; counselorId: string } }) => {
 //           if (sortOption.type === 'name') {
 //             if (a.data.counselorname < b.data.counselorname) return sortOption.direction === 'asc' ? -1 : 1;
@@ -183,23 +183,23 @@
 //     }
 
 //     if (type === 'counselor') {
-//       // 상담원 정보에 이미 tenantId가 포함되어 있거나, parentTenantId를 사용
+//       // 상담사 정보에 이미 tenantId가 포함되어 있거나, parentTenantId를 사용
 //       const tenantId = data.tenantId || currentTenantId;
 //       if (tenantId) {
-//         console.log(`상담원 선택: ${data.counselorname}, TenantID: ${tenantId}`);
+//         console.log(`상담사 선택: ${data.counselorname}, TenantID: ${tenantId}`);
 //         setSelectedCounselor(
 //           data.counselorId,
 //           data.counselorname,
 //           tenantId
 //         );
 //       } else {
-//         console.warn(`상담원 ${data.counselorname}의 tenantId를 찾을 수 없습니다.`);
+//         console.warn(`상담사 ${data.counselorname}의 tenantId를 찾을 수 없습니다.`);
 //       }
 //     }
 
 //     console.log(`${type} ${label} 클릭 - TenantID: ${currentTenantId}`);
 //     const counselors = getCounselorsForNode();
-//     console.log(`${type} 노드의 상담원 목록:`, counselors);
+//     console.log(`${type} 노드의 상담사 목록:`, counselors);
 //   };
 
 //   const handleContextMenu = useCallback(() => {
@@ -386,14 +386,14 @@ export function TreeNodeForCounselorListForSideBar({
       case 'counselor':
         return [{
           ...data,
-          tenantId: currentTenantId // 상담원 정보에 현재 tenantId 추가
+          tenantId: currentTenantId // 상담사 정보에 현재 tenantId 추가
         }];
       case 'team': {
         let counselors = data.counselorInfo?.map((counselor: any) => ({
           type: 'counselor',
           data: {
             ...counselor,
-            tenantId: currentTenantId // 상담원에 tenantId 추가
+            tenantId: currentTenantId // 상담사에 tenantId 추가
           }
         })) || [];
         
@@ -416,7 +416,7 @@ export function TreeNodeForCounselorListForSideBar({
           );
         }
         
-        // store의 sortOption에 따라 상담원 정렬 (이름 또는 아이디 기준)
+        // store의 sortOption에 따라 상담사 정렬 (이름 또는 아이디 기준)
         counselors.sort((a: { data: { counselorname: string; counselorId: string } }, b: { data: { counselorname: string; counselorId: string } }) => {
           if (sortOption.type === 'name') {
             if (a.data.counselorname < b.data.counselorname) return sortOption.direction === 'asc' ? -1 : 1;
@@ -431,7 +431,7 @@ export function TreeNodeForCounselorListForSideBar({
         return counselors;
       }
       case 'group':
-        // 그룹 내 모든 팀의 상담원 정보에 tenantId 추가
+        // 그룹 내 모든 팀의 상담사 정보에 tenantId 추가
         return data.teamInfo?.reduce((acc: any[], team: any) => {
           const counselors = team.counselorInfo?.map((counselor: any) => ({
             ...counselor,
@@ -492,7 +492,7 @@ export function TreeNodeForCounselorListForSideBar({
           type: 'counselor',
           data: {
             ...counselor,
-            tenantId: currentTenantId // 상담원에 tenantId 추가
+            tenantId: currentTenantId // 상담사에 tenantId 추가
           }
         })) || [];
         
@@ -514,7 +514,7 @@ export function TreeNodeForCounselorListForSideBar({
           );
         }
         
-        // 상담원 정렬
+        // 상담사 정렬
         counselors.sort((a: { data: { counselorname: string; counselorId: string } }, b: { data: { counselorname: string; counselorId: string } }) => {
           if (sortOption.type === 'name') {
             if (a.data.counselorname < b.data.counselorname) return sortOption.direction === 'asc' ? -1 : 1;
@@ -546,23 +546,23 @@ export function TreeNodeForCounselorListForSideBar({
     }
 
     if (type === 'counselor') {
-      // 상담원 정보에 이미 tenantId가 포함되어 있거나, parentTenantId를 사용
+      // 상담사 정보에 이미 tenantId가 포함되어 있거나, parentTenantId를 사용
       const tenantId = data.tenantId || currentTenantId;
       if (tenantId) {
-        console.log(`상담원 선택: ${data.counselorname}, TenantID: ${tenantId}`);
+        console.log(`상담사 선택: ${data.counselorname}, TenantID: ${tenantId}`);
         setSelectedCounselor(
           data.counselorId,
           data.counselorname,
           tenantId
         );
       } else {
-        console.warn(`상담원 ${data.counselorname}의 tenantId를 찾을 수 없습니다.`);
+        console.warn(`상담사 ${data.counselorname}의 tenantId를 찾을 수 없습니다.`);
       }
     }
 
     console.log(`${type} ${label} 클릭 - TenantID: ${currentTenantId}`);
     const counselors = getCounselorsForNode();
-    console.log(`${type} 노드의 상담원 목록:`, counselors);
+    console.log(`${type} 노드의 상담사 목록:`, counselors);
   };
 
   const handleContextMenu = useCallback(() => {

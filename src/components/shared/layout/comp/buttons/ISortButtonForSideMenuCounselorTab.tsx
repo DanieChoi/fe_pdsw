@@ -291,9 +291,9 @@ const ISortButtonForSideMenuCounselorTab = () => {
             </div>
           </div>
 
-          {/* 상담원 정렬 옵션 */}
+          {/* 상담사 정렬 옵션 */}
           <div className="flex items-center hover:bg-[#F4F6F9] rounded-md px-[6px] py-[4px]">
-            <div className="flex-1 text-sm text-[#333]">상담원 보기</div>
+            <div className="flex-1 text-sm text-[#333]">상담사 보기</div>
             <div className="flex gap-2">
               <button
                 className={`p-1.5 rounded-md ${

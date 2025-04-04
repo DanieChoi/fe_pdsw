@@ -50,7 +50,7 @@ export function TreeMenusForAgentTab() {
       // 기본 확장 상태 적용
       applyDefaultExpansion();
       
-      // 모든 상담원 정보 추출
+      // 모든 상담사 정보 추출
       const counselors = getAllCounselors(data.organizationList);
       setAllCounselors(counselors);
       
@@ -153,10 +153,10 @@ export function TreeMenusForAgentTab() {
                   });
                 }
 
-                // 각 팀 내의 상담원 정렬
+                // 각 팀 내의 상담사 정렬
                 group.teamInfo.forEach(team => {
                   if (team.counselorInfo && team.counselorInfo.length > 0) {
-                    // 상담원 레벨 정렬
+                    // 상담사 레벨 정렬
                     if (nodeType === 'all' || nodeType === 'counselor') {
                       team.counselorInfo.sort((a, b) => {
                         if (type === 'id') {
@@ -249,7 +249,7 @@ export function TreeMenusForAgentTab() {
                   newExpanded.add(teamId);
                   
                   if (level >= 5 && team.counselorInfo) {
-                    // 레벨 5: 상담원
+                    // 레벨 5: 상담사
                     team.counselorInfo.forEach(counselor => {
                       const counselorId = `counselor-${counselor.counselorId}`;
                       newExpanded.add(counselorId);
@@ -300,13 +300,13 @@ export function TreeMenusForAgentTab() {
   //   if (counselorInfo) {
   //     selectCounselor(counselorInfo.counselorId, counselorInfo.counselorName, counselorInfo.tenantId);
   //   } else {
-  //     toast.error("상담원을 찾을 수 없습니다.");
+  //     toast.error("상담사을 찾을 수 없습니다.");
   //   }
   // };
 
-  // 상담원 선택 처리 공통 함수
+  // 상담사 선택 처리 공통 함수
   // const selectCounselor = (counselorId: string, counselorName: string, tenantId: string) => {
-  //   // 상담원 선택 상태 업데이트
+  //   // 상담사 선택 상태 업데이트
   //   setSelectedNodeId(counselorId);
   //   setSelectedCounselor(counselorId, counselorName, tenantId);
     
@@ -351,7 +351,7 @@ export function TreeMenusForAgentTab() {
     if (counselorInfo) {
       selectCounselor(counselorInfo.counselorId, counselorInfo.counselorName, counselorInfo.tenantId);
     } else {
-      toast.error("상담원을 찾을 수 없습니다.");
+      toast.error("상담사을 찾을 수 없습니다.");
     }
   };
 
@@ -367,7 +367,7 @@ export function TreeMenusForAgentTab() {
       return;
     }
   
-    // 상담원 선택 상태 업데이트
+    // 상담사 선택 상태 업데이트
     setSelectedNodeId(counselorId);
     setSelectedCounselor(counselorId, counselorName, tenantId);
     
@@ -411,7 +411,7 @@ export function TreeMenusForAgentTab() {
             value={searchTerm}
             onChange={setSearchTerm}
             onSearch={handleSearch}
-            placeholder="상담원"
+            placeholder="상담사"
             counselors={allCounselors}
             onSelectCounselor={selectCounselor}
           />

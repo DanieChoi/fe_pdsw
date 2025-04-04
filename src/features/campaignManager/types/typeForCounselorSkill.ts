@@ -40,7 +40,7 @@ export interface CounselorSkillApiError {
 }
 
 /**
- * 상담원에게 스킬 할당 API 요청 타입
+ * 상담사에게 스킬 할당 API 요청 타입
  * 요청 예시:
  * {
  *   "request_data": {
@@ -58,7 +58,7 @@ export interface CounselorSkillAssignmentRequest {
 }
 
 /**
- * 상담원에게 스킬 할당 API 응답 타입
+ * 상담사에게 스킬 할당 API 응답 타입
  * 응답 예시:
  * {
  *   "result_code": 0,
@@ -71,7 +71,7 @@ export interface CounselorSkillAssignmentResponse {
 }
 
 /**
- * 상담원에게 스킬 할당 API 요청 타입
+ * 상담사에게 스킬 할당 API 요청 타입
  * 요청 예시:
  * {
  *   "request_data": {
@@ -89,7 +89,7 @@ export interface CounselorSkillAssignmentRequest {
 }
 
 /**
- * 상담원에게 스킬 할당 API 응답 타입
+ * 상담사에게 스킬 할당 API 응답 타입
  * 응답 예시:
  * {
  *   "result_code": 0,
@@ -102,9 +102,9 @@ export interface CounselorSkillAssignmentResponse {
 }
 
 /**
- * ✅ 상담원이 보유한 스킬과 할당 가능한 스킬을 함께 반환하는 타입 추가
+ * ✅ 상담사이 보유한 스킬과 할당 가능한 스킬을 함께 반환하는 타입 추가
  */
 export interface RelatedCounselorSkillInfo {
-  assignedSkills: CounselorSkillListResponse;  // 상담원이 현재 보유한 스킬
-  assignableSkills: CounselorSkillListResponse;  // 상담원에게 할당 가능한 스킬
+  assignedSkills: CounselorSkillListResponse;  // 상담사이 현재 보유한 스킬
+  assignableSkills: CounselorSkillListResponse;  // 상담사에게 할당 가능한 스킬
 }

@@ -219,7 +219,7 @@ export function ContextMenuForTreeNode({
     addMultiTab({
       id: 22,
       uniqueKey: uniqueKey,
-      title: `상담원 상태 모니터 - ${campaignName}`,
+      title: `상담사 상태 모니터 - ${campaignName}`,
       icon: '',
       href: '',
       content: null,
@@ -246,7 +246,7 @@ export function ContextMenuForTreeNode({
     addTab({
       id: 131,
       uniqueKey: uniqueKey,
-      title: `상담원 삭제 - ${campaignName}`,
+      title: `상담사 삭제 - ${campaignName}`,
       icon: '',
       href: '',
       content: null,
@@ -466,7 +466,7 @@ export function ContextMenuForTreeNode({
             className="flex items-center text-sm"
           >
             {/* <Activity className="mr-2 h-4 w-4 text-gray-500" /> */}
-            상담원 상태 모니터
+            상담사 상태 모니터
           </ContextMenuItem>
 
           <ContextMenuItem

@@ -82,7 +82,7 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
 
     return result;
   };
-  //할당상담원 정보 조회
+  //할당상담사 정보 조회
   const { mutate: fetchCampaignAssignmentAgents } = useApiForCampaignAssignmentAgent({
     onSuccess: (data) => {
       const transformedData = transformToTreeData(data.assignedCounselorList);
@@ -197,7 +197,7 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
     },
     {
       key: 'counselorEmplNum',
-      name: '상담원'
+      name: '상담사'
     },
     {
       key: 'counselorId',
@@ -205,7 +205,7 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
     },
     {
       key: 'counselorname',
-      name: '상담원 아이디'
+      name: '상담사 아이디'
     }
   ];
 

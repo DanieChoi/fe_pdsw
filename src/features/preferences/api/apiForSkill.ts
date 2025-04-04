@@ -202,7 +202,7 @@ export const fetchCampaignList = async (): Promise<CampaignListResponse> => {
     }
 };
 
-// 선택 상담원 스킬할당 해제 API(DELETE)
+// 선택 상담사 스킬할당 해제 API(DELETE)
 export const DeleteAgentSkill = async (credentials: DeleteAgentSkillCredentials): Promise<SuccesResponse> => {
     try {
         const { data } = await axiosInstance.delete<SuccesResponse>(

@@ -27,36 +27,36 @@ export function TeamSkillAssignmentTab() {
   const activeTabKey = useTabStore((state) => state.activeTabKey);
   const { candidateMembersForSkilAssign } = useCounselorFilterStore();
 
-  // 컴포넌트 마운트 시 상담원 정보 디버깅
+  // 컴포넌트 마운트 시 상담사 정보 디버깅
   useEffect(() => {
     console.group("🔍 [TeamSkillAssignmentTab] 컴포넌트 마운트");
     console.log("📋 candidateMembersForSkilAssign 데이터:", candidateMembersForSkilAssign);
 
     if (Array.isArray(candidateMembersForSkilAssign) && candidateMembersForSkilAssign.length > 0) {
-      console.log("👤 첫 번째 상담원:", candidateMembersForSkilAssign[0]);
-      console.log("👥 총 상담원 수:", candidateMembersForSkilAssign.length);
+      console.log("👤 첫 번째 상담사:", candidateMembersForSkilAssign[0]);
+      console.log("👥 총 상담사 수:", candidateMembersForSkilAssign.length);
 
-      // 상담원 ID 목록 추출
+      // 상담사 ID 목록 추출
       const counselorIds = candidateMembersForSkilAssign
         .filter(c => c && c.counselorId)
         .map(c => c.counselorId);
-      console.log("🆔 유효한 상담원 ID 목록:", counselorIds);
+      console.log("🆔 유효한 상담사 ID 목록:", counselorIds);
     } else {
-      console.warn("⚠️ 상담원 데이터가 없거나 형식이 올바르지 않습니다.");
+      console.warn("⚠️ 상담사 데이터가 없거나 형식이 올바르지 않습니다.");
     }
     console.groupEnd();
   }, [candidateMembersForSkilAssign]);
 
-  // 상담원 배열이 유효한지 확인
+  // 상담사 배열이 유효한지 확인
   const isValidCounselorsArray = Array.isArray(candidateMembersForSkilAssign) && candidateMembersForSkilAssign.length > 0;
 
-  // 첫 번째 상담원의 테넌트 ID를 사용
+  // 첫 번째 상담사의 테넌트 ID를 사용
   const firstCounselor = isValidCounselorsArray ? candidateMembersForSkilAssign[0] : null;
   const tenantId = firstCounselor?.tenantId ? Number(firstCounselor.tenantId) : undefined;
   const counselorId = firstCounselor?.counselorId || "";
 
   console.log("🏢 테넌트 ID:", tenantId);
-  console.log("👤 대표 상담원 ID:", counselorId);
+  console.log("👤 대표 상담사 ID:", counselorId);
 
   // useAssignableSkills 훅 사용
   const { data: assignableSkills, isLoading, error } = useAssignableSkills(tenantId);
@@ -89,11 +89,11 @@ export function TeamSkillAssignmentTab() {
     }
   }, [assignableSkills]);
 
-  // 유효한 상담원 ID 배열 생성 함수
-// 유효한 상담원 ID 배열 생성 함수
+  // 유효한 상담사 ID 배열 생성 함수
+// 유효한 상담사 ID 배열 생성 함수
 const getValidCounselorIds = () => {
   if (!isValidCounselorsArray) {
-    console.warn("⚠️ 유효한 상담원 배열이 없습니다.");
+    console.warn("⚠️ 유효한 상담사 배열이 없습니다.");
     return [];
   }
 
@@ -101,7 +101,7 @@ const getValidCounselorIds = () => {
   const validIds = candidateMembersForSkilAssign
     .filter(counselor => {
       // 더 자세한 디버깅
-      console.log("각 상담원 객체:", counselor);
+      console.log("각 상담사 객체:", counselor);
       
       // 여러 경로로 ID 접근 시도
       const id = 
@@ -117,11 +117,11 @@ const getValidCounselorIds = () => {
       return (counselor.data && counselor.data.counselorId) || counselor.counselorId;
     });
   
-  console.log("✅ 추출된 상담원 ID 목록:", validIds, "개수:", validIds.length);
+  console.log("✅ 추출된 상담사 ID 목록:", validIds, "개수:", validIds.length);
   
   // 빈 배열이라면 다시 검증
   if (validIds.length === 0) {
-    console.error("❌ 상담원 데이터는 있지만 유효한 ID를 추출하지 못했습니다.");
+    console.error("❌ 상담사 데이터는 있지만 유효한 ID를 추출하지 못했습니다.");
     console.log("전체 객체 구조:", JSON.stringify(candidateMembersForSkilAssign));
   }
   
@@ -133,7 +133,7 @@ const getValidCounselorIds = () => {
     const counselorIds = getValidCounselorIds();
 
     if (counselorIds.length === 0) {
-      toast.error('유효한 상담원이 없습니다.');
+      toast.error('유효한 상담사이 없습니다.');
       return;
     }
 
@@ -198,7 +198,7 @@ const getValidCounselorIds = () => {
     const counselorIds = getValidCounselorIds();
 
     if (counselorIds.length === 0) {
-      toast.error('유효한 상담원이 없습니다.');
+      toast.error('유효한 상담사이 없습니다.');
       return;
     }
 
@@ -208,8 +208,8 @@ const getValidCounselorIds = () => {
     console.log("📊 스킬 변경 정보:", {
       추가할_스킬: skillsToAdd,
       제거할_스킬: skillsToRemove,
-      상담원_IDs: counselorIds,
-      상담원_수: counselorIds.length
+      상담사_IDs: counselorIds,
+      상담사_수: counselorIds.length
     });
 
     // 변경사항이 있는지 확인
@@ -277,7 +277,7 @@ const getValidCounselorIds = () => {
     }
   };
 
-  // 상담원 목록 토글
+  // 상담사 목록 토글
   const toggleCounselors = () => {
     setShowCounselors(!showCounselors);
   };
@@ -320,7 +320,7 @@ const getValidCounselorIds = () => {
     );
   }
 
-  // 상담원이 없는 경우 UI
+  // 상담사이 없는 경우 UI
   if (!isValidCounselorsArray) {
     return (
       <div className="">
@@ -334,10 +334,10 @@ const getValidCounselorIds = () => {
           <div className="px-[30px] py-[20px]">
              <div className="flex items-center">
                 <Image src="/tree-menu/team_icon_for_tree.png" alt="팀" width={14} height={12} className="mr-2" />
-                <span className="text-sm text-[#333]">상담원 정보를 찾을 수 없습니다</span>
+                <span className="text-sm text-[#333]">상담사 정보를 찾을 수 없습니다</span>
             </div>
             <p className="text-[#333] mb-4 text-sm">
-              선택된 그룹의 상담원 정보를 불러올 수 없습니다.<br />
+              선택된 그룹의 상담사 정보를 불러올 수 없습니다.<br />
               다시 시도하거나 관리자에게 문의하세요.
             </p>
             {/* <Button onClick={handleCancel} className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">
@@ -362,8 +362,8 @@ const getValidCounselorIds = () => {
 
         <div className="px-[30px] py-[20px]">
           <div className="text-sm text-gray-600 mb-4">
-            팀의 모든 상담원({candidateMembersForSkilAssign.length}명)에게 스킬을 일괄 할당할 수 있습니다.<br />
-            할당할 스킬을 선택하고 확인 버튼을 누르면 팀의 모든 상담원에게 선택된 스킬이 할당됩니다.
+            팀의 모든 상담사({candidateMembersForSkilAssign.length}명)에게 스킬을 일괄 할당할 수 있습니다.<br />
+            할당할 스킬을 선택하고 확인 버튼을 누르면 팀의 모든 상담사에게 선택된 스킬이 할당됩니다.
           </div>
 
           {/* 디버깅 버튼 */}
@@ -383,7 +383,7 @@ const getValidCounselorIds = () => {
             </div>
           )} */}
 
-          {/* 상담원 목록 표시 */}
+          {/* 상담사 목록 표시 */}
           <div className="mb-4">
             <div
               className="flex justify-between items-center p-2 border rounded cursor-pointer bg-gray-50 hover:bg-gray-100"
@@ -391,7 +391,7 @@ const getValidCounselorIds = () => {
             >
                <div className="flex items-center">
                   <Image src="/tree-menu/team_icon_for_tree.png" alt="팀" width={14} height={12} className="mr-2" />
-                  <span className="text-sm text-[#333]">상담원 정보를 찾을 수 없습니다</span>
+                  <span className="text-sm text-[#333]">상담사 정보를 찾을 수 없습니다</span>
               </div>
               
               <div className="flex items-center">
@@ -421,7 +421,7 @@ const getValidCounselorIds = () => {
                       const name = counselor.data?.counselorname || counselor.counselorname || '-';
                       const tenantId = counselor.data?.tenantId || counselor.tenantId || '-';
 
-                      console.log(`상담원 ${index} 데이터:`, counselor);
+                      console.log(`상담사 ${index} 데이터:`, counselor);
                       console.log(`추출한 값:`, { id, name, tenantId });
 
                       return (
@@ -441,7 +441,7 @@ const getValidCounselorIds = () => {
           {/* 테넌트 ID 정보 */}
           <div className="p-2 bg-gray-50 border rounded text-sm text-[#333] mb-4">
             <span>테넌트 ID: {tenantId || 'N/A'}</span>
-            <span>대표 상담원 ID: {counselorId || 'N/A'}</span>
+            <span>대표 상담사 ID: {counselorId || 'N/A'}</span>
           </div>
 
           {/* 스킬 목록 테이블 */}

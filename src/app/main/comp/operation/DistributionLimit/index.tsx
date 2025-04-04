@@ -243,19 +243,19 @@ const DistributionLimit = () => {
             
             switch (viewFilter) {
               case 'remaining':
-                // 잔여 호수가 남은 상담원 (최대 분배호수 > 현재 응답호수)
+                // 잔여 호수가 남은 상담사 (최대 분배호수 > 현재 응답호수)
                 shouldInclude = maxDist > currentResp && (maxDist > 0 || currentResp > 0);
                 break;
               case 'no-remaining':
-                // 잔여 호수가 없는 상담원 (최대 분배호수 = 현재 응답호수)
+                // 잔여 호수가 없는 상담사 (최대 분배호수 = 현재 응답호수)
                 shouldInclude = maxDist === currentResp && (maxDist > 0 || currentResp > 0);
                 break;
               case 'no-limit':
-                // 최대 분배호수가 설정되지 않은 상담원 (데이터가 없거나 둘 다 0인 경우)
+                // 최대 분배호수가 설정되지 않은 상담사 (데이터가 없거나 둘 다 0인 경우)
                 shouldInclude = maxDist === 0 && currentResp === 0;
                 break;
               case 'has-limit':
-                // 최대 분배호수가 설정된 상담원 (최대 분배호수나 현재 응답호수 중 하나라도 값이 있는 경우)
+                // 최대 분배호수가 설정된 상담사 (최대 분배호수나 현재 응답호수 중 하나라도 값이 있는 경우)
                 shouldInclude = maxDist > 0 || currentResp > 0;
                 break;
             }
@@ -323,19 +323,19 @@ const DistributionLimit = () => {
             
             switch (viewFilter) {
               case 'remaining':
-                // 잔여 호수가 남은 상담원 (최대 분배호수 > 현재 응답호수)
+                // 잔여 호수가 남은 상담사 (최대 분배호수 > 현재 응답호수)
                 shouldInclude = maxDist > currentResp && (maxDist > 0 || currentResp > 0);
                 break;
               case 'no-remaining':
-                // 잔여 호수가 없는 상담원 (최대 분배호수 = 현재 응답호수)
+                // 잔여 호수가 없는 상담사 (최대 분배호수 = 현재 응답호수)
                 shouldInclude = maxDist === currentResp && (maxDist > 0 || currentResp > 0);
                 break;
               case 'no-limit':
-                // 최대 분배호수가 설정되지 않은 상담원 (데이터가 없거나 둘 다 0인 경우)
+                // 최대 분배호수가 설정되지 않은 상담사 (데이터가 없거나 둘 다 0인 경우)
                 shouldInclude = maxDist === 0 && currentResp === 0;
                 break;
               case 'has-limit':
-                // 최대 분배호수가 설정된 상담원 (최대 분배호수나 현재 응답호수 중 하나라도 값이 있는 경우)
+                // 최대 분배호수가 설정된 상담사 (최대 분배호수나 현재 응답호수 중 하나라도 값이 있는 경우)
                 shouldInclude = maxDist > 0 || currentResp > 0;
                 break;
             }
@@ -366,7 +366,7 @@ const DistributionLimit = () => {
 
   // Apply filter to raw agent data - 필터는 최종 표시 시 적용
   const filteredAgentData = useMemo(() => {
-    // 필터링하지 않고 모든 상담원 데이터 반환
+    // 필터링하지 않고 모든 상담사 데이터 반환
     // 실제 필터링은 트리 데이터 평탄화 과정에서 수행
     return rawAgentData;
   }, [rawAgentData]);
@@ -456,7 +456,7 @@ const DistributionLimit = () => {
     }
   };
 
-  // 캠페인별 상담원 목록 조회
+  // 캠페인별 상담사 목록 조회
   const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
     onSuccess: (response) => {
       if (response?.result_data && response.result_data.length > 0) {
@@ -481,13 +481,13 @@ const DistributionLimit = () => {
           router.push('/login');
         }, 1000);
       } else {
-        showAlert('캠페인 상담원 목록 조회 실패: ' + error.message);
+        showAlert('캠페인 상담사 목록 조회 실패: ' + error.message);
         setCampaignAgents([]);
       }
     }
   });
 
-  // 백엔드에서 가져온 상담원 리스트 정보 처리
+  // 백엔드에서 가져온 상담사 리스트 정보 처리
   const { mutate: fetchCounselorList } = useApiForCounselorList({
     onSuccess: (response) => {
       if (response?.organizationList && selectedCampaignId) {
@@ -540,7 +540,7 @@ const DistributionLimit = () => {
           router.push('/login');
         }, 1000);
       } else {
-        showAlert('상담원 목록 조회 실패: ' + error.message);
+        showAlert('상담사 목록 조회 실패: ' + error.message);
         setRawAgentData([]);
       }
     }
@@ -705,7 +705,7 @@ const DistributionLimit = () => {
   useEffect(() => {
     fetchMaxCallInitTimeList({});
     if (selectedCampaignId) {
-      // 1. 먼저 캠페인 상담원 목록을 가져옴
+      // 1. 먼저 캠페인 상담사 목록을 가져옴
       fetchCampaignAgentList({
         campaign_id: [Number(selectedCampaignId)]
       });
@@ -715,7 +715,7 @@ const DistributionLimit = () => {
     }
   }, [selectedCampaignId, fetchCampaignAgentList, fetchMaxCallInitTimeList]);
   
-  // campaignAgents가 업데이트되면 상담원 목록 조회
+  // campaignAgents가 업데이트되면 상담사 목록 조회
   useEffect(() => {
     if (selectedCampaignId && campaignAgents.length > 0) {
       fetchCounselorList({
@@ -725,7 +725,7 @@ const DistributionLimit = () => {
     }
   }, [tenant_id, role_id, selectedCampaignId, campaignAgents, fetchCounselorList]);
 
-  // 캠페인이 선택되고 상담원 목록이 로드된 후에 분배호수 제한 설정 조회
+  // 캠페인이 선택되고 상담사 목록이 로드된 후에 분배호수 제한 설정 조회
   useEffect(() => {
     if (selectedCampaignId && rawAgentData.length > 0) {
       fetchMaxCallList({
@@ -842,7 +842,7 @@ const DistributionLimit = () => {
 
   // 셀 값 변경 처리 함수
   const handleCellChange = (row: Row, field: 'max_dist' | 'fix_flag', value: string) => {
-    // 상담원 행만 편집 가능
+    // 상담사 행만 편집 가능
     if (row.level !== 3) return;
     
     // 값의 유효성 검사
@@ -1031,34 +1031,34 @@ const DistributionLimit = () => {
     let confirmMessage = "";
     let agentIds: string[] = [];
     
-    // 삭제 대상에 따라 메시지와 상담원 ID 목록 설정
+    // 삭제 대상에 따라 메시지와 상담사 ID 목록 설정
     if (contextMenu.level === 3) {
-      // 상담원 개인 삭제
-      confirmMessage = `${contextMenu.agentId} 상담원의 분배 제한 정보를 삭제하시겠습니까?`;
+      // 상담사 개인 삭제
+      confirmMessage = `${contextMenu.agentId} 상담사의 분배 제한 정보를 삭제하시겠습니까?`;
       if (contextMenu.agentId) {
         agentIds = [contextMenu.agentId];
       }
     } else if (contextMenu.level === 2) {
       // 상담파트 전체 삭제
-      confirmMessage = `파트 ${contextMenu.part} 의 모든 상담원의 분배 제한 정보를 삭제하시겠습니까?`;
+      confirmMessage = `파트 ${contextMenu.part} 의 모든 상담사의 분배 제한 정보를 삭제하시겠습니까?`;
       
-      // 파트에 속한 모든 상담원 ID 수집
+      // 파트에 속한 모든 상담사 ID 수집
       agentIds = rawAgentData
         .filter(agent => agent.part === contextMenu.part)
         .map(agent => agent.agent_id);
         
     } else if (contextMenu.level === 1) {
       // 상담그룹 전체 삭제
-      confirmMessage = `그룹 ${contextMenu.group} 의 모든 상담원의 분배 제한 정보를 삭제하시겠습니까?`;
+      confirmMessage = `그룹 ${contextMenu.group} 의 모든 상담사의 분배 제한 정보를 삭제하시겠습니까?`;
       
-      // 그룹에 속한 모든 상담원 ID 수집
+      // 그룹에 속한 모든 상담사 ID 수집
       agentIds = rawAgentData
         .filter(agent => agent.group === contextMenu.group)
         .map(agent => agent.agent_id);
     }
     
     if (agentIds.length === 0) {
-      showAlert('삭제할 상담원이 없습니다.');
+      showAlert('삭제할 상담사이 없습니다.');
       handleCloseContextMenu();
       return;
     }
@@ -1068,7 +1068,7 @@ const DistributionLimit = () => {
       let successCount = 0;
       let failCount = 0;
       
-      // 선택된 모든 상담원에 대해 삭제 처리
+      // 선택된 모든 상담사에 대해 삭제 처리
       for (const agentId of agentIds) {
         try {
           await new Promise<void>((resolve, reject) => {
@@ -1208,7 +1208,7 @@ const DistributionLimit = () => {
         } else if (row.level === 2) {
           hierarchyContent = `상담파트: ${row.part}`;
         } else if (row.level === 3) {
-          // 상담원 레벨에서는 계층 표시 없이 센터 값만 보여줌
+          // 상담사 레벨에서는 계층 표시 없이 센터 값만 보여줌
           return <div style={{ marginLeft: `${indent}px` }}>{centerContent}</div>;
         }
         
@@ -1247,7 +1247,7 @@ const DistributionLimit = () => {
       key: 'group', 
       name: '상담그룹',
       renderCell: ({ row }: { row: Row }) => {
-        // 상담원 행에만 데이터 표시
+        // 상담사 행에만 데이터 표시
         return row.level === 3 ? row.group : '';
       }
     },
@@ -1255,20 +1255,20 @@ const DistributionLimit = () => {
       key: 'part', 
       name: '상담파트',
       renderCell: ({ row }: { row: Row }) => {
-        // 상담원 행에만 데이터 표시
+        // 상담사 행에만 데이터 표시
         return row.level === 3 ? row.part : '';
       }
     },
     { 
       key: 'agent_id', 
-      name: '상담원 아이디',
+      name: '상담사 아이디',
       renderCell: ({ row }: { row: Row }) => {
         return row.level === 3 ? row.agent_id : '';
       }
     },
     { 
       key: 'agent_name', 
-      name: '상담원 이름',
+      name: '상담사 이름',
       renderCell: ({ row }: { row: Row }) => {
         return row.level === 3 ? row.agent_name : '';
       }
@@ -1437,7 +1437,7 @@ const DistributionLimit = () => {
 
       <div className="flex flex-col gap-2">
         <div className="flex justify-between items-center">
-          <div className="text-sm">할당 상담원 목록</div>
+          <div className="text-sm">할당 상담사 목록</div>
           <div className="flex items-center gap-2">
             <Label className="w-12 min-w-12">보기설정</Label>
             <Select 
@@ -1446,14 +1446,14 @@ const DistributionLimit = () => {
               defaultValue='all'
             >
               <SelectTrigger className="w-[250px]">
-                <SelectValue placeholder="해당 상담원 전체" />
+                <SelectValue placeholder="해당 상담사 전체" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='all'>해당 상담원 전체</SelectItem>
-                <SelectItem value='remaining'>잔여 호수가 남은 상담원</SelectItem>
-                <SelectItem value='no-remaining'>잔여 호수가 없는 상담원</SelectItem>
-                <SelectItem value='no-limit'>최대 분배호수가 설정되지 않은 상담원</SelectItem>
-                <SelectItem value='has-limit'>최대 분배호수가 설정된 상담원</SelectItem>
+                <SelectItem value='all'>해당 상담사 전체</SelectItem>
+                <SelectItem value='remaining'>잔여 호수가 남은 상담사</SelectItem>
+                <SelectItem value='no-remaining'>잔여 호수가 없는 상담사</SelectItem>
+                <SelectItem value='no-limit'>최대 분배호수가 설정되지 않은 상담사</SelectItem>
+                <SelectItem value='has-limit'>최대 분배호수가 설정된 상담사</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -1493,7 +1493,7 @@ const DistributionLimit = () => {
         
         <div className="mt-[20px] text-sm">
           <ul className='space-y-1 notice-li'>
-            <li>• 상담원에게 분배하는 콜 수를 제한합니다.</li>
+            <li>• 상담사에게 분배하는 콜 수를 제한합니다.</li>
             <li>• 운영시간 중의 일괄처리(Batch)작업은 많은 부하를 발생시켜 정상적인 운영이 불가능 할 수 있습니다.</li>
             <li>• 일괄처리작업의 경우, 발신 량이 적은 시간이나, 업무 종료 후 작업하시기를 권장합니다.</li>
           </ul>

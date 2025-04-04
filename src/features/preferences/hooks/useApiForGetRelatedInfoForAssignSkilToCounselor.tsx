@@ -5,10 +5,10 @@ import { CounselorSkillListResponse } from "@/features/campaignManager/types/typ
 import { apiForGetRelatedInfoForAssignSkilToCounselor } from "@/features/campaignManager/api/apiForCounselorSkil";
 
 /**
- * 상담원의 보유 스킬 및 할당 가능한 스킬을 가져오는 커스텀 훅
- * @param counselorId 상담원 ID (null 가능)
+ * 상담사의 보유 스킬 및 할당 가능한 스킬을 가져오는 커스텀 훅
+ * @param counselorId 상담사 ID (null 가능)
  * @param tenantId 테넌트 ID
- * @returns 상담원이 보유한 스킬과 할당 가능한 스킬 목록, 로딩 상태, 에러 정보
+ * @returns 상담사이 보유한 스킬과 할당 가능한 스킬 목록, 로딩 상태, 에러 정보
  */
 export const useApiForGetRelatedInfoForAssignSkilToCounselor = (
     counselorId: string | null,
@@ -35,13 +35,13 @@ export const useApiForGetRelatedInfoForAssignSkilToCounselor = (
                     tenantId
                 );
 
-                // console.log("✅ 상담원이 보유한 스킬:", assignedSkills);
-                console.log("✅ 상담원에게 할당 가능한 스킬:", assignableSkills);
+                // console.log("✅ 상담사이 보유한 스킬:", assignedSkills);
+                console.log("✅ 상담사에게 할당 가능한 스킬:", assignableSkills);
 
                 setAssignedSkills(assignedSkills);
                 setAssignableSkills(assignableSkills);
             } catch (err) {
-                console.error("❌ 상담원 스킬 데이터 불러오기 실패:", err);
+                console.error("❌ 상담사 스킬 데이터 불러오기 실패:", err);
                 setError("스킬 데이터를 불러오는 중 오류가 발생했습니다.");
             } finally {
                 setIsLoading(false);

@@ -9,8 +9,8 @@ import {
 } from "../types/typeForCounselorSkill";
 
 /**
- * 상담원에게 선택한 스킬들을 할당하는 API
- * @param counselorIds 상담원 ID 배열 (여러 명 가능)
+ * 상담사에게 선택한 스킬들을 할당하는 API
+ * @param counselorIds 상담사 ID 배열 (여러 명 가능)
  * @param selectedSkills 선택한 스킬 ID 배열
  * @returns 각 요청의 응답 결과 배열
  */
@@ -18,8 +18,8 @@ export async function assignSkillsToCounselor(
   counselorIds: string[],
   selectedSkills: number[]
 ): Promise<CounselorSkillAssignmentResponse[]> {
-  console.log("✅ 상담원 스킬 할당 API 호출!");
-  console.log("🎯 상담원 목록:", counselorIds);
+  console.log("✅ 상담사 스킬 할당 API 호출!");
+  console.log("🎯 상담사 목록:", counselorIds);
   console.log("🔗 할당할 스킬 목록:", selectedSkills);
 
   const requests = selectedSkills.map((skillId) =>
@@ -37,13 +37,13 @@ export async function assignSkillsToCounselor(
 }
 
 /**
- * 상담원에게 할당 가능한 스킬 목록을 조회하는 API
+ * 상담사에게 할당 가능한 스킬 목록을 조회하는 API
  * @param tenantId 테넌트 ID
  * @returns 할당 가능한 스킬 목록
  */
 export const getAssignableSkillsForCounselor = async (tenantId: number): Promise<CounselorSkillListResponse> => {
 
-  // console.log("📌 상담원 할당 가능 스킬 목록 조회 시작:", tenantId);
+  // console.log("📌 상담사 할당 가능 스킬 목록 조회 시작:", tenantId);
   // console.log("🔗 테넌트 ID 타입:", typeof tenantId);
   // console.log("🔗 테넌트 ID for 캠페인 탭 헤더 :", tenantId);
 
@@ -71,12 +71,12 @@ export const getAssignableSkillsForCounselor = async (tenantId: number): Promise
       "collections/skill",
       skillRequestData
     );
-    // console.log("✅ 상담원 할당 가능 스킬 목록 조회 성공 ???????????????????????????? ", data);
+    // console.log("✅ 상담사 할당 가능 스킬 목록 조회 성공 ???????????????????????????? ", data);
 
     return data;
 
     // if (data.result_code === 0 && data.result_msg === "Success") {
-    //   console.log("✅ 상담원 할당 가능 스킬 목록 조회 성공:", data);
+    //   console.log("✅ 상담사 할당 가능 스킬 목록 조회 성공:", data);
     //   return data;
     // } else {
     //   throw new Error(`API Error: ${data.result_msg}`);
@@ -84,20 +84,20 @@ export const getAssignableSkillsForCounselor = async (tenantId: number): Promise
   } catch (error) {
     const typedError = error as CounselorSkillApiError;
     throw new Error(
-      typedError.response?.data?.result_msg || "상담원 스킬 목록을 가져오는 데 실패했습니다."
+      typedError.response?.data?.result_msg || "상담사 스킬 목록을 가져오는 데 실패했습니다."
     );
   }
 };
 
 /**
- * 상담원이 보유한 스킬 목록을 조회하는 API
- * @param counselorId 상담원 ID
- * @returns 상담원이 현재 보유한 스킬 목록
+ * 상담사이 보유한 스킬 목록을 조회하는 API
+ * @param counselorId 상담사 ID
+ * @returns 상담사이 현재 보유한 스킬 목록
  */
 export const getAssignedSkillsForCounselor = async (
   counselorId: string
 ): Promise<CounselorSkillListResponse> => {
-  // console.log("📌 상담원 스킬 데이터 조회 시작:", counselorId);
+  // console.log("📌 상담사 스킬 데이터 조회 시작:", counselorId);
 
   try {
     const { data } = await axiosInstance.post<CounselorSkillListResponse>(
@@ -109,41 +109,41 @@ export const getAssignedSkillsForCounselor = async (
       }
     );
 
-    // console.log("✅ 상담원이 보유한 스킬 목록 조회 성공:", data);
+    // console.log("✅ 상담사이 보유한 스킬 목록 조회 성공:", data);
     return data;
   } catch (error) {
     const typedError = error as CounselorSkillApiError;
-    console.error("❌ 상담원 스킬 목록 조회 실패:", error);
+    console.error("❌ 상담사 스킬 목록 조회 실패:", error);
     throw new Error(
-      typedError.response?.data?.result_msg || "상담원의 스킬 목록을 가져오는 데 실패했습니다."
+      typedError.response?.data?.result_msg || "상담사의 스킬 목록을 가져오는 데 실패했습니다."
     );
   }
 };
 
 /**
- * 상담원이 보유한 스킬과 할당 가능한 스킬을 동시에 가져오는 API
- * @param counselorId 상담원 ID
+ * 상담사이 보유한 스킬과 할당 가능한 스킬을 동시에 가져오는 API
+ * @param counselorId 상담사 ID
  * @param tenantId 테넌트 ID
- * @returns 상담원이 보유한 스킬 목록과 할당 가능한 스킬 목록
+ * @returns 상담사이 보유한 스킬 목록과 할당 가능한 스킬 목록
  */
 export const apiForGetRelatedInfoForAssignSkilToCounselor = async (
   counselorId: string,
   tenantId: number
 ): Promise<{ assignedSkills: CounselorSkillListResponse; assignableSkills: CounselorSkillListResponse }> => {
-  // console.log("📌 상담원 스킬 데이터 조회 시작:", counselorId, tenantId);
+  // console.log("📌 상담사 스킬 데이터 조회 시작:", counselorId, tenantId);
 
   try {
     const [assignedSkills, assignableSkills] = await Promise.all([
-      getAssignedSkillsForCounselor(counselorId), // 상담원이 보유한 스킬
+      getAssignedSkillsForCounselor(counselorId), // 상담사이 보유한 스킬
       getAssignableSkillsForCounselor(tenantId), // 할당 가능한 스킬 목록
     ]);
 
-    // console.log("✅ 상담원이 보유한 스킬 목록:", assignedSkills);
-    // console.log("✅ 상담원에게 할당 가능한 스킬 목록:", assignableSkills);
+    // console.log("✅ 상담사이 보유한 스킬 목록:", assignedSkills);
+    // console.log("✅ 상담사에게 할당 가능한 스킬 목록:", assignableSkills);
 
     return { assignedSkills, assignableSkills };
   } catch (error) {
-    console.error("❌ 상담원 스킬 조회 실패:", error);
+    console.error("❌ 상담사 스킬 조회 실패:", error);
     throw new Error("스킬 데이터를 가져오는 중 오류가 발생했습니다.");
   }
 };

@@ -158,7 +158,7 @@ const MonitorPage = () => {
     },
     { 
       id: 'agent-status', 
-      title: '상담원 상태모니터', 
+      title: '상담사 상태모니터', 
       position: 'top-right', 
       width: `${sizes.topRow.right}%` 
     },

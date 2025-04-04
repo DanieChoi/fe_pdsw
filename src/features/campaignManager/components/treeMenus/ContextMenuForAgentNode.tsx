@@ -52,7 +52,7 @@ export function ContextMenuForAgentNode({
       removeTab(tab.id, tab.uniqueKey);
     });
   
-    // 상담원 스킬 할당 정보 설정
+    // 상담사 스킬 할당 정보 설정
     setCounselorSkillAssignmentInfo({
       tenantId: item.tenantId,
       counselorId: item.id,
@@ -63,7 +63,7 @@ export function ContextMenuForAgentNode({
     addTab({
       id: 500, // SkillAssignmentTab을 위한 ID
       uniqueKey: `skill-assignment-${item.id}-${Date.now()}`, // 유니크한 키 추가
-      title: `상담원 스킬 할당 - ${item.label}`,
+      title: `상담사 스킬 할당 - ${item.label}`,
       icon: '',
       href: '/skill-assignment',
       content: null,
@@ -81,12 +81,12 @@ export function ContextMenuForAgentNode({
             <>
               <ContextMenuItem onClick={handleSkillAssignment}>
                 <UserCog className="mr-2 h-4 w-4" />
-                상담원 스킬 할당
+                상담사 스킬 할당
               </ContextMenuItem>
               <ContextMenuSeparator />
               <ContextMenuItem>
                 <PhoneCall className="mr-2 h-4 w-4" />
-                상담원 스킬 해제
+                상담사 스킬 해제
               </ContextMenuItem>
             </>
           )}

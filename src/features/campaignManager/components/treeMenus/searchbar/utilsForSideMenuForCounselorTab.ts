@@ -78,7 +78,7 @@ export function findCounselorInfo(
   return null;
 }
 
-// 전체 상담원 리스트 가져오기 (자동완성용)
+// 전체 상담사 리스트 가져오기 (자동완성용)
 export function getAllCounselors(organizations: IOrganization[]): Array<{
   counselorId: string;
   counselorName: string;

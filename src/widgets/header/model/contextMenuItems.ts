@@ -15,7 +15,7 @@ export const contextMenuItems = [
     },
     {
       id: 22,
-      title: "상담원상태모니터링",
+      title: "상담사상태모니터링",
       icon: "/header-menu/총진행상황.svg",
       href: "/status",
       showInHeader: false

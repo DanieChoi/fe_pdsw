@@ -37,7 +37,7 @@
 //   currentTabId: "campaign",
 //   tabWidths: {
 //     "campaign": 240,   // 캠페인 탭 - 좁은 너비
-//     "agent": 320,      // 상담원 탭 - 넓은 너비
+//     "agent": 320,      // 상담사 탭 - 넓은 너비
 //     "campaign-group": 280 // 그룹 탭 - 중간 너비
 //   },
   

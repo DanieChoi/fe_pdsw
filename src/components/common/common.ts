@@ -130,13 +130,13 @@ export  const CheckCampaignSaveReturnCode = (returnCode: number) => {
     if (returnCode === -1) {
       return 'DataBase 데이터 처리 중 문제가 발생 하였습니다.';
     } else if (returnCode === -3) {
-      return '상담원과 고객이 통화 중이라 캠페인 통계가 완료되지 않았습니다. \n잠시만 기다려주세요.';
+      return '상담사과 고객이 통화 중이라 캠페인 통계가 완료되지 않았습니다. \n잠시만 기다려주세요.';
     } else if (returnCode === -10) {
       return '에러사항에 대해서 관리자에게 문의 하세요.';
     } else if (returnCode === -15) {
       return '업무 외 시간으로 캠페인을 시작 할 수 없습니다. 캠페인 시작을 원하시면 발신 업무 시간을 변경 하십시오.';
     } else if (returnCode === -16) {
-      return '상담원과 고객이 통화 중이라 캠페인 통계가 완료되지 않았습니다. \n잠시만 기다려주세요.';
+      return '상담사과 고객이 통화 중이라 캠페인 통계가 완료되지 않았습니다. \n잠시만 기다려주세요.';
     } else if (returnCode === -7770) {
       return '리스트 파일이 존재 하지 않습니다.';
     } else if (returnCode === -7771) {
@@ -146,11 +146,11 @@ export  const CheckCampaignSaveReturnCode = (returnCode: number) => {
     } else if (returnCode === -7773) {
       return '캠페인 시작/종료 날짜를 확인해 주시기 바랍니다.';
     } else if (returnCode === -7774) {
-      return '응대할 상담원이 없으므로 캠페인 시작이 취소 되었습니다.';
+      return '응대할 상담사이 없으므로 캠페인 시작이 취소 되었습니다.';
     } else if (returnCode === -7775) {
       return '발신 할 트렁크가 없습니다.';
     } else if (returnCode === -7776) {
-      return '캠페인에 할당된 상담원이 없습니다.';
+      return '캠페인에 할당된 상담사이 없습니다.';
     } else if (returnCode === -7777) {
       return 'CIDS가 작동중 인지 확인 하세요.에러사항에 대해서 관리자에게 문의 하세요.';
     } else if (returnCode === -7778) {

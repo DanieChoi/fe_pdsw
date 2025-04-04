@@ -110,7 +110,7 @@ export const CampaignContextMenu = ({
     addTab({
       id: TabIds.AGENT_MONITOR,
       uniqueKey: `${TabIds.AGENT_MONITOR}-${Date.now()}`,
-      title: '상담원 상태 모니터링',
+      title: '상담사 상태 모니터링',
       icon: '',
       href: '',
       content: null,
@@ -229,7 +229,7 @@ export const CampaignContextMenu = ({
 
         <ContextMenuItem onClick={handleMonitorClick}>
           <Activity className="mr-2 h-4 w-4" />
-          상담원 상태 모니터
+          상담사 상태 모니터
         </ContextMenuItem>
 
         <ContextMenuItem onClick={handleBlacklistCountClick}>

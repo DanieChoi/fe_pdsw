@@ -74,8 +74,8 @@ const initialSettings: RebroadcastSettings = {
 
 const getOutgoingResultLabel = (key: string) => {
     const labels: { [key: string]: string } = {
-        'outgoing-success-ok': '발신 성공 상담원 연결 성공',
-        'outgoing-success-no': '발신 성공 상담원 연결 실패',
+        'outgoing-success-ok': '발신 성공 상담사 연결 성공',
+        'outgoing-success-no': '발신 성공 상담사 연결 실패',
         'fail-busy': '통화중 실패',
         'fail-no-answer': '무응답 실패',
         'fail-fax': '팩스/모뎀 실패',
@@ -207,11 +207,11 @@ const RebroadcastSettingsGroupPanel = () => {
             if( selectedOutgoingResults['outgoing-success-ok'] && selectedOutgoingResults['outgoing-success-no'] ){
                 returnValue += "35210@";
             }else{
-                //80954, "발신 성공 상담원 연결 성공"
+                //80954, "발신 성공 상담사 연결 성공"
                 if( selectedOutgoingResults['outgoing-success-ok'] ){
                     returnValue += "35233@";
                 }
-                //80955, "발신 성공 상담원 연결 실패"
+                //80955, "발신 성공 상담사 연결 실패"
                 if( selectedOutgoingResults['outgoing-success-no'] ){
                     returnValue += "35223@35213@";
                 }
@@ -472,11 +472,11 @@ const RebroadcastSettingsGroupPanel = () => {
             if( broadcastType === 'realtime'){
                 setSelectedOutgoingResults(initOutgoingResult);
             }else{
-                let outgoingSuccessOk = false;  //80954, "발신 성공 상담원 연결 성공"
+                let outgoingSuccessOk = false;  //80954, "발신 성공 상담사 연결 성공"
                 if( listRedialQuery.indexOf('35233') > -1 ){   
                     outgoingSuccessOk = true;
                 }
-                let outgoingSuccessNo = false;  //80955, "발신 성공 상담원 연결 실패"
+                let outgoingSuccessNo = false;  //80955, "발신 성공 상담사 연결 실패"
                 if( listRedialQuery.indexOf('35223@35213') > -1 ){   
                     outgoingSuccessNo = true;
                 }
@@ -737,7 +737,7 @@ const RebroadcastSettingsGroupPanel = () => {
                 }else if( data.reason_code === -1){
                     _message = '[-1]실시간 재발신 요청을 실패 하였습니다. \n서버의 상태를 확인 후 다시 시도하여 주십시오.';
                 }else if( data.reason_code === -3){
-                    _message = '[-3]상담원과 고객이 통화 중이라 캠페인 통계가 완료되지 않았습니다. \n잠시만 기다려주세요.';
+                    _message = '[-3]상담사과 고객이 통화 중이라 캠페인 통계가 완료되지 않았습니다. \n잠시만 기다려주세요.';
                 }
                 setAlertState({
                     isOpen: true,

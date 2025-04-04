@@ -152,7 +152,7 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
       _message = '고객 성향[5] 사이즈는 최대 20byte 입니다.';
       tempLength = 20;
     }else if( newRows[rowIndex].field === 'EMPLOYEEID' &&  tempLength > 10 ){
-      _message = '상담원 ID 사이즈는 최대 20byte 입니다.';
+      _message = '상담사 ID 사이즈는 최대 20byte 입니다.';
       tempLength = 10;
     }else if( newRows[rowIndex].field === 'TKDA' &&  tempLength > 1024 ){
       _message = '토큰데이터 사이즈는 최대 1024byte 입니다.';
@@ -231,7 +231,7 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
     { id: '13', name: '고객성향[4]', field: 'CSC4' },
     { id: '14', name: '고객성향[5]', field: 'CSC5' },
     { id: '15', name: '고객성향[6]', field: 'CSC6' },
-    { id: '16', name: '상담원 아이디', field: 'EMPLOYEEID' },
+    { id: '16', name: '상담사 아이디', field: 'EMPLOYEEID' },
     { id: '17', name: '토큰데이터', field: 'TKDA' },
   ], []);
 
@@ -282,7 +282,7 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
     { id: '13', name: '고객성향[4]', field: 'CSC4' },
     { id: '14', name: '고객성향[5]', field: 'CSC5' },
     { id: '15', name: '고객성향[6]', field: 'CSC6' },
-    { id: '16', name: '상담원 아이디', field: 'EMPLOYEEID' },
+    { id: '16', name: '상담사 아이디', field: 'EMPLOYEEID' },
     { id: '17', name: '토큰데이터', field: 'TKDA' },
   ], []);
 

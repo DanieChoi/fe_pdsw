@@ -179,15 +179,15 @@ export function SkillAssignmentTab() {
     <div className="">
       <Card className="w-[480px] relative bg-white shadow-lg">
         <div className="flex flex-col space-y-2 text-center sm:text-left bg-[#AAA] px-4 py-2 border-b rounded-tl-[.5rem] rounded-tr-[.5rem]">
-          <h2 className="text-sm text-[#fff] font-normal">상담원 스킬 할당</h2>
+          <h2 className="text-sm text-[#fff] font-normal">상담사 스킬 할당</h2>
 
         </div>
 
         <div className="px-[30px] py-[20px]">
           <div className="text-sm text-[#333] mb-4">
-            상담원에게 스킬을 할당 할 수 있는 창입니다.<br />
+            상담사에게 스킬을 할당 할 수 있는 창입니다.<br />
             체크 후 확인 버튼을 누르시면 체크된 스킬들이 일괄 할당됩니다.<br />
-            (상담원에게 최대 10개 스킬까지만 할당 가능 합니다.)
+            (상담사에게 최대 10개 스킬까지만 할당 가능 합니다.)
           </div>
 
           <div className="max-h-[300px] overflow-y-auto border rounded">

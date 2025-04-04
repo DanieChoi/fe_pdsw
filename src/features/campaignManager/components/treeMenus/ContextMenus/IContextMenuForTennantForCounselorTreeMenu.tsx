@@ -31,7 +31,7 @@
 //         <ContextMenuSub>
 //           <ContextMenuSubTrigger>
 //             {/* <Users className="mr-2 h-4 w-4" /> */}
-//             상담원 보기
+//             상담사 보기
 //           </ContextMenuSubTrigger>
 //           <ContextMenuSubContent className="w-[150px]">
 //             <ContextMenuItem onClick={() => {
@@ -97,7 +97,7 @@ export function IContextMenuForTennantForCounselorTreeMenu({
         <ContextMenuSub>
           <ContextMenuSubTrigger>
             {/* <Users className="mr-2 h-4 w-4" /> */}
-            상담원 보기
+            상담사 보기
           </ContextMenuSubTrigger>
           <ContextMenuSubContent className="w-[150px]">
             <ContextMenuItem onClick={() => {

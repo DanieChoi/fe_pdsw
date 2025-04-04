@@ -47,12 +47,12 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
     {
       id: 22,
       menuId: 16,
-      title: "상담원 상태 모니터",
+      title: "상담사 상태 모니터",
       handler: () => {
         addTab({
           id: 22,
           uniqueKey: `22-${Date.now()}`,
-          title: "상담원 상태 모니터",
+          title: "상담사 상태 모니터",
           icon: "",
           href: "",
           content: null,

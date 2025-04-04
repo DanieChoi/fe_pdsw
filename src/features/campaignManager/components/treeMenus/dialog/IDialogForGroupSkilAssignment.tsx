@@ -45,7 +45,7 @@
 //     setSelectedSkills([]);
 //   }, [isUnassignment]);
 
-//   // 첫 번째 상담원을 대표로 사용하여 스킬 정보 조회
+//   // 첫 번째 상담사을 대표로 사용하여 스킬 정보 조회
 //   const firstCounselor = groupMembers.length > 0 ? groupMembers[0] : null;
 //   const representativeCounselorId = firstCounselor?.counselorId || firstCounselor?.data?.counselorId || "";
 
@@ -73,10 +73,10 @@
 //     }
 //   }, [assignedSkills]);
 
-//   // 유효한 상담원 ID 배열 생성
+//   // 유효한 상담사 ID 배열 생성
 //   const getValidCounselorIds = () => {
 //     if (!groupMembers || groupMembers.length === 0) {
-//       console.warn("⚠️ 유효한 상담원 배열이 없습니다.");
+//       console.warn("⚠️ 유효한 상담사 배열이 없습니다.");
 //       return [];
 //     }
 //     const validIds = groupMembers
@@ -100,7 +100,7 @@
 //     });
 //   };
 
-//   // 상담원 목록 토글
+//   // 상담사 목록 토글
 //   const toggleCounselors = () => {
 //     setShowCounselors(!showCounselors);
 //   };
@@ -129,7 +129,7 @@
 //     const skillsToRemove = getSkillsToRemove();
 
 //     if (counselorIds.length === 0) {
-//       toast.error("유효한 상담원이 없습니다.");
+//       toast.error("유효한 상담사이 없습니다.");
 //       return;
 //     }
 
@@ -148,7 +148,7 @@
 //           isUnassignment: false,
 //         });
 //         if (addResult.success) {
-//           toast.success(`${skillsToAdd.length}개 스킬이 모든 상담원에게 할당되었습니다.`);
+//           toast.success(`${skillsToAdd.length}개 스킬이 모든 상담사에게 할당되었습니다.`);
 //         } else {
 //           toast.warning(`${addResult.successCount}개 스킬만 할당되었습니다. ${addResult.failedSkills.length}개 실패.`);
 //         }
@@ -161,7 +161,7 @@
 //           tenantId,
 //         });
 //         if (removeResult.success) {
-//           toast.success(`${skillsToRemove.length}개 스킬이 모든 상담원에게서 해제되었습니다.`);
+//           toast.success(`${skillsToRemove.length}개 스킬이 모든 상담사에게서 해제되었습니다.`);
 //         } else {
 //           toast.warning(`${removeResult.successCount}개 스킬만 해제되었습니다. ${removeResult.failedSkills.length}개 실패.`);
 //         }
@@ -208,10 +208,10 @@
 //         <div className="px-6 py-4">
 //           <div className="flex items-center">
 //             <Image src="/tree-menu/group_icon_for_tree.png" alt="그룹" width={15} height={12} className="mr-2" />
-//             <span className="text-sm text-[#333]">상담원 정보를 찾을 수 없습니다</span>
+//             <span className="text-sm text-[#333]">상담사 정보를 찾을 수 없습니다</span>
 //           </div>
 //           <p className="text-[#333] mb-4 text-sm">
-//             선택된 그룹의 상담원 정보를 불러올 수 없습니다.<br />
+//             선택된 그룹의 상담사 정보를 불러올 수 없습니다.<br />
 //             다시 시도하거나 관리자에게 문의하세요.
 //           </p>
 //         </div>
@@ -227,8 +227,8 @@
 //         {/* 공통 설명 영역 */}
 //         <div className="text-sm text-gray-600 mb-4">
 //           {isUnassignMode
-//             ? `그룹의 모든 상담원(${groupMembers.length}명)에게서 스킬을 일괄 해제합니다. 해제할 스킬을 선택하세요.`
-//             : `그룹의 모든 상담원(${groupMembers.length}명)에게 스킬을 일괄 할당합니다. 할당할 스킬을 선택하세요.`}
+//             ? `그룹의 모든 상담사(${groupMembers.length}명)에게서 스킬을 일괄 해제합니다. 해제할 스킬을 선택하세요.`
+//             : `그룹의 모든 상담사(${groupMembers.length}명)에게 스킬을 일괄 할당합니다. 할당할 스킬을 선택하세요.`}
 //         </div>
 
 //         {/* 테넌트 ID 정보 */}
@@ -237,7 +237,7 @@
 //         </div>
 
 //         <div className="flex flex-row gap-6">
-//           {/* 왼쪽: 그룹 정보 및 상담원 목록 */}
+//           {/* 왼쪽: 그룹 정보 및 상담사 목록 */}
 //           <div className="w-1/2">
 //             <div className="mb-2 font-medium text-sm">그룹 정보</div>
 //             <div
@@ -470,7 +470,7 @@ export function IDialogForGroupSkilAssignment({
     setSelectedSkills([]);
   }, [isUnassignment]);
 
-  // 첫 번째 상담원을 대표로 사용하여 스킬 정보 조회
+  // 첫 번째 상담사을 대표로 사용하여 스킬 정보 조회
   const firstCounselor = groupMembers.length > 0 ? groupMembers[0] : null;
   const representativeCounselorId =
     firstCounselor?.counselorId || firstCounselor?.data?.counselorId || "";
@@ -507,10 +507,10 @@ export function IDialogForGroupSkilAssignment({
     }
   }, [assignedSkills]);
 
-  // 유효한 상담원 ID 배열 생성
+  // 유효한 상담사 ID 배열 생성
   const getValidCounselorIds = () => {
     if (!groupMembers || groupMembers.length === 0) {
-      console.warn("⚠️ 유효한 상담원 배열이 없습니다.");
+      console.warn("⚠️ 유효한 상담사 배열이 없습니다.");
       return [];
     }
     const validIds = groupMembers
@@ -540,7 +540,7 @@ export function IDialogForGroupSkilAssignment({
     });
   };
 
-  // 상담원 목록 토글
+  // 상담사 목록 토글
   const toggleCounselors = () => {
     setShowCounselors(!showCounselors);
   };
@@ -569,7 +569,7 @@ export function IDialogForGroupSkilAssignment({
     const skillsToRemove = getSkillsToRemove();
 
     if (counselorIds.length === 0) {
-      toast.error("유효한 상담원이 없습니다.");
+      toast.error("유효한 상담사이 없습니다.");
       return;
     }
 
@@ -589,7 +589,7 @@ export function IDialogForGroupSkilAssignment({
         });
         if (addResult.success) {
           toast.success(
-            `${skillsToAdd.length}개 스킬이 모든 상담원에게 할당되었습니다.`
+            `${skillsToAdd.length}개 스킬이 모든 상담사에게 할당되었습니다.`
           );
         } else {
           toast.warning(
@@ -606,7 +606,7 @@ export function IDialogForGroupSkilAssignment({
         });
         if (removeResult.success) {
           toast.success(
-            `${skillsToRemove.length}개 스킬이 모든 상담원에게서 해제되었습니다.`
+            `${skillsToRemove.length}개 스킬이 모든 상담사에게서 해제되었습니다.`
           );
         } else {
           toast.warning(
@@ -662,10 +662,10 @@ export function IDialogForGroupSkilAssignment({
               height={12}
               className="mr-2"
             />
-            <span className="text-sm text-[#333]">상담원 정보를 찾을 수 없습니다</span>
+            <span className="text-sm text-[#333]">상담사 정보를 찾을 수 없습니다</span>
           </div>
           <p className="text-[#333] mb-4 text-sm">
-            선택된 그룹의 상담원 정보를 불러올 수 없습니다.
+            선택된 그룹의 상담사 정보를 불러올 수 없습니다.
             <br />
             다시 시도하거나 관리자에게 문의하세요.
           </p>
@@ -682,8 +682,8 @@ export function IDialogForGroupSkilAssignment({
         {/* 설명 영역 */}
         <div className="text-sm text-[#333] mb-4">
           {isUnassignMode
-            ? `그룹의 모든 상담원(${groupMembers.length}명)에게서 스킬을 일괄 해제합니다. 해제할 스킬을 선택하세요.`
-            : `그룹의 모든 상담원(${groupMembers.length}명)에게 스킬을 일괄 할당합니다. 할당할 스킬을 선택하세요.`}
+            ? `그룹의 모든 상담사(${groupMembers.length}명)에게서 스킬을 일괄 해제합니다. 해제할 스킬을 선택하세요.`
+            : `그룹의 모든 상담사(${groupMembers.length}명)에게 스킬을 일괄 할당합니다. 할당할 스킬을 선택하세요.`}
         </div>
 
         {/* 테넌트 ID 정보 */}
@@ -692,7 +692,7 @@ export function IDialogForGroupSkilAssignment({
         </div>
 
         <div className="">
-          {/* 그룹 정보 및 상담원 목록 */}
+          {/* 그룹 정보 및 상담사 목록 */}
           <div className="">
             <div className="mb-2 font-medium text-sm">그룹 정보</div>
             <div

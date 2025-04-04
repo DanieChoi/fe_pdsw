@@ -297,27 +297,27 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                           <TableCell className="text-center text-sm">{selectedCall?.scct||0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[170px]"><Label>대기 상담원 없음</Label></TableHeader>
+                          <TableHeader className="w-[170px]"><Label>대기 상담사 없음</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.overDial||0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[170px]"><Label>상담원 연결</Label></TableHeader>
+                          <TableHeader className="w-[170px]"><Label>상담사 연결</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.agentConnect||0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[170px]"><Label>상담원 연결 실패</Label></TableHeader>
+                          <TableHeader className="w-[170px]"><Label>상담사 연결 실패</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.abct||0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[170px]"><Label>상담원 무응답</Label></TableHeader>
+                          <TableHeader className="w-[170px]"><Label>상담사 무응답</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.agentNoAnswerCnt||0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[170px]"><Label>상담원 통화중</Label></TableHeader>
+                          <TableHeader className="w-[170px]"><Label>상담사 통화중</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.agentBusyCnt||0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[170px]"><Label>상담원 바로 끊음</Label></TableHeader>
+                          <TableHeader className="w-[170px]"><Label>상담사 바로 끊음</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.agentDropCnt||0}</TableCell>
                         </TableRow>
                         <TableRow>
@@ -329,7 +329,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                           <TableCell className="text-center text-sm">{selectedCall?.nonServiceCnt||0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[170px]"><Label>멘트 청취후 상담원 연결 안함</Label></TableHeader>
+                          <TableHeader className="w-[170px]"><Label>멘트 청취후 상담사 연결 안함</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.noAgentCnt||0}</TableCell>
                         </TableRow>
                       </tbody>
@@ -433,7 +433,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                           <TableCell className="text-center text-sm">{selectedCall?.nogtimeOutCallback || 0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[200px]"><Label>팝업 후 상담원 미발신 선택</Label></TableHeader>
+                          <TableHeader className="w-[200px]"><Label>팝업 후 상담사 미발신 선택</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.nogautoPopNotDial || 0}</TableCell>
                         </TableRow>
                         <TableRow>
@@ -441,23 +441,23 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                           <TableCell className="text-center text-sm">{selectedCall?.nogautoPopNoAnswer || 0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[200px]"><Label>팝업 후 상담원 상태 변경</Label></TableHeader>
+                          <TableHeader className="w-[200px]"><Label>팝업 후 상담사 상태 변경</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.nogautoPopNoReady || 0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[200px]"><Label>팝업 후 상담원 모드 변경</Label></TableHeader>
+                          <TableHeader className="w-[200px]"><Label>팝업 후 상담사 모드 변경</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.nogautoPopFailMode || 0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[200px]"><Label>발신확인 전 상담원 상태 변경</Label></TableHeader>
+                          <TableHeader className="w-[200px]"><Label>발신확인 전 상담사 상태 변경</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.nogautoDialNoReady || 0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[200px]"><Label>발신확인 전 상담원 모드 변경</Label></TableHeader>
+                          <TableHeader className="w-[200px]"><Label>발신확인 전 상담사 모드 변경</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.nogautoPopFailMode || 0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[200px]"><Label>지정 상담원 정보 미입력</Label></TableHeader>
+                          <TableHeader className="w-[200px]"><Label>지정 상담사 정보 미입력</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.nogautoNoEmployeeId || 0}</TableCell>
                         </TableRow>
                       </tbody>

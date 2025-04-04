@@ -216,19 +216,19 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
           <tbody>
             <TableRow>
               <TableHeader className="w-[120px] !text-center border-r border-b">
-                <Label>대기 상담원 없음</Label>
+                <Label>대기 상담사 없음</Label>
               </TableHeader>
               <TableHeader className="w-[160px] !text-center border-r border-b">
-                <Label>상담원연결</Label>
+                <Label>상담사연결</Label>
               </TableHeader>
               <TableHeader className="w-[120px] !text-center border-r border-b">
-                <Label>상담원 연결실패</Label>
+                <Label>상담사 연결실패</Label>
               </TableHeader>
               <TableHeader className="w-[120px] !text-center border-r border-b">
-                <Label>상담원 무응답</Label>
+                <Label>상담사 무응답</Label>
               </TableHeader>
               <TableHeader className="w-[120px] !text-center">
-                <Label>상담원 통화중</Label>
+                <Label>상담사 통화중</Label>
               </TableHeader>
             </TableRow>
             <TableRow>
@@ -254,7 +254,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
           <tbody>
             <TableRow>
               <TableHeader className="w-[120px] !text-center border-r border-b">
-                <Label>상담원 바로 끊음</Label>
+                <Label>상담사 바로 끊음</Label>
               </TableHeader>
               <TableHeader className="w-[160px] !text-center border-r border-b">
                 <Label>고객 포기</Label>
@@ -263,7 +263,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
                 <Label>고객 최대 대기시간 초과</Label>
               </TableHeader>
               <TableHeader className="w-[120px] !text-center">
-                <Label>멘트 청취 후 상담원 연결 안함</Label>
+                <Label>멘트 청취 후 상담사 연결 안함</Label>
               </TableHeader>
             </TableRow>
             <TableRow>

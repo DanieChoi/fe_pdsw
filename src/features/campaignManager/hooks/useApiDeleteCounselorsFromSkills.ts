@@ -18,7 +18,7 @@ interface BatchDeleteResult {
 }
 
 /**
- * 여러 스킬에서 여러 상담원을 한 번에 해제하는 커스텀 훅
+ * 여러 스킬에서 여러 상담사을 한 번에 해제하는 커스텀 훅
  */
 export function useApiDeleteCounselorsFromSkills(tenantId: string) {
   const queryClient = useQueryClient();
@@ -84,7 +84,7 @@ export function useApiDeleteCounselorsFromSkills(tenantId: string) {
         queryKey: ['counselorSkills', tenantId]
       });
       
-      // 상담원 관련 쿼리 캐시 무효화
+      // 상담사 관련 쿼리 캐시 무효화
       queryClient.invalidateQueries({
         queryKey: ['counselorList', tenantId]
       });

@@ -35,22 +35,22 @@ export const tabsData: TabData[] = [
   },
   {
     id: 'agent',
-    label: '상담원',
+    label: '상담사',
     items: [
       {
         id: 'agent-list',
-        label: '상담원 목록',
+        label: '상담사 목록',
         type: 'folder',
         children: [
-          { id: 'agent1', label: '상담원1', type: 'campaign', status: 'started', direction: 'inbound' },
-          { id: 'agent2', label: '상담원2', type: 'campaign', status: 'pending', direction: 'outbound' },
+          { id: 'agent1', label: '상담사1', type: 'campaign', status: 'started', direction: 'inbound' },
+          { id: 'agent2', label: '상담사2', type: 'campaign', status: 'pending', direction: 'outbound' },
           { 
             id: 'department1',
             label: '영업부',
             type: 'folder',
             children: [
-              { id: 'agent3', label: '상담원3', type: 'campaign', status: 'started', direction: 'inbound' },
-              { id: 'agent4', label: '상담원4', type: 'campaign', status: 'stopped', direction: 'outbound' }
+              { id: 'agent3', label: '상담사3', type: 'campaign', status: 'started', direction: 'inbound' },
+              { id: 'agent4', label: '상담사4', type: 'campaign', status: 'stopped', direction: 'outbound' }
             ]
           }
         ]
@@ -92,15 +92,15 @@ export const tabsData: TabData[] = [
 
 export const agentTab: TabData = {
   id: 'agent',
-  label: '상담원',
+  label: '상담사',
   items: [
     {
       id: 'agent-list',
-      label: '상담원 목록',
+      label: '상담사 목록',
       type: 'folder',
       children: [
-        { id: 'agent1', label: '상담원1', type: 'campaign', status: 'started', direction: 'inbound' },
-        { id: 'agent2', label: '상담원2', type: 'campaign', status: 'pending', direction: 'outbound' }
+        { id: 'agent1', label: '상담사1', type: 'campaign', status: 'started', direction: 'inbound' },
+        { id: 'agent2', label: '상담사2', type: 'campaign', status: 'pending', direction: 'outbound' }
       ]
     }
   ]
@@ -108,7 +108,7 @@ export const agentTab: TabData = {
 
 export const agentGroupTab: TabData = {
   id: 'campaign-group',
-  label: '상담원 그룹',
+  label: '상담사 그룹',
   items: [
     {
       id: 'group-list',

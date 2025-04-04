@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getAssignableSkillsForCounselor } from "@/features/campaignManager/api/apiForCounselorSkil";
 
 /**
- * 상담원에게 할당 가능한 스킬 목록을 가져오는 TanStack Query 훅
+ * 상담사에게 할당 가능한 스킬 목록을 가져오는 TanStack Query 훅
  * @param tenantId 테넌트 ID
  * @returns 할당 가능한 스킬 목록 (skill_id, skill_name 포함), 로딩 상태, 에러 정보
  */

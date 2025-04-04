@@ -27,7 +27,7 @@ export function CallSettingBulkUpdateFormForCampaingGroup({
     { key: "callingMethod", label: "발신방법" },
     { key: "callLineCount", label: "콜라인수" },
     { key: "lunarCalendar", label: "음력" },
-    { key: "assignedCounselor", label: "할당상담원" },
+    { key: "assignedCounselor", label: "할당상담사" },
     { key: "otherInfo", label: "기타정보" },
   ];
 
@@ -50,7 +50,7 @@ export function CallSettingBulkUpdateFormForCampaingGroup({
     callingMethod: "발신방법 관련 내용을 여기에 표시합니다.",
     callLineCount: "콜라인수 관련 내용을 여기에 표시합니다.",
     lunarCalendar: "음력 관련 내용을 여기에 표시합니다.",
-    assignedCounselor: "할당상담원 관련 내용을 여기에 표시합니다.",
+    assignedCounselor: "할당상담사 관련 내용을 여기에 표시합니다.",
     otherInfo: "기타정보 관련 내용을 여기에 표시합니다.",
   };
 

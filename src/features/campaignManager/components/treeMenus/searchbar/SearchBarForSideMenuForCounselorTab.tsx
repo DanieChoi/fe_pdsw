@@ -14,7 +14,7 @@
 //   onChange: (value: string) => void;
 //   onSearch: () => void;
 //   placeholder?: string;
-//   counselors?: Counselor[]; // 전체 상담원 목록 받기
+//   counselors?: Counselor[]; // 전체 상담사 목록 받기
 //   onSelectCounselor?: (counselorId: string, counselorName: string, tenantId: string) => void;
 // }
 
@@ -22,7 +22,7 @@
 //   value, 
 //   onChange, 
 //   onSearch,
-//   placeholder = "상담원",
+//   placeholder = "상담사",
 //   counselors = [],
 //   onSelectCounselor
 // }: SearchBarProps) {
@@ -173,7 +173,7 @@ interface SearchBarProps {
   onChange: (value: string) => void;
   onSearch: () => void;
   placeholder?: string;
-  counselors?: Counselor[]; // 전체 상담원 목록 받기
+  counselors?: Counselor[]; // 전체 상담사 목록 받기
   onSelectCounselor?: (counselorId: string, counselorName: string, tenantId: string) => void;
 }
 
@@ -181,7 +181,7 @@ export function SearchBarForSideMenuForCounselorTab({
   value, 
   onChange, 
   onSearch,
-  placeholder = "상담원",
+  placeholder = "상담사",
   counselors = [],
   onSelectCounselor
 }: SearchBarProps) {

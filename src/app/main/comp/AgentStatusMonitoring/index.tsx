@@ -123,7 +123,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   };
 
   const statusHeaderItems: StatusHeaderItem[] = [
-    { status: 'waiting', bg: '!bg-[#DDF4F2]', text: '대기 상담원', icon: '/waiting.svg' },
+    { status: 'waiting', bg: '!bg-[#DDF4F2]', text: '대기 상담사', icon: '/waiting.svg' },
     { status: 'processing', bg: '!bg-[#FEE9EC]', text: '처리', icon: '/processing.svg' },
     { status: 'afterProcessing', bg: '!bg-[#E8EFFA]', text: '후처리', icon: '/afterprocessing.svg' },
     { status: 'rest', bg: '!bg-[#F6F0FA]', text: '휴식', icon: '/rest.svg' }
@@ -146,7 +146,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
     return returnValue;
   };
 
-  // 할당 상담원 정보 조회 (campaignId를 props로 받아 사용)
+  // 할당 상담사 정보 조회 (campaignId를 props로 받아 사용)
   const { mutate: fetchAgentStateMonitoringList } = useApiForAgentStateMonitoringList({
     onSuccess: (data) => {
       if (data.counselorStatusList.length > 0) {
@@ -212,7 +212,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
     <div className="w-full h-full flex flex-col gap-4">
       <div>
         <TitleWrap
-          title={`상담원 상태 통계 (캠페인 ID: ${campaignId})`}
+          title={`상담사 상태 통계 (캠페인 ID: ${campaignId})`}
           className="border-b border-gray-300 pb-1"
         />
         <Table>
@@ -248,7 +248,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
       </div>
       <div className="h-[calc(100%-115px)]">
         <TitleWrap
-          title="상담원 상태"
+          title="상담사 상태"
           className="border-b border-gray-300 pb-1"
         />
         <div className="flex justify-between items-center bg-[#f8f8f8] h-[30px] px-5 border-t border-x rounded-t-[3px]">
@@ -281,8 +281,8 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="time">시간</SelectItem>
-                    <SelectItem value="agent">상담원 아이디</SelectItem>
-                    <SelectItem value="name">상담원 이름</SelectItem>
+                    <SelectItem value="agent">상담사 아이디</SelectItem>
+                    <SelectItem value="name">상담사 이름</SelectItem>
                     <SelectItem value="status">상태</SelectItem>
                   </SelectContent>
                 </Select>

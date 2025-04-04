@@ -452,7 +452,7 @@ export default function CampaignMonitorDashboard() {
     <div className="">
       <TitleWrap
         className="border-b border-gray-300 pb-3"
-        title="상담원 상태"
+        title="상담사 상태"
       />
       <div className="flex items-center justify-between pb-3">
         <div className="flex gap-5">

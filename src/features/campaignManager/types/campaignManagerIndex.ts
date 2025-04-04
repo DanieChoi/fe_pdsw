@@ -49,20 +49,20 @@ export interface SkillListCredentials {
   tenant_id_array: number[];
 }
 
-// 캠페인 할당상담원 요청 시 필요한 credentials 타입
+// 캠페인 할당상담사 요청 시 필요한 credentials 타입
 export interface CampaignAssignmentAgentCredentials {
   tenantId: string;
   campaignId: string;
 }
 
-// 캠페인 할당상담원 데이터 타입
+// 캠페인 할당상담사 데이터 타입
 export interface CampaignAssignmentAgentListResponse {
   code: number;
   message: string;
   assignedCounselorList: CampaignAssignmentAgentListDataResponse[];
 }
 
-// 캠페인 할당상담원 데이터 타입
+// 캠페인 할당상담사 데이터 타입
 export interface CampaignAssignmentAgentListDataResponse {
   affiliationGroupId: string;
   affiliationTeamId: string;

@@ -323,7 +323,7 @@ export interface SkillAssignedCounselorListItem {
   affiliationGroupName: string; //상담사 소속그룹명
   affiliationTeamId: string; // 상담사 팀아이디
   affiliationTeamName: string; // 상담사 팀이름
-  counselorEmplNum: string; //상담원아이디
+  counselorEmplNum: string; //상담사아이디
   counselorId: string; //상담사 로그인아이디
   counselorname: string; //상담사 이름
   blendKind: string; //블렌드 구분(인바운드: 1, 아웃바운드: 2, 블렌드: 3)

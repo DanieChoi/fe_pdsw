@@ -21,12 +21,12 @@ const tabsConfig = [
   },
   {
     id: "agent" as TabId,
-    label: "상담원",
+    label: "상담사",
     icons: {
       default: "/tree-menu/ghost_icon_for_counselor_tab.png",
       selected: "/tree-menu/ghost_icon_for_counselor_tab_selected.png"
     },
-    alt: "상담원 아이콘",
+    alt: "상담사 아이콘",
     iconWidth: 14,
     iconHeight: 14
   },

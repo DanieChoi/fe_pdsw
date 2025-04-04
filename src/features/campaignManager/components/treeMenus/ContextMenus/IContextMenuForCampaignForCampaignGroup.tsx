@@ -200,7 +200,7 @@ export function IContextMenuForCampaignForCampaignGroup({
     addMultiTab({
       id: 22,
       uniqueKey: uniqueKey,
-      title: `상담원 상태 모니터 - ${campaignName}`,
+      title: `상담사 상태 모니터 - ${campaignName}`,
       icon: '',
       href: '',
       content: null,
@@ -425,7 +425,7 @@ export function IContextMenuForCampaignForCampaignGroup({
       id: 56,
       group: 4,
       key: "monitor",
-      label: "상담원 상태 모니터",
+      label: "상담사 상태 모니터",
       action: () => handleMonitorClick(item.id, item.label)
     },
     {

@@ -12,7 +12,7 @@ export async function apiToFetchCounselorListForSideBar({
     `/counselor/list?tenantId=${tenant_id}&roleId=${roleId}`
   );
   
-  console.log("response.data at 상담원 api 함수 ! : ", response.data);
+  console.log("response.data at 상담사 api 함수 ! : ", response.data);
   
 
   return response.data;

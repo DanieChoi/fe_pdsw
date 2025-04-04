@@ -197,7 +197,7 @@ export function IDialogForSkilAssignmentForCounselor({
         <div className="text-sm text-[#333] mb-4">
           {isUnassignMode
             ? "할당된 스킬을 해제할 수 있습니다."
-            : "상담원에게 스킬을 할당할 수 있습니다."}
+            : "상담사에게 스킬을 할당할 수 있습니다."}
           <br />
           체크 후 확인 버튼을 누르시면 선택한 작업이 적용됩니다.
         </div>

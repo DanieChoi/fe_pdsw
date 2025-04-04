@@ -36,7 +36,7 @@ interface CampaignRow {
   mode: string;
 }
 
-// 상담원 정보 (그리드용)
+// 상담사 정보 (그리드용)
 interface AgentRow {
   skillId: string;
   teamId: string;
@@ -109,7 +109,7 @@ const SkillEdit = () => {
     { key: 'skillName', name: '스킬이름' },
     { key: 'description', name: '설명' },
     { key: 'campaignCount', name: '소속캠페인 수' },
-    { key: 'agentCount', name: '소속상담원 수' }
+    { key: 'agentCount', name: '소속상담사 수' }
   ], []);
 
   // 캠페인 그리드 컬럼
@@ -120,14 +120,14 @@ const SkillEdit = () => {
     { key: 'mode', name: '캠페인 모드' }
   ], []);
 
-  // 상담원 그리드 컬럼
+  // 상담사 그리드 컬럼
   const agentColumns = useMemo(() => [
     SelectColumn,
     { key: 'teamId', name: '팀아이디' },
     { key: 'teamName', name: '팀이름' },
     { key: 'loginId', name: '로그인아이디' },
-    { key: 'agentId', name: '상담원아이디' },
-    { key: 'agentName', name: '상담원 이름' },
+    { key: 'agentId', name: '상담사아이디' },
+    { key: 'agentName', name: '상담사 이름' },
     { key: 'consultMode', name: '상담모드' }
   ], []);
 
@@ -202,7 +202,7 @@ const SkillEdit = () => {
     
     loadCampaignData();
     
-    // 상담원 불러오기
+    // 상담사 불러오기
     fetchCounselorAssignList({
       tenantId: row.tenantId,
       skillId: Number(row.skillId)
@@ -352,27 +352,27 @@ const SkillEdit = () => {
 
   const handleAgentSkillUnassign = () => {
     if (selectedAgentRows.size === 0) {
-      showAlert('스킬을 해제할 상담원을 선택해주세요.');
+      showAlert('스킬을 해제할 상담사을 선택해주세요.');
       return;
     }
   
-    // 선택된 상담원 ID 배열 생성
+    // 선택된 상담사 ID 배열 생성
     const selectedAgentIds = Array.from(selectedAgentRows).map(agentId => {
       const agent = filteredAgents.find(agent => agent.agentId === agentId);
       return agent ? agent.agentId : '';
     }).filter(id => id !== ''); // 빈 ID 필터링
   
     // 실제로 API 호출하기 전에 확인 메시지 표시
-    showConfirm(`선택한 ${selectedAgentIds.length}명의 상담원 스킬을 해제하시겠습니까?`, () => {
+    showConfirm(`선택한 ${selectedAgentIds.length}명의 상담사 스킬을 해제하시겠습니까?`, () => {
       // 먼저 UI 업데이트 - 이 부분이 중요!
       if (selectedSkill) {
-        // 1. 소속상담원 목록에서 선택된 상담원들 제거
+        // 1. 소속상담사 목록에서 선택된 상담사들 제거
         const updatedAgents = filteredAgents.filter(
           agent => !selectedAgentRows.has(agent.agentId)
         );
         setFilteredAgents(updatedAgents);
   
-        // 2. 스킬목록에서 소속상담원 수 갱신
+        // 2. 스킬목록에서 소속상담사 수 갱신
         const newAgentCount = selectedSkill.agentCount - selectedAgentIds.length;
         
         // 전체 스킬 목록 업데이트
@@ -698,7 +698,7 @@ const SkillEdit = () => {
           router.push('/login');
         }, 1000);
       } else {
-        showAlert(`상담원 리스트 조회 실패: ${error.message}`);
+        showAlert(`상담사 리스트 조회 실패: ${error.message}`);
       }
     }
   });
@@ -896,7 +896,7 @@ const SkillEdit = () => {
   const { mutate: deleteAgentSkill } = useApiForDeleteAgentSkill({
     onSuccess: () => {
       // API 성공 알림만 표시
-      showAlert('상담원 스킬이 성공적으로 해제되었습니다.');
+      showAlert('상담사 스킬이 성공적으로 해제되었습니다.');
     },
     onError: (error) => {
       if (error.message.split('||')[0] === '5') {
@@ -912,7 +912,7 @@ const SkillEdit = () => {
           router.push('/login');
         }, 1000);
       } else {
-        showAlert(`상담원 스킬 해제 실패: ${error.message}`);
+        showAlert(`상담사 스킬 해제 실패: ${error.message}`);
       }
     }
   });
@@ -1195,14 +1195,14 @@ const SkillEdit = () => {
             </div>
           </div>
 
-          {/* 소속 상담원 목록 */}
+          {/* 소속 상담사 목록 */}
           <div>
             <TitleWrap 
-              title="소속 상담원 목록" 
+              title="소속 상담사 목록" 
               totalCount={filteredAgents.length}
               buttons={[
                 { 
-                  label: "선택 상담원 스킬할당 해제",
+                  label: "선택 상담사 스킬할당 해제",
                   onClick: handleAgentSkillUnassign
                 },
               ]}

@@ -108,7 +108,7 @@ export default function Footer({
       (announce === '/pds/skill' && ['INSERT', 'UPDATE', 'DELETE'].includes(command)) ||
       // 캠페인 요구스킬 수정
       (announce === '/pds/campaign/skill' && command === 'UPDATE') ||
-      // 상담원 리소스 수정/삭제
+      // 상담사 리소스 수정/삭제
       (announce === 'update-agent' && ['UPDATE', 'DELETE'].includes(command))
     );
     
@@ -261,11 +261,11 @@ export default function Footer({
       for (let i = 0; i < tempAgentIdList.length; i++) {
         let __message = '[EVENT] '
         if (command === 'UPDATE') {
-          __message += '상담원 스킬 할당';
+          __message += '상담사 스킬 할당';
         } else if (command === 'DELETE') {
-          __message += '상담원 스킬 해제';
+          __message += '상담사 스킬 해제';
         } else if (command === 'INSERT') {
-          __message += '상담원 스킬 할당';
+          __message += '상담사 스킬 할당';
         }
         tempFooterDataList.push({
           time: _time,
@@ -281,7 +281,7 @@ export default function Footer({
 
       if (useAlramPopup === 1) {
         tempFooterDataList.forEach(item => {
-          toast.event(`[EVENT] [${_skillId}] 상담원 스킬 ${command === 'DELETE' ? '해제' : '할당'}`, {
+          toast.event(`[EVENT] [${_skillId}] 상담사 스킬 ${command === 'DELETE' ? '해제' : '할당'}`, {
             duration: 6000
           });
         });
@@ -309,13 +309,13 @@ export default function Footer({
         _message = '';
       }
     }
-    //상담원 자원 수정/삭제
+    //상담사 자원 수정/삭제
     else if (announce === 'update-agent') {
-      _message = '[상담원 자원 '
+      _message = '[상담사 자원 '
       if (command === 'UPDATE') {
-        _message += '수정] 상담원 아이디 : ' + data['employee_id'] + ' , 상담원 이름 : ' + data['agent_name'];
+        _message += '수정] 상담사 아이디 : ' + data['employee_id'] + ' , 상담사 이름 : ' + data['agent_name'];
       } else if (command === 'DELETE') {
-        _message += '삭제] 상담원 아이디 : ' + data['employee_id'] + ' , 상담원 이름 : ' + data['agent_name'];
+        _message += '삭제] 상담사 아이디 : ' + data['employee_id'] + ' , 상담사 이름 : ' + data['agent_name'];
       }
     }
     //캠페인수정>동작시간 추가

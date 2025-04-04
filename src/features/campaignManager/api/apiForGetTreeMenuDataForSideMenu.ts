@@ -146,7 +146,7 @@ export async function apiToFetchCounselorTreeData(credentials: MainCredentials):
   const tabData: TabData[] = [
     {
       id: 'agent',
-      label: '상담원',
+      label: '상담사',
       items: [
         {
           id: 'nexus',

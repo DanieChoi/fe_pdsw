@@ -9,7 +9,7 @@
 //     <div className="p-4">
 //       <h2 className="text-lg font-semibold mb-4">그룹 스킬 할당</h2>
 //       <div className="space-y-4">
-//         <h3 className="text-md font-medium">소속 상담원 목록</h3>
+//         <h3 className="text-md font-medium">소속 상담사 목록</h3>
 //         <div className="space-y-2">
 //           {candidateMembersForSkilAssign.map((counselor: any) => (
 //             <div 
@@ -59,7 +59,7 @@ interface Skill {
 }
 
 /**
- * 상담원에게 할당 가능한 스킬 목록을 가져오는 커스텀 훅
+ * 상담사에게 할당 가능한 스킬 목록을 가져오는 커스텀 훅
  */
 const useAssignableSkills = (tenantId?: number) => {
   return useQuery({
@@ -100,7 +100,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
   const [showCounselors, setShowCounselors] = useState(false);
   const [showRawData, setShowRawData] = useState(false);  // 디버깅용
 
-  // 상담원 데이터 검증 및 테넌트 ID 추출
+  // 상담사 데이터 검증 및 테넌트 ID 추출
   const isValidCounselorsArray = Array.isArray(candidateMembersForSkilAssign) && candidateMembersForSkilAssign.length > 0;
   const firstCounselor = isValidCounselorsArray ? candidateMembersForSkilAssign[0] : null;
   
@@ -126,21 +126,21 @@ export function GroupSkillAssignmentTab(): JSX.Element {
     console.log("📋 candidateMembersForSkilAssign 데이터:", candidateMembersForSkilAssign);
     
     if (isValidCounselorsArray) {
-      console.log("👤 첫 번째 상담원:", candidateMembersForSkilAssign[0]);
-      console.log("👥 총 상담원 수:", candidateMembersForSkilAssign.length);
+      console.log("👤 첫 번째 상담사:", candidateMembersForSkilAssign[0]);
+      console.log("👥 총 상담사 수:", candidateMembersForSkilAssign.length);
       
       const counselorIds = getValidCounselorIds();
-      console.log("🆔 유효한 상담원 ID 목록:", counselorIds);
+      console.log("🆔 유효한 상담사 ID 목록:", counselorIds);
     } else {
-      console.warn("⚠️ 상담원 데이터가 없거나 형식이 올바르지 않습니다.");
+      console.warn("⚠️ 상담사 데이터가 없거나 형식이 올바르지 않습니다.");
     }
     console.groupEnd();
   }, [candidateMembersForSkilAssign]);
 
-  // 유효한 상담원 ID 배열 생성 함수
+  // 유효한 상담사 ID 배열 생성 함수
   const getValidCounselorIds = (): string[] => {
     if (!isValidCounselorsArray) {
-      console.warn("⚠️ 유효한 상담원 배열이 없습니다.");
+      console.warn("⚠️ 유효한 상담사 배열이 없습니다.");
       return [];
     }
 
@@ -158,7 +158,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
         return (counselor.data && counselor.data.counselorId) || counselor.counselorId;
       });
     
-    console.log("✅ 추출된 상담원 ID 목록:", validIds, "개수:", validIds.length);
+    console.log("✅ 추출된 상담사 ID 목록:", validIds, "개수:", validIds.length);
     
     return validIds;
   };
@@ -168,7 +168,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
     const counselorIds = getValidCounselorIds();
 
     if (counselorIds.length === 0) {
-      toast.error('유효한 상담원이 없습니다.');
+      toast.error('유효한 상담사이 없습니다.');
       return;
     }
 
@@ -233,7 +233,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
     toast.success('스킬 할당이 완료되었습니다.');
   };
 
-  // 상담원 목록 토글
+  // 상담사 목록 토글
   const toggleCounselors = () => {
     setShowCounselors(!showCounselors);
   };
@@ -276,7 +276,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
     );
   }
 
-  // 상담원이 없는 경우 UI
+  // 상담사이 없는 경우 UI
   if (!isValidCounselorsArray) {
     return (
       <div className="">
@@ -290,11 +290,11 @@ export function GroupSkillAssignmentTab(): JSX.Element {
           <div className="px-[30px] py-[20px]">
             <div className="flex items-center">
                 <Image className="mr-2" src="/tree-menu/group_icon_for_tree.png" alt="그룹" width={15} height={12} />
-                <span className="text-sm text-[#333]">상담원 정보를 찾을 수 없습니다</span>
+                <span className="text-sm text-[#333]">상담사 정보를 찾을 수 없습니다</span>
             </div>
 
             <p className="text-[#333] mb-4 text-sm">
-              선택된 그룹의 상담원 정보를 불러올 수 없습니다.<br />
+              선택된 그룹의 상담사 정보를 불러올 수 없습니다.<br />
               다시 시도하거나 관리자에게 문의하세요.
             </p>
             {/* <Button onClick={handleCancel} className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">
@@ -319,8 +319,8 @@ export function GroupSkillAssignmentTab(): JSX.Element {
 
         <div className="px-[30px] py-[20px]">
           <div className="text-sm text-[#333] mb-4">
-            그룹의 모든 상담원({candidateMembersForSkilAssign.length}명)에게 스킬을 일괄 할당할 수 있습니다.<br />
-            할당할 스킬을 선택하면 그룹의 모든 상담원에게 선택된 스킬이 할당됩니다.
+            그룹의 모든 상담사({candidateMembersForSkilAssign.length}명)에게 스킬을 일괄 할당할 수 있습니다.<br />
+            할당할 스킬을 선택하면 그룹의 모든 상담사에게 선택된 스킬이 할당됩니다.
           </div>
 
           {/* 디버깅 버튼 - 개발 환경에서만 표시 */}
@@ -342,7 +342,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
             </div>
           )}
 
-          {/* 상담원 목록 표시 */}
+          {/* 상담사 목록 표시 */}
           <div className="mb-4">
             <div
               className="flex justify-between items-center p-2 border rounded cursor-pointer bg-gray-50 hover:bg-gray-100"
@@ -350,7 +350,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
             >
               <div className="flex items-center">
                 <Image className="mr-2" src="/tree-menu/group_icon_for_tree.png" alt="그룹" width={15} height={12} />
-                <span className="text-sm text-[#333]">소속 상담원 목록</span>
+                <span className="text-sm text-[#333]">소속 상담사 목록</span>
               </div>
               <div className="flex items-center">
                 <span className="text-sm text-[#333] mr-2">{candidateMembersForSkilAssign.length}명</span>

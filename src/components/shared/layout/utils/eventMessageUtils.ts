@@ -170,11 +170,11 @@ export const processEventMessage = (
     for (let i = 0; i < tempAgentIdList.length; i++) {
       let tempMessage = '[스킬 ';
       if (command === 'UPDATE') {
-        tempMessage += '추가] 스킬 아이디 : ' + skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
+        tempMessage += '추가] 스킬 아이디 : ' + skillId + ' , 상담사 아이디 : ' + tempAgentIdList[i];
       } else if (command === 'DELETE') {
-        tempMessage += '해제] 스킬 아이디 : ' + skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
+        tempMessage += '해제] 스킬 아이디 : ' + skillId + ' , 상담사 아이디 : ' + tempAgentIdList[i];
       } else if (command === 'INSERT') {
-        tempMessage += '추가] 스킬 아이디 : ' + skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
+        tempMessage += '추가] 스킬 아이디 : ' + skillId + ' , 상담사 아이디 : ' + tempAgentIdList[i];
       }
       
       messageList.push({
@@ -186,7 +186,7 @@ export const processEventMessage = (
     
     // 토스트 메시지 준비
     const actionType = command === 'UPDATE' || command === 'INSERT' ? '추가' : '해제';
-    toastMessage = `[스킬 ${actionType}] 스킬 아이디 : ${skillId}\n${tempAgentIdList.length}명의 상담원 변경됨`;
+    toastMessage = `[스킬 ${actionType}] 스킬 아이디 : ${skillId}\n${tempAgentIdList.length}명의 상담사 변경됨`;
     
     message = ''; // 이미 messageList에 추가했으므로 message는 비워둠
   }
@@ -213,13 +213,13 @@ export const processEventMessage = (
     }
   }
   
-  // 상담원 자원 수정/삭제
+  // 상담사 자원 수정/삭제
   else if (announce === 'update-agent') {
-    message = '[상담원 자원 ';
+    message = '[상담사 자원 ';
     if (command === 'UPDATE') {
-      message += '수정] 상담원 아이디 : ' + data['employee_id'] + ' , 상담원 이름 : ' + data['agent_name'];
+      message += '수정] 상담사 아이디 : ' + data['employee_id'] + ' , 상담사 이름 : ' + data['agent_name'];
     } else if (command === 'DELETE') {
-      message += '삭제] 상담원 아이디 : ' + data['employee_id'] + ' , 상담원 이름 : ' + data['agent_name'];
+      message += '삭제] 상담사 아이디 : ' + data['employee_id'] + ' , 상담사 이름 : ' + data['agent_name'];
     }
   }
   
