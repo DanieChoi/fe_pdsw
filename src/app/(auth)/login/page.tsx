@@ -280,6 +280,7 @@ export default function LoginPage() {
 
       <p className="footer-text mt-4">
         © {new Date().getFullYear()} NEXUS COMMUNITY All rights reserved.
+        <span className="ml-2 text-xs text-gray-500">v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
       </p>
 
       <CustomAlert
