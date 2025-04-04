@@ -1,7 +1,6 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { ChevronUp, ChevronDown, PanelLeftClose, PanelLeftOpen, Bell, BellOff } from "lucide-react";
-
-
 import { isEqual } from 'lodash';
 import { useAuthStore, useMainStore } from '@/store';
 import { Resizable } from "re-resizable";
@@ -9,7 +8,6 @@ import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { customAlertService } from "./utils/CustomAlertService";
 import { useEnvironmentStore } from "@/store/environmentStore";
 import { toast, initToasts } from "./CustomToast";
-
 
 type FooterDataType = {
   time: string;
@@ -80,8 +78,8 @@ export default function Footer({
     }
   });
 
-  const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, tempEventData: any): void => {
 
+  const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, tempEventData: any): void => {
     //시간.
     const today = new Date();
     const _time = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0') + ':' + String(today.getSeconds()).padStart(2, '0');
@@ -97,6 +95,7 @@ export default function Footer({
     //메시지.
     let _message = '';
     let _message2 = '';
+
     //운영설정>캠페인별 발신번호설정
     if (announce === '/pds/campaign/calling-number') {
       _message = '캠페인 : '
@@ -107,7 +106,6 @@ export default function Footer({
       } else if (command === 'UPDATE') {
         _message += '[' + data['campaign_id'] + '], 사용자 발신번호 설정 변경 성공';
       }
-
     }
     //장비 사용, 장비 사용중지
     else if (announce === 'dialing-device') {
@@ -162,15 +160,39 @@ export default function Footer({
       } else if (data['end_flag'] === 2) {
         _end_flag = '완료';
       }
+
       if (command === 'INSERT') {
         _message += '추가, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
-        _message2 += '추가 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag;
+        _message2 = `[EVENT] [${data['campaign_id']}] 캠페인 추가`;
+
+        // 캠페인 추가 시 토스트 메시지
+        if (useAlramPopup === 1) {
+          toast.event(_message2, {
+            duration: 6000
+          });
+        }
       } else if (command === 'UPDATE') {
         _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
-        _message2 += '수정 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag;
+        _message2 = `[EVENT] [${data['campaign_id']}] 캠페인 수정`;
+
+        // 캠페인 수정 시 토스트 메시지
+        if (useAlramPopup === 1) {
+          toast.event(_message2, {
+            duration: 6000
+          });
+        }
       } else if (command === 'DELETE') {
         _message += '삭제, 캠페인 아이디 : ' + data['campaign_id'];
+        _message2 = `[EVENT] [${data['campaign_id']}] 캠페인 삭제`;
+
+        // 캠페인 삭제 시 토스트 메시지
+        if (useAlramPopup === 1) {
+          toast.event(_message2, {
+            duration: 6000
+          });
+        }
       }
+
       fetchMain({
         session_key: '',
         tenant_id: tenant_id,
@@ -181,32 +203,21 @@ export default function Footer({
           '캠페인 이름 : ' + data['campaign_name'] + '\n' +
           '동작상태 : ';
 
-        // tofix
         setFooterDataList((prev) => [
           {
             time: _time,
             type: _type,
-            // message: '캠페인 동작상태 변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag
             message: statusMessage
           },
           ...prev
         ]);
 
-        // alert("캠페인 동작 상태 변경!!")
-        console.log("useAlramPopup check !! ", useAlramPopup);
-        console.log("useAlramPopup check !! ", typeof useAlramPopup);
-
         // 알림 설정이 활성화되어 있으면 토스트 표시
         if (useAlramPopup === 1) {
-          // alert("여기 !")
-          console.log("statusMessage2 : ", statusMessage2);
-          
-          console.log("여기야 여기 22222222");
-          toast.success(`[ ${statusMessage2}`, {
-            duration: 3000,
+          toast.event(`[EVENT] [${data['campaign_id']}] 캠페인 상태 변경`, {
+            duration: 6000,
           });
         }
-
       }
     }
     //스킬.
@@ -215,14 +226,6 @@ export default function Footer({
       const _skillId = data['skill_id'];
       const tempFooterDataList: FooterDataType[] = [];
       for (let i = 0; i < tempAgentIdList.length; i++) {
-        // let __message = '[스킬 '
-        // if (command === 'UPDATE') {
-        //   __message += '추가] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
-        // } else if (command === 'DELETE') {
-        //   __message += '해제] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
-        // } else if (command === 'INSERT') {
-        //   __message += '추가] 스킬 아이디 : ' + _skillId + ' , 상담원 아이디 : ' + tempAgentIdList[i];
-        // }
         let __message = '[EVENT] '
         if (command === 'UPDATE') {
           __message += '상담원 스킬 할당';
@@ -238,45 +241,23 @@ export default function Footer({
         });
       }
 
-      // tofix1
       setFooterDataList((prev) => [
         ...tempFooterDataList,
         ...prev.slice(0, 9) // 상위 10개만 보이게.
       ]);
 
-      // alert("스킬 상담원 변경!")
-
-      // 알림 설정이 활성화되어 있으면 각 메시지에 대해 토스트 표시
-      // if (useAlramPopup === 1) {
-      //   tempFooterDataList.forEach(item => {
-      //     toast.info(`[${item.time}] ${item.message}`, {
-      //       position: "bottom-right",
-      //       autoClose: 3000,
-      //       hideProgressBar: false,
-      //       closeOnClick: true,
-      //       pauseOnHover: true,
-      //       draggable: true
-      //     });
-      //   });
-      // }
       if (useAlramPopup === 1) {
-        // alert("here")
         tempFooterDataList.forEach(item => {
-          // alert("여기5")
-          console.log("여기야 여기 333333333");
-
-          toast.success(`${item.message}`, {
-            duration: 18000
+          toast.event(`[EVENT] [${_skillId}] 상담원 스킬 ${command === 'DELETE' ? '해제' : '할당'}`, {
+            duration: 6000
           });
         });
       }
-
 
       _message = '';
     }
     //스킬편집
     else if (announce === '/pds/skill') {
-      console.log("Skill event:", command, data);
       _message = '[스킬 '
       if (command === 'INSERT') {
         _message += '추가] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
@@ -315,7 +296,6 @@ export default function Footer({
     }
     //캠페인 동작상태 변경
     else if (announce === '/pds/campaign/status') {
-      _message = '캠페인 동작상태'
       if (command === 'UPDATE') {
         let _start_flag = '';
         if (data['campaign_status'] === 1) {
@@ -325,11 +305,39 @@ export default function Footer({
         } else if (data['campaign_status'] === 3) {
           _start_flag = '중지';
         }
-        const tempCampaign = campaigns.filter((campaign) => campaign.campaign_id === Number(data['campaign_id']));
-        _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
-        _message2 += '[이벤트] : ' + data['campaign_id'] + ' , 동작상태 : ' + _start_flag + ' , 완료구분 : 진행중';
-      }
 
+        // 푸터 로그 메시지
+        _message = '캠페인 동작상태 변경, 캠페인 아이디 : ' + data['campaign_id'] + ', 동작상태: ' + _start_flag + ', 완료구분: 진행중';
+        _message2 = `[EVENT] [${data['campaign_id']}] 캠페인 상태 변경`;
+
+        // 토스트 메시지를 위한 이벤트 코드 포맷팅
+        const eventCode = [data['campaign_id']];
+
+        // 토스트 알림 표시 (이미지 스타일과 유사하게)
+        if (useAlramPopup === 1) {
+          // 첫 번째 토스트 - 캠페인 변경
+          toast.event(`[EVENT] [${eventCode}] 캠페인 변경`, {
+            duration: 6000
+          });
+
+          // 두 번째 토스트 - 캠페인 상태 변경
+          setTimeout(() => {
+            toast.event(`[EVENT] [${eventCode}] 캠페인 상태 변경`, {
+              duration: 6000
+            });
+          }, 100); // 약간의 지연으로 두 개의 토스트가 순차적으로 표시되도록 함
+        }
+
+        // 푸터 데이터 리스트에 추가
+        setFooterDataList((prev) => [
+          {
+            time: _time,
+            type: _type,
+            message: _message
+          },
+          ...prev.slice(0, 9) // 상위 10개만 보이게
+        ]);
+      }
     }
     //발신리스트등록
     else if (announce === '/pds/campaign/calling-list') {
@@ -346,14 +354,18 @@ export default function Footer({
           list_flag = '초기화';
         }
         _message += '캠페인 아이디 : ' + data['campaign_id'] + ' , 리스트구분 : ' + list_flag;
-        _message2 += '캠페인 아이디 : ' + data['campaign_id'] + '\n' +
-          '리스트구분 : ' + list_flag + '\n' +
-          '';
+        _message2 = `[EVENT] [${data['campaign_id']}] 발신리스트 ${list_flag} 등록`;
+
+        // 토스트 알림 표시
+        if (useAlramPopup === 1) {
+          toast.event(_message2, {
+            duration: 6000
+          });
+        }
       }
     }
 
     if (_message !== '') {
-
       setFooterDataList((prev) => [
         {
           time: _time,
@@ -364,66 +376,58 @@ export default function Footer({
       ]);
     }
 
-    // alert("여기야 여기1")
-    console.log("useAlramPopup : ", useAlramPopup);
-
-
-    if (useAlramPopup === 1) {
-      console.log("여기야 여기 11111111");
-      // alert("hi2")
-      toast.success(`${_message2}`, {
-        duration: 6000
-      });
-    }
-
-  }, [setFooterDataList, useAlramPopup]);
+  }, [campaigns, fetchMain, setFooterDataList, tenant_id, useAlramPopup]);
 
   // SSE 구독
   useEffect(() => {
-    const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-    const eventSource = new EventSource(
-      `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
-    );
+    // 브라우저 환경인지 확인
+    if (typeof window !== 'undefined' && window.EventSource) {
+      const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+      const eventSource = new EventSource(
+        `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe`
+      );
 
-    let data: any = {};
-    let announce = "";
-    let command = "";
-    let kind = "";
+      let data: any = {};
+      let announce = "";
+      let command = "";
+      let kind = "";
 
-    eventSource.addEventListener("message", (event) => {
-      //실시간 이벤트를 받아서 처리(함수로 처리하면 좋을 듯)
-      console.log("footer sse event = ", event.data);
-      if (event.data !== "Connected!!") {
-        const tempEventData = JSON.parse(event.data);
-        if (
-          announce !== tempEventData["announce"] ||
-          !isEqual(data, tempEventData.data) ||
-          !isEqual(data, tempEventData["data"]) ||
-          kind !== tempEventData["kind"]
-        ) {
-          announce = tempEventData["announce"];
-          command = tempEventData["command"];
-          data = tempEventData["data"];
-          kind = tempEventData["kind"];
+      const messageHandler = (event: MessageEvent) => {
+        console.log("footer sse event = ", event.data);
 
-          // alert("footer sse event = "+ event.data);
+        if (event.data !== "Connected!!") {
+          const tempEventData = JSON.parse(event.data);
+          if (
+            announce !== tempEventData["announce"] ||
+            !isEqual(data, tempEventData.data) ||
+            !isEqual(data, tempEventData["data"]) ||
+            kind !== tempEventData["kind"]
+          ) {
+            announce = tempEventData["announce"];
+            command = tempEventData["command"];
+            data = tempEventData["data"];
+            kind = tempEventData["kind"];
 
-          footerDataSet(
-            tempEventData["announce"],
-            tempEventData["command"],
-            tempEventData["data"],
-            tempEventData["kind"],
-            tempEventData
-          );
+            footerDataSet(
+              tempEventData["announce"],
+              tempEventData["command"],
+              tempEventData["data"],
+              tempEventData["kind"],
+              tempEventData
+            );
+          }
         }
+      };
 
+      eventSource.addEventListener("message", messageHandler);
 
-      }
-    });
-    return () => {
-      eventSource.close();
-    };
-  }, [tenant_id, role_id, useAlramPopup]);
+      // 클린업 함수
+      return () => {
+        eventSource.removeEventListener("message", messageHandler);
+        eventSource.close();
+      };
+    }
+  }, [footerDataSet, tenant_id, role_id, useAlramPopup]);
 
   // 높이 변경 핸들러
   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
@@ -435,7 +439,7 @@ export default function Footer({
     }
 
     if (onResizeEnd) {
-      onResizeEnd(newHeight); // 수정: 높이 값을 인자로 전달
+      onResizeEnd(newHeight);
     }
   };
 
@@ -493,19 +497,6 @@ export default function Footer({
             </span>
           )}
 
-          {/* 모드 전환 버튼 */}
-          {/* <button
-            onClick={toggleExpanded}
-            className="flex items-center"
-            title={isExpanded ? "default mode" : "wide mode"}
-          >
-            {isExpanded ? (
-              <PanelLeftOpen className="w-4 h-4" />
-            ) : (
-              <PanelLeftClose className="w-4 h-4" />
-            )}
-          </button> */}
-
           {/* 열기/닫기 버튼 */}
           <button
             onClick={toggleDrawer}
@@ -519,7 +510,6 @@ export default function Footer({
             )}
           </button>
         </div>
-
       </div>
 
       {/* 푸터 내부 콘텐츠: isDrawerOpen이 true일 때만 렌더링 */}
@@ -538,7 +528,7 @@ export default function Footer({
                 {footerDataList.map((log, index) => (
                   <tr key={index}>
                     <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
-                    <td className="whitespace-nowrap text-[13px] px-1">[{log.type}]</td>
+                    <td className="whitespace-nowrap text-[13px] px-1 hidden">[{log.type}]</td>
                     <td className="text-[13px]">{log.message}</td>
                   </tr>
                 ))}
@@ -554,7 +544,7 @@ export default function Footer({
                   {footerDataList.map((log, index) => (
                     <tr key={index}>
                       <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
-                      <td className="whitespace-nowrap text-[13px] px-1">[{log.type}]</td>
+                      <td className="whitespace-nowrap text-[13px] px-1 hidden">[{log.type}]</td>
                       <td className="text-[13px]">{log.message}</td>
                     </tr>
                   ))}

@@ -1,13 +1,14 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ChevronUp, ChevronDown, PanelLeftClose, PanelLeftOpen, Bell, BellOff } from "lucide-react";
-import { isEqual } from 'lodash';
+import { debounce, isEqual } from 'lodash';
 import { useAuthStore, useMainStore } from '@/store';
 import { Resizable } from "re-resizable";
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { customAlertService } from "./utils/CustomAlertService";
 import { useEnvironmentStore } from "@/store/environmentStore";
 import { toast, initToasts } from "./CustomToast";
+import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 
 type FooterDataType = {
   time: string;
@@ -38,6 +39,15 @@ export default function Footer({
   const { tenant_id, role_id } = useAuthStore();
   const { campaigns, setCampaigns } = useMainStore();
   const { useAlramPopup } = useEnvironmentStore();
+
+  const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
+
+  const debouncedInvalidate = useCallback(
+    debounce(() => {
+      invalidateTreeMenuData();
+    }, 500),
+    [invalidateTreeMenuData]
+  );
 
   useEffect(() => {
     initToasts();
@@ -84,6 +94,25 @@ export default function Footer({
     const today = new Date();
     const _time = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0') + ':' + String(today.getSeconds()).padStart(2, '0');
 
+    // tofix
+    const shouldInvalidateTreeMenu = (
+      // 캠페인 추가/수정/삭제
+      (announce === '/pds/campaign' && ['INSERT', 'UPDATE', 'DELETE'].includes(command)) ||
+      // 캠페인 상태 변경
+      (announce === '/pds/campaign/status' && command === 'UPDATE') ||
+      // 스킬 추가/수정/삭제
+      (announce === '/pds/skill' && ['INSERT', 'UPDATE', 'DELETE'].includes(command)) ||
+      // 캠페인 요구스킬 수정
+      (announce === '/pds/campaign/skill' && command === 'UPDATE') ||
+      // 상담원 리소스 수정/삭제
+      (announce === 'update-agent' && ['UPDATE', 'DELETE'].includes(command))
+    );
+    
+    // 필요한 경우 트리 메뉴 데이터 갱신
+    if (shouldInvalidateTreeMenu) {
+      debouncedInvalidate();
+    }    
+    
     //타입.
     let _type = 'Event';
     if (kind === 'event') {
@@ -376,7 +405,7 @@ export default function Footer({
       ]);
     }
 
-  }, [campaigns, fetchMain, setFooterDataList, tenant_id, useAlramPopup]);
+  }, [campaigns, fetchMain, setFooterDataList, tenant_id, useAlramPopup, debouncedInvalidate]);
 
   // SSE 구독
   useEffect(() => {
