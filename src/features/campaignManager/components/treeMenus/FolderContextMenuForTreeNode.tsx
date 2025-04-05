@@ -17,8 +17,8 @@ export interface FolderContextMenuProps {
 }
 
 export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
-  const { addTab, openedTabs, setActiveTab } = useTabStore();
-  const { selectedMenus, toggleMenu } = useTreeMenuStore(); // 통합 스토어 사용
+  const { addTab, openedTabs, setActiveTab , removeExistingTabsByTabId} = useTabStore();
+  const { selectedMenus, toggleMenu , } = useTreeMenuStore(); // 통합 스토어 사용
   const { availableCampaignTenantContextMenuIds } = useAvailableMenuStore(); // 권한 있는 메뉴 ID 가져오기
 
   // 체크박스가 필요한 메뉴 ID
@@ -40,21 +40,26 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
       menuId: 15,
       title: "새 캠페인",
       handler: () => {
-        if (openedTabs.some((tab) => tab.id === 13)) {
-          setActiveTab(13, "13");
-        } else {
-          addTab({
-            id: 13,
-            uniqueKey: "13",
-            title: "새 캠페인",
-            icon: "",
-            href: "",
-            content: null,
-
-          });
-        }
+        const tenantId = item.id;
+        const newKey = `13-${Date.now()}`;
+    
+        // 💡 새로 추가한 메서드 사용!
+        removeExistingTabsByTabId(13);
+    
+        addTab({
+          id: 13,
+          uniqueKey: newKey,
+          title: "새 캠페인",
+          icon: "",
+          href: "",
+          content: null,
+          params: { tenantId },
+        });
+    
+        setActiveTab(13, newKey);
       },
     },
+      
     {
       id: 22,
       menuId: 16,

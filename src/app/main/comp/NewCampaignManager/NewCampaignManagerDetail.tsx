@@ -1,5 +1,7 @@
+// C:\nproject\fe_pdsw\src\app\main\comp\NewCampaignManager\NewCampaignManagerDetail.tsx
+
 "use client";
-// components/CampaignManager/CampaignManagerDetail.tsx
+
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 import Image from 'next/image'
 import TitleWrap from "@/components/shared/TitleWrap";
@@ -30,6 +32,7 @@ import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import ISelectorForTeanantForCreateNewCampaign from './comp/ISelectorForTeanantForCreateNewCampaign';
 
 export interface TabItem {
   id: number;
@@ -320,7 +323,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
     , selectedCampaign
     , setSelectedCampaign
   } = useMainStore();
-  const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab , setCampaignIdForUpdateFromSideMenu, simulateHeaderMenuClick} = useTabStore();
+  const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab, setCampaignIdForUpdateFromSideMenu, simulateHeaderMenuClick } = useTabStore();
   const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
   const [inputSkills, setInputSkills] = useState('');
   const [inputCallingNumber, setInputCallingNumber] = useState('');
@@ -792,7 +795,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
-    
+
     if (!saveErrorCheck && tempCampaignManagerInfo.campaign_name === '') {
       saveErrorCheck = true;
       setAlertState({
@@ -852,7 +855,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
     onSuccess: (data) => {
       console.log("캠페인 정보 입력 api 결과 : ", data);
       toast.success('캠페인 정보가 저장되었습니다.', { autoClose: 2000 });
-      
+
       // tofix 0405 수정:
       // 1. 현재 캠페인 탭 닫기
       removeTab(Number(activeTabId), activeTabKey + '');
@@ -870,7 +873,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
       //   content: <NewCampaignManagerDetail tenantId={tempCampaignInfo.tenant_id.toString()} />
       // });
       // setActiveTab(newCampaignId, `campaignManager_${newCampaignId}`);
-  
+
       // 추가로 캠페인 스케줄 등록 로직이 필요하면 아래 주석 해제
       // const _tempCampaignSchedule = {
       //   ...tempCampaignSchedule,
@@ -890,7 +893,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
       }
     }
   });
-  
+
 
   const goLogin = () => {
     Cookies.remove('session_key');
@@ -995,7 +998,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
             />
           </div>
 
-          <div className='flex items-center gap-2'>
+          {/* <div className='flex items-center gap-2'>
             <Label className="w-[74px] min-w-[74px]">테넌트</Label>
             <Select
               onValueChange={(value) => handleSelectChange(value, 'tenant')}
@@ -1012,7 +1015,11 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
                 ))}
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
+          <ISelectorForTeanantForCreateNewCampaign
+            tenantId={tenantId}
+            onChange={(value) => handleSelectChange(value.toString(), 'tenant')}
+          />
 
           <div className='flex items-center gap-2'>
             <Label className="w-[74px] min-w-[74px]">캠페인명</Label>

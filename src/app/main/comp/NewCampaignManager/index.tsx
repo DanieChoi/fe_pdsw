@@ -12,18 +12,18 @@ type Props = {
   tenantId?: string;
 }
 
-const NewCampaignManager = ({tenantId}: Props) => {
-  
+const NewCampaignManager = ({ tenantId }: Props) => {
+
   const { tenants } = useMainStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
-  
+
   // const [campaignHeaderSearchParam,setCampaignHeaderSearchParam] = useState<CampaignHeaderSearch>();
   // const handleCampaignHeaderSearch = (param:CampaignHeaderSearch) => {
   //   setCampaignHeaderSearchParam(param);
   // };
-  
+
   // 스케줄 조회
   // const { mutate: fetchSchedules } = useApiForSchedules({
   //   onSuccess: (data) => {
@@ -70,20 +70,20 @@ const NewCampaignManager = ({tenantId}: Props) => {
   //     setPhoneDescriptions(data.result_data);
   //   }
   // });
-  
+
   useEffect(() => {
-    if( typeof tenantId !== 'undefined'){
-      console.log(tenantId);
+    if (typeof tenantId !== 'undefined') {
+      console.log("새캠페인 탭에 전달된 tenant id", tenantId);
     }
   }, [tenantId]);
 
   return (
     <div>
       <div className='flex flex-col gap-[15px]'>
-          <div className="flex gap-[30px]">
-            <NewCampaignManagerDetail tenantId={tenantId}/>
-          </div> 
+        <div className="flex gap-[30px]">
+          <NewCampaignManagerDetail tenantId={tenantId} />
         </div>
+      </div>
     </div>
   )
 }

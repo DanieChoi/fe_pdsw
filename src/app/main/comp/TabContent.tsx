@@ -61,7 +61,7 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
     case 12:
       return <PreferencesBoard />;
     case 13:
-      return <NewCampaignManager />;
+      return <NewCampaignManager tenantId={params?.tenantId} />;
     case 14:
       return <StatusCampaign />;
     case 20:
@@ -89,7 +89,7 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
           <BlackListCountPopup />
         </div>
       );
-      
+
     case 600: // 상담사 스킬 할당 탭
       return (
         <div className="flex justify-left w-full">

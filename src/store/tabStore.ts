@@ -137,6 +137,8 @@ export interface TabLayoutStore {
   closeOtherTabs: (rowId: string, sectionId: string, exceptTabKey: string) => void;
   closeAllTabs: (rowId: string, sectionId: string) => void;
 
+  // 기존 탭 닫기
+  removeExistingTabsByTabId: (tabId: number) => void;
 }
 
 const generateUniqueId = (prefix: string, existingIds: string[]) => {
@@ -1020,5 +1022,14 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
         rows: newRows,
       };
     }),
+
+    removeExistingTabsByTabId: (tabId: number) => {
+      const { openedTabs, removeTab } = get();
+      openedTabs
+        .filter((tab) => tab.id === tabId)
+        .forEach((tab) => {
+          removeTab(tab.id, tab.uniqueKey);
+        });
+    },
 
 }));
