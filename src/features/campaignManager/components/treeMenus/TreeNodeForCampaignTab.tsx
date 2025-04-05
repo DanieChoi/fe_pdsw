@@ -50,8 +50,8 @@ export function TreeNodeForCampaignTab({
     status: currentStatus
   };
 
-  // 캠페인 타입일 경우 hasChildren은 항상 false로 처리
-  const hasChildren = item.type === "campaign" ? false : (item.children && item.children.length > 0);
+  // 캠페인 타입이더라도 실제 자식이 있으면 hasChildren을 true로 설정
+  const hasChildren = item.children && item.children.length > 0;
   const isExpanded = expandedNodes.has(item.id);
   const isSelected = selectedNodeId === item.id;
   const statusIcon = item.type === "campaign" ? getStatusIcon(currentStatus) : null;
@@ -96,10 +96,8 @@ export function TreeNodeForCampaignTab({
     });
   }, [item, setCampaignIdForUpdateFromSideMenu, setCampaignIdForCopyCampaign, addTab]);
 
-  // 뷰 모드가 tenant이고 item.type이 campaign인 경우 렌더링하지 않음
-  // if (viewMode === 'tenant' && item.type === 'campaign') {
-  //   return null;
-  // }
+  // 뷰 모드가 'tenant'이고 item.type이 'campaign'인 경우에 숨김 처리는 삭제
+  // 모든 노드 타입이 항상 표시되도록 함
 
   if (item.visible === false) {
     return null;
@@ -175,6 +173,10 @@ export function TreeNodeForCampaignTab({
             width={12}
             height={12}
             className="flex-shrink-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              onNodeToggle(item.id);
+            }}
           />
         ) : (
           <Image
@@ -183,6 +185,10 @@ export function TreeNodeForCampaignTab({
             width={12}
             height={12}
             className="flex-shrink-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              onNodeToggle(item.id);
+            }}
           />
         )
       ) : (

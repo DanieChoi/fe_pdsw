@@ -23,7 +23,7 @@ export function SortButtonForCampaign() {
     setSelectedNodeType,
   } = useTreeMenuStore();
 
-  // 초기 설정 - 캠페인 모드로 설정하고 모든 노드 확장
+  // 초기 설정 - 캠페인 모드로 설정하고 루트 노드만 확장
   useEffect(() => {
     if (viewMode === null) {
       useTreeMenuStore.getState().setViewMode('campaign');
@@ -91,6 +91,32 @@ export function SortButtonForCampaign() {
 
   const handleViewModeChange = (mode: ViewMode) => {
     console.log("뷰 모드 변경:", mode);
+    
+    // 이미 같은 모드인지 확인
+    if (viewMode === mode) {
+      // 같은 모드라도 확장 상태를 초기화
+      setTimeout(() => {
+        if (mode === 'tenant') {
+          // @ts-expect-error: global window function expandTenantsOnly might not be declared
+          if (window.expandTenantsOnly) {
+            // @ts-expect-error: calling undeclared global function expandTenantsOnly
+            window.expandTenantsOnly();
+          }
+        } else {
+          // @ts-expect-error: global window function expandAllNodes might not be declared
+          if (window.expandAllNodes) {
+            // @ts-expect-error: calling undeclared global function expandAllNodes
+            window.expandAllNodes();
+          }
+        }
+        
+        // 리사이즈 이벤트 발생시켜 UI 업데이트 유도
+        window.dispatchEvent(new Event('resize'));
+      }, 50);
+      return;
+    }
+    
+    // 다른 모드로 변경
     setViewMode(mode);
 
     setTimeout(() => {
@@ -107,6 +133,9 @@ export function SortButtonForCampaign() {
           window.expandAllNodes();
         }
       }
+      
+      // 리사이즈 이벤트 발생시켜 UI 업데이트 유도
+      window.dispatchEvent(new Event('resize'));
     }, 50);
   };
 

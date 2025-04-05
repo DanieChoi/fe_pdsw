@@ -119,10 +119,33 @@ export const useTreeMenuStore = create<TreeMenuState>()(
       
       // 뷰 모드 설정
       setViewMode: (mode) => 
-        set((state) => ({
-          viewMode: mode,
-          // 노드 타입은 변경하지 않음 (정렬 대상과 표시 방식 분리)
-        })),
+        set((state) => {
+          const newState = { viewMode: mode };
+          
+          // 트리 노드 상태 저장/복원
+          if (state.viewMode !== mode) {
+            // 뷰 모드 변경 시 적절한 확장 함수 호출
+            setTimeout(() => {
+              if (mode === 'tenant') {
+                // @ts-expect-error - 전역 객체에 window.expandTenantsOnly 함수가 타입 정의되지 않음
+                if (window.expandTenantsOnly) {
+                  console.log("테넌트 노드만 확장 (모드 변경)");
+                  // @ts-expect-error - 전역 객체에 window.expandTenantsOnly 함수가 타입 정의되지 않음
+                  window.expandTenantsOnly();
+                }
+              } else {
+                // @ts-expect-error - 전역 객체에 window.expandAllNodes 함수가 타입 정의되지 않음
+                if (window.expandAllNodes) {
+                  console.log("모든 노드 확장 (모드 변경)");
+                  // @ts-expect-error - 전역 객체에 window.expandAllNodes 함수가 타입 정의되지 않음
+                  window.expandAllNodes();
+                }
+              }
+            }, 100);
+          }
+          
+          return newState;
+        }),
       
       // 노드 타입 직접 설정
       setSelectedNodeType: (nodeType) => 
