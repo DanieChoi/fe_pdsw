@@ -156,7 +156,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
         ,overdial_abandon_time : campaignInfo.overdial_abandon_time
         ,detect_mode : campaignInfo.detect_mode
         ,auto_dial_interval : campaignInfo.auto_dial_interval
-        ,power_divert_queue : campaignInfo.power_divert_queue
+        ,power_divert_queue : Number(campaignInfo.power_divert_queue)
         ,next_campaign : campaignInfo.next_campaign
         ,DDD_code : campaignInfo.DDD_code
         ,callback_kind : campaignInfo.callback_kind

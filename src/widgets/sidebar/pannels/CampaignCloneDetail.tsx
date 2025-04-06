@@ -929,7 +929,68 @@ export default function CampaignDetail() {
   //캠페인 저장 실행.
   const handleCampaignSaveExecute = () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
-    fetchCampaignManagerInsert(tempCampaignManagerInfo);
+    
+    // Convert CampaignInfoUpdateRequest to MainDataResponse format
+    const campaignData: MainDataResponse = {
+      campaign_id: tempCampaignManagerInfo.campaign_id,
+      campaign_name: tempCampaignManagerInfo.campaign_name,
+      campaign_desc: tempCampaignManagerInfo.campaign_desc,
+      site_code: tempCampaignManagerInfo.site_code,
+      service_code: tempCampaignManagerInfo.service_code,
+      start_flag: tempCampaignManagerInfo.start_flag,
+      end_flag: tempCampaignManagerInfo.end_flag,
+      dial_mode: tempCampaignManagerInfo.dial_mode,
+      callback_kind: tempCampaignManagerInfo.callback_kind,
+      delete_flag: tempCampaignManagerInfo.delete_flag,
+      list_count: tempCampaignManagerInfo.list_count,
+      list_redial_query: tempCampaignManagerInfo.list_redial_query,
+      next_campaign: tempCampaignManagerInfo.next_campaign,
+      token_id: tempCampaignManagerInfo.token_id,
+      phone_order: tempCampaignManagerInfo.phone_order,
+      phone_dial_try: [
+        tempCampaignManagerInfo.phone_dial_try1,
+        tempCampaignManagerInfo.phone_dial_try2,
+        tempCampaignManagerInfo.phone_dial_try3,
+        tempCampaignManagerInfo.phone_dial_try4,
+        tempCampaignManagerInfo.phone_dial_try5
+      ],
+      dial_try_interval: tempCampaignManagerInfo.dial_try_interval,
+      trunk_access_code: tempCampaignManagerInfo.trunk_access_code,
+      DDD_code: tempCampaignManagerInfo.DDD_code,
+      power_divert_queue: Number(tempCampaignManagerInfo.power_divert_queue),
+      max_ring: tempCampaignManagerInfo.max_ring,
+      detect_mode: tempCampaignManagerInfo.detect_mode,
+      auto_dial_interval: tempCampaignManagerInfo.auto_dial_interval,
+      creation_user: tempCampaignManagerInfo.creation_user,
+      creation_time: tempCampaignManagerInfo.creation_time,
+      creation_ip: tempCampaignManagerInfo.creation_ip,
+      update_user: tempCampaignManagerInfo.update_user,
+      update_time: tempCampaignManagerInfo.update_time,
+      update_ip: tempCampaignManagerInfo.update_ip,
+      dial_phone_id: tempCampaignManagerInfo.dial_phone_id,
+      tenant_id: tempCampaignManagerInfo.tenant_id,
+      alarm_answer_count: tempCampaignManagerInfo.alarm_answer_count,
+      dial_speed: tempCampaignManagerInfo.dial_speed,
+      parent_campaign: tempCampaignManagerInfo.parent_campaign,
+      overdial_abandon_time: tempCampaignManagerInfo.overdial_abandon_time,
+      list_alarm_count: tempCampaignManagerInfo.list_alarm_count,
+      supervisor_phone: tempCampaignManagerInfo.supervisor_phone,
+      reuse_count: tempCampaignManagerInfo.reuse_count,
+      use_counsel_result: tempCampaignManagerInfo.use_counsel_result,
+      use_list_alarm: tempCampaignManagerInfo.use_list_alarm,
+      redial_strategy: [
+        tempCampaignManagerInfo.redial_strategy1,
+        tempCampaignManagerInfo.redial_strategy2,
+        tempCampaignManagerInfo.redial_strategy3,
+        tempCampaignManagerInfo.redial_strategy4,
+        tempCampaignManagerInfo.redial_strategy5
+      ],
+      dial_mode_option: tempCampaignManagerInfo.dial_mode_option,
+      user_option: tempCampaignManagerInfo.user_option,
+      campaign_status: 0
+    };
+    
+    fetchCampaignManagerInsert(campaignData);
   }
 
   //캠페인 정보 수정 api 호출

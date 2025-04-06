@@ -61,7 +61,7 @@ export interface MainDataResponse {
   dial_try_interval: number;
   trunk_access_code: string;
   DDD_code: string;
-  power_divert_queue: number;
+  power_divert_queue: number | string;
   max_ring: number;
   detect_mode: number;
   auto_dial_interval: number;
@@ -85,6 +85,25 @@ export interface MainDataResponse {
   redial_strategy: string[];
   dial_mode_option: number;
   user_option: string;
+  customer_char_id?: number;
+  counsel_script_id?: number;
+  announcement_id?: number;
+  campaign_level?: number;
+  outbound_sequence?: string;
+
+  phone_dial_try1?: 0,
+  phone_dial_try2?: 0,
+  phone_dial_try3?: 0,
+  phone_dial_try4?: 0,
+  phone_dial_try5?: 0,
+
+  redial_strategy1?: string,
+  redial_strategy2?: string,  
+  redial_strategy3?: string,
+  redial_strategy4?: string,
+  redial_strategy5?: string,
+  
+
 }
 
 // 메인 응답 데이터 타입
@@ -153,7 +172,7 @@ export interface CampaignInfoUpdateRequest {
   dial_try_interval: number;  
   trunk_access_code: string;
   DDD_code: string;
-  power_divert_queue: number;
+  power_divert_queue: number | string;
   max_ring: number;
   detect_mode: number;
   auto_dial_interval: number;

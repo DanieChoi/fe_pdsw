@@ -1,11 +1,13 @@
 // src/features/campaignManager/hooks/useApiForCampaignManagerInsert.ts
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchCampaignManagerInsert } from '../api/mainCampaignManagerInsert';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { CampaignInfoUpdateRequest, CampaignInsertResponse, CampaignApiError } from '../types/campaignManagerIndex';
+import { CampaignInsertResponse, CampaignApiError, CampaignInfoUpdateRequest } from '../types/campaignManagerIndex';
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
 
 export function useApiForCampaignManagerInsert(
-  options?: UseMutationOptions<CampaignInsertResponse, CampaignApiError, CampaignInfoUpdateRequest>
+  options?: UseMutationOptions<CampaignInsertResponse, CampaignApiError, MainDataResponse | CampaignInfoUpdateRequest>
 ) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -18,12 +20,9 @@ export function useApiForCampaignManagerInsert(
       });
       options?.onSuccess?.(data, variables, context);
 
-    queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu"] });
-
+      queryClient.invalidateQueries({ queryKey: ['treeMenuDataForSideMenu'] });
     },
-    onError: (error: CampaignApiError, variables: CampaignInfoUpdateRequest, context: unknown) => {
-      // console.error('API Error:', error);
-      // toast.error(error.message || '데이터 로드에 실패했습니다.');
+    onError: (error: CampaignApiError, variables: MainDataResponse, context: unknown) => {
       options?.onError?.(error, variables, context);
     },
   });
