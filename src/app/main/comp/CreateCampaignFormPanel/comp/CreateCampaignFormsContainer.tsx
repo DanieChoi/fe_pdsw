@@ -5,9 +5,6 @@
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 import Image from 'next/image'
 import TitleWrap from "@/components/shared/TitleWrap";
-import { Label } from "@/components/ui/label";
-import { CustomInput } from "@/components/shared/CustomInput";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import CampaignTab from '../../CampaignManager/CampaignTab';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import {
@@ -18,21 +15,14 @@ import {
   , CampaignDialSpeedUpdateRequest
 } from '@/features/campaignManager/types/campaignManagerIndex';
 import { useEffect, useState } from 'react';
-import SkillListPopup from '@/components/shared/layout/SkillListPopup';
-import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
 import { useApiForCampaignManagerInsert } from '@/features/campaignManager/hooks/useApiForCampaignManagerInsert';
 import { useApiForCampaignScheduleInsert } from '@/features/campaignManager/hooks/useApiForCampaignScheduleInsert';
-import { useApiForDialSpeedUpdate } from '@/features/campaignManager/hooks/useApiForDialSpeedUpdate';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
-import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
-import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
-import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
+
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
-import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import ISelectorForTeanantForCreateNewCampaign from './ISelectorForTeanantForCreateNewCampaign';
 import CampaignBasicInfoForm from './CampaignBasicInfoForm';
 
 export interface TabItem {
@@ -308,7 +298,7 @@ const CreateCampaignFormsContainer: React.FC<Props> = ({ tenantId }: Props) => {
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
-  const [tempCallingNumberInfo, setTempCallingNumberInfo] = useState<CallingNumberListDataResponse>(CallingNumberInfo);
+  // const [tempCallingNumberInfo, setTempCallingNumberInfo] = useState<CallingNumberListDataResponse>(CallingNumberInfo);
   const [tempCampaignSchedule, setTempCampaignSchedule] = useState<CampaignScheDuleListDataResponse>(CampaignScheduleInfo);
   const [tempCampaignDialSpeedInfo, setTempCampaignDialSpeedInfo] = useState<CampaignDialSpeedUpdateRequest>(CampaignDialSpeedInfo);
   const [tempCampaignDialSpeedInfoParam, setTempCampaignDialSpeedInfoParam] = useState<CallPacingTabParam>(CampaignCallPacingTabInfo);
@@ -327,7 +317,7 @@ const CreateCampaignFormsContainer: React.FC<Props> = ({ tenantId }: Props) => {
   const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab, setCampaignIdForUpdateFromSideMenu, simulateHeaderMenuClick } = useTabStore();
   const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
   const [inputSkills, setInputSkills] = useState('');
-  const [inputCallingNumber, setInputCallingNumber] = useState('');
+  // const [inputCallingNumber, setInputCallingNumber] = useState('');
   const [skillPopupState, setSkillPopupState] = useState({
     isOpen: false,
     param: [],
@@ -335,14 +325,14 @@ const CreateCampaignFormsContainer: React.FC<Props> = ({ tenantId }: Props) => {
     type: '1',
   });
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
-  const [callingNumberPopupState, setCallingNumberPopupState] = useState({
-    isOpen: false,
-    param: [],
-    tenantId: 0,
-    type: '1',
-  });
+  // const [callingNumberPopupState, setCallingNumberPopupState] = useState({
+  //   isOpen: false,
+  //   param: [],
+  //   tenantId: 0,
+  //   type: '1',
+  // });
   const router = useRouter();
-  const [campaignNewId, setCampaignNewId] = useState<number>(0);
+  // const [campaignNewId, setCampaignNewId] = useState<number>(0);
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
@@ -357,30 +347,30 @@ const CreateCampaignFormsContainer: React.FC<Props> = ({ tenantId }: Props) => {
     setChangeYn(true);
     setCampaignInfoChangeYn(true);
     if (col === 'campaign_id' && value !== '') {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo,
-        campaign_id: Number(value)
-      });
+      // setTempCampaignsInfo({
+      //   ...tempCampaignInfo,
+      //   campaign_id: Number(value)
+      // });
       setTempCampaignManagerInfo({
         ...tempCampaignManagerInfo,
         campaign_id: Number(value)
       });
     }
     if (col === 'campaign_name') {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo,
-        campaign_name: value
-      });
+      // setTempCampaignsInfo({
+      //   ...tempCampaignInfo,
+      //   campaign_name: value
+      // });
       setTempCampaignManagerInfo({
         ...tempCampaignManagerInfo,
         campaign_name: value
       });
     }
     if (col === 'campaign_desc') {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo,
-        campaign_desc: value
-      });
+      // setTempCampaignsInfo({
+      //   ...tempCampaignInfo,
+      //   campaign_desc: value
+      // });
       setTempCampaignManagerInfo({
         ...tempCampaignManagerInfo,
         campaign_desc: value
@@ -420,24 +410,24 @@ const CreateCampaignFormsContainer: React.FC<Props> = ({ tenantId }: Props) => {
   }
 
   //스킬 선택 팝업 버튼이벤트
-  const handleOpenSkillPopup = () => {
+  // const handleOpenSkillPopup = () => {
 
-    console.log(tempCampaignInfo.tenant_id);
-    if (tempCampaignInfo.tenant_id < 0 && tenantId === undefined) {
-      setAlertState({
-        ...errorMessage,
-        isOpen: true,
-        message: '테넌트를 선택해 주세요.',
-        type: '2',
-        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
-      });
-    } else {
-      setSkillPopupState({
-        ...skillPopupState,
-        isOpen: true,
-      });
-    }
-  }
+  //   console.log(tempCampaignInfo.tenant_id);
+  //   if (tempCampaignInfo.tenant_id < 0 && tenantId === undefined) {
+  //     setAlertState({
+  //       ...errorMessage,
+  //       isOpen: true,
+  //       message: '테넌트를 선택해 주세요.',
+  //       type: '2',
+  //       onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+  //     });
+  //   } else {
+  //     setSkillPopupState({
+  //       ...skillPopupState,
+  //       isOpen: true,
+  //     });
+  //   }
+  // }
 
   //스킬 선택 팝업
   const handleSelectSkills = (param: string) => {
@@ -455,19 +445,19 @@ const CreateCampaignFormsContainer: React.FC<Props> = ({ tenantId }: Props) => {
   }
 
   //발신번호 팝업
-  const handleCallingNumlber = (param: string) => {
-    if (inputCallingNumber !== param) {
-      setChangeYn(true);
-      setCallingNumberChangeYn(true);
-      setInputCallingNumber(param);
-      setTempCallingNumberInfo({
-        ...tempCallingNumberInfo
-        , campaign_id: tempCampaignInfo.campaign_id
-        , calling_number: param
-      });
-    }
-    setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))
-  }
+  // const handleCallingNumlber = (param: string) => {
+  //   if (inputCallingNumber !== param) {
+  //     setChangeYn(true);
+  //     setCallingNumberChangeYn(true);
+  //     setInputCallingNumber(param);
+  //     setTempCallingNumberInfo({
+  //       ...tempCallingNumberInfo
+  //       , campaign_id: tempCampaignInfo.campaign_id
+  //       , calling_number: param
+  //     });
+  //   }
+  //   setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))
+  // }
 
   //캠페인 동작시간 탭 변경
   const handleCampaignScheduleChange = (value: OperationTimeParam) => {
@@ -916,9 +906,9 @@ const CreateCampaignFormsContainer: React.FC<Props> = ({ tenantId }: Props) => {
 
         <CampaignBasicInfoForm
           tenantId={tenantId}
-          tempCampaignInfo={tempCampaignInfo}
+          // tempCampaignInfo={tempCampaignInfo}
+          tempCampaignInfo={tempCampaignManagerInfo}
           inputSkills={inputSkills}
-          inputCallingNumber={inputCallingNumber}
           onInputChange={handleInputData}
           onSelectChange={handleSelectChange}
           onUpdateSkill={(param) => handleSelectSkills(param)}
@@ -951,13 +941,6 @@ const CreateCampaignFormsContainer: React.FC<Props> = ({ tenantId }: Props) => {
         onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
       />
 
-      <CallingNumberPopup
-        param={inputCallingNumber}
-        type={callingNumberPopupState.type}
-        isOpen={callingNumberPopupState.isOpen}
-        onConfirm={(param) => handleCallingNumlber(param)}
-        onCancle={() => setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))}
-      />
     </div>
   );
 

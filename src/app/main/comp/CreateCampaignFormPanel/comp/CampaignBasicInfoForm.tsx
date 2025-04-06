@@ -21,7 +21,6 @@ type Props = {
   tempCampaignInfo: any;
   inputSkills: string;
   onUpdateSkill: (param: string) => void;
-  inputCallingNumber: string;
   onInputChange: (value: string, field: string) => void;
   onSelectChange: (value: string, field: 'tenant' | 'dialMode') => void;
 }
@@ -31,7 +30,6 @@ const CampaignBasicInfoForm = ({
   tempCampaignInfo,
   inputSkills,
   onUpdateSkill,
-  inputCallingNumber,
   onInputChange,
   onSelectChange
 }: Props) => {
@@ -106,7 +104,8 @@ const CampaignBasicInfoForm = ({
 
         <div className='flex items-center gap-2'>
           <Label className="w-[74px] min-w-[74px]">발신번호</Label>
-          <CustomInput value={inputCallingNumber} className="w-full" readOnly />
+          {/* <CustomInput value={inputCallingNumber} className="w-full" readOnly /> */}
+          <CustomInput value={""} className="w-full" readOnly />
         </div>
 
         <div className="flex items-center gap-2 col-span-3">
