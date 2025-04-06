@@ -40,6 +40,7 @@ export const renderTabContent = (tabId: number | null) => {
     case 12:
       return <PreferencesBoard />;
     case 13:
+      // 캠페인 생성 폼을 출력하는 컴포넌트
       return <CreateCampaignFormPanel />;
     case 14:
       return <StatusCampaign />;

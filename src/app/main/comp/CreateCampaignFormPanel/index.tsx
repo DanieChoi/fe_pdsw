@@ -1,12 +1,12 @@
 // C:\Users\terec\fe_pdsw\src\app\main\comp\CampaignManager\index.tsx
 import React, { useState, useEffect } from 'react'
-import NewCampaignManagerDetail from './CreateCampaignFormPanel';
 // import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 // import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 // import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
 // import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 // import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
+import CreateCampaignFormsContainer from './comp/CreateCampaignFormsContainer';
 
 type Props = {
   tenantId?: string;
@@ -81,7 +81,7 @@ const CreateCampaignFormPanel = ({ tenantId }: Props) => {
     <div>
       <div className='flex flex-col gap-[15px]'>
         <div className="flex gap-[30px]">
-          <NewCampaignManagerDetail tenantId={tenantId} />
+          <CreateCampaignFormsContainer tenantId={tenantId} />
         </div>
       </div>
     </div>

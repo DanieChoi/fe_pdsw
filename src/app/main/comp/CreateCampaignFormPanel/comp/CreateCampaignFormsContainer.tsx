@@ -8,7 +8,7 @@ import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
-import CampaignTab from '../CampaignManager/CampaignTab';
+import CampaignTab from '../../CampaignManager/CampaignTab';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import {
   CampaignSkillUpdateRequest
@@ -32,7 +32,8 @@ import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import ISelectorForTeanantForCreateNewCampaign from './comp/ISelectorForTeanantForCreateNewCampaign';
+import ISelectorForTeanantForCreateNewCampaign from './ISelectorForTeanantForCreateNewCampaign';
+import CampaignBasicInfoForm from './CampaignBasicInfoForm';
 
 export interface TabItem {
   id: number;
@@ -303,7 +304,7 @@ type Props = {
   tenantId?: string;
 }
 
-const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
+const CreateCampaignFormsContainer: React.FC<Props> = ({ tenantId }: Props) => {
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
@@ -829,7 +830,6 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
   //캠페인 저장 실행.
   const handleCampaignSaveExecute = () => {
     console.log("tempCampaignManagerInfo at save !!!!!!!!!!!!!", tempCampaignManagerInfo);
-    setAlertState((prev) => ({ ...prev, isOpen: false }));
     fetchCampaignManagerInsert(tempCampaignManagerInfo);
   }
 
@@ -858,33 +858,19 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
   const { mutate: fetchCampaignManagerInsert } = useApiForCampaignManagerInsert({
     onSuccess: (data) => {
       console.log("캠페인 정보 입력 api 결과 : ", data);
-      toast.success('캠페인 정보가 저장되었습니다.', { autoClose: 2000 });
-
-      // tofix 0405 수정:
-      // 1. 현재 캠페인 탭 닫기
       removeTab(Number(activeTabId), activeTabKey + '');
-
       const newCampaignId = data.result_data.campaign_id;
-
       simulateHeaderMenuClick(2);
       setCampaignIdForUpdateFromSideMenu(newCampaignId.toString());
-
-      //   id: newCampaignId,
-      //   uniqueKey: `campaignManager_${newCampaignId}`,
-      //   title: `캠페인 관리 (${newCampaignId})`,
-      //   icon: 'campaignIcon', // 필요시 아이콘 수정
-      //   href: `/campaignManager/detail?campaignId=${newCampaignId}`,
-      //   content: <NewCampaignManagerDetail tenantId={tempCampaignInfo.tenant_id.toString()} />
-      // });
-      // setActiveTab(newCampaignId, `campaignManager_${newCampaignId}`);
-
-      // 추가로 캠페인 스케줄 등록 로직이 필요하면 아래 주석 해제
+      
+      // 캠페인 스케쥴 저장은 따로 api 를 날려야함 
       const _tempCampaignSchedule = {
         ...tempCampaignSchedule,
         campaign_id: newCampaignId
       }
       fetchCampaignScheduleInsert(_tempCampaignSchedule);
     },
+
     onError: (data) => {
       if (data.message.split('||')[0] === '5') {
         setAlertState({
@@ -904,78 +890,15 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
     router.push('/login');
   }
 
-  //캠페인 스킬 조회 api 호출
-  const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
-    onSuccess: (data) => {
-      setCampaignSkills(data.result_data);
-      setCampaignSkillChangeYn(false);
-    }
-  });
-
-  //캠페인 스킬 수정 api 호출
-  const { mutate: fetchCampaignSkillUpdate } = useApiForCampaignSkillUpdate({
-    onSuccess: (data) => {
-      fetchCampaignSkills({
-        session_key: '',
-        tenant_id: 0,
-      });
-    }
-  });
-
-  // 캠페인 스케줄 조회
-  const { mutate: fetchSchedules } = useApiForSchedules({
-    onSuccess: (data) => {
-      setSchedules(data.result_data);
-      setCampaignScheduleChangeYn(false);
-      if (changeYn) {
-        if (campaignSkillChangeYn) {
-          const _tempCampaignSkills = {
-            ...tempCampaignSkills,
-            campaign_id: campaignNewId
-          }
-          //캠페인 스킬 수정 api 호출
-          fetchCampaignSkillUpdate(_tempCampaignSkills);
-        }
-        if (campaignDialSpeedChangeYn) {
-          const _tempCampaignDialSpeedInfo = {
-            ...tempCampaignDialSpeedInfo,
-            campaign_id: campaignNewId
-          }
-          //캠페인 발신 속도 수정 api 호출
-          fetchDialSpeedUpdate(_tempCampaignDialSpeedInfo);
-        }
-      }
-    }
-  });
 
   //캠페인 스케줄 등록 api 호출
   const { mutate: fetchCampaignScheduleInsert } = useApiForCampaignScheduleInsert({
     onSuccess: (data) => {
-      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
-      fetchSchedules({
-        tenant_id_array: tempTenantIdArray
-      });
+      toast.success('캠페인 스케줄이 저장되었습니다.', { autoClose: 2000 });
+
     }
     , onError: (data) => {
-      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
-      fetchSchedules({
-        tenant_id_array: tempTenantIdArray
-      });
-    }
-  });
-
-  //캠페인 발신 속도 수정 api 호출
-  const { mutate: fetchDialSpeedUpdate } = useApiForDialSpeedUpdate({
-    onSuccess: (data) => {
-      setCampaignDialSpeedChangeYn(false);
-    }
-  });
-
-  // 전화번호 조회
-  const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
-    onSuccess: (data) => {
-      setCallingNumbers(data.result_data || []);
-      setCallingNumberChangeYn(false);
+      toast.error('캠페인 스케줄 저장에 실패했습니다.', { autoClose: 2000 });
     }
   });
 
@@ -986,89 +909,25 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
           className='border-b border-gray-300 pb-1'
           title="캠페인정보"
           buttons={[
-            { label: "캠페인 생성", onClick: () => handleCampaignSave(), },
+            { label: "캠페인 생성", onClick: () => handleCampaignSave() },
             { label: "생성 취소", onClick: () => handleCampaignClosed() },
           ]}
         />
-        <div className="grid grid-cols-3 gap-x-[24px] gap-y-2">
-          <div className='flex items-center gap-2'>
-            <Label className="w-[90px] min-w-[90px]">캠페인 아이디</Label>
-            <CustomInput
-              type="number"
-              value={tempCampaignInfo.campaign_id}
-              onChange={(e) => handleInputData(e.target.value, 'campaign_id')}
-              className=""
-              min="0"
-            />
-          </div>
 
-          {/* 테넌트*/}
-          <ISelectorForTeanantForCreateNewCampaign
-            tenantId={tenantId}
-            onChange={(value) => handleSelectChange(value.toString(), 'tenant')}
-          />
-
-          <div className='flex items-center gap-2'>
-            <Label className="w-[74px] min-w-[74px]">캠페인명</Label>
-            <CustomInput
-              value={tempCampaignInfo.campaign_name || ''}
-              onChange={(e) => handleInputData(e.target.value, 'campaign_name')}
-              className=""
-            />
-          </div>
-
-          <div className='flex items-center gap-2'>
-            <Label className="w-[90px] min-w-[90px]">다이얼 모드</Label>
-            <Select
-              onValueChange={(value) => handleSelectChange(value, 'dialMode')}
-              value={tempCampaignInfo.dial_mode + ''}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="다이얼 모드를 선택하세요" />
-              </SelectTrigger>
-              <SelectContent>
-                {dialModeList.map(option => (
-                  <SelectItem key={option.dial_id} value={option.dial_id.toString()}>
-                    {option.dial_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className='flex items-center gap-2 relative'>
-            <Label className="w-[74px] min-w-[74px]">스킬</Label>
-            <CustomInput value={inputSkills} className="w-full" readOnly />
-            <button
-              className="absolute right-2 top-[52%] transform -translate-y-1/2">
-              <Image
-                src="/skill-popup.svg"
-                alt="스킬팝업"
-                width={12}
-                height={12}
-                priority
-                onClick={() => handleOpenSkillPopup()}
-              />
-            </button>
-          </div>
-
-          <div className='flex items-center gap-2'>
-            <Label className="w-[74px] min-w-[74px]">발신번호</Label>
-            <CustomInput value={inputCallingNumber} className="w-full"
-              disabled={selectedCampaign !== null} readOnly
-            />
-          </div>
-          <div className="flex items-center gap-2 col-span-3">
-            <Label className="w-[90px] min-w-[90px]">설명</Label>
-            <CustomInput value={tempCampaignInfo.campaign_desc || ''} className="w-full"
-              onChange={(e) => handleInputData(e.target.value, 'campaign_desc')}
-            />
-          </div>
-        </div>
+        <CampaignBasicInfoForm
+          tenantId={tenantId}
+          tempCampaignInfo={tempCampaignInfo}
+          inputSkills={inputSkills}
+          inputCallingNumber={inputCallingNumber}
+          onInputChange={handleInputData}
+          onSelectChange={handleSelectChange}
+          onUpdateSkill={(param) => handleSelectSkills(param)}
+        />
       </div>
+
       <div>
-        {/* menu-address 동작 시간, 발신 순서, 발신 전략, 발신 방법, 콜페이싱, 콜백, 알림, 할당상담사, 기타정보 */}
-        <CampaignTab campaignSchedule={tempCampaignSchedule}
+        <CampaignTab
+          campaignSchedule={tempCampaignSchedule}
           callCampaignMenu={'NewCampaignManager'}
           campaignInfo={tempCampaignInfo}
           campaignDialSpeedInfo={tempCampaignDialSpeedInfoParam}
@@ -1082,23 +941,16 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
           onHandleNotificationTabChange={(value) => handleNotificationTabChange(value)}
         />
       </div>
-      <SkillListPopup
-        param={tempCampaignSkills.skill_id || []}
-        tenantId={tempCampaignInfo.tenant_id}
-        type={skillPopupState.type}
-        isOpen={skillPopupState.isOpen}
-        onConfirm={(param) => handleSelectSkills(param)}
-        onCancle={() => setSkillPopupState((prev) => ({ ...prev, isOpen: false }))}
-      />
+
       <CustomAlert
         message={alertState.message}
         title={alertState.title}
         type={alertState.type}
         isOpen={alertState.isOpen}
-        onClose={() => {
-          alertState.onClose()
-        }}
-        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
+        onClose={() => alertState.onClose()}
+        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
+      />
+
       <CallingNumberPopup
         param={inputCallingNumber}
         type={callingNumberPopupState.type}
@@ -1108,5 +960,6 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
       />
     </div>
   );
+
 }
-export default NewCampaignManagerDetail
+export default CreateCampaignFormsContainer
