@@ -28,7 +28,7 @@ const ISelectorForTeanantForCreateNewCampaign = ({ tenantId, onChange }: Props) 
 
   return (
     <div className="flex items-center gap-2">
-      <Label className="w-[74px] min-w-[74px]">테넌트 {selectedTenantId}</Label>
+      <Label className="w-[74px] min-w-[74px]">테넌트</Label>
       <Select
         onValueChange={handleChange}
         value={selectedTenantId}

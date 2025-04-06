@@ -422,7 +422,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
   const handleOpenSkillPopup = () => {
 
     console.log(tempCampaignInfo.tenant_id);
-    if (tempCampaignInfo.tenant_id < 0) {
+    if (tempCampaignInfo.tenant_id < 0 && tenantId === undefined) {
       setAlertState({
         ...errorMessage,
         isOpen: true,
@@ -767,12 +767,16 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
   }
 
   //캠페인 저장
+  // tofix 0405 
+  // 동작 시간 설정 안했을시 
   const handleCampaignSave = () => {
     console.log(tempCampaignManagerInfo);
     console.log('power_divert_queue :: ' + tempCampaignManagerInfo.power_divert_queue);
+    console.log('tenant_id :: ' + tenantId);
+
     let saveErrorCheck = false;
 
-    if (!saveErrorCheck && tempCampaignManagerInfo.tenant_id < 0) {
+    if (!saveErrorCheck && tempCampaignManagerInfo.tenant_id < 0 && tenantId === "") {
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -783,8 +787,18 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
       });
     }
 
+    if (!saveErrorCheck && tempCampaignSchedule.start_time.length === 0) {
+      saveErrorCheck = true;
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "시작시간 또는 종료시간을 지정해 주세요.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
+
     //2018.11.27 Gideon #23127 캠페인 수정창 연결 IVR 입력 예외 처리
-    // if( tempCampaignManagerInfo.dial_mode === 1 && (tempCampaignManagerInfo.token_id === 0 || tempCampaignManagerInfo.token_id === 3) ){
     if (!saveErrorCheck && tempCampaignManagerInfo.power_divert_queue === '0' || tempCampaignManagerInfo.power_divert_queue === '') {
       saveErrorCheck = true;
       setAlertState({
@@ -807,17 +821,6 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
       });
     }
 
-    if (!saveErrorCheck && tempCampaignSchedule.start_time.length === 0) {
-      saveErrorCheck = true;
-      setAlertState({
-        ...errorMessage,
-        isOpen: true,
-        message: "시작시간 또는 종료시간을 지정해 주세요.",
-        type: '2',
-        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
-      });
-    }
-
     if (!saveErrorCheck) {
       handleCampaignSaveExecute();
     }
@@ -825,6 +828,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
 
   //캠페인 저장 실행.
   const handleCampaignSaveExecute = () => {
+    console.log("tempCampaignManagerInfo at save !!!!!!!!!!!!!", tempCampaignManagerInfo);
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     fetchCampaignManagerInsert(tempCampaignManagerInfo);
   }
@@ -875,11 +879,11 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
       // setActiveTab(newCampaignId, `campaignManager_${newCampaignId}`);
 
       // 추가로 캠페인 스케줄 등록 로직이 필요하면 아래 주석 해제
-      // const _tempCampaignSchedule = {
-      //   ...tempCampaignSchedule,
-      //   campaign_id: newCampaignId
-      // }
-      // fetchCampaignScheduleInsert(_tempCampaignSchedule);
+      const _tempCampaignSchedule = {
+        ...tempCampaignSchedule,
+        campaign_id: newCampaignId
+      }
+      fetchCampaignScheduleInsert(_tempCampaignSchedule);
     },
     onError: (data) => {
       if (data.message.split('||')[0] === '5') {
@@ -998,24 +1002,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
             />
           </div>
 
-          {/* <div className='flex items-center gap-2'>
-            <Label className="w-[74px] min-w-[74px]">테넌트</Label>
-            <Select
-              onValueChange={(value) => handleSelectChange(value, 'tenant')}
-              value={tempCampaignInfo.tenant_id + '' || ''}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="테넌트를 선택하세요" />
-              </SelectTrigger>
-              <SelectContent>
-                {tenants.map(option => (
-                  <SelectItem key={option.tenant_id} value={option.tenant_id.toString()}>
-                    {option.tenant_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div> */}
+          {/* 테넌트*/}
           <ISelectorForTeanantForCreateNewCampaign
             tenantId={tenantId}
             onChange={(value) => handleSelectChange(value.toString(), 'tenant')}
@@ -1080,6 +1067,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId }: Props) => {
         </div>
       </div>
       <div>
+        {/* menu-address 동작 시간, 발신 순서, 발신 전략, 발신 방법, 콜페이싱, 콜백, 알림, 할당상담사, 기타정보 */}
         <CampaignTab campaignSchedule={tempCampaignSchedule}
           callCampaignMenu={'NewCampaignManager'}
           campaignInfo={tempCampaignInfo}

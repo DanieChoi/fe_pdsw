@@ -4,6 +4,9 @@ import { fetchCampaignScheduleInsert } from '../api/mainCampaignScheduleInsert';
 import { UseMutationOptions } from '@tanstack/react-query';
 import { CampaignScheDuleListDataResponse, UpdateResponse, CampaignApiError } from '../types/campaignManagerIndex';
 
+// 요청 타입: CampaignScheDuleListDataResponse
+// 응답 타입: UpdateResponse
+// 에러 타입: CampaignApiError
 export function useApiForCampaignScheduleInsert(
   options?: UseMutationOptions<UpdateResponse, CampaignApiError, CampaignScheDuleListDataResponse>
 ) {

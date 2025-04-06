@@ -33,6 +33,8 @@ export function TreeNodeForCampaignTab({
 
   // Get the most current status from the campaigns store
   const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
+  const isTenantFolder = item.type === "folder" && level === 1;
+
   const currentStatus = currentCampaign ? 
     (() => {
       switch (currentCampaign.campaign_status) {
@@ -187,7 +189,7 @@ export function TreeNodeForCampaignTab({
             className="flex-shrink-0"
             onClick={(e) => {
               e.stopPropagation();
-              onNodeToggle(item.id);
+              onNodeToggle(item.type === "folder-node" && item.id);
             }}
           />
         )
@@ -196,7 +198,7 @@ export function TreeNodeForCampaignTab({
       )}
       {getNodeIcon()}
       <span className={textStyle}>
-        {item.label}
+        {item.label}{(isTenantFolder || item.type === "campaign") && ` (${item.id})`}
       </span>
     </div>
   );

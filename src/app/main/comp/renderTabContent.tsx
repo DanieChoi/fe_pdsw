@@ -8,10 +8,10 @@ import ChannelMonitor from "@/app/main/comp/ChannelMonitor";
 import ListManager from "@/app/main/comp/ListManager";
 import OperationBoard from "@/app/main/comp/operation";
 import CampaignGroupManager from "@/app/main/comp/CampaignGroupManager";
-import NewCampaignManager from "@/app/main/comp/NewCampaignManager";
 import RebroadcastSettingsPanel from "@/app/main/comp/RebroadcastSettingsPanel";
 import RebroadcastSettingsGroupPanel from "@/app/main/comp/RebroadcastSettingsGroupPanel";
 import CampaignManager from "@/app/main/comp/CampaignManager";
+import CreateCampaignFormPanel from "./CreateCampaignFormPanel";
 
 export const renderTabContent = (tabId: number | null) => {
   switch (tabId) {
@@ -40,7 +40,7 @@ export const renderTabContent = (tabId: number | null) => {
     case 12:
       return <PreferencesBoard />;
     case 13:
-      return <NewCampaignManager />;
+      return <CreateCampaignFormPanel />;
     case 14:
       return <StatusCampaign />;
     case 20:

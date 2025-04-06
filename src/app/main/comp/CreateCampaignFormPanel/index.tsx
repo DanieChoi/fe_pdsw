@@ -1,6 +1,6 @@
 // C:\Users\terec\fe_pdsw\src\app\main\comp\CampaignManager\index.tsx
 import React, { useState, useEffect } from 'react'
-import NewCampaignManagerDetail from './NewCampaignManagerDetail';
+import NewCampaignManagerDetail from './CreateCampaignFormPanel';
 // import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 // import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 // import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
@@ -12,7 +12,7 @@ type Props = {
   tenantId?: string;
 }
 
-const NewCampaignManager = ({ tenantId }: Props) => {
+const CreateCampaignFormPanel = ({ tenantId }: Props) => {
 
   const { tenants } = useMainStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
@@ -88,4 +88,4 @@ const NewCampaignManager = ({ tenantId }: Props) => {
   )
 }
 
-export default NewCampaignManager
+export default CreateCampaignFormPanel
