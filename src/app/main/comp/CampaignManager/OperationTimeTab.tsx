@@ -14,6 +14,7 @@ import { CampaignScheDuleListDataResponse } from "@/features/campaignManager/typ
 import CustomAlert, { CustomAlertRequest } from "@/components/shared/layout/CustomAlert";
 import { MainDataResponse } from "@/features/auth/types/mainIndex";
 import CustomInputForTime from "@/components/shared/CustomInputForTime";
+import { CalendarHeadless } from "@/components/shared/CalendarRadix";
 
 interface DataProps {
   no: number;
@@ -222,7 +223,7 @@ const OperationTimeTab: React.FC<Props> = ({
               />
             </div>
 
-            <div className="flex items-center gap-[10px] justify-between">
+            {/* <div className="flex items-center gap-[10px] justify-between">
               <Label className="w-[70px] min-w-[70px]">시작날짜</Label>
               <DatePicker
                 onChange={(value) => {
@@ -302,7 +303,66 @@ const OperationTimeTab: React.FC<Props> = ({
                 }
                 clearIcon={null}
               />
+            </div> */}
+
+            <div className="flex items-center gap-[10px] justify-between">
+              <Label className="w-[70px] min-w-[70px]">시작날짜</Label>
+              <CalendarHeadless
+                date={new Date(
+                  `${tempCampaignSchedule.start_date.substring(0, 4)}-${tempCampaignSchedule.start_date.substring(4, 6)}-${tempCampaignSchedule.start_date.substring(6, 8)}`
+                )}
+                setDate={(value) => {
+                  if (value instanceof Date || value === null) {
+                    let tempStartDate = "";
+                    let tempEndDate = tempCampaignSchedule.end_date;
+                    if (value) {
+                      tempStartDate = `${value.getFullYear()}${("0" + (value.getMonth() + 1)).slice(-2)}${("0" + value.getDate()).slice(-2)}`;
+                      if (tempStartDate > tempEndDate) {
+                        tempEndDate = tempStartDate;
+                      }
+                    }
+                    onCampaignScheduleChange({
+                      ...tempCampaignSchedule,
+                      changeYn: true,
+                      campaignScheduleChangeYn: true,
+                      start_date: tempStartDate,
+                      end_date: tempEndDate,
+                    });
+                  }
+                }}
+              />
             </div>
+
+            <div className="flex items-center gap-[10px] justify-between">
+              <Label className="w-[70px] min-w-[70px]">종료날짜</Label>
+              <CalendarHeadless
+                date={new Date(
+                  `${tempCampaignSchedule.end_date.substring(0, 4)}-${tempCampaignSchedule.end_date.substring(4, 6)}-${tempCampaignSchedule.end_date.substring(6, 8)}`
+                )}
+                setDate={(value) => {
+                  if (value instanceof Date || value === null) {
+                    const tempStartDate = tempCampaignSchedule.start_date;
+                    let tempEndDate = "";
+                    if (value) {
+                      tempEndDate = `${value.getFullYear()}${("0" + (value.getMonth() + 1)).slice(-2)}${("0" + value.getDate()).slice(-2)}`;
+                      if (tempEndDate < tempStartDate) {
+                        tempEndDate = tempStartDate;
+                      }
+                    }
+                    onCampaignScheduleChange({
+                      ...tempCampaignSchedule,
+                      changeYn: true,
+                      campaignScheduleChangeYn: true,
+                      start_date: tempStartDate,
+                      end_date: tempEndDate,
+                    });
+                  }
+                }}
+              />
+            </div>
+
+
+
           </div>
         </div>
 

@@ -828,4 +828,7 @@ html, body {
   transition: width linear;
 }
 
-/* 커스텀 토스트 메세지 end */
+/* react-date-picker 관련 */
+.react-calendar__month-view__weekdays {
+  display: none !important;
+}
