@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { CommonButton } from "@/components/shared/CommonButton";
 import CustomAlert from '@/components/shared/layout/CustomAlert';
-import { useAuthStore, useCampainManagerStore } from '@/store';
+import { useAuthStore, useCampainManagerStore, useMainStore } from '@/store';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useApiForPhoneDescriptionUpdate } from '@/features/campaignManager/hooks/useApiForPhoneDescriptionUpdate';
 import { useApiForPhoneDescriptionInsert } from '@/features/campaignManager/hooks/useApiForPhoneDescriptionInsert';
@@ -34,6 +34,7 @@ const errorMessage = {
 };
 
 const EditDescription = () => {
+  const { campaigns } = useMainStore();
   const { phoneDescriptions, setPhoneDescriptions } = useCampainManagerStore();
   const [selectedRow, setSelectedRow] = useState<PhoneRow | null>(null);
   const [inputId, setInputId] = useState('');
@@ -163,6 +164,7 @@ const EditDescription = () => {
 
   // 전화번호설명 템플릿 조회
   useEffect(() => {
+    console.log("campaigns", campaigns)
     fetchPhoneDescriptions({
       session_key: '',
       tenant_id: tenant_id,

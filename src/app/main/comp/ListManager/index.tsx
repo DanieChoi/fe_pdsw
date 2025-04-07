@@ -124,12 +124,13 @@ const ListManager: React.FC = () => {
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
   const [headerColumnData,setHeaderColumnData] = useState<FormatRow[]>([]);
   const [originaldataYn, setOriginaldataYn] = useState<boolean>(false);
+  const [campaignId, setCampaignId] = useState<number>(0);
   // 아이디 생성용 카운터
   const [nextId, setNextId] = useState(1);
   
   // 모달 상태
   const [isFileFormatOpen, setIsFileFormatOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   
   // 파일 관련 상태
   const [targetType, setTargetType] = useState<"general" | "blacklist">("general");
@@ -353,7 +354,7 @@ const ListManager: React.FC = () => {
           const newFileData: FileRow = {
             id: nextId,
             fileName: file.name,
-            campaignId: targetType === "general" ? "G123" : "B456",
+            campaignId: campaignId+'',
             fileSize: (file.size / 1024).toFixed(2) + " KB",
             deletable: false,
           };
@@ -563,7 +564,14 @@ const ListManager: React.FC = () => {
       });
     }else{
       const fileInput = document.getElementById("fileInput") as HTMLInputElement;
-      if (fileInput) fileInput.click();
+      if (fileInput){
+        if( fileFormat === 'excel'){
+          fileInput.accept = ".xlsx, .xls";
+        }else{
+          fileInput.accept = ".txt";
+        }
+        fileInput.click();
+      } 
     }
   };
 
@@ -707,10 +715,10 @@ const ListManager: React.FC = () => {
       //setIsLoading(true);
 
       // 테스트를 위해 2초간 로딩 모달 표시
-      setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 2000);
+      // setIsLoading(true);
+      // setTimeout(() => {
+      //   setIsLoading(false);
+      // }, 2000);
 
     }
   };
@@ -769,11 +777,11 @@ const ListManager: React.FC = () => {
     if (activeTabId === 7) {
       const tempData = openedTabs.filter(tab => tab.id === 7);
       if( tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
-        // setCampaignId(tempData[0].campaignId);
-        // setCampaignName(tempData[0].campaignName);
+        const _campaignId = Number(tempData[0].campaignId);
+        setCampaignId(_campaignId);
         setCallListInsertData({
           ..._callListInsertData,
-          campaign_id: Number(tempData[0].campaignId)
+          campaign_id: _campaignId
         });
         setCampaignIdDisabled(true);
       }
