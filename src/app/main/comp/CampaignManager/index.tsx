@@ -68,14 +68,11 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     router.push('/login');
   }
 
-  // tofix: 새캠페인추가0404
   // 스킬 조회
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data);
-
       console.log("스킬 패치 결과 : ", data.result_data);
-
       fetchCallingNumbers({
         session_key: '',
         tenant_id: 0,
@@ -104,6 +101,7 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
       });
     }
   });
+  
   // 전화번호설명 템플릿 조회
   const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
     onSuccess: (data) => {
@@ -124,19 +122,23 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     console.log('campaignIdForUpdateFromSideMenu:', campaignIdForUpdateFromSideMenu);
     console.log('campaignId:', campaignId);
     if (typeof campaignId === 'undefined') {
-      // alert("here 1")
       _setCampaignId(campaignIdForUpdateFromSideMenu || '');
     } else {
-      // alert("here 2")
       _setCampaignId(campaignId);
     }
   }, [campaignIdForUpdateFromSideMenu, campaignId]);
 
   return (
-    <div className='compaign-wrap'>
-      {/* hi */}
-      <div className='flex flex-col gap-[15px] limit-width '>
-      {/* campaignId: {_campaignId} */}
+    // 스크롤바 공간을 항상 확보하도록 클래스 수정
+    <div className='compaign-wrap stable-scrollbar' style={{
+      overflowY: 'scroll', // 항상 스크롤바 표시
+      scrollbarGutter: 'stable', // 스크롤바 공간 확보
+      boxSizing: 'border-box',
+      width: '100%',
+      height: '100%',
+      contain: 'content', // 내부 변경이 외부 레이아웃에 영향 최소화
+    }}>
+      <div className='flex flex-col gap-[15px] limit-width'>
         <CampaignManagerHeader campaignId={_campaignId} onSearch={handleCampaignHeaderSearch} />
         <div className="flex gap-[30px]">
           <CampaignManagerList campaignId={_campaignId} campaignHeaderSearchParam={campaignHeaderSearchParam} />

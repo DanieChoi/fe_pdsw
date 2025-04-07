@@ -1637,7 +1637,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   };
 
   return (
-    <div className='flex flex-col gap-5 w-[58%] overflow-y-auto'> {/* Fixed width instead of 60% */}
+    <div className='flex flex-col gap-5 w-[58%]'> {/* Fixed width instead of 60% */}
       {/* hi */}
       <div>
         <TitleWrap
