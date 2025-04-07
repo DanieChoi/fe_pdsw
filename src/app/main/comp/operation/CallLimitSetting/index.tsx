@@ -87,6 +87,23 @@ const CampaignSettings = () => {
     setAlertState(prev => ({ ...prev, isOpen: false }));
   };
 
+  // 입력값 검증 로직을 추가 - 제한건수 최대 5000 제한
+  const handleLimitCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    
+    // 숫자만 입력 가능하도록 처리
+    if (value === '' || /^\d+$/.test(value)) {
+      // 최대 5000까지만 입력 가능
+      if (value === '' || parseInt(value) <= 5000) {
+        setLimitCount(value);
+      } else {
+        // 5000을 초과하는 값이 입력되면 5000으로 제한
+        setLimitCount('5000');
+        showAlert('제한건수는 최대 5000까지만 입력할 수 있습니다.');
+      }
+    }
+  };
+
   // 예약콜 제한건수 조회
   const { mutate: fetchCallLimitSettingList } = useApiForCallLimitSettingList({
     onSuccess: (data) => {
@@ -265,6 +282,18 @@ const CampaignSettings = () => {
       showAlert('모든 필드를 입력해주세요.');
       return;
     }
+    
+    // 제한건수 유효성 검사
+    const limitValue = parseInt(limitCount);
+    if (isNaN(limitValue) || limitValue <= 0) {
+      showAlert('유효한 제한건수를 입력해주세요.');
+      return;
+    }
+
+    if (limitValue > 5000) {
+      showAlert('제한건수는 최대 5000까지만 등록할 수 있습니다.');
+      return;
+    }
   
     // 선택된 캠페인의 tenant_id 찾기
     const selectedCampaign = campaigns?.find(camp => camp.campaign_id === Number(campaignId));
@@ -277,7 +306,7 @@ const CampaignSettings = () => {
       tenant_id: selectedCampaign.tenant_id,
       call_kind: 1,  // Callback으로 고정
       call_timeout: 0,
-      max_call: Number(limitCount),
+      max_call: limitValue,
       max_criteria: 1
     };
   
@@ -466,8 +495,9 @@ const CampaignSettings = () => {
             <CustomInput 
               value={limitCount}
               className="w-full"
-              onChange={(e) => setLimitCount(e.target.value)}
+              onChange={handleLimitCountChange}
               disabled={isFieldDisabled()} 
+              // placeholder="최대 5000"
             />
           </div>
 
