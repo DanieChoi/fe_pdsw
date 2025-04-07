@@ -1,13 +1,12 @@
-// src/app/main/comp/NewCampaignManager/comp/CampaignBasicInfoForm.tsx
 "use client";
 
-import Image from 'next/image';
 import { useState } from 'react';
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import ISelectorForTeanantForCreateNewCampaign from './ISelectorForTeanantForCreateNewCampaign';
 import SkillListPopup from '@/components/shared/layout/SkillListPopup';
+import { Search, Plus } from "lucide-react"; // Lucide 아이콘 가져오기
 
 const dialModeList = [
   { dial_id: 1, dial_name: 'Power' },
@@ -37,6 +36,9 @@ const CampaignBasicInfoForm = ({
     isOpen: false,
     type: '1',
   });
+  
+  // 발신번호 상태 추가
+  const [callingNumber, setCallingNumber] = useState('');
 
   const handleOpenSkillPopup = () => {
     if (tempCampaignInfo.tenant_id < 0 && !tenantId) {
@@ -95,17 +97,28 @@ const CampaignBasicInfoForm = ({
           <Label className="w-[74px] min-w-[74px]">스킬</Label>
           <CustomInput value={inputSkills} className="w-full" readOnly />
           <button
-            className="absolute right-2 top-[52%] transform -translate-y-1/2"
+            className="absolute right-2 top-[52%] transform -translate-y-1/2 hover:bg-gray-100 p-1 rounded-full"
             onClick={handleOpenSkillPopup}
+            title="스킬 선택"
           >
-            <Image src="/skill-popup.svg" alt="스킬팝업" width={12} height={12} />
+            <Search size={16} className="text-gray-500" />
           </button>
         </div>
 
-        <div className='flex items-center gap-2'>
+        <div className='flex items-center gap-2 relative'>
           <Label className="w-[74px] min-w-[74px]">발신번호</Label>
-          {/* <CustomInput value={inputCallingNumber} className="w-full" readOnly /> */}
-          <CustomInput value={""} className="w-full" readOnly />
+          <CustomInput 
+            value={callingNumber} 
+            onChange={(e) => setCallingNumber(e.target.value)}
+            className="w-full" 
+          />
+          <button
+            className="absolute right-2 top-[52%] transform -translate-y-1/2 hover:bg-gray-100 p-1 rounded-full"
+            onClick={() => {/* 발신번호 추가 로직 */}}
+            title="발신번호 추가"
+          >
+            <Plus size={16} className="text-gray-500" />
+          </button>
         </div>
 
         <div className="flex items-center gap-2 col-span-3">
