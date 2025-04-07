@@ -196,10 +196,10 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
       }
     } else {
       setTempData([]);
-      if (filteredCampaigns.length === 0 && campaignListResponse?.result_data && campaignListResponse.result_data.length > 0) {
-        setSelectedCampaign(null);
-        setSelectedCampaignRow(null);
-      }
+      // if (filteredCampaigns.length === 0 && campaignListResponse?.result_data && campaignListResponse.result_data.length > 0) {
+      //   setSelectedCampaign(null);
+      //   setSelectedCampaignRow(null);
+      // }
     }
   }, [filteredCampaigns, schedules, campaignSkills, callingNumbers, selectedCampaignRow, setSelectedCampaign, setSelectedCampaignRow, campaignListResponse]);
 
