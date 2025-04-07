@@ -1336,6 +1336,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   //캠페인 발신번호 삭제 api 호출
   const { mutate: fetchCallingNumberDelete } = useApiForCallingNumberDelete({
     onSuccess: (data) => {
+      setCallingNumberChangeYn(false);
       // fetchCallingNumbers({
       //   session_key: '',
       //   tenant_id: 0,
@@ -1346,6 +1347,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   //캠페인 발신번호 추가 api 호출
   const { mutate: fetchCallingNumberInsert } = useApiForCallingNumberInsert({
     onSuccess: (data) => {
+      setCallingNumberChangeYn(false);
       fetchCallingNumbers({
         session_key: '',
         tenant_id: 0,
@@ -1356,6 +1358,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   //캠페인 발신번호 수정 api 호출
   const { mutate: fetchCallingNumberUpdate } = useApiForCallingNumberUpdate({
     onSuccess: (data) => {
+      setCallingNumberChangeYn(false);
       // fetchCallingNumbers({
       //   session_key: '',
       //   tenant_id: 0,
