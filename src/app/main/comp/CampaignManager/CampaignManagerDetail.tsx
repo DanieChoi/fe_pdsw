@@ -47,6 +47,7 @@ import { useApiForCallingListDelete } from '@/features/listManager/hooks/useApiF
 import { CheckCampaignSaveReturnCode,CampaignManagerInfo } from '@/components/common/common';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import { CampaignInfo } from '../CreateCampaignFormPanel/variables/variablesForCreateCampaignForm';
 
 export interface TabItem {
   id: number;
@@ -90,57 +91,57 @@ const CampaignDialSpeedInfo: CampaignDialSpeedUpdateRequest = {
   dial_speed: 0
 }
 
-export const CampaignInfo: MainDataResponse = {
-  campaign_id: 0,
-  campaign_name: '',
-  campaign_desc: '',
-  site_code: 0,
-  service_code: 0,
-  start_flag: 0,
-  end_flag: 0,
-  dial_mode: 0,
-  callback_kind: 0,
-  delete_flag: 0,
-  list_count: 0,
-  list_redial_query: '',
-  next_campaign: 0,
-  token_id: 0,
-  phone_order: '',
-  phone_dial_try: [],
-  dial_try_interval: 0,
-  trunk_access_code: '',
-  DDD_code: '',
-  power_divert_queue: 0,
-  max_ring: 0,
-  detect_mode: 0,
-  auto_dial_interval: 0,
-  creation_user: '',
-  creation_time: '',
-  creation_ip: '',
-  update_user: '',
-  update_time: '',
-  update_ip: '',
-  dial_phone_id: 0,
-  tenant_id: 0,
-  alarm_answer_count: 0,
-  dial_speed: 0,
-  parent_campaign: 0,
-  overdial_abandon_time: 0,
-  list_alarm_count: 0,
-  supervisor_phone: '',
-  reuse_count: 0,
-  use_counsel_result: 0,
-  use_list_alarm: 0,
-  redial_strategy: [
-    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
-    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
-    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
-    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
-    "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0"
-  ],
-  dial_mode_option: 0,
-  user_option: '',
-}
+// export const CampaignInfo: MainDataResponse = {
+//   campaign_id: 0,
+//   campaign_name: '',
+//   campaign_desc: '',
+//   site_code: 0,
+//   service_code: 0,
+//   start_flag: 0,
+//   end_flag: 0,
+//   dial_mode: 0,
+//   callback_kind: 0,
+//   delete_flag: 0,
+//   list_count: 0,
+//   list_redial_query: '',
+//   next_campaign: 0,
+//   token_id: 0,
+//   phone_order: '',
+//   phone_dial_try: [],
+//   dial_try_interval: 0,
+//   trunk_access_code: '',
+//   DDD_code: '',
+//   power_divert_queue: 0,
+//   max_ring: 0,
+//   detect_mode: 0,
+//   auto_dial_interval: 0,
+//   creation_user: '',
+//   creation_time: '',
+//   creation_ip: '',
+//   update_user: '',
+//   update_time: '',
+//   update_ip: '',
+//   dial_phone_id: 0,
+//   tenant_id: 0,
+//   alarm_answer_count: 0,
+//   dial_speed: 0,
+//   parent_campaign: 0,
+//   overdial_abandon_time: 0,
+//   list_alarm_count: 0,
+//   supervisor_phone: '',
+//   reuse_count: 0,
+//   use_counsel_result: 0,
+//   use_list_alarm: 0,
+//   redial_strategy: [
+//     "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+//     "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+//     "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+//     "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0",
+//     "7:2.1.0\/3.1.0\/4.1.0\/5.1.0\/6.1.0\/10.1.0\/99.1.0\/2501.1.0\/2502.1.0\/2503.1.0\/2504.1.0\/2505.1.0\/2506.1.0"
+//   ],
+//   dial_mode_option: 0,
+//   user_option: '',
+// }
 
 export interface OperationTimeParam {
   changeYn: boolean;

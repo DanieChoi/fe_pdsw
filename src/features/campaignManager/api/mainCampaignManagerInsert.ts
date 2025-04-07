@@ -64,7 +64,7 @@ const mapMainDataToCampaignRequest = (data: MainDataResponse | CampaignInfoUpdat
 });
 
 // 캠페인 관리 등록 요청
-export const fetchCampaignManagerInsert = async (data: MainDataResponse | CampaignInfoUpdateRequest ): Promise<CampaignInsertResponse> => {
+export const fetchCampaignManagerInsert = async (data: MainDataResponse  ): Promise<CampaignInsertResponse> => {
   const requestPayload = {
     request_data: mapMainDataToCampaignRequest(data)
   };

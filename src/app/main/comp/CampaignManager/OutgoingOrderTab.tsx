@@ -6,8 +6,8 @@ import DataGrid from "react-data-grid";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { useCampainManagerStore } from "@/store";
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
-import { CampaignInfo } from './CampaignManagerDetail';
 import { OutgoingOrderTabParam } from './CampaignManagerDetail';
+import { CampaignInfo } from "../CreateCampaignFormPanel/variables/variablesForCreateCampaignForm";
 
 const columns = [
   { key: "phone1", name: "고객전화번호(1)" },

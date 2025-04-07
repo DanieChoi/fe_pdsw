@@ -20,14 +20,13 @@ import { AdditionalInfoTabParam, CallbackTabParam, CallPacingTabParam, CampaignS
 import { CampaignCallPacingTabInfo, CampaignDialSpeedInfo, CampaignInfo, CampaignManagerInfo, CampaignSkillInfo, errorMessage } from '../variables/variablesForCreateCampaignForm';
 import {
   CampaignSkillUpdateRequest
-  , CampaignInfoUpdateRequest
   , CampaignScheDuleListDataResponse
   , CampaignDialSpeedUpdateRequest
 } from '@/features/campaignManager/types/campaignManagerIndex';
 
 
 const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ tenantId }: IPropsForCreateCampaignForm) => {
-  const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
+  // const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
   const [tempCampaignSchedule, setTempCampaignSchedule] = useState<CampaignScheDuleListDataResponse>(CampaignScheduleInfo);
@@ -71,20 +70,32 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
     setChangeYn(true);
     setCampaignInfoChangeYn(true);
     if (col === 'campaign_id' && value !== '') {
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
+      // setTempCampaignManagerInfo({
+      //   ...tempCampaignManagerInfo,
+      //   campaign_id: Number(value)
+      // });
+      setTempCampaignsInfo({  // Add this to keep both states in sync
+        ...tempCampaignInfo,
         campaign_id: Number(value)
       });
     }
     if (col === 'campaign_name') {
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
+      // setTempCampaignManagerInfo({
+      //   ...tempCampaignManagerInfo,
+      //   campaign_name: value
+      // });
+      setTempCampaignsInfo({  // Add this to keep both states in sync
+        ...tempCampaignInfo,
         campaign_name: value
       });
     }
     if (col === 'campaign_desc') {
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
+      // setTempCampaignManagerInfo({
+      //   ...tempCampaignManagerInfo,
+      //   campaign_desc: value
+      // });
+      setTempCampaignsInfo({  // Add this to keep both states in sync
+        ...tempCampaignInfo,
         campaign_desc: value
       });
     }
@@ -99,10 +110,10 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
         ...tempCampaignInfo,
         tenant_id: Number(value)
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
-        tenant_id: Number(value)
-      });
+      // setTempCampaignManagerInfo({
+      //   ...tempCampaignManagerInfo,
+      //   tenant_id: Number(value)
+      // });
     }
     if (type === 'dialMode' && value !== '') {
       console.log('dialMode');
@@ -110,14 +121,14 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
         ...tempCampaignInfo,
         dial_mode: Number(value)
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
-        dial_mode: Number(value)
-      });
-      setTempCampaignDialSpeedInfoParam({
-        ...tempCampaignDialSpeedInfoParam,
-        dial_mode: Number(value)
-      });
+      // setTempCampaignManagerInfo({
+      //   ...tempCampaignManagerInfo,
+      //   dial_mode: Number(value)
+      // });
+      // setTempCampaignDialSpeedInfoParam({
+      //   ...tempCampaignDialSpeedInfoParam,
+      //   dial_mode: Number(value)
+      // });
     }
   }
 
@@ -141,10 +152,10 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
     if (value.campaignInfoChangeYn) {
       setChangeYn(true);
       setCampaignInfoChangeYn(true);
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
-        , start_flag: Number(value.start_flag)
-      });
+      // setTempCampaignManagerInfo({
+      //   ...tempCampaignManagerInfo
+      //   , start_flag: Number(value.start_flag)
+      // });
       setTempCampaignsInfo({
         ...tempCampaignInfo
         , start_flag: Number(value.start_flag)
@@ -182,16 +193,16 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
         , phone_dial_try: value.phone_dial_try
         , phone_order: value.phone_order
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
-        , dial_phone_id: Number(value.dial_phone_id)
-        , phone_dial_try1: value.phone_dial_try[0]
-        , phone_dial_try2: value.phone_dial_try[1]
-        , phone_dial_try3: value.phone_dial_try[2]
-        , phone_dial_try4: value.phone_dial_try[3]
-        , phone_dial_try5: value.phone_dial_try[4]
-        , phone_order: value.phone_order
-      });
+      // setTempCampaignManagerInfo({
+      //   ...tempCampaignManagerInfo
+      //   , dial_phone_id: Number(value.dial_phone_id)
+      //   , phone_dial_try1: value.phone_dial_try[0]
+      //   , phone_dial_try2: value.phone_dial_try[1]
+      //   , phone_dial_try3: value.phone_dial_try[2]
+      //   , phone_dial_try4: value.phone_dial_try[3]
+      //   , phone_dial_try5: value.phone_dial_try[4]
+      //   , phone_order: value.phone_order
+      // });
     }
     if (value.onSave) {
       setCampaignSaveYn(false);
@@ -211,8 +222,22 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
         ...tempCampaignInfo
         , redial_strategy: value.redial_strategy
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
+
+      // setTempCampaignManagerInfo({
+      //   ...tempCampaignManagerInfo
+      //   , redial_strategy1: value.redial_strategy[0]
+      //   , redial_strategy2: value.redial_strategy[1]
+      //   , redial_strategy3: value.redial_strategy[2] 
+      //   , redial_strategy4: value.redial_strategy[3]
+      //   , redial_strategy5: value.redial_strategy[4]
+      // });
+
+    }
+    //초기화버튼 클릭시
+    if (value.onInit) {
+      setTempCampaignsInfo({
+        ...tempCampaignInfo
+        , redial_strategy: value.redial_strategy
         , redial_strategy1: value.redial_strategy[0]
         , redial_strategy2: value.redial_strategy[1]
         , redial_strategy3: value.redial_strategy[2]
@@ -220,21 +245,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
         , redial_strategy5: value.redial_strategy[4]
       });
     }
-    //초기화버튼 클릭시
-    if (value.onInit) {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo
-        , redial_strategy: CampaignInfo.redial_strategy
-      });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
-        , redial_strategy1: CampaignManagerInfo.redial_strategy1
-        , redial_strategy2: CampaignManagerInfo.redial_strategy2
-        , redial_strategy3: CampaignManagerInfo.redial_strategy3
-        , redial_strategy4: CampaignManagerInfo.redial_strategy4
-        , redial_strategy5: CampaignManagerInfo.redial_strategy5
-      });
-    }
+
     if (value.onSave) {
       setCampaignSaveYn(false);
       handleCampaignSave();
@@ -267,24 +278,24 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
         , dial_mode_option: value.dial_mode_option
         , user_option: value.user_option
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
-        , trunk_access_code: value.trunk_access_code
-        , dial_try_interval: value.dial_try_interval
-        , alarm_answer_count: value.alarm_answer_count
-        , overdial_abandon_time: value.overdial_abandon_time
-        , detect_mode: value.detect_mode
-        , auto_dial_interval: value.auto_dial_interval
-        , power_divert_queue: value.power_divert_queue + ''
-        , next_campaign: value.next_campaign
-        , DDD_code: value.DDD_code
-        , callback_kind: value.callback_kind
-        , max_ring: value.max_ring
-        , token_id: value.token_id
-        , use_counsel_result: value.use_counsel_result
-        , dial_mode_option: value.dial_mode_option
-        , user_option: value.user_option
-      });
+      // setTempCampaignManagerInfo({
+      //   ...tempCampaignManagerInfo
+      //   , trunk_access_code: value.trunk_access_code
+      //   , dial_try_interval: value.dial_try_interval
+      //   , alarm_answer_count: value.alarm_answer_count
+      //   , overdial_abandon_time: value.overdial_abandon_time
+      //   , detect_mode: value.detect_mode
+      //   , auto_dial_interval: value.auto_dial_interval
+      //   , power_divert_queue: value.power_divert_queue + ''
+      //   , next_campaign: value.next_campaign
+      //   , DDD_code: value.DDD_code
+      //   , callback_kind: value.callback_kind
+      //   , max_ring: value.max_ring
+      //   , token_id: value.token_id
+      //   , use_counsel_result: value.use_counsel_result
+      //   , dial_mode_option: value.dial_mode_option
+      //   , user_option: value.user_option
+      // });
     }
     if (value.onSave) {
       setCampaignSaveYn(false);
@@ -330,11 +341,11 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
         , callback_kind: Number(value.callback_kind)
         , service_code: value.service_code
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
-        , callback_kind: Number(value.callback_kind)
-        , service_code: value.service_code
-      });
+      // setTempCampaignManagerInfo({
+      //   ...tempCampaignManagerInfo
+      //   , callback_kind: Number(value.callback_kind)
+      //   , service_code: value.service_code
+      // });
     }
     if (value.onSave) {
       // setCampaignSaveYn(false);
@@ -356,12 +367,12 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
         , supervisor_phone: value.supervisor_phone
         , use_list_alarm: value.use_list_alarm
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
-        , list_alarm_count: Number(value.list_alarm_count)
-        , supervisor_phone: value.supervisor_phone
-        , use_list_alarm: value.use_list_alarm
-      });
+      // setTempCampaignManagerInfo({
+      //   ...tempCampaignManagerInfo
+      //   , list_alarm_count: Number(value.list_alarm_count)
+      //   , supervisor_phone: value.supervisor_phone
+      //   , use_list_alarm: value.use_list_alarm
+      // });
     }
     if (value.onSave) {
       // setCampaignSaveYn(false);
@@ -404,15 +415,15 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
     });
   }
 
-  // tofix 0427
+  // tofix
   const handleCampaignSave = () => {
-    console.log(tempCampaignManagerInfo);
-    console.log('power_divert_queue :: ' + tempCampaignManagerInfo.power_divert_queue);
+    console.log("tempCampaignInfo : ", tempCampaignInfo);
+    console.log('power_divert_queue :: ' + tempCampaignInfo.power_divert_queue);
     console.log('tenant_id :: ' + tenantId);
 
     let saveErrorCheck = false;
 
-    if (!saveErrorCheck && tempCampaignManagerInfo.tenant_id < 0 && tenantId === "") {
+    if (!saveErrorCheck && tempCampaignInfo.tenant_id < 0 && tenantId === "") {
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -435,7 +446,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
     }
 
     //2018.11.27 Gideon #23127 캠페인 수정창 연결 IVR 입력 예외 처리
-    if (!saveErrorCheck && tempCampaignManagerInfo.power_divert_queue === '0' || tempCampaignManagerInfo.power_divert_queue === '') {
+    if (!saveErrorCheck && tempCampaignInfo.power_divert_queue === '0' || tempCampaignInfo.power_divert_queue === '') {
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -446,7 +457,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
       });
     }
 
-    if (!saveErrorCheck && tempCampaignManagerInfo.campaign_name === '') {
+    if (!saveErrorCheck && tempCampaignInfo.campaign_name === '') {
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -464,37 +475,26 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
 
   // tofix 0427
   const handleCampaignSaveExecute = () => {
-    console.log("tempCampaignManagerInfo at save !!!!!!!!!!!!!", tempCampaignManagerInfo);
-    // Convert CampaignInfoUpdateRequest to MainDataResponse format
+    console.log("tempCampaignInfo at save !!!!!!!!!!!!!", tempCampaignInfo);
+    // Convert to MainDataResponse format using only tempCampaignInfo
     const campaignDataToSend: MainDataResponse = {
-      ...tempCampaignInfo,
-      campaign_id: tempCampaignManagerInfo.campaign_id,
-      campaign_name: tempCampaignManagerInfo.campaign_name,
-      campaign_desc: tempCampaignManagerInfo.campaign_desc,
-      site_code: tempCampaignManagerInfo.site_code,
-      service_code: tempCampaignManagerInfo.service_code,
-      start_flag: tempCampaignManagerInfo.start_flag,
-      end_flag: tempCampaignManagerInfo.end_flag,
-      dial_mode: tempCampaignManagerInfo.dial_mode,
-      callback_kind: tempCampaignManagerInfo.callback_kind,
-      delete_flag: tempCampaignManagerInfo.delete_flag,
-      tenant_id: tempCampaignManagerInfo.tenant_id,
-      phone_order: tempCampaignManagerInfo.phone_order,
-      phone_dial_try: [
-        tempCampaignManagerInfo.phone_dial_try1,
-        tempCampaignManagerInfo.phone_dial_try2,
-        tempCampaignManagerInfo.phone_dial_try3,
-        tempCampaignManagerInfo.phone_dial_try4,
-        tempCampaignManagerInfo.phone_dial_try5
-      ],
-      redial_strategy: [
-        tempCampaignManagerInfo.redial_strategy1,
-        tempCampaignManagerInfo.redial_strategy2,
-        tempCampaignManagerInfo.redial_strategy3,
-        tempCampaignManagerInfo.redial_strategy4,
-        tempCampaignManagerInfo.redial_strategy5
-      ]
-    };
+        ...tempCampaignInfo,
+        // 필요한 경우에만 tempCampaignManagerInfo의 특정 필드 사용
+        phone_dial_try: [
+          tempCampaignInfo.phone_dial_try1 ?? 0,
+          tempCampaignInfo.phone_dial_try2 ?? 0,
+          tempCampaignInfo.phone_dial_try3 ?? 0,
+          tempCampaignInfo.phone_dial_try4 ?? 0,
+          tempCampaignInfo.phone_dial_try5 ?? 0
+        ],
+        redial_strategy: [
+          tempCampaignInfo.redial_strategy1 ?? '',
+          tempCampaignInfo.redial_strategy2 ?? '',
+          tempCampaignInfo.redial_strategy3 ?? '',
+          tempCampaignInfo.redial_strategy4 ?? '',
+          tempCampaignInfo.redial_strategy5 ?? ''
+        ]
+      };
     fetchCampaignManagerInsert(campaignDataToSend);
   }
 
@@ -581,7 +581,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
 
         <CampaignBasicInfoForm
           tenantId={tenantId}
-          tempCampaignInfo={tempCampaignManagerInfo}
+          tempCampaignInfo={tempCampaignInfo}
           inputSkills={inputSkills}
           onInputChange={handleInputData}
           onSelectChange={handleSelectChange}

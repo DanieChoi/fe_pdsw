@@ -7,7 +7,7 @@ import { CampaignInsertResponse, CampaignApiError, CampaignInfoUpdateRequest } f
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 
 export function useApiForCampaignManagerInsert(
-  options?: UseMutationOptions<CampaignInsertResponse, CampaignApiError, MainDataResponse | CampaignInfoUpdateRequest>
+  options?: UseMutationOptions<CampaignInsertResponse, CampaignApiError, MainDataResponse>
 ) {
   const queryClient = useQueryClient();
   return useMutation({
