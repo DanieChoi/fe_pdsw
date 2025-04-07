@@ -27,7 +27,7 @@ export const loginApi = {
       // 두 번째 로그인 API 호출 (내부)
       const loginData: LoginRequest = {
         grant_type: "password",
-        device_id: "api_test",
+        device_id: "WEB",
         user_name: dataFirst.id,
         password: dataFirst.passwd,
       };
