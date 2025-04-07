@@ -237,6 +237,16 @@ const EditDescription = () => {
       showAlert('삭제할 항목을 선택해주세요.');
       return;
     }
+    
+    // campaigns 배열에서 현재 선택된 phone description ID가 사용 중인지 확인
+    const descriptionId = Number(selectedRow.id);
+    const isInUse = campaigns.some(campaign => campaign.dial_phone_id === descriptionId);
+    
+    if (isInUse) {
+      // 사용 중인 경우 알림 표시하고 삭제 방지
+      showAlert(`선택되어진 발신번호 설명을 사용하는 캠페인이 있습니다.\n캠페인 아이디 : ${campaigns.filter(c => c.dial_phone_id === descriptionId).map(c => c.campaign_id).join(', ')}\n캠페인 정보수정후 삭제하여 주십시오.`)
+      return;
+    }
   
     // 삭제 확인 메시지 표시
     showConfirm('선택된 전화번호 설명을 삭제하시겠습니까?\n\n ※주의:  삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해 주세요.', () => {
@@ -245,7 +255,6 @@ const EditDescription = () => {
       
       fetchPhoneDescriptionDelete(idToDelete, {
         onSuccess: () => {
-          
           // 2. 입력 필드 초기화
           setSelectedRow(null);
           setInputId('');
