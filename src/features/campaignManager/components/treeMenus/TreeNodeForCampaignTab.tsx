@@ -239,7 +239,7 @@ const nodeContent = (
             onContextMenu={handleContextMenu}
             style={{ paddingLeft }}
           >
-            {nodeContent} {item.type}
+            {nodeContent}
           </div>
         </ContextMenuForCampaignForCampaignTab>
       )}
