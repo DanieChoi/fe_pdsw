@@ -54,59 +54,86 @@ export const CalendarHeadless = ({
           </Button>
         </Popover.Button>
         <Popover.Panel className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-[320px] p-4 bg-background shadow-lg rounded-md">
-          {({ close }) => (
-            <>
-              <div className="flex items-center gap-2 mb-4 justify-center">
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(Number(e.target.value))}
-                  className="border rounded px-2 py-1 text-sm"
-                >
-                  {Array.from({ length: 10 }).map((_, i) => {
-                    const year = new Date().getFullYear() - 5 + i;
-                    return (
-                      <option key={year} value={year}>
-                        {year}년
-                      </option>
-                    );
-                  })}
-                </select>
-                <select
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                  className="border rounded px-2 py-1 text-sm"
-                >
-                  {Array.from({ length: 12 }).map((_, i) => (
-                    <option key={i} value={i}>
-                      {i + 1}월
+          <div className="flex items-center gap-4 mb-4 justify-center">
+            {/* 연도 선택 영역 */}
+            <div className="flex items-center gap-1">
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                className="border rounded px-2 py-1 text-sm"
+              >
+                {Array.from({ length: 10 }).map((_, i) => {
+                  const year = new Date().getFullYear() - 5 + i;
+                  return (
+                    <option key={year} value={year}>
+                      {year}년
                     </option>
-                  ))}
-                </select>
-              </div>
-              <div className="grid grid-cols-7 gap-1 text-center">
-                {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
-                  <div key={day} className="text-xs text-muted-foreground font-medium">
-                    {day}
-                  </div>
+                  );
+                })}
+              </select>
+              <button
+                onClick={() => setSelectedYear(selectedYear - 1)}
+                className="px-2 py-1 border rounded text-sm"
+              >
+                {"<<"}
+              </button>
+              <button
+                onClick={() => setSelectedYear(selectedYear + 1)}
+                className="px-2 py-1 border rounded text-sm"
+              >
+                {">>"}
+              </button>
+            </div>
+            {/* 월 선택 영역 */}
+            <div className="flex items-center gap-1">
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                className="border rounded px-2 py-1 text-sm"
+              >
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <option key={i} value={i}>
+                    {i + 1}월
+                  </option>
                 ))}
-                {currentMonthDates.map((day) => (
-                  <button
-                    key={day.toISOString()}
-                    onClick={() => {
-                      handleSelect(day);
-                      close();
-                    }}
-                    className={cn(
-                      "text-sm w-10 h-10 rounded hover:bg-accent focus:outline-none",
-                      date?.toDateString() === day.toDateString() && "bg-primary text-white"
-                    )}
-                  >
-                    {day.getDate()}
-                  </button>
-                ))}
+              </select>
+              <button
+                onClick={() => setSelectedMonth((prev) => (prev > 0 ? prev - 1 : prev))}
+                disabled={selectedMonth === 0}
+                className="px-2 py-1 border rounded text-sm disabled:opacity-50"
+              >
+                {"<"}
+              </button>
+              <button
+                onClick={() => setSelectedMonth((prev) => (prev < 11 ? prev + 1 : prev))}
+                disabled={selectedMonth === 11}
+                className="px-2 py-1 border rounded text-sm disabled:opacity-50"
+              >
+                {">"}
+              </button>
+            </div>
+          </div>
+          <div className="grid grid-cols-7 gap-1 text-center">
+            {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
+              <div key={day} className="text-xs text-muted-foreground font-medium">
+                {day}
               </div>
-            </>
-          )}
+            ))}
+            {currentMonthDates.map((day) => (
+              <button
+                key={day.toISOString()}
+                onClick={() => {
+                  handleSelect(day);
+                }}
+                className={cn(
+                  "text-sm w-10 h-10 rounded hover:bg-accent focus:outline-none",
+                  date?.toDateString() === day.toDateString() && "bg-primary text-white"
+                )}
+              >
+                {day.getDate()}
+              </button>
+            ))}
+          </div>
         </Popover.Panel>
       </Popover>
     </div>
