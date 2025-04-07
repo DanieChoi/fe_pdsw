@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Inter } from 'next/font/google';
@@ -21,7 +20,6 @@ export default function MainLayout({
   const isOpen = useSidebarWidthStore((state) => state.isOpen);
 
   // 푸터 관련 상태
-  // const [footerHeight, setFooterHeight] = useState(108);
   const [footerHeight, setFooterHeight] = useState(111);
   const [isFooterOpen, setIsFooterOpen] = useState(true);
   const [isFooterResizing, setIsFooterResizing] = useState(false);
@@ -70,12 +68,14 @@ export default function MainLayout({
             className="flex flex-col h-full transition-all duration-300 overflow-x-auto"
             style={{ width: getMainWidth() }}
           >
-            <div
+            <div 
               ref={contentRef}
-              className="overflow-auto flex-shrink-0 min-w-[800px]"
+              className="refined-scrollbar overflow-auto flex-shrink-0 min-w-[800px]"
               style={{
                 height: `calc(100% - ${actualFooterHeight}px)`,
                 transition: isFooterResizing ? 'none' : 'height 0.3s ease-in-out',
+                paddingTop: '0', // 상단 여백 제거
+                boxSizing: 'border-box',
               }}
             >
               {children}
@@ -86,15 +86,6 @@ export default function MainLayout({
                 maxHeight: `${actualFooterHeight}px`,
               }}
             >
-
-              {/* <Footer2
-                footerHeight={footerHeight}
-                onToggleDrawer={toggleFooter}
-                onResizeHeight={handleResize}
-                onResizeStart={handleResizeStart}
-                onResizeEnd={handleResizeEnd}
-              /> */}
-
               <Footer
                 footerHeight={footerHeight}
                 onToggleDrawer={toggleFooter}

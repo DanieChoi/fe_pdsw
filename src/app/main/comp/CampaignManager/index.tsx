@@ -134,8 +134,9 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
 
   return (
     <div className='compaign-wrap'>
-      <div className='flex flex-col gap-[15px] limit-width'>
-        {/* campaignId: {_campaignId} */}
+      {/* hi */}
+      <div className='flex flex-col gap-[15px] limit-width '>
+      {/* campaignId: {_campaignId} */}
         <CampaignManagerHeader campaignId={_campaignId} onSearch={handleCampaignHeaderSearch} />
         <div className="flex gap-[30px]">
           <CampaignManagerList campaignId={_campaignId} campaignHeaderSearchParam={campaignHeaderSearchParam} />

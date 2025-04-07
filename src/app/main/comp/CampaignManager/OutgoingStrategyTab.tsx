@@ -254,12 +254,13 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
               }), variant: "secondary" },
           ]}
           />
-          <div className="grid-custom-wrap overflow-auto w-full h-[184px]">
+          <div className="grid-custom-wrap w-full">
+          {/* <div className="grid-custom-wrap w-full "> */}
             <DataGrid
               columns={mainColumns}
               rows={rows}
               onRowsChange={handleMainRowsChange}
-              className="grid-custom row-none"
+              className="grid-custom row-none h-[300px]"
               rowHeight={26}
             />
           </div>
