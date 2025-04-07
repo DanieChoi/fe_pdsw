@@ -64,7 +64,7 @@ const SystemCard: React.FC<SystemCardProps> = ({ title, status, pdi, time }) => 
         <Table className="!w-[80%] text-[#333]">
           <tbody>
             <TableRow>
-              <TableHeader className="text-sm font-normal">pdi</TableHeader>
+              <TableHeader className="text-sm font-normal">pid</TableHeader>
               <TableCell className="text-sm">{pdi}</TableCell>
             </TableRow>
             <TableRow>
