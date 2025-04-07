@@ -1336,7 +1336,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   //캠페인 발신번호 삭제 api 호출
   const { mutate: fetchCallingNumberDelete } = useApiForCallingNumberDelete({
     onSuccess: (data) => {
-      setCallingNumberChangeYn(false);
+      setCallingNumberChangeYn(false);  //2-1 TC-011 캠페인 목록의 발신번호 업데이트 수정 3-1 20250407
       // fetchCallingNumbers({
       //   session_key: '',
       //   tenant_id: 0,
@@ -1347,7 +1347,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   //캠페인 발신번호 추가 api 호출
   const { mutate: fetchCallingNumberInsert } = useApiForCallingNumberInsert({
     onSuccess: (data) => {
-      setCallingNumberChangeYn(false);
+      setCallingNumberChangeYn(false);  //2-1 TC-011 캠페인 목록의 발신번호 업데이트 수정 3-2 20250407
       fetchCallingNumbers({
         session_key: '',
         tenant_id: 0,
@@ -1358,7 +1358,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   //캠페인 발신번호 수정 api 호출
   const { mutate: fetchCallingNumberUpdate } = useApiForCallingNumberUpdate({
     onSuccess: (data) => {
-      setCallingNumberChangeYn(false);
+      setCallingNumberChangeYn(false);  //2-1 TC-011 캠페인 목록의 발신번호 업데이트 수정 3-3 20250407
       // fetchCallingNumbers({
       //   session_key: '',
       //   tenant_id: 0,
@@ -1449,9 +1449,9 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
 
   //리스트 적용 버튼 이벤트
   const handleListManager = () => {
-    if( campaignIdForUpdateFromSideMenu == null || campaignIdForUpdateFromSideMenu === ''){
-      setCampaignIdForUpdateFromSideMenu(tempCampaignInfo.campaign_id+'');
-    }
+    // if( campaignIdForUpdateFromSideMenu == null || campaignIdForUpdateFromSideMenu === ''){
+    //   setCampaignIdForUpdateFromSideMenu(tempCampaignInfo.campaign_id+'');
+    // }
     // if (openedTabs.some(tab => tab.id === 7)) {
     //   setActiveTab(7, openedTabs.filter((data) => data.id === 7)[0].uniqueKey);
     // } else if (!openedTabs.some(tab => tab.id === 7)) {

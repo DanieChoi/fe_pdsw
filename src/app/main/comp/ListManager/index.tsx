@@ -115,7 +115,7 @@ interface ProgressRow {
 const ListManager: React.FC = () => {
   const router = useRouter();
   const { campaigns } = useMainStore();
-  const { campaignIdForUpdateFromSideMenu } = useTabStore();
+  const { activeTabId, openedTabs } = useTabStore();
   const [delimiter, setDelimiter] = useState<string>('');
   const [_callListInsertData, setCallListInsertData] = useState<CallingListInsertRequest>(callListInsertData);
   const [fileFormat,setFileFormat ] = useState<string>('excel');
@@ -744,28 +744,37 @@ const ListManager: React.FC = () => {
     }  
   }
 
-  useEffect(() => {
-    if( campaignIdForUpdateFromSideMenu ){
-      setCallListInsertData({
-        ..._callListInsertData,
-        campaign_id: Number(campaignIdForUpdateFromSideMenu)
-      });
-      setCampaignIdDisabled(true);
-    }else{
-      setCallListInsertData({
-        ..._callListInsertData,
-        campaign_id: 0
-      });
-      setCampaignIdDisabled(false);
-    }
-  }, [campaignIdForUpdateFromSideMenu]);
-
   // useEffect(() => {
-  //   if( headerColumnData.length > 0 ){
-  //     console.log('headerColumnData ' + headerColumnData.length);
+  //   if( campaignIdForUpdateFromSideMenu ){
+  //     setCallListInsertData({
+  //       ..._callListInsertData,
+  //       campaign_id: Number(campaignIdForUpdateFromSideMenu)
+  //     });
+  //     setCampaignIdDisabled(true);
+  //   }else{
+  //     setCallListInsertData({
+  //       ..._callListInsertData,
+  //       campaign_id: 0
+  //     });
+  //     setCampaignIdDisabled(false);
   //   }
-  // }, [headerColumnData]);
+  // }, [campaignIdForUpdateFromSideMenu]);
 
+  useEffect(() => {
+    if (activeTabId === 7) {
+      const tempData = openedTabs.filter(tab => tab.id === 7);
+      if( tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
+        // setCampaignId(tempData[0].campaignId);
+        // setCampaignName(tempData[0].campaignName);
+        setCallListInsertData({
+          ..._callListInsertData,
+          campaign_id: Number(tempData[0].campaignId)
+        });
+        setCampaignIdDisabled(true);
+      }
+    }
+  }, [activeTabId, openedTabs]);
+   
   return (
     <div className="flex flex-col gap-5 limit-width">
       <div className="flex gap-5">
