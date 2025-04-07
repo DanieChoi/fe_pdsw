@@ -319,36 +319,6 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
     }
   }
 
-  //캠페인 콜백 탭 변경
-  const handleCampaignCallbackTabChange = (value: OutgoingOrderTabParam) => {
-    if (value.campaignInfoChangeYn) {
-      setChangeYn(true);
-      setCampaignInfoChangeYn(true);
-      setTempCampaignsInfo({
-        ...tempCampaignInfo
-        , dial_phone_id: Number(value.dial_phone_id)
-        , phone_dial_try: value.phone_dial_try
-        , phone_order: value.phone_order
-      });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
-        , dial_phone_id: Number(value.dial_phone_id)
-        , phone_dial_try1: value.phone_dial_try[0]
-        , phone_dial_try2: value.phone_dial_try[1]
-        , phone_dial_try3: value.phone_dial_try[2]
-        , phone_dial_try4: value.phone_dial_try[3]
-        , phone_dial_try5: value.phone_dial_try[4]
-        , phone_order: value.phone_order
-      });
-    }
-    if (value.onSave) {
-      setCampaignSaveYn(false);
-      handleCampaignSave();
-    }
-    if (value.onClosed) {
-      handleCampaignClosed();
-    }
-  }
 
   //캠페인 콜백 탭 변경
   const handleCallbackTabChange = (value: CallbackTabParam) => {
@@ -434,9 +404,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
     });
   }
 
-  //캠페인 저장
-  // tofix 0405 
-  // 동작 시간 설정 안했을시 
+  // tofix 0427
   const handleCampaignSave = () => {
     console.log(tempCampaignManagerInfo);
     console.log('power_divert_queue :: ' + tempCampaignManagerInfo.power_divert_queue);
@@ -494,7 +462,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
     }
   }
 
-  //캠페인 저장 실행.
+  // tofix 0427
   const handleCampaignSaveExecute = () => {
     console.log("tempCampaignManagerInfo at save !!!!!!!!!!!!!", tempCampaignManagerInfo);
     // Convert CampaignInfoUpdateRequest to MainDataResponse format
@@ -613,7 +581,6 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
 
         <CampaignBasicInfoForm
           tenantId={tenantId}
-          // tempCampaignInfo={tempCampaignInfo}
           tempCampaignInfo={tempCampaignManagerInfo}
           inputSkills={inputSkills}
           onInputChange={handleInputData}
