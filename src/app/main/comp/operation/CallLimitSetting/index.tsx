@@ -310,7 +310,7 @@ const CampaignSettings = () => {
   
     // 삭제 확인 알림
     showConfirm(
-      `선택된된 캠페인 [${selectedCampaign.campaign_name}]의 제한건수 설정을 삭제하시겠습니까? \n\n ※주의: 삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해 주세요.`,
+      `선택된 캠페인 [${selectedCampaign.campaign_name}]의 제한건수 설정을 삭제하시겠습니까? \n\n ※주의: 삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해 주세요.`,
       () => {
         // 확인 버튼 클릭 시 실행될 함수
         deleteCallLimitSetting(
