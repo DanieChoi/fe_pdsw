@@ -165,43 +165,45 @@ export function TreeNodeForCampaignTab({
   );
 
   // 공통된 노드 내용 컴포넌트
-  const nodeContent = (
-    <div className="flex items-center w-full gap-1">
-      {hasChildren ? (
-        isExpanded ? (
-          <Image
-            src="/tree-menu/minus_for_tree.png"
-            alt="접기"
-            width={12}
-            height={12}
-            className="flex-shrink-0"
-            onClick={(e) => {
-              e.stopPropagation();
-              onNodeToggle(item.id);
-            }}
-          />
-        ) : (
-          <Image
-            src="/tree-menu/plus_icon_for_tree.png"
-            alt="펼치기"
-            width={12}
-            height={12}
-            className="flex-shrink-0"
-            onClick={(e) => {
-              e.stopPropagation();
-              onNodeToggle(item.type === "folder-node" && item.id);
-            }}
-          />
-        )
+// nodeContent 부분을 다음과 같이 수정합니다
+const nodeContent = (
+  <div className="flex items-center w-full gap-1">
+    {/* 폴더 타입이고 자식이 있는 경우에만 확장 아이콘 표시 */}
+    {item.type === "folder" && hasChildren ? (
+      isExpanded ? (
+        <Image
+          src="/tree-menu/minus_for_tree.png"
+          alt="접기"
+          width={12}
+          height={12}
+          className="flex-shrink-0"
+          onClick={(e) => {
+            e.stopPropagation();
+            onNodeToggle(item.id);
+          }}
+        />
       ) : (
-        <span className="w-3" />
-      )}
-      {getNodeIcon()}
-      <span className={textStyle}>
-        {item.label}{(isTenantFolder || item.type === "campaign") && ` (${item.id})`}
-      </span>
-    </div>
-  );
+        <Image
+          src="/tree-menu/plus_icon_for_tree.png"
+          alt="펼치기"
+          width={12}
+          height={12}
+          className="flex-shrink-0"
+          onClick={(e) => {
+            e.stopPropagation();
+            onNodeToggle(item.id);
+          }}
+        />
+      )
+    ) : (
+      <span className="w-3" />
+    )}
+    {getNodeIcon()}
+    <span className={textStyle}>
+      {item.label}{(isTenantFolder || item.type === "campaign") && ` (${item.id})`}
+    </span>
+  </div>
+);
 
   // 레벨 인덴트 계산 - 컴팩트 모드일 경우 더 작은 인덴트
   const indentSize = compact ? 12 : 16;
@@ -237,7 +239,7 @@ export function TreeNodeForCampaignTab({
             onContextMenu={handleContextMenu}
             style={{ paddingLeft }}
           >
-            {nodeContent}
+            {nodeContent} {item.type}
           </div>
         </ContextMenuForCampaignForCampaignTab>
       )}

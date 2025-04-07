@@ -894,24 +894,22 @@ export function TreeMenusForCampaigns() {
       // };
 
       const expandAllNodes = () => {
-        // 모든 노드를 확장하는 상태 생성
         const newExpanded = new Set<string>();
-        
-        // 모든 노드를 재귀적으로 확장
+
         const expandAll = (nodes: TreeItem[]) => {
           for (const node of nodes) {
-            newExpanded.add(node.id);
-            if (node.children) {
+            // 자식 노드가 있는 경우에만 expanded 상태에 추가
+            if (node.children && node.children.length > 0) {
+              newExpanded.add(node.id);
               expandAll(node.children);
             }
           }
         };
-        
-        // 재귀적으로 모든 노드 확장
+
         expandAll(items);
         expandNodes(newExpanded);
-        console.log("캠페인 뷰: 모든 노드 확장됨", newExpanded.size);
-      };      
+        console.log("캠페인 뷰: 자식이 있는 노드만 확장됨", newExpanded.size);
+      };
 
       // 초기 확장 상태 설정
       if (selectedNodeType === 'tenant') {
