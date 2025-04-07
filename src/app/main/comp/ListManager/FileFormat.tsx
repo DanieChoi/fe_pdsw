@@ -424,6 +424,7 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
 
       <div className="mb-4">
         <p className="text-sm">* 블랙리스트의 경우 고객키[1], 고객이름 항목만 사용 합니다.</p>
+        <p className="text-sm">* 필드 항목은 키보드 Delete 키로 삭제가 가능합니다.</p>
       </div>
 
       <Tabs  value={tabValue} onValueChange={handleTabChange}>
