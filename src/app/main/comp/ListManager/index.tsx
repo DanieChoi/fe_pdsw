@@ -443,7 +443,12 @@ const ListManager: React.FC = () => {
               const fileContent = event.target?.result;       
               console.log("File content:", fileContent);
               if( fileContent != null && fileContent !== '' ){
-                const tempdata = (fileContent+'').split('\r\n');
+                let tempdata = [];
+                if( (fileContent+'').indexOf('\r\n') > -1){
+                  tempdata = (fileContent+'').split('\r\n');
+                }else{
+                  tempdata = (fileContent+'').split('\n');
+                }
                 let index = 0;
                 const tempSendList: SendRow[] = [];
                 for( let i=0;i<tempdata.length;i++){

@@ -92,7 +92,7 @@ export default function LoginPage() {
       if (e.message === 'Request failed with status code 500') {
         setAlertState({
           isOpen: true,
-          message: '아이디, 또는 암호가 잘못 입력되었습니다.',
+          message: '아이디 또는 암호가 잘못 입력되었습니다.',
           title: '로그인',
           type: '2',
         });
