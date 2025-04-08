@@ -146,7 +146,7 @@ export  const CheckCampaignSaveReturnCode = (returnCode: number) => {
     } else if (returnCode === -7773) {
       return '캠페인 시작/종료 날짜를 확인해 주시기 바랍니다.';
     } else if (returnCode === -7774) {
-      return '응대할 상담사이 없으므로 캠페인 시작이 취소 되었습니다.';
+      return '응대할 상담사가 없으므로 시작이 취소되었습니다.';
     } else if (returnCode === -7775) {
       return '발신 할 트렁크가 없습니다.';
     } else if (returnCode === -7776) {
