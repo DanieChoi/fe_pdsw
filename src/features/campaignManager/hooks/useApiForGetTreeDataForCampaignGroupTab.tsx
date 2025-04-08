@@ -22,23 +22,23 @@
 //   } = useSideMenuCampaignGroupTabStore();
   
 //   // tenant_id 결정 (props로 받은 값이 우선, 없으면 스토어 값 사용)
-//   const effectiveTenantId = initialTenantId !== undefined ? initialTenantId : storeTenantId;
+//   const tenant_id = initialTenantId !== undefined ? initialTenantId : storeTenantId;
   
 //   // TanStack Query를 사용하여 트리 데이터 가져오기
 //   const query = useQuery({
-//     queryKey: ['campaignTreeDataForCampaignGroupTab', effectiveTenantId],
+//     queryKey: ['campaignTreeDataForCampaignGroupTab', tenant_id],
 //     queryFn: async () => {
-//       if (effectiveTenantId === undefined || effectiveTenantId === null) {
+//       if (tenant_id === undefined || tenant_id === null) {
 //         throw new Error('테넌트 ID가 없습니다');
 //       }
       
-//       const combinedData = await apiForCombinedTenantAndCampaignGroup(effectiveTenantId);
+//       const combinedData = await apiForCombinedTenantAndCampaignGroup(tenant_id);
 //       return {
 //         combinedData,
 //         transformedData: transformToTreeData(combinedData)
 //       };
 //     },
-//     enabled: effectiveTenantId !== undefined && effectiveTenantId !== null,
+//     enabled: tenant_id !== undefined && tenant_id !== null,
 //     staleTime: 5 * 60 * 1000, // 5분 동안 데이터를 "신선한" 상태로 유지
 //     refetchOnWindowFocus: false // 창 포커스 시 자동 리페치 비활성화
 //   });
@@ -46,8 +46,8 @@
 //   // 쿼리 결과에 따라 스토어 상태 업데이트
 //   useEffect(() => {
 //     // tenant_id 설정
-//     if (effectiveTenantId !== undefined && effectiveTenantId !== null) {
-//       setTenantId(effectiveTenantId);
+//     if (tenant_id !== undefined && tenant_id !== null) {
+//       setTenantId(tenant_id);
 //     }
     
 //     // 로딩 상태 업데이트
@@ -94,7 +94,7 @@
 //     query.isFetching, 
 //     query.error, 
 //     query.isSuccess,
-//     effectiveTenantId,
+//     tenant_id,
 //     setTenantId,
 //     setTreeData, 
 //     setLoading, 
@@ -119,7 +119,7 @@
   
 //   // 현재 상태를 유지하면서 트리 데이터 다시 가져오기
 //   const refetchTreeData = useCallback(async (tenant_id?: number) => {
-//     const targetTenantId = tenant_id || effectiveTenantId;
+//     const targetTenantId = tenant_id || tenant_id;
     
 //     if (targetTenantId === undefined || targetTenantId === null) {
 //       console.error("테넌트 ID가 없습니다.");
@@ -153,7 +153,7 @@
 //       console.error("트리 데이터 다시 가져오기 오류:", error);
 //       return null;
 //     }
-//   }, [effectiveTenantId, queryClient, setExpandedNodes, setSelectedNodeId]);
+//   }, [tenant_id, queryClient, setExpandedNodes, setSelectedNodeId]);
   
 //   // 훅에서 필요한 상태와 함수 반환
 //   return {
@@ -193,29 +193,33 @@ export const useApiForGetTreeDataForCampaignGroupTab = (initialTenantId?: number
   } = useSideMenuCampaignGroupTabStore();
   
   // tenant_id 결정 (props로 받은 값이 우선, 없으면 스토어 값 사용)
-  const effectiveTenantId = initialTenantId !== undefined ? initialTenantId : storeTenantId;
+  // const tenant_id = initialTenantId !== undefined ? initialTenantId : storeTenantId;
+  const tenant_id = initialTenantId
   
   // 쿼리 키 생성 함수 추가 - 재사용 가능하도록
   const getQueryKey = useCallback(() => 
-    ['campaignTreeDataForCampaignGroupTab', effectiveTenantId], 
-    [effectiveTenantId]
+    ['campaignTreeDataForCampaignGroupTab', tenant_id], 
+    [tenant_id]
   );
 
   // TanStack Query를 사용하여 트리 데이터 가져오기
   const query = useQuery({
     queryKey: getQueryKey(),
     queryFn: async () => {
-      if (effectiveTenantId === undefined || effectiveTenantId === null) {
+      if (tenant_id === undefined || tenant_id === null) {
         throw new Error('테넌트 ID가 없습니다');
       }
       
-      const combinedData = await apiForCombinedTenantAndCampaignGroup(effectiveTenantId);
+      console.log("tenant_id :::::::::::::::::::::::::: ", tenant_id);
+      
+
+      const combinedData = await apiForCombinedTenantAndCampaignGroup(tenant_id);
       return {
         combinedData,
         transformedData: transformToTreeData(combinedData)
       };
     },
-    enabled: effectiveTenantId !== undefined && effectiveTenantId !== null,
+    enabled: tenant_id !== undefined && tenant_id !== null,
     staleTime: 30 * 1000, // 30초 동안 데이터를 "신선한" 상태로 유지 (사이드메뉴와 일치)
     refetchOnWindowFocus: false // 창 포커스 시 자동 리페치 비활성화
   });
@@ -223,8 +227,8 @@ export const useApiForGetTreeDataForCampaignGroupTab = (initialTenantId?: number
   // 쿼리 결과에 따라 스토어 상태 업데이트
   useEffect(() => {
     // tenant_id 설정
-    if (effectiveTenantId !== undefined && effectiveTenantId !== null) {
-      setTenantId(effectiveTenantId);
+    if (tenant_id !== undefined && tenant_id !== null) {
+      setTenantId(tenant_id);
     }
     
     // 로딩 상태 업데이트
@@ -271,7 +275,7 @@ export const useApiForGetTreeDataForCampaignGroupTab = (initialTenantId?: number
     query.isFetching, 
     query.error, 
     query.isSuccess,
-    effectiveTenantId,
+    tenant_id,
     setTenantId,
     setTreeData, 
     setLoading, 
@@ -296,7 +300,7 @@ export const useApiForGetTreeDataForCampaignGroupTab = (initialTenantId?: number
   
   // 현재 상태를 유지하면서 트리 데이터 다시 가져오기
   const refetchTreeData = useCallback(async (tenant_id?: number) => {
-    const targetTenantId = tenant_id || effectiveTenantId;
+    const targetTenantId = tenant_id || tenant_id;
     
     if (targetTenantId === undefined || targetTenantId === null) {
       console.error("테넌트 ID가 없습니다.");
@@ -330,7 +334,7 @@ export const useApiForGetTreeDataForCampaignGroupTab = (initialTenantId?: number
       console.error("트리 데이터 다시 가져오기 오류:", error);
       return null;
     }
-  }, [effectiveTenantId, queryClient, setExpandedNodes, setSelectedNodeId, getQueryKey]);
+  }, [tenant_id, queryClient, setExpandedNodes, setSelectedNodeId, getQueryKey]);
   
   // 캠페인 그룹 트리 데이터 무효화 함수 추가
   const invalidateCampaignGroupTreeData = useCallback(() => {

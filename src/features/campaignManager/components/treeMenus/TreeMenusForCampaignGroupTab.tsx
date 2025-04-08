@@ -10,6 +10,9 @@ import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignMana
 export function TreeMenusForCampaignGroupTab() {
   const { tenant_id } = useAuthStore();
   
+  console.log("tenant_id :!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ", tenant_id);
+  
+
   // TanStack Query 커스텀 훅 사용 (tenant_id 자동 적용)
   const { isLoading, error, data } = useApiForGetTreeDataForCampaignGroupTab(tenant_id);
   

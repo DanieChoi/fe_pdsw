@@ -212,6 +212,11 @@ export function ContextMenuForCampaignForCampaignTab({
       href: '',
       content: null,
       campaignId: campaignId,
+      params: {
+        sessionKey: session_key,
+        campaignId: campaignId,
+        tenantId: tenant_id,
+      },
     });
   };
 

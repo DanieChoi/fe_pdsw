@@ -59,6 +59,8 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   const [_agentData, _setAgentData] = useState<AgentData[]>([]);
   const { statisticsUpdateCycle } = useEnvironmentStore();
 
+  console.log("agentData ::::::::::::::::::::::::::::::::::::: ", agentData);
+
   const handleStatusChange = (status: keyof AgentStatus): void => {
     setSelectedStatuses(prev => ({
       ...prev,
