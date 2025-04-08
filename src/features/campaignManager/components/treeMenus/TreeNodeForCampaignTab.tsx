@@ -35,7 +35,7 @@ export function TreeNodeForCampaignTab({
   const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
   const isTenantFolder = item.type === "folder" && level === 1;
 
-  const currentStatus = currentCampaign ? 
+  const currentStatus = currentCampaign ?
     (() => {
       switch (currentCampaign.campaign_status) {
         case 1: return "started";
@@ -43,7 +43,7 @@ export function TreeNodeForCampaignTab({
         case 3: return "stopped";
         default: return item.status;
       }
-    })() : 
+    })() :
     item.status;
 
   // Update the item with the current status to ensure it's passed to the ContextMenu
@@ -79,11 +79,11 @@ export function TreeNodeForCampaignTab({
   const handleEdit = useCallback(() => {
     console.log("Edit clicked:", { id: item.id, label: item.label, type: item.type });
   }, [item.id, item.label, item.type]);
-  
+
   const handleMonitor = useCallback(() => {
     console.log("Monitor clicked:", { id: item.id, label: item.label, type: item.type });
   }, [item.id, item.label, item.type]);
-  
+
   const onHandleCampaignCopy = useCallback(() => {
     console.log("Copy clicked:", { id: item.id, label: item.label, type: item.type });
     setCampaignIdForUpdateFromSideMenu(item.id);
@@ -130,7 +130,7 @@ export function TreeNodeForCampaignTab({
         />
       );
     }
-    
+
     if (item.type === "campaign") {
       return statusIcon ? (
         <Image src={statusIcon} alt="status" width={12} height={12} className="flex-shrink-0" />
@@ -138,7 +138,7 @@ export function TreeNodeForCampaignTab({
         <FileText className={`${compact ? 'h-4 w-4' : 'h-4 w-4'} text-gray-400 flex-shrink-0`} />
       );
     }
-    
+
     return <FileText className={`${compact ? 'h-4 w-4' : 'h-4 w-4'} text-gray-400 flex-shrink-0`} />;
   };
 
@@ -165,45 +165,46 @@ export function TreeNodeForCampaignTab({
   );
 
   // 공통된 노드 내용 컴포넌트
-// nodeContent 부분을 다음과 같이 수정합니다
-const nodeContent = (
-  <div className="flex items-center w-full gap-1">
-    {/* 폴더 타입이고 자식이 있는 경우에만 확장 아이콘 표시 */}
-    {item.type === "folder" && hasChildren ? (
-      isExpanded ? (
-        <Image
-          src="/tree-menu/minus_for_tree.png"
-          alt="접기"
-          width={12}
-          height={12}
-          className="flex-shrink-0"
-          onClick={(e) => {
-            e.stopPropagation();
-            onNodeToggle(item.id);
-          }}
-        />
+  // nodeContent 부분을 다음과 같이 수정합니다
+  const nodeContent = (
+    <div className="flex items-center w-full gap-1">
+      {/* 폴더 타입이고 자식이 있는 경우에만 확장 아이콘 표시 */}
+      {item.type === "folder" && hasChildren ? (
+        isExpanded ? (
+          <Image
+            src="/tree-menu/minus_for_tree.png"
+            alt="접기"
+            width={12}
+            height={12}
+            className="flex-shrink-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              onNodeToggle(item.id);
+            }}
+          />
+        ) : (
+          <Image
+            src="/tree-menu/plus_icon_for_tree.png"
+            alt="펼치기"
+            width={12}
+            height={12}
+            className="flex-shrink-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              onNodeToggle(item.id);
+            }}
+          />
+        )
       ) : (
-        <Image
-          src="/tree-menu/plus_icon_for_tree.png"
-          alt="펼치기"
-          width={12}
-          height={12}
-          className="flex-shrink-0"
-          onClick={(e) => {
-            e.stopPropagation();
-            onNodeToggle(item.id);
-          }}
-        />
-      )
-    ) : (
-      <span className="w-3" />
-    )}
-    {getNodeIcon()}
-    <span className={textStyle}>
-      {item.label}{(isTenantFolder || item.type === "campaign") && ` (${item.id})`}
-    </span>
-  </div>
-);
+        <span className="w-3" />
+      )}
+      {getNodeIcon()}
+      <span className={textStyle}>
+        {(isTenantFolder || item.type === "campaign") && ` [${item.id}]`}
+        {item.label}
+      </span>
+    </div>
+  );
 
   // 레벨 인덴트 계산 - 컴팩트 모드일 경우 더 작은 인덴트
   const indentSize = compact ? 12 : 16;

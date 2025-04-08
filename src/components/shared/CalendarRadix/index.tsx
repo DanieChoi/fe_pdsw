@@ -43,13 +43,13 @@ export const CalendarHeadless = ({
           <Button
             variant="outline"
             className={cn(
-              "w-full justify-center px-3 text-center font-medium h-10 border border-input bg-background shadow-sm rounded-md",
+              "w-full justify-between px-3 text-left font-medium h-10 border border-input bg-background shadow-sm rounded-md",
               !date && "text-muted-foreground"
             )}
           >
-            <div className="flex items-center gap-2 justify-center">
+            <div className="flex items-center justify-between w-full">
+              <span>{date ? format(date, "yyyy-MM-dd", { locale: ko }) : <span>날짜 선택</span>}</span>
               <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-              {date ? format(date, "yyyy-MM-dd", { locale: ko }) : <span>날짜 선택</span>}
             </div>
           </Button>
         </Popover.Button>

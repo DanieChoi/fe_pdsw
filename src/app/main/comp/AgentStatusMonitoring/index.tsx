@@ -212,7 +212,8 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
     <div className="w-full h-full flex flex-col gap-4">
       <div>
         <TitleWrap
-          title={`상담사 상태 통계 (캠페인 ID: ${campaignId})`}
+          // title={`상담사 상태 통계 (캠페인 ID: ${campaignId})`}
+          title={`상담사 상태 통계${campaignId ? ` (캠페인 ID: ${campaignId})` : ''}`}
           className="border-b border-gray-300 pb-1"
         />
         <Table>
