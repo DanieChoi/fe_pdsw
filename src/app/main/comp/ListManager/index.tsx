@@ -757,22 +757,6 @@ const ListManager: React.FC = () => {
     }  
   }
 
-  // useEffect(() => {
-  //   if( campaignIdForUpdateFromSideMenu ){
-  //     setCallListInsertData({
-  //       ..._callListInsertData,
-  //       campaign_id: Number(campaignIdForUpdateFromSideMenu)
-  //     });
-  //     setCampaignIdDisabled(true);
-  //   }else{
-  //     setCallListInsertData({
-  //       ..._callListInsertData,
-  //       campaign_id: 0
-  //     });
-  //     setCampaignIdDisabled(false);
-  //   }
-  // }, [campaignIdForUpdateFromSideMenu]);
-
   useEffect(() => {
     if (activeTabId === 7) {
       const tempData = openedTabs.filter(tab => tab.id === 7);
