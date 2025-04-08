@@ -185,7 +185,7 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
 
   const handleMainRowsChange = (newRows: MainRow[]) => {
     let check = true;
-    for( var i=0;i<newRows.length;i++){
+    for( let i=0;i<newRows.length;i++){
       if( newRows[i].count1 < 1 ){
         newRows[i].count1 = 1;
         check = false;
