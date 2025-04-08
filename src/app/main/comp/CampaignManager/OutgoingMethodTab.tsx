@@ -34,7 +34,7 @@ const CampaignOutgoingMethodTab:OutgoingMethodTabParam = {
   dial_try_interval: 0,           //재시도 간격(초)
   alarm_answer_count: 0,          //콜 목표량
   overdial_abandon_time: 0,       //포기호 처리시간(초)
-  detect_mode: 0,                 //기계음 처리 - 자동응답기 처리 1 : 컬러링 판별 후 사람만 연결, 2 : 컬러링 판별 후 사람/기계음 연결, 3 : 기계음/사람 무조건 연결
+  detect_mode: 1,                 //기계음 처리 - 자동응답기 처리 1 : 컬러링 판별 후 사람만 연결, 2 : 컬러링 판별 후 사람/기계음 연결, 3 : 기계음/사람 무조건 연결
   auto_dial_interval: 0,          //자동 다이얼 시
   power_divert_queue: 0,          //연결 IVR NO 및 다이얼 모드
   next_campaign: 0,               //연결 캠페인
@@ -149,12 +149,15 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
 
   useEffect(() => {
     if (campaignInfo) {  
+      // 서버에서 값이 0이거나 없는 경우, 기본값 1로 설정
+      const detectMode = campaignInfo.detect_mode === 0 ? 1 : campaignInfo.detect_mode;
+      
       setTempOutgoingMethodTab({...tempOutgoingMethodTab
         ,trunk_access_code : campaignInfo.trunk_access_code
         ,dial_try_interval : campaignInfo.dial_try_interval
         ,alarm_answer_count : campaignInfo.alarm_answer_count
         ,overdial_abandon_time : campaignInfo.overdial_abandon_time
-        ,detect_mode : campaignInfo.detect_mode
+        ,detect_mode : detectMode  // 기본값 1로 설정
         ,auto_dial_interval : campaignInfo.auto_dial_interval
         ,power_divert_queue : Number(campaignInfo.power_divert_queue)
         ,next_campaign : campaignInfo.next_campaign
@@ -174,6 +177,16 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
       }
     }
   }, [campaignInfo]);
+
+  // 초기 생성시에 기본값으로 1 설정하기
+  useEffect(() => {
+    if (callCampaignMenu === 'NewCampaignManager' || callCampaignMenu === 'CampaignClone') {
+      onCampaignOutgoingMethodChange({
+        ...tempOutgoingMethodTab,
+        detect_mode: 1  // 컬러링 판별후 사람만연결
+      });
+    }
+  }, [callCampaignMenu]);
 
   return (
     <div className="py-5">
@@ -243,7 +256,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
               onValueChange={handleMachineHandling}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder={tempOutgoingMethodTab.detect_mode} />
+                <SelectValue placeholder="컬러링 판별후 사람만연결" />
               </SelectTrigger>
               <SelectContent>
                 {useMachineHandling.map((option) => (
