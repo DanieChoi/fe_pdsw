@@ -107,7 +107,7 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
       name: '통화중 실패',
       children: [
         { key: 'count1', name: '횟수',  renderCell: EditableCell },
-        { key: 'duration1', name: '긴급',  renderCell: EditableCell },
+        { key: 'duration1', name: '간격',  renderCell: EditableCell },
       ],
     },
     {
@@ -116,15 +116,15 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
       width: 120,
       children: [
         { key: 'count2', name: '횟수',  renderCell: EditableCell },
-        { key: 'duration2', name: '긴급',  renderCell: EditableCell },
+        { key: 'duration2', name: '간격',  renderCell: EditableCell },
       ],
     },
     {
       key: 'section3',
-      name: '목소/전화번호 오류',
+      name: '팩스/전화번호 오류',
       children: [
         { key: 'count3', name: '횟수',  renderCell: EditableCell },
-        { key: 'duration3', name: '긴급',  renderCell: EditableCell },
+        { key: 'duration3', name: '간격',  renderCell: EditableCell },
       ],
     },
     {
@@ -132,7 +132,7 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
       name: '기계음 실패',
       children: [
         { key: 'count4', name: '횟수', renderCell: EditableCell },
-        { key: 'duration4', name: '긴급', renderCell: EditableCell },
+        { key: 'duration4', name: '간격', renderCell: EditableCell },
       ],
     },
     {
@@ -140,7 +140,7 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
       name: '기타 실패',
       children: [
         { key: 'count5', name: '횟수', renderCell: EditableCell },
-        { key: 'duration5', name: '긴급',  renderCell: EditableCell },
+        { key: 'duration5', name: '간격',  renderCell: EditableCell },
       ],
     },
     {
@@ -148,7 +148,7 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
       name: '고객 바로 끊음',
       children: [
         { key: 'count6', name: '횟수', renderCell: EditableCell },
-        { key: 'duration6', name: '긴급',  renderCell: EditableCell },
+        { key: 'duration6', name: '간격',  renderCell: EditableCell },
       ],
     },
     {
@@ -156,7 +156,7 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
       name: '채널오류',
       children: [
         { key: 'count7', name: '횟수', renderCell: EditableCell },
-        { key: 'duration7', name: '긴급',  renderCell: EditableCell },
+        { key: 'duration7', name: '간격',  renderCell: EditableCell },
       ],
     },
   ];
@@ -184,12 +184,60 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
   }
 
   const handleMainRowsChange = (newRows: MainRow[]) => {
-    setRows(newRows);
-    onCampaignOutgoingStrategyChange({...tempOutgoingStrategyTab      
-        , changeYn: true
-        , campaignInfoChangeYn: true
-        , redial_strategy: tempOutgoingStrategyTab.redial_strategy.map((val,index) => changeRedialStrategyData(newRows[index],val))
-    });
+    let check = true;
+    for( let i=0;i<newRows.length;i++){
+      if( newRows[i].count1 < 1 ){
+        newRows[i].count1 = 1;
+        check = false;
+      }else if( newRows[i].count2 < 1 ){
+        newRows[i].count2 = 1;
+        check = false;
+      }else if( newRows[i].count3 < 1 ){
+        newRows[i].count3 = 1;
+        check = false;
+      }else if( newRows[i].count4 < 1 ){
+        newRows[i].count4 = 1;
+        check = false;
+      }else if( newRows[i].count5 < 1 ){
+        newRows[i].count5 = 1;
+        check = false;
+      }else if( newRows[i].count6 < 1 ){
+        newRows[i].count6 = 1;
+        check = false;
+      }else if( newRows[i].count7 < 1 ){
+        newRows[i].count7 = 1;
+        check = false;
+      }else if( newRows[i].duration1 < 0 ){
+        newRows[i].duration1 = 0;
+        check = false;
+      }else if( newRows[i].duration2 < 0 ){
+        newRows[i].duration2 = 0;
+        check = false;
+      }else if( newRows[i].duration3 < 0 ){
+        newRows[i].duration3 = 0;
+        check = false;
+      }else if( newRows[i].duration4 < 0 ){
+        newRows[i].duration4 = 0;
+        check = false;
+      }else if( newRows[i].duration5 < 0 ){
+        newRows[i].duration5 = 0;
+        check = false;
+      }else if( newRows[i].duration6 < 0 ){
+        newRows[i].duration6 = 0;
+        check = false;
+      }else if( newRows[i].duration7 < 0 ){
+        newRows[i].duration7 = 0;
+        check = false;
+      }
+    }
+    if(check){
+      setRows(newRows);
+      onCampaignOutgoingStrategyChange({...tempOutgoingStrategyTab      
+          , changeYn: true
+          , campaignInfoChangeYn: true
+          , redial_strategy: tempOutgoingStrategyTab.redial_strategy.map((val,index) => changeRedialStrategyData(newRows[index],val))
+      });
+    }
   };
 
   useEffect(() => {
