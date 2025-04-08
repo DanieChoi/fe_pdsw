@@ -263,10 +263,10 @@ export function TreeNodeForSideBarCampaignGroupTab({
         {renderIcon()}
         <span className={`flex text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
           {getStatusIcon(node.start_flag) && <Image src={getStatusIcon(node.start_flag) || ''} alt="상태" width={12} height={12} className="mr-1" />}
-          {node.name}
+          [{node.campaign_id}]{node.name}
           {node.type === "campaign" && node.campaign_id && (
             <span className="ml-1 text-xs text-[#555]">
-              (ID: {node.campaign_id})
+              {/* (ID: {node.campaign_id}) */}
             </span>
           )}
         </span>
