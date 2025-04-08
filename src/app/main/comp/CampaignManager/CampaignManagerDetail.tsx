@@ -675,7 +675,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   //캠페인 발신순서 탭 변경
   const handleCampaignOutgoingOrderChange = (value: OutgoingOrderTabParam) => {
 
-    alert("확인 버튼 클릭!")
+    // alert("확인 버튼 클릭!")
 
     if (value.campaignInfoChangeYn) {
       // setChangeYn(true);

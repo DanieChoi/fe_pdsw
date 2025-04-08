@@ -413,14 +413,14 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
  
   const modalContent = (
     <div className="w-full">
-      <div className="flex items-center gap-2 mb-1">
+      {/* <div className="flex items-center gap-2 mb-1">
         <CustomCheckbox
           id="originaldata" checked={originaldataYn} onCheckedChange={(checked) => setOriginaldataYn(checked === true)}
         />
         <Label htmlFor="originaldata" className="text-sm">
           원본 데이터를 서버전송 후 삭제합니다.
         </Label>
-      </div>
+      </div> */}
 
       <div className="mb-4">
         <p className="text-sm">* 블랙리스트의 경우 고객키[1], 고객이름 항목만 사용 합니다.</p>

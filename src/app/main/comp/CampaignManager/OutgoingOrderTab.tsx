@@ -144,6 +144,7 @@ const OutgoingOrderTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onC
         , phone_dial_try: tempCampaignOutgoingOrderTab.phone_dial_try.map((val, idx) => idx === index - 1 ? 1 : val)
         , phone_order: rightList.length == 0?'1'+index:(rightList.length+1) + tempCampaignOutgoingOrderTab.phone_order.substring(1) + index
       });
+      setSelectedRight(rightList.length+1);
     }
   };
 
@@ -169,6 +170,7 @@ const OutgoingOrderTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onC
           , phone_dial_try: tempCampaignOutgoingOrderTab.phone_dial_try.map((val, idx) => idx === index - 1 ? 0 : val)
           , phone_order: rightList.length == 1?'':(rightList.length-1) + tempCampaignOutgoingOrderTab.phone_order.substring(1,idx) + tempCampaignOutgoingOrderTab.phone_order.substring(idx+1)
         });
+        setSelectedLeft(removedItem.label);
       }
     }
   };
@@ -176,7 +178,7 @@ const OutgoingOrderTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onC
   const moveUp = () => {
     if (selectedRight !== null) {
       const index = rightList.findIndex((item) => item.id === selectedRight);
-      if (index > 0) {
+      if (index > 0 && rightList.length > 1) {
         const updatedList = [...rightList];
         [updatedList[index - 1], updatedList[index]] = [updatedList[index], updatedList[index - 1]];
         setRightList(
@@ -186,7 +188,6 @@ const OutgoingOrderTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onC
           }))
         );
         if( rightList.length > 2){
-          setSelectedRight(index); // 선택된 항목을 이동된 순서에 맞게 업데이트
           const upItem = rightList.find((item) => item.id === selectedRight);
           const cnt = Number(upItem?.label.substring(8,9));
           const idx = tempCampaignOutgoingOrderTab.phone_order.lastIndexOf(cnt+'');
@@ -196,6 +197,8 @@ const OutgoingOrderTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onC
             , phone_order: tempCampaignOutgoingOrderTab.phone_order.substring(0,idx-1) + tempCampaignOutgoingOrderTab.phone_order.substring(idx,idx+1) + tempCampaignOutgoingOrderTab.phone_order.substring(idx-1,idx) + tempCampaignOutgoingOrderTab.phone_order.substring(idx+1)
           });
         }
+        setSelectedLeft(null);
+        setSelectedRight(index); // 선택된 항목을 이동된 순서에 맞게 업데이트
       }
     }
   };
@@ -203,7 +206,7 @@ const OutgoingOrderTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onC
   const moveDown = () => {
     if (selectedRight !== null) {
       const index = rightList.findIndex((item) => item.id === selectedRight);
-      if (index < rightList.length - 1) {
+      if (index < rightList.length - 1 && rightList.length > 1) {
         const updatedList = [...rightList];
         [updatedList[index], updatedList[index + 1]] = [updatedList[index + 1], updatedList[index]];
         setRightList(
@@ -212,9 +215,8 @@ const OutgoingOrderTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onC
             label: item.label,
           }))
         );
-        setSelectedRight(index + 2); // 선택된 항목을 이동된 순서에 맞게 업데이트
         if( rightList.length > 2){
-          setSelectedRight(index); // 선택된 항목을 이동된 순서에 맞게 업데이트
+          // setSelectedRight(index); // 선택된 항목을 이동된 순서에 맞게 업데이트
           const upItem = rightList.find((item) => item.id === selectedRight);
           const cnt = Number(upItem?.label.substring(8,9));
           const idx = tempCampaignOutgoingOrderTab.phone_order.lastIndexOf(cnt+'');
@@ -224,6 +226,8 @@ const OutgoingOrderTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onC
             , phone_order: tempCampaignOutgoingOrderTab.phone_order.substring(0,idx) + tempCampaignOutgoingOrderTab.phone_order.substring(idx+1,idx+2) + tempCampaignOutgoingOrderTab.phone_order.substring(idx,idx+1) + tempCampaignOutgoingOrderTab.phone_order.substring(idx+2)
           });
         }
+        setSelectedLeft(null);
+        setSelectedRight(index + 2); // 선택된 항목을 이동된 순서에 맞게 업데이트
       }
     }
   };
@@ -236,6 +240,12 @@ const OutgoingOrderTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onC
     });
   };
 
+  useEffect(() => {
+    if (selectedRight != null) {
+      console.log(selectedRight);
+    }
+  }, [selectedRight]);
+   
 
   return (
     <div className="py-5">
