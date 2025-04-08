@@ -95,8 +95,8 @@ const CallbackTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onHandle
               <SelectValue placeholder="Select an option" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1">일반 callback</SelectItem>
-              <SelectItem value="2">무한 callback</SelectItem>
+              <SelectItem value="1">무한 callback</SelectItem>
+              <SelectItem value="2">일반 callback</SelectItem>
             </SelectContent>
           </Select>
         </div>
