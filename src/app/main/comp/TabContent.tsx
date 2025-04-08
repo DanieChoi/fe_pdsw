@@ -70,8 +70,16 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
     case 21:
       // 캠페인 ID를 props로 전달
       return <CampaignMonitorDashbord campaignId={campaignId} />;
+    // case 22:
+    //   return <AgentStatusMonitoring campaignId={params?.campainId}/>;
     case 22:
-      return <AgentStatusMonitoring campaignId={params?.campainId}/>;
+      return (
+        <AgentStatusMonitoring
+          sessionKey={params?.sessionKey}
+          campaignId={params?.campaignId}
+          tenantId={params?.tenantId}
+        />
+      );
     case 23:
       return <SystemMonitoring />;
     case 24:

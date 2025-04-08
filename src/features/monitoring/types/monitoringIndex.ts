@@ -6,6 +6,12 @@ export interface CampaignProgressInformationRequest {
   campaignId: number;
 }
 
+export interface IRequestTypeForFetchConsultantStatusMonitorData {
+  tenantId: number;
+  campaignId: number;
+  sessionKey: string;
+}
+
 // 캠페인진행정보 응답 데이터 타입
 export interface CampaignProgressInformationResponseDataType {
   tenantId: number;                   //테넌트ID

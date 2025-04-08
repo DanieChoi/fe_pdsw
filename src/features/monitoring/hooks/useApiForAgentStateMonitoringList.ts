@@ -4,6 +4,7 @@ import { fetchAgentStateMonitoringList } from '../api/mainAgentStateMonitoringLi
 import { UseMutationOptions } from '@tanstack/react-query';
 import { CampaignProgressInformationRequest, AgentStateMonitoringListResponse, MonitoringApiError } from '../types/monitoringIndex';
 
+// 상담 모니터 목록
 export function useApiForAgentStateMonitoringList(
   options?: UseMutationOptions<AgentStateMonitoringListResponse, MonitoringApiError, CampaignProgressInformationRequest>
 ) {
@@ -19,8 +20,6 @@ export function useApiForAgentStateMonitoringList(
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: MonitoringApiError, variables: CampaignProgressInformationRequest, context: unknown) => {
-      // console.error('API Error:', error);
-      // toast.error(error.message || '데이터 로드에 실패했습니다.');
       options?.onError?.(error, variables, context);
     },
   });
