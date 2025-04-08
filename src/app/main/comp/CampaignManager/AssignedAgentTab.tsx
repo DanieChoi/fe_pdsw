@@ -78,6 +78,7 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
             counselorId: counselor.counselorId,
             counselorname: counselor.counselorname
         });
+        group.children.sort((a: TreeRow, b: TreeRow) => a.id.localeCompare(b.id));
     });
 
     return result;
@@ -168,7 +169,7 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
         if (row.level === 0) {
           displayName = `상담그룹 : ${row.affiliationGroupId}`;
         } else if (row.level === 1) {
-          displayName = `상담팀${row.affiliationTeamId}`;
+          displayName = `상담파트 : ${row.affiliationTeamId}`;
         } else {
           displayName = row.id;
         }
