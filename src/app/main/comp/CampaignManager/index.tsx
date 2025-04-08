@@ -30,7 +30,7 @@ type Props = {
 
 const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) => {
 
-  const { tenants, campaigns, setCampaigns } = useMainStore();
+  const { tenants, campaigns, selectedCampaign, setCampaigns, setSelectedCampaign } = useMainStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
   const [_campaignId, _setCampaignId] = useState<string>('');
   const [alertState, setAlertState] = useState(errorMessage);
@@ -116,7 +116,11 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
         tenant_id_array: tempTenantIdArray
       });
     }
-  }, [tenants, campaigns]);
+    if( campaigns.length > 0 && selectedCampaign != null) {
+      setSelectedCampaign( campaigns.filter( campaign => campaign.campaign_id === Number(selectedCampaign.campaign_id))[0] );
+    }
+
+  }, [tenants, campaigns,selectedCampaign]);
 
   useEffect(() => {
     console.log('campaignIdForUpdateFromSideMenu:', campaignIdForUpdateFromSideMenu);
