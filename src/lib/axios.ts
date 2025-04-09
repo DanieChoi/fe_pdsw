@@ -36,7 +36,8 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   async (response) => {
     const url = response.config.url || '';
-    if( url !== '/login' ) {
+    const userId = getCookie('id');
+    if( url !== '/login' && userId != null && userId != '' ) {
       let activation = '';
       let eventName = '';
       let queryType = 'R';
@@ -379,7 +380,7 @@ axiosInstance.interceptors.response.use(
       }
       const logData = {
           "tenantId": Number(getCookie('tenant_id')),
-          "employeeId": getCookie('id'),
+          "employeeId": userId,
           "userHost": getCookie('userHost'),
           "queryId": response.config.url,
           "queryType": queryType,
@@ -392,7 +393,7 @@ axiosInstance.interceptors.response.use(
           "userSessionType": 0,
           "exportFlag": 1,
           "memo": "",
-          "updateEmployeeId": getCookie('id')
+          "updateEmployeeId": userId
       };
       const { data } = await axiosRedisInstance.post<{code:string;message:string;}>(
         `/log/save`,
@@ -403,7 +404,8 @@ axiosInstance.interceptors.response.use(
   },
   async (error) => {
     const url = error.config.url || '';
-    if( url !== '/login' ) {
+    const userId = getCookie('id');
+    if( url !== '/login' && userId != null && userId != '' ) {
       let activation = '';
       let eventName = '';
       let queryType = 'R';
@@ -744,7 +746,7 @@ axiosInstance.interceptors.response.use(
       }
       const logData = {
           "tenantId": Number(getCookie('tenant_id')),
-          "employeeId": getCookie('id'),
+          "employeeId": userId,
           "userHost": getCookie('userHost'),
           "queryId": error.config.url,
           "queryType": queryType,
@@ -757,7 +759,7 @@ axiosInstance.interceptors.response.use(
           "userSessionType": 0,
           "exportFlag": 1,
           "memo": "",
-          "updateEmployeeId": getCookie('id')
+          "updateEmployeeId": userId
       };
       const { data } = await axiosRedisInstance.post<{code:string;message:string;}>(
         `/log/save`,
@@ -775,7 +777,8 @@ axiosInstance.interceptors.response.use(
 axiosRedisInstance.interceptors.response.use(
   async (response) => {
     const url = response.config.url || '';
-    if( url !== '/log/save' ) {
+    const userId = getCookie('id');
+    if( url !== '/log/save' && userId != null && userId != '' ) {
       let activation = '';
       let eventName = '';
       let queryType = 'R';
@@ -827,7 +830,7 @@ axiosRedisInstance.interceptors.response.use(
       }
       const logData = {
           "tenantId": Number(getCookie('tenant_id')),
-          "employeeId": getCookie('id'),
+          "employeeId": userId,
           "userHost": getCookie('userHost'),
           "queryId": response.config.url,
           "queryType": queryType,
@@ -840,7 +843,7 @@ axiosRedisInstance.interceptors.response.use(
           "userSessionType": 0,
           "exportFlag": 1,
           "memo": "",
-          "updateEmployeeId": getCookie('id')
+          "updateEmployeeId": userId
       };
       const { data } = await axiosRedisInstance.post<{code:string;message:string;}>(
         `/log/save`,
@@ -855,7 +858,8 @@ axiosRedisInstance.interceptors.response.use(
       return Promise.reject(new Error('세션이 만료되었습니다. 다시 로그인해주세요.'));
     }
     const url = error.config.url || '';
-    if( url !== '/log/save' ) {
+    const userId = getCookie('id');
+    if( url !== '/log/save' && userId != null && userId != '' ) {
       let activation = '';
       let eventName = '';
       let queryType = 'R';
@@ -907,7 +911,7 @@ axiosRedisInstance.interceptors.response.use(
       }
       const logData = {
           "tenantId": Number(getCookie('tenant_id')),
-          "employeeId": getCookie('id'),
+          "employeeId": userId,
           "userHost": getCookie('userHost'),
           "queryId": error.config.url,
           "queryType": queryType,
@@ -920,7 +924,7 @@ axiosRedisInstance.interceptors.response.use(
           "userSessionType": 0,
           "exportFlag": 1,
           "memo": "",
-          "updateEmployeeId": getCookie('id')
+          "updateEmployeeId": userId
       };
       const { data } = await axiosRedisInstance.post<{code:string;message:string;}>(
         `/log/save`,
