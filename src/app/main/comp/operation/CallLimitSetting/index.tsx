@@ -111,18 +111,24 @@ const CampaignSettings = () => {
 
   // 제한건수 추가 API 
   const { mutate: createCallLimitSetting } = useApiForCallLimitSettingCreate({
-    onSuccess: () => {
-      // 저장 성공 후 리스트를 새로 가져오기
-      fetchCallLimitSettingList({
-        tenant_id_array: tenants.map(tenant => tenant.tenant_id)
-      });
-      
-      // 저장 후에도 현재 선택된 캠페인 정보 유지
-      // 신규 모드는 해제하지만, 선택 상태는 유지
-      setIsNewMode(false);
-      
-      // 저장 성공 메시지 표시
-      showAlert('저장되었습니다.');
+    onSuccess: (data) => {
+      if( data.result_code === -1 ){
+        // -9053 메시지 표시
+        showAlert('리스트 등록 건수를 초과하였습니다.');
+      }else{
+
+        // 저장 성공 후 리스트를 새로 가져오기
+        fetchCallLimitSettingList({
+          tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+        });
+        
+        // 저장 후에도 현재 선택된 캠페인 정보 유지
+        // 신규 모드는 해제하지만, 선택 상태는 유지
+        setIsNewMode(false);
+        
+        // 저장 성공 메시지 표시
+        showAlert('저장되었습니다.');
+      }
     },
     onError: (error) => {
       if (error.message.split('||')[0] === '5') {

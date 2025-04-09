@@ -86,6 +86,12 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
         { name: '리스트대비(%)', value: (selectedCall?.scct || 0) === 0?0:parseFloat(((selectedCall?.scct || 0)/(selectedCall?.totLstCnt || 0)*100).toFixed(1)), color: '#88B3FC' }
       ];
       setTempBarChartData(tempBarChartData);
+    }else{
+      const tempBarChartData: SuccessRateData[] = [
+        { name: '발신대비(%)', value: 0, color: '#FF8DA0' },
+        { name: '리스트대비(%)', value: 0, color: '#88B3FC' }
+      ];
+      setTempBarChartData(tempBarChartData);
     }
   }, [selectedCall]);
   
