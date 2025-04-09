@@ -204,7 +204,11 @@ export function ContextMenuForCampaignForCampaignTab({
     });
   };
 
-  const handleMonitorClick = (tenantId: any, campaignId: any, campaignName: string) => {
+  const handleMonitorClick = (tenantIdForCampaignTab: any, campaignId: any, campaignName: string) => {
+
+    console.log("tenantIdForCampaignTab : ", tenantIdForCampaignTab);
+    
+
     const uniqueKey = `monitor-${Date.now()}`;
     addMultiTab({
       id: 22,
@@ -217,7 +221,7 @@ export function ContextMenuForCampaignForCampaignTab({
       params: {
         sessionKey: session_key,
         campaignId: campaignId,
-        tenantId: tenantId,
+        tenantId: tenantIdForCampaignTab,
       },
     });
   };
@@ -413,7 +417,7 @@ export function ContextMenuForCampaignForCampaignTab({
     {
       key: "monitor",
       title: "상담사 상태 모니터",
-      onClick: () => handleMonitorClick(tenantIdForCampaignTab, item.id, item.label),
+      onClick: () => handleMonitorClick(item.id, item.id, item.label),
       menuId: 29,
     },
     {

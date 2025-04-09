@@ -182,23 +182,23 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
     }
   }, [data]);
   
-  useEffect(() => {
-    if (_agentData.length > 0) {
-      let tempCounter = 0;
-      const interval = setInterval(() => {
-        const tempData = [];
-        for (let i = 0; i < _agentData.length; i++) {
-          tempData.push({
-            ..._agentData[i],
-            time: getStatusTime(Number(_agentData[i].time) + tempCounter)
-          });
-        }
-        setAgentData(tempData);
-        tempCounter++;
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [_agentData]);
+  // useEffect(() => {
+  //   if (_agentData.length > 0) {
+  //     let tempCounter = 0;
+  //     const interval = setInterval(() => {
+  //       const tempData = [];
+  //       for (let i = 0; i < _agentData.length; i++) {
+  //         tempData.push({
+  //           ..._agentData[i],
+  //           time: getStatusTime(Number(_agentData[i].time) + tempCounter)
+  //         });
+  //       }
+  //       setAgentData(tempData);
+  //       tempCounter++;
+  //     }, 1000);
+  //     return () => clearInterval(interval);
+  //   }
+  // }, [_agentData]);
 
   return (
       <>
