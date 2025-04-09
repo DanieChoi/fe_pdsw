@@ -308,7 +308,7 @@ export function TreeNodeForCampaignTab({
   // Get the most current status from the campaigns store
   const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
   const isTenantFolder = item.type === "folder" && level === 1;
-  const isRootNode = item.id.toLowerCase() === "nexus"; // Check if this is the root node
+  const isRootNode = item.label.toLowerCase() === "nexus"; // Check if this is the root node
 
   const currentStatus = currentCampaign ?
     (() => {

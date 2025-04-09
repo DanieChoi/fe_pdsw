@@ -30,8 +30,8 @@ export const useApiForGetConsultantStatusMonitorData = (
     >({
         queryKey,
         queryFn: () => fetchConsultantStatusMonitorData(credentials),
-        // ...options
-        refetchInterval: statisticsUpdateCycle, // Refetch every 30 seconds by default
+        ...options
+        // refetchInterval: statisticsUpdateCycle, // Refetch every 30 seconds by default
         // staleTime: 10000, // Consider data stale after 10 seconds
     });
 };
