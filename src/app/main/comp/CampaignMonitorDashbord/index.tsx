@@ -89,10 +89,12 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
       
       // 첫 번째 항목을 선택 (데이터가 있는 경우에만)
       // 마지막 항목 선택으로 변경 20250325
-      if (tempList.length > 0 && !selectedCall) {
+      if (tempList.length > 0 && selectedCall == null ) {
         setSelectedCall(tempList[tempList.length-1]);
-      }else{
-        
+      }else if (tempList.length > 0 && selectedCall != null && selectedCall.campId != tempList[0].campId ) {
+        setSelectedCall(tempList[tempList.length-1]);
+      }else if(tempList.length == 0){
+        setSelectedCall(null);
       }
       
       console.log("API 응답 데이터:", tempList);
