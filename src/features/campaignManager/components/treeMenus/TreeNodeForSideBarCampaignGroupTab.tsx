@@ -310,8 +310,11 @@ export function TreeNodeForSideBarCampaignGroupTab({
           onEdit={handleEditCampaign}
           onMonitor={handleMonitorCampaign}
           onHandleCampaignCopy={handleCopyCampaign}
+
+          // tofix 0409 tenantId 전달 해야함 캠페인의 tenantId
+          tenantIdForCampaignTab= {node.tenant_id}
         >
-          {renderNodeUI()}
+          {renderNodeUI()} 
         </IContextMenuForCampaignForCampaignGroup>
       );
     }

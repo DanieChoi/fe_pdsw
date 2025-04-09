@@ -533,6 +533,9 @@ export function TreeMenusForCampaigns() {
   // 트리 데이터 API 호출
   const { data: treeData, isLoading, error } = useApiForGetTreeMenuDataForSideMenu();
 
+  console.log("트리 데이터 at 캠페인탭:", treeData);
+  
+
   // 트리 노드 선택/확장 상태 관리
   const {
     selectedNodeId,

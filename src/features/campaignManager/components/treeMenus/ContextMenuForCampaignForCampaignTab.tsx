@@ -205,9 +205,7 @@ export function ContextMenuForCampaignForCampaignTab({
   };
 
   const handleMonitorClick = (tenantIdForCampaignTab: any, campaignId: any, campaignName: string) => {
-
-    console.log("tenantIdForCampaignTab : ", tenantIdForCampaignTab);
-    
+    console.log("tenantId 확인 at 캠페인탭 : ", tenantIdForCampaignTab);
 
     const uniqueKey = `monitor-${Date.now()}`;
     addMultiTab({
@@ -417,7 +415,7 @@ export function ContextMenuForCampaignForCampaignTab({
     {
       key: "monitor",
       title: "상담사 상태 모니터",
-      onClick: () => handleMonitorClick(item.id, item.id, item.label),
+      onClick: () => handleMonitorClick(tenantIdForCampaignTab, item.id, item.label),
       menuId: 29,
     },
     {

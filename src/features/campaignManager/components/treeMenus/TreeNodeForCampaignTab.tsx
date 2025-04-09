@@ -232,7 +232,9 @@ export function TreeNodeForCampaignTab({
           onEdit={handleEdit}
           onMonitor={handleMonitor}
           onHandleCampaignCopy={onHandleCampaignCopy}
-          tenantIdForCampaignTab={item.tenant_id}
+
+          // tofix 0409 tenantId 가 전달 안되고 있어 
+          tenantIdForCampaignTab={item.tenantId}
         >
           <div
             className={nodeStyle}

@@ -19,7 +19,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
   selectedNodeId,
   getStatusIcon,
   onNodeToggle,
-  onNodeSelect
+  onNodeSelect,
 }) => {
   const hasChildren = item.children && item.children.length > 0;
   const isExpanded = expandedNodes.has(item.id);

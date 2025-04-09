@@ -26,7 +26,7 @@ export function TreeMenusForCampaignGroupTab() {
     expandTenantAndGroup
   } = useSideMenuCampaignGroupTabStore();
 
-  console.log("treeData : ", treeData);
+  console.log("treeData ㅁㅅ 캠페인 탭: ", treeData);
   
   // 데이터가 로드된 후 테넌트와 그룹 레벨 확장
   useEffect(() => {

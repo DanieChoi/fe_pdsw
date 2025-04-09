@@ -72,6 +72,7 @@ export async function apiForGetTreeMenuDataForSideMenu(tenant_id?: number, role_
         type: 'campaign',
         status: getStatusFromFlags(campaign.start_flag),
         direction: 'outbound',
+        tenantId: campaign.tenant_id.toString(),
         children: skills.map(skill => ({
           id: `skill-${skill.skill_id}-${campaign.campaign_id}`,
           label: `Skill ${skill.skill_id}`,
@@ -99,6 +100,8 @@ export async function apiForGetTreeMenuDataForSideMenu(tenant_id?: number, role_
       ]
     }
   ];
+
+  console.log("tabData !!!", tabData);
 
   return tabData;
 }

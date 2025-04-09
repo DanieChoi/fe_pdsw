@@ -56,6 +56,7 @@ interface ContextMenuForTreeNodeProps {
   onEdit?: () => void;
   onMonitor?: () => void;
   onHandleCampaignCopy?: () => void;
+  tenantIdForCampaignTab: any;
 }
 
 export const getStatusFromFlag = (flag?: number): CampaignStatus => {
@@ -73,6 +74,7 @@ export function IContextMenuForCampaignForCampaignGroup({
   onEdit,
   onMonitor,
   onHandleCampaignCopy,
+  tenantIdForCampaignTab,
 }: ContextMenuForTreeNodeProps) {
   const isFolder = item.type === "folder";
   const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, setCampaignIdForCopyCampaign, addTab, addMultiTab } = useTabStore();
@@ -189,11 +191,14 @@ export function IContextMenuForCampaignForCampaignGroup({
     });
   };
 
-  const handleMonitorClick = (campaignId: any, campaignName: string) => {
-    if (onMonitor) {
-      onMonitor();
-      return;
-    }
+  const handleMonitorClick = (tenantIdForCampaignTab:any , campaignId: any, campaignName: string) => {
+    // if (onMonitor) {
+    //   onMonitor();
+    //   return;
+    // }
+
+    console.log("캠페인 그룹에서 상담원 상태 모니터 클릭 했을때 tenantId : ", tenantIdForCampaignTab);
+    
 
     const uniqueKey = `monitor-${Date.now()}`;
 
@@ -204,7 +209,12 @@ export function IContextMenuForCampaignForCampaignGroup({
       icon: '',
       href: '',
       content: null,
-      campaignId: campaignId
+      campaignId: campaignId,
+      params: {
+        campaignId: campaignId,
+        campaignName: campaignName,
+        tenantId: tenantIdForCampaignTab,
+      }
     });
   };
 
@@ -425,8 +435,8 @@ export function IContextMenuForCampaignForCampaignGroup({
       id: 56,
       group: 4,
       key: "monitor",
-      label: "상담사 상태 모니터",
-      action: () => handleMonitorClick(item.id, item.label)
+      label: "상담사 상태 모니터22",
+      action: () => handleMonitorClick(tenantIdForCampaignTab, item.id, item.label)
     },
     {
       id: 57,

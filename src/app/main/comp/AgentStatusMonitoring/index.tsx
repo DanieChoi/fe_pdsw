@@ -159,7 +159,9 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
       // }, );
       // return () => clearInterval(interval);
     // }
-  }, [campaignId]);
+  }, [
+    _agentData, data
+  ]);
 
   useEffect(() => {
     if (data && data.counselorStatusList.length > 0) {
