@@ -60,7 +60,9 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
           <TabsTrigger value="tab5">콜페이싱</TabsTrigger>
           <TabsTrigger value="tab6">콜백</TabsTrigger>
           <TabsTrigger value="tab7">알림</TabsTrigger>
+          { callCampaignMenu != 'NewCampaignManager' &&
           <TabsTrigger value="tab8">할당상담사</TabsTrigger>
+          }
           <TabsTrigger value="tab9">기타정보</TabsTrigger>
         </TabsList>
       </div>
@@ -85,9 +87,11 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
       <TabsContent value="tab7">
         <NotificationTab callCampaignMenu={callCampaignMenu} campaignInfo={campaignInfo} onHandleNotificationTabChange={onHandleNotificationTabChange} />
       </TabsContent>
+      { callCampaignMenu != 'NewCampaignManager' &&
       <TabsContent value="tab8">
         <AssignedAgentTab callCampaignMenu={callCampaignMenu} campaignInfo={campaignInfo} onHandleAdditionalInfoTabChange={onHandleAdditionalInfoTabChange} />
       </TabsContent>
+      }
       <TabsContent value="tab9">
         <AdditionalInfoTab callCampaignMenu={callCampaignMenu} campaignInfo={campaignInfo} onHandleAdditionalInfoTabChange={onHandleAdditionalInfoTabChange} />
       </TabsContent>

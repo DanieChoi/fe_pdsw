@@ -814,7 +814,11 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
       });
       setTempCampaignDialSpeedInfo({
         ...tempCampaignDialSpeedInfo
-        , dial_speed: value.dial_mode === 2 ? Math.floor(value.progressive_dial_speed) : value.predictive_dial_speed
+        , dial_speed: tempCampaignManagerInfo.dial_mode === 2 ? Math.floor(value.progressive_dial_speed) : value.predictive_dial_speed
+      });
+      setTempCampaignManagerInfo({
+        ...tempCampaignManagerInfo
+        , dial_speed: tempCampaignManagerInfo.dial_mode === 2 ? Math.floor(value.progressive_dial_speed) : value.predictive_dial_speed
       });
     }
     if (value.onSave) {
@@ -916,17 +920,46 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     removeTab(Number(activeTabId), activeTabKey + '');
   }
 
+  //캠페인 저장 체크.
+  const saveCampaignCheck = () => {
+    let saveCheck = true;
+    const today = new Date();
+    const tempDate = today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2);
+    if( tempCampaignSchedule.start_time.length === 0){
+      saveCheck = false;
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "시작시간 또는 종료시간을 지정해 주세요.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }else if( tempCampaignSchedule.end_date < tempDate ){
+      saveCheck = false;
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "종료일이 금일 이전으로 설정되어 있습니다.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
+    return saveCheck;
+  };
+
   //캠페인 저장
   const handleCampaignSave = () => {
-    setAlertState({
-      ...errorMessage,
-      isOpen: true,
-      message: '캠페인 아이디 : ' + tempCampaignManagerInfo.campaign_id
+    if( saveCampaignCheck() ){
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '캠페인 아이디 : ' + tempCampaignManagerInfo.campaign_id
         + '\n 캠페인 이름 : ' + tempCampaignManagerInfo.campaign_name
         + '\n 캠페인을 수정하시겠습니까?',
-      onClose: handleCampaignSaveExecute,
-      onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
-    });
+        onClose: handleCampaignSaveExecute,
+        onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
   }
 
   // tofix 0404
