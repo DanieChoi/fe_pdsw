@@ -151,12 +151,18 @@ const CampaignSettings = () => {
 
   // 제한건수 수정 API
   const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
-    onSuccess: () => {
-      fetchCallLimitSettingList({
-        tenant_id_array: tenants.map(tenant => tenant.tenant_id)
-      });
-      setIsNewMode(false); // 수정 후 신규 모드 해제
-      showAlert('수정되었습니다.');
+    onSuccess: (data) => {
+      if( data.result_code === -1 ){
+        // -9053 메시지 표시
+        showAlert('리스트 등록 건수를 초과하였습니다.');
+      }else{
+
+        fetchCallLimitSettingList({
+          tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+        });
+        setIsNewMode(false); // 수정 후 신규 모드 해제
+        showAlert('수정되었습니다.');
+      }
     },
     onError: (error) => {
       if (error.message.split('||')[0] === '5') {
