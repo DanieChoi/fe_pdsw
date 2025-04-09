@@ -250,7 +250,7 @@ const ChannelMonitor: React.FC = () => {
                   innerRadius={45}
                   outerRadius={100}
                   fill="#8884d8"
-                  label={({ value }) => `${value.toFixed(1)}%`}
+                  label={({ value }) => `${value.toFixed(0)}%`}
                 >
                   {chartData.map((entry, index) => (
                     <Cell 
