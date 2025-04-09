@@ -232,7 +232,7 @@ export function TreeNodeForCampaignTab({
           onEdit={handleEdit}
           onMonitor={handleMonitor}
           onHandleCampaignCopy={onHandleCampaignCopy}
-          tenantIdForCampaign = {item.tenant_id}
+          tenantIdForCampaignTab={item.tenant_id}
         >
           <div
             className={nodeStyle}
