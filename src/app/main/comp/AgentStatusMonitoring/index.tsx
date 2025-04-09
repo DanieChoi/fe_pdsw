@@ -132,7 +132,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
   };
 
   // 새로 만든 useApiForGetConsultantStatusMonitorData 훅 사용
-  const { data, refetch } = useApiForGetConsultantStatusMonitorData({
+  const { data, refetch, isLoading } = useApiForGetConsultantStatusMonitorData({
     tenantId: Number(tenantId || 0),
     campaignId: Number(campaignId || 0),
     sessionKey: sessionKey || '',
@@ -145,19 +145,19 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
 
   useEffect(() => {
     // if (_agentData.length > 0) {
-      let tempCounter = 0;
-      // const interval = setInterval(() => {
-        const tempData = [];
-        for (let i = 0; i < _agentData.length; i++) {
-          tempData.push({
-            ..._agentData[i],
-            time: getStatusTime(Number(_agentData[i].time) + tempCounter)
-          });
-        }
-        setAgentData(tempData);
-        tempCounter++;
-      // }, );
-      // return () => clearInterval(interval);
+    let tempCounter = 0;
+    // const interval = setInterval(() => {
+    const tempData = [];
+    for (let i = 0; i < _agentData.length; i++) {
+      tempData.push({
+        ..._agentData[i],
+        time: getStatusTime(Number(_agentData[i].time) + tempCounter)
+      });
+    }
+    setAgentData(tempData);
+    tempCounter++;
+    // }, );
+    // return () => clearInterval(interval);
     // }
   }, [
     _agentData, data
@@ -182,7 +182,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
       setCounter(counter + 1);
     }
   }, [data]);
-  
+
   // useEffect(() => {
   //   if (_agentData.length > 0) {
   //     let tempCounter = 0;
@@ -202,7 +202,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
   // }, [_agentData]);
 
   return (
-      <>
+    <>
       <div>
         <TitleWrap
           title={`상담사 상태 통계${campaignId ? ` (캠페인 ID: ${campaignId})` : ''} tenantId: ${tenantId}`}
@@ -299,7 +299,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
         <div className="h-[calc(100%-59px)] overflow-auto border border-[#ebebeb] rounded-b-[3px]">
           <table className="w-full table-auto rounded-[3px] border-separate border-spacing-0">
             <tbody>
-              {sortedAndFilteredAgents.map((agent) => (
+              { sortedAndFilteredAgents && !isLoading ? sortedAndFilteredAgents.map((agent) => (
                 <tr key={agent.id}>
                   <td className="text-center text-sm border-b px-3 py-1 text-[#333]">
                     <div className={`flex items-center gap-2 justify-center ${getStatusColor(agent.status)}`}>
@@ -319,12 +319,26 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
                     ({agentData.filter(a => a.status === agent.status).length}/{agentData.length})
                   </td>
                 </tr>
-              ))}
+              )) :
+                (
+                  [...Array(6)].map((_, index) => (
+                    <tr key={`skeleton-${index}`}>
+                      {Array.from({ length: 5 }).map((_, colIndex) => (
+                        <td key={colIndex} className="text-center text-sm border-b px-3 py-1">
+                          <div className="flex justify-center">
+                            <div className="h-4 w-24 rounded bg-gray-200 animate-pulse" />
+                          </div>
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                )
+              }
             </tbody>
           </table>
         </div>
       </div>
-      </>
+    </>
   );
 };
 
