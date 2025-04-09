@@ -137,7 +137,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
     campaignId: Number(campaignId || 0),
     sessionKey: sessionKey || '',
   }, {
-    enabled: !!tenantId && !!campaignId,
+    // enabled: !!tenantId && !!campaignId,
     // refetchInterval: statisticsUpdateCycle > 0 ? statisticsUpdateCycle * 1000 : false,
   });
 
