@@ -13,6 +13,7 @@ import { useApirForEnvironmentSave } from '@/features/auth/hooks/useApiForEnviro
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useRouter } from 'next/navigation';
 import { useTabStore } from '@/store/tabStore';
+import CustomInputForTime from '@/components/shared/CustomInputForTime';
 
 // API에 전송할 데이터 구조
 interface PreferencesData {
@@ -163,11 +164,78 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
     closeCurrentTab();
   };
 
+
+  // 유효한 시간 형식인지 확인 (4자리 문자열이고, 시는 00~23, 분은 00~59이어야 함)
+  const isTimeFormatValid = (time: string) => {
+    if (time.length !== 4) return false;
+    const hours = Number(time.substring(0, 2));
+    const minutes = Number(time.substring(2, 4));
+    if (isNaN(hours) || isNaN(minutes)) return false;
+    if (hours < 0 || hours > 23) return false;
+    if (minutes < 0 || minutes > 59) return false;
+    return true;
+  };
+
+    // 추가적인 유효성 예시("1112"인 경우 무효)와 24시간 체제 확인
+    const validateTime = (time: string) => {
+      // "1112"는 예시로 무효 처리
+      if (time === "1112") return false;
+      return isTimeFormatValid(time);
+    };
+ 
+  
+
   // 폼 제출 핸들러
   const handleSubmit = () => {
     if (!environmentData) {
       showAlert('환경설정 데이터를 불러올 수 없습니다.');
       return;
+    }
+
+    // 필수 입력 및 기본 유효성 검사
+    if (startTime.length === 4 && endTime.length === 4) {
+      // 24시간 범위를 벗어난 경우
+      if (!isTimeFormatValid(startTime) || !isTimeFormatValid(endTime)) {
+        setAlertState({
+          ...alertState,
+          isOpen: true,
+          message: "잘못된 시간 형식입니다. 00:00 ~ 23:59 범위 내 입력해 주세요.",
+        });
+        return;
+      }
+      // 시작시간/종료시간 추가 유효성 검사 (예: "1112" 무효 처리)
+      if (!validateTime(startTime) || !validateTime(endTime)) {
+        setAlertState({
+          ...alertState,
+          isOpen: true,
+          message: "잘못된 시간입니다.",
+        });
+        return;
+      }
+      // 시작시간이 종료시간보다 늦은 경우
+      if (startTime > endTime) {
+        setAlertState({
+          ...alertState,
+          isOpen: true,
+          message: "시작시간이 종료시간보다 늦을 수 없습니다.",
+        });
+        return;
+      }
+      let check = false;
+      
+      if (
+        startTime.replace(":", "") === startTime &&
+        endTime.replace(":", "") === endTime
+      ) {
+        check = true;
+      }
+      
+      if (!check) {
+        setStartTime("");
+        setEndTime("");
+
+        return;
+      }
     }
 
     setIsSaving(true);
@@ -195,6 +263,9 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
       onSubmit(requestData);
     }
   };
+
+  
+  
 
   return (
     <div className="w-full limit-width">
@@ -353,16 +424,16 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                 <TableCell className="w-[17rem]">
                   <div className="flex items-center gap-2">
                     <Label>시작시간</Label>
-                    <CustomInput
+                    <CustomInputForTime
                       value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
+                      onChange={(value) => setStartTime(value)}
                       className="w-16"
                       disabled={unusedWorkHoursCalc}
                     />
                     <Label>종료시간</Label>
-                    <CustomInput
+                    <CustomInputForTime
                       value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
+                      onChange={(value) => setEndTime(value)}
                       className="w-16"
                       disabled={unusedWorkHoursCalc}
                     />
@@ -411,8 +482,12 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
         title={alertState.title}
         type={alertState.type}
         isOpen={alertState.isOpen}
-        onClose={alertState.onConfirm}
-        onCancle={alertState.onCancel}
+        onClose={() => {
+          setAlertState((prev) => ({ ...prev, isOpen: false }));
+        }}
+        onCancle={() => {
+          setAlertState((prev) => ({ ...prev, isOpen: false }));
+        }}
       />
     </div>
   );

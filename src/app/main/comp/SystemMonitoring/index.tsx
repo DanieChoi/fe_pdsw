@@ -26,7 +26,7 @@ interface SystemData {
   id: number;  
   title: string;
   status: SystemStatus;
-  pdi: string;
+  pid: string;
   time: string;
 }
 
@@ -45,9 +45,9 @@ const statusStyles = {
 };
 
 // 개별 시스템 컴포넌트
-const SystemCard: React.FC<SystemCardProps> = ({ title, status, pdi, time }) => {
+const SystemCard: React.FC<SystemCardProps> = ({ title, status, pid, time }) => {
   const style = status === "normal" ? statusStyles.normal : statusStyles.abnormal;
-  
+
   return (
     <div>
       <TitleWrap title={title} />
@@ -65,7 +65,7 @@ const SystemCard: React.FC<SystemCardProps> = ({ title, status, pdi, time }) => 
           <tbody>
             <TableRow>
               <TableHeader className="text-sm font-normal">pid</TableHeader>
-              <TableCell className="text-sm">{pdi}</TableCell>
+              <TableCell className="text-sm">{pid}</TableCell>
             </TableRow>
             <TableRow>
               <TableHeader className="text-sm font-normal">time</TableHeader>
@@ -95,11 +95,36 @@ const SystemMonitoring: React.FC = () => {
             id: index + 1,
             title: item.name, // name을 title로 매핑
             status: item.state === 1 ? "normal" : "abnormal", // state 1은 normal, 그 외는 abnormal
-            pdi: item.pid.toString(), // pid를 문자열로 변환하여 pdi에 매핑
+            pid: item.pid.toString(), // pid를 문자열로 변환하여 pdi에 매핑  ==> pid로 수정
             time: item.time // time은 그대로 사용
           }));
+          console.log(data.processStatusList);
+
+          // 요구사항 정렬순서 텍스트 배열
+          const customOrder = [
+            "EXDdesigner", 
+            "EXDdbcontrol", 
+            "EXDfr", 
+            "EXDdialer", 
+            "EXDcallpacing", 
+            "EXDassist", 
+            "EXDListAutomation", 
+            "EXDfw", 
+            "EXDMMService", 
+            "CCbridge1", 
+            "CCbridge2"
+          ];
+
+          const sortedProcessData = formattedData.sort((a, b) => {
+            
+            // b는 원본객체, a는 b의 다음순서객체이며,
+            // customOrder 순서에서 a와 b의 index를 구하고, 음수면 a가 앞으로, 양수면 b가 앞으로 옴
+            // 즉, api받아온 순서를 customOrder의 index에 맞게 앞으로 뒤로 정렬시킨다.
+
+            return customOrder.indexOf(a.title) - customOrder.indexOf(b.title);
+          });
           
-          setSystemsData(formattedData);
+          setSystemsData(sortedProcessData);
         }
       }
     },
@@ -118,6 +143,10 @@ const SystemMonitoring: React.FC = () => {
     }
   }, [systemMonitoring,statisticsUpdateCycle]);
 
+  
+
+  
+
   return (
     <div className="w-full limit-width">
       {systemsData.length > 0 ? (
@@ -127,7 +156,7 @@ const SystemMonitoring: React.FC = () => {
               key={system.id}
               title={system.title}
               status={system.status}
-              pdi={system.pdi}
+              pid={system.pid}
               time={system.time}
             />
           ))}
