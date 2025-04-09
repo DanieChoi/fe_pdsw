@@ -59,9 +59,9 @@ interface ContextMenuForTreeNodeProps {
     id: string;
     label: string;
     type: any;
-    tenantIdForCampaignTab: any;
     status: CampaignStatus;
   };
+  tenantIdForCampaignTab: any;
   onEdit: () => void;
   onMonitor: () => void;
   onHandleCampaignCopy: () => void;
