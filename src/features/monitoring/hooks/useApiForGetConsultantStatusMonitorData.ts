@@ -15,16 +15,20 @@ export const useApiForGetConsultantStatusMonitorData = (
         AgentStateMonitoringListResponse,
         Error,
         AgentStateMonitoringListResponse,
-        ['consultantStatusMonitor', number, number]
+        readonly ['consultantStatusMonitor', number, number]
     >, 'queryKey' | 'queryFn'>
 ) => {
+    const queryKey = ['consultantStatusMonitor', credentials.tenantId, credentials.campaignId] as const;
+    
     return useQuery<
         AgentStateMonitoringListResponse,
         Error,
-        AgentStateMonitoringListResponse
+        AgentStateMonitoringListResponse,
+        typeof queryKey
     >({
-        queryKey: ['consultantStatusMonitor', credentials.tenantId, credentials.campaignId],
+        queryKey,
         queryFn: () => fetchConsultantStatusMonitorData(credentials),
+        ...options
         // refetchInterval: 30000, // Refetch every 30 seconds by default
         // staleTime: 10000, // Consider data stale after 10 seconds
     });

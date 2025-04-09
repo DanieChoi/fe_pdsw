@@ -138,9 +138,10 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
     sessionKey: sessionKey || '',
   }, {
     // enabled: !!tenantId && !!campaignId,
-    // refetchInterval: statisticsUpdateCycle > 0 ? statisticsUpdateCycle * 1000 : false,
+    refetchInterval: statisticsUpdateCycle > 0 ? statisticsUpdateCycle * 1000 : false,
   });
 
+  console.log("statisticsUpdateCycle : ", statisticsUpdateCycle);
   console.log("data for GetConsultantStatusMonitorData : ", data);
 
   useEffect(() => {
