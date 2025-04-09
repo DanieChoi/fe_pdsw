@@ -438,6 +438,7 @@ export function TreeNodeForCampaignTab({
       ) : (
         <ContextMenuForCampaignForCampaignTab
           item={item}
+          tenantIdForCampaignTab={item.tenantId || ''}
           onEdit={handleEdit}
           onMonitor={handleMonitor}
           onHandleCampaignCopy={onHandleCampaignCopy}
