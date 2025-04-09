@@ -204,7 +204,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
       <>
       <div>
         <TitleWrap
-          title={`상담사 상태 통계${campaignId ? ` (캠페인 ID: ${campaignId})` : ''}`}
+          title={`상담사 상태 통계${campaignId ? ` (캠페인 ID: ${campaignId})` : ''} tenantId: ${tenantId}`}
           className="border-b border-gray-300 pb-1"
         />
         <Table>

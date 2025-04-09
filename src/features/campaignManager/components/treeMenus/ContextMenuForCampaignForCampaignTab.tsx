@@ -59,6 +59,7 @@ interface ContextMenuForTreeNodeProps {
     id: string;
     label: string;
     type: any;
+    tenantIdForCampaignTab: any;
     status: CampaignStatus;
   };
   onEdit: () => void;
@@ -82,6 +83,7 @@ export function ContextMenuForCampaignForCampaignTab({
   item,
   onEdit,
   onMonitor,
+  tenantIdForCampaignTab,
   onHandleCampaignCopy,
 }: ContextMenuForTreeNodeProps) {
   const isFolder = item.type === "folder";
@@ -202,7 +204,7 @@ export function ContextMenuForCampaignForCampaignTab({
     });
   };
 
-  const handleMonitorClick = (campaignId: any, campaignName: string) => {
+  const handleMonitorClick = (tenantId: any, campaignId: any, campaignName: string) => {
     const uniqueKey = `monitor-${Date.now()}`;
     addMultiTab({
       id: 22,
@@ -215,7 +217,7 @@ export function ContextMenuForCampaignForCampaignTab({
       params: {
         sessionKey: session_key,
         campaignId: campaignId,
-        tenantId: tenant_id,
+        tenantId: tenantId,
       },
     });
   };
@@ -411,7 +413,7 @@ export function ContextMenuForCampaignForCampaignTab({
     {
       key: "monitor",
       title: "상담사 상태 모니터",
-      onClick: () => handleMonitorClick(item.id, item.label),
+      onClick: () => handleMonitorClick(tenantIdForCampaignTab, item.id, item.label),
       menuId: 29,
     },
     {
