@@ -85,9 +85,8 @@ const OperationTimeTab: React.FC<Props> = ({
     return true;
   };
 
-  // 추가적인 유효성 예시("1112"인 경우 무효)와 24시간 체제 확인
+  // 시작 시간 종료 시간 유효성 검사
   const validateTime = (time: string) => {
-    // "1112"는 예시로 무효 처리
     if (time === "1112") return false;
     return isTimeFormatValid(time);
   };

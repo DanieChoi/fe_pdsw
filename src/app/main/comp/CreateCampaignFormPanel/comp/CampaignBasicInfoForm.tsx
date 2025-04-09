@@ -24,16 +24,27 @@ type Props = {
 };
 
 const CampaignBasicInfoForm = ({
-  tenantId,
+  tenantId: initialTenantId,
   tempCampaignInfo,
   inputSkills,
   onUpdateSkill,
   onInputChange,
   onSelectChange
 }: Props) => {
+  // 내부적으로 tenantId 상태 관리 (초기값은 props에서 받음)
+  const [currentTenantId, setCurrentTenantId] = useState<string>(
+    initialTenantId || (tempCampaignInfo.tenant_id > 0 ? tempCampaignInfo.tenant_id.toString() : '')
+  );
   const [skillPopupState, setSkillPopupState] = useState({ isOpen: false, type: '1' });
   const [callingNumber, setCallingNumber] = useState('');
   const [formattedSkills, setFormattedSkills] = useState('');
+
+  // initialTenantId가 변경될 때 currentTenantId 업데이트
+  useEffect(() => {
+    if (initialTenantId) {
+      setCurrentTenantId(initialTenantId);
+    }
+  }, [initialTenantId]);
 
   // inputSkills 변경 시 화면에 표시할 형식으로 가공
   useEffect(() => {
@@ -45,14 +56,30 @@ const CampaignBasicInfoForm = ({
     setFormattedSkills(skillsDisplay);
   }, [inputSkills]);
 
+  // tenant 선택 변경 처리
+  const handleTenantChange = (tenantId: number) => {
+    const tenantIdStr = tenantId.toString();
+    setCurrentTenantId(tenantIdStr);
+    onSelectChange(tenantIdStr, 'tenant');
+    
+    // tenant가 변경되면 스킬을 초기화 (선택적으로 구현)
+    // onUpdateSkill("");
+  };
+
   // 스킬 선택 결과를 처리하는 함수
-  const handleSelectSkills = (param: string) => {
+  const handleSelectSkills = (param: string, updatedTenantId?: number) => {
     onUpdateSkill(param);
+    
+    // SkillListPopup에서 tenantId가 변경된 경우 처리
+    if (updatedTenantId && updatedTenantId.toString() !== currentTenantId) {
+      setCurrentTenantId(updatedTenantId.toString());
+      onSelectChange(updatedTenantId.toString(), 'tenant');
+    }
   };
 
   // 스킬 팝업 열기
   const handleOpenSkillPopup = () => {
-    if (tempCampaignInfo.tenant_id < 0 && !tenantId) {
+    if (!currentTenantId || currentTenantId === '-1') {
       alert('테넌트를 선택해 주세요.');
     } else {
       setSkillPopupState({ ...skillPopupState, isOpen: true });
@@ -73,8 +100,8 @@ const CampaignBasicInfoForm = ({
         </div>
 
         <ISelectorForTeanantForCreateNewCampaign
-          tenantId={tenantId}
-          onChange={(value) => onSelectChange(value.toString(), 'tenant')}
+          tenantId={currentTenantId}
+          onChange={handleTenantChange}
         />
 
         <div className="flex items-center gap-2">
@@ -155,14 +182,15 @@ const CampaignBasicInfoForm = ({
       {skillPopupState.isOpen && (
         <SkillListPopup
           param={inputSkills.split(',').filter(id => id !== '').map(id => Number(id))}
-          tenantId={Number(tempCampaignInfo.tenant_id || tenantId)}
+          tenantId={Number(currentTenantId)}
           type={skillPopupState.type}
           isOpen={skillPopupState.isOpen}
-          onConfirm={(param) => {
-            handleSelectSkills(param);
+          onConfirm={(param, updatedTenantId) => {
+            handleSelectSkills(param, updatedTenantId);
             setSkillPopupState(prev => ({ ...prev, isOpen: false }));
           }}
           onCancle={() => setSkillPopupState(prev => ({ ...prev, isOpen: false }))}
+          allowTenantChange={true}
         />
       )}
     </div>

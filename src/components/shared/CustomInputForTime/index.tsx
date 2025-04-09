@@ -62,11 +62,14 @@ const CustomInputForTime = React.forwardRef<HTMLInputElement, CustomInputForTime
     };
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-      // When input loses focus, validate the time if it has 4 digits
+      const validationErrorToastId = 'time-validation-error'; // 고유 ID 정의
+  
       if (value.length === 4) {
         if (!validateTime(value)) {
-          toast.error("잘못된 시간 형식입니다. 올바른 시간을 입력하세요 (00:00-23:59).");
-          // Focus back on the input
+          // 동일 ID 토스트가 이미 떠있으면 새로 띄우지 않음
+          toast.error("잘못된 시간 형식입니다. 올바른 시간을 입력하세요 (00:00-23:59).", {
+            toastId: validationErrorToastId
+          });
           setTimeout(() => {
             if (inputRef.current) {
               inputRef.current.focus();
@@ -74,17 +77,16 @@ const CustomInputForTime = React.forwardRef<HTMLInputElement, CustomInputForTime
           }, 100);
         }
       } else if (value.length > 0) {
-        // If user entered something but not complete
-        toast.error("Please enter a complete time in HH:MM format.");
-        // Focus back on the input
+        toast.error("Please enter a complete time in HH:MM format.", {
+           toastId: validationErrorToastId // 동일 ID 사용 또는 다른 ID 사용 가능
+        });
         setTimeout(() => {
           if (inputRef.current) {
             inputRef.current.focus();
           }
         }, 100);
       }
-      
-      // Call the original onBlur if provided
+  
       if (props.onBlur) {
         props.onBlur(e);
       }

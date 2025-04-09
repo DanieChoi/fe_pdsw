@@ -1,4 +1,3 @@
-// src/app/main/comp/NewCampaignManager/comp/ISelectorForTeanantForCreateNewCampaign.tsx
 "use client";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
@@ -7,7 +6,7 @@ import { useMainStore } from "@/store";
 import { useEffect, useState } from "react";
 
 type Props = {
-  tenantId?: any;
+  tenantId?: string;
   onChange: (tenantId: number) => void;
 };
 
@@ -15,10 +14,13 @@ const ISelectorForTeanantForCreateNewCampaign = ({ tenantId, onChange }: Props) 
   const { tenants } = useMainStore();
 
   // 내부 상태 추가
-  const [selectedTenantId, setSelectedTenantId] = useState<string>(tenantId?.toString() || "");
+  const [selectedTenantId, setSelectedTenantId] = useState<string>(tenantId || "");
 
+  // props로 받은 tenantId가 변경되면 내부 상태도 업데이트
   useEffect(() => {
-    setSelectedTenantId(tenantId?.toString() || "");
+    if (tenantId !== undefined && tenantId !== selectedTenantId) {
+      setSelectedTenantId(tenantId);
+    }
   }, [tenantId]);
 
   const handleChange = (value: string) => {

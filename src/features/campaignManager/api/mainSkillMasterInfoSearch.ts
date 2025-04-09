@@ -4,17 +4,20 @@ import { SkillListCredentials, SkillListResponse } from '../types/campaignManage
 
 // 스킬마스터정보조회 리스트 요청
 export const fetchSkills = async (credentials: SkillListCredentials): Promise<SkillListResponse> => {
+  console.log("credentials ?????????????????????????? ", credentials);
+  
+  
   const skillMasterInfoSearchRequestData = {
     filter: {      
       skill_id: {
         start: 1,
         end: 9999999,
       },    
-      tenant_id: credentials.tenant_id_array
+      tenant_id: credentials.tenant_id_array[0]
     },
     sort: {
       skill_id: 0,
-      tenant_id: 0,
+      tenant_id: credentials.tenant_id_array[0],
     },
     page: {
       index: 1,
