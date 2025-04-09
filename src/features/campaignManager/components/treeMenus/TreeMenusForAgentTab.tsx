@@ -50,15 +50,43 @@ export function TreeMenusForAgentTab() {
       // 기본 확장 상태 적용
       applyDefaultExpansion();
       
-      // 모든 상담사 정보 추출
-      const counselors = getAllCounselors(data.organizationList);
+      // 필터링 및 정렬 적용한 데이터
+      const sorted = applySorting([...data.organizationList]);
+      
+      // 모든 상담사 정보 추출 (필터링된 데이터에서 추출하기 위해 이 위치로 이동)
+      const counselors = getAllCounselorsFromFilteredData(sorted);
       setAllCounselors(counselors);
       
-      // 초기 정렬 적용
-      const sorted = applySorting([...data.organizationList]);
       setSortedData(sorted);
     }
-  }, [data]);
+  }, [data, tenant_id]);
+
+  // 필터링된 데이터에서 상담사 목록 추출
+  const getAllCounselorsFromFilteredData = (filteredData: IOrganization[]) => {
+    const counselors: Array<{
+      counselorId: string;
+      counselorName: string;
+      tenantId: string;
+    }> = [];
+
+    filteredData.forEach(org => {
+      org.tenantInfo?.forEach(tenant => {
+        tenant.groupInfo?.forEach(group => {
+          group.teamInfo?.forEach(team => {
+            team.counselorInfo?.forEach(counselor => {
+              counselors.push({
+                counselorId: counselor.counselorId,
+                counselorName: counselor.counselorname,
+                tenantId: tenant.tenantId
+              });
+            });
+          });
+        });
+      });
+    });
+
+    return counselors;
+  };
 
   // 정렬 옵션 변경 시 데이터 재정렬
   useEffect(() => {
@@ -66,16 +94,16 @@ export function TreeMenusForAgentTab() {
       const sorted = applySorting([...data.organizationList]);
       setSortedData(sorted);
     }
-  }, [sortOption, data]);
+  }, [sortOption, data, tenant_id]);
 
   // 확장 레벨 변경 시 노드 확장 상태 업데이트
   useEffect(() => {
     if (data?.organizationList && currentExpansionLevel > 0) {
       expandToLevel(currentExpansionLevel);
     }
-  }, [currentExpansionLevel, data]);
+  }, [currentExpansionLevel, data, tenant_id]);
 
-  // 정렬 로직 구현 (개선된 버전)
+  // 정렬 로직 구현 (tenant_id 필터링 적용)
   const applySorting = (dataArray: IOrganization[]) => {
     if (!dataArray || dataArray.length === 0) return [];
     
@@ -83,6 +111,19 @@ export function TreeMenusForAgentTab() {
     
     // 깊은 복사를 통해 원본 데이터 보존
     const clonedData: IOrganization[] = JSON.parse(JSON.stringify(dataArray));
+    
+    // tenant_id가 0이 아닌 경우에만 필터링 적용
+    if (tenant_id !== 0 && tenant_id !== 0) {
+      // 테넌트 필터링 적용 (tenant_id에 해당하는 것만 표시)
+      clonedData.forEach(org => {
+        if (org.tenantInfo && org.tenantInfo.length > 0) {
+          // tenant_id에 해당하는 테넌트만 필터링
+          org.tenantInfo = org.tenantInfo.filter(tenant => 
+            tenant.tenantId === tenant_id.toString()
+          );
+        }
+      });
+    }
     
     // 조직 레벨 정렬 (최상위 레벨)
     if (nodeType === 'all' || nodeType === 'organization') {
@@ -194,21 +235,22 @@ export function TreeMenusForAgentTab() {
       }
 
       org.tenantInfo?.forEach(tenant => {
-        if (defaultExpanded.tenant) {
+        // tenant_id가 0이거나 tenant_id와 일치하는 테넌트만 처리
+        if ((tenant_id === 0 || tenant_id === 0 || tenant.tenantId === tenant_id.toString()) && defaultExpanded.tenant) {
           initialExpanded.add(`tenant-${tenant.tenantId}`);
-        }
 
-        tenant.groupInfo?.forEach(group => {
-          if (defaultExpanded.group) {
-            initialExpanded.add(`group-${group.groupId}`);
-          }
-
-          group.teamInfo?.forEach(team => {
-            if (defaultExpanded.team) {
-              initialExpanded.add(`team-${team.teamId}`);
+          tenant.groupInfo?.forEach(group => {
+            if (defaultExpanded.group) {
+              initialExpanded.add(`group-${group.groupId}`);
             }
+
+            group.teamInfo?.forEach(team => {
+              if (defaultExpanded.team) {
+                initialExpanded.add(`team-${team.teamId}`);
+              }
+            });
           });
-        });
+        }
       });
     });
 
@@ -231,33 +273,35 @@ export function TreeMenusForAgentTab() {
       if (level >= 1) newExpanded.add(orgId);
       
       if (level >= 2 && org.tenantInfo) {
-        // 레벨 2: 테넌트
+        // 레벨 2: 테넌트 (tenant_id가 0이거나 tenant_id에 해당하는 것만)
         org.tenantInfo.forEach(tenant => {
-          const tenantId = `tenant-${tenant.tenantId}`;
-          newExpanded.add(tenantId);
-          
-          if (level >= 3 && tenant.groupInfo) {
-            // 레벨 3: 그룹
-            tenant.groupInfo.forEach(group => {
-              const groupId = `group-${group.groupId}`;
-              newExpanded.add(groupId);
-              
-              if (level >= 4 && group.teamInfo) {
-                // 레벨 4: 팀
-                group.teamInfo.forEach(team => {
-                  const teamId = `team-${team.teamId}`;
-                  newExpanded.add(teamId);
-                  
-                  if (level >= 5 && team.counselorInfo) {
-                    // 레벨 5: 상담사
-                    team.counselorInfo.forEach(counselor => {
-                      const counselorId = `counselor-${counselor.counselorId}`;
-                      newExpanded.add(counselorId);
-                    });
-                  }
-                });
-              }
-            });
+          if (tenant_id === 0 || tenant_id === 0 || tenant.tenantId === tenant_id.toString()) {
+            const tenantId = `tenant-${tenant.tenantId}`;
+            newExpanded.add(tenantId);
+            
+            if (level >= 3 && tenant.groupInfo) {
+              // 레벨 3: 그룹
+              tenant.groupInfo.forEach(group => {
+                const groupId = `group-${group.groupId}`;
+                newExpanded.add(groupId);
+                
+                if (level >= 4 && group.teamInfo) {
+                  // 레벨 4: 팀
+                  group.teamInfo.forEach(team => {
+                    const teamId = `team-${team.teamId}`;
+                    newExpanded.add(teamId);
+                    
+                    if (level >= 5 && team.counselorInfo) {
+                      // 레벨 5: 상담사
+                      team.counselorInfo.forEach(counselor => {
+                        const counselorId = `counselor-${counselor.counselorId}`;
+                        newExpanded.add(counselorId);
+                      });
+                    }
+                  });
+                }
+              });
+            }
           }
         });
       }
@@ -293,51 +337,6 @@ export function TreeMenusForAgentTab() {
     });
   };
 
-  // const handleSearch = () => {
-  //   if (!searchTerm.trim() || !data?.organizationList) return;
-
-  //   const counselorInfo = findCounselorInfo(data.organizationList, searchTerm);
-  //   if (counselorInfo) {
-  //     selectCounselor(counselorInfo.counselorId, counselorInfo.counselorName, counselorInfo.tenantId);
-  //   } else {
-  //     toast.error("상담사을 찾을 수 없습니다.");
-  //   }
-  // };
-
-  // 상담사 선택 처리 공통 함수
-  // const selectCounselor = (counselorId: string, counselorName: string, tenantId: string) => {
-  //   // 상담사 선택 상태 업데이트
-  //   setSelectedNodeId(counselorId);
-  //   setSelectedCounselor(counselorId, counselorName, tenantId);
-    
-  //   if (data?.organizationList) {
-  //     // 경로 찾기
-  //     const counselorInfo = findCounselorInfo(data.organizationList, counselorName);
-      
-  //     if (counselorInfo) {
-  //       // 경로상의 모든 노드 확장
-  //       const newExpanded = new Set(expandedNodes);
-  //       counselorInfo.paths.forEach(path => newExpanded.add(path));
-  //       setExpandedNodes(newExpanded);
-
-  //       // DOM 업데이트를 위한 짧은 지연 후 스크롤 실행
-  //       setTimeout(() => {
-  //         const scrollContainer = document.querySelector('.tree-node');
-  //         const targetElement = document.getElementById(`counselor-${counselorId}`);
-
-  //         if (scrollContainer && targetElement) {
-  //           scrollContainer.scrollTop = (
-  //             targetElement.offsetTop -
-  //             (scrollContainer as HTMLElement).offsetTop -
-  //             (scrollContainer.clientHeight / 2) +
-  //             (targetElement.clientHeight / 2)
-  //           );
-  //         }
-  //       }, 100);
-  //     }
-  //   }
-  // };
-
   const handleSearch = () => {
     // 검색어가 비어있으면 전체 목록 표시
     if (!searchTerm.trim()) {
@@ -346,13 +345,50 @@ export function TreeMenusForAgentTab() {
     }
   
     if (!data?.organizationList) return;
-  
-    const counselorInfo = findCounselorInfo(data.organizationList, searchTerm);
+    
+    // 필터링된 데이터에서 검색
+    const filteredData = applySorting([...data.organizationList]);
+    const counselorInfo = findCounselorInfoInFilteredData(filteredData, searchTerm);
+    
     if (counselorInfo) {
       selectCounselor(counselorInfo.counselorId, counselorInfo.counselorName, counselorInfo.tenantId);
     } else {
-      toast.error("상담사을 찾을 수 없습니다.");
+      toast.error("상담사를 찾을 수 없습니다.");
     }
+  };
+  
+  // 필터링된 데이터에서 상담사 검색
+  const findCounselorInfoInFilteredData = (
+    filteredData: IOrganization[],
+    searchTerm: string
+  ) => {
+    for (const org of filteredData) {
+      for (const tenant of (org.tenantInfo || [])) {
+        for (const group of (tenant.groupInfo || [])) {
+          for (const team of (group.teamInfo || [])) {
+            for (const counselor of (team.counselorInfo || [])) {
+              if (
+                counselor.counselorId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                counselor.counselorname.toLowerCase().includes(searchTerm.toLowerCase())
+              ) {
+                return {
+                  counselorId: counselor.counselorId,
+                  counselorName: counselor.counselorname,
+                  tenantId: tenant.tenantId,
+                  paths: [
+                    `org-${org.centerId}`,
+                    `tenant-${tenant.tenantId}`,
+                    `group-${group.groupId}`,
+                    `team-${team.teamId}`
+                  ]
+                };
+              }
+            }
+          }
+        }
+      }
+    }
+    return null;
   };
 
   const selectCounselor = (counselorId: string, counselorName: string, tenantId: string) => {
@@ -372,8 +408,9 @@ export function TreeMenusForAgentTab() {
     setSelectedCounselor(counselorId, counselorName, tenantId);
     
     if (data?.organizationList) {
-      // 경로 찾기
-      const counselorInfo = findCounselorInfo(data.organizationList, counselorName);
+      // 필터링된 데이터에서 경로 찾기
+      const filteredData = applySorting([...data.organizationList]);
+      const counselorInfo = findCounselorInfoInFilteredData(filteredData, counselorName);
       
       if (counselorInfo) {
         // 경로상의 모든 노드 확장

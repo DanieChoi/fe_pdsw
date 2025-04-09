@@ -655,7 +655,7 @@ export function TreeNodeForCounselorListForSideBar({
   
       return (
         <IContextMenuForGroupAndTeamAndCounselor item={contextMenuItem}>
-          {content}
+          {content} 
         </IContextMenuForGroupAndTeamAndCounselor>
       );
     }
