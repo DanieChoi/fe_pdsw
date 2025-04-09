@@ -43,7 +43,7 @@ const HeaderColumn : Column<SendRow>[] = [
   { key: 'CSC4', name: '고객성향[4]'},
   { key: 'CSC5', name: '고객성향[5]'},
   { key: 'CSC6', name: '고객성향[6]'},
-  { key: 'EMPLOYEEID', name: '고객성향[1]'},
+  { key: 'EMPLOYEEID', name: '상담사 아이디'},
   { key: 'TKDA', name: '토큰데이터'},
 ];
 
