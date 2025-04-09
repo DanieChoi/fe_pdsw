@@ -308,7 +308,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
                 {campaigns.filter((data) => data.tenant_id === Number(campaignInfo.tenant_id))
                   .map((campaign) => (
                   <SelectItem key={campaign.campaign_id} value={campaign.campaign_id+''}>
-                    {campaign.campaign_name}
+                    [{campaign.campaign_id}]{campaign.campaign_name}
                   </SelectItem>
                 ))}
               </SelectContent>
