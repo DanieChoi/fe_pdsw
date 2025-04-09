@@ -1,6 +1,7 @@
 import { useMutation, useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { AgentStateMonitoringListResponse, IRequestTypeForFetchConsultantStatusMonitorData } from '../types/monitoringIndex';
 import { fetchConsultantStatusMonitorData } from '../api/mainAgentStateMonitoringList';
+import { useEnvironmentStore } from '@/store/environmentStore';
 
 
 /**
@@ -19,6 +20,7 @@ export const useApiForGetConsultantStatusMonitorData = (
     >, 'queryKey' | 'queryFn'>
 ) => {
     const queryKey = ['consultantStatusMonitor', credentials.tenantId, credentials.campaignId] as const;
+      const { statisticsUpdateCycle } = useEnvironmentStore();
     
     return useQuery<
         AgentStateMonitoringListResponse,
@@ -28,8 +30,8 @@ export const useApiForGetConsultantStatusMonitorData = (
     >({
         queryKey,
         queryFn: () => fetchConsultantStatusMonitorData(credentials),
-        ...options
-        // refetchInterval: 30000, // Refetch every 30 seconds by default
+        // ...options
+        refetchInterval: statisticsUpdateCycle, // Refetch every 30 seconds by default
         // staleTime: 10000, // Consider data stale after 10 seconds
     });
 };

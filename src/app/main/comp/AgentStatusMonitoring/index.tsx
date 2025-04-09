@@ -20,6 +20,7 @@ import {
   AgentStateMonitoringListResponse
 } from './types/typeForCunsultantMonitoring';
 import { useApiForGetConsultantStatusMonitorData } from "@/features/monitoring/hooks/useApiForGetConsultantStatusMonitorData";
+import StatusTimer from "./component/StatusTimer";
 
 const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
   sessionKey,
@@ -38,10 +39,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
   const [sortField, setSortField] = useState<SortField>('time');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const { campaigns } = useMainStore();
-  const [counter, setCounter] = useState(0);
-
   const [agentData, setAgentData] = useState<AgentData[]>([]);
-  const [_agentData, _setAgentData] = useState<AgentData[]>([]);
   const { statisticsUpdateCycle } = useEnvironmentStore();
 
   const handleStatusChange = (status: keyof AgentStatus): void => {
@@ -114,55 +112,17 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
     { status: 'rest', bg: '!bg-[#F6F0FA]', text: '휴식', icon: '/rest.svg' }
   ];
 
-  const getStatusTime = (time: number) => {
-    let returnValue = "00:00:00";
-
-    if (time !== 0) {
-      const date = new Date(1970, 0, 1);
-      date.setSeconds(time);
-
-      const hours = String(date.getUTCHours()).padStart(2, '0');
-      const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-      const seconds = String(date.getUTCSeconds()).padStart(2, '0');
-
-      returnValue = `${hours}:${minutes}:${seconds}`;
-    }
-
-    return returnValue;
-  };
-
   // 새로 만든 useApiForGetConsultantStatusMonitorData 훅 사용
   const { data, refetch, isLoading } = useApiForGetConsultantStatusMonitorData({
     tenantId: Number(tenantId || 0),
     campaignId: Number(campaignId || 0),
     sessionKey: sessionKey || '',
   }, {
-    // enabled: !!tenantId && !!campaignId,
     refetchInterval: statisticsUpdateCycle > 0 ? statisticsUpdateCycle * 1000 : false,
   });
 
-  console.log("statisticsUpdateCycle : ", statisticsUpdateCycle);
-  console.log("data for GetConsultantStatusMonitorData : ", data);
-
-  useEffect(() => {
-    // if (_agentData.length > 0) {
-    let tempCounter = 0;
-    // const interval = setInterval(() => {
-    const tempData = [];
-    for (let i = 0; i < _agentData.length; i++) {
-      tempData.push({
-        ..._agentData[i],
-        time: getStatusTime(Number(_agentData[i].time) + tempCounter)
-      });
-    }
-    setAgentData(tempData);
-    tempCounter++;
-    // }, );
-    // return () => clearInterval(interval);
-    // }
-  }, [
-    _agentData, data
-  ]);
+  console.log("AgentStatusMonitoring data", data);
+  
 
   useEffect(() => {
     if (data && data.counselorStatusList.length > 0) {
@@ -179,28 +139,9 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
         name: item.counselorName,
         time: item.statusTime || '0',
       }));
-      _setAgentData(tempDataList);
-      setCounter(counter + 1);
+      setAgentData(tempDataList);
     }
   }, [data]);
-
-  // useEffect(() => {
-  //   if (_agentData.length > 0) {
-  //     let tempCounter = 0;
-  //     const interval = setInterval(() => {
-  //       const tempData = [];
-  //       for (let i = 0; i < _agentData.length; i++) {
-  //         tempData.push({
-  //           ..._agentData[i],
-  //           time: getStatusTime(Number(_agentData[i].time) + tempCounter)
-  //         });
-  //       }
-  //       setAgentData(tempData);
-  //       tempCounter++;
-  //     }, 1000);
-  //     return () => clearInterval(interval);
-  //   }
-  // }, [_agentData]);
 
   return (
     <>
@@ -315,7 +256,10 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
                   </td>
                   <td className="text-center text-sm border-b px-3 py-1 text-[#333]">{agent.agent}</td>
                   <td className="text-center text-sm border-b px-3 py-1 text-[#333]">{agent.name}</td>
-                  <td className="text-center text-sm border-b px-3 py-1 text-[#333]">{agent.time}</td>
+                  <td className="text-center text-sm border-b px-3 py-1 text-[#333]">
+                  <StatusTimer initialTime={agent.time || 0} />
+
+                  </td>
                   <td className="text-center text-sm border-b px-3 py-1 text-[#333]">
                     ({agentData.filter(a => a.status === agent.status).length}/{agentData.length})
                   </td>
