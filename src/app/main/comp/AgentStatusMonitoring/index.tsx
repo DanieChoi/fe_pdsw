@@ -137,17 +137,16 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
     campaignId: Number(campaignId || 0),
     sessionKey: sessionKey || '',
   }, {
-    // enabled: !!tenantId && !!campaignId,
+    enabled: !!tenantId && !!campaignId,
     // refetchInterval: statisticsUpdateCycle > 0 ? statisticsUpdateCycle * 1000 : false,
   });
 
   console.log("data for GetConsultantStatusMonitorData : ", data);
-  
 
   useEffect(() => {
-    if (_agentData.length > 0) {
+    // if (_agentData.length > 0) {
       let tempCounter = 0;
-      const interval = setInterval(() => {
+      // const interval = setInterval(() => {
         const tempData = [];
         for (let i = 0; i < _agentData.length; i++) {
           tempData.push({
@@ -157,10 +156,10 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
         }
         setAgentData(tempData);
         tempCounter++;
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [_agentData]);
+      // }, );
+      // return () => clearInterval(interval);
+    // }
+  }, [campaignId]);
 
   useEffect(() => {
     if (data && data.counselorStatusList.length > 0) {
