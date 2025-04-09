@@ -8,6 +8,7 @@ import { useTabStore } from "@/store/tabStore";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
+import { useAuthStore } from "@/store";
 
 export interface FolderContextMenuProps {
   item: {
@@ -21,8 +22,9 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
   const { selectedMenus, toggleMenu , } = useTreeMenuStore(); // 통합 스토어 사용
   const { availableCampaignTenantContextMenuIds } = useAvailableMenuStore(); // 권한 있는 메뉴 ID 가져오기
 
-  // 체크박스가 필요한 메뉴 ID
-  const checkableMenuIds = [14, 23];
+
+  const { tenant_id, role_id, session_key } = useAuthStore();
+  
 
   // addTab({
   //   id: 700,
@@ -72,6 +74,12 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
           icon: "",
           href: "",
           content: null,
+          params: {
+            sessionKey: session_key,
+            campaignId: 0,
+            tenantId: item.id,
+          }
+
         });
       },
     },
