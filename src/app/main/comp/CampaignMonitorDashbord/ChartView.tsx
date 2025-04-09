@@ -92,6 +92,15 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
         { name: '방지리스트:'+(selectedCall.nogdeleteGL), value: selectedCall.nogdeleteGL, color: '#FFB6C6' }
       ];
       setTempListStatusData(listStatusData);  
+    }else{
+      setTempCallStatusData([]);
+      setTempListStatusData([]);
+      const callStatusData: ChartData[] = [
+        { name: '발신시도:'+0, value: 0, color: '#40E0D0' },
+        { name: '발신성공:'+0, value: 0, color: '#2CC7B5' },
+        { name: '발신실패:'+0, value: 0, color: '#20AE9C' }
+      ];
+      setTempCallStatusData(callStatusData);
     }
   }, [selectedCall]);
   
