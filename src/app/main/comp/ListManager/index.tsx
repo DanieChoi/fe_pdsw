@@ -481,15 +481,32 @@ const ListManager: React.FC = () => {
                   if( delimiter === '' ){
                     for(let k=0;k<headerColumnData.length;k++){
                       const key = headerColumnData[k].field as keyof SendRow;
+                      // if (key in tempData) {
+                      //   if (typeof key === 'string' && key in tempData) {
+                      //     if (typeof key === 'string' && key in tempData) {
+                      //       (tempData as any)[key] = tempdata[i].substring(headerColumnData[k].start-1, headerColumnData[k].start + headerColumnData[k].length -1) as string || '';
+                      //     }
+                      //   }
+                      // }
                       if (key in tempData) {
+                        // Calculate the byte length of the extracted substring
+                        const extractedSubstring = tempdata[i].substring(headerColumnData[k].start - 1, headerColumnData[k].start + headerColumnData[k].length - 1);
+                        
                         if (typeof key === 'string' && key in tempData) {
-                          if (typeof key === 'string' && key in tempData) {
-                            (tempData as any)[key] = tempdata[i].substring(headerColumnData[k].start-1, headerColumnData[k].start + headerColumnData[k].length -1) as string || '';
+                          const byteLength = getByteLength(extractedSubstring);
+                          
+                          // Ensure that the extracted substring fits within the specified byte length
+                          if (byteLength <= headerColumnData[k].length) {
+                            (tempData as any)[key] = extractedSubstring || '';  // If it's within the byte size limit, assign it
+                          } else {
+                            // Handle case where the byte length exceeds the specified limit, truncating if necessary
+                            (tempData as any)[key] = extractedSubstring.slice(0, headerColumnData[k].length);
                           }
                         }
                       }
                     }
                     tempSendList.push(tempData);                  
+                    
                     //구분자인 경우
                   }else{ 
                     const row = tempdata[i].split(delimiter) as unknown[];
@@ -541,6 +558,12 @@ const ListManager: React.FC = () => {
     }// 파일 업로드 후 input 값 초기화
     e.target.value = '';
   };
+  
+  const getByteLength = (str: string) => {
+    const encoder = new TextEncoder();
+    const encoded = encoder.encode(str);
+    return encoded.length;
+  }
  
   // 새 작업대상 핸들러
   const handleNewTarget = () => {
