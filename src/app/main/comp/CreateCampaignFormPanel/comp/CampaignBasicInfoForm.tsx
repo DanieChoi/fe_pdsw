@@ -4,8 +4,8 @@ import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import ISelectorForTeanantForCreateNewCampaign from './ISelectorForTeanantForCreateNewCampaign';
-import SkillListPopup from '@/components/shared/layout/SkillListPopup';
 import { Search, Plus } from "lucide-react";
+import SkillListPopupForNewCampaign from '@/components/shared/layout/SkillListPopupForNewCampaign';
 
 const dialModeList = [
   { dial_id: 1, dial_name: 'Power' },
@@ -180,7 +180,7 @@ const CampaignBasicInfoForm = ({
 
       {/* SkillListPopup 컴포넌트 */}
       {skillPopupState.isOpen && (
-        <SkillListPopup
+        <SkillListPopupForNewCampaign
           param={inputSkills.split(',').filter(id => id !== '').map(id => Number(id))}
           tenantId={Number(currentTenantId)}
           type={skillPopupState.type}
