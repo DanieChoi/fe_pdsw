@@ -41,6 +41,9 @@ export default function Footer({
   const { campaigns, setCampaigns } = useMainStore();
   const { useAlramPopup } = useEnvironmentStore();
 
+  console.log("id = ", id);
+  
+
   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
 
