@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from "react";
 import { useMainStore } from '@/store';
 import TitleWrap from "@/components/shared/TitleWrap";
@@ -51,53 +50,44 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
     setViewType(value as ViewType);
   };
 
-  // 캠페인 진행 정보 API 호출 (useQuery 사용)
+  // 캠페인 진행 정보 API 호출 (useMutation 사용)
   const { 
+    mutate: fetchProgressData,
     data: progressData, 
-    isLoading, 
+    isPending, 
     isError,
-    refetch,
-    invalidateCache 
   } = useApiForCampaignProgressInformation({
-    tenantId: 1,
-    campaignId: numericCampaignId || 0
+    onSuccess: (data) => {
+      console.log("캠페인 진행 정보 API 성공:", data);
+      
+      if (data) {
+        const tempList = [...data.progressInfoList].sort((a, b) => a.reuseCnt - b.reuseCnt);
+        setDataList(tempList);
+        
+        // 첫 번째 항목을 선택 (데이터가 있는 경우에만)
+        // 마지막 항목 선택으로 변경 20250325
+        if (tempList.length > 0 && !selectedCall) {
+          setSelectedCall(tempList[tempList.length-1]);
+        }
+      }
+    }
   });
 
   console.log("progressData 확인 : ", progressData);
   
-
   // 데이터 갱신 함수
   const refreshData = useCallback(() => {
-    // invalidateCache 함수가 있으면 사용하고, 없으면 refetch 사용
-    if (invalidateCache) {
-      invalidateCache();
+    if (numericCampaignId) {
+      fetchProgressData({
+        tenantId: 1,
+        campaignId: numericCampaignId
+      });
     } else {
-      refetch();
+      console.warn("캠페인 ID가 없어 API 호출이 비활성화됩니다.");
     }
-  }, [invalidateCache, refetch]);
+  }, [fetchProgressData, numericCampaignId]);
 
-  // 데이터가 변경될 때마다 처리
-  // fix 
-  useEffect(() => {
-    if (progressData) {
-      console.log("캠페인 진행 정보 check !!");
-
-      const tempList = [...progressData.progressInfoList].sort((a, b) => a.reuseCnt - b.reuseCnt);
-      setDataList(tempList);
-      
-      // 첫 번째 항목을 선택 (데이터가 있는 경우에만)
-      // 마지막 항목 선택으로 변경 20250325
-      if (tempList.length > 0 && !selectedCall) {
-        setSelectedCall(tempList[tempList.length-1]);
-      }else{
-        
-      }
-      
-      console.log("API 응답 데이터:", tempList);
-    }
-  }, [refetch, progressData, selectedCall]);
-
-  // 컴포넌트 마운트 시 캠페인 정보 로드
+  // 컴포넌트 마운트 시 캠페인 정보 로드 및 데이터 조회
   useEffect(() => {
     console.log("컴포넌트 마운트, 캠페인 ID:", numericCampaignId);
     
@@ -112,10 +102,16 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
           setCampaignIdList([numericCampaignId]);
         }
       }
+      
+      // 최초 데이터 조회
+      fetchProgressData({
+        tenantId: 1,
+        campaignId: numericCampaignId
+      });
     } else {
       console.warn("캠페인 ID가 없어 API 호출이 비활성화됩니다.");
     }
-  }, [numericCampaignId, campaigns]);
+  }, [numericCampaignId, campaigns, fetchProgressData]);
 
   return (
     <div className="flex gap-4 w-full limit-width">
@@ -168,7 +164,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
           <div className="border rounded overflow-y-auto h-[calc(100%-20px)]">
             <table className="w-full text-sm border-collapse">
               <tbody>
-                {isLoading ? (
+                {isPending ? (
                   <tr>
                     <td className="p-4 text-center text-gray-500">로딩 중...</td>
                   </tr>
@@ -201,8 +197,8 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         <div className="flex justify-end gap-2">
           <CommonButton
             variant="outline"
-            // onClick={refreshData}
-            disabled={isLoading}
+            onClick={refreshData}
+            disabled={isPending}
           >
             새로고침
           </CommonButton>
