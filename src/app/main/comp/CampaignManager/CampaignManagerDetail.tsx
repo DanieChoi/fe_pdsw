@@ -48,6 +48,7 @@ import { CheckCampaignSaveReturnCode,CampaignManagerInfo } from '@/components/co
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { CampaignInfo } from '../CreateCampaignFormPanel/variables/variablesForCreateCampaignForm';
+import { toast } from 'react-toastify';
 
 export interface TabItem {
   id: number;
@@ -1095,11 +1096,14 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
         }
       }
       if (campaignScheduleChangeYn) {
+        
         if( tempCampaignSchedule.tenant_id === 0){
           //캠페인 스케줄 등록 api 호출
+          console.log("캠페인 스케쥴이 변했으므로 캠페인 스케쥴 api 업데이트를 실행합니다!");
           fetchCampaignScheduleInsert({...tempCampaignSchedule,tenant_id:tempCampaignManagerInfo.tenant_id});
         }else{
           //캠페인 스케줄 수정 api 호출
+          console.log("캠페인 스케쥴이 안안변했으므로 캠페인 스케쥴 api 업데이트를 실행하지 않습니다!");
           fetchCampaignScheduleUpdate(tempCampaignSchedule);
         }
       }
@@ -1204,6 +1208,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   //캠페인 스케줄 수정 api 호출 
   const { mutate: fetchCampaignScheduleUpdate } = useApiForCampaignScheduleUpdate({
     onSuccess: (data) => {
+      toast.success('캠페인 스케줄 수정이 완료되었습니다.');
       const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       fetchSchedules({
         tenant_id_array: tempTenantIdArray

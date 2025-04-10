@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { Popover } from "@headlessui/react";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -116,122 +116,129 @@ export const CalendarHeadless = ({
           </Button>
         </Popover.Button>
         <Popover.Panel className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-[320px] p-4 bg-background shadow-lg rounded-md">
-          {/* 헤더 영역 */}
-          <div className="bg-gray-50 p-3 rounded mb-4">
-            {/* 헤더의 1행: 연도 및 월 선택 영역 */}
-            <div className="flex items-center gap-2 justify-center mb-3">
-              <div className="flex items-center gap-1">
-                <select
-                  value={selectedYear}
-                  onChange={(e) => {
-                    const newYear = Number(e.target.value);
-                    setSelectedYear(newYear);
-                    setDate(new Date(newYear, selectedMonth, 1));
-                  }}
-                  className="border rounded px-2 py-1 text-sm"
-                >
-                  {Array.from({ length: 10 }).map((_, i) => {
-                    const year = today.getFullYear() - 5 + i;
-                    return (
-                      <option key={year} value={year}>
-                        {year}년
-                      </option>
-                    );
-                  })}
-                </select>
-                <button
-                  onClick={handlePrevYear}
-                  className="px-2 py-1 border rounded text-sm hover:bg-accent transition-colors duration-200"
-                >
-                  {"<<"}
-                </button>
-                <button
-                  onClick={handleNextYear}
-                  className="px-2 py-1 border rounded text-sm hover:bg-accent transition-colors duration-200"
-                >
-                  {">>"}
-                </button>
+          {({ close }) => (
+            <>
+              {/* 헤더 영역 */}
+              <div className="bg-gray-50 p-3 rounded mb-4">
+                {/* 헤더의 1행: 연도 및 월 선택 영역 */}
+                <div className="flex items-center gap-2 justify-center mb-3">
+                  <div className="flex items-center gap-1">
+                    <select
+                      value={selectedYear}
+                      onChange={(e) => {
+                        const newYear = Number(e.target.value);
+                        setSelectedYear(newYear);
+                        setDate(new Date(newYear, selectedMonth, 1));
+                      }}
+                      className="border rounded px-2 py-1 text-sm"
+                    >
+                      {Array.from({ length: 10 }).map((_, i) => {
+                        const year = today.getFullYear() - 5 + i;
+                        return (
+                          <option key={year} value={year}>
+                            {year}년
+                          </option>
+                        );
+                      })}
+                    </select>
+                    <button
+                      onClick={handlePrevYear}
+                      className="px-2 py-1 border rounded text-sm hover:bg-accent transition-colors duration-200"
+                    >
+                      {"<<"}
+                    </button>
+                    <button
+                      onClick={handleNextYear}
+                      className="px-2 py-1 border rounded text-sm hover:bg-accent transition-colors duration-200"
+                    >
+                      {">>"}
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <select
+                      value={selectedMonth}
+                      onChange={(e) => {
+                        const newMonth = Number(e.target.value);
+                        setSelectedMonth(newMonth);
+                        setDate(new Date(selectedYear, newMonth, 1));
+                      }}
+                      className="border rounded px-2 py-1 text-sm"
+                    >
+                      {Array.from({ length: 12 }).map((_, i) => (
+                        <option key={i} value={i}>
+                          {i + 1}월
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={handlePrevMonth}
+                      className="px-2 py-1 border rounded text-sm hover:bg-accent transition-colors duration-200"
+                    >
+                      {"<"}
+                    </button>
+                    <button
+                      onClick={handleNextMonth}
+                      className="px-2 py-1 border rounded text-sm hover:bg-accent transition-colors duration-200"
+                    >
+                      {">"}
+                    </button>
+                  </div>
+                </div>
+                {/* 헤더의 2행: 선택된 날짜 및 유틸 버튼 (저번주, 오늘, 다음주) */}
+                <div className="flex items-center justify-between">
+                  <span className="text-base font-medium">
+                    {date ? format(date, "yyyy-MM-dd", { locale: ko }) : "선택된 날짜 없음"}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      className="px-2 py-1 text-sm"
+                      onClick={handleLastWeek}
+                    >
+                      저번주
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="px-2 py-1 text-sm"
+                      onClick={handleToday}
+                    >
+                      오늘
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="px-2 py-1 text-sm"
+                      onClick={handleNextWeek}
+                    >
+                      다음주
+                    </Button>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-1">
-                <select
-                  value={selectedMonth}
-                  onChange={(e) => {
-                    const newMonth = Number(e.target.value);
-                    setSelectedMonth(newMonth);
-                    setDate(new Date(selectedYear, newMonth, 1));
-                  }}
-                  className="border rounded px-2 py-1 text-sm"
-                >
-                  {Array.from({ length: 12 }).map((_, i) => (
-                    <option key={i} value={i}>
-                      {i + 1}월
-                    </option>
-                  ))}
-                </select>
-                <button
-                  onClick={handlePrevMonth}
-                  className="px-2 py-1 border rounded text-sm hover:bg-accent transition-colors duration-200"
-                >
-                  {"<"}
-                </button>
-                <button
-                  onClick={handleNextMonth}
-                  className="px-2 py-1 border rounded text-sm hover:bg-accent transition-colors duration-200"
-                >
-                  {">"}
-                </button>
+              {/* 날짜 선택 영역 */}
+              <div className="grid grid-cols-7 gap-1 text-center">
+                {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
+                  <div key={day} className="text-xs text-muted-foreground font-medium">
+                    {day}
+                  </div>
+                ))}
+                {currentMonthDates.map((day) => (
+                  <button
+                    key={day.toISOString()}
+                    onClick={() => {
+                      handleSelect(day);
+                      close();
+                    }}
+                    className={cn(
+                      "text-sm w-10 h-10 rounded hover:bg-accent focus:outline-none transition-colors duration-200",
+                      date?.toDateString() === day.toDateString() && "bg-primary text-white"
+                    )}
+                  >
+                    {day.getDate()}
+                  </button>
+                ))}
               </div>
-            </div>
-            {/* 헤더의 2행: 선택된 날짜 및 유틸 버튼 (저번주, 오늘, 다음주) */}
-            <div className="flex items-center justify-between">
-              <span className="text-base font-medium">
-                {date ? format(date, "yyyy-MM-dd", { locale: ko }) : "선택된 날짜 없음"}
-              </span>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  className="px-2 py-1 text-sm"
-                  onClick={handleLastWeek}
-                >
-                  저번주
-                </Button>
-                <Button
-                  variant="outline"
-                  className="px-2 py-1 text-sm"
-                  onClick={handleToday}
-                >
-                  오늘
-                </Button>
-                <Button
-                  variant="outline"
-                  className="px-2 py-1 text-sm"
-                  onClick={handleNextWeek}
-                >
-                  다음주
-                </Button>
-              </div>
-            </div>
-          </div>
-          {/* 날짜 선택 영역 */}
-          <div className="grid grid-cols-7 gap-1 text-center">
-            {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
-              <div key={day} className="text-xs text-muted-foreground font-medium">
-                {day}
-              </div>
-            ))}
-            {currentMonthDates.map((day) => (
-              <button
-                key={day.toISOString()}
-                onClick={() => handleSelect(day)}
-                className={cn(
-                  "text-sm w-10 h-10 rounded hover:bg-accent focus:outline-none transition-colors duration-200",
-                  date?.toDateString() === day.toDateString() && "bg-primary text-white"
-                )}
-              >
-                {day.getDate()}
-              </button>
-            ))}
-          </div>
+            </>
+          )}
         </Popover.Panel>
       </Popover>
     </div>
