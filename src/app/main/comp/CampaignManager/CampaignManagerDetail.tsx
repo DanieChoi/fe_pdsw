@@ -966,7 +966,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   // tofix 0404
   //캠페인 저장 실행.
   const handleCampaignSaveExecute = () => {
-    setRtnMessage('캠페인 수정이 완료되었습니다.');
+    // setRtnMessage('캠페인 수정이 완료되었습니다.');
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     
     if (changeYn) {

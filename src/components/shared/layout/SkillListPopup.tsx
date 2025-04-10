@@ -123,6 +123,7 @@ const SkillListPopup = ({
   // Modern compact UI
   const skillsContent = (
     <div className="w-full max-h-[440px]">
+      hi
       <div className="mb-3">
         <div className="flex items-center mb-2">
           {/* <div className="font-medium text-sm mr-2">Tenant ID:</div> */}
