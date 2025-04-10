@@ -463,7 +463,7 @@ export default function Footer({
         eventSource.close();
       };
     }
-  }, [tenant_id, role_id]);
+  }, [id, tenant_id, role_id]);
 
   // 높이 변경 핸들러
   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
@@ -504,6 +504,7 @@ export default function Footer({
       onResizeStart={onResizeStart}
       onResizeStop={handleResizeStop}
     >
+      {/* userId: {`${id}`} */}
       {/* 상단 바 영역 */}
       <div className="flex-none pt-[5px] pb-[4px] px-[20px] border-b bg-white flex justify-between items-center">
         <div className="flex items-center gap-1">
