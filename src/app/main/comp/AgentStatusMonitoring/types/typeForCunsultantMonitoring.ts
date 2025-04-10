@@ -26,13 +26,13 @@ export interface AgentStateMonitoringListDataResponse {
   export interface AgentStatus {
     waiting: boolean;
     processing: boolean;
-    afterProcessing: boolean;
+    afterprocessing: boolean;
     rest: boolean;
   }
   
   export interface AgentData {
     id: number;
-    status: 'waiting' | 'processing' | 'afterProcessing' | 'rest';
+    status: 'waiting' | 'processing' | 'afterprocessing' | 'rest';
     agent: string;
     name: string;
     time: string;
