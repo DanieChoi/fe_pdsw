@@ -31,7 +31,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
   const [selectedStatuses, setSelectedStatuses] = useState<AgentStatus>({
     waiting: true,
     processing: false,
-    afterProcessing: false,
+    afterprocessing: false,
     rest: false
   });
 
@@ -57,7 +57,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
     const colors = {
       waiting: 'text-[#3A9D6C]',
       processing: 'text-[#C95E5E]',
-      afterProcessing: 'text-[#338BD3]',
+      afterprocessing: 'text-[#338BD3]',
       rest: 'text-[#9459BF]'
     };
     return colors[status];
@@ -67,7 +67,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
     const statusMap = {
       waiting: '대기',
       processing: '처리',
-      afterProcessing: '후처리',
+      afterprocessing: '후처리',
       rest: '휴식'
     };
     return statusMap[status];
@@ -108,7 +108,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
   const statusHeaderItems: StatusHeaderItem[] = [
     { status: 'waiting', bg: '!bg-[#DDF4F2]', text: '대기 상담사', icon: '/waiting.svg' },
     { status: 'processing', bg: '!bg-[#FEE9EC]', text: '처리', icon: '/processing.svg' },
-    { status: 'afterProcessing', bg: '!bg-[#E8EFFA]', text: '후처리', icon: '/afterprocessing.svg' },
+    { status: 'afterprocessing', bg: '!bg-[#E8EFFA]', text: '후처리', icon: '/afterprocessing.svg' },
     { status: 'rest', bg: '!bg-[#F6F0FA]', text: '휴식', icon: '/rest.svg' }
   ];
 
@@ -118,6 +118,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
     campaignId: Number(campaignId || 0),
     sessionKey: sessionKey || '',
   }, {
+    enabled: !!sessionKey && tenantId !== 'undefined', // sessionKey가 존재하고 tenantId != null 인 경우
     refetchInterval: statisticsUpdateCycle > 0 ? statisticsUpdateCycle * 1000 : false,
   });
 
@@ -133,7 +134,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
           : item.statusCode === '205'
             ? 'processing'
             : item.statusCode === '206'
-              ? 'afterProcessing'
+              ? 'afterprocessing'
               : 'rest',
         agent: item.counselorId,
         name: item.counselorName,
