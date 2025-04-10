@@ -25,25 +25,6 @@ export interface SkillListPopupProps {
   allowTenantChange?: boolean;
 }
 
-// API 대체 함수 - 실제 환경에서는 제거
-const useFakeSkillsData = (tenantId: number) => {
-  const fakeData = {
-    result_code: 0,
-    result_msg: "Success",
-    result_count: 5,
-    total_count: 5,
-    result_data: [
-      { tenant_id: 1, skill_id: 1, skill_name: "스킬1", skill_description: "스킬1설명" },
-      { tenant_id: 1, skill_id: 2, skill_name: "스킬2", skill_description: "스킬2설명" },
-      { tenant_id: 1, skill_id: 3, skill_name: "스킬3", skill_description: "스킬3설명" },
-      { tenant_id: 1, skill_id: 4, skill_name: "스킬4", skill_description: "스킬4설명" },
-      { tenant_id: 1, skill_id: 5, skill_name: "스킬5", skill_description: "스킬5설명" }
-    ]
-  };
-  
-  return { data: fakeData, isLoading: false, isError: false };
-};
-
 const SkillListPopup = ({
   param = [],
   tenantId: initialTenantId,
@@ -66,28 +47,48 @@ const SkillListPopup = ({
     }
   }, [initialTenantId]);
   
-  // 실제 API 사용 (프로덕션에서 사용)
+  // 실제 API 사용
   const { data: skillsData, isLoading, isError } = useApiForGetSkills2({
     tenant_id_array: [currentTenantId],
   });
 
   console.log("API Data for skillist popup:", skillsData);
   
-  // Set 대신 셀렉션 관리
-  const [selectedRows, setSelectedRows] = useState(() => {
+  // 선택된 항목을 Set으로 관리
+  const [selectedRows, setSelectedRows] = useState<Set<number>>(() => {
     const initialSelection = new Set<number>();
-    param.forEach(id => {
-      if (id !== 0) initialSelection.add(id);
-    });
+    if (param && param.length > 0) {
+      param.forEach(id => {
+        if (id !== 0) initialSelection.add(id);
+      });
+    }
     return initialSelection;
   });
   
+  // param이 변경되거나 팝업이 열릴 때마다 selectedRows 업데이트
+  useEffect(() => {
+    if (isOpen) {
+      const initialSelection = new Set<number>();
+      if (param && param.length > 0) {
+        param.forEach(id => {
+          if (id !== 0) initialSelection.add(id);
+        });
+      }
+      setSelectedRows(initialSelection);
+      
+      console.log("SkillListPopup opened with param:", param);
+      console.log("Initial selection set to:", Array.from(initialSelection));
+    }
+  }, [param, isOpen]);
+  
   // 디버깅용 로그
   useEffect(() => {
-    console.log("Initial param:", param);
-    console.log("Selected rows:", Array.from(selectedRows));
-    console.log("Current tenant ID:", currentTenantId);
-  }, [param, selectedRows, currentTenantId]);
+    if (isOpen) {
+      console.log("Initial param:", param);
+      console.log("Selected rows:", Array.from(selectedRows));
+      console.log("Current tenant ID:", currentTenantId);
+    }
+  }, [param, selectedRows, currentTenantId, isOpen]);
   
   // tenant ID가 변경될 때 선택된 항목 초기화
   useEffect(() => {
@@ -186,9 +187,9 @@ const SkillListPopup = ({
     );
   }
 
-  // 그리드 컴포넌트
+  // 그리드 컴포넌트 - 높이 제한 적용
   const gridContent = (
-    <div className="w-full">
+    <div className="w-full flex flex-col">
       {/* {allowTenantChange && (
         <div className="mb-4">
           <div className="flex items-center">
@@ -236,7 +237,8 @@ const SkillListPopup = ({
         총 {rows.length}개 중 {selectedRows.size}개 선택됨
       </div>
       
-      <div className="w-full" style={{ height: '400px' }}>
+      {/* 고정 높이 설정하여 화면에서 넘치지 않도록 함 */}
+      <div className="w-full" style={{ height: '350px' }}>
         <DataGrid
           columns={columns}
           rows={rows}
@@ -259,7 +261,8 @@ const SkillListPopup = ({
       onClose={handleConfirm}
       onCancle={onCancle}
       type={type}
-      width="lg"
+      width={450}
+      height={450} // 적절한 높이 설정
     />
   );
 };

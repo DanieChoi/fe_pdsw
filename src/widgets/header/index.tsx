@@ -13,6 +13,7 @@ import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useApiForGetAuthorizedMenusInfoForMenuRoleId } from "./hooks/useApiForGetAuthorizedMenusInfoForMenuRoleId";
 import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
 import { useEnvironmentStore } from "@/store/environmentStore";
+import { Button } from "@/components/ui/button";
 
 const errorMessage = {
   isOpen: false,
@@ -168,7 +169,7 @@ export default function Header() {
       // console.error('Tenants API error:', error);
       // alert("에러 발생 여기!")
       console.log("error 에러 발생 여기 !!!!!! : ", error);
-      
+
       if (error.message.split('||')[0] === '5') {
         setAlertState({
           ...errorMessage,
@@ -255,6 +256,19 @@ export default function Header() {
           <div className="flex items-center space-x-4 text-white text-sm">
 
             <div className='flex items-center space-x-1'>
+
+              <div className='flex items-center space-x-1'>
+                {tenant_id === 0 && (
+                  <div>
+                    {/* s 글자의 outline button 으로 시스템 관리자임을 알림 shadcn ui button */}
+                    <Button variant="outline" className="text-xs px-1 py-0 mr-1 bg-[#56CAD6]/20 text-[#56CAD6] rounded-full">
+                      S
+                    </Button>
+                  </div>
+                )}
+              </div> 
+
+
               <Image
                 src="/header-menu/top_pic.svg"
                 alt="사용자"
