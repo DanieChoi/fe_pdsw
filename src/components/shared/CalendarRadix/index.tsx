@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { Popover } from "@headlessui/react";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, RefreshCcw, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -23,8 +23,9 @@ export const CalendarHeadless = ({
   className = "",
   label,
 }: CalendarHeadlessProps) => {
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const today = new Date();
+  const [selectedYear, setSelectedYear] = useState(today.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(today.getMonth());
 
   const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
   const currentMonthDates = Array.from({ length: daysInMonth }, (_, i) =>
@@ -35,8 +36,51 @@ export const CalendarHeadless = ({
     setDate(day);
   };
 
+  const handlePrevYear = () => {
+    const newYear = selectedYear - 1;
+    setSelectedYear(newYear);
+    setDate(new Date(newYear, selectedMonth, 1));
+  };
+
+  const handleNextYear = () => {
+    const newYear = selectedYear + 1;
+    setSelectedYear(newYear);
+    setDate(new Date(newYear, selectedMonth, 1));
+  };
+
+  const handlePrevMonth = () => {
+    let newYear = selectedYear;
+    let newMonth = selectedMonth - 1;
+    if (newMonth < 0) {
+      newMonth = 11;
+      newYear = selectedYear - 1;
+      setSelectedYear(newYear);
+    }
+    setSelectedMonth(newMonth);
+    setDate(new Date(newYear, newMonth, 1));
+  };
+
+  const handleNextMonth = () => {
+    let newYear = selectedYear;
+    let newMonth = selectedMonth + 1;
+    if (newMonth > 11) {
+      newMonth = 0;
+      newYear = selectedYear + 1;
+      setSelectedYear(newYear);
+    }
+    setSelectedMonth(newMonth);
+    setDate(new Date(newYear, newMonth, 1));
+  };
+
+  const handleToday = () => {
+    const newToday = new Date();
+    setSelectedYear(newToday.getFullYear());
+    setSelectedMonth(newToday.getMonth());
+    setDate(newToday);
+  };
+
   return (
-    <div className={cn("w-full", className)}>
+    <div className={cn("w-full font-sans text-gray-800", className)}>
       {label && <label className="text-sm font-medium mb-1 block">{label}</label>}
       <Popover className="relative">
         <Popover.Button as="div">
@@ -48,71 +92,107 @@ export const CalendarHeadless = ({
             )}
           >
             <div className="flex items-center justify-between w-full">
-              <span>{date ? format(date, "yyyy-MM-dd", { locale: ko }) : <span>날짜 선택</span>}</span>
+              <span>
+                {date
+                  ? format(date, "yyyy-MM-dd", { locale: ko })
+                  : <span>날짜 선택</span>}
+              </span>
               <CalendarIcon className="h-4 w-4 text-muted-foreground" />
             </div>
           </Button>
         </Popover.Button>
         <Popover.Panel className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-[320px] p-4 bg-background shadow-lg rounded-md">
-          <div className="flex items-center gap-4 mb-4 justify-center">
-            {/* 연도 선택 영역 */}
-            <div className="flex items-center gap-1">
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(Number(e.target.value))}
-                className="border rounded px-2 py-1 text-sm"
-              >
-                {Array.from({ length: 10 }).map((_, i) => {
-                  const year = new Date().getFullYear() - 5 + i;
-                  return (
-                    <option key={year} value={year}>
-                      {year}년
+          {/* 헤더 영역 */}
+          <div className="bg-gray-50 p-3 rounded mb-4">
+            {/* 1행: 연도 및 월 선택 영역 */}
+            <div className="flex items-center gap-2 justify-center mb-3">
+              <div className="flex items-center gap-1">
+                <select
+                  value={selectedYear}
+                  onChange={(e) => {
+                    const newYear = Number(e.target.value);
+                    setSelectedYear(newYear);
+                    setDate(new Date(newYear, selectedMonth, 1));
+                  }}
+                  className="border rounded px-2 py-1 text-sm"
+                >
+                  {Array.from({ length: 10 }).map((_, i) => {
+                    const year = today.getFullYear() - 5 + i;
+                    return (
+                      <option key={year} value={year}>
+                        {year}년
+                      </option>
+                    );
+                  })}
+                </select>
+                <button
+                  onClick={handlePrevYear}
+                  className="px-2 py-1 border rounded text-sm hover:bg-accent transition-colors duration-200"
+                >
+                  {"<<"}
+                </button>
+                <button
+                  onClick={handleNextYear}
+                  className="px-2 py-1 border rounded text-sm hover:bg-accent transition-colors duration-200"
+                >
+                  {">>"}
+                </button>
+              </div>
+              <div className="flex items-center gap-1">
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => {
+                    const newMonth = Number(e.target.value);
+                    setSelectedMonth(newMonth);
+                    setDate(new Date(selectedYear, newMonth, 1));
+                  }}
+                  className="border rounded px-2 py-1 text-sm"
+                >
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <option key={i} value={i}>
+                      {i + 1}월
                     </option>
-                  );
-                })}
-              </select>
-              <button
-                onClick={() => setSelectedYear(selectedYear - 1)}
-                className="px-2 py-1 border rounded text-sm"
-              >
-                {"<<"}
-              </button>
-              <button
-                onClick={() => setSelectedYear(selectedYear + 1)}
-                className="px-2 py-1 border rounded text-sm"
-              >
-                {">>"}
-              </button>
+                  ))}
+                </select>
+                <button
+                  onClick={handlePrevMonth}
+                  className="px-2 py-1 border rounded text-sm hover:bg-accent transition-colors duration-200"
+                >
+                  {"<"}
+                </button>
+                <button
+                  onClick={handleNextMonth}
+                  className="px-2 py-1 border rounded text-sm hover:bg-accent transition-colors duration-200"
+                >
+                  {">"}
+                </button>
+              </div>
             </div>
-            {/* 월 선택 영역 */}
-            <div className="flex items-center gap-1">
-              <select
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                className="border rounded px-2 py-1 text-sm"
-              >
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <option key={i} value={i}>
-                    {i + 1}월
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => setSelectedMonth((prev) => (prev > 0 ? prev - 1 : prev))}
-                disabled={selectedMonth === 0}
-                className="px-2 py-1 border rounded text-sm disabled:opacity-50"
-              >
-                {"<"}
-              </button>
-              <button
-                onClick={() => setSelectedMonth((prev) => (prev < 11 ? prev + 1 : prev))}
-                disabled={selectedMonth === 11}
-                className="px-2 py-1 border rounded text-sm disabled:opacity-50"
-              >
-                {">"}
-              </button>
+            {/* 2행: 선택된 날짜 및 유틸 버튼 */}
+            <div className="flex items-center justify-between">
+              <span className="text-base font-medium">
+                {date
+                  && `${format(date, "yyyy-MM-dd", { locale: ko })}`
+                }
+                
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleToday}
+                  className="p-2 border rounded text-sm hover:bg-accent transition-colors duration-200"
+                >
+                  <RefreshCcw className="h-4 w-4" />
+                </button>
+                <Popover.Button
+                  as="button"
+                  className="p-2 border rounded text-sm hover:bg-accent transition-colors duration-200"
+                >
+                  <Check className="h-4 w-4" />
+                </Popover.Button>
+              </div>
             </div>
           </div>
+          {/* 날짜 선택 영역 */}
           <div className="grid grid-cols-7 gap-1 text-center">
             {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
               <div key={day} className="text-xs text-muted-foreground font-medium">
@@ -122,11 +202,9 @@ export const CalendarHeadless = ({
             {currentMonthDates.map((day) => (
               <button
                 key={day.toISOString()}
-                onClick={() => {
-                  handleSelect(day);
-                }}
+                onClick={() => handleSelect(day)}
                 className={cn(
-                  "text-sm w-10 h-10 rounded hover:bg-accent focus:outline-none",
+                  "text-sm w-10 h-10 rounded hover:bg-accent focus:outline-none transition-colors duration-200",
                   date?.toDateString() === day.toDateString() && "bg-primary text-white"
                 )}
               >
