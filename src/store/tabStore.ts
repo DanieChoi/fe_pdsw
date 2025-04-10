@@ -389,6 +389,7 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
   // ------------------------
   // 탭 제거
   // ------------------------
+  // tofix 0410
   removeTab: (tabId, uniqueKey) =>
     set((state) => {
       const newTabs = state.openedTabs.filter(
@@ -412,6 +413,18 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
                 : sec.activeTabKey,
           };
         }),
+
+        // openedTabs 에서 제일 최신 마지막거거를 활성탭으로 지정하도록 함수 호출
+        // 예를 들어 
+        // const newTabKey = `${item.id}-${Date.now()}`;
+        // setActiveTab(item.id, newTabKey);
+        // setActiveTab: (tabId, uniqueKey) => {
+        //   set({
+        //     activeTabId: tabId,
+        //     activeTabKey: uniqueKey,
+        //   });
+        // }   
+
       }));
 
       const updatedGroups = state.tabGroups
@@ -1023,13 +1036,13 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
       };
     }),
 
-    removeExistingTabsByTabId: (tabId: number) => {
-      const { openedTabs, removeTab } = get();
-      openedTabs
-        .filter((tab) => tab.id === tabId)
-        .forEach((tab) => {
-          removeTab(tab.id, tab.uniqueKey);
-        });
-    },
+  removeExistingTabsByTabId: (tabId: number) => {
+    const { openedTabs, removeTab } = get();
+    openedTabs
+      .filter((tab) => tab.id === tabId)
+      .forEach((tab) => {
+        removeTab(tab.id, tab.uniqueKey);
+      });
+  },
 
 }));

@@ -587,6 +587,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
           onSelectChange={handleSelectChange}
           onUpdateSkill={(param) => handleSelectSkills(param)}
         />
+        
       </div>
 
       <div>
