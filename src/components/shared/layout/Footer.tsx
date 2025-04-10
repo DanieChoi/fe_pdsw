@@ -10,6 +10,7 @@ import { useEnvironmentStore } from "@/store/environmentStore";
 import { toast, initToasts } from "./CustomToast";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
+import { el } from "@faker-js/faker";
 
 type FooterDataType = {
   time: string;
@@ -326,7 +327,14 @@ export default function Footer({
       _message = '캠페인 스케쥴'
       if (command === 'INSERT') {
         _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'];
-      } else {
+      } 
+      else if (command === 'UPDATE') {
+        _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'];
+      }
+      else if (command === 'DELETE') {
+        _message += '삭제, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'];
+      }     
+      else {
         _message = '';
       }
     }
