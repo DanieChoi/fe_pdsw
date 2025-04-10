@@ -95,7 +95,7 @@ const MonitorPage = () => {
   const { skills, setSkills } = useCampainManagerStore();
 
     // 인증 관련 상태
-    const { tenant_id } = useAuthStore();
+    const { tenant_id,session_key } = useAuthStore();
 
     // 드래그 관련 상태
     const containerRef = useRef<HTMLDivElement>(null);
@@ -474,7 +474,10 @@ const MonitorPage = () => {
           />
         );
       case 'agent-status':
-        return <AgentStatusMonitoring campaignId={Number(selectedCampaign)} />;
+        return <AgentStatusMonitoring campaignId={Number(selectedCampaign)} 
+            sessionKey={session_key}
+            tenantId={campaigns.find(c => c.campaign_id === Number(selectedCampaign))?.tenant_id+''}
+        />;
       case 'channel-monitor':
         return <ChannelMonitor />;
       case 'campaign-progress':
