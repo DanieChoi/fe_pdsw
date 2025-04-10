@@ -68,11 +68,11 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
     case 20:
       return <RebroadcastSettingsPanel />;
     case 21:
-      // 캠페인 ID를 props로 전달
       return <CampaignMonitorDashbord campaignId={campaignId} />;
     // case 22:
     //   return <AgentStatusMonitoring campaignId={params?.campainId}/>;
     case 22:
+      // 상담원 상태 모니터 
       return (
         <AgentStatusMonitoring
           sessionKey={params?.sessionKey}
