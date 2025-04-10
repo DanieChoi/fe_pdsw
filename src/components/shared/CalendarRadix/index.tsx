@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { Popover } from "@headlessui/react";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, RefreshCcw, Check } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -79,6 +79,22 @@ export const CalendarHeadless = ({
     setDate(newToday);
   };
 
+  const handleLastWeek = () => {
+    const current = date ? new Date(date) : new Date();
+    current.setDate(current.getDate() - 7);
+    setDate(current);
+    setSelectedYear(current.getFullYear());
+    setSelectedMonth(current.getMonth());
+  };
+
+  const handleNextWeek = () => {
+    const current = date ? new Date(date) : new Date();
+    current.setDate(current.getDate() + 7);
+    setDate(current);
+    setSelectedYear(current.getFullYear());
+    setSelectedMonth(current.getMonth());
+  };
+
   return (
     <div className={cn("w-full font-sans text-gray-800", className)}>
       {label && <label className="text-sm font-medium mb-1 block">{label}</label>}
@@ -93,9 +109,7 @@ export const CalendarHeadless = ({
           >
             <div className="flex items-center justify-between w-full">
               <span>
-                {date
-                  ? format(date, "yyyy-MM-dd", { locale: ko })
-                  : <span>날짜 선택</span>}
+                {date ? format(date, "yyyy-MM-dd", { locale: ko }) : <span>날짜 선택</span>}
               </span>
               <CalendarIcon className="h-4 w-4 text-muted-foreground" />
             </div>
@@ -104,7 +118,7 @@ export const CalendarHeadless = ({
         <Popover.Panel className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-[320px] p-4 bg-background shadow-lg rounded-md">
           {/* 헤더 영역 */}
           <div className="bg-gray-50 p-3 rounded mb-4">
-            {/* 1행: 연도 및 월 선택 영역 */}
+            {/* 헤더의 1행: 연도 및 월 선택 영역 */}
             <div className="flex items-center gap-2 justify-center mb-3">
               <div className="flex items-center gap-1">
                 <select
@@ -168,27 +182,33 @@ export const CalendarHeadless = ({
                 </button>
               </div>
             </div>
-            {/* 2행: 선택된 날짜 및 유틸 버튼 */}
+            {/* 헤더의 2행: 선택된 날짜 및 유틸 버튼 (저번주, 오늘, 다음주) */}
             <div className="flex items-center justify-between">
               <span className="text-base font-medium">
-                {date
-                  && `${format(date, "yyyy-MM-dd", { locale: ko })}`
-                }
-                
+                {date ? format(date, "yyyy-MM-dd", { locale: ko }) : "선택된 날짜 없음"}
               </span>
               <div className="flex items-center gap-2">
-                <button
+                <Button
+                  variant="outline"
+                  className="px-2 py-1 text-sm"
+                  onClick={handleLastWeek}
+                >
+                  저번주
+                </Button>
+                <Button
+                  variant="outline"
+                  className="px-2 py-1 text-sm"
                   onClick={handleToday}
-                  className="p-2 border rounded text-sm hover:bg-accent transition-colors duration-200"
                 >
-                  <RefreshCcw className="h-4 w-4" />
-                </button>
-                <Popover.Button
-                  as="button"
-                  className="p-2 border rounded text-sm hover:bg-accent transition-colors duration-200"
+                  오늘
+                </Button>
+                <Button
+                  variant="outline"
+                  className="px-2 py-1 text-sm"
+                  onClick={handleNextWeek}
                 >
-                  <Check className="h-4 w-4" />
-                </Popover.Button>
+                  다음주
+                </Button>
               </div>
             </div>
           </div>
