@@ -13,6 +13,7 @@ import {
 import { TenantListResponse } from "@/features/campaignManager/types/typeForTenant";
 import { apiForGetTenantList } from "@/features/campaignManager/api/apiForTennants";
 import { ApiRequest, CampaignGroupResponse } from "@/features/campaignManager/types/typeForCampaignGroup";
+import { customAlertService } from "@/components/shared/layout/utils/CustomAlertService";
 
 interface CombinedData {
     tenantData: TenantListResponse;
@@ -30,7 +31,7 @@ export const apiForCombinedTenantAndCampaignGroup = async (
 ): Promise<ExtendedCombinedData> => {
 
     console.log("tenant_id ??????????????????????????????????????????????????????????? ", tenant_id);
-    
+
 
     try {
         // Promise.all을 사용하여 세 API를 병렬로 호출
@@ -86,6 +87,13 @@ export const apiForCombinedTenantAndCampaignGroup = async (
         return safeData;
     } catch (error: any) {
 
+        if (error.response.data.result_code === 5) {
+            // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
+            customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
+              window.location.href = '/login';
+            });
+          }
+
         // tofix for hyunsok
         console.error("Combined API call failed:", error);
 
@@ -116,7 +124,7 @@ export const apiForCampaignListForCampaignGroup = async (
         );
 
         console.log("Campaign list for campaign group response:", data);
-        
+
         // Check if data exists and has the expected structure
         // if (!data || typeof data !== 'object') {
         //     console.error("Invalid API response format:", data);
@@ -137,7 +145,7 @@ export const apiForCampaignListForCampaignGroup = async (
         };
     } catch (error: any) {
         console.error("Error fetching campaign group list:", error);
-        
+
         if (error.response?.status === 401) {
             throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
         }
@@ -253,6 +261,14 @@ export const apiForCampaignGroupList = async (
         );
         return data;
     } catch (error: any) {
+
+        if (error.response.data.result_code === 5) {
+            // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
+            customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
+                window.location.href = '/login';
+            });
+        }
+
         if (error.response?.status === 401) {
             throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
         }

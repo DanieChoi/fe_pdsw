@@ -7,6 +7,7 @@ import {
   CounselorSkillListResponse,
   CounselorSkillRequestData
 } from "../types/typeForCounselorSkill";
+import { customAlertService } from "@/components/shared/layout/utils/CustomAlertService";
 
 /**
  * 상담사에게 선택한 스킬들을 할당하는 API
@@ -210,7 +211,15 @@ export const apiForAddCounselorsForSpecificSkill = async (
 
     console.log("✅ 스킬을 가진 상담사 목록에 특정 상담사들 추가 성공:", data);
     return data;
-  } catch (error) {
+  } catch (error:any) {
+
+    if (error.response.data.result_code === 5) {
+      // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
+      customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
+        window.location.href = '/login';
+      });
+    }
+
     console.error("❌ 스킬에 상담사 추가 실패:", error);
     const typedError = error as CounselorSkillApiError;
     throw new Error(

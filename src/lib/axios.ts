@@ -1,6 +1,8 @@
 // src/lib/axios.ts
 import axios from 'axios';
 import { getCookie } from './cookies';
+import { customAlertService } from '@/components/shared/layout/utils/CustomAlertService';
+import { log } from 'console';
 
 export const axiosInstance = axios.create({
   baseURL: '/pds',
@@ -19,6 +21,7 @@ export const externalAxiosInstance = axios.create({
 // 요청 인터셉터 추가
 axiosInstance.interceptors.request.use(
   (config) => {
+    
     const sessionKey = getCookie('session_key');
 
     if (sessionKey && config.headers) {
@@ -28,6 +31,16 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
+
+    // console.log("error ???????????????", error);
+
+    if (error.response.data.result_code === 5) {
+      // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
+      customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
+        window.location.href = '/login';
+      });
+    }
+
     return Promise.reject(error);
   }
 );
@@ -35,6 +48,8 @@ axiosInstance.interceptors.request.use(
 // 응답 인터셉터
 axiosInstance.interceptors.response.use(
   async (response) => {
+    console.log("here 8888888888888 response", response);
+    
     const url = response.config.url || '';
     const userId = getCookie('id');
     if( url !== '/login' && userId != null && userId != '' ) {
@@ -403,6 +418,14 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   async (error) => {
+
+    if (error.response.data.result_code === 5) {
+      // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
+      customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
+        window.location.href = '/login';
+      });
+    }
+
     const url = error.config.url || '';
     const userId = getCookie('id');
     if( url !== '/login' && userId != null && userId != '' ) {
@@ -776,6 +799,10 @@ axiosInstance.interceptors.response.use(
 // 응답 인터셉터
 axiosRedisInstance.interceptors.response.use(
   async (response) => {
+
+    console.log("here 9999999999999999999999999999999999", response);
+    
+
     const url = response.config.url || '';
     const userId = getCookie('id');
     if( url !== '/log/save' && userId != null && userId != '' ) {
@@ -853,10 +880,22 @@ axiosRedisInstance.interceptors.response.use(
     return response;
   },
   async (error) => {
+
+    console.log("axios에서 result code 확인 1111111 : ", error.response.data.result_code);
+    
+
+    // result_code 5 일 경우 axiosInstance 와 동일하게 로그인 페이지로 이동
+    if (error.response.data.result_code === 5) {
+      customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
+        window.location.href = '/login';
+      });
+    }
+
     if (error.response?.status === 401) {
       window.location.href = '/login';
       return Promise.reject(new Error('세션이 만료되었습니다. 다시 로그인해주세요.'));
     }
+
     const url = error.config.url || '';
     const userId = getCookie('id');
     if( url !== '/log/save' && userId != null && userId != '' ) {

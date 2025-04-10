@@ -9,7 +9,8 @@ export async function apiToFetchCounselorListForSideBar({
   roleId
 }: IParmaterForFetchCounsolorList) {
   const response = await axiosRedisInstance.get(
-    `/counselor/list?tenantId=${tenant_id}&roleId=${roleId}`
+    // `/counselor/list?tenantId=${tenant_id}&roleId=${roleId}`
+    `/counselor/list?tenantId=${tenant_id}`
   );
   
   console.log("response.data at 상담사 api 함수 ! : ", response.data);
