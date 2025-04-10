@@ -140,6 +140,8 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
         time: item.statusTime || '0',
       }));
       setAgentData(tempDataList);
+    }else{
+      setAgentData([]);
     }
   }, [data]);
 
