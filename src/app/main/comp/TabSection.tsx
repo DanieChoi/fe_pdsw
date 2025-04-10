@@ -124,7 +124,7 @@ const TabSection: React.FC<TabSectionProps> = ({
 
         <div
           ref={scrollContainerRef}
-          className="flex-1 flex overflow-hidden scroll-smooth"
+          className="flex-1 flex scroll-smooth"
         >
           {section.tabs.map((tab) => {
             const isActive = section.activeTabKey === tab.uniqueKey;

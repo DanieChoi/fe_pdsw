@@ -248,7 +248,6 @@ const TabContent = () => {
             const campaignName = activeTab?.campaignName;
             const params = activeTab?.params; // params 추출 추가
 
-
             return (
               <React.Fragment key={section.id}>
                 <div

@@ -58,10 +58,10 @@ export default function MainLayout({
   const actualFooterHeight = isFooterOpen ? footerHeight : 32;
 
   return (
-    <div className={`${inter.className} h-screen overflow-hidden`}>
+    <div className={`${inter.className} h-screen`}>
       <div className="flex flex-col h-full">
         <Header />
-        <div className="flex flex-1 min-h-0 overflow-hidden">
+        <div className="flex flex-1 min-h-0">
           <Sidebar2 />
           {/* 메인 영역: 사이드바 너비에 따라 줄어들지만 내부 컨텐츠 영역은 최소 너비(800px)를 유지하여 가로 스크롤 발생 */}
           <main
