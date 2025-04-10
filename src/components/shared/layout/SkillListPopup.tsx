@@ -1,522 +1,9 @@
-// // "use client";
-
-// // import React, { useState, useEffect } from 'react';
-// // import CustomAlert from '@/components/shared/layout/CustomAlert';
-// // import DataGrid from 'react-data-grid';
-// // import { SelectColumn } from 'react-data-grid';
-// // import 'react-data-grid/lib/styles.css';
-// // import { useApiForGetSkills2 } from '@/features/campaignManager/hooks/useApiForGetSkills2';
-// // import { Loader2 } from "lucide-react";
-
-// // interface Skill {
-// //   tenant_id: number | string;
-// //   skill_id: number;
-// //   skill_name: string;
-// //   skill_description: string;
-// // }
-
-// // export interface SkillListPopupProps {
-// //   param: number[];
-// //   tenantId: number;
-// //   isOpen?: boolean;
-// //   type: string;
-// //   onConfirm: (param: string, updatedTenantId?: number) => void;
-// //   onCancle?: () => void;
-// //   allowTenantChange?: boolean;
-// // }
-
-// // const SkillListPopup = ({
-// //   param = [],
-// //   tenantId: initialTenantId,
-// //   type,
-// //   isOpen = true,
-// //   onConfirm,
-// //   onCancle,
-// //   allowTenantChange = true
-// // }: SkillListPopupProps) => {
-// //   // 내부 tenantId 상태 관리
-// //   const [currentTenantId, setCurrentTenantId] = useState(initialTenantId);
-// //   const [showTenantIdInput, setShowTenantIdInput] = useState(false);
-// //   const [tenantIdInput, setTenantIdInput] = useState(initialTenantId.toString());
-  
-// //   // initialTenantId prop이 변경되면 내부 상태도 업데이트
-// //   useEffect(() => {
-// //     if (initialTenantId !== currentTenantId) {
-// //       setCurrentTenantId(initialTenantId);
-// //       setTenantIdInput(initialTenantId.toString());
-// //     }
-// //   }, [initialTenantId]);
-  
-// //   // 실제 API 사용 (프로덕션에서 사용)
-// //   const { data: skillsData, isLoading, isError } = useApiForGetSkills2({
-// //     tenant_id_array: [currentTenantId],
-// //   });
-  
-// //   // Set 대신 셀렉션 관리 - 선택된 항목을 Set으로 관리
-// //   const [selectedRows, setSelectedRows] = useState<Set<number>>(() => {
-// //     const initialSelection = new Set<number>();
-// //     if (param && param.length > 0) {
-// //       param.forEach(id => {
-// //         if (id !== 0) initialSelection.add(id);
-// //       });
-// //     }
-// //     return initialSelection;
-// //   });
-  
-// //   // param이 변경되거나 팝업이 열릴 때마다 selectedRows 업데이트
-// //   useEffect(() => {
-// //     if (isOpen) {
-// //       const initialSelection = new Set<number>();
-// //       if (param && param.length > 0) {
-// //         param.forEach(id => {
-// //           if (id !== 0) initialSelection.add(id);
-// //         });
-// //       }
-// //       setSelectedRows(initialSelection);
-// //     }
-// //   }, [param, isOpen]);
-  
-// //   // tenant ID가 변경될 때 선택된 항목 초기화
-// //   useEffect(() => {
-// //     if (currentTenantId !== initialTenantId) {
-// //       setSelectedRows(new Set<number>());
-// //     }
-// //   }, [currentTenantId, initialTenantId]);
-  
-// //   // 확인 버튼 클릭 처리
-// //   const handleConfirm = () => {
-// //     const selectedArray = Array.from(selectedRows);
-// //     // 여기를 수정 - 마지막 쉼표 제거
-// //     const resultString = selectedArray.sort((a, b) => a - b).join(',');
-    
-// //     // 현재 tenantId가 초기값과 다르면 updatedTenantId도 함께 전달
-// //     const wasTenantIdChanged = currentTenantId !== initialTenantId;
-// //     onConfirm(resultString, wasTenantIdChanged ? currentTenantId : undefined);
-// //   };
-
-// //   // 그리드에 표시할 데이터 필터링
-// //   const rows = skillsData?.result_data
-// //     ? skillsData.result_data.filter((skill: Skill) => 
-// //         skill.tenant_id === currentTenantId && skill.skill_id !== 0
-// //       )
-// //     : [];
-
-// //   // 선택 변경 핸들러
-// //   const handleSelectedRowsChange = (newSelection: Set<number>) => {
-// //     setSelectedRows(newSelection);
-// //   };
-  
-// //   // Tenant ID 변경 핸들러
-// //   const handleTenantIdChange = () => {
-// //     const newTenantId = parseInt(tenantIdInput);
-// //     if (!isNaN(newTenantId) && newTenantId > 0) {
-// //       setCurrentTenantId(newTenantId);
-// //       setShowTenantIdInput(false);
-// //     } else {
-// //       alert("유효한 Tenant ID를 입력해주세요.");
-// //     }
-// //   };
-
-// //   // 컬럼 정의
-// //   const columns = [
-// //     SelectColumn,
-// //     {
-// //       key: 'skill_id',
-// //       name: '아이디',
-// //       width: 80
-// //     },
-// //     {
-// //       key: 'skill_name',
-// //       name: '이름',
-// //       width: 150
-// //     },
-// //     {
-// //       key: 'skill_description',
-// //       name: '설명',
-// //       width: 200
-// //     }
-// //   ];
-
-// //   // 로딩 상태
-// //   if (isLoading) {
-// //     return (
-// //       <CustomAlert
-// //         isOpen={isOpen}
-// //         title="캠페인 스킬 선택"
-// //         message={
-// //           <div className="flex justify-center items-center h-40">
-// //             <Loader2 className="h-6 w-6 animate-spin" />
-// //             <span className="ml-2">스킬 정보를 불러오는 중입니다...</span>
-// //           </div>
-// //         }
-// //         onClose={onCancle || (() => {})}
-// //         type={type}
-// //       />
-// //     );
-// //   }
-
-// //   // 에러 상태
-// //   if (isError) {
-// //     return (
-// //       <CustomAlert
-// //         isOpen={isOpen}
-// //         title="캠페인 스킬 선택"
-// //         message={
-// //           <div className="flex justify-center items-center h-40 text-red-500">
-// //             스킬 정보를 불러오는 중 오류가 발생했습니다.
-// //           </div>
-// //         }
-// //         onClose={onCancle || (() => {})}
-// //         type={type}
-// //       />
-// //     );
-// //   }
-
-// //   // 그리드 컴포넌트
-// //   const gridContent = (
-// //     <div className="w-full">
-// //       {allowTenantChange && (
-// //         <div className="mb-4">
-// //           <div className="flex items-center">
-// //             <div className="font-medium mr-2">Tenant ID:</div>
-// //             {showTenantIdInput ? (
-// //               <div className="flex items-center">
-// //                 <input
-// //                   type="number"
-// //                   className="border rounded px-2 py-1 w-24 mr-2"
-// //                   value={tenantIdInput}
-// //                   onChange={(e) => setTenantIdInput(e.target.value)}
-// //                 />
-// //                 <button
-// //                   className="bg-blue-500 text-white px-2 py-1 rounded text-sm"
-// //                   onClick={handleTenantIdChange}
-// //                 >
-// //                   적용
-// //                 </button>
-// //                 <button
-// //                   className="ml-2 text-gray-500 text-sm"
-// //                   onClick={() => setShowTenantIdInput(false)}
-// //                 >
-// //                   취소
-// //                 </button>
-// //               </div>
-// //             ) : (
-// //               <div className="flex items-center">
-// //                 <span className="mr-2">{currentTenantId}</span>
-// //                 <button
-// //                   className="text-blue-500 text-sm"
-// //                   onClick={() => {
-// //                     setTenantIdInput(currentTenantId.toString());
-// //                     setShowTenantIdInput(true);
-// //                   }}
-// //                 >
-// //                   변경
-// //                 </button>
-// //               </div>
-// //             )}
-// //           </div>
-// //         </div>
-// //       )}
-      
-// //       <div className="text-sm mb-2">
-// //         총 {rows.length}개 중 {selectedRows.size}개 선택됨
-// //       </div>
-      
-// //       <div className="w-full" style={{ height: '400px' }}>
-// //         <DataGrid
-// //           columns={columns}
-// //           rows={rows}
-// //           rowKeyGetter={(row) => row.skill_id}
-// //           selectedRows={selectedRows}
-// //           onSelectedRowsChange={handleSelectedRowsChange}
-// //           className="h-full"
-// //           rowHeight={40}
-// //           headerRowHeight={40}
-// //         />
-// //       </div>
-// //     </div>
-// //   );
-
-// //   return (
-// //     <CustomAlert
-// //       isOpen={isOpen}
-// //       title="캠페인 스킬 선택"
-// //       message={gridContent}
-// //       onClose={handleConfirm}
-// //       onCancle={onCancle}
-// //       type={type}
-// //       width="lg"
-// //     />
-// //   );
-// // };
-
-// // export default SkillListPopup;
-
-
-// "use client";
-
-// import React, { useState, useEffect } from 'react';
-// import CustomAlert from '@/components/shared/layout/CustomAlert';
-// import DataGrid from 'react-data-grid';
-// import { SelectColumn } from 'react-data-grid';
-// import 'react-data-grid/lib/styles.css';
-// import { useApiForGetSkills2 } from '@/features/campaignManager/hooks/useApiForGetSkills2';
-// import { Loader2 } from "lucide-react";
-
-// interface Skill {
-//   tenant_id: number | string;
-//   skill_id: number;
-//   skill_name: string;
-//   skill_description: string;
-// }
-
-// export interface SkillListPopupProps {
-//   param: number[];
-//   tenantId: number;
-//   isOpen?: boolean;
-//   type: string;
-//   onConfirm: (param: string, updatedTenantId?: number) => void;
-//   onCancle?: () => void;
-//   allowTenantChange?: boolean;
-// }
-
-// const SkillListPopup = ({
-//   param = [],
-//   tenantId: initialTenantId,
-//   type,
-//   isOpen = true,
-//   onConfirm,
-//   onCancle,
-//   allowTenantChange = true
-// }: SkillListPopupProps) => {
-//   // 내부 tenantId 상태 관리
-//   const [currentTenantId, setCurrentTenantId] = useState(initialTenantId);
-//   const [showTenantIdInput, setShowTenantIdInput] = useState(false);
-//   const [tenantIdInput, setTenantIdInput] = useState(initialTenantId.toString());
-  
-//   // initialTenantId prop이 변경되면 내부 상태도 업데이트
-//   useEffect(() => {
-//     if (initialTenantId !== currentTenantId) {
-//       setCurrentTenantId(initialTenantId);
-//       setTenantIdInput(initialTenantId.toString());
-//     }
-//   }, [initialTenantId]);
-  
-//   // 실제 API 사용 (프로덕션에서 사용)
-//   const { data: skillsData, isLoading, isError } = useApiForGetSkills2({
-//     tenant_id_array: [currentTenantId],
-//   });
-  
-//   // Set 대신 셀렉션 관리 - 선택된 항목을 Set으로 관리
-//   const [selectedRows, setSelectedRows] = useState<Set<number>>(() => {
-//     const initialSelection = new Set<number>();
-//     if (param && param.length > 0) {
-//       param.forEach(id => {
-//         if (id !== 0) initialSelection.add(id);
-//       });
-//     }
-//     return initialSelection;
-//   });
-  
-//   // param이 변경되거나 팝업이 열릴 때마다 selectedRows 업데이트
-//   useEffect(() => {
-//     if (isOpen) {
-//       const initialSelection = new Set<number>();
-//       if (param && param.length > 0) {
-//         param.forEach(id => {
-//           if (id !== 0) initialSelection.add(id);
-//         });
-//       }
-//       setSelectedRows(initialSelection);
-//     }
-//   }, [param, isOpen]);
-  
-//   // tenant ID가 변경될 때 선택된 항목 초기화
-//   useEffect(() => {
-//     if (currentTenantId !== initialTenantId) {
-//       setSelectedRows(new Set<number>());
-//     }
-//   }, [currentTenantId, initialTenantId]);
-  
-//   // 확인 버튼 클릭 처리
-//   const handleConfirm = () => {
-//     const selectedArray = Array.from(selectedRows);
-//     // 여기를 수정 - 마지막 쉼표 제거
-//     const resultString = selectedArray.sort((a, b) => a - b).join(',');
-    
-//     // 현재 tenantId가 초기값과 다르면 updatedTenantId도 함께 전달
-//     const wasTenantIdChanged = currentTenantId !== initialTenantId;
-//     onConfirm(resultString, wasTenantIdChanged ? currentTenantId : undefined);
-//   };
-
-//   // 그리드에 표시할 데이터 필터링
-//   const rows = skillsData?.result_data
-//     ? skillsData.result_data.filter((skill: Skill) => 
-//         skill.tenant_id === currentTenantId && skill.skill_id !== 0
-//       )
-//     : [];
-
-//   // 선택 변경 핸들러
-//   const handleSelectedRowsChange = (newSelection: Set<number>) => {
-//     setSelectedRows(newSelection);
-//   };
-  
-//   // Tenant ID 변경 핸들러
-//   const handleTenantIdChange = () => {
-//     const newTenantId = parseInt(tenantIdInput);
-//     if (!isNaN(newTenantId) && newTenantId > 0) {
-//       setCurrentTenantId(newTenantId);
-//       setShowTenantIdInput(false);
-//     } else {
-//       alert("유효한 Tenant ID를 입력해주세요.");
-//     }
-//   };
-
-//   // 컬럼 정의
-//   const columns = [
-//     SelectColumn,
-//     {
-//       key: 'skill_id',
-//       name: '아이디',
-//       width: 80
-//     },
-//     {
-//       key: 'skill_name',
-//       name: '이름',
-//       width: 150
-//     },
-//     {
-//       key: 'skill_description',
-//       name: '설명',
-//       width: 200
-//     }
-//   ];
-
-//   // 로딩 상태
-//   if (isLoading) {
-//     return (
-//       <CustomAlert
-//         isOpen={isOpen}
-//         title="캠페인 스킬 선택"
-//         message={
-//           <div className="flex justify-center items-center h-40">
-//             <Loader2 className="h-6 w-6 animate-spin" />
-//             <span className="ml-2">스킬 정보를 불러오는 중입니다...</span>
-//           </div>
-//         }
-//         onClose={onCancle || (() => {})}
-//         type={type}
-//       />
-//     );
-//   }
-
-//   // 에러 상태
-//   if (isError) {
-//     return (
-//       <CustomAlert
-//         isOpen={isOpen}
-//         title="캠페인 스킬 선택"
-//         message={
-//           <div className="flex justify-center items-center h-40 text-red-500">
-//             스킬 정보를 불러오는 중 오류가 발생했습니다.
-//           </div>
-//         }
-//         onClose={onCancle || (() => {})}
-//         type={type}
-//       />
-//     );
-//   }
-
-//   // 그리드 컴포넌트
-//   const gridContent = (
-//     <div className="w-full">
-//       {allowTenantChange && (
-//         <div className="mb-4">
-//           <div className="flex items-center">
-//             <div className="font-medium mr-2">Tenant ID:</div>
-//             {showTenantIdInput ? (
-//               <div className="flex items-center">
-//                 <input
-//                   type="number"
-//                   className="border rounded px-2 py-1 w-24 mr-2"
-//                   value={tenantIdInput}
-//                   onChange={(e) => setTenantIdInput(e.target.value)}
-//                 />
-//                 <button
-//                   className="bg-blue-500 text-white px-2 py-1 rounded text-sm"
-//                   onClick={handleTenantIdChange}
-//                 >
-//                   적용
-//                 </button>
-//                 <button
-//                   className="ml-2 text-gray-500 text-sm"
-//                   onClick={() => setShowTenantIdInput(false)}
-//                 >
-//                   취소
-//                 </button>
-//               </div>
-//             ) : (
-//               <div className="flex items-center">
-//                 <span className="mr-2">{currentTenantId}</span>
-//                 <button
-//                   className="text-blue-500 text-sm"
-//                   onClick={() => {
-//                     setTenantIdInput(currentTenantId.toString());
-//                     setShowTenantIdInput(true);
-//                   }}
-//                 >
-//                   변경
-//                 </button>
-//               </div>
-//             )}
-//           </div>
-//         </div>
-//       )}
-      
-//       <div className="text-sm mb-2">
-//         총 {rows.length}개 중 {selectedRows.size}개 선택됨
-//       </div>
-      
-//       <div className="w-full" style={{ height: '400px' }}>
-//         <DataGrid
-//           columns={columns}
-//           rows={rows}
-//           rowKeyGetter={(row) => row.skill_id}
-//           selectedRows={selectedRows}
-//           onSelectedRowsChange={handleSelectedRowsChange}
-//           className="h-full"
-//           rowHeight={40}
-//           headerRowHeight={40}
-//         />
-//       </div>
-//     </div>
-//   );
-
-//   return (
-//     <CustomAlert
-//       isOpen={isOpen}
-//       title="캠페인 스킬 선택"
-//       message={gridContent}
-//       onClose={handleConfirm}
-//       onCancle={onCancle}
-//       type={type}
-//       width="lg"
-//     />
-//   );
-// };
-
-// export default SkillListPopup;
-
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import CustomAlert from '@/components/shared/layout/CustomAlert';
-import DataGrid from 'react-data-grid';
-import { SelectColumn } from 'react-data-grid';
-import 'react-data-grid/lib/styles.css';
 import { useApiForGetSkills2 } from '@/features/campaignManager/hooks/useApiForGetSkills2';
 import { Loader2 } from "lucide-react";
+import CustomAlert from '@/components/shared/layout/CustomAlert';
 
 interface Skill {
   tenant_id: number | string;
@@ -530,40 +17,25 @@ export interface SkillListPopupProps {
   tenantId: number;
   isOpen?: boolean;
   type: string;
-  onConfirm: (param: string, updatedTenantId?: number) => void;
-  onCancle?: () => void;
-  allowTenantChange?: boolean;
+  onConfirm: (param: string) => void;
+  onCancel?: () => void;
 }
 
 const SkillListPopup = ({
   param = [],
-  tenantId: initialTenantId,
+  tenantId,
   type,
   isOpen = true,
   onConfirm,
-  onCancle,
-  allowTenantChange = true
+  onCancel
 }: SkillListPopupProps) => {
-  // 내부 tenantId 상태 관리
-  const [currentTenantId, setCurrentTenantId] = useState(initialTenantId);
-  const [showTenantIdInput, setShowTenantIdInput] = useState(false);
-  const [tenantIdInput, setTenantIdInput] = useState(initialTenantId.toString());
-  
-  // initialTenantId prop이 변경되면 내부 상태도 업데이트
-  useEffect(() => {
-    if (initialTenantId !== currentTenantId) {
-      setCurrentTenantId(initialTenantId);
-      setTenantIdInput(initialTenantId.toString());
-    }
-  }, [initialTenantId]);
-  
-  // 실제 API 사용 (프로덕션에서 사용)
+  // API call to fetch skills
   const { data: skillsData, isLoading, isError } = useApiForGetSkills2({
-    tenant_id_array: [currentTenantId],
+    tenant_id_array: [tenantId],
   });
   
-  // Set 대신 셀렉션 관리 - 선택된 항목을 Set으로 관리
-  const [selectedRows, setSelectedRows] = useState<Set<number>>(() => {
+  // Selected rows management
+  const [selectedSkills, setSelectedSkills] = useState<Set<number>>(() => {
     const initialSelection = new Set<number>();
     if (param && param.length > 0) {
       param.forEach(id => {
@@ -573,7 +45,7 @@ const SkillListPopup = ({
     return initialSelection;
   });
   
-  // param이 변경되거나 팝업이 열릴 때마다 selectedRows 업데이트
+  // Update selected skills when param changes or popup reopens
   useEffect(() => {
     if (isOpen) {
       const initialSelection = new Set<number>();
@@ -582,167 +54,118 @@ const SkillListPopup = ({
           if (id !== 0) initialSelection.add(id);
         });
       }
-      setSelectedRows(initialSelection);
+      setSelectedSkills(initialSelection);
     }
   }, [param, isOpen]);
   
-  // tenant ID가 변경될 때 선택된 항목 초기화
-  useEffect(() => {
-    if (currentTenantId !== initialTenantId) {
-      setSelectedRows(new Set<number>());
-    }
-  }, [currentTenantId, initialTenantId]);
-  
-  // 확인 버튼 클릭 처리
+  // Handle confirm button click
   const handleConfirm = () => {
-    const selectedArray = Array.from(selectedRows);
-    // 여기를 수정 - 마지막 쉼표 제거
+    const selectedArray = Array.from(selectedSkills);
     const resultString = selectedArray.sort((a, b) => a - b).join(',');
-    
-    // 현재 tenantId가 초기값과 다르면 updatedTenantId도 함께 전달
-    const wasTenantIdChanged = currentTenantId !== initialTenantId;
-    onConfirm(resultString, wasTenantIdChanged ? currentTenantId : undefined);
+    onConfirm(resultString);
   };
 
-  // 그리드에 표시할 데이터 필터링
-  const rows = skillsData?.result_data
-    ? skillsData.result_data.filter((skill: Skill) => 
-        skill.tenant_id === currentTenantId && skill.skill_id !== 0
-      )
+  // Filter and sort data for display
+  const skills = skillsData?.result_data
+    ? skillsData.result_data
+        .filter((skill: Skill) => skill.tenant_id === tenantId && skill.skill_id !== 0)
+        .sort((a: Skill, b: Skill) => a.skill_id - b.skill_id)
     : [];
 
-  // 선택 변경 핸들러
-  const handleSelectedRowsChange = (newSelection: Set<number>) => {
-    setSelectedRows(newSelection);
-  };
-  
-  // Tenant ID 변경 핸들러
-  const handleTenantIdChange = () => {
-    const newTenantId = parseInt(tenantIdInput);
-    if (!isNaN(newTenantId) && newTenantId > 0) {
-      setCurrentTenantId(newTenantId);
-      setShowTenantIdInput(false);
-    } else {
-      alert("유효한 Tenant ID를 입력해주세요.");
-    }
+  // Toggle skill selection
+  const toggleSkill = (skillId: number) => {
+    setSelectedSkills(prev => {
+      const newSelection = new Set(prev);
+      if (newSelection.has(skillId)) {
+        newSelection.delete(skillId);
+      } else {
+        newSelection.add(skillId);
+      }
+      return newSelection;
+    });
   };
 
-  // 컬럼 정의
-  const columns = [
-    SelectColumn,
-    {
-      key: 'skill_id',
-      name: '아이디',
-      width: 80
-    },
-    {
-      key: 'skill_name',
-      name: '이름',
-      width: 150
-    },
-    {
-      key: 'skill_description',
-      name: '설명',
-      width: 200
-    }
-  ];
-
-  // 로딩 상태
+  // Loading state
   if (isLoading) {
     return (
       <CustomAlert
         isOpen={isOpen}
         title="캠페인 스킬 선택"
         message={
-          <div className="flex justify-center items-center h-40">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="ml-2">스킬 정보를 불러오는 중입니다...</span>
+          <div className="flex justify-center items-center h-24">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span className="ml-2 text-sm">스킬 정보를 불러오는 중...</span>
           </div>
         }
-        onClose={onCancle || (() => {})}
+        onClose={onCancel || (() => {})}
         type={type}
       />
     );
   }
 
-  // 에러 상태
+  // Error state
   if (isError) {
     return (
       <CustomAlert
         isOpen={isOpen}
         title="캠페인 스킬 선택"
         message={
-          <div className="flex justify-center items-center h-40 text-red-500">
+          <div className="flex justify-center items-center h-24 text-red-500 text-sm">
             스킬 정보를 불러오는 중 오류가 발생했습니다.
           </div>
         }
-        onClose={onCancle || (() => {})}
+        onClose={onCancel || (() => {})}
         type={type}
       />
     );
   }
 
-  // 그리드 컴포넌트
-  const gridContent = (
-    <div className="w-full">
-      {allowTenantChange && (
-        <div className="mb-4">
-          <div className="flex items-center">
-            <div className="font-medium mr-2">Tenant ID:</div>
-            {showTenantIdInput ? (
-              <div className="flex items-center">
-                <input
-                  type="number"
-                  className="border rounded px-2 py-1 w-24 mr-2"
-                  value={tenantIdInput}
-                  onChange={(e) => setTenantIdInput(e.target.value)}
-                />
-                <button
-                  className="bg-blue-500 text-white px-2 py-1 rounded text-sm"
-                  onClick={handleTenantIdChange}
-                >
-                  적용
-                </button>
-                <button
-                  className="ml-2 text-gray-500 text-sm"
-                  onClick={() => setShowTenantIdInput(false)}
-                >
-                  취소
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center">
-                <span className="mr-2">{currentTenantId}</span>
-                <button
-                  className="text-blue-500 text-sm"
-                  onClick={() => {
-                    setTenantIdInput(currentTenantId.toString());
-                    setShowTenantIdInput(true);
-                  }}
-                >
-                  변경
-                </button>
-              </div>
-            )}
-          </div>
+  // Modern compact UI
+  const skillsContent = (
+    <div className="w-full max-h-[440px]">
+      <div className="mb-3">
+        <div className="flex items-center mb-2">
+          {/* <div className="font-medium text-sm mr-2">Tenant ID:</div> */}
+          {/* <div className="text-sm">{tenantId}</div> */}
         </div>
-      )}
-      
-      <div className="text-sm mb-2">
-        총 {rows.length}개 중 {selectedRows.size}개 선택됨
+        <div className="text-xs text-gray-600">
+          총 {skills.length}개 중 {selectedSkills.size}개 선택됨
+        </div>
       </div>
       
-      <div className="w-full" style={{ height: '400px' }}>
-        <DataGrid
-          columns={columns}
-          rows={rows}
-          rowKeyGetter={(row) => row.skill_id}
-          selectedRows={selectedRows}
-          onSelectedRowsChange={handleSelectedRowsChange}
-          className="h-full"
-          rowHeight={40}
-          headerRowHeight={40}
-        />
+      <div className="border rounded shadow-sm overflow-hidden">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-gray-100 border-b">
+              <th className="w-10 p-2 text-center"></th>
+              <th className="w-16 py-2 px-3 text-left font-medium">아이디</th>
+              <th className="w-[120px] py-2 px-3 text-left font-medium">이름</th>
+              <th className="py-2 px-3 text-left font-medium">설명</th>
+            </tr>
+          </thead>
+          <tbody className="max-h-[320px] overflow-y-auto">
+            {skills.map((skill: Skill) => (
+              <tr 
+                key={skill.skill_id} 
+                className={`border-b last:border-b-0 hover:bg-gray-50 ${
+                  selectedSkills.has(skill.skill_id) ? 'bg-blue-50' : ''
+                }`}
+              >
+                <td className="p-2 text-center">
+                  <input
+                    type="checkbox"
+                    checked={selectedSkills.has(skill.skill_id)}
+                    onChange={() => toggleSkill(skill.skill_id)}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                  />
+                </td>
+                <td className="py-2 px-3">{skill.skill_id}</td>
+                <td className="py-2 px-3">{skill.skill_name}</td>
+                <td className="py-2 px-3">{skill.skill_description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -751,11 +174,11 @@ const SkillListPopup = ({
     <CustomAlert
       isOpen={isOpen}
       title="캠페인 스킬 선택"
-      message={gridContent}
+      message={skillsContent}
       onClose={handleConfirm}
-      onCancle={onCancle}
+      onCancle={onCancel}
       type={type}
-      width="lg"
+      width="md"
     />
   );
 };

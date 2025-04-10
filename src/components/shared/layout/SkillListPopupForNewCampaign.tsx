@@ -189,7 +189,7 @@ const SkillListPopup = ({
   // 그리드 컴포넌트
   const gridContent = (
     <div className="w-full">
-      {allowTenantChange && (
+      {/* {allowTenantChange && (
         <div className="mb-4">
           <div className="flex items-center">
             <div className="font-medium mr-2">Tenant ID:</div>
@@ -230,7 +230,7 @@ const SkillListPopup = ({
             )}
           </div>
         </div>
-      )}
+      )} */}
       
       <div className="text-sm mb-2">
         총 {rows.length}개 중 {selectedRows.size}개 선택됨
