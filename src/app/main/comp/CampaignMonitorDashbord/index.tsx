@@ -12,7 +12,6 @@ import ChartView from './ChartView';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
 import { CampaignProgressInformationResponseDataType } from '@/features/monitoring/types/monitoringIndex';
-import { useEnvironmentStore } from '@/store/environmentStore';
 
 interface CallItem {
   id: number;
@@ -34,7 +33,6 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   const numericCampaignId = campaignId ? Number(campaignId) : null;
 
   const { campaigns } = useMainStore();
-  const { statisticsUpdateCycle } = useEnvironmentStore();
   const [campaignInfo, setCampaignInfo] = useState<MainDataResponse | null>(null);
   const [dataList, setDataList] = useState<CampaignProgressInformationResponseDataType[]>([]);
   const [campaignIdList, setCampaignIdList] = useState<number[]>([]);
@@ -61,7 +59,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
     refetch,
     invalidateCache 
   } = useApiForCampaignProgressInformation({
-    tenantId: campaigns.find(data => data.campaign_id === numericCampaignId)?.tenant_id || 1,
+    tenantId: 1,
     campaignId: numericCampaignId || 0
   });
 
@@ -89,12 +87,10 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
       
       // 첫 번째 항목을 선택 (데이터가 있는 경우에만)
       // 마지막 항목 선택으로 변경 20250325
-      if (tempList.length > 0 && selectedCall == null ) {
+      if (tempList.length > 0 && !selectedCall) {
         setSelectedCall(tempList[tempList.length-1]);
-      }else if (tempList.length > 0 && selectedCall != null && selectedCall.campId != tempList[0].campId ) {
-        setSelectedCall(tempList[tempList.length-1]);
-      }else if(tempList.length == 0){
-        setSelectedCall(null);
+      }else{
+        
       }
       
       console.log("API 응답 데이터:", tempList);
@@ -119,20 +115,14 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
     } else {
       console.warn("캠페인 ID가 없어 API 호출이 비활성화됩니다.");
     }
-    if( statisticsUpdateCycle > 0 ){        
-      const interval = setInterval(() => {  
-        refreshData();
-      }, statisticsUpdateCycle * 1000);  
-      return () => clearInterval(interval);
-    }
-  }, [numericCampaignId, campaigns,statisticsUpdateCycle]);
+  }, [numericCampaignId, campaigns]);
 
   return (
     <div className="flex gap-4 w-full limit-width">
       {/* 왼쪽 설정 영역 */}
       <div className="flex flex-col gap-5 w-[230px] min-w-[230px]">
         <div>
-          <TitleWrap title="캠페인 정보" />
+          <TitleWrap title="캠페인 정보222222" />
           <Table>
             <tbody>
               <TableRow>
@@ -174,7 +164,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         </div>
 
         <div className="flex-1 h-full">
-          <TitleWrap title="발신구분" />
+          <TitleWrap title="발신구분3" />
           <div className="border rounded overflow-y-auto h-[calc(100%-20px)]">
             <table className="w-full text-sm border-collapse">
               <tbody>
@@ -186,7 +176,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
                   <tr>
                     <td className="p-4 text-center text-gray-500">데이터 로드 오류</td>
                   </tr>
-                ) : dataList ? dataList.map((item, index) => (
+                ) : progressData ? progressData.progressInfoList.map((item, index) => (
                   <tr
                     key={item.reuseCnt}
                     onClick={() => setSelectedCall(item)}
@@ -211,7 +201,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         <div className="flex justify-end gap-2">
           <CommonButton
             variant="outline"
-            onClick={refreshData}
+            // onClick={refreshData}
             disabled={isLoading}
           >
             새로고침
