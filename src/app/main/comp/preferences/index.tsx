@@ -165,7 +165,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   };
 
 
-  // 유효한 시간 형식인지 확인 (4자리 문자열이고, 시는 00~23, 분은 00~59이어야 함)
+  // #### 유효한 시간 형식인지 확인 (4자리 문자열이고, 시는 00~23, 분은 00~59이어야 함)
   const isTimeFormatValid = (time: string) => {
     if (time.length !== 4) return false;
     const hours = Number(time.substring(0, 2));
@@ -176,7 +176,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
     return true;
   };
 
-    // 추가적인 유효성 예시("1112"인 경우 무효)와 24시간 체제 확인
+    // #### 추가적인 유효성 예시("1112"인 경우 무효)와 24시간 체제 확인
     const validateTime = (time: string) => {
       // "1112"는 예시로 무효 처리
       if (time === "1112") return false;
@@ -192,7 +192,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
       return;
     }
 
-    // 필수 입력 및 기본 유효성 검사
+    // #### 필수 입력 및 기본 유효성 검사
     if (startTime.length === 4 && endTime.length === 4) {
       // 24시간 범위를 벗어난 경우
       if (!isTimeFormatValid(startTime) || !isTimeFormatValid(endTime)) {
@@ -203,7 +203,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
         });
         return;
       }
-      // 시작시간/종료시간 추가 유효성 검사 (예: "1112" 무효 처리)
+      // #### 시작시간/종료시간 추가 유효성 검사 (예: "1112" 무효 처리)
       if (!validateTime(startTime) || !validateTime(endTime)) {
         setAlertState({
           ...alertState,
@@ -212,7 +212,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
         });
         return;
       }
-      // 시작시간이 종료시간보다 늦은 경우
+      // #### 시작시간이 종료시간보다 늦은 경우
       if (startTime > endTime) {
         setAlertState({
           ...alertState,

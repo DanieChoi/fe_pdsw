@@ -98,9 +98,8 @@ const SystemMonitoring: React.FC = () => {
             pid: item.pid.toString(), // pid를 문자열로 변환하여 pdi에 매핑  ==> pid로 수정
             time: item.time // time은 그대로 사용
           }));
-          console.log(data.processStatusList);
-
-          // 요구사항 정렬순서 텍스트 배열
+          
+          // #### 요구사항 정렬순서 텍스트 배열
           const customOrder = [
             "EXDdesigner", 
             "EXDdbcontrol", 
@@ -114,7 +113,7 @@ const SystemMonitoring: React.FC = () => {
             "CCbridge1", 
             "CCbridge2"
           ];
-
+          // ####
           const sortedProcessData = formattedData.sort((a, b) => {
             
             // b는 원본객체, a는 b의 다음순서객체이며,

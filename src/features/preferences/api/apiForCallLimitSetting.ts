@@ -12,8 +12,9 @@ export const fetchCallLimitSettingList = async (credentials: TenantIdCredentials
             tenant_id: credentials.tenant_id_array
         },
         sort: {
-            tenant_id: 0,
-            campaign_id: 0
+            // ### 정렬 우선순위 campaing_id로 변경
+            campaign_id: 0,
+            tenant_id: 0
         },
         page: {
             index: 1,
