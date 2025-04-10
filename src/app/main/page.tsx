@@ -23,6 +23,7 @@ interface ActiveTabState {
   icon: string;
 }
 
+// 메인 페이지
 const MainPage = () => {
   const [activeTab, setActiveTab] = React.useState<ActiveTabState | null>(null);
 
@@ -95,7 +96,7 @@ const MainPage = () => {
             <TabRow key={row.id} rowId={row.id} />
           ))}
         </div>
-
+          
         <div className="flex-1 py-[15px] pl-[35px] pr-[25px]" style={{ height: "calc(100% - 46px)" }}>
           <TabContent />
         </div>

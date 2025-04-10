@@ -390,12 +390,76 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
   // 탭 제거
   // ------------------------
   // tofix 0410
+  // removeTab: (tabId, uniqueKey) =>
+  //   set((state) => {
+  //     const newTabs = state.openedTabs.filter(
+  //       (t) => !(t.id === tabId && t.uniqueKey === uniqueKey)
+  //     );
+
+  //     const updatedRows = state.rows.map((row) => ({
+  //       ...row,
+  //       sections: row.sections.map((sec) => {
+  //         const newSectionTabs = sec.tabs.filter(
+  //           (t) => !(t.id === tabId && t.uniqueKey === uniqueKey)
+  //         );
+  //         return {
+  //           ...sec,
+  //           tabs: newSectionTabs,
+  //           activeTabKey:
+  //             sec.activeTabKey === uniqueKey
+  //               ? newSectionTabs.length > 0
+  //                 ? newSectionTabs[newSectionTabs.length - 1].uniqueKey
+  //                 : null
+  //               : sec.activeTabKey,
+  //         };
+  //       }),
+
+  //     }));
+
+  //     const updatedGroups = state.tabGroups
+  //       .map((group) => ({
+  //         ...group,
+  //         tabs: group.tabs.filter(
+  //           (t) => !(t.id === tabId && t.uniqueKey === uniqueKey)
+  //         ),
+  //       }))
+  //       .filter((g) => g.tabs.length > 0);
+
+  //     // 현재 열린 탭들중 최신 탭의 아이디 가져오기
+  //     // 헤더 활성탭들 정보는 
+  //     const latestOpenedTab = state.openedTabs[newTabs.length - 1];
+  //     // ex
+  //     //   {
+  //     //     "id": 1,
+  //     //     "menuId": 1,
+  //     //     "title": "캠페인 그룹관리",
+  //     //     "icon": "/header-menu/캠페인그룹관리.svg",
+  //     //     "href": "/main",
+  //     //     "content": null,
+  //     //     "uniqueKey": "1-1744248429074"
+  //     // }
+  //     // todo 
+  //     // 헤더의 active tab 을 latestOpenedTab 로 설정
+
+  //     return {
+  //       ...state,
+  //       openedTabs: newTabs,
+  //       rows: updatedRows,
+  //       tabGroups: updatedGroups,
+  //     };
+  //   }),
+
   removeTab: (tabId, uniqueKey) =>
     set((state) => {
+      // 1. 먼저 제거된 탭이 활성화된 탭인지 확인
+      const isRemovingActiveTab = state.activeTabKey === uniqueKey;
+      
+      // 2. 탭 제거 후 남아있는 탭 목록 생성
       const newTabs = state.openedTabs.filter(
         (t) => !(t.id === tabId && t.uniqueKey === uniqueKey)
       );
-
+  
+      // 3. 섹션별 처리를 위한 행 업데이트
       const updatedRows = state.rows.map((row) => ({
         ...row,
         sections: row.sections.map((sec) => {
@@ -413,20 +477,9 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
                 : sec.activeTabKey,
           };
         }),
-
-        // openedTabs 에서 제일 최신 마지막거거를 활성탭으로 지정하도록 함수 호출
-        // 예를 들어 
-        // const newTabKey = `${item.id}-${Date.now()}`;
-        // setActiveTab(item.id, newTabKey);
-        // setActiveTab: (tabId, uniqueKey) => {
-        //   set({
-        //     activeTabId: tabId,
-        //     activeTabKey: uniqueKey,
-        //   });
-        // }   
-
       }));
-
+  
+      // 4. 탭 그룹 업데이트
       const updatedGroups = state.tabGroups
         .map((group) => ({
           ...group,
@@ -435,12 +488,39 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
           ),
         }))
         .filter((g) => g.tabs.length > 0);
-
+  
+      // 5. 새로운 활성 탭 결정 (제거된 탭이 활성 탭이었을 경우에만)
+      let newActiveTabId = state.activeTabId;
+      let newActiveTabKey = state.activeTabKey;
+  
+      if (isRemovingActiveTab && newTabs.length > 0) {
+        // 가장 최신 탭을 활성 탭으로 설정
+        const latestTab = newTabs[newTabs.length - 1];
+        newActiveTabId = latestTab.id;
+        newActiveTabKey = latestTab.uniqueKey;
+        
+        // 해당 탭이 속한 섹션도 활성화
+        updatedRows.forEach(row => {
+          row.sections.forEach(sec => {
+            const tabInSection = sec.tabs.find(t => t.uniqueKey === newActiveTabKey);
+            if (tabInSection) {
+              sec.activeTabKey = newActiveTabKey;
+            }
+          });
+        });
+      } else if (isRemovingActiveTab && newTabs.length === 0) {
+        // 남은 탭이 없으면 활성 탭 정보를 null로 설정
+        newActiveTabId = null;
+        newActiveTabKey = null;
+      }
+  
       return {
         ...state,
         openedTabs: newTabs,
         rows: updatedRows,
         tabGroups: updatedGroups,
+        activeTabId: newActiveTabId,
+        activeTabKey: newActiveTabKey
       };
     }),
 
