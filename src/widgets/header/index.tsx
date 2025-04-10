@@ -253,6 +253,7 @@ export default function Header() {
             />
           </div>
           <div className="flex items-center space-x-4 text-white text-sm">
+
             <div className='flex items-center space-x-1'>
               <Image
                 src="/header-menu/top_pic.svg"
