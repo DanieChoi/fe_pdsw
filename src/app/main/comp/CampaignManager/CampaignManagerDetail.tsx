@@ -980,7 +980,14 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
           // setSelectedCampaignRow(tempCampaignManagerInfo.campaign_id);
           
         } else {
-          fetchCampaignManagerUpdate(tempCampaignManagerInfo);
+          //다이얼모드가 predictive, progressive 아닌경우 발신속도를 0 으로 저장한다.
+          if(tempCampaignManagerInfo.dial_mode === 2 || tempCampaignManagerInfo.dial_mode === 3){
+            fetchCampaignManagerUpdate(tempCampaignManagerInfo);
+          }else{
+            fetchCampaignManagerUpdate({...tempCampaignManagerInfo
+              ,dial_speed: 0
+            });
+          }
         }
       }
     }
@@ -1111,7 +1118,14 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
       }
       if (campaignDialSpeedChangeYn) {
         //캠페인 발신 속도 수정 api 호출
-        fetchDialSpeedUpdate(tempCampaignDialSpeedInfo);
+        //다이얼모드가 predictive, progressive 아닌경우 발신속도를 0 으로 저장한다.
+        if(tempCampaignManagerInfo.dial_mode === 2 || tempCampaignManagerInfo.dial_mode === 3){
+          fetchDialSpeedUpdate(tempCampaignDialSpeedInfo);
+        }else{
+          fetchDialSpeedUpdate({...tempCampaignDialSpeedInfo
+            ,dial_speed: 0
+          });
+        }
       }
     }
     , onError: (data) => {
