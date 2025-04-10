@@ -743,7 +743,7 @@ const renderBottomRow = () => {
           tenantId={Number(currentCampaign.tenant_id)}
           type="1" 
           onConfirm={handleSkillConfirm}
-          onCancle={handleSkillPopupClose}
+          onCancel={handleSkillPopupClose}
         />
 
          {/* 재발신 설정 팝업 */}
