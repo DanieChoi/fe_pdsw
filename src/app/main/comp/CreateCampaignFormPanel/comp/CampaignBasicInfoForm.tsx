@@ -190,7 +190,6 @@ const CampaignBasicInfoForm = ({
             setSkillPopupState(prev => ({ ...prev, isOpen: false }));
           }}
           onCancle={() => setSkillPopupState(prev => ({ ...prev, isOpen: false }))}
-          allowTenantChange={true}
         />
       )}
     </div>
