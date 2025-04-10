@@ -1891,7 +1891,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
         type={skillPopupState.type}
         isOpen={skillPopupState.isOpen}
         onConfirm={(param) => handleSelectSkills(param)}
-        onCancle={() => setSkillPopupState((prev) => ({ ...prev, isOpen: false }))}
+        onCancel={() => setSkillPopupState((prev) => ({ ...prev, isOpen: false }))}
       />
 
       {/* 확인,취소  */}
