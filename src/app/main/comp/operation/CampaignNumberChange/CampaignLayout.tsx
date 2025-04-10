@@ -291,14 +291,14 @@ function CampaignLayout() {
       const callingNumber = safeCallingNumbers.find(
         num => num && campaign && num.campaign_id === campaign.campaign_id
       );
-      
       return {
         ...campaign,
         calling_number: callingNumber?.calling_number || ''
       };
     })
     .filter(Boolean) // null 값 제거
-    .filter((row): row is GridRow => row !== null && row.calling_number !== ''); // 발신번호가 있는 행만 필터링
+    .filter((row): row is GridRow => row !== null && row.calling_number !== '') // 발신번호가 있는 행만 필터링
+    .sort((a, b) => Number(a.campaign_id) - Number(b.campaign_id)); // #### 오름차순 정리를 위한 2차 sort    
   }, [campaigns, callingNumbers]);
 
   // 그리드 셀 클릭 핸들러
