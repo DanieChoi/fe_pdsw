@@ -1893,7 +1893,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
         onConfirm={(param) => handleSelectSkills(param)}
         onCancel={() => setSkillPopupState((prev) => ({ ...prev, isOpen: false }))}
       />
-
+      
       {/* 확인,취소  */}
       <CustomAlert
         message={alertState.message}
