@@ -168,7 +168,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
     const counselorIds = getValidCounselorIds();
 
     if (counselorIds.length === 0) {
-      toast.error('유효한 상담사이 없습니다.');
+      toast.error('유효한 상담사가 없습니다.');
       return;
     }
 
@@ -276,7 +276,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
     );
   }
 
-  // 상담사이 없는 경우 UI
+  // 상담사가 없는 경우 UI
   if (!isValidCounselorsArray) {
     return (
       <div className="">

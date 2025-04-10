@@ -91,9 +91,9 @@ export const getAssignableSkillsForCounselor = async (tenantId: number): Promise
 };
 
 /**
- * 상담사이 보유한 스킬 목록을 조회하는 API
+ * 상담사가 보유한 스킬 목록을 조회하는 API
  * @param counselorId 상담사 ID
- * @returns 상담사이 현재 보유한 스킬 목록
+ * @returns 상담사가 현재 보유한 스킬 목록
  */
 export const getAssignedSkillsForCounselor = async (
   counselorId: string
@@ -110,7 +110,7 @@ export const getAssignedSkillsForCounselor = async (
       }
     );
 
-    // console.log("✅ 상담사이 보유한 스킬 목록 조회 성공:", data);
+    // console.log("✅ 상담사가 보유한 스킬 목록 조회 성공:", data);
     return data;
   } catch (error) {
     const typedError = error as CounselorSkillApiError;
@@ -122,10 +122,10 @@ export const getAssignedSkillsForCounselor = async (
 };
 
 /**
- * 상담사이 보유한 스킬과 할당 가능한 스킬을 동시에 가져오는 API
+ * 상담사가 보유한 스킬과 할당 가능한 스킬을 동시에 가져오는 API
  * @param counselorId 상담사 ID
  * @param tenantId 테넌트 ID
- * @returns 상담사이 보유한 스킬 목록과 할당 가능한 스킬 목록
+ * @returns 상담사가 보유한 스킬 목록과 할당 가능한 스킬 목록
  */
 export const apiForGetRelatedInfoForAssignSkilToCounselor = async (
   counselorId: string,
@@ -135,11 +135,11 @@ export const apiForGetRelatedInfoForAssignSkilToCounselor = async (
 
   try {
     const [assignedSkills, assignableSkills] = await Promise.all([
-      getAssignedSkillsForCounselor(counselorId), // 상담사이 보유한 스킬
+      getAssignedSkillsForCounselor(counselorId), // 상담사가 보유한 스킬
       getAssignableSkillsForCounselor(tenantId), // 할당 가능한 스킬 목록
     ]);
 
-    // console.log("✅ 상담사이 보유한 스킬 목록:", assignedSkills);
+    // console.log("✅ 상담사가 보유한 스킬 목록:", assignedSkills);
     // console.log("✅ 상담사에게 할당 가능한 스킬 목록:", assignableSkills);
 
     return { assignedSkills, assignableSkills };

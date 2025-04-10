@@ -1090,7 +1090,7 @@ const DistributionLimit = () => {
     }
     
     if (agentIds.length === 0) {
-      showAlert('삭제할 상담사이 없습니다.');
+      showAlert('삭제할 상담사가 없습니다.');
       handleCloseContextMenu();
       return;
     }

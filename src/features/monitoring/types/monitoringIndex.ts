@@ -68,9 +68,9 @@ export interface CampaignProgressInformationResponseDataType {
   dialToneSilence: number;            //다이얼 톤이 안 들림
   buct: number;                       //통화 중 실패 건수
   agentConnect: number;               //상담사 연결
-  nognotDialAgent: number;            //미발신 사유 코드 지정상담사이 Dial이 아닐 때
+  nognotDialAgent: number;            //미발신 사유 코드 지정상담사가 Dial이 아닐 때
   nogblockTime: number;               //미발신 사유 코드 발신방지 시각
-  nognotDialReady: number;            //미발신 사유 코드 지정상담사이 Ready가 아닐 때
+  nognotDialReady: number;            //미발신 사유 코드 지정상담사가 Ready가 아닐 때
 }
 
 // 캠페인진행정보 응답

@@ -133,7 +133,7 @@ const getValidCounselorIds = () => {
     const counselorIds = getValidCounselorIds();
 
     if (counselorIds.length === 0) {
-      toast.error('유효한 상담사이 없습니다.');
+      toast.error('유효한 상담사가 없습니다.');
       return;
     }
 
@@ -198,7 +198,7 @@ const getValidCounselorIds = () => {
     const counselorIds = getValidCounselorIds();
 
     if (counselorIds.length === 0) {
-      toast.error('유효한 상담사이 없습니다.');
+      toast.error('유효한 상담사가 없습니다.');
       return;
     }
 
@@ -320,7 +320,7 @@ const getValidCounselorIds = () => {
     );
   }
 
-  // 상담사이 없는 경우 UI
+  // 상담사가 없는 경우 UI
   if (!isValidCounselorsArray) {
     return (
       <div className="">

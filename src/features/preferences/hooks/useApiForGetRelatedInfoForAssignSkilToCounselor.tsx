@@ -8,7 +8,7 @@ import { apiForGetRelatedInfoForAssignSkilToCounselor } from "@/features/campaig
  * 상담사의 보유 스킬 및 할당 가능한 스킬을 가져오는 커스텀 훅
  * @param counselorId 상담사 ID (null 가능)
  * @param tenantId 테넌트 ID
- * @returns 상담사이 보유한 스킬과 할당 가능한 스킬 목록, 로딩 상태, 에러 정보
+ * @returns 상담사가 보유한 스킬과 할당 가능한 스킬 목록, 로딩 상태, 에러 정보
  */
 export const useApiForGetRelatedInfoForAssignSkilToCounselor = (
     counselorId: string | null,
@@ -35,7 +35,7 @@ export const useApiForGetRelatedInfoForAssignSkilToCounselor = (
                     tenantId
                 );
 
-                // console.log("✅ 상담사이 보유한 스킬:", assignedSkills);
+                // console.log("✅ 상담사가 보유한 스킬:", assignedSkills);
                 console.log("✅ 상담사에게 할당 가능한 스킬:", assignableSkills);
 
                 setAssignedSkills(assignedSkills);

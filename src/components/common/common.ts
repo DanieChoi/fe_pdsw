@@ -150,7 +150,7 @@ export  const CheckCampaignSaveReturnCode = (returnCode: number) => {
     } else if (returnCode === -7775) {
       return '발신 할 트렁크가 없습니다.';
     } else if (returnCode === -7776) {
-      return '캠페인에 할당된 상담사이 없습니다.';
+      return '캠페인에 할당된 상담사가 없습니다.';
     } else if (returnCode === -7777) {
       return 'CIDS가 작동중 인지 확인 하세요.에러사항에 대해서 관리자에게 문의 하세요.';
     } else if (returnCode === -7778) {

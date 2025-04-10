@@ -149,7 +149,7 @@ export function IDialogForTeamSkilAssignment({
     const skillsToRemove = getSkillsToRemove();
     
     if (counselorIds.length === 0) {
-      toast.error('유효한 상담사이 없습니다.');
+      toast.error('유효한 상담사가 없습니다.');
       return;
     }
     
