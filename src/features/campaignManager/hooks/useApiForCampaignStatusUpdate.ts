@@ -33,7 +33,7 @@ export function useApiForCampaignStatusUpdate(
         );
         
         // 에러 발생 후에도 캠페인 관리 탭 열기
-        openCampaignManagerTab();
+        // openCampaignManagerTab();
       }
 
       // 상태 업데이트 성공 후 관련 쿼리 무효화
