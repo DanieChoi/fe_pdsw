@@ -22,6 +22,67 @@ interface CampaignMonitorDashboardProps {
   campaignId?: string; // props로 캠페인 ID 직접 받기
 }
 
+// 캠페인진행정보 초기화 데이터 
+const initData: CampaignProgressInformationResponseDataType = {
+  tenantId: 0,                   //테넌트ID
+  detectMachineRoaming: 0,       //해외로밍밍
+  detectMachineEtc: 0,           //기타기계음
+  detectMachineMissingNumber: 0, //결번
+  detectSilenceCnt: 0,           //10초 동안 묵음 지속
+  detectMachineLineBusy: 0,      //소리샘-통화중
+  deleteBeforeDial: 0,           //미발신 삭제
+  nogautoPopNotDial: 0,          //미발신 사유 코드 Autopreview시 Popup 수신후, 상담사 미발신 선택
+  nogtimeOutCallback: 0,         //미발신 사유 코드 콜백 Time over
+  nogautoPopNoReady: 0,          //미발신 사유 코드 Autopreview시 Popup 수신후, 상담사 상태 변경
+  nogautoDialNoReady: 0,         //미발신 사유 코드 Autopreview시 CIDS->CIOD 발신 여부 확인전, 상담사 상태변경
+  nogtimeContradictory: 0,       //미발신 사유 코드 발신방지, 예약시간 잘못 설정
+  nogautoDialFailMode: 0,        //미발신 사유 코드 Autopreview시 CIDS->CIOD 발신 여부 확인전, 상담사 모드변경
+  agentNoAnswerCnt: 0,           //상담사 무응답
+  nogautoNoEmployeeId: 0,        //미발신 사유 코드 SystemPreview시 발신리스트에 상담사 이름이 입력되지 않음
+  nogautoPopNoAnswer: 0,         //미발신 사유 코드 Autopreview시 Popup 수신후, 발신여부 선택 안함
+  detectMachineNoanswer: 0,      //소리샘-무응답
+  customerOnHookCnt: 0,          //고객이 바로 끊은 건수
+  detectMachinePowerOff: 0,      //소리샘-전원꺼짐
+  nogautoPopFailMode: 0,         //미발신 사유 코드 Autopreview시 Popup 수신후, 상담사 모드 변경
+  reuseCnt: 0,                   //캠페인 재사용 회수 : 1(최초발신), 2~(재발신)
+  campId: 0,                     //캠페인ID
+  totLstCnt: 0,                  //총 리스트 건수
+  totDialCnt: 0,                 //총 발신 건수
+  acct: 0,                       //기계음 실패 건수
+  scct: 0,                       //발신 성공 건수
+  overDial: 0,                   //대기 상담사 없음
+  nonTTCT: 0,                    //순수 발신 건수
+  campListQuery: '',              //List Query
+  tect: 0,                       //전화번호 오류 건수
+  blackList: 0,                  //통화방지 리스트
+  abct: 0,                       //상담사 연결 실패
+  retryCall: 0,                  //재시도 콜(현재 버퍼에 남은 Call 중 재시도 할 Call수)
+  dialingCall: 0,                //발신 중인 콜
+  nonServiceCnt: 0,              //고객 최대시간 초과
+  firstCall: 0,                  //최초 시도 콜(현재 버퍼에 남은 Call 중 최초시도 할 Call수)
+  agentBusyCnt: 0,               //상담사 통화 중
+  blackListCall: 0,              //통화방지 콜
+  fileIndex: 0,                  //
+  recallCnt: 0,                  //예약 리스트(현재 남은 Call 중 남은 예약 Call수)
+  lineStopCnt: 0,                //다이얼 실패 건수
+  fact: 0,                       //팩스/모뎀 실패 건수
+  noAgentCnt: 0,                 //멘트 청취 후 상담사 미연결
+  nogdeleteGL: 0,                //미발신 사유 코드 실시간 발신방지 건수
+  nogaddBL: 0,                   //미발신 사유 코드 실시간 블랙리스트 추가
+  agentDropCnt: 0,               //상담사 바로 끊음
+  customerDropCnt: 0,            //고객 포기
+  nact: 0,                       //무응답 실패 건수
+  deleteAfterDial: 0,            //발신 후 삭제
+  etct: 0,                       //기타 실패 건수
+  timeoutRecall: 0,              //타임아웃 콜(시간이 지나서 발신하지 않은 예약 호)
+  dialToneSilence: 0,            //다이얼 톤이 안 들림
+  buct: 0,                       //통화 중 실패 건수
+  agentConnect: 0,               //상담사 연결
+  nognotDialAgent: 0,            //미발신 사유 코드 지정상담사가 Dial이 아닐 때
+  nogblockTime: 0,               //미발신 사유 코드 발신방지 시각
+  nognotDialReady: 0,            //미발신 사유 코드 지정상담사가 Ready가 아닐 때
+}
+
 type ViewType = "gridView" | "chartView";
 
 const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ campaignId }) => {
@@ -35,7 +96,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
 
   const { campaigns } = useMainStore();
   const [campaignInfo, setCampaignInfo] = useState<MainDataResponse | null>(null);
-  const [dataList, setDataList] = useState<CampaignProgressInformationResponseDataType[]>([]);
+  const [dataList, setDataList] = useState<CampaignProgressInformationResponseDataType[]>([initData]);
   const [campaignIdList, setCampaignIdList] = useState<number[]>([]);
   const [usageTimePopupState, setUsageTimePopupState] = useState<{
     campaignIdList: number[];
@@ -62,7 +123,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
     onSuccess: (data) => {
       console.log("캠페인 진행 정보 API 성공:", data);
       
-      if (data) {
+      if (data && data.progressInfoList.length > 0) {
         const tempList = [...data.progressInfoList].sort((a, b) => a.reuseCnt - b.reuseCnt);
         setDataList(tempList);
         
@@ -75,6 +136,9 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         }else if(tempList.length == 0){
           setSelectedCall(null);
         }
+      }else if (data && data.progressInfoList.length == 0) {
+        setDataList([initData]);
+        setSelectedCall(initData);
       }
     }
   });
