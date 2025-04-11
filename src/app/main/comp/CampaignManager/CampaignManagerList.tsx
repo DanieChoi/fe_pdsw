@@ -87,7 +87,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
   // Update viewMode when campaignId changes
   useEffect(() => {
     setViewMode(campaignId ? "single" : "full");
-  }, [campaignId]);
+  }, []);
 
   const campaignIdNumber = campaignId ? Number(campaignId) : undefined;
 
@@ -235,7 +235,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
     if (!currentSelectedRowExists && filteredCampaigns.length > 0) {
       const firstCampaignData = filteredCampaigns[0];
       if (firstCampaignData) {
-        setSelectedCampaign(firstCampaignData);
+        setSelectedCampaign(firstCampaignData as any);
         setSelectedCampaignRow(tempData[0]);
       }
     }
@@ -247,7 +247,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
     );
 
     if (clickedCampaign) {
-      setSelectedCampaign(clickedCampaign);
+      setSelectedCampaign(clickedCampaign as any);
       setSelectedCampaignRow(row);
     }
   }, [filteredCampaigns, setSelectedCampaign, setSelectedCampaignRow]);

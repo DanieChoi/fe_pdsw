@@ -48,7 +48,7 @@ axiosInstance.interceptors.request.use(
 // 응답 인터셉터
 axiosInstance.interceptors.response.use(
   async (response) => {
-    console.log("here 8888888888888 response", response);
+    // console.log("here 8888888888888 response", response);
     
     const url = response.config.url || '';
     const userId = getCookie('id');
@@ -800,7 +800,7 @@ axiosInstance.interceptors.response.use(
 axiosRedisInstance.interceptors.response.use(
   async (response) => {
 
-    console.log("here 9999999999999999999999999999999999", response);
+    // console.log("here 9999999999999999999999999999999999", response);
     
 
     const url = response.config.url || '';

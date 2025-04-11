@@ -70,6 +70,8 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
 
   // 스킬 조회
   const { mutate: fetchSkills } = useApiForSkills({
+    
+    gcTime: 10 * 60 * 1000, // 10분
     onSuccess: (data) => {
       setSkills(data.result_data);
       console.log("스킬 패치 결과 : ", data.result_data);
