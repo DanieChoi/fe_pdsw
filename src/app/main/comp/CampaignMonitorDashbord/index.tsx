@@ -11,6 +11,7 @@ import ChartView from './ChartView';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
 import { CampaignProgressInformationResponseDataType } from '@/features/monitoring/types/monitoringIndex';
+import { useEnvironmentStore } from '@/store/environmentStore';
 
 interface CallItem {
   id: number;
@@ -27,6 +28,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   // 상태 추가
   const [viewType, setViewType] = useState<ViewType>("gridView");
   const [selectedCall, setSelectedCall] = useState<CampaignProgressInformationResponseDataType | null>(null);
+  const { statisticsUpdateCycle } = useEnvironmentStore();
   
   // props로 전달받은 campaignId를 사용
   const numericCampaignId = campaignId ? Number(campaignId) : null;
@@ -66,8 +68,12 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         
         // 첫 번째 항목을 선택 (데이터가 있는 경우에만)
         // 마지막 항목 선택으로 변경 20250325
-        if (tempList.length > 0 && !selectedCall) {
+        if (tempList.length > 0 && selectedCall == null ) {
           setSelectedCall(tempList[tempList.length-1]);
+        }else if (tempList.length > 0 && selectedCall != null && selectedCall.campId != tempList[0].campId ) {
+          setSelectedCall(tempList[tempList.length-1]);
+        }else if(tempList.length == 0){
+          setSelectedCall(null);
         }
       }
     }
@@ -79,7 +85,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   const refreshData = useCallback(() => {
     if (numericCampaignId) {
       fetchProgressData({
-        tenantId: 1,
+        tenantId: campaigns.find(data => data.campaign_id === numericCampaignId)?.tenant_id || 1,
         campaignId: numericCampaignId
       });
     } else {
@@ -105,20 +111,26 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
       
       // 최초 데이터 조회
       fetchProgressData({
-        tenantId: 1,
+        tenantId: campaigns.find(data => data.campaign_id === numericCampaignId)?.tenant_id || 1,
         campaignId: numericCampaignId
       });
     } else {
       console.warn("캠페인 ID가 없어 API 호출이 비활성화됩니다.");
     }
-  }, [numericCampaignId, campaigns, fetchProgressData]);
+    if( statisticsUpdateCycle > 0 ){        
+      const interval = setInterval(() => {  
+        refreshData();
+      }, statisticsUpdateCycle * 1000);  
+      return () => clearInterval(interval);
+    }
+  }, [numericCampaignId, campaigns,statisticsUpdateCycle]);
 
   return (
     <div className="flex gap-4 w-full limit-width">
       {/* 왼쪽 설정 영역 */}
       <div className="flex flex-col gap-5 w-[230px] min-w-[230px]">
         <div>
-          <TitleWrap title="캠페인 정보222222" />
+          <TitleWrap title="캠페인 정보" />
           <Table>
             <tbody>
               <TableRow>
@@ -160,7 +172,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         </div>
 
         <div className="flex-1 h-full">
-          <TitleWrap title="발신구분3" />
+          <TitleWrap title="발신구분" />
           <div className="border rounded overflow-y-auto h-[calc(100%-20px)]">
             <table className="w-full text-sm border-collapse">
               <tbody>
@@ -172,7 +184,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
                   <tr>
                     <td className="p-4 text-center text-gray-500">데이터 로드 오류</td>
                   </tr>
-                ) : progressData ? progressData.progressInfoList.map((item, index) => (
+                ) : dataList ? dataList.map((item, index) => (
                   <tr
                     key={item.reuseCnt}
                     onClick={() => setSelectedCall(item)}

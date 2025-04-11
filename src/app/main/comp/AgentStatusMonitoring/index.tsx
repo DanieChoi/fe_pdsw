@@ -362,7 +362,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
     campaignId: Number(campaignId || 0), // Ensure campaignId is a number
     sessionKey: sessionKey || '',
   }, {
-    enabled: !!sessionKey && tenantId !== undefined && tenantId !== null, // Enable only when valid props are present
+    enabled: !!sessionKey && tenantId !== 'undefined' && tenantId !== null, // Enable only when valid props are present
     refetchInterval: statisticsUpdateCycle > 0 ? statisticsUpdateCycle * 1000 : false, // Use store value for interval
   });
 
