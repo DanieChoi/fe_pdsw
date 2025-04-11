@@ -24,7 +24,7 @@ export function useApiForCampaignStatusUpdate(
         );
         
         // 성공 후 캠페인 관리 탭 열기 (탭 ID 2번이 캠페인 관리)
-        openCampaignManagerTab();
+        // openCampaignManagerTab();
       } else {
         // 실패 시 에러 메시지 표시
         customAlertService.error(
