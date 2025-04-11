@@ -10,6 +10,9 @@ export function useApiForSkills(
   return useMutation({
     mutationKey: ['mainSkills'],
     mutationFn: fetchSkills,
+    retry: 1,
+    gcTime: 10 * 60 * 1000, // 10분
+
     onSuccess: (data, variables, context) => {
       options?.onSuccess?.(data, variables, context);
     },

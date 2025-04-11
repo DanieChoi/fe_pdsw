@@ -10,7 +10,7 @@ export function useApiForSchedules(
   return useMutation({
     mutationKey: ['mainSchedules'],
     mutationFn: fetchSchedules,
-    gcTime: 10 * 60 * 1000, // 10분,
+    // gcTime: 10 * 60 * 1000, // 10분,
     onSuccess: (data, variables, context) => {
       console.log('API Response:', {
         code: data.result_code,

@@ -1,5 +1,5 @@
 // src\app\main\comp\CampaignManager\index.tsx
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, cache } from 'react'
 import CampaignManagerHeader, { CampaignHeaderSearch } from './CampaignManagerHeader';
 import CampaignManagerDetail from './CampaignManagerDetail';
 import CampaignManagerList from './CampaignManagerList';
@@ -70,8 +70,6 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
 
   // 스킬 조회
   const { mutate: fetchSkills } = useApiForSkills({
-    
-    gcTime: 10 * 60 * 1000, // 10분
     onSuccess: (data) => {
       setSkills(data.result_data);
       console.log("스킬 패치 결과 : ", data.result_data);
@@ -79,7 +77,8 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
         session_key: '',
         tenant_id: 0,
       });
-    }
+    },
+    retry: 0, // 실패 시 재시도 하지 않음
   });
 
   // 전화번호 조회
