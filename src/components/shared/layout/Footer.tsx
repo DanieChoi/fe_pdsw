@@ -991,7 +991,7 @@ export default function Footer({
     if (typeof window !== 'undefined' && window.EventSource && id !== '') {
       const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
       const eventSource = new EventSource(
-        `${DOMAIN}/api/v1/notification/${tenant_id}/subscribe/${id}`
+        `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
       );
 
       let data: any = {};
