@@ -999,7 +999,7 @@ export default function Footer({
       let command = "";
       let kind = "";
 
-      const messageHandler = (event: MessageEvent) => {
+      eventSource.addEventListener('message', (event) => {
         console.log("footer sse event = ", event.data);
 
         if (event.data !== "Connected!!") {
@@ -1024,17 +1024,44 @@ export default function Footer({
             );
           }
         }
-      };
+      });
 
-      eventSource.addEventListener("message", messageHandler);
+      // const messageHandler = (event: MessageEvent) => {
+      //   console.log("footer sse event = ", event.data);
+
+      //   if (event.data !== "Connected!!") {
+      //     const tempEventData = JSON.parse(event.data);
+      //     if (
+      //       announce !== tempEventData["announce"] ||
+      //       !isEqual(data, tempEventData.data) ||
+      //       !isEqual(data, tempEventData["data"]) ||
+      //       kind !== tempEventData["kind"]
+      //     ) {
+      //       announce = tempEventData["announce"];
+      //       command = tempEventData["command"];
+      //       data = tempEventData["data"];
+      //       kind = tempEventData["kind"];
+
+      //       footerDataSet(
+      //         tempEventData["announce"],
+      //         tempEventData["command"],
+      //         tempEventData["data"],
+      //         tempEventData["kind"],
+      //         tempEventData
+      //       );
+      //     }
+      //   }
+      // };
+
+      // eventSource.addEventListener("message", messageHandler);
 
       // 클린업 함수
-      return () => {
-        eventSource.removeEventListener("message", messageHandler);
-        eventSource.close();
-      };
+      // return () => {
+      //   eventSource.removeEventListener("message", messageHandler);
+      //   eventSource.close();
+      // };
     }
-  }, [id, tenant_id, role_id, footerDataSet]);
+  }, [id, tenant_id, role_id]);
 
   // 높이 변경 핸들러
   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
