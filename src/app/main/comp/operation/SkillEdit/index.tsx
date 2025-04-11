@@ -804,7 +804,8 @@ const SkillEdit = () => {
           agentName: counselor.counselorname,
           consultMode: getBlendKindText(counselor.blendKind)
         }));
-        setFilteredAgents(mappedAgents);
+        // 소속 상담사목록 팀아이디 기준 오름차순 정렬
+        setFilteredAgents(mappedAgents.sort((a,b)=> Number(a.teamId) - Number(b.teamId)));
       }
     },
     onError: (error) => {
@@ -1026,6 +1027,8 @@ const SkillEdit = () => {
       }
     }
   }, [rows, selectedSkill]);
+
+
 
   useEffect(() => {
     fetchCounselorList({ tenantId: tenant_id, roleId: role_id });

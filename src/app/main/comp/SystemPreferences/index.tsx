@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
 import DataGrid, { CellClickArgs } from 'react-data-grid';
-import { useMainStore } from '@/store';
+import { useAuthStore, useMainStore } from '@/store';
 import { ChannelListDataResponse, DialingDeviceListDataResponse } from '@/features/preferences/types/SystemPreferences';
 import { useApiForChannelList } from '@/features/preferences/hooks/useApiForChannelList';
 import { useApiForChannelEdit } from '@/features/preferences/hooks/useApiForChannelEdit';
@@ -58,6 +58,8 @@ const SystemPreferences = () => {
 
     // 디바이스 상태를 저장할 상태 변수 추가
     const [deviceStatuses, setDeviceStatuses] = useState<Record<string, "run" | "down">>({});
+
+    const { tenant_id, role_id } = useAuthStore();
 
     // useMainStore의 campaigns에서 가져오는 creation_time으로 채널 리스트의 값이 useEnvironmentStore에서 가져오는 환경설정에서 설정한 
     // showChannelCampaignDayScop 시간내에 만들어진것만 보이게 수정해야함.
@@ -226,7 +228,7 @@ const SystemPreferences = () => {
         onSuccess: (data) => {
             fetchChannelList();
             fetchDialingDeviceList({
-                tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+                tenant_id_array: tenant_id === 0 ?  tenants.map(tenant => tenant.tenant_id) : [tenant_id]
             });
         },onError: (error) => {
             if (error.message.split('||')[0] === '5') {
@@ -252,7 +254,7 @@ const SystemPreferences = () => {
         onSuccess: (data) => {
             fetchChannelList();
             fetchDialingDeviceList({
-                tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+                tenant_id_array: tenant_id === 0 ?  tenants.map(tenant => tenant.tenant_id) : [tenant_id]
             });
         },onError: (error) => {
             if (error.message.split('||')[0] === '5') {
@@ -278,7 +280,7 @@ const SystemPreferences = () => {
         onSuccess: (data) => {
             fetchChannelList();
             fetchDialingDeviceList({
-                tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+                tenant_id_array: tenant_id === 0 ?  tenants.map(tenant => tenant.tenant_id) : [tenant_id]
             });
         },
         onError: (error) => {
@@ -305,7 +307,7 @@ const SystemPreferences = () => {
         onSuccess: (data) => {
             fetchChannelList();
             fetchDialingDeviceList({
-                tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+                tenant_id_array: tenant_id === 0 ?  tenants.map(tenant => tenant.tenant_id) : [tenant_id]
             });
         },
         onError: (error) => {
@@ -358,7 +360,7 @@ const SystemPreferences = () => {
     useEffect(() => {
         if (tenants && tenants.length > 0) {
             fetchDialingDeviceList({
-                tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+                tenant_id_array: tenant_id === 0 ?  tenants.map(tenant => tenant.tenant_id) : [tenant_id]
             });
             fetchChannelList();
             

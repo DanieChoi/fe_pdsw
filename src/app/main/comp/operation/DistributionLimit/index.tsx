@@ -15,6 +15,7 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import TimePickerComponent from './TimePicker';
 import ContextMenu from './context_menu';
+import OnlyNumberInput from '@/components/shared/OnlyNumberInput';
 
 interface Row {
   id: string;
@@ -877,6 +878,10 @@ const DistributionLimit = () => {
         showAlert('최대 분배호수는 0 이상의 숫자여야 합니다.');
         return;
       }
+      if (numValue > 99999){
+        showAlert('최대 분배호수는 99999 까지 입력 가능합니다.');
+        return;
+      }
     }
     
     // 편집된 데이터 추적
@@ -1178,6 +1183,11 @@ const DistributionLimit = () => {
     const maxLimit = parseInt(bulkLimitModal.maxLimit);
     if (isNaN(maxLimit) || maxLimit <= 0) {
       showAlert('최대 발신 건수는 0보다 큰 숫자여야 합니다.');
+      return;
+    }
+
+    if (maxLimit > 99999) {
+      showAlert('최대 발신 건수는 99999까지 입력 가능합니다.');
       return;
     }
     
@@ -1608,7 +1618,7 @@ const DistributionLimit = () => {
             className="w-[140px]"
             disabled={true}
           />
-          <div className="text-sm">
+          <div className="text-sm w-[380px]">
             응답호수 초기화 시간 : {initTime === "9999" ? "없음" : `${initTime.slice(0, 2)}:${initTime.slice(2)}`}
           </div>
         </div>
@@ -1728,11 +1738,29 @@ const DistributionLimit = () => {
             </div>
             <div className="flex items-center gap-2">
               <Label className="w-32 min-w-32">최대 발신 건수</Label>
-              <CustomInput
-                type="number"
-                min="1"
+              <OnlyNumberInput
+                type="text"
+                min={1}
+                max={99999}
                 value={bulkLimitModal.maxLimit}
-                onChange={(e) => setBulkLimitModal(prev => ({ ...prev, maxLimit: e.target.value }))}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const numericValue = parseInt(value, 10);
+
+                  if(numericValue <= 0){
+                    showAlert("최대 발신건수는 최소 1부터 입력 가능합니다.");
+                    setBulkLimitModal((prev) => ({ ...prev, maxLimit: "1" }));
+                    return; 
+                  }
+
+                  if (numericValue > 99999) {
+                    showAlert("최대 발신건수는 99999까지 입력 가능합니다.");
+                    setBulkLimitModal((prev) => ({ ...prev, maxLimit: "99999" }));
+                    return; 
+                  }
+
+                  setBulkLimitModal((prev) => ({ ...prev, maxLimit: value }));
+                }}
                 className="w-[140px]"
               />
             </div>

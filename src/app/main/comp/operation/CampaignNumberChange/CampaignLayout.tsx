@@ -14,6 +14,7 @@ import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { useApiForCallingNumberDelete } from '@/features/campaignManager/hooks/useApiForCallingNumberDelete';
+import OnlyNumberInput from '@/components/shared/OnlyNumberInput';
 
 type GridRow = MainDataResponse & {
   calling_number: string;
@@ -197,7 +198,7 @@ function CampaignLayout() {
     }
   });
 
-  // 컴포넌트 마운트 시 발신번호 조회
+  // 컴포넌트 마운트 시 발신번호 조회  ######
   useEffect(() => {
     fetchCallingNumbers({
       session_key: '',
@@ -346,6 +347,13 @@ function CampaignLayout() {
       return;
     }
 
+    const isNumber = /^[0-9]+$/.test(selectedCallingNumber);
+
+    if (!isNumber) {
+      showAlert('발신번호는 숫자로만 입력해주세요.')
+      return;
+    }
+
     // 발신번호가 이미 존재하는지 확인
     const existingCallingNumber = callingNumbers.find(num => num.campaign_id === Number(selectedCampaignId));
     const saveRequest = {
@@ -476,7 +484,7 @@ function CampaignLayout() {
           {/* 발신번호 영역 */}
           <div className="flex items-center gap-2">
             <Label className="w-[5rem] min-w-[5rem]">발신번호</Label>
-            <CustomInput 
+            <OnlyNumberInput
               type="text" 
               value={selectedCallingNumber}
               onChange={(e) => setSelectedCallingNumber(e.target.value)}
