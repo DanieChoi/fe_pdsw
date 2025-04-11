@@ -18,8 +18,6 @@ const dialModeList = [
   { dial_id: 4, dial_name: 'System Preview' },
 ];
 
-type Column = GridColumn<Row>;
-
 type Row = {
   no: number;
   campaignId: number;
@@ -31,6 +29,9 @@ type Row = {
   callingNumber: string;
 };
 
+type Column = GridColumn<Row>;
+
+// columns 정의 (Grid에 표시될 열들)
 const columns: Column[] = [
   { 
     key: "no", 
@@ -79,12 +80,13 @@ const columns: Column[] = [
 type Props = {
   campaignId?: string;
   campaignHeaderSearchParam?: CampaignHeaderSearch;
-}
+  onRowClick?: (campaignId: string) => void; // 추가된 속성
+};
 
-export default function CampaignManagerList({ campaignId, campaignHeaderSearchParam }: Props) {
+export default function CampaignManagerList({ campaignId, campaignHeaderSearchParam, onRowClick }: Props) {
   const [viewMode, setViewMode] = useState<string>(campaignId ? "single" : "full");
 
-  // Update viewMode when campaignId changes
+  // campaignId 값에 따라 viewMode 설정
   useEffect(() => {
     setViewMode(campaignId ? "single" : "full");
   }, []);
@@ -96,7 +98,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
     } else {
       setViewMode("full");
     }
-  }, [campaignId])
+  }, [campaignId]);
 
   const campaignIdNumber = campaignId ? Number(campaignId) : undefined;
 
@@ -121,7 +123,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
   const [filteredCampaigns, setFilteredCampaigns] = useState<CampaignListDataResponse[]>([]);
   const [tempData, setTempData] = useState<Row[]>([]);
 
-  // Process campaignListResponse and update filteredCampaigns
+  // campaignListResponse를 처리하여 filteredCampaigns 업데이트
   useEffect(() => {
     if (!campaignListResponse?.result_data) {
       setFilteredCampaigns([]);
@@ -137,7 +139,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
         setFilteredCampaigns([]);
       }
     } else {
-      // Apply search filters in full view mode
+      // full view mode: search 파라미터 적용
       let _filteredCampaigns = [...campaignListResponse.result_data];
 
       if (campaignHeaderSearchParam) {
@@ -192,7 +194,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
     campaignSkills
   ]);
 
-  // Convert filteredCampaigns to grid data format
+  // filteredCampaigns를 grid 데이터 형식(Row)로 변환
   useEffect(() => {
     if (filteredCampaigns.length === 0) {
       setTempData([]);
@@ -234,7 +236,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
     setTempData(newTempData);
   }, [filteredCampaigns, schedules, campaignSkills, callingNumbers]);
 
-  // Handle auto-selection of first row if needed
+  // 자동 선택: 목록에 행이 있고 선택된 행이 없으면 첫 번째 행을 선택
   useEffect(() => {
     if (tempData.length === 0) return;
     
@@ -250,6 +252,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
     }
   }, [tempData, selectedCampaignRow, filteredCampaigns]);
 
+  // 셀 클릭 시 호출 - 클릭한 행의 캠페인 데이터를 선택 상태로 업데이트하고, onRowClick이 있다면 호출
   const handleCellClick = useCallback(({ row }: CellClickArgs<Row>) => {
     const clickedCampaign = filteredCampaigns.find(
       campaign => campaign.campaign_id === row.campaignId
@@ -258,8 +261,11 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
     if (clickedCampaign) {
       setSelectedCampaign(clickedCampaign as any);
       setSelectedCampaignRow(row);
+      if (onRowClick) {
+        onRowClick(row.campaignId.toString());
+      }
     }
-  }, [filteredCampaigns, setSelectedCampaign, setSelectedCampaignRow]);
+  }, [filteredCampaigns, setSelectedCampaign, setSelectedCampaignRow, onRowClick]);
 
   const getCampaignRowClass = useCallback((row: Row) => {
     return selectedCampaignRow?.campaignId === row.campaignId ? 'bg-[#FFFAEE]' : '';

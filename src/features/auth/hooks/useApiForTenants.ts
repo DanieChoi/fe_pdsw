@@ -15,9 +15,9 @@ export function useApiForTenants(
   return useMutation({
     mutationKey: ['mainTenants'],
     mutationFn: async (variables: MainCredentials) => {
-      if (isFetching.current) {
-        throw new Error('이미 요청이 진행 중입니다.'); // 요청 중일 때는 에러를 던짐
-      }
+      // if (isFetching.current) {
+      //   throw new Error('이미 요청이 진행 중입니다.'); // 요청 중일 때는 에러를 던짐
+      // }
       isFetching.current = true; // 요청 시작
       try {
         const response = await fetchTenants(variables);
