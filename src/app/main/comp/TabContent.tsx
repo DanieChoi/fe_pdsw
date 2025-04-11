@@ -38,8 +38,9 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
         groupName={params?.groupName}
       />;
     case 2:
-      return <CampaignManager />;
-
+      return <CampaignManager 
+        campaignId={params?.campaignId}
+      />;
     case 3:
       return <IntegratedMonitoringDashboard />;
     case 4:
