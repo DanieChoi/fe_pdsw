@@ -17,6 +17,7 @@ interface CampaignInfoProps {
   selectedCampaign: string;
   campaignStatus: string;
   callPacing: number;
+  dialMode: number;
   campaigns: Campaign[];
   onCampaignSelect: (id: string) => void;
   onStatusChange: (status: string) => void;
@@ -32,6 +33,7 @@ const CampaignInfo = ({
   selectedCampaign,
   campaignStatus,
   callPacing,
+  dialMode,
   campaigns,
   onCampaignSelect,
   onStatusChange,
@@ -107,12 +109,14 @@ const CampaignInfo = ({
               value={callPacing}
               onChange={onCallPacingChange}
               min={0}
+              disabled={!(dialMode === 2 || dialMode === 3)}
             />
           </div>
           <CommonButton 
             variant="outline" 
             className='!border-[#A0A0A0]'
             onClick={onCallPacingApply}
+            disabled={!(dialMode === 2 || dialMode === 3)}
           >
             적용
           </CommonButton>
