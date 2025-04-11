@@ -303,6 +303,7 @@ export function TreeNodeForCampaignTab({
     setCampaignIdForUpdateFromSideMenu,
     setCampaignIdForCopyCampaign,
     addTab,
+    addTabCurrentOnly
   } = useTabStore();
 
   // Get the most current status from the campaigns store
@@ -349,10 +350,10 @@ export function TreeNodeForCampaignTab({
     if (item.type !== "campaign") return;
     // simulateHeaderMenuClick(2);
 
-    addTab({
+    addTabCurrentOnly({
       id: 2,
       uniqueKey: "2",
-      title: "캠페인 관리",
+      title: `캠페인 관리 ${item.id}`,
       // icon: "",
       // href: "",
       content: null,
@@ -363,8 +364,7 @@ export function TreeNodeForCampaignTab({
       },
     });
 
-
-    setCampaignIdForUpdateFromSideMenu(item.id);
+    // setCampaignIdForUpdateFromSideMenu(item.id);
   }, [item, simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu]);
 
   const handleEdit = useCallback(() => {

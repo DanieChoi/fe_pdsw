@@ -270,9 +270,10 @@ export interface NotificationTabParam {
 type Props = {
   isOpen?: boolean;
   onCampaignPopupClose?: () => void;
+  campaignId?: any;
 }
 
-export default function CampaignDetail({ isOpen, onCampaignPopupClose }: Props) {
+export default function CampaignDetail({campaignId, isOpen, onCampaignPopupClose }: Props) {
   const [oriCampaignManagerInfo, setOriCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);

@@ -146,7 +146,7 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
         <CampaignManagerHeader campaignId={_campaignId} onSearch={handleCampaignHeaderSearch} />
         <div className="flex gap-[30px]">
           <CampaignManagerList campaignId={_campaignId} campaignHeaderSearchParam={campaignHeaderSearchParam} />
-          <CampaignManagerDetail isOpen={isOpen} onCampaignPopupClose={onCampaignPopupClose} />
+          <CampaignManagerDetail campaignId={_campaignId} isOpen={isOpen} onCampaignPopupClose={onCampaignPopupClose} />
         </div>
       </div>
       <CustomAlert
