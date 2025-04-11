@@ -135,7 +135,7 @@ const CustomAlert = ({
     onClose,
     onCancle,
     width = 500,
-    height,
+    height = 500,
     showButtons = true,
     confirmDisabled = false
 }: CustomAlertRequest) => {
