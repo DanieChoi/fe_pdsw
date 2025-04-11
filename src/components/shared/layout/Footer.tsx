@@ -1032,9 +1032,7 @@ export default function Footer({
       //   if (event.data !== "Connected!!") {
       //     const tempEventData = JSON.parse(event.data);
       //     if (
-      //       announce !== tempEventData["announce"] ||
-      //       !isEqual(data, tempEventData.data) ||
-      //       !isEqual(data, tempEventData["data"]) ||
+      //       announce !== tempEventData["announce"] || !isEqual(data, tempEventData.data) || !isEqual(data, tempEventData["data"]) ||
       //       kind !== tempEventData["kind"]
       //     ) {
       //       announce = tempEventData["announce"];
