@@ -1,7 +1,7 @@
 // components/CampaignManager/CampaignManagerDetail.tsx
 // 캠페인 관리 탭의 캠페인 상세 정보 부분
 "use client";
-import { useMainStore, useCampainManagerStore, useTabStore,useAuthStore } from '@/store';
+import { useMainStore, useCampainManagerStore, useTabStore, useAuthStore } from '@/store';
 import Image from 'next/image'
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Label } from "@/components/ui/label";
@@ -44,7 +44,7 @@ import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/Cust
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 import { useApiForCampaignAgent } from '@/features/campaignManager/hooks/useApiForCampaignAgent';
 import { useApiForCallingListDelete } from '@/features/listManager/hooks/useApiForCallingListDelete';
-import { CheckCampaignSaveReturnCode,CampaignManagerInfo } from '@/components/common/common';
+import { CheckCampaignSaveReturnCode, CampaignManagerInfo } from '@/components/common/common';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { CampaignInfo } from '../CreateCampaignFormPanel/variables/variablesForCreateCampaignForm';
@@ -272,7 +272,7 @@ type Props = {
   onCampaignPopupClose?: () => void;
 }
 
-export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
+export default function CampaignDetail({ isOpen, onCampaignPopupClose }: Props) {
   const [oriCampaignManagerInfo, setOriCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
@@ -294,7 +294,8 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     , setSelectedCampaign
     , setSelectedCampaignRow
   } = useMainStore();
-  const { tenant_id
+  const {
+    tenant_id
     , menu_role_id
   } = useAuthStore();
   const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab
@@ -319,7 +320,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
-    if ( typeof selectedCampaign !== 'undefined' && selectedCampaign !== null) {
+    if (typeof selectedCampaign !== 'undefined' && selectedCampaign !== null) {
       // setChangeYn(false);
       // setCampaignInfoChangeYn(true);
       setTempCampaignsInfo({
@@ -527,7 +528,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
             start_time: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].start_time,
             end_time: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].end_time
           });
-        }else{
+        } else {
           setTempCampaignSchedule(CampaignScheduleInfo);
         }
       } else {
@@ -900,11 +901,11 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
 
   //캠페인 취소
   const handleCampaignClosed = () => {
-    if( isOpen ){ //통합모니터에서 호출시
+    if (isOpen) { //통합모니터에서 호출시
       if (onCampaignPopupClose) {
         onCampaignPopupClose();
       }
-    }else{
+    } else {
       setAlertState({
         ...errorMessage,
         isOpen: true,
@@ -926,7 +927,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     let saveCheck = true;
     const today = new Date();
     const tempDate = today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2);
-    if( tempCampaignSchedule.start_time.length === 0){
+    if (tempCampaignSchedule.start_time.length === 0) {
       saveCheck = false;
       setAlertState({
         ...errorMessage,
@@ -935,7 +936,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
         type: '2',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
-    }else if( tempCampaignSchedule.end_date < tempDate ){
+    } else if (tempCampaignSchedule.end_date < tempDate) {
       saveCheck = false;
       setAlertState({
         ...errorMessage,
@@ -950,13 +951,13 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
 
   //캠페인 저장
   const handleCampaignSave = () => {
-    if( saveCampaignCheck() ){
+    if (saveCampaignCheck()) {
       setAlertState({
         ...errorMessage,
         isOpen: true,
         message: '캠페인 아이디 : ' + tempCampaignManagerInfo.campaign_id
-        + '\n 캠페인 이름 : ' + tempCampaignManagerInfo.campaign_name
-        + '\n 캠페인을 수정하시겠습니까?',
+          + '\n 캠페인 이름 : ' + tempCampaignManagerInfo.campaign_name
+          + '\n 캠페인을 수정하시겠습니까?',
         onClose: handleCampaignSaveExecute,
         onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
@@ -968,7 +969,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   const handleCampaignSaveExecute = () => {
     // setRtnMessage('캠페인 수정이 완료되었습니다.');
     setAlertState((prev) => ({ ...prev, isOpen: false }));
-    
+
     if (changeYn) {
       if (campaignInfoChangeYn) {
         if (tempCampaignManagerInfo.start_flag === 1 && oriCampaignManagerInfo.start_flag != 1) {
@@ -979,14 +980,15 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
             , campaign_status: tempCampaignManagerInfo.start_flag
           });
           // setSelectedCampaignRow(tempCampaignManagerInfo.campaign_id);
-          
+
         } else {
           //다이얼모드가 predictive, progressive 아닌경우 발신속도를 0 으로 저장한다.
-          if(tempCampaignManagerInfo.dial_mode === 2 || tempCampaignManagerInfo.dial_mode === 3){
+          if (tempCampaignManagerInfo.dial_mode === 2 || tempCampaignManagerInfo.dial_mode === 3) {
             fetchCampaignManagerUpdate(tempCampaignManagerInfo);
-          }else{
-            fetchCampaignManagerUpdate({...tempCampaignManagerInfo
-              ,dial_speed: 0
+          } else {
+            fetchCampaignManagerUpdate({
+              ...tempCampaignManagerInfo
+              , dial_speed: 0
             });
           }
         }
@@ -1055,7 +1057,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
       setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
       setCampaignInfoChangeYn(true);
       // if( rtnMessage !== ''){
-        setRtnMessage('');        
+      setRtnMessage('');
       //   setAlertState({
       //     ...errorMessage,
       //     isOpen: true,
@@ -1064,7 +1066,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
       //     onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       //   });
       // }else{
-        // removeTab(Number(activeTabId), activeTabKey + '');
+      // removeTab(Number(activeTabId), activeTabKey + '');
       // }
       setAlertState({
         ...errorMessage,
@@ -1079,7 +1081,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   //캠페인 정보 수정 api 호출
   const { mutate: fetchCampaignManagerUpdate } = useApiForCampaignManagerUpdate({
     onSuccess: (data) => {
-      
+
       // tofix 0404 캠페인 선택 row 업데이트 here
       // setSelectedCampaignRow()
 
@@ -1096,12 +1098,12 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
         }
       }
       if (campaignScheduleChangeYn) {
-        
-        if( tempCampaignSchedule.tenant_id === 0){
+
+        if (tempCampaignSchedule.tenant_id === 0) {
           //캠페인 스케줄 등록 api 호출
           console.log("캠페인 스케쥴이 변했으므로 캠페인 스케쥴 api 업데이트를 실행합니다!");
-          fetchCampaignScheduleInsert({...tempCampaignSchedule,tenant_id:tempCampaignManagerInfo.tenant_id});
-        }else{
+          fetchCampaignScheduleInsert({ ...tempCampaignSchedule, tenant_id: tempCampaignManagerInfo.tenant_id });
+        } else {
           //캠페인 스케줄 수정 api 호출
           console.log("캠페인 스케쥴이 안안변했으므로 캠페인 스케쥴 api 업데이트를 실행하지 않습니다!");
           fetchCampaignScheduleUpdate(tempCampaignSchedule);
@@ -1123,11 +1125,12 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
       if (campaignDialSpeedChangeYn) {
         //캠페인 발신 속도 수정 api 호출
         //다이얼모드가 predictive, progressive 아닌경우 발신속도를 0 으로 저장한다.
-        if(tempCampaignManagerInfo.dial_mode === 2 || tempCampaignManagerInfo.dial_mode === 3){
+        if (tempCampaignManagerInfo.dial_mode === 2 || tempCampaignManagerInfo.dial_mode === 3) {
           fetchDialSpeedUpdate(tempCampaignDialSpeedInfo);
-        }else{
-          fetchDialSpeedUpdate({...tempCampaignDialSpeedInfo
-            ,dial_speed: 0
+        } else {
+          fetchDialSpeedUpdate({
+            ...tempCampaignDialSpeedInfo
+            , dial_speed: 0
           });
         }
       }
@@ -1155,7 +1158,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
         , tenant_id: tempCampaignManagerInfo.tenant_id
       });
       // removeTab(Number(activeTabId),activeTabKey+'');
-    },onError: (data) => {      
+    }, onError: (data) => {
       if (data.message.split('||')[0] === '5') {
         setAlertState({
           ...errorMessage,
@@ -1201,10 +1204,10 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
       const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       fetchSchedules({
         tenant_id_array: tempTenantIdArray
-      });      
+      });
     }
   });
-  
+
   //캠페인 스케줄 수정 api 호출 
   const { mutate: fetchCampaignScheduleUpdate } = useApiForCampaignScheduleUpdate({
     onSuccess: (data) => {
@@ -1356,7 +1359,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
         });
       }
-    },onError: (data) => {
+    }, onError: (data) => {
       // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
       //캠페인관리 화면 닫기.
       fetchMain({
@@ -1434,7 +1437,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
         });
       }
-    },onError: (data) => {      
+    }, onError: (data) => {
       if (data.message.split('||')[0] === '5') {
         setAlertState({
           ...errorMessage,
@@ -1461,7 +1464,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   // 전화번호 조회
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
-      setCallingNumbers(data.result_data||[]);
+      setCallingNumbers(data.result_data || []);
       setCallingNumberChangeYn(false);
     }
   });
@@ -1486,7 +1489,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     existingTabs.forEach(tab => {
       removeTab(tab.id, tab.uniqueKey);
     });
-    const newTabKey = `13-${Date.now()}`;      
+    const newTabKey = `13-${Date.now()}`;
     addTab({
       id: 13,
       uniqueKey: '13',
@@ -1495,7 +1498,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
       href: '',
       content: null,
     });
-    setTimeout(function() {
+    setTimeout(function () {
       setActiveTab(13, newTabKey);
     }, 50);
   };
@@ -1522,10 +1525,10 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     existingTabs.forEach(tab => {
       removeTab(tab.id, tab.uniqueKey);
     });
-    const newTabKey = `7-${Date.now()}`;      
+    const newTabKey = `7-${Date.now()}`;
     addTab({
       id: 7,
-      campaignId: tempCampaignInfo.campaign_id+'',
+      campaignId: tempCampaignInfo.campaign_id + '',
       campaignName: tempCampaignInfo.campaign_name,
       uniqueKey: '7',
       title: '리스트매니저',
@@ -1533,16 +1536,16 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
       href: '',
       content: null,
     });
-    setTimeout(function() {
+    setTimeout(function () {
       setActiveTab(7, newTabKey);
     }, 50);
   };
-  
+
   // 발신리스트 업로드 취소 api 호출
   const { mutate: fetchCallingListDelete } = useApiForCallingListDelete({
-    onSuccess: (data) => {   
+    onSuccess: (data) => {
       setAlertState((prev) => ({ ...prev, isOpen: false }));
-    },onError: (data) => {      
+    }, onError: (data) => {
       if (data.message.split('||')[0] === '5') {
         setAlertState({
           ...errorMessage,
@@ -1599,10 +1602,10 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     existingTabs.forEach(tab => {
       removeTab(tab.id, tab.uniqueKey);
     });
-    const newTabKey = `8-${Date.now()}`;      
+    const newTabKey = `8-${Date.now()}`;
     addTab({
       id: 8,
-      campaignId: tempCampaignInfo.campaign_id+'',
+      campaignId: tempCampaignInfo.campaign_id + '',
       campaignName: tempCampaignInfo.campaign_name,
       uniqueKey: newTabKey,
       title: '예약콜 제한 설정',
@@ -1610,7 +1613,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
       href: '/reserve',
       content: null,
     });
-    setTimeout(function() {
+    setTimeout(function () {
       setActiveTab(8, newTabKey);
     }, 50);
   };
@@ -1634,10 +1637,10 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     existingTabs.forEach(tab => {
       removeTab(tab.id, tab.uniqueKey);
     });
-    const newTabKey = `9-${Date.now()}`;      
+    const newTabKey = `9-${Date.now()}`;
     addTab({
       id: 9,
-      campaignId: tempCampaignInfo.campaign_id+'',
+      campaignId: tempCampaignInfo.campaign_id + '',
       campaignName: tempCampaignInfo.campaign_name,
       uniqueKey: newTabKey,
       title: '분배호수 제한 설정',
@@ -1645,7 +1648,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
       href: '/distribute',
       content: null,
     });
-    setTimeout(function() {
+    setTimeout(function () {
       setActiveTab(9, newTabKey);
     }, 50);
   };
@@ -1653,8 +1656,8 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
   //재발신 버튼 이벤트
   const handleRebroadcast = () => {
     // openRebroadcastSettings('20','재발신 설정');
-    if( campaignIdForUpdateFromSideMenu == null || campaignIdForUpdateFromSideMenu === ''){
-      setCampaignIdForUpdateFromSideMenu(tempCampaignInfo.campaign_id+'');
+    if (campaignIdForUpdateFromSideMenu == null || campaignIdForUpdateFromSideMenu === '') {
+      setCampaignIdForUpdateFromSideMenu(tempCampaignInfo.campaign_id + '');
     }
     // if (openedTabs.some(tab => tab.id === 20)) {
     //   setActiveTab(20, openedTabs.filter((data) => data.id === 20)[0].uniqueKey);
@@ -1673,10 +1676,10 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
     existingTabs.forEach(tab => {
       removeTab(tab.id, tab.uniqueKey);
     });
-    const newTabKey = `20-${Date.now()}`;      
+    const newTabKey = `20-${Date.now()}`;
     addTab({
       id: 20,
-      campaignId: tempCampaignInfo.campaign_id+'',
+      campaignId: tempCampaignInfo.campaign_id + '',
       campaignName: tempCampaignInfo.campaign_name,
       uniqueKey: '20',
       title: '재발신 설정',
@@ -1684,7 +1687,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
       href: '',
       content: null,
     });
-    setTimeout(function() {
+    setTimeout(function () {
       setActiveTab(20, newTabKey);
     }, 50);
   };
@@ -1697,78 +1700,78 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
           className='border-b border-gray-300 pb-1'
           title="상세내역"
           buttons={
-            menu_role_id === 1?
-            selectedCampaign?.start_flag === 3?
-            [
-              { label: "새 캠페인", onClick: () => handleNewCampaign() },
-              // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
-              { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
-              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
-              { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
-              { label: "리스트 삭제", onClick: () => handleListManagerDelete(), variant: "customblue" },
-              { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
-              { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
-            ]
-            :
-            [
-              { label: "새 캠페인", onClick: () => handleNewCampaign() },
-              // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
-              { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
-              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
-              { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
-              { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
-              { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
-            ]
-            :
-            menu_role_id === 2?
-            selectedCampaign?.start_flag === 3?
-            [
-              { label: "새 캠페인", onClick: () => handleNewCampaign() },
-              // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
-              { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
-              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
-              { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
-              { label: "리스트 삭제", onClick: () => handleListManagerDelete(), variant: "customblue" },
-            ]
-            :
-            [
-              { label: "새 캠페인", onClick: () => handleNewCampaign() },
-              // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
-              { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
-              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
-              { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
-            ]
-            :
-            menu_role_id === 3?
-            [
-              { label: "새 캠페인", onClick: () => handleNewCampaign() },
-              // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
-              { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
-              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
-            ]
-            :
-            selectedCampaign?.start_flag === 3?
-            [
-              { label: "새 캠페인", onClick: () => handleNewCampaign() },
-              // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
-              { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
-              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
-              { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
-              { label: "리스트 삭제", onClick: () => handleListManagerDelete(), variant: "customblue" },
-              { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
-              { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
-            ]
-            :
-            [
-              { label: "새 캠페인", onClick: () => handleNewCampaign() },
-              // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
-              { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
-              { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
-              { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
-              { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
-              { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
-            ]
-        }
+            menu_role_id === 1 ?
+              selectedCampaign?.start_flag === 3 ?
+                [
+                  { label: "새 캠페인", onClick: () => handleNewCampaign() },
+                  // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+                  { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+                  { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+                  { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+                  { label: "리스트 삭제", onClick: () => handleListManagerDelete(), variant: "customblue" },
+                  { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
+                  { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
+                ]
+                :
+                [
+                  { label: "새 캠페인", onClick: () => handleNewCampaign() },
+                  // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+                  { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+                  { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+                  { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+                  { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
+                  { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
+                ]
+              :
+              menu_role_id === 2 ?
+                selectedCampaign?.start_flag === 3 ?
+                  [
+                    { label: "새 캠페인", onClick: () => handleNewCampaign() },
+                    // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+                    { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+                    { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+                    { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+                    { label: "리스트 삭제", onClick: () => handleListManagerDelete(), variant: "customblue" },
+                  ]
+                  :
+                  [
+                    { label: "새 캠페인", onClick: () => handleNewCampaign() },
+                    // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+                    { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+                    { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+                    { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+                  ]
+                :
+                menu_role_id === 3 ?
+                  [
+                    { label: "새 캠페인", onClick: () => handleNewCampaign() },
+                    // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+                    { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+                    { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+                  ]
+                  :
+                  selectedCampaign?.start_flag === 3 ?
+                    [
+                      { label: "새 캠페인", onClick: () => handleNewCampaign() },
+                      // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+                      { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+                      { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+                      { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+                      { label: "리스트 삭제", onClick: () => handleListManagerDelete(), variant: "customblue" },
+                      { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
+                      { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
+                    ]
+                    :
+                    [
+                      { label: "새 캠페인", onClick: () => handleNewCampaign() },
+                      // { label: "캠페인 저장", onClick: () => handleCampaignSave(), },
+                      { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+                      { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+                      { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+                      { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
+                      { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
+                    ]
+          }
         />
         <div className="grid grid-cols-3 gap-x-[26px] gap-y-2">
           <div className='flex items-center gap-2'>
@@ -1854,7 +1857,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
             <CustomInput value={inputCallingNumber} className="w-full"
               disabled={selectedCampaign !== null} readOnly
             />
-            {menu_role_id === 1?
+            {menu_role_id === 1 ?
               <CommonButton variant="outline" className='h-[24px]' onClick={() =>
                 setCallingNumberPopupState({
                   ...callingNumberPopupState,
@@ -1898,7 +1901,7 @@ export default function CampaignDetail({isOpen,onCampaignPopupClose}: Props) {
         onConfirm={(param) => handleSelectSkills(param)}
         onCancel={() => setSkillPopupState((prev) => ({ ...prev, isOpen: false }))}
       />
-      
+
       {/* 확인,취소  */}
       <CustomAlert
         message={alertState.message}

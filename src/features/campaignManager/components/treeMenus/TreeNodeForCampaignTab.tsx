@@ -347,7 +347,23 @@ export function TreeNodeForCampaignTab({
 
   const handleDoubleClick = useCallback(() => {
     if (item.type !== "campaign") return;
-    simulateHeaderMenuClick(2);
+    // simulateHeaderMenuClick(2);
+
+    addTab({
+      id: 2,
+      uniqueKey: "2",
+      title: "캠페인 관리",
+      // icon: "",
+      // href: "",
+      content: null,
+      params: {
+        campaignId: item.id,
+        campaignName: item.label,
+        campaignType: item.type,
+      },
+    });
+
+
     setCampaignIdForUpdateFromSideMenu(item.id);
   }, [item, simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu]);
 
