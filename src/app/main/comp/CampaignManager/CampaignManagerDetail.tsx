@@ -2229,7 +2229,6 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         reuse_count: selectedCampaign.reuse_count,
         use_counsel_result: selectedCampaign.use_counsel_result,
         use_list_alarm: selectedCampaign.use_list_alarm,
-        redial_strategy: selectedCampaign.redial_strategy,
         dial_mode_option: selectedCampaign.dial_mode_option,
         user_option: selectedCampaign.user_option
       });
