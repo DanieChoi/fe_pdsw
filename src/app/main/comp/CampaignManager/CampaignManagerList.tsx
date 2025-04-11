@@ -89,6 +89,15 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
     setViewMode(campaignId ? "single" : "full");
   }, []);
 
+  useEffect(() => {
+    if (campaignId) {
+      // alert("캠페인 ID " + campaignId + "로 캠페인 상세 조회를 시작합니다.");
+      setViewMode("single");
+    } else {
+      setViewMode("full");
+    }
+  }, [campaignId])
+
   const campaignIdNumber = campaignId ? Number(campaignId) : undefined;
 
   // API hooks
