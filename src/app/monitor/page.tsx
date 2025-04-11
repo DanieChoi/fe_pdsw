@@ -138,6 +138,7 @@ const MonitorPage = () => {
   const [selectedCampaign, setSelectedCampaign] = useState<string>('');
   const [campaignStatus, setCampaignStatus] = useState<CampaignStatus>('멈춤');
   const [callPacing, setCallPacing] = useState<number>(0);
+  const [dialMode, setDialMode] = useState<number>(0);
   const [_campaigns, _setCampaigns] = useState<Campaign[]>([]);
   const [campaignList, setCampaignList ] = useState<any[]>([]);
   const [campaignSkillList, setCampaignSkillList ] = useState<any[]>([]);
@@ -336,6 +337,7 @@ const MonitorPage = () => {
       setSelectedCampaign(campaignId);
       const tempCampaignInfo = campaigns.find(c => c.campaign_id === Number(campaignId));
       setCallPacing(tempCampaignInfo?.dial_mode === 2 ? tempCampaignInfo.dial_speed * 2 : tempCampaignInfo?.dial_mode === 3 ? tempCampaignInfo.dial_speed : 0);
+      setDialMode(tempCampaignInfo?.dial_mode || 0);
       // API 호출 로직 추가
     };
 
@@ -452,6 +454,7 @@ const MonitorPage = () => {
             selectedCampaign={selectedCampaign}
             campaignStatus={campaignStatus}
             callPacing={callPacing}
+            dialMode={dialMode}
             campaigns={_campaigns}
             onCampaignSelect={handleCampaignSelect}
             onStatusChange={handleStatusChange}
@@ -567,6 +570,7 @@ const MonitorPage = () => {
       setCampaignStatus(tempCampaign.startFlag === 1 ? '시작' : tempCampaign.startFlag === 2 ? '멈춤' : '중지');
       const tempCampaignInfo = campaigns.find(c => c.campaign_id === Number(tempCampaign.id));
       setCallPacing(tempCampaignInfo?.dial_mode === 2 ? tempCampaignInfo.dial_speed * 2 : tempCampaignInfo?.dial_mode === 3 ? tempCampaignInfo.dial_speed : 0);
+      setDialMode(tempCampaignInfo?.dial_mode || 0);
     }
   }, [selectedCampaign]);
 
