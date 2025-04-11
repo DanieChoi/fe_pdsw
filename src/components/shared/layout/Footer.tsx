@@ -1025,39 +1025,6 @@ export default function Footer({
           }
         }
       });
-
-      // const messageHandler = (event: MessageEvent) => {
-      //   console.log("footer sse event = ", event.data);
-
-      //   if (event.data !== "Connected!!") {
-      //     const tempEventData = JSON.parse(event.data);
-      //     if (
-      //       announce !== tempEventData["announce"] || !isEqual(data, tempEventData.data) || !isEqual(data, tempEventData["data"]) ||
-      //       kind !== tempEventData["kind"]
-      //     ) {
-      //       announce = tempEventData["announce"];
-      //       command = tempEventData["command"];
-      //       data = tempEventData["data"];
-      //       kind = tempEventData["kind"];
-
-      //       footerDataSet(
-      //         tempEventData["announce"],
-      //         tempEventData["command"],
-      //         tempEventData["data"],
-      //         tempEventData["kind"],
-      //         tempEventData
-      //       );
-      //     }
-      //   }
-      // };
-
-      // eventSource.addEventListener("message", messageHandler);
-
-      // 클린업 함수
-      // return () => {
-      //   eventSource.removeEventListener("message", messageHandler);
-      //   eventSource.close();
-      // };
     }
   }, [id, tenant_id, role_id]);
 
