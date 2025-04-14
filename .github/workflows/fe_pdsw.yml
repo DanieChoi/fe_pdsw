@@ -40,7 +40,7 @@ jobs:
       - name: npm run build
         run: |
           npm run build
-          ls ./.next
+          ls ./.next_upds
 
       - name: 서버(PDSW)에 파일/폴더 업로드
         uses: appleboy/scp-action@v0.1.7
