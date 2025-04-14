@@ -394,70 +394,23 @@ export default function Footer({
   }, [campaigns, fetchMain, useAlramPopup, debouncedInvalidate, tenant_id]);
 
   // SSE 구독
-  // useEffect(() => {
-  //   // 브라우저 환경인지 확인
-  //   if (typeof window !== 'undefined' && window.EventSource && id !== '') {
-  //     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-  //     const eventSource = new EventSource(
-  //       `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
-  //     );
-
-  //     let data: any = {};
-  //     let announce = "";
-  //     let command = "";
-  //     let kind = "";
-
-  //     eventSource.addEventListener('message', (event) => {
-  //       console.log("footer sse event = ", event.data);
-
-  //       if (event.data !== "Connected!!") {
-  //         const tempEventData = JSON.parse(event.data);
-  //         if (
-  //           announce !== tempEventData["announce"] ||
-  //           !isEqual(data, tempEventData.data) ||
-  //           !isEqual(data, tempEventData["data"]) ||
-  //           kind !== tempEventData["kind"]
-  //         ) {
-  //           announce = tempEventData["announce"];
-  //           command = tempEventData["command"];
-  //           data = tempEventData["data"];
-  //           kind = tempEventData["kind"];
-
-  //           footerDataSet(
-  //             tempEventData["announce"],
-  //             tempEventData["command"],
-  //             tempEventData["data"],
-  //             tempEventData["kind"],
-  //             tempEventData
-  //           );
-  //         }
-  //       }
-  //     });
-  //   }
-  // }, [id, tenant_id, role_id]);
-
   useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.EventSource !== 'undefined' &&
-      id &&
-      tenant_id &&
-      process.env.NEXT_PUBLIC_API_URL
-    ) {
+    // 브라우저 환경인지 확인
+    if (typeof window !== 'undefined' && window.EventSource && id !== '') {
       const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
       const eventSource = new EventSource(
         `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
       );
-  
+
       let data: any = {};
       let announce = "";
       let command = "";
       let kind = "";
       let campaign_id = "";
 
-      const messageHandler = (event: MessageEvent) => {
+      eventSource.addEventListener('message', (event) => {
         console.log("footer sse event = ", event.data);
-  
+
         if (event.data !== "Connected!!") {
           const tempEventData = JSON.parse(event.data);
           if (
@@ -483,18 +436,10 @@ export default function Footer({
             );
           }
         }
-      };
-  
-      eventSource.addEventListener('message', messageHandler);
-  
-      return () => {
-        console.log("🧹 Closing SSE connection");
-        eventSource.removeEventListener('message', messageHandler);
-        eventSource.close();
-      };
+      });
     }
-  }, [id, tenant_id, footerDataSet]);
-  
+  }, [id, tenant_id, role_id]);
+
 
   // 높이 변경 핸들러
   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
