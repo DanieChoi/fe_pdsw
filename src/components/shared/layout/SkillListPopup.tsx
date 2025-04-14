@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useApiForGetSkills2 } from '@/features/campaignManager/hooks/useApiForGetSkills2';
 import { Loader2 } from "lucide-react";
 import CustomAlert from '@/components/shared/layout/CustomAlert';
+import DataGrid, { SelectColumn } from 'react-data-grid';
 
 interface Skill {
   tenant_id: number | string;
@@ -170,16 +171,66 @@ const SkillListPopup = ({
     </div>
   );
 
+    // skill_id가 0인 항목 제외
+    const rows = skills.filter((skill) => 
+      skill.tenant_id === tenantId && skill.skill_id !== 0
+  );
+
+  const handleSelectedRowsChange = (newSelection: Set<number>) => {
+    // 혹시 모를 0값이 포함되는 것을 방지
+    const filteredSelection = new Set(
+        Array.from(newSelection).filter(id => id !== 0)
+    );
+    setSelectedSkills(filteredSelection);
+};
+
+  const columns = [
+    SelectColumn,
+    {
+        key: 'skill_id',
+        name: '아이디',
+        frozen: true,
+        width: 157,
+        minWidth: 100
+    },
+    {
+        key: 'skill_name',
+        name: '이름',
+        frozen: true,
+        width: 157,
+        minWidth: 100
+    }
+  ];
+
+  const rowClass = (row: Skill) => {
+      return selectedSkills.has(row.skill_id) ? 'selected-row' : '';
+  };
+
+  const gridContent = (
+    <div className="grid-custom-wrap w-full">
+        <DataGrid
+            columns={columns}
+            rows={rows}
+            className="grid-custom w-full"
+            rowKeyGetter={(row) => row.skill_id}
+            selectedRows={selectedSkills}
+            onSelectedRowsChange={handleSelectedRowsChange}
+            rowClass={rowClass}
+            rowHeight={26}
+        />
+    </div>
+);
+
   return (
     <CustomAlert
       isOpen={isOpen}
       title="캠페인 스킬 선택"
-      message={skillsContent}
+      message={gridContent}
       onClose={handleConfirm}
       onCancle={onCancel}
       type={type}
-      width={400}
-      height={450}
+      // width={400}
+      // height={450}
     />
   );
 };
