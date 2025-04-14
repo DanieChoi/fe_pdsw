@@ -10,7 +10,7 @@ export const axiosInstance = axios.create({
 });
 
 export const axiosRedisInstance = axios.create({
-  baseURL: '/api/v1',
+  baseURL: '/api_upds/v1',
   withCredentials: true
 });
 
