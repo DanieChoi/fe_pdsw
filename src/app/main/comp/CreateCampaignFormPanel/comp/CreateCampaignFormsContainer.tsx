@@ -477,25 +477,25 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
   const handleCampaignSaveExecute = () => {
     console.log("tempCampaignInfo at save !!!!!!!!!!!!!", tempCampaignInfo);
     // Convert to MainDataResponse format using only tempCampaignInfo
-    const campaignDataToSend: MainDataResponse = {
-        ...tempCampaignInfo,
-        // 필요한 경우에만 tempCampaignManagerInfo의 특정 필드 사용
-        phone_dial_try: [
-          tempCampaignInfo.phone_dial_try1 ?? 0,
-          tempCampaignInfo.phone_dial_try2 ?? 0,
-          tempCampaignInfo.phone_dial_try3 ?? 0,
-          tempCampaignInfo.phone_dial_try4 ?? 0,
-          tempCampaignInfo.phone_dial_try5 ?? 0
-        ],
-        redial_strategy: [
-          tempCampaignInfo.redial_strategy1 ?? '',
-          tempCampaignInfo.redial_strategy2 ?? '',
-          tempCampaignInfo.redial_strategy3 ?? '',
-          tempCampaignInfo.redial_strategy4 ?? '',
-          tempCampaignInfo.redial_strategy5 ?? ''
-        ]
-      };
-    fetchCampaignManagerInsert(campaignDataToSend);
+    // const campaignDataToSend: MainDataResponse = {
+    //     ...tempCampaignInfo,
+    //     // 필요한 경우에만 tempCampaignManagerInfo의 특정 필드 사용
+    //     phone_dial_try: [
+    //       tempCampaignInfo.phone_dial_try1 ?? 0,
+    //       tempCampaignInfo.phone_dial_try2 ?? 0,
+    //       tempCampaignInfo.phone_dial_try3 ?? 0,
+    //       tempCampaignInfo.phone_dial_try4 ?? 0,
+    //       tempCampaignInfo.phone_dial_try5 ?? 0
+    //     ],
+    //     redial_strategy: [
+    //       tempCampaignInfo.redial_strategy1 ?? '',
+    //       tempCampaignInfo.redial_strategy2 ?? '',
+    //       tempCampaignInfo.redial_strategy3 ?? '',
+    //       tempCampaignInfo.redial_strategy4 ?? '',
+    //       tempCampaignInfo.redial_strategy5 ?? ''
+    //     ]
+    //   };
+    // fetchCampaignManagerInsert(campaignDataToSend);
   }
 
   //변경여부 체크
