@@ -77,8 +77,8 @@ export default function ClientProvider({ children }: { children: React.ReactNode
         pauseOnHover
       /> 
       <NotificationSetup />
-      <NotificationListener /> {/* 추가 */}
-      <AppNotificationSetup /> {/* 추가: 인앱 알림 컨테이너 */}
+      {/* <NotificationListener />  */}
+      {/* <AppNotificationSetup /> */}
 
       {/* React Query 개발자 도구 */}
       {/* <ReactQueryDevtools initialIsOpen={false} /> */}
