@@ -88,38 +88,10 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
   const [filteredCampaigns, setFilteredCampaigns] = useState<CampaignListDataResponse[]>([]);
   const [tempData, setTempData] = useState<Row[]>([]);
 
-  useEffect(() => {
-    if( campaigns && campaigns.length > 0 ){
-      setTempData([]);
-      campaigns.map((data, index) => {
-        setTempData((prev) => [
-          ...prev,
-          {
-            no: index + 1,
-            campaignId: data.campaign_id,
-            idName: '['+data.campaign_id+']'+data.campaign_name,
-            startDate: schedules.filter((schedule) => schedule.campaign_id === data.campaign_id)
-            .map((data) => data.start_date.length == 8? data.start_date.substring(0,4)+'-'+data.start_date.substring(4,6)+'-'+data.start_date.substring(6,8):'').join(','),
-            endDate: schedules.filter((schedule) => schedule.campaign_id === data.campaign_id)
-            .map((data) => data.end_date.length == 8? data.end_date.substring(0,4)+'-'+data.end_date.substring(4,6)+'-'+data.end_date.substring(6,8):'').join(','),
-            skill: campaignSkills.filter((skill) => skill.campaign_id === data.campaign_id)
-            .map((data) => data.skill_id)
-            .join(','),
-            dialMode: dialModeList.filter((dialMode) => dialMode.dial_id === data.dial_mode)
-                  .map((data) => data.dial_name).join(','),
-            callingNumber: callingNumbers.filter((callingNumber) => callingNumber.campaign_id === data.campaign_id)
-            .map((data) => data.calling_number).join(',')
-          }
-        ]);
-      });      
-    }else{
-      setTempData([]);
-    }
-  }, [campaigns,schedules,campaignSkills,dialModeList,callingNumbers]);
-
   // campaignListResponse를 처리하여 filteredCampaigns 업데이트
   useEffect(() => {
     let _filteredCampaigns = campaigns;
+    setFilteredCampaigns([]);
     if( typeof campaignHeaderSearchParam != 'undefined' ){
       // full view mode: search 파라미터 적용
       if (campaignHeaderSearchParam) {
@@ -184,48 +156,69 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
 
   // filteredCampaigns를 grid 데이터 형식(Row)로 변환
   useEffect(() => {
-    const newTempData: Row[] = filteredCampaigns.map((campaign, index) => ({
-      no: index + 1,
-      campaignId: campaign.campaign_id,
-      idName: `[${campaign.campaign_id}]${campaign.campaign_name}`,
-      startDate: schedules
-        .filter((schedule) => schedule.campaign_id === campaign.campaign_id)
-        .map((data) => data.start_date && data.start_date.length === 8 
-          ? `${data.start_date.substring(0,4)}-${data.start_date.substring(4,6)}-${data.start_date.substring(6,8)}`
-          : '')
-        .join(','),
-      endDate: schedules
-        .filter((schedule) => schedule.campaign_id === campaign.campaign_id)
-        .map((data) => data.end_date && data.end_date.length === 8 
-          ? `${data.end_date.substring(0,4)}-${data.end_date.substring(4,6)}-${data.end_date.substring(6,8)}`
-          : '')
-        .join(','),
-      skill: campaignSkills
-        .filter((skill) => skill.campaign_id === campaign.campaign_id)
-        .map((data) => data.skill_id)
-        .join(','),
-      dialMode: dialModeList
-        .filter((dialMode) => dialMode.dial_id === campaign.dial_mode)
-        .map((data) => data.dial_name)
-        .join(','),
-      callingNumber: callingNumbers
-        .filter((callingNumber) => callingNumber.campaign_id === campaign.campaign_id)
-        .map((data) => data.calling_number)
-        .join(',')
-    }));
+    if( filteredCampaigns.length > 0 ){        
+      const newTempData: Row[] = filteredCampaigns.map((campaign, index) => ({
+        no: index + 1,
+        campaignId: campaign.campaign_id,
+        idName: `[${campaign.campaign_id}]${campaign.campaign_name}`,
+        startDate: schedules
+          .filter((schedule) => schedule.campaign_id === campaign.campaign_id)
+          .map((data) => data.start_date && data.start_date.length === 8 
+            ? `${data.start_date.substring(0,4)}-${data.start_date.substring(4,6)}-${data.start_date.substring(6,8)}`
+            : '')
+          .join(','),
+        endDate: schedules
+          .filter((schedule) => schedule.campaign_id === campaign.campaign_id)
+          .map((data) => data.end_date && data.end_date.length === 8 
+            ? `${data.end_date.substring(0,4)}-${data.end_date.substring(4,6)}-${data.end_date.substring(6,8)}`
+            : '')
+          .join(','),
+        skill: campaignSkills
+          .filter((skill) => skill.campaign_id === campaign.campaign_id)
+          .map((data) => data.skill_id)
+          .join(','),
+        dialMode: dialModeList
+          .filter((dialMode) => dialMode.dial_id === campaign.dial_mode)
+          .map((data) => data.dial_name)
+          .join(','),
+        callingNumber: callingNumbers
+          .filter((callingNumber) => callingNumber.campaign_id === campaign.campaign_id)
+          .map((data) => data.calling_number)
+          .join(',')
+      }));
+      setTempData(newTempData);
+    }else{
+      setTempData([]);
+      setSelectedCampaign(null);
+      setSelectedCampaignRow(null);
+    }
 
-    setTempData(newTempData);
   }, [filteredCampaigns, schedules, campaignSkills, callingNumbers]);
 
   // 자동 선택: 목록에 행이 있고 선택된 행이 없으면 첫 번째 행을 선택
   useEffect(() => {
     if (tempData.length > 0 && campaignId != ''){
       const selectedCampaign = campaigns.find(c => c.campaign_id === Number(campaignId));
+      const filterCampaign = filteredCampaigns.find(c => c.campaign_id === Number(campaignId));
       const index = tempData.findIndex(d => d.campaignId === Number(campaignId));
 
-      if (selectedCampaign && index !== -1) {
-        setSelectedCampaign(selectedCampaign);
+      if (selectedCampaign && index !== -1 && typeof filterCampaign !== 'undefined' ) {
+        setSelectedCampaign(selectedCampaign ?? null);
         setSelectedCampaignRow(tempData[index]);
+      }else{        
+        // const selectedCampaign = campaigns.find(c => c.campaign_id === tempData[0].campaignId);
+        // setSelectedCampaign(selectedCampaign ?? null);
+        // setSelectedCampaignRow(tempData[0]);
+        // if (onRowClick) {
+        //   onRowClick(tempData[0].campaignId.toString());
+        // }
+      }
+    }else if (tempData.length > 0){
+      const selectedCampaign = campaigns.find(c => c.campaign_id === tempData[0].campaignId);
+      setSelectedCampaign(selectedCampaign ?? null);
+      setSelectedCampaignRow(tempData[0]);
+      if (onRowClick) {
+        onRowClick(tempData[0].campaignId.toString());
       }
     }
     

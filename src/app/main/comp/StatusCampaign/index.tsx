@@ -159,7 +159,7 @@ const StatusCampaign: React.FC = () => {
     currentSkill: string, 
     dispatchType: string
   ) => {
-    let filteredCampaigns = campaignSkillsData.sort((a, b) => b.campaign_id - a.campaign_id);
+    let filteredCampaigns = campaignSkillsData.sort((a, b) => a.campaign_id - b.campaign_id);
     
     // 스킬 필터링
     if (currentSkill !== 'total') {
@@ -167,7 +167,7 @@ const StatusCampaign: React.FC = () => {
         campaign.skill_id?.includes(Number(currentSkill))
       );
     } else {
-      filteredCampaigns = campaigns.sort((a, b) => b.campaign_id - a.campaign_id);
+      filteredCampaigns = campaigns.sort((a, b) => a.campaign_id - b.campaign_id);
     }
 
     // 각 캠페인에 대해 발신 단계 데이터 생성
