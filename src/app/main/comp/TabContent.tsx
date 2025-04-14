@@ -10,9 +10,8 @@ import StatusCampaign from "./StatusCampaign";
 import ChannelMonitor from "./ChannelMonitor";
 import ListManager from "./ListManager";
 import OperationBoard from "./operation";
-import CampaignUpdatePanel from "./CampaignUpdatePanel";
+import NewCampaignManager from "./NewCampaignManager";
 import CampaignGroupManager from "./CampaignGroupManager";
-import CreateCampaignFormPanel from "./CreateCampaignFormPanel";
 import RebroadcastSettingsPanel from "./RebroadcastSettingsPanel";
 import RebroadcastSettingsGroupPanel from "./RebroadcastSettingsGroupPanel";
 import CampaignManager from "./CampaignManager";
@@ -63,7 +62,7 @@ const renderContent = (tabId: number | null, campaignId?: string, campaignName?:
       return <PreferencesBoard />;
     case 13:
       // 새 캠페인 입력용 패널
-      return <CreateCampaignFormPanel tenantId={params?.tenantId} />;
+      return <NewCampaignManager tenantId={params?.tenantId} />;
     case 14:
       return <StatusCampaign />;
     case 20:
