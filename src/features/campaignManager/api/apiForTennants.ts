@@ -50,14 +50,17 @@ import { TenantApiError, TenantListResponse, TenantRequestData } from "@/feature
 import { axiosInstance } from "@/lib/axios";
 import { toast } from "react-toastify";
 
+
 export const apiForGetTenantList = async (tenant_id?: number): Promise<TenantListResponse> => {
   const tenantRequestData: TenantRequestData = {
-    filter: {      
-      tenant_id: {
-        start: tenant_id || 0,
-        end: tenant_id || 9999,
+    ...(tenant_id !== undefined && {
+      filter: {
+        tenant_id: {
+          start: tenant_id,
+          end: tenant_id,
+        },
       },
-    },
+    }),
     sort: {
       tenant_id: 0,
     },
@@ -69,33 +72,24 @@ export const apiForGetTenantList = async (tenant_id?: number): Promise<TenantLis
 
   try {
     const { data } = await axiosInstance.post<TenantListResponse>(
-      '/collections/tenant', 
+      '/collections/tenant',
       tenantRequestData
     );
 
-    // 응답 데이터가 예상한 형식과 일치하는지 검증
     if (data.result_code === 0 && data.result_msg === "Success") {
       return data;
     } else {
-      console.log("여기서 세션 에러 발생 ??? : ", data)
       throw new Error(`API Error: ${data.result_msg}`);
     }
   } catch (error: any) {
-    console.log("error :!@#$!2!@#$!@#41@#$!@#$!@#$!@#$!@#$!@#$!@#$!@@#$!@#$!@#$ ", error);
-    
-    // toast.error("API Error: " + error)
-
-    if (error.response.data.result_code === 5) {
-      // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
+    if (error.response?.data?.result_code === 5) {
       customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
         window.location.href = '/login';
       });
     }
 
-    const typedError = error as TenantApiError;
-
-    // tofix for hyunsok 여기서 session invalid 에러 발생
     throw error;
-
   }
 };
+
+

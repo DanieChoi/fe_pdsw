@@ -2,7 +2,7 @@
 
 // Request 데이터 타입
 export interface TenantRequestData {
-    filter: {
+    filter?: {
       tenant_id: {
         start: number;
         end: number;
