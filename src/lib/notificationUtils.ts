@@ -52,7 +52,7 @@ interface ExtendedNotificationOptions extends NotificationOptions {
   
       // 우선순위에 따른 아이콘 결정
       let iconPath = "/task-icon.png";
-      let badgePath = "/badge-icon.png";
+      const badgePath = "/badge-icon.png";
       
       if (options.priority === "high") {
         iconPath = "/task-icon-high.png";
