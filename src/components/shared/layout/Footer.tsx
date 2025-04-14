@@ -438,8 +438,13 @@ export default function Footer({
         }
       });
     }
+<<<<<<< HEAD
   }, [id, tenant_id, role_id]);
 
+=======
+  }, [id, tenant_id]);
+  
+>>>>>>> ec3a07bd2d41380cedb707cfa59eef51718b88e2
 
   // 높이 변경 핸들러
   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
