@@ -52,11 +52,10 @@ import { toast } from "react-toastify";
 
 export const apiForGetTenantList = async (tenant_id?: number): Promise<TenantListResponse> => {
   const tenantRequestData: TenantRequestData = {
-    filter: {      
-      tenant_id: {
-        start: tenant_id || 0,
-        end: tenant_id || 9999,
-      },
+    filter: {
+      tenant_id: tenant_id !== undefined
+        ? { start: tenant_id, end: tenant_id }
+        : { start: 0, end: 9999 },
     },
     sort: {
       tenant_id: 0,
@@ -83,10 +82,7 @@ export const apiForGetTenantList = async (tenant_id?: number): Promise<TenantLis
   } catch (error: any) {
     console.log("error :!@#$!2!@#$!@#41@#$!@#$!@#$!@#$!@#$!@#$!@#$!@@#$!@#$!@#$ ", error);
     
-    // toast.error("API Error: " + error)
-
-    if (error.response.data.result_code === 5) {
-      // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
+    if (error.response?.data?.result_code === 5) {
       customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
         window.location.href = '/login';
       });
@@ -94,8 +90,7 @@ export const apiForGetTenantList = async (tenant_id?: number): Promise<TenantLis
 
     const typedError = error as TenantApiError;
 
-    // tofix for hyunsok 여기서 session invalid 에러 발생
     throw error;
-
   }
 };
+
