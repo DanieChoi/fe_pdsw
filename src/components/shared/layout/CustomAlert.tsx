@@ -21,12 +21,7 @@ const CustomAlert = ({
     isOpen = true,
     onClose,
     onCancle,
-<<<<<<< HEAD
-    width = 400,
-    height = 300,
-=======
     width = 'max-w-sm',
->>>>>>> ada24b0ad8d18ca11c894b866057bf8b94931c91
     showButtons = true,
     confirmDisabled = false
 }: CustomAlertRequest) => {
