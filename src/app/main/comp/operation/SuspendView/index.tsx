@@ -223,7 +223,7 @@ const SuspendView = () => {
       fetchSuspendedSkillList();
       
       if (!isSkillDataLoaded) {
-        fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
+        fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) ? [] : undefined });
       }
     }
   }, [viewMode]);
