@@ -493,7 +493,7 @@ export default function Footer({
         eventSource.close();
       };
     }
-  }, [id, tenant_id, footerDataSet]);
+  }, [id, tenant_id]);
   
 
   // 높이 변경 핸들러
