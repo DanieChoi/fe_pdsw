@@ -53,14 +53,14 @@ import { toast } from "react-toastify";
 
 export const apiForGetTenantList = async (tenant_id?: number): Promise<TenantListResponse> => {
   const tenantRequestData: TenantRequestData = {
-    ...(tenant_id !== undefined && {
+    ...(tenant_id !== undefined && tenant_id !== 0 ? {
       filter: {
         tenant_id: {
           start: tenant_id,
           end: tenant_id,
         },
       },
-    }),
+    } : {}),
     sort: {
       tenant_id: 0,
     },
