@@ -1,5 +1,6 @@
 "use client";
 
+import { NotificationSetup } from "@/app/_components/NotificationSetup";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ToastContainer } from "react-toastify";
@@ -29,7 +30,8 @@ export default function ClientProvider({ children }: { children: React.ReactNode
         pauseOnFocusLoss
         draggable
         pauseOnHover
-      />
+      /> 
+      <NotificationSetup />
 
       {/* React Query 개발자 도구 */}
       {/* <ReactQueryDevtools initialIsOpen={false} /> */}
