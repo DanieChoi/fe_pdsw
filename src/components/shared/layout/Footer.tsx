@@ -351,13 +351,8 @@ export default function Footer({
         }
 
         // 푸터 로그 메시지
-<<<<<<< HEAD
-        _message = '캠페인 동작상태 변경, 캠페인 아이디 : ' + data['campaign_id'] + ', 동작상태: ' + _start_flag + ', 완료구분: 진행중';
-
-=======
         _message = '캠페인 동작상태 변경, 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: 진행중';
         
->>>>>>> a57b7d72c941fae7a55a64a9942b8fd22561452e
         // 토스트 알림 표시 (한번만 표시)
         if (useAlramPopup === 1) {
           toast.event(`[EVENT] [${campaign_id}] 캠페인 상태 변경`, {
@@ -458,41 +453,12 @@ export default function Footer({
       let announce = "";
       let command = "";
       let kind = "";
-<<<<<<< HEAD
-  
-      const messageHandler = (event: MessageEvent) => {
-=======
       let campaign_id = "";
 
-      eventSource.addEventListener('message', (event) => {
->>>>>>> a57b7d72c941fae7a55a64a9942b8fd22561452e
+      const messageHandler = (event: MessageEvent) => {
         console.log("footer sse event = ", event.data);
   
         if (event.data !== "Connected!!") {
-<<<<<<< HEAD
-          try {
-            const tempEventData = JSON.parse(event.data);
-            if (
-              announce !== tempEventData["announce"] ||
-              !isEqual(data, tempEventData.data) ||
-              kind !== tempEventData["kind"]
-            ) {
-              announce = tempEventData["announce"];
-              command = tempEventData["command"];
-              data = tempEventData["data"];
-              kind = tempEventData["kind"];
-  
-              footerDataSet(
-                tempEventData["announce"],
-                tempEventData["command"],
-                tempEventData["data"],
-                tempEventData["kind"],
-                tempEventData
-              );
-            }
-          } catch (e) {
-            console.error("❌ SSE message parsing error:", e);
-=======
           const tempEventData = JSON.parse(event.data);
           if (
             announce !== tempEventData["announce"] ||
@@ -515,7 +481,6 @@ export default function Footer({
               tempEventData["campaign_id"],
               tempEventData
             );
->>>>>>> a57b7d72c941fae7a55a64a9942b8fd22561452e
           }
         }
       };
