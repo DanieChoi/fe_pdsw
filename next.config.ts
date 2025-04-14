@@ -5,7 +5,7 @@ import packageJson from './package.json';
 
 const nextConfig: NextConfig = {
   reactStrictMode: false,
-  distDir: '.next_upds',
+  // distDir: '.next_upds',
   images: {
     domains: ['localhost', '10.10.40.145'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
