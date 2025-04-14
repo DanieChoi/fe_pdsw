@@ -246,7 +246,7 @@ export interface MaxCallInitTimeUpdateResponse {
 }
 
 export interface SkillListCredentials {
-  tenant_id_array: number[];
+  tenant_id_array: number[] | undefined;
 }
 
 export interface SkillListResponse {
