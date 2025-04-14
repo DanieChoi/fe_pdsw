@@ -39,7 +39,9 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   const router = useRouter();
   const [headerInit, setHeaderInit] = useState<boolean>(false);
 
-  const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions } = useCampainManagerStore();
+  const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions
+    ,schedules,campaignSkills,callingNumbers
+   } = useCampainManagerStore();
 
   const [campaignHeaderSearchParam, setCampaignHeaderSearchParam] = useState<CampaignHeaderSearch>();
   const handleCampaignHeaderSearch = (param: CampaignHeaderSearch) => {
@@ -130,6 +132,8 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     setHeaderInit(false);
   };
 
+  // 캠페인 리스트
+  
   return (
     <div className='compaign-wrap stable-scrollbar' style={{
       overflowY: 'scroll',

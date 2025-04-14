@@ -477,6 +477,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           tenant_id: selectedCampaign.tenant_id
         });
       }
+    }else{
+
     }
   // campaignId 추가하여 masterCampaignId 변경 시에도 재설정되도록 함
   }, [campaignId, selectedCampaign, campaignSkills, callingNumbers, schedules]);
@@ -1627,7 +1629,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
               type="number"
               value={campaignId}
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}
-              disabled={selectedCampaign !== null}
+              disabled={true}
             />
           </div>
           <div className='flex items-center gap-2'>
