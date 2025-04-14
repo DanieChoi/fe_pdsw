@@ -1,41 +1,11 @@
-// // C:\nproject\fe_pdsw\public\sw.js
-// self.addEventListener("install", (event) => {
-//     console.log("[Service Worker] 설치됨");
-//     // 즉시 활성화
-//     self.skipWaiting();
-//   });
-  
-//   self.addEventListener("activate", (event) => {
-//     console.log("[Service Worker] 활성화됨");
-//     // 활성화 즉시 모든 클라이언트 제어
-//     event.waitUntil(clients.claim());
-//   });
-  
-//   self.addEventListener("push", function (event) {
-//     const data = event.data?.json() ?? {};
-  
-//     console.log("[Service Worker] Push Event Received:", data);
-  
-//     event.waitUntil(
-//       self.registration.showNotification(data.title || "알림", {
-//         body: data.body || "새로운 알림이 있습니다.",
-//         icon: "/icon.png",
-//         tag: data.tag ?? "campaign-event",
-//         renotify: true,
-//       })
-//     );
-//   });
-
 // C:\nproject\fe_pdsw\public\sw.js
 self.addEventListener("install", (event) => {
     console.log("[Service Worker] 설치됨");
-    // 즉시 활성화
     self.skipWaiting();
   });
   
   self.addEventListener("activate", (event) => {
     console.log("[Service Worker] 활성화됨");
-    // 활성화 즉시 모든 클라이언트 제어
     event.waitUntil(clients.claim());
   });
   
@@ -46,24 +16,66 @@ self.addEventListener("install", (event) => {
   
   // 알림 클릭 이벤트 처리
   self.addEventListener("notificationclick", (event) => {
-    console.log("[Service Worker] 알림이 클릭됨:", event.notification.tag);
+    const notification = event.notification;
+    const action = event.action;
+    const data = notification.data || {};
+    
+    console.log("[Service Worker] 알림이 클릭됨:", notification.tag, "액션:", action);
     
     // 알림 닫기
-    event.notification.close();
+    notification.close();
     
-    // 필요한 경우 클라이언트 창 포커스
-    event.waitUntil(
-      clients.matchAll({type: 'window'}).then(clientList => {
-        if (clientList.length > 0) {
-          return clientList[0].focus();
+    // 액션 기반 처리
+    if (action === "view") {
+      // 태스크 상세 페이지로 이동 (taskId가 있는 경우)
+      const taskUrl = data.taskId ? `/tasks/${data.taskId}` : '/tasks';
+      
+      // 클라이언트 창 포커스
+      event.waitUntil(
+        clients.matchAll({type: 'window'}).then(clientList => {
+          // 열린 창이 있으면 포커스
+          for (const client of clientList) {
+            if ("focus" in client) {
+              return client.focus().then(focusedClient => {
+                if (taskUrl && focusedClient.url !== taskUrl) {
+                  return focusedClient.navigate(taskUrl);
+                }
+                return focusedClient;
+              });
+            }
+          }
+          // 열린 창이 없으면 새 창 열기
+          return clients.openWindow(taskUrl);
+        })
+      );
+    } else if (action === "dismiss") {
+      // 나중에 다시 알림 (15분 후)
+      console.log("[Service Worker] 알림 나중에 다시 표시:", notification.title);
+      
+      // 자체 타이머는 서비스 워커 생명주기에 의존적이므로 대신 postMessage 사용
+      self.registration.active.postMessage({
+        type: "REMIND_LATER",
+        notification: {
+          title: notification.title,
+          body: notification.body,
+          data: data,
+          tag: `${notification.tag}-remind`
         }
-        return clients.openWindow('/');
-      })
-    );
+      });
+    } else {
+      // 기본 클릭 동작 (액션 버튼을 클릭하지 않은 경우)
+      event.waitUntil(
+        clients.matchAll({type: 'window'}).then(clientList => {
+          if (clientList.length > 0) {
+            return clientList[0].focus();
+          }
+          return clients.openWindow('/');
+        })
+      );
+    }
   });
   
   self.addEventListener("push", function (event) {
-    // 데이터 파싱 시도 (실패하면 기본값 사용)
     let data = {};
     try {
       data = event.data ? event.data.json() : {};
@@ -73,25 +85,61 @@ self.addEventListener("install", (event) => {
     }
   
     console.log("[Service Worker] Push Event Received:", data);
-  
-    // 타임스탬프가 없으면 현재 시간 추가
+    
     if (!data.timestamp) {
       data.timestamp = Date.now();
     }
-  
-    // 태그가 없으면 고유한 태그 생성
+    
     const tag = data.tag ? `${data.tag}-${data.timestamp}` : `notification-${Date.now()}`;
+    
+    // 우선순위에 따른 아이콘 결정
+    let iconPath = "/task-icon.png";
+    if (data.priority === "high") {
+      iconPath = "/task-icon-high.png";
+    } else if (data.priority === "low") {
+      iconPath = "/task-icon-low.png";
+    }
   
+    // 액션 설정
+    const actions = [
+      { action: "view", title: "확인" },
+      { action: "dismiss", title: "나중에" }
+    ];
+    
     event.waitUntil(
-      self.registration.showNotification(data.title || "알림", {
-        body: data.body || "새로운 알림이 있습니다.",
-        icon: "/icon.png",
+      self.registration.showNotification(data.title || "업무 알림", {
+        body: data.body || "새로운 업무가 할당되었습니다.",
+        icon: iconPath,
+        badge: "/badge-icon.png",
         tag: tag,
-        renotify: true,
+        actions: actions,
+        requireInteraction: false,
+        silent: data.silent || false,
+        timestamp: data.timestamp,
         data: {
           ...data,
           timestamp: data.timestamp || Date.now()
         }
       })
     );
+  });
+  
+  // 메시지 수신 처리 (나중에 알림 다시 표시용)
+  self.addEventListener("message", (event) => {
+    console.log("[Service Worker] 메시지 수신:", event.data);
+    
+    if (event.data && event.data.type === "REMIND_LATER") {
+      const notificationData = event.data.notification;
+      
+      // 클라이언트에게 나중에 알림을 표시하라고 메시지 보내기
+      clients.matchAll().then(clients => {
+        clients.forEach(client => {
+          client.postMessage({
+            type: "SCHEDULE_NOTIFICATION",
+            notification: notificationData,
+            delay: 15 * 60 * 1000 // 15분
+          });
+        });
+      });
+    }
   });
