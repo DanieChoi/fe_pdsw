@@ -49,7 +49,7 @@ jobs:
           username: ${{ secrets.PDSW_USER }}
           password: ${{ secrets.PDSW_PASSWORD }}
           port: ${{ secrets.PDSW_PORT }}
-          source: "./.next/*, ./public/*"
+          source: "./.next_upds/*, ./public/*"
           target: "/home/nexus/fe_pdsw"
 
       - name: SSH로 서버(PDSW)에 접속후 서버 재시작
@@ -64,6 +64,6 @@ jobs:
             cd /home/nexus/fe_pdsw
             npm -v
             npm install
-            # pm2 delete fe_pdsw
-            pm2 start fe_pdsw.config.js
-            # pm2 start "npx next start" --name fe_pdsw
+            pm2 delete fe_pdsw
+            # pm2 start fe_pdsw.config.js
+            pm2 start "npx next start" --name fe_pdsw
