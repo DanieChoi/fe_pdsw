@@ -703,7 +703,7 @@ export default function Footer({
     }
   };
 
-  const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, tempEventData: any): void => {
+  const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string,campaign_id: string, tempEventData: any): void => {
     //시간.
     const today = new Date();
     const _time = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0') + ':' + String(today.getSeconds()).padStart(2, '0');
@@ -743,11 +743,11 @@ export default function Footer({
     if (announce === '/pds/campaign/calling-number') {
       _message = '캠페인 : ';
       if (command === 'INSERT') {
-        _message += '[' + data['campaign_id'] + '], 사용자 발신번호 설정 추가 성공';
+        _message += '[' + campaign_id + '], 사용자 발신번호 설정 추가 성공';
       } else if (command === 'DELETE') {
-        _message += '[' + data['campaign_id'] + '], 사용자 발신번호 설정 삭제 성공';
+        _message += '[' + campaign_id + '], 사용자 발신번호 설정 삭제 성공';
       } else if (command === 'UPDATE') {
-        _message += '[' + data['campaign_id'] + '], 사용자 발신번호 설정 변경 성공';
+        _message += '[' + campaign_id + '], 사용자 발신번호 설정 변경 성공';
       }
       addMessageToFooterList(_time, _type, _message);
     }
@@ -781,11 +781,11 @@ export default function Footer({
     else if (announce === '/pds/campaign/dial-speed') {
       _message = '[콜페이싱] ';
       if (command === 'UPDATE') {
-        const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === data['campaign_id']);
+        const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === Number(campaign_id));
         if (tempCampaign && tempCampaign.dial_mode === 2) {
-          _message += '캠페인 아이디 ' + data['campaign_id'] + ' , 현재 설정값 ' + data['dial_speed'] * 2;
+          _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'] * 2;
         } else {
-          _message += '캠페인 아이디 ' + data['campaign_id'] + ' , 현재 설정값 ' + data['dial_speed'] * 2;
+          _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'] * 2;
         }
         addMessageToFooterList(_time, _type, _message);
       }
@@ -809,8 +809,8 @@ export default function Footer({
       }
 
       if (command === 'INSERT') {
-        _message += '추가, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
-        _message2 = `[EVENT] [${data['campaign_id']}] 캠페인 추가`;
+        _message += '추가, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
+        _message2 = `[EVENT] [${campaign_id}] 캠페인 추가`;
 
         // 캠페인 추가 시 토스트 메시지
         if (useAlramPopup === 1) {
@@ -820,8 +820,8 @@ export default function Footer({
         }
         addMessageToFooterList(_time, _type, _message);
       } else if (command === 'UPDATE') {
-        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
-        _message2 = `[EVENT] [${data['campaign_id']}] 캠페인 수정`;
+        _message += '수정, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
+        _message2 = `[EVENT] [${campaign_id}] 캠페인 수정`;
 
         // 캠페인 수정 시 토스트 메시지
         if (useAlramPopup === 1) {
@@ -831,8 +831,8 @@ export default function Footer({
         }
         addMessageToFooterList(_time, _type, _message);
       } else if (command === 'DELETE') {
-        _message += '삭제, 캠페인 아이디 : ' + data['campaign_id'];
-        _message2 = `[EVENT] [${data['campaign_id']}] 캠페인 삭제`;
+        _message += '삭제, 캠페인 아이디 : ' + campaign_id;
+        _message2 = `[EVENT] [${campaign_id}] 캠페인 삭제`;
 
         // 캠페인 삭제 시 토스트 메시지
         if (useAlramPopup === 1) {
@@ -849,11 +849,11 @@ export default function Footer({
       });
       
       if (data['start_flag'] === 3) {
-        const statusMessage = '캠페인 동작상태 변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
+        const statusMessage = '캠페인 동작상태 변경, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
 
         // 알림 설정이 활성화되어 있으면 토스트 표시
         if (useAlramPopup === 1) {
-          toast.event(`[EVENT] [${data['campaign_id']}] 캠페인 상태 변경`, {
+          toast.event(`[EVENT] [${campaign_id}] 캠페인 상태 변경`, {
             duration: 6000,
           });
         }
@@ -900,7 +900,7 @@ export default function Footer({
     //캠페인 요구스킬 수정
     else if (announce === '/pds/campaign/skill') {
       if (command === 'UPDATE') {
-        _message = '캠페인 요구스킬 수정, 캠페인 아이디 : ' + data['campaign_id'];
+        _message = '캠페인 요구스킬 수정, 캠페인 아이디 : ' + campaign_id;
         addMessageToFooterList(_time, _type, _message);
       }
     }
@@ -918,15 +918,15 @@ export default function Footer({
     else if (announce === '/pds/campaign/schedule') {
       _message = '캠페인 스케쥴';
       if (command === 'INSERT') {
-        _message += '수정, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'];
+        _message += '수정, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
         addMessageToFooterList(_time, _type, _message);
       } 
       else if (command === 'UPDATE') {
-        _message += '변경, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'];
+        _message += '변경, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
         addMessageToFooterList(_time, _type, _message);
       }
       else if (command === 'DELETE') {
-        _message += '삭제, 캠페인 아이디 : ' + data['campaign_id'] + ' , 캠페인 이름 : ' + data['campaign_name'];
+        _message += '삭제, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
         addMessageToFooterList(_time, _type, _message);
       }
     }
@@ -943,11 +943,11 @@ export default function Footer({
         }
 
         // 푸터 로그 메시지
-        _message = '캠페인 동작상태 변경, 캠페인 아이디 : ' + data['campaign_id'] + ', 동작상태: ' + _start_flag + ', 완료구분: 진행중';
+        _message = '캠페인 동작상태 변경, 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: 진행중';
         
         // 토스트 알림 표시 (한번만 표시)
         if (useAlramPopup === 1) {
-          toast.event(`[EVENT] [${data['campaign_id']}] 캠페인 상태 변경`, {
+          toast.event(`[EVENT] [${campaign_id}] 캠페인 상태 변경`, {
             duration: 6000,
           });
         }
@@ -969,8 +969,8 @@ export default function Footer({
         } else if (data['list_flag'] === 'L') {
           list_flag = '초기화';
         }
-        _message = '발신리스트등록, 캠페인 아이디 : ' + data['campaign_id'] + ' , 리스트구분 : ' + list_flag;
-        _message2 = `[EVENT] [${data['campaign_id']}] 발신리스트 ${list_flag} 등록`;
+        _message = '발신리스트등록, 캠페인 아이디 : ' + campaign_id + ' , 리스트구분 : ' + list_flag;
+        _message2 = `[EVENT] [${campaign_id}] 발신리스트 ${list_flag} 등록`;
 
         // 토스트 알림 표시
         if (useAlramPopup === 1) {
@@ -998,6 +998,7 @@ export default function Footer({
       let announce = "";
       let command = "";
       let kind = "";
+      let campaign_id = "";
 
       eventSource.addEventListener('message', (event) => {
         console.log("footer sse event = ", event.data);
@@ -1008,18 +1009,21 @@ export default function Footer({
             announce !== tempEventData["announce"] ||
             !isEqual(data, tempEventData.data) ||
             !isEqual(data, tempEventData["data"]) ||
-            kind !== tempEventData["kind"]
+            kind !== tempEventData["kind"] ||
+            campaign_id !== tempEventData["campaign_id"]
           ) {
             announce = tempEventData["announce"];
             command = tempEventData["command"];
             data = tempEventData["data"];
             kind = tempEventData["kind"];
+            campaign_id = tempEventData["campaign_id"];
 
             footerDataSet(
               tempEventData["announce"],
               tempEventData["command"],
               tempEventData["data"],
               tempEventData["kind"],
+              tempEventData["campaign_id"],
               tempEventData
             );
           }
