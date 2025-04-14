@@ -185,8 +185,8 @@ const SkillListPopupForNewCampaign = ({
       onClose={handleConfirm}
       onCancle={onCancle}
       type={type}
-      width={420}
-      height={400}
+      // width={420}
+      // height={400}
     />
   );
 };
