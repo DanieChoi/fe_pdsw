@@ -907,6 +907,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         {
           ...tempCampaignManagerInfo
           , update_user: user_id
+          , update_ip: Cookies.get('userHost')+''
         }
       );
 
@@ -920,12 +921,14 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           fetchCampaignManagerUpdate({
             ...tempCampaignManagerInfo
             , update_user: user_id
+            , update_ip: Cookies.get('userHost')+''
           });
         } else {
           fetchCampaignManagerUpdate({
-            ...tempCampaignManagerInfo,
-            update_user: user_id,
-            dial_speed: 0
+            ...tempCampaignManagerInfo
+            , update_user: user_id
+            , update_ip: Cookies.get('userHost')+''
+            , dial_speed: 0
           });
         }
         if (campaignSkillChangeYn) {
