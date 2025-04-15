@@ -22,11 +22,11 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api_upds/v1/:path*',
-        destination: 'http://10.10.30.228:4000/api_upds/v1/:path*'
+        destination: '${process.env.NEXT_PUBLIC_API_URL}/api_upds/v1/:path*'
       },
       {
         source: '/pds/:path*',
-        destination: 'http://10.10.40.145:8010/pds/:path*'
+        destination: '${process.env.NEXT_PUBLIC_RESTAPI_URL}/pds/:path*'
       }
     ]
   }
