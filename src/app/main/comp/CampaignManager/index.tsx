@@ -14,6 +14,7 @@ import { useMainStore, useCampainManagerStore, useTabStore, useAuthStore } from 
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
+import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 
 const errorMessage = {
   isOpen: false,
@@ -31,9 +32,9 @@ type Props = {
 };
 
 const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) => {
-  const { tenants, campaigns, selectedCampaign, setSelectedCampaign } = useMainStore();
+  const { tenants, campaigns, selectedCampaign, setSelectedCampaign, setCampaigns } = useMainStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
-  const { session_key } = useAuthStore();
+  const { session_key, tenant_id } = useAuthStore();
   const [masterCampaignId, setMasterCampaignId] = useState<string>('');
   const [alertState, setAlertState] = useState(errorMessage);
   const router = useRouter();
@@ -132,7 +133,21 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     setHeaderInit(false);
   };
 
-  // 캠페인 리스트
+  const handleDetailInit = (campaign_id:number) => {
+    console.log('campaign_id:: '+campaign_id);
+    setMasterCampaignId(campaign_id+'');
+    fetchMain({
+      session_key: session_key,
+      tenant_id: tenant_id,
+    });
+  };
+
+  // 캠페인 정보 조회 API 호출
+  const { mutate: fetchMain } = useApiForMain({
+    onSuccess: (data) => {
+      setCampaigns(data.result_data);
+    }
+  });
   
   return (
     <div className='compaign-wrap stable-scrollbar' style={{
@@ -155,6 +170,7 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
             campaignId={masterCampaignId}
             isOpen={isOpen}
             onCampaignPopupClose={onCampaignPopupClose}
+            setInit={handleDetailInit}
           />
         </div>
       </div>
