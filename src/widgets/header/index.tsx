@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useTabStore } from '@/store/tabStore'
 import Cookies from 'js-cookie'
 import { MenuItem, menuItems } from '@/widgets/header/model/menuItems'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useAuthStore, useMainStore } from '@/store';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
@@ -42,6 +42,9 @@ export default function Header() {
     setError
   } = useAvailableMenuStore();
 
+
+  const popupRef = useRef<Window | null>(null);
+
   const openInNewWindow = () => {
     // 현재 화면의 크기를 가져옵니다
     const width = window.screen.width;
@@ -59,6 +62,8 @@ export default function Header() {
 
     if (newWindow) {
       newWindow.focus();
+      // popup 창이 열려있다면 useRef에 연결 (로그아웃시 팝업창 닫히게 하기 위함)
+      popupRef.current = newWindow;
     }
   };
   const {
@@ -140,6 +145,11 @@ export default function Header() {
 
     // AuthStore의 상태를 초기화
     useAuthStore.getState().clearAuth();
+
+    // 통합모니터창이 열려있다면 popup close
+    if (popupRef.current && !popupRef.current.closed) {
+      popupRef.current.close();
+    }
 
     // 홈 또는 로그인 페이지로 리다이렉트
     router.push('/login');
