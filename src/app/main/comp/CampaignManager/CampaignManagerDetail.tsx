@@ -903,9 +903,6 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     setChangeYn(false);
     if (campaignInfoChangeYn) {
-      // tofix
-      console.log("userId check at 캠페인 수정 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! : ", user_id);
-      
       fetchCampaignManagerUpdate(
         {
           ...tempCampaignManagerInfo
@@ -949,7 +946,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           }
         }
         if (callingNumberChangeYn) {
-          const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === campaignId)
+          const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignManagerInfo.campaign_id)
             .map((data) => data.calling_number)
             .join(',');
           if (tempCallingNumberInfo.calling_number !== '' && tempCallNumber === '') {
@@ -990,7 +987,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         }
       }
       if (callingNumberChangeYn) {
-        const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === campaignId)
+        const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignManagerInfo.campaign_id)
           .map((data) => data.calling_number)
           .join(',');
         if (tempCallingNumberInfo.calling_number !== '' && tempCallNumber === '') {
