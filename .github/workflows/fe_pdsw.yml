@@ -65,5 +65,5 @@ jobs:
             npm -v
             npm install
             pm2 delete fe_pdsw
-            # pm2 start fe_pdsw.config.js
-            pm2 start "npx next start" --name fe_pdsw
+            pm2 start fe_pdsw.config.js env-production
+            #pm2 start "npx next start" --name fe_pdsw
