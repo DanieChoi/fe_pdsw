@@ -20,7 +20,7 @@ export const useAuthStore = create<AuthStore>()(
       (set) => ({
         // Initial state
         id: "",
-        tenant_id: 0,
+        tenant_id: -1,
         session_key: "",
         role_id: 0,
         menu_role_id: 0,

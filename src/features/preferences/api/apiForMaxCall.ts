@@ -38,20 +38,31 @@ export const fetchMaxCallList = async (credentials: MaxCallListCredentials): Pro
 // 신규 등록 API (POST)
 export const createMaxCall = async (credentials: CreateMaxCallRequest): Promise<CreateMaxCallResponse> => {
     const requestData = {
-        request_data: [
+        request_data: Array.isArray(credentials)
+        ? credentials.map((item) => ({
+            agent_id: item.agent_id,
+            max_call: item.max_call,
+            fix_flag: item.fix_flag
+        }))
+        : [
             {
-                agent_id: credentials.agent_id,
-                max_call: credentials.max_call,
-                fix_flag: credentials.fix_flag
+            agent_id: credentials.agent_id,
+            max_call: credentials.max_call,
+            fix_flag: credentials.fix_flag
             }
         ]
     };
 
     try {
+        const campaignId = Array.isArray(credentials)
+            ? credentials[0].campaign_id
+            : credentials.campaign_id;
+
         const { data } = await axiosInstance.post<CreateMaxCallResponse>(
-            '/campaigns/'+credentials.campaign_id+'/maxcall-ext',
+            `/campaigns/${campaignId}/maxcall-ext`,
             requestData
         );
+
         return data;
     } catch (error: any) {
         if (error.response?.status === 401) {
@@ -64,20 +75,35 @@ export const createMaxCall = async (credentials: CreateMaxCallRequest): Promise<
 // 수정 API (PUT)
 export const updateMaxCall = async (credentials: CreateMaxCallRequest): Promise<CreateMaxCallResponse> => {
     const requestData = {
-        request_data: [
+        request_data: Array.isArray(credentials)
+        ? credentials.map((item) => ({
+            agent_id: item.agent_id,
+            max_call: item.max_call,
+            fix_flag: item.fix_flag
+        }))
+        : [
             {
-                agent_id: credentials.agent_id,
-                max_call: credentials.max_call,
-                fix_flag: credentials.fix_flag
+            agent_id: credentials.agent_id,
+            max_call: credentials.max_call,
+            fix_flag: credentials.fix_flag
             }
         ]
     };
 
     try {
-        const { data } = await axiosInstance.put<CreateMaxCallResponse>(
-            '/campaigns/'+credentials.campaign_id+'/maxcall-ext',
+        const campaignId = Array.isArray(credentials)
+            ? credentials[0].campaign_id
+            : credentials.campaign_id;
+
+
+        // console.log("requestData : " , requestData);
+        // console.log("campaignId : " , campaignId);
+
+        const { data } = await axiosInstance.post<CreateMaxCallResponse>(
+            `/campaigns/${campaignId}/maxcall-ext`,
             requestData
         );
+
         return data;
     } catch (error: any) {
         if (error.response?.status === 401) {

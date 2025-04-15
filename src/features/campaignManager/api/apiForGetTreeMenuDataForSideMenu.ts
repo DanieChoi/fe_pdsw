@@ -116,7 +116,7 @@ interface Counselor {
 
 export async function apiToFetchCounselorTreeData(credentials: MainCredentials): Promise<TabData[]> {
   const [tenantsData, counselorData] = await Promise.all([
-    apiForGetTenantList(),
+    apiForGetTenantList(credentials.tenant_id),
     fetchCounselorList(credentials),
   ]);
 

@@ -30,6 +30,7 @@ export const useAssignableSkills = (tenantId?: number) => {
         throw new Error(`API 오류: ${response.result_msg}`);
       }
     },
+    enabled: tenantId !== -1,
   });
 };
 

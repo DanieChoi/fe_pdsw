@@ -52,8 +52,7 @@ export const getAssignableSkillsForCounselor = async (tenantId: number): Promise
     filter: {
       skill_id: { start: 1, end: 9999 },
       // tenant_id: [tenantId],
-      tenant_id: tenantId ? [tenantId] : undefined,
-
+      tenant_id: tenantId !== 0 ? [tenantId] : undefined,
     },
     // sort: {
     //   skill_id: 0,

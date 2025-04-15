@@ -8,6 +8,7 @@ import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableS
 import Image from 'next/image'
 import SkilFilterOptionPannelForCampaignTab from "../TabActions/SkilFilterOptionPannelForCampaignTab";
 import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
+import { useAuthStore } from "@/store";
 
 const IFilterButtonForCampaignTabHeader = () => {
   const [showSkillFilter, setShowSkillFilter] = useState(false);
@@ -23,8 +24,10 @@ const IFilterButtonForCampaignTabHeader = () => {
     setFilterMode
   } = useTreeMenuStore(); // 변경됨
   
+  const {tenant_id} = useAuthStore();
+  
   // 할당 가능한 스킬 목록 가져오기
-  const { data: skills = [] } = useAssignableSkills();
+  const { data: skills = [] } = useAssignableSkills(tenant_id);
 
   // 현재 "전체 선택" 상태 확인 (로컬 상태 기준)
   const allSkillIds = skills.map(skill => skill.skill_id);

@@ -485,6 +485,7 @@ const DistributionLimit = () => {
   // 캠페인별 상담사 목록 조회
   const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
     onSuccess: (response) => {
+      console.log("response : ",response);
       if (response?.result_data && response.result_data.length > 0) {
         // 캠페인에 소속된 상담사 ID 목록 저장
         const agentIds = response.result_data[0].agent_id;
@@ -1212,6 +1213,8 @@ const DistributionLimit = () => {
       showAlert('변경할 상담사가 없습니다.');
       return;
     }
+
+    console.log("targetAgents : ",targetAgents);
     
     // 모달 닫기
     setBulkLimitModal(prev => ({ ...prev, isOpen: false }));
@@ -1225,91 +1228,67 @@ const DistributionLimit = () => {
     let successCount = 0;
     let failCount = 0;
     
-    // 변경할 상담사 ID 목록
+    // #### 일괄 수정은 update api로 보내기!
     const agentIds = targetAgents.map(agent => agent.agent_id);
-    // console.log('변경 대상 상담사 ID:', agentIds);
+    const updateArr = [];
     
-    // 모든 대상 상담사에 대해 API 호출로 바로 저장
-    for (const agent of targetAgents) {
-      const saveData = {
-        campaign_id: parseInt(selectedCampaignId),
-        agent_id: agent.agent_id,
-        max_call: maxLimit,
-        fix_flag: bulkLimitModal.fixFlag ? 1 : 0
-      };
-      
-      // 기존 설정 존재 여부 확인 (max_dist가 0이 아닌 경우)
-      const isExisting = parseInt(agent.max_dist) > 0;
-      
-      try {
-        if (isExisting) {
-          // 기존 설정 수정
-          await new Promise<void>((resolve, reject) => {
-            updateMaxCallMutation(saveData, {
-              onSuccess: (response) => {
-                if (response.result_code === 0) {
-                  successCount++;
-                  resolve();
-                } else {
-                  // 이미 적용된 설정이라면 성공으로 처리
-                  if (response.result_msg && response.result_msg.includes("No action is needed")) {
-                    successCount++;
-                    resolve();
-                  } else {
-                    failCount++;
-                    reject(new Error(response.result_msg));
-                  }
-                }
-              },
-              onError: (error) => {
-                // "No action is needed" 오류는 무시하고 성공으로 처리
-                if (error.message && error.message.includes("No action is needed")) {
-                  successCount++;
-                  resolve();
-                } else {
-                  failCount++;
-                  reject(error);
-                }
-              }
-            });
-          });
-        } else {
-          // 새 설정 생성
-          await new Promise<void>((resolve, reject) => {
-            createMaxCallMutation(saveData, {
-              onSuccess: (response) => {
-                if (response.result_code === 0) {
-                  successCount++;
-                  resolve();
-                } else {
-                  // 이미 적용된 설정이라면 성공으로 처리
-                  if (response.result_msg && response.result_msg.includes("No action is needed")) {
-                    successCount++;
-                    resolve();
-                  } else {
-                    failCount++;
-                    reject(new Error(response.result_msg));
-                  }
-                }
-              },
-              onError: (error) => {
-                // "No action is needed" 오류는 무시하고 성공으로 처리
-                if (error.message && error.message.includes("No action is needed")) {
-                  successCount++;
-                  resolve();
-                } else {
-                  failCount++;
-                  reject(error);
-                }
-              }
-            });
-          });
-        }
-      } catch (error) {
-        console.error('저장 중 오류 발생:', error);
-      }
+    // 변경 대상 상담사 ID 100개씩 자르기 (한 요청에 최대 100개의 상담사 ID)
+    for (let i = 0; i < targetAgents.length; i += 100) {
+      updateArr.push(targetAgents.slice(i, i+100));
     }
-    
+
+    for(const agent of updateArr){
+
+      const saveData = agent.map(row => {
+        
+        const agent_id = row.agent_id.replace('agent-', '')
+
+        return {
+          campaign_id: parseInt(selectedCampaignId),
+          agent_id : agent_id,
+          max_call : maxLimit,
+          fix_flag : bulkLimitModal.fixFlag ? 1 : 0
+        }
+      });
+
+      // console.log("saveData : ", saveData);
+
+      await new Promise<void>((resolve, reject) => {
+        updateMaxCallMutation(saveData, {
+          onSuccess: (response) => {
+            if (response.result_code === 0) {
+              successCount++;
+              resolve();
+            } else {
+              // 이미 적용된 설정이라면 성공으로 처리
+              if (response.result_msg && response.result_msg.includes("No action is needed")) {
+                successCount++;
+                resolve();
+              } else {
+                failCount++;
+                reject(new Error(response.result_msg));
+              }
+            }
+          },
+          onError: (error) => {
+            // "No action is needed" 오류는 무시하고 성공으로 처리
+            if (error.message && error.message.includes("No action is needed")) {
+              successCount++;
+              resolve();
+            } else {
+              failCount++;
+              reject(error);
+            }
+          }
+        });
+      });
+
+
+    } // end of for
+
+    // console.log("successCount : ",successCount);
+    // console.log("failcount : ", failCount);
+
     // 화면 데이터 직접 업데이트 (API 응답을 기다리지 않고)
     setRawAgentData(prevData => 
       prevData.map(row => {
@@ -1332,7 +1311,114 @@ const DistributionLimit = () => {
     
     // 로딩 종료
     setIsLoading(false);
-  };
+    
+    // 아래는 기존 개별 api 호출
+
+    // 모든 대상 상담사에 대해 API 호출로 바로 저장
+    // for (const agent of targetAgents) {
+    //   const saveData = {
+    //     campaign_id: parseInt(selectedCampaignId),
+    //     agent_id: agent.agent_id,
+    //     max_call: maxLimit,
+    //     fix_flag: bulkLimitModal.fixFlag ? 1 : 0
+    //   };
+      
+    //   // 기존 설정 존재 여부 확인 (max_dist가 0이 아닌 경우)
+    //   const isExisting = parseInt(agent.max_dist) > 0;
+      
+    //   try {
+    //     if (isExisting) {
+    //       // 기존 설정 수정
+    //       await new Promise<void>((resolve, reject) => {
+    //         updateMaxCallMutation(saveData, {
+    //           onSuccess: (response) => {
+    //             if (response.result_code === 0) {
+    //               successCount++;
+    //               resolve();
+    //             } else {
+    //               // 이미 적용된 설정이라면 성공으로 처리
+    //               if (response.result_msg && response.result_msg.includes("No action is needed")) {
+    //                 successCount++;
+    //                 resolve();
+    //               } else {
+    //                 failCount++;
+    //                 reject(new Error(response.result_msg));
+    //               }
+    //             }
+    //           },
+    //           onError: (error) => {
+    //             // "No action is needed" 오류는 무시하고 성공으로 처리
+    //             if (error.message && error.message.includes("No action is needed")) {
+    //               successCount++;
+    //               resolve();
+    //             } else {
+    //               failCount++;
+    //               reject(error);
+    //             }
+    //           }
+    //         });
+    //       });
+    //     } else {
+    //       // 새 설정 생성
+    //       await new Promise<void>((resolve, reject) => {
+    //         createMaxCallMutation(saveData, {
+    //           onSuccess: (response) => {
+    //             if (response.result_code === 0) {
+    //               successCount++;
+    //               resolve();
+    //             } else {
+    //               // 이미 적용된 설정이라면 성공으로 처리
+    //               if (response.result_msg && response.result_msg.includes("No action is needed")) {
+    //                 successCount++;
+    //                 resolve();
+    //               } else {
+    //                 failCount++;
+    //                 reject(new Error(response.result_msg));
+    //               }
+    //             }
+    //           },
+    //           onError: (error) => {
+    //             // "No action is needed" 오류는 무시하고 성공으로 처리
+    //             if (error.message && error.message.includes("No action is needed")) {
+    //               successCount++;
+    //               resolve();
+    //             } else {
+    //               failCount++;
+    //               reject(error);
+    //             }
+    //           }
+    //         });
+    //       });
+    //     }
+    //   } catch (error) {
+    //     console.error('저장 중 오류 발생:', error);
+    //   }
+    // } // end of for
+    
+    // 화면 데이터 직접 업데이트 (API 응답을 기다리지 않고)
+    // setRawAgentData(prevData => 
+    //   prevData.map(row => {
+    //     // 선택된 상담사 ID에 포함된 경우에만 업데이트
+    //     if (agentIds.includes(row.agent_id)) {
+    //       return {
+    //         ...row,
+    //         max_dist: maxLimit.toString(),
+    //         fix_flag: bulkLimitModal.fixFlag ? 'Y' : 'N'
+    //       };
+    //     }
+    //     return row;
+    //   })
+    // );
+    
+    // // 변경 후 목록 다시 조회
+    // await fetchMaxCallList({
+    //   campaign_id: [parseInt(selectedCampaignId)]
+    // });
+    
+    // // 로딩 종료
+    // setIsLoading(false);
+
+  }; // end of handleApplyBulkLimit
 
   // Toggle row expansion - 행 확장/축소 토글 개선
   const toggleRowExpand = (rowId: string) => {
@@ -1485,8 +1571,20 @@ const DistributionLimit = () => {
             <input
               type="number"
               min="0"
+              max="99999"
               value={getCellValue(row, 'max_dist')}
-              onChange={(e) => handleCellChange(row, 'max_dist', e.target.value)}
+              // onChange={(e) => handleCellChange(row, 'max_dist', e.target.value)}
+              onChange={(e) => {
+                let inputValue = e.target.value;
+            
+                // 강제로 99999 넘으면 잘라주기
+                if (parseInt(inputValue) > 99999) {
+                  showAlert('최대 분배호수는 99999 까지 입력 가능합니다.');
+                  inputValue = "99999";
+                }
+            
+                handleCellChange(row, 'max_dist', inputValue);
+              }}
               className="w-full h-full px-2 text-center border-0 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -1618,7 +1716,7 @@ const DistributionLimit = () => {
             className="w-[140px]"
             disabled={true}
           />
-          <div className="text-sm w-[380px]">
+          <div className="text-sm w-full ml-5">
             응답호수 초기화 시간 : {initTime === "9999" ? "없음" : `${initTime.slice(0, 2)}:${initTime.slice(2)}`}
           </div>
         </div>

@@ -176,12 +176,14 @@ export interface MaxCallListResponse {
   result_data: MaxCallListDataResponse[];
 }
 
-export interface CreateMaxCallRequest {
+export interface SingleMaxCallRequest {
   campaign_id: number;
   agent_id: string;
   max_call: number;
   fix_flag: number;
 }
+
+export type CreateMaxCallRequest = SingleMaxCallRequest | SingleMaxCallRequest[];
 
 export interface MaxCallDataResponse {
   agent_id: string;
