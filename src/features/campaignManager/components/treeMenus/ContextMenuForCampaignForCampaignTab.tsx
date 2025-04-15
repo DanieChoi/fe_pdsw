@@ -388,6 +388,7 @@ export function ContextMenuForCampaignForCampaignTab({
         <div className="py-1" key="delete">
           <IDialogButtonForCampaingDelete
             campaignId={item.id}
+            tenant_id = {tenantIdForCampaignTab}
             campaignName={item.label}
             variant="ghost"
             size="sm"
