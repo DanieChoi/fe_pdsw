@@ -21,9 +21,6 @@ import { useApiForCampaignScheduleInsert } from '@/features/campaignManager/hook
 import { useApiForCallingNumberInsert } from '@/features/campaignManager/hooks/useApiForCallingNumberInsert';
 import { useApiForDialSpeedUpdate } from '@/features/campaignManager/hooks/useApiForDialSpeedUpdate';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
-import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
-import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
-import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 import Cookies from 'js-cookie';
@@ -762,7 +759,12 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   const handleCampaignSaveExecute = () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     setChangeYn(true);
-    fetchCampaignManagerInsert(tempCampaignManagerInfo);
+    fetchCampaignManagerInsert({...tempCampaignManagerInfo
+      , update_user: id
+      , creation_user: id
+      , update_ip: Cookies.get('userHost')+''
+      , creation_ip: Cookies.get('userHost')+''
+    });
   }
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -786,12 +788,23 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
-      setSelectedCampaign( data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0] );
-      setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
+      setSelectedCampaign( data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0] );
+      setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0]);
     //   setChangeYn(false);
-      removeTab(Number(activeTabId),activeTabKey+'');
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '작업이 완료되었습니다.',
+        type: '2',
+        onClose: handleClose,
+      });
     }
   });
+
+  const handleClose = () => {
+    setAlertState((prev) => ({ ...prev, isOpen: false }));
+    removeTab(Number(activeTabId),activeTabKey+'');
+  };
 
   //캠페인 발신번호 추가 api 호출
   const { mutate: fetchCallingNumberInsert } = useApiForCallingNumberInsert({
@@ -838,7 +851,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   //캠페인 스케줄 등록 api 호출
   const { mutate: fetchCampaignScheduleInsert } = useApiForCampaignScheduleInsert({
     onSuccess: (data) => {
-        if( tempCampaignSkills.skill_id[0] !== 0 ){
+        if( tempCampaignSkills.skill_id.length > 0){
             const _tempCampaignSkills = {...tempCampaignSkills,
                 campaign_id: tempCampaignId
             }

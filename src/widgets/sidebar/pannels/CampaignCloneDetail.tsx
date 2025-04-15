@@ -838,7 +838,12 @@ export default function CampaignDetail() {
   const handleCampaignSaveExecute = () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     setChangeYn(true);
-    fetchCampaignManagerInsert(tempCampaignManagerInfo);
+    fetchCampaignManagerInsert({...tempCampaignManagerInfo
+      , update_user: id
+      , creation_user: id
+      , update_ip: Cookies.get('userHost')+''
+      , creation_ip: Cookies.get('userHost')+''
+    });
   }
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -922,28 +927,29 @@ export default function CampaignDetail() {
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
-      setSelectedCampaign(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
-      setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
+      setSelectedCampaign( data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0] );
+      setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0]);
       // setChangeYn(false);
-      removeTab(Number(activeTabId), activeTabKey + '');
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '작업이 완료되었습니다.',
+        type: '2',
+        onClose: handleClose,
+      });
     }
   });
   
+  const handleClose = () => {
+    setAlertState((prev) => ({ ...prev, isOpen: false }));
+    removeTab(Number(activeTabId),activeTabKey+'');
+  };
+
   useEffect(() => {
     if( campaigns ){
       setSelectedCampaign(campaigns.filter(data => data.campaign_id === Number(campaignIdForCopyCampaign))[0]);
     }
   }, [campaigns, campaignIdForCopyCampaign]);
-
-  useEffect(() => {
-    if( id !== ''){        
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
-        , update_user: id
-        , creation_user: id
-      });
-    }
-  }, [id]);
 
   return (
     <div className='flex flex-col gap-5 w-full overflow-auto'>
