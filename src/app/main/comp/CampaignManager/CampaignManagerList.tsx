@@ -137,7 +137,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
       }
     }
     setFilteredCampaigns(_filteredCampaigns);
-  }, [ campaignHeaderSearchParam ]);
+  }, [ campaignHeaderSearchParam, campaigns ]);
 
   // 셀 클릭 시 호출 - 클릭한 행의 캠페인 데이터를 선택 상태로 업데이트하고, onRowClick이 있다면 호출
   const handleCellClick = useCallback(({ row }: CellClickArgs<Row>) => {
