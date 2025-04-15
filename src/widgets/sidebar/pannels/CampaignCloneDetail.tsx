@@ -455,13 +455,14 @@ export default function CampaignDetail() {
   //input data change
   const handleInputData = (value: any, col: string) => {
     if (col === 'campaign_id' && value !== '') {
+      const numValue = Number(value);
       setTempCampaignsInfo({
-        ...tempCampaignInfo,
-        campaign_id: 0
+          ...tempCampaignInfo,
+          campaign_id: numValue
       });
       setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
-        campaign_id: 0
+          ...tempCampaignManagerInfo,
+          campaign_id: numValue
       });
     }
     if (col === 'campaign_name') {
@@ -951,11 +952,12 @@ export default function CampaignDetail() {
         <div className="grid grid-cols-3 gap-x-4 gap-y-2">
           <div className='flex items-center gap-2'>
             <Label className="w-[5.6rem] min-w-[5.6rem]">캠페인 아이디</Label>
-            <CustomInput
-              type="number"
-              value={tempCampaignInfo.campaign_id}
-              onChange={(e) => handleInputData(e.target.value, 'campaign_id')}
-              className=""
+            <CustomInput 
+              type="number" 
+              value={tempCampaignInfo.campaign_id } 
+              onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
+              className="" 
+              min="0" 
             />
           </div>
 

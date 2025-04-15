@@ -267,9 +267,10 @@ type Props = {
   isOpen?: boolean;
   onCampaignPopupClose?: () => void;
   campaignId?: any; // masterCampaignId를 전달받음
+  setInit: (campaign_id:number) => void;
 };
 
-export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClose }: Props) {
+export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClose,setInit }: Props) {
   const [oriCampaignManagerInfo, setOriCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
   const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
@@ -1275,7 +1276,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
             });
           } else {
             //캠페인관리 화면 닫기.
-            fetchMain({ session_key: '', tenant_id: 0 });
+            setInit(0);
             setAlertState({
               ...errorMessage,
               isOpen: true,
@@ -1286,7 +1287,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           }
         } else {
           //캠페인관리 화면 닫기.
-          fetchMain({ session_key: '', tenant_id: 0 });
+          setInit(0);
           setAlertState({
             ...errorMessage,
             isOpen: true,
@@ -1296,7 +1297,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           });
         }
       } else {
-        fetchMain({ session_key: '', tenant_id: 0 });
+        setInit(0);
         setAlertState({
           ...errorMessage,
           isOpen: true,
@@ -1309,7 +1310,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     onError: (data) => {
       // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
       //캠페인관리 화면 닫기.
-      fetchMain({ session_key: '', tenant_id: 0 });
+      setInit(0);
       setAlertState({
         ...errorMessage,
         isOpen: true,
@@ -1323,7 +1324,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   // 재발신 삭제 API 호출
   const { mutate: fetchAutoRedialDelete } = useApiForAutoRedialDelete({
     onSuccess: (data) => {
-      fetchMain({ session_key: '', tenant_id: 0 });
+      setInit(0);
     }
   });
 
