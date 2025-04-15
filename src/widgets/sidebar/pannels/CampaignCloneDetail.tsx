@@ -841,6 +841,13 @@ export default function CampaignDetail() {
     fetchCampaignManagerInsert(tempCampaignManagerInfo);
   }
 
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const currentValue = e.target.value;
+    if (currentValue.startsWith("0") && currentValue.length > 1) {
+      e.target.value = currentValue.replace(/^0+/, "");
+    }
+  };
+
   //캠페인 정보 수정 api 호출
   const { mutate: fetchCampaignManagerInsert } = useApiForCampaignManagerInsert({
     onSuccess: (data) => {
@@ -958,6 +965,7 @@ export default function CampaignDetail() {
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
               className="" 
               min="0" 
+              onBlur={handleBlur}
             />
           </div>
 

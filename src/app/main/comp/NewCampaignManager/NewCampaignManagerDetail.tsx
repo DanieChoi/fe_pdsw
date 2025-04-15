@@ -765,6 +765,13 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     fetchCampaignManagerInsert(tempCampaignManagerInfo);
   }
 
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const currentValue = e.target.value;
+    if (currentValue.startsWith("0") && currentValue.length > 1) {
+      e.target.value = currentValue.replace(/^0+/, "");
+    }
+  };
+
   //변경여부 체크
   useEffect(() => {  
     if( changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !callingNumberChangeYn && !campaignDialSpeedChangeYn ){  
@@ -898,6 +905,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
               className="" 
               min="0" 
+              onBlur={handleBlur}
             />
           </div>
 
