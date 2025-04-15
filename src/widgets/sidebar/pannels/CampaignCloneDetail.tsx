@@ -455,26 +455,14 @@ export default function CampaignDetail() {
   //input data change
   const handleInputData = (value: any, col: string) => {
     if (col === 'campaign_id' && value !== '') {
-      if (/^\d+$/.test(value)) {
-          const numValue = Number(value);
-          setTempCampaignsInfo({
-              ...tempCampaignInfo,
-              campaign_id: numValue
-          });
-          setTempCampaignManagerInfo({
-              ...tempCampaignManagerInfo,
-              campaign_id: numValue
-          });
-      }else{
-          setTempCampaignsInfo({
-            ...tempCampaignInfo,
-            campaign_id: 0
-          });
-          setTempCampaignManagerInfo({
-            ...tempCampaignManagerInfo,
-            campaign_id: 0
-          });
-      }
+      setTempCampaignsInfo({
+        ...tempCampaignInfo,
+        campaign_id: 0
+      });
+      setTempCampaignManagerInfo({
+        ...tempCampaignManagerInfo,
+        campaign_id: 0
+      });
     }
     if (col === 'campaign_name') {
       setTempCampaignsInfo({
