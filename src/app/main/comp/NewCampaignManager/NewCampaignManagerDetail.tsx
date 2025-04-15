@@ -712,7 +712,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     
     let saveErrorCheck = false;
     //2018.11.27 Gideon #23127 캠페인 수정창 연결 IVR 입력 예외 처리
-    if(!saveErrorCheck && tempCampaignManagerInfo.power_divert_queue === '0' || tempCampaignManagerInfo.power_divert_queue === ''){
+    if(!saveErrorCheck && tempCampaignManagerInfo.dial_mode !== 2 && (tempCampaignManagerInfo.power_divert_queue === '0' || tempCampaignManagerInfo.power_divert_queue === '')){
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
