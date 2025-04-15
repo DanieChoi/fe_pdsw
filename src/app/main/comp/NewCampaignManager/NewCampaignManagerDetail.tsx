@@ -337,31 +337,20 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   });
   const router = useRouter();
   const [tempCampaignId, setTempCampaignId] = useState<number>(0);
-  const { id, menu_role_id } = useAuthStore();
+  const { id, menu_role_id, session_key, tenant_id } = useAuthStore();
 
   //input data change
   const handleInputData = (value:any, col:string) => {
     if( col === 'campaign_id' && value !== '' ){
-        if (/^\d+$/.test(value)) {
-            const numValue = Number(value);
-            setTempCampaignsInfo({
-                ...tempCampaignInfo,
-                campaign_id: numValue
-            });
-            setTempCampaignManagerInfo({
-                ...tempCampaignManagerInfo,
-                campaign_id: numValue
-            });
-        }else{
-            setTempCampaignsInfo({
-              ...tempCampaignInfo,
-              campaign_id: 0
-            });
-            setTempCampaignManagerInfo({
-              ...tempCampaignManagerInfo,
-              campaign_id: 0
-            });
-        }
+      const numValue = Number(value);
+      setTempCampaignsInfo({
+          ...tempCampaignInfo,
+          campaign_id: numValue
+      });
+      setTempCampaignManagerInfo({
+          ...tempCampaignManagerInfo,
+          campaign_id: numValue
+      });
     }    
     if( col === 'campaign_name' ){
       setTempCampaignsInfo({
@@ -722,27 +711,17 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   const handleCampaignSave = () => {
     
     let saveErrorCheck = false;
-    if(!saveErrorCheck && tempCampaignManagerInfo.tenant_id < 0 ){
+    //2018.11.27 Gideon #23127 캠페인 수정창 연결 IVR 입력 예외 처리
+    if(!saveErrorCheck && tempCampaignManagerInfo.power_divert_queue === '0' || tempCampaignManagerInfo.power_divert_queue === ''){
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
         isOpen: true,
-        message: "테넌트를 선택해 주세요.",
+        message: "'발신 방법' 탭의 '연결 IVR NO' 값을 입력해 주시기 바랍니다.", 
         type: '2',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
-    //2018.11.27 Gideon #23127 캠페인 수정창 연결 IVR 입력 예외 처리
-      if(!saveErrorCheck && tempCampaignManagerInfo.power_divert_queue === '0' || tempCampaignManagerInfo.power_divert_queue === ''){
-        saveErrorCheck = true;
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: "'발신 방법' 탭의 '연결 IVR NO' 값을 입력해 주시기 바랍니다.", 
-          type: '2',
-          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
-        });
-      }
     // }
     if(!saveErrorCheck && tempCampaignManagerInfo.campaign_name === '' ){
       saveErrorCheck = true;
@@ -750,6 +729,16 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         ...errorMessage,
         isOpen: true,
         message: "캠페인명을 입력해 주세요.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }
+    if(!saveErrorCheck && isNaN(tempCampaignManagerInfo.tenant_id) ){
+      saveErrorCheck = true;
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "테넌트를 선택해 주세요.",
         type: '2',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
@@ -780,8 +769,8 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   useEffect(() => {  
     if( changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !callingNumberChangeYn && !campaignDialSpeedChangeYn ){  
       fetchMain({
-        session_key: '',
-        tenant_id: 0,
+        session_key: session_key,
+        tenant_id: tenant_id,
       });
     }
   }, [campaignInfoChangeYn,campaignSkillChangeYn,callingNumberChangeYn,campaignDialSpeedChangeYn]);
@@ -832,14 +821,6 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     router.push('/login');
   }
 
-  //캠페인 스킬 조회 api 호출
-  const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
-    onSuccess: (data) => {
-      setCampaignSkills(data.result_data);
-      setCampaignSkillChangeYn(false);
-    }
-  });
-  
   //캠페인 스킬 수정 api 호출
   const { mutate: fetchCampaignSkillUpdate } = useApiForCampaignSkillUpdate({
     onSuccess: (data) => {
