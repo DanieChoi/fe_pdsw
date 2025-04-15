@@ -22,6 +22,7 @@ interface Props {
   buttonText?: string;
   isDisabled?: boolean;
   isOpen?: boolean;
+  tenant_id?: number;
   onOpenChange?: (open: boolean) => void;
 }
 
@@ -35,18 +36,21 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
   isDisabled = false,
   isOpen: externalIsOpen,
   onOpenChange,
+  tenant_id,
 }) => {
   // 외부에서 isOpen prop을 전달하지 않으면 내부 상태로 관리
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const isDialogOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
   const [isDeleting, setIsDeleting] = useState(false);
-  const { tenant_id } = useAuthStore();
+  // const { tenant_id } = useAuthStore();
 
-
+  console.log('tenant_id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', tenant_id);
+  
+  
   // 스토어 및 API 훅들
   const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
   const { callingNumbers, campaignSkills } = useCampainManagerStore();
-  const { activeTabKey, closeAllTabs, rows } = useTabStore();
+  const { activeTabKey, closeAllTabs, rows, removeTab } = useTabStore();
 
   const { mutate: updateCampaignSkill } = useApiForCampaignSkillUpdate({
     onSuccess: () => {
@@ -84,25 +88,27 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
       // 예약콜 제한 삭제
       fetchReservedCallDelete({
         campaign_id: Number(campaignId),
-        tenant_id: tenant_id,
+        tenant_id: Number(tenant_id),
         delete_dial_list: 1
       });
 
       // 트리 데이터 리패치 및 탭 닫기
       refetchTreeDataForCampaignGroupTab();
-      closeCurrentTab();
+      // closeCurrentTab();
+      const { rowId, sectionId } = findCurrentTabLocation();
+      removeTab(2,"2");
     }
   });
 
   const { mutate: deleteCampaign, isPending } = useApiForCampaignManagerDelete({
     onSuccess: (data) => {
       console.log('캠페인 삭제 성공:', data);
-      // toast.success(`'${campaignName}' 캠페인이 삭제되었습니다.`);
+      toast.success(`'${campaignName}' 캠페인이 삭제되었습니다.`);
 
       // 삭제 후 스케줄 삭제 등 처리
       deleteCampaignSchedule({
         campaign_id: Number(campaignId),
-        tenant_id: tenant_id,
+        tenant_id: Number(tenant_id),
         delete_dial_list: 1
       });
 
@@ -143,7 +149,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
     setIsDeleting(true);
     deleteCampaign({
       campaign_id: Number(campaignId),
-      tenant_id: tenant_id,
+      tenant_id: Number(tenant_id),
       delete_dial_list: 1
     });
 
