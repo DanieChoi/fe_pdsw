@@ -5,6 +5,9 @@ import { useApiForGetSkills2 } from '@/features/campaignManager/hooks/useApiForG
 import { Loader2 } from "lucide-react";
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import DataGrid, { SelectColumn } from 'react-data-grid';
+import { useSessionCheckStore } from '@/store/sessionCheckStore';
+
+
 
 interface Skill {
   tenant_id: number | string;
@@ -31,9 +34,26 @@ const SkillListPopup = ({
   onCancel
 }: SkillListPopupProps) => {
   // API call to fetch skills
-  const { data: skillsData, isLoading, isError } = useApiForGetSkills2({
+  const { data: skillsData, isLoading, isError} = useApiForGetSkills2({
     tenant_id_array: [tenantId],
   });
+  
+  // 이 컴포넌트가 통합모니터링 실행시 가장 먼저 api와 통신하는 컴포넌트임
+  // sessionCheckStore에 저장된 값 확인하기 (세션 만료 확인)
+  const sessionError = useSessionCheckStore((state) => state.sessionError);
+  const clearSessionError = useSessionCheckStore((state) => state.clearSessionError);
+  if ( sessionError && typeof window !== 'undefined') {
+    // 팝업창인지 확인하기
+    if (window.opener) {
+      window.opener.postMessage({ type: "sessionFailed" }, "*");
+
+      // 반드시 초기화!!! 
+      clearSessionError();
+      
+      // 팝업창 닫기
+      window.close();
+    } // end of window if
+  }
   
   // Selected rows management
   const [selectedSkills, setSelectedSkills] = useState<Set<number>>(() => {
