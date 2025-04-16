@@ -133,21 +133,29 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     setHeaderInit(false);
   };
 
+  //초기화.
   const handleDetailInit = (campaign_id:number) => {
     console.log('campaign_id:: '+campaign_id);
-    setMasterCampaignId(campaign_id+'');
-    fetchMain({
-      session_key: session_key,
-      tenant_id: tenant_id,
-    });
+    if( campaign_id === 0){
+      setHeaderInit(true);
+      const tempCampaigns = campaigns.filter(data => data.campaign_id != Number(masterCampaignId));
+      setMasterCampaignId(campaigns[0].campaign_id+'');
+      setCampaigns(tempCampaigns);
+      // }else{
+    //   setMasterCampaignId(campaign_id+'');
+    //   fetchMain({
+    //     session_key: session_key,
+    //     tenant_id: tenant_id,
+    //   });
+    }
   };
 
   // 캠페인 정보 조회 API 호출
-  const { mutate: fetchMain } = useApiForMain({
-    onSuccess: (data) => {
-      setCampaigns(data.result_data);
-    }
-  });
+  // const { mutate: fetchMain } = useApiForMain({
+  //   onSuccess: (data) => {
+  //     setCampaigns(data.result_data);
+  //   }
+  // });
   
   return (
     <div className='compaign-wrap stable-scrollbar' style={{

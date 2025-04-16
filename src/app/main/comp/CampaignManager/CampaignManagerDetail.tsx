@@ -287,7 +287,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const [campaignDialSpeedChangeYn, setCampaignDialSpeedChangeYn] = useState<boolean>(false);
   const [rtnMessage, setRtnMessage] = useState<string>('');
   const { tenants, setCampaigns, selectedCampaign, setSelectedCampaign, setSelectedCampaignRow } = useMainStore();
-  const { id: user_id, tenant_id, menu_role_id } = useAuthStore();
+  const { id: user_id, tenant_id, menu_role_id, session_key } = useAuthStore();
   const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab, campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
   const [inputSkills, setInputSkills] = useState('');
@@ -1236,16 +1236,16 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       } else {
         // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
         fetchAutoRedials({
-          session_key: '',
-          tenant_id: 0,
+          session_key: session_key,
+          tenant_id: tenant_id,
         });
       }
     },
     onError: (data) => {
       // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
       fetchAutoRedials({
-        session_key: '',
-        tenant_id: 0,
+        session_key: session_key,
+        tenant_id: tenant_id,
       });
     }
   });
@@ -1255,8 +1255,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     onSuccess: (data) => {
       // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
       fetchAutoRedials({
-        session_key: '',
-        tenant_id: 0,
+        session_key: session_key,
+        tenant_id: tenant_id,
       });
     }
   });
