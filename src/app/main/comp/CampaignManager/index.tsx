@@ -162,12 +162,12 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
         <CampaignManagerHeader init={headerInit} setInit={handleHeaderInit} onSearch={handleCampaignHeaderSearch} />
         <div className="flex gap-[30px]">
           <CampaignManagerList
-            campaignId={masterCampaignId}
+            campaignId={campaignIdForUpdateFromSideMenu || masterCampaignId}
             onRowClick={handleRowClick}
             campaignHeaderSearchParam={campaignHeaderSearchParam}
           />
           <CampaignManagerDetail
-            campaignId={masterCampaignId}
+            campaignId={campaignIdForUpdateFromSideMenu || masterCampaignId}
             isOpen={isOpen}
             onCampaignPopupClose={onCampaignPopupClose}
             setInit={handleDetailInit}

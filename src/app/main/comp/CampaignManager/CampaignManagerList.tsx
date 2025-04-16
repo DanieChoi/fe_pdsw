@@ -148,10 +148,14 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
     if (clickedCampaign) {
       setSelectedCampaign(clickedCampaign as any);
       setSelectedCampaignRow(row);
+      setCampaignIdForUpdateFromSideMenu(clickedCampaign.campaign_id.toString());
       if (onRowClick) {
         onRowClick(row.campaignId.toString());
       }
     }
+
+    setCampaignIdForUpdateFromSideMenu(row.campaignId.toString());
+
   }, [filteredCampaigns, setSelectedCampaign, setSelectedCampaignRow, onRowClick]);
 
   // filteredCampaigns를 grid 데이터 형식(Row)로 변환

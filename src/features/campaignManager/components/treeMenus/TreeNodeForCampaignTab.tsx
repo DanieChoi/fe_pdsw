@@ -364,7 +364,7 @@ export function TreeNodeForCampaignTab({
       },
     });
 
-    // setCampaignIdForUpdateFromSideMenu(item.id);
+    setCampaignIdForUpdateFromSideMenu(item.id);
   }, [item, simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu]);
 
   const handleEdit = useCallback(() => {
