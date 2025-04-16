@@ -107,7 +107,7 @@ const initOutgoingResult = {
 const RebroadcastSettingsPanel = () => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
     const { campaigns } = useMainStore();
-    const { activeTabId, openedTabs } = useTabStore();
+    const { activeTabId, openedTabs,campaignIdForUpdateFromSideMenu } = useTabStore();
     const router = useRouter();
 
     const [settings, setSettings] = useState<RebroadcastSettings>(initialSettings);
@@ -975,6 +975,25 @@ const RebroadcastSettingsPanel = () => {
     
     //최초 캠페인 재발신 정보 리스트 조회 실행.
     useEffect(() => {
+        if( campaignIdForUpdateFromSideMenu && campaignIdForUpdateFromSideMenu !== '' ){
+            setCampaignId(Number(campaignIdForUpdateFromSideMenu));
+            setSettings(prev => ({ ...prev, campaignId: campaignIdForUpdateFromSideMenu }));
+            const campaign = campaigns.find(data => Number(campaignIdForUpdateFromSideMenu) === data.campaign_id);
+            if (campaign) {
+                setListRedialQuery(campaign.list_redial_query);
+            }
+            //버튼 설정.                    
+            setReservationShouldShowAdd(true);
+            setReservationShouldShowDelete(true);
+            fetchCampaignAutoRedials({
+                session_key: '',
+                tenant_id: 0,
+            });
+        }
+    }, [campaignIdForUpdateFromSideMenu]);
+    
+    //최초 캠페인 재발신 정보 리스트 조회 실행.
+    useEffect(() => {
     if (activeTabId === 20) {
         const tempData = openedTabs.filter(tab => tab.id === 20);
         if( tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
@@ -994,7 +1013,7 @@ const RebroadcastSettingsPanel = () => {
             });
         }
     }
-    }, [activeTabId, openedTabs,campaigns]);
+    }, [activeTabId, openedTabs]);
        
     return (
         <div className="limit-width">
