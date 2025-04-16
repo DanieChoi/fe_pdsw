@@ -107,7 +107,7 @@ const initOutgoingResult = {
 const RebroadcastSettingsPanel = () => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
     const { campaigns } = useMainStore();
-    const { campaignIdForUpdateFromSideMenu } = useTabStore();
+    const { activeTabId, openedTabs } = useTabStore();
     const router = useRouter();
 
     const [settings, setSettings] = useState<RebroadcastSettings>(initialSettings);
@@ -124,8 +124,7 @@ const RebroadcastSettingsPanel = () => {
     const [rebroadcastList, setRebroadcastList] = useState<RebroadcastItem[]>([]);
     const [selectedRebroadcastId, setSelectedRebroadcastId] = useState<number | null>(null);
     const [selectedRebroadcastDetails, setSelectedRebroadcastDetails] = useState<RebroadcastItem | null>(null);
-
-    const [_campaignId, set_campaignId] = useState<string>('0');
+    const [campaignId, setCampaignId] = useState<number>(0);
     const [listRedialQuery, setListRedialQuery] = useState<string>('');
     const [reservationShouldShowApply,setReservationShouldShowApply ] = useState<boolean>(false);   //적용 버튼.
     const [reservationShouldShowAdd,setReservationShouldShowAdd ] = useState<boolean>(false);       //추가 버튼.
@@ -344,7 +343,7 @@ const RebroadcastSettingsPanel = () => {
     const handleRemoveRebroadcast = () => {
         if (selectedRebroadcastId !== null && rebroadcastList.some(item => item.id === selectedRebroadcastId)) {
             fetchAutoRedialDelete({
-              campaign_id: Number(campaignIdForUpdateFromSideMenu)
+              campaign_id: Number(campaignId)
               , sequence_number: selectedRebroadcastId
             });
             setTextType('');
@@ -460,7 +459,7 @@ const RebroadcastSettingsPanel = () => {
             }
 
             fetchCampaignAutoRedialInsert({
-                campaign_id: Number(campaignIdForUpdateFromSideMenu),
+                campaign_id: Number(campaignId),
                 sequence_number: sequenceNumber,
                 start_date: startDate instanceof Date ? startDate.getFullYear() + ('0' + (startDate.getMonth() + 1)).slice(-2) + ('0' + startDate.getDate()).slice(-2) + startTime + '00' : '',
                 redial_condition: MakeRedialPacket(),
@@ -470,7 +469,7 @@ const RebroadcastSettingsPanel = () => {
         }else if (broadcastType === "realtime") {
             setCaseType(2);
             fetchCampaignRedialPreviewSearch({
-                campaign_id: Number(campaignIdForUpdateFromSideMenu),
+                campaign_id: Number(campaignId),
                 condition: MakeRedialPacket()
             });
         }
@@ -630,7 +629,7 @@ const RebroadcastSettingsPanel = () => {
     const { mutate: fetchCampaignAutoRedials } = useApiForAutoRedial({
         onSuccess: (data) => {
             if (data.result_data.length > 0) {
-                const tempList = data.result_data.filter(data => data.campaign_id === Number(campaignIdForUpdateFromSideMenu));
+                const tempList = data.result_data.filter(data => data.campaign_id === Number(campaignId));
                 if (tempList.length > 0) {                  
                     const prevList = tempList.map(item => ({
                         id: item.sequence_number,
@@ -797,7 +796,7 @@ const RebroadcastSettingsPanel = () => {
                 }else if( data.reason_code === -3){
                     _message = '[-3]상담사과 고객이 통화 중이라 캠페인 통계가 완료되지 않았습니다. \n잠시만 기다려주세요.';
                 }
-                fetchCampaignManagerUpdate(UpdataCampaignInfo(campaigns,Number(campaignIdForUpdateFromSideMenu),2));
+                fetchCampaignManagerUpdate(UpdataCampaignInfo(campaigns,Number(campaignId),2));
 
                 setAlertState({
                     isOpen: true,
@@ -827,7 +826,7 @@ const RebroadcastSettingsPanel = () => {
                 onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
                 onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
             });
-            fetchCampaignManagerUpdate(UpdataCampaignInfo(campaigns,Number(campaignIdForUpdateFromSideMenu),2));
+            fetchCampaignManagerUpdate(UpdataCampaignInfo(campaigns,Number(campaignId),2));
         }
     });
 
@@ -861,7 +860,7 @@ const RebroadcastSettingsPanel = () => {
                         onClose: () => {                           
                             setAlertState({
                                 isOpen: true,
-                                message: `캠페인 아이디 : ${campaignIdForUpdateFromSideMenu} \n캠페인을 바로 시작하시겠습니까?`,
+                                message: `캠페인 아이디 : ${campaignId} \n캠페인을 바로 시작하시겠습니까?`,
                                 title: '재발신 적용',
                                 type: '1',
                                 onClose: handleCampaignCurrentRedial,
@@ -920,7 +919,7 @@ const RebroadcastSettingsPanel = () => {
         onSuccess: (data) => {
             if (data.result_code === 0 || data.result_code === -13) {
                 fetchCampaignCurrentRedial({
-                    campaign_id: Number(campaignIdForUpdateFromSideMenu),
+                    campaign_id: Number(campaignId),
                     condition: MakeRedialPacket()
                 });
             } else {
@@ -951,15 +950,15 @@ const RebroadcastSettingsPanel = () => {
         //     campaign_id: Number(campaignIdForUpdateFromSideMenu),
         //     condition: MakeRedialPacket()
         // });
-        const tempCampaign = campaigns.filter(data => data.campaign_id === Number(campaignIdForUpdateFromSideMenu))[0];
+        const tempCampaign = campaigns.filter(data => data.campaign_id === Number(campaignId))[0];
         if( tempCampaign.start_flag === 1 ){
             fetchCampaignCurrentRedial({
-                campaign_id: Number(campaignIdForUpdateFromSideMenu),
+                campaign_id: Number(campaignId),
                 condition: MakeRedialPacket()
             });
         }else{
             fetchCampaignStatusUpdate({
-                campaign_id: Number(campaignIdForUpdateFromSideMenu)
+                campaign_id: Number(campaignId)
               , campaign_status: 1
             });
         }
@@ -969,17 +968,20 @@ const RebroadcastSettingsPanel = () => {
     const handleCheckListCount = async () => {
         setCaseType(1);
         fetchCampaignRedialPreviewSearch({
-            campaign_id: Number(campaignIdForUpdateFromSideMenu),
+            campaign_id: Number(campaignId),
             condition: MakeRedialPacket()
         });
     };
     
     //최초 캠페인 재발신 정보 리스트 조회 실행.
     useEffect(() => {
-        if( campaigns && campaignIdForUpdateFromSideMenu && campaignIdForUpdateFromSideMenu !== '' ){
-            set_campaignId(campaignIdForUpdateFromSideMenu);
-            setSettings(prev => ({ ...prev, campaignId: campaignIdForUpdateFromSideMenu }));
-            const campaign = campaigns.find(data => Number(campaignIdForUpdateFromSideMenu) === data.campaign_id);
+    if (activeTabId === 20) {
+        const tempData = openedTabs.filter(tab => tab.id === 20);
+        if( tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
+            const _campaignId = Number(tempData[0].campaignId);
+            setCampaignId(_campaignId);
+            setSettings(prev => ({ ...prev, campaignId: _campaignId+'' }));
+            const campaign = campaigns.find(data => _campaignId === data.campaign_id);
             if (campaign) {
                 setListRedialQuery(campaign.list_redial_query);
             }
@@ -991,12 +993,13 @@ const RebroadcastSettingsPanel = () => {
                 tenant_id: 0,
             });
         }
-    }, [campaignIdForUpdateFromSideMenu,campaigns]);
-
+    }
+    }, [activeTabId, openedTabs,campaigns]);
+       
     return (
         <div className="limit-width">
             <div className="flex flex-col gap-6">
-                <RebroadcastSettingsPanelHeader campaignId={_campaignId} 
+                <RebroadcastSettingsPanelHeader campaignId={campaignId+''} 
                     reservationShouldShowApply={reservationShouldShowApply}
                     reservationShouldShowAdd={reservationShouldShowAdd}
                     reservationShouldShowDelete={reservationShouldShowDelete}

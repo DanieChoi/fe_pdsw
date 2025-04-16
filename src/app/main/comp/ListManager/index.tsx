@@ -44,6 +44,7 @@ interface FileRow {
   campaignId: string;
   fileSize: string;
   deletable: boolean;
+  listFlag: string;
 }
 
 interface SendRow {
@@ -125,6 +126,10 @@ const ListManager: React.FC = () => {
   const [headerColumnData,setHeaderColumnData] = useState<FormatRow[]>([]);
   const [originaldataYn, setOriginaldataYn] = useState<boolean>(false);
   const [campaignId, setCampaignId] = useState<number>(0);
+  const [listFlag, setListFlag] = useState<string>('I');
+  const [workFileIndex, setWorkFileIndex ] = useState<number>(-1);
+  const [listTotalCount, setListTotalCount] = useState<number>(0);
+  const [listSuccessCount,setListSuccessCount] = useState<number>(0);
   // 아이디 생성용 카운터
   const [nextId, setNextId] = useState(1);
   
@@ -145,27 +150,33 @@ const ListManager: React.FC = () => {
   //캠페인 발신번호 추가 api 호출
   const { mutate: fetchCallingListInsert } = useApiForCallingListInsert({
     onSuccess: (data) => {   
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const seconds = now.getSeconds().toString().padStart(2, '0');
-      if( data.result_code === 0){
-        const newProgressListData = { ...progressListData
-          , id: progressList.length+1
-          , datetime: hours + ':' + minutes + ':' + seconds
-          , message: '서버에 리스트 파일 등록 완료 : 총 ' + data.request_count + '건, 성공 ' + data.result_count + '건'
-        };
-        setProgressList(prev => [newProgressListData, ...prev]);
+      if( workFileIndex < uploadedFiles.length-1 ){
+        setWorkFileIndex(prevIndex => prevIndex + 1);
+        setListTotalCount(listTotalCount+data.request_count);
+        setListSuccessCount(listSuccessCount+data.result_count);
       }else{
-        const newProgressListData = { ...progressListData
-          , id: progressList.length+1
-          , datetime: hours + ':' + minutes + ':' + seconds
-          , message: '서버에 리스트 파일 등록 에러 : ' + data.result_msg
-        };
-        setProgressList(prev => [newProgressListData, ...prev]);
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        if( data.result_code === 0){
+          const newProgressListData = { ...progressListData
+            , id: progressList.length+1
+            , datetime: hours + ':' + minutes + ':' + seconds
+            , message: '서버에 리스트 파일 등록 완료 : 총 ' + (listTotalCount+data.request_count) + '건, 성공 ' + (listSuccessCount+data.result_count) + '건'
+          };
+          setProgressList(prev => [newProgressListData, ...prev]);
+        }else{
+          const newProgressListData = { ...progressListData
+            , id: progressList.length+1
+            , datetime: hours + ':' + minutes + ':' + seconds
+            , message: '서버에 리스트 파일 등록 에러 : ' + data.result_msg
+          };
+          setProgressList(prev => [newProgressListData, ...prev]);
+        }
+        setUploadedFiles([]);
+        setSendList([]);
       }
-      setUploadedFiles([]);
-      setSendList([]);
     }
     , onError: (data) => {  
       if (data.message.split('||')[0] === '5') {
@@ -198,27 +209,33 @@ const ListManager: React.FC = () => {
   // 블랙리스트 추가 api 호출
   const { mutate: fetchBlacklistInsert } = useApiForBlacklistInsert({
     onSuccess: (data) => {   
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const seconds = now.getSeconds().toString().padStart(2, '0');
-      if( data.result_code === 0){
-        const newProgressListData = { ...progressListData
-          , id: progressList.length+1
-          , datetime: hours + ':' + minutes + ':' + seconds
-          , message: '서버에 리스트 파일 등록 완료 : 총 ' + data.request_count + '건, 성공 ' + data.result_count + '건'
-        };
-        setProgressList(prev => [newProgressListData, ...prev]);
+      if( workFileIndex < uploadedFiles.length-1 ){
+        setWorkFileIndex(prevIndex => prevIndex + 1);
+        setListTotalCount(listTotalCount+data.request_count);
+        setListSuccessCount(listSuccessCount+data.result_count);
       }else{
-        const newProgressListData = { ...progressListData
-          , id: progressList.length+1
-          , datetime: hours + ':' + minutes + ':' + seconds
-          , message: '서버에 리스트 파일 등록 에러 : ' + data.result_msg
-        };
-        setProgressList(prev => [newProgressListData, ...prev]);
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        if( data.result_code === 0){
+          const newProgressListData = { ...progressListData
+            , id: progressList.length+1
+            , datetime: hours + ':' + minutes + ':' + seconds
+            , message: '서버에 리스트 파일 등록 완료 : 총 ' + (listTotalCount+data.request_count) + '건, 성공 ' + (listSuccessCount+data.result_count) + '건'
+          };
+          setProgressList(prev => [newProgressListData, ...prev]);
+        }else{
+          const newProgressListData = { ...progressListData
+            , id: progressList.length+1
+            , datetime: hours + ':' + minutes + ':' + seconds
+            , message: '서버에 리스트 파일 등록 에러 : ' + data.result_msg
+          };
+          setProgressList(prev => [newProgressListData, ...prev]);
+        }
+        setUploadedFiles([]);
+        setSendList([]);
       }
-      setUploadedFiles([]);
-      setSendList([]);
     }
     , onError: (data) => {
       if (data.message.split('||')[0] === '5') {
@@ -247,27 +264,31 @@ const ListManager: React.FC = () => {
   // 블랙리스트 업로드 취소 api 호출
   const { mutate: fetchBlacklistDelete } = useApiForBlacklistDelete({
     onSuccess: (data) => {   
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const seconds = now.getSeconds().toString().padStart(2, '0');
-      if( data.result_code === 0){
-        const newProgressListData = { ...progressListData
-          , id: progressList.length+1
-          , datetime: hours + ':' + minutes + ':' + seconds
-          , message: '서버에 리스트 파일 등록 완료'
-        };
-        setProgressList(prev => [newProgressListData, ...prev]);
+      if( workFileIndex < uploadedFiles.length-1 ){
+        setWorkFileIndex(prevIndex => prevIndex + 1);
       }else{
-        const newProgressListData = { ...progressListData
-          , id: progressList.length+1
-          , datetime: hours + ':' + minutes + ':' + seconds
-          , message: '서버에 리스트 파일 등록 에러 : ' + data.result_msg
-        };
-        setProgressList(prev => [newProgressListData, ...prev]);
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        if( data.result_code === 0){
+          const newProgressListData = { ...progressListData
+            , id: progressList.length+1
+            , datetime: hours + ':' + minutes + ':' + seconds
+            , message: '서버에 리스트 파일 등록 완료'
+          };
+          setProgressList(prev => [newProgressListData, ...prev]);
+        }else{
+          const newProgressListData = { ...progressListData
+            , id: progressList.length+1
+            , datetime: hours + ':' + minutes + ':' + seconds
+            , message: '서버에 리스트 파일 등록 에러 : ' + data.result_msg
+          };
+          setProgressList(prev => [newProgressListData, ...prev]);
+        }
+        setUploadedFiles([]);
+        setSendList([]);
       }
-      setUploadedFiles([]);
-      setSendList([]);
     }
     , onError: (data) => {    
       if (data.message.split('||')[0] === '5') {
@@ -322,6 +343,7 @@ const ListManager: React.FC = () => {
   // 파일 관련 핸들러
   const handleTargetTypeChange = (value: string) => {
     setTargetType(value as "general" | "blacklist");
+    setListFlag('I');
     setCallListInsertData({
       ..._callListInsertData,
       list_flag: 'I'
@@ -329,6 +351,7 @@ const ListManager: React.FC = () => {
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {   
+    setCampaignIdDisabled(true);
     const files = e.target.files;
     if (files && files.length > 0) {
       try{
@@ -357,6 +380,7 @@ const ListManager: React.FC = () => {
             campaignId: campaignId+'',
             fileSize: (file.size / 1024).toFixed(2) + " KB",
             deletable: false,
+            listFlag: listFlag
           };
           setUploadedFiles((prev) => [...prev, newFileData]);
           setSelectedFileName(file.name);
@@ -585,6 +609,14 @@ const ListManager: React.FC = () => {
         type: '2',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
+    }else if( campaignId === 0){
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "캠페인을 선택해야 합니다.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
     }else{
       const fileInput = document.getElementById("fileInput") as HTMLInputElement;
       if (fileInput){
@@ -704,44 +736,8 @@ const ListManager: React.FC = () => {
         , message: '서버에 리스트 파일 등록 시작'
       };
       setProgressList(prev => [newProgressListData, ...prev]);
-      
-      const callingListInsertData: CallingListInsertRequest = {
-        ..._callListInsertData
-        , campaign_id: _callListInsertData.campaign_id
-        , list_flag: _callListInsertData.list_flag+''
-        ,calling_list: sendList.map((data, index) => ({
-          ...callListInsertDataType,
-          customer_key: data.CSKE+'',
-          sequence_number: index + 1,
-          customer_name: data.CSNA+'',
-          phone_number1: data.TNO1+'',
-          phone_number2: data.TNO2+'',
-          phone_number3: data.TNO3+'',
-          phone_number4: data.TNO4+'',
-          phone_number5: data.TNO5+'',
-          reserved_time: data.TKDA+'',
-          token_data: data.CSC1+''
-        }))
-      };
-      if( _callListInsertData.list_flag === 'T'){
-        fetchBlacklistDelete(_callListInsertData.campaign_id);
-      }else if( targetType === 'general' ){
-        fetchCallingListInsert(callingListInsertData);
-      }else{
-        fetchBlacklistInsert(callingListInsertData);
-      }
-      // 실제 작업 로직 수행
-      // ...
-      // fetchCallingListInsert();
-      
-      // 작업 완료 후 로딩 창 숨기기
-      //setIsLoading(true);
 
-      // 테스트를 위해 2초간 로딩 모달 표시
-      // setIsLoading(true);
-      // setTimeout(() => {
-      //   setIsLoading(false);
-      // }, 2000);
+      setWorkFileIndex(0);
 
     }
   };
@@ -749,12 +745,14 @@ const ListManager: React.FC = () => {
   //select data change
   const handleSelectChange = (value: string, type: string) => {
     if( type === 'campaignId' ){
+      setCampaignId(Number(value));
       setCallListInsertData({
         ..._callListInsertData,
         campaign_id: Number(value)
       });
     }  
     if( type === 'listFlag'){
+      setListFlag(value);
       setCallListInsertData({
         ..._callListInsertData,
         list_flag: value
@@ -767,11 +765,13 @@ const ListManager: React.FC = () => {
     if( type === 'deleteData' ){  //체크 I 안하면 A
       setDeleteData(checked);
       if( checked ){
+        setListFlag('I');
         setCallListInsertData({
           ..._callListInsertData,
           list_flag: 'I'
         });
       }else{
+        setListFlag('A');
         setCallListInsertData({
           ..._callListInsertData,
           list_flag: 'A'
@@ -794,6 +794,55 @@ const ListManager: React.FC = () => {
       }
     }
   }, [activeTabId, openedTabs]);
+   
+  useEffect(() => {
+    if (workFileIndex > -1) {
+      
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      const newProgressListData = { ...progressListData
+        , id: progressList.length+1
+        , datetime: hours + ':' + minutes + ':' + seconds
+        , message: (workFileIndex+1)+' 번 파일 리스트 등록 시작'
+      };
+      setProgressList(prev => [newProgressListData, ...prev]);
+
+      const dataList:CallingListInsertDataType[] = [];
+      let sequenceIndex = 1;
+      for( let j=0;j<sendList.length;j++){
+        if( uploadedFiles[workFileIndex].id === sendList[j].fileId ){
+          dataList.push({
+            customer_key: sendList[j].CSNA+''
+            , sequence_number: sequenceIndex++,
+            customer_name: sendList[j].CSNA+'',
+            phone_number1: sendList[j].TNO1+'',
+            phone_number2: sendList[j].TNO2+'',
+            phone_number3: sendList[j].TNO3+'',
+            phone_number4: sendList[j].TNO4+'',
+            phone_number5: sendList[j].TNO5+'',
+            reserved_time: sendList[j].TKDA+'',
+            token_data: sendList[j].CSC1+''
+          });
+        }
+      }
+      const callingListInsertData: CallingListInsertRequest = {
+        ..._callListInsertData
+        , campaign_id: Number(uploadedFiles[workFileIndex].campaignId)
+        , list_flag: uploadedFiles[workFileIndex].listFlag+''
+        , calling_list: dataList
+      };
+
+      if( uploadedFiles[workFileIndex].listFlag === 'T'){
+        fetchBlacklistDelete(Number(uploadedFiles[workFileIndex].campaignId));
+      }else if( targetType === 'general' ){
+        fetchCallingListInsert(callingListInsertData);
+      }else{
+        fetchBlacklistInsert(callingListInsertData);
+      }
+    }
+  }, [workFileIndex]);
    
   return (
     <div className="flex flex-col gap-5 limit-width">
