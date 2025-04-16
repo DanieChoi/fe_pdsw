@@ -305,12 +305,19 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
                   <SelectItem key={0} value={'0'}>
                     없음
                   </SelectItem>
-                {campaigns.filter((data) => data.tenant_id === Number(campaignInfo.tenant_id))
+                  {isNaN(campaignInfo.tenant_id ) ? 
+                  campaigns.map((campaign) => (
+                  <SelectItem key={campaign.campaign_id} value={campaign.campaign_id+''}>
+                    [{campaign.campaign_id}]{campaign.campaign_name}
+                  </SelectItem>
+                ))
+                  :campaigns.filter((data) => data.tenant_id === Number(campaignInfo.tenant_id))
                   .map((campaign) => (
                   <SelectItem key={campaign.campaign_id} value={campaign.campaign_id+''}>
                     [{campaign.campaign_id}]{campaign.campaign_name}
                   </SelectItem>
-                ))}
+                ))
+                  }
               </SelectContent>
             </Select>
           </div>
