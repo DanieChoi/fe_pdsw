@@ -809,7 +809,7 @@ const ListManager: React.FC = () => {
       };
       setProgressList(prev => [newProgressListData, ...prev]);
 
-      let dataList:CallingListInsertDataType[] = [];
+      const dataList:CallingListInsertDataType[] = [];
       let sequenceIndex = 1;
       for( let j=0;j<sendList.length;j++){
         if( uploadedFiles[workFileIndex].id === sendList[j].fileId ){
