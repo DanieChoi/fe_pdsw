@@ -37,6 +37,13 @@ interface CustomColumn<R> extends Column<R> {
   children?: CustomColumn<R>[];
 }
 
+const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const currentValue = e.target.value;
+  if (currentValue.startsWith("0") && currentValue.length > 1) {
+    e.target.value = currentValue.replace(/^0+/, "");
+  }
+};
+
 const EditableCell = ({ row, column, onRowChange }: any) => {
   return (
     <input
@@ -47,6 +54,7 @@ const EditableCell = ({ row, column, onRowChange }: any) => {
         const newValue = parseInt(e.target.value) || 0;
         onRowChange({ ...row, [column.key]: newValue });
       }}
+      onBlur={handleBlur}
     />
   );
 };
@@ -227,6 +235,48 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
         check = false;
       }else if( newRows[i].duration7 < 0 ){
         newRows[i].duration7 = 0;
+        check = false;
+      }else if( newRows[i].count1 > 5 ){
+        newRows[i].count1 = 5;
+        check = false;
+      }else if( newRows[i].count2 > 5 ){
+        newRows[i].count2 = 5;
+        check = false;
+      }else if( newRows[i].count3 > 5 ){
+        newRows[i].count3 = 5;
+        check = false;
+      }else if( newRows[i].count4 > 5 ){
+        newRows[i].count4 = 5;
+        check = false;
+      }else if( newRows[i].count5 > 5 ){
+        newRows[i].count5 = 5;
+        check = false;
+      }else if( newRows[i].count6 > 5 ){
+        newRows[i].count6 = 5;
+        check = false;
+      }else if( newRows[i].count7 > 5 ){
+        newRows[i].count7 = 5;
+        check = false;
+      }else if( newRows[i].duration1 > 100 ){
+        newRows[i].duration1 = 100;
+        check = false;
+      }else if( newRows[i].duration2 > 100 ){
+        newRows[i].duration2 = 100;
+        check = false;
+      }else if( newRows[i].duration3 > 100 ){
+        newRows[i].duration3 = 100;
+        check = false;
+      }else if( newRows[i].duration4 > 100 ){
+        newRows[i].duration4 = 100;
+        check = false;
+      }else if( newRows[i].duration5 > 100 ){
+        newRows[i].duration5 = 100;
+        check = false;
+      }else if( newRows[i].duration6 > 100 ){
+        newRows[i].duration6 = 100;
+        check = false;
+      }else if( newRows[i].duration7 > 100 ){
+        newRows[i].duration7 = 100;
         check = false;
       }
     }

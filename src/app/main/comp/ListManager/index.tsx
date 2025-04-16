@@ -329,6 +329,7 @@ const ListManager: React.FC = () => {
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {   
+    setCampaignIdDisabled(true);
     const files = e.target.files;
     if (files && files.length > 0) {
       try{
@@ -572,7 +573,7 @@ const ListManager: React.FC = () => {
     setSelectedFile(null);
     // setUploadedFiles([]);
     // setSendList([]);
-    setCampaignIdDisabled(false);
+    // setCampaignIdDisabled(false);
   };
 
   // 작업대상 올리기
@@ -582,6 +583,14 @@ const ListManager: React.FC = () => {
         ...errorMessage,
         isOpen: true,
         message: "파일 포맷이 설정되어 있지 않습니다. 파일 포맷을 설정해 주세요.",
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    }else if( campaignId === 0){
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: "캠페인을 선택해야 합니다.",
         type: '2',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
@@ -749,6 +758,7 @@ const ListManager: React.FC = () => {
   //select data change
   const handleSelectChange = (value: string, type: string) => {
     if( type === 'campaignId' ){
+      setCampaignId(Number(value));
       setCallListInsertData({
         ..._callListInsertData,
         campaign_id: Number(value)
