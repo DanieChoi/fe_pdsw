@@ -398,6 +398,7 @@ export default function Footer({
     // 브라우저 환경인지 확인
     if (typeof window !== 'undefined' && window.EventSource && id !== '') {
       const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+      console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
       const eventSource = new EventSource(
         `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
       );
