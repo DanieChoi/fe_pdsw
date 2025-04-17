@@ -1007,8 +1007,15 @@ const RebroadcastSettingsPanel = () => {
     //캠페인 상태 변경 api 호출
     const { mutate: fetchCampaignStatusUpdate } = useApiForCampaignStatusUpdate({
         onSuccess: (data) => {
-            if (data.result_code === 0 || data.result_code === -13) {
-                
+            if (data.result_code === 0 || data.result_code === -13) {                 
+                setAlertState({
+                    isOpen: true,
+                    message: '재발신 적용 완료했습니다.',
+                    title: '재발신',
+                    type: '2',
+                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                });
             } else {
                 setAlertState({
                     ...errorMessage,
