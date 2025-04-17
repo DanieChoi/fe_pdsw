@@ -57,7 +57,7 @@ const CampaignAddPopup: React.FC<Props> = ({
   const [skillLookup, setSkillLookup] = useState<Record<number, SkillInfo>>({});
   const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
 
-  const { setCampaignGroupManagerInit } = useCampainManagerStore();  
+  const { setCampaignGroupManagerInit } = useCampainManagerStore();
 
   // ----------------------------
   //  Hooks
@@ -512,12 +512,12 @@ const CampaignAddPopup: React.FC<Props> = ({
         message={
           <div className="">
 
-              <CustomInput
-                type="text"
-                placeholder="검색"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-              />
+            <CustomInput
+              type="text"
+              placeholder="검색"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+            />
 
             <div
               className=""
@@ -580,7 +580,7 @@ const CampaignAddPopup: React.FC<Props> = ({
                   </button>
                 </div>
                 <div className="flex-1">
-                <TitleWrap title="그룹 소속 캠페인목록" totalCount={groupCampaignsData.length} />
+                  <TitleWrap title="그룹 소속 캠페인목록" totalCount={groupCampaignsData.length} />
                   <div className="border rounded overflow-hidden">
                     <GroupCampaignList
                       isLoading={isLoadingGroup}
@@ -592,13 +592,12 @@ const CampaignAddPopup: React.FC<Props> = ({
               </div>
             </div>
             <div className="flex justify-end space-x-2 mt-6">
-
-                <CommonButton
-                  onClick={onClose}
-                >
-                  닫기
-                </CommonButton>
-
+              <CommonButton onClick={handleConfirm}>
+                확인
+              </CommonButton>
+              <CommonButton variant="outline" onClick={onClose}>
+                닫기
+              </CommonButton>
             </div>
           </div>
         }
@@ -621,6 +620,7 @@ const CampaignAddPopup: React.FC<Props> = ({
           type="custom"
           width="max-w-md"
           confirmDisabled={false} // 항상 확인 버튼 활성화
+          isShowForCancleButton={true} // 취소 버튼 표시 여부
         />
       )}
     </>
