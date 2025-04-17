@@ -818,7 +818,7 @@ const RebroadcastSettingsPanel = () => {
                 }else if( data.reason_code === -3){
                     _message = '[-3]상담사과 고객이 통화 중이라 캠페인 통계가 완료되지 않았습니다. \n잠시만 기다려주세요.';
                 }
-                fetchCampaignManagerUpdate(UpdataCampaignInfo(campaigns,Number(campaignId),2));
+                // fetchCampaignManagerUpdate(UpdataCampaignInfo(campaigns,Number(campaignId),2));
 
                 setAlertState({
                     isOpen: true,
