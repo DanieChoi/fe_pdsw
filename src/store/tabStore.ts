@@ -43,6 +43,11 @@ export interface TabLayoutStore {
   rows: TabRow[];
   tabGroups: TabGroup[];
 
+  // 삭제된 캠페인 ID (단일 값)
+  deletedCampaignIdAtSidebar: string | null;
+  // 삭제된 캠페인 ID 설정 메소드
+  setDeletedCampaignId: (campaignId: string | null) => void;
+
   // 전역 단일 activeTabId/activeTabKey (드래그 중 Overlay 표시 등에 활용)
   activeTabId: number | null;
   activeTabKey: string | null;
@@ -193,6 +198,13 @@ export const useTabStore = create<TabLayoutStore>((set, get) => ({
 
   splitMode: false,
   splitLayout: 'none',
+
+  // 삭제된 캠페인 ID 초기값
+  deletedCampaignIdAtSidebar: null,
+  
+  // 삭제된 캠페인 ID 설정 메소드
+  setDeletedCampaignId: (campaignId: string | null) => 
+    set({ deletedCampaignIdAtSidebar: campaignId }),
 
   setSplitMode: (mode) => set({ splitMode: mode }),
   setSplitLayout: (layout) => set({ splitLayout: layout }),

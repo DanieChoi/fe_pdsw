@@ -36,6 +36,20 @@ export function TreeNodeForCampaignTab({
   } = useTabStore();
   const nodeRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    // campaignIdForUpdateFromSideMenu가 현재 노드의 ID와 일치하면 해당 노드 선택
+    if (campaignIdForUpdateFromSideMenu && campaignIdForUpdateFromSideMenu === item.id) {
+      onNodeSelect(item.id);
+      
+      // 노드가 보이지 않을 경우 해당 위치로 스크롤
+      if (nodeRef.current) {
+        nodeRef.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'nearest'
+        });
+      }
+    }
+  }, [campaignIdForUpdateFromSideMenu, item.id, onNodeSelect]);
 
   // Get the most current status from the campaigns store
   const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
@@ -288,20 +302,7 @@ export function TreeNodeForCampaignTab({
     }
   };
 
-useEffect(() => {
-  // campaignIdForUpdateFromSideMenu가 현재 노드의 ID와 일치하면 해당 노드 선택
-  if (campaignIdForUpdateFromSideMenu && campaignIdForUpdateFromSideMenu === item.id) {
-    onNodeSelect(item.id);
-    
-    // 노드가 보이지 않을 경우 해당 위치로 스크롤
-    if (nodeRef.current) {
-      nodeRef.current.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'nearest'
-      });
-    }
-  }
-}, [campaignIdForUpdateFromSideMenu, item.id, onNodeSelect]);
+
 
   return (
     <div className="select-none">
