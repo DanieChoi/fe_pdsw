@@ -544,6 +544,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
                 onRowClick(row.campaignId.toString());
             }
         }
+        setCampaignIdForUpdateFromSideMenu(row.campaignId.toString()); // This is for the side menu to update its state
     // Dependencies: Include everything read inside the callback
     }, [filteredCampaigns, selectedCampaignRow, onRowClick, setSelectedCampaign, setSelectedCampaignRow]); // Added setters back here as they are used
 
