@@ -24,6 +24,7 @@ import { useRouter } from 'next/navigation';
 import { useApiForDialSpeedUpdate } from '@/features/campaignManager/hooks/useApiForDialSpeedUpdate';
 import { campaignChannel } from '@/lib/broadcastChannel';
 import { toast } from 'react-toastify';
+import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
 
 
 const errorMessage: CustomAlertRequest = {
@@ -306,11 +307,19 @@ const MonitorPage = () => {
 
   //캠페인 발신 속도 수정 api 호출
   const { mutate: fetchDialSpeedUpdate } = useApiForDialSpeedUpdate({
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
+
+      // 현재 선택된 캠페인의 발신속도를 업데이트해서 최신 상태 반영
+      setCurrentCampaign((prev) => ({
+        ...prev,
+        callPacing: variables.dial_speed,
+      }));
+      // 캠페인 목록 다시 가져오기
       fetchMain({
         session_key: '',
         tenant_id: tenant_id,
       });
+
     }, onError: (data) => {
       if (data.message.split('||')[0] === '5') {
         setAlertState({
@@ -322,6 +331,35 @@ const MonitorPage = () => {
         setTimeout(() => {
           router.push('/login');
         }, 1000);
+      }
+    }
+  });
+
+  // 캠페인 스킬 수정 API 호출
+  const { mutate: fetchCampaignSkillUpdate } = useApiForCampaignSkillUpdate({
+    onSuccess: (data, variables) => {
+      
+      if (data.result_code === 0) {
+        // 현재 선택된 캠페인의 스킬을 업데이트해서 최신 상태 반영
+        setCurrentCampaign((prev) => ({
+          ...prev,
+          skills: variables.skill_id,
+        }));
+        // 캠페인 목록 다시 가져오기
+        fetchMain({
+          session_key: '',
+          tenant_id: tenant_id,
+        });
+      } // end of if result_code
+    },
+    onError: (data) => {
+      // 세션이 만료되었을때 팝업창을 닫는 로직처리를 위한 것
+      if (data.message.split('||')[0] === '5') {
+        if (window.opener) {
+          window.opener.postMessage({ type: "sessionFailed" }, "*");
+          // 자기 자신 닫기
+          window.close();
+        }  
       }
     }
   });
@@ -357,9 +395,10 @@ const MonitorPage = () => {
     //캠페인 발신 속도 수정 api 호출
     fetchDialSpeedUpdate({
       campaign_id: Number(selectedCampaign),
-      dial_speed: tempCampaign?.dial_mode === 2 ? callPacing / 2 : tempCampaign?.dial_mode === 3 ? callPacing : 0,
+      dial_speed: tempCampaign?.dial_mode === 2 ? Math.floor(callPacing / 2) : tempCampaign?.dial_mode === 3 ? callPacing : 0,
       tenant_id: tempCampaign?.tenant_id ?? 0
     });
+    // dial_mode 이 2인 경우는 C# 코드와 동일하게 발신 속도를 2로 나누고 소수점이 있을경우 내림처리
   };
 
   const handleRebroadcastEdit = () => {
@@ -376,10 +415,21 @@ const MonitorPage = () => {
     setIsSkillPopupOpen(true);
   };
 
+  // 해당 캠페인 스킬 수정 API 호출
   const handleSkillConfirm = (selectedSkills: string) => {
-    // 여기서 선택된 스킬 처리
-    console.log('Selected skills:', selectedSkills);
-    setIsSkillPopupOpen(false);
+    
+    // 선택된 스킬로 수정 시작
+    const skillArray = selectedSkills.split(',').map(Number);
+
+    const requestData = {
+      campaign_id: Number(selectedCampaign),
+      skill_id: skillArray,
+    };
+
+    // 캠페인 스킬 수정 API 호출
+    fetchCampaignSkillUpdate(requestData);
+
+    handleSkillPopupClose();
   };
 
   // 섹션 드래그 관련 핸들러
