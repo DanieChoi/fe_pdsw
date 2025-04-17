@@ -1768,7 +1768,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       </div>
       <SkillListPopup
         param={tempCampaignSkills.skill_id || []}
-        tenantId={tempCampaignInfo.tenant_id}
+        tenantId={tempCampaignInfo.tenant_id||-1}
         type={skillPopupState.type}
         isOpen={skillPopupState.isOpen}
         onConfirm={(param) => handleSelectSkills(param)}

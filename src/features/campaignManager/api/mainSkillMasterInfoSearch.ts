@@ -25,7 +25,7 @@ export const fetchSkills = async (credentials: SkillListCredentials): Promise<Sk
       items: 9999999,
     },
   };
-  debugger
+  
   try {
     const { data } = await axiosInstance.post<SkillListResponse>(
       '/collections/skill', 

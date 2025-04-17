@@ -485,7 +485,7 @@ const DistributionLimit = () => {
   // 캠페인별 상담사 목록 조회
   const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
     onSuccess: (response) => {
-      console.log("response : ",response);
+      // console.log("response : ",response);
       if (response?.result_data && response.result_data.length > 0) {
         // 캠페인에 소속된 상담사 ID 목록 저장
         const agentIds = response.result_data[0].agent_id;
@@ -1075,7 +1075,7 @@ const DistributionLimit = () => {
       confirmMessage = `파트 ${contextMenu.part} 의 할당된 콜수를 삭제하시겠습니까?`;
       
       // 파트에 속한 상담사 중 최대분배호수가 0보다 큰 상담사만 ID 수집
-      console.log("rawAgentData : " , rawAgentData);
+      
       agentIds = rawAgentData
         .filter(agent => 
           agent.part === contextMenu.part  && 
@@ -1300,8 +1300,6 @@ const DistributionLimit = () => {
       return;
     }
 
-    console.log("targetAgents : ",targetAgents);
-    
     // 모달 닫기
     setBulkLimitModal(prev => ({ ...prev, isOpen: false }));
     

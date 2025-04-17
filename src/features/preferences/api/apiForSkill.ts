@@ -17,7 +17,7 @@ export const fetchSkillList = async (credentials: SkillListCredentials): Promise
         },
         page: {
             index: 1,
-            items: 10
+            items: 99999
         }
     };
 
