@@ -11,6 +11,14 @@ import { ArrowUp, ArrowDown } from "lucide-react";
 import Image from 'next/image';
 import { NodeType, SortDirection, SortType, useTreeMenuStore, ViewMode } from '@/store/storeForSsideMenuCampaignTab';
 
+// Extend Window interface to include custom functions
+declare global {
+  interface Window {
+    expandAllNodes?: () => void;
+    expandTenantsOnly?: () => void;
+  }
+}
+
 export function SortButtonForCampaign() {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
@@ -30,9 +38,7 @@ export function SortButtonForCampaign() {
       useTreeMenuStore.getState().setSelectedNodeType('campaign');
 
       setTimeout(() => {
-        // @ts-expect-error: global window function expandAllNodes might not be declared
         if (window.expandAllNodes) {
-          // @ts-expect-error: calling undeclared global function expandAllNodes
           window.expandAllNodes();
         }
       }, 100);
@@ -46,32 +52,21 @@ export function SortButtonForCampaign() {
 
   const handleNodeTypeSort = (nodeType: NodeType, direction: SortDirection) => {
     console.log("정렬 버튼 클릭:", { nodeType, direction });
-
+    
     sortByNodeType(nodeType, campaignSort.type, direction);
-
-    if (nodeType === 'tenant') {
-      setViewMode('tenant');
-
-      setTimeout(() => {
-        // @ts-expect-error: global window function expandTenantsOnly might not be declared
+    setSelectedNodeType(nodeType);
+    
+    setTimeout(() => {
+      if (nodeType === 'tenant') {
         if (window.expandTenantsOnly) {
-          // @ts-expect-error: calling undeclared global function expandTenantsOnly
           window.expandTenantsOnly();
         }
-      }, 50);
-    } else {
-      setViewMode('campaign');
-
-      setTimeout(() => {
-        // @ts-expect-error: global window function expandAllNodes might not be declared
+      } else {
         if (window.expandAllNodes) {
-          // @ts-expect-error: calling undeclared global function expandAllNodes
           window.expandAllNodes();
         }
-      }, 50);
-    }
-
-    setTimeout(() => {
+      }
+      
       window.dispatchEvent(new Event('resize'));
     }, 100);
 
@@ -97,15 +92,11 @@ export function SortButtonForCampaign() {
       // 같은 모드라도 확장 상태를 초기화
       setTimeout(() => {
         if (mode === 'tenant') {
-          // @ts-expect-error: global window function expandTenantsOnly might not be declared
           if (window.expandTenantsOnly) {
-            // @ts-expect-error: calling undeclared global function expandTenantsOnly
             window.expandTenantsOnly();
           }
         } else {
-          // @ts-expect-error: global window function expandAllNodes might not be declared
           if (window.expandAllNodes) {
-            // @ts-expect-error: calling undeclared global function expandAllNodes
             window.expandAllNodes();
           }
         }
@@ -121,15 +112,11 @@ export function SortButtonForCampaign() {
 
     setTimeout(() => {
       if (mode === 'tenant') {
-        // @ts-expect-error: global window function expandTenantsOnly might not be declared
         if (window.expandTenantsOnly) {
-          // @ts-expect-error: calling undeclared global function expandTenantsOnly
           window.expandTenantsOnly();
         }
       } else {
-        // @ts-expect-error: global window function expandAllNodes might not be declared
         if (window.expandAllNodes) {
-          // @ts-expect-error: calling undeclared global function expandAllNodes
           window.expandAllNodes();
         }
       }

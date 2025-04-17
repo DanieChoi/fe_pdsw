@@ -19,18 +19,14 @@ export function IRootNodeContextMenu({ item }: RootNodeContextMenuProps) {
   const { session_key } = useAuthStore();
 
   const handleExpandAll = useCallback(() => {
-    // @ts-expect-error - 전역 객체에 함수 추가 (window 타입에 정의되지 않은 속성)
-    if (typeof window.expandAllNodes === 'function') {
-      // @ts-expect-error - 전역 객체에 함수 추가 (window 타입에 정의되지 않은 속성)
-      window.expandAllNodes();
+    if (typeof (window as any).expandAllNodes === 'function') {
+      (window as any).expandAllNodes();
     }
   }, []);
 
   const handleCollapseAll = useCallback(() => {
-    // @ts-expect-error - 전역 객체에 함수 추가 (window 타입에 정의되지 않은 속성)
-    if (typeof window.expandTenantsOnly === 'function') {
-      // @ts-expect-error - 전역 객체에 함수 추가 (window 타입에 정의되지 않은 속성)
-      window.expandTenantsOnly();
+    if (typeof (window as any).expandTenantsOnly === 'function') {
+      (window as any).expandTenantsOnly();
     }
   }, []);
 
