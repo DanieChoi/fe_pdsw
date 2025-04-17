@@ -18,18 +18,18 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_APP_VERSION: packageJson.version || '0.0.0',
   },
 
-  // async rewrites() {
-  //   return [
-  //     {
-  //       source: '/api_upds/v1/:path*',
-  //       destination: 'http://10.10.30.228:4000/api_upds/v1/:path*'
-  //     },
-  //     {
-  //       source: '/pds/:path*',
-  //       destination: 'http://10.10.40.145:8010/pds/:path*'
-  //     }
-  //   ]
-  // }
+  async rewrites() {
+    return [
+      {
+        source: '/api_upds/v1/:path*',
+        destination: 'http://10.10.30.228:4000/api_upds/v1/:path*'
+      },
+      {
+        source: '/pds/:path*',
+        destination: 'http://10.10.40.145:8010/pds/:path*'
+      }
+    ]
+  }
 };
 
 export default nextConfig;
