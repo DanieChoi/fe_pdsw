@@ -1,25 +1,22 @@
 import * as React from "react";
-import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input"; // Shadcn UI Input 사용
 
 interface CustomInputNumberProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "type"> {
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "onChange"> {
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
 }
 
 const CustomInputNumber = React.forwardRef<HTMLInputElement, CustomInputNumberProps>(
-  ({ className, value, onChange, ...props }, ref) => {
+  ({ value, onChange, onBlur, ...props }, ref) => {
     return (
-      <input
-        inputMode="numeric"
-        pattern="[0-9]*"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={cn(
-          "flex h-[26px] w-full rounded-[3px] border border-input bg-white px-[8px] transition-colors file:border-0 file:bg-white file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:text-[#aaa] disabled:bg-[#F4F4F4] border-[#ebebeb] text-[#333] text-sm",
-          className
-        )}
+      <Input
         ref={ref}
+        // inputMode="numeric"
+        value={value}
+        onChange={(e) => onChange(e.target.value)} // ✨ 자유롭게 입력 허용
+        onBlur={onBlur} // ✨ 숫자 검증은 여기서
         {...props}
       />
     );
