@@ -45,13 +45,13 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
   // const { tenant_id } = useAuthStore();
 
   console.log('tenant_id !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', tenant_id);
-  
-  
+
+
   // 스토어 및 API 훅들
   const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
   const { callingNumbers, campaignSkills } = useCampainManagerStore();
-  const { activeTabKey, closeAllTabs, rows, removeTab , campaignIdForUpdateFromSideMenu} = useTabStore();
-  
+  const { activeTabKey, closeAllTabs, rows, removeTab, campaignIdForUpdateFromSideMenu, setDeletedCampaignId } = useTabStore();
+
 
   const { mutate: updateCampaignSkill } = useApiForCampaignSkillUpdate({
     onSuccess: () => {
@@ -106,10 +106,10 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
       console.log('캠페인 삭제 성공:', data);
       toast.success(`'${campaignName}' 캠페인이 삭제되었습니다.`);
 
-      // todo
-      // tofix 0417
-      // 캠페인 삭제 후 삭제된 아이디를 전달하여 캠페인 관리 패널 캠페인 목록에서 삭제
-
+      // 삭제된 캠페인 ID 설정
+      if (campaignId) {
+        setDeletedCampaignId(campaignId.toString());
+      }
 
       // 삭제 후 스케줄 삭제 등 처리
       deleteCampaignSchedule({
