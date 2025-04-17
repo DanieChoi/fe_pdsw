@@ -29,6 +29,7 @@ import { CampaignGroupGampaignListItem } from '@/features/campaignManager/types/
 import { CampaignInfoUpdateRequest } from '@/features/campaignManager/types/campaignManagerIndex';
 import { useApiForCampaignManagerUpdate } from '@/features/campaignManager/hooks/useApiForCampaignManagerUpdate';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
 
 interface RebroadcastSettings {
     campaignId: string;
@@ -448,6 +449,7 @@ const RebroadcastSettingsGroupPanel = () => {
                 onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
             });
         }
+        //4-1. 실시간 재발신 적용 - 리스트 건수가 0 보다 큰 경우 실행.
         for( let i=0;i<tempCampaignsCount;i++){
             fetchCampaignRedialPreviewSearch({
                 campaign_id: Number(tempCampaigns[i].campaign_id),
@@ -810,15 +812,15 @@ const RebroadcastSettingsGroupPanel = () => {
                     };
                     fetchCampaignManagerUpdate(imsiData);
                 }
-            }else{                
-                setAlertState({
-                    isOpen: true,
-                    message: '재발신 적용 완료했습니다.',
-                    title: '재발신',
-                    type: '2',
-                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-                });
+            }else{        
+                //4-4. 실시간 재발신 적용 -  캠페인 상태 시작으로 변경한다.  
+                for( let j=0;j<tempCampaignsCount;j++){
+                    const selectedCampaign = tempCampaigns[j];                         
+                    fetchCampaignStatusUpdate({
+                        campaign_id: selectedCampaign.campaign_id
+                        , campaign_status: 1
+                    });
+                }
             }
         },
         onError: (data) => {  
@@ -909,32 +911,24 @@ const RebroadcastSettingsGroupPanel = () => {
                     onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 });
             }else if( caseType === 2 ){
-                if( data.result_data.redial_count > 0){           
-                    // setAlertState({
-                    //     isOpen: true,
-                    //     message: `캠페인 아이디 : ${campaignIdForUpdateFromSideMenu} \n캠페인을 바로 시작하시겠습니까?`,
-                    //     title: '재발신 적용',
-                    //     type: '1',
-                    //     onClose: handleCampaignCurrentRedial,
-                    //     onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-                    // });          
-                    setAlertState({
-                        isOpen: true,
-                        message: `현재 발신가능한 리스트가 남아있습니다. \n 그래도 재설정 하시겠습니까?`,
-                        title: '재발신 설정 경고',
-                        type: '1',
-                        onClose: () => {                           
-                            setAlertState({
-                                isOpen: true,
-                                message: `캠페인 아이디 : ${campaignIdForUpdateFromSideMenu} \n캠페인을 바로 시작하시겠습니까?`,
-                                title: '재발신 적용',
-                                type: '1',
-                                onClose: handleCampaignCurrentRedial,
-                                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-                            });  
-                        },
-                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-                    });
+                if( data.result_data.redial_count > 0){       
+                    if( data.result_data.redial_count > 0){           
+                        //4-2. 실시간 재발신 적용 -  리스트 건수가 있는 경우 캠페인 진행 정보 API 호출 호출하여 대기리스트건수확인
+                        const campaignId = data.result_data.campaign_id;
+                        fetchCampaignProgressInformation({
+                            tenantId: campaigns.find(data=>data.campaign_id === campaignId)?.tenant_id||0,
+                            campaignId: campaignId
+                        });                         
+                    }else{        
+                        setAlertState({
+                            isOpen: true,
+                            message: '적용할 리스트 건수가 없습니다.',
+                            title: '리스트 건수 확인',
+                            type: '2',
+                            onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                            onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                        });
+                    }
                 }else{        
                     setAlertState({
                         isOpen: true,
@@ -987,16 +981,86 @@ const RebroadcastSettingsGroupPanel = () => {
         }
     });
 
+    // 캠페인 진행 정보 API 호출 (useMutation 사용)
+    const { mutate: fetchCampaignProgressInformation } = useApiForCampaignProgressInformation({
+        onSuccess: (data) => {      
+            if (data && data.progressInfoList && data.progressInfoList.length > 0 ) {
+                console.log(data.progressInfoList.length);
+                const tempList = data.progressInfoList.sort((a, b) => a.reuseCnt - b.reuseCnt);
+                const campaignProgressInfo = tempList[tempList.length-1];
+                const waitlist = campaignProgressInfo.totLstCnt - campaignProgressInfo.scct
+                    - campaignProgressInfo.buct 
+                    - campaignProgressInfo.fact
+                    - campaignProgressInfo.tect
+                    - campaignProgressInfo.customerOnHookCnt
+                    - campaignProgressInfo.dialToneSilence
+                    - campaignProgressInfo.nact
+                    - campaignProgressInfo.etct
+                    - campaignProgressInfo.lineStopCnt
+                    - campaignProgressInfo.detectSilenceCnt
+                    - campaignProgressInfo.acct
+                    - campaignProgressInfo.recallCnt;
+                 if( waitlist > 0){
+                    //4-3. 실시간 재발신 적용 -  대기리스트 건수가 있는 경우 캠페인 재발신 추출 api 호출 실행하여 재발신 추출한다.
+                    setAlertState({
+                        isOpen: true,
+                        message: `현재 발신가능한 리스트가 남아있습니다. \n 그래도 재설정 하시겠습니까?`,
+                        title: '재발신 설정 경고',
+                        type: '1',
+                        onClose: () => {    
+                            fetchCampaignCurrentRedial({
+                                campaign_id: Number(campaignProgressInfo.campId),
+                                condition: MakeRedialPacket()
+                            });      
+                        },
+                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    });
+
+                 }else{  
+                    setAlertState({
+                        isOpen: true,
+                        message: '적용할 대기리스트 건수가 없습니다.',
+                        title: '리스트 건수 확인',
+                        type: '2',
+                        onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    });
+                 }
+            }else{
+                setAlertState({
+                    isOpen: true,
+                    message: '적용할 대기리스트 건수가 없습니다.',
+                    title: '리스트 건수 확인',
+                    type: '2',
+                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                });
+            }
+        },onError: (data) => {      
+            if (data.message.split('||')[0] === '5') {
+                setAlertState({
+                    ...errorMessage,
+                    isOpen: true,
+                    message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                    type: '2',
+                    onClose: () => goLogin(),
+                });
+            }
+        }
+    });
+
     //캠페인 상태 변경 api 호출
     const { mutate: fetchCampaignStatusUpdate } = useApiForCampaignStatusUpdate({
         onSuccess: (data) => {
-            if (data.result_code === 0 || data.result_code === -13) {
-                for( let k=0;k<tempCampaignsCount;k++){
-                    fetchCampaignCurrentRedial({
-                        campaign_id: tempCampaigns[k].campaign_id,
-                        condition: MakeRedialPacket()
-                    });
-                }
+            if (data.result_code === 0 || data.result_code === -13) {        
+                setAlertState({
+                    isOpen: true,
+                    message: '재발신 적용 완료했습니다.',
+                    title: '재발신',
+                    type: '2',
+                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                });
             } else { 
                 for( let j=0;j<tempCampaignsCount;j++){
                     const selectedCampaign = tempCampaigns[j];
