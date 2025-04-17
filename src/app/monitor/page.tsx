@@ -1,3 +1,4 @@
+// src\app\monitor\page.tsx
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
@@ -7,7 +8,7 @@ import AgentStatusMonitoring from '@/app/main/comp/AgentStatusMonitoring';
 import OutboundCallProgressPanel from '@/app/main/comp/OutboundCallProgressPanel';
 import CampaignMonitorDashbord from '@/app/main/comp/CampaignMonitorDashbord';
 import Image from "next/image";
-import CustomAlert, {CustomAlertRequest} from '@/components/shared/layout/CustomAlert';
+import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import CampaignManager from '@/app/main/comp/CampaignManager';
 import RebroadcastSettingsPanel from '@/app/main/comp/RebroadcastSettingsPanel';
 import SkillListPopup from '@/components/shared/layout/SkillListPopup';
@@ -21,6 +22,8 @@ import { CheckCampaignSaveReturnCode } from '@/components/common/common';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { useApiForDialSpeedUpdate } from '@/features/campaignManager/hooks/useApiForDialSpeedUpdate';
+import { campaignChannel } from '@/lib/broadcastChannel';
+import { toast } from 'react-toastify';
 
 
 const errorMessage: CustomAlertRequest = {
@@ -72,7 +75,7 @@ interface Campaign {
   };
 }
 
-const initData : Campaign = {
+const initData: Campaign = {
   id: '',
   name: '',
   skills: [],
@@ -94,30 +97,30 @@ const MonitorPage = () => {
   const { setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const { skills, setSkills } = useCampainManagerStore();
 
-    // 인증 관련 상태
-    const { tenant_id,session_key } = useAuthStore();
+  // 인증 관련 상태
+  const { tenant_id, session_key } = useAuthStore();
 
-    // 드래그 관련 상태
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [isDragging, setIsDragging] = useState<boolean>(false);
-    const [activeDragger, setActiveDragger] = useState<DraggerId | null>(null);
-    const initialPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-    const initialSizesRef = useRef<Sizes | null>(null);
- 
-   // 모달/팝업 상태
-    const [isCampaignManagerOpen, setIsCampaignManagerOpen] = useState(false);
-    const [isRebroadcastOpen, setIsRebroadcastOpen] = useState(false);
-    const [isSkillPopupOpen, setIsSkillPopupOpen] = useState(false);
-    const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
-    const router = useRouter();
- 
-   // 크기 조정 상태
-   const [sizes, setSizes] = useState<Sizes>({
-     topHeight: 40,
-     topRow: { left: 15, middle: 55, right: 30 },
-     bottomRow: { left: 40, right: 60 }
-   });
-   
+  // 드래그 관련 상태
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [activeDragger, setActiveDragger] = useState<DraggerId | null>(null);
+  const initialPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const initialSizesRef = useRef<Sizes | null>(null);
+
+  // 모달/팝업 상태
+  const [isCampaignManagerOpen, setIsCampaignManagerOpen] = useState(false);
+  const [isRebroadcastOpen, setIsRebroadcastOpen] = useState(false);
+  const [isSkillPopupOpen, setIsSkillPopupOpen] = useState(false);
+  const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
+  const router = useRouter();
+
+  // 크기 조정 상태
+  const [sizes, setSizes] = useState<Sizes>({
+    topHeight: 40,
+    topRow: { left: 15, middle: 55, right: 30 },
+    bottomRow: { left: 40, right: 60 }
+  });
+
 
   // 캠페인 관련 상태(가짜 데이터)
   // const [campaigns] = useState<Campaign[]>([
@@ -140,45 +143,45 @@ const MonitorPage = () => {
   const [callPacing, setCallPacing] = useState<number>(0);
   const [dialMode, setDialMode] = useState<number>(0);
   const [_campaigns, _setCampaigns] = useState<Campaign[]>([]);
-  const [campaignList, setCampaignList ] = useState<any[]>([]);
-  const [campaignSkillList, setCampaignSkillList ] = useState<any[]>([]);
+  const [campaignList, setCampaignList] = useState<any[]>([]);
+  const [campaignSkillList, setCampaignSkillList] = useState<any[]>([]);
 
   // 섹션 상태
   const [sections, setSections] = useState<Section[]>([
-    { 
-      id: 'campaign-info', 
-      title: '캠페인정보', 
-      position: 'top-left', 
-      width: `${sizes.topRow.left}%` 
+    {
+      id: 'campaign-info',
+      title: '캠페인정보',
+      position: 'top-left',
+      width: `${sizes.topRow.left}%`
     },
-    { 
-      id: 'outbound-progress', 
-      title: '발신 진행 상태', 
-      position: 'top-middle', 
-      width: `${sizes.topRow.middle}%` 
+    {
+      id: 'outbound-progress',
+      title: '발신 진행 상태',
+      position: 'top-middle',
+      width: `${sizes.topRow.middle}%`
     },
-    { 
-      id: 'agent-status', 
-      title: '상담사 상태모니터', 
-      position: 'top-right', 
-      width: `${sizes.topRow.right}%` 
+    {
+      id: 'agent-status',
+      title: '상담사 상태모니터',
+      position: 'top-right',
+      width: `${sizes.topRow.right}%`
     },
-    { 
-      id: 'channel-monitor', 
-      title: '채널모니터', 
-      position: 'bottom-left', 
-      width: `${sizes.bottomRow.left}%` 
+    {
+      id: 'channel-monitor',
+      title: '채널모니터',
+      position: 'bottom-left',
+      width: `${sizes.bottomRow.left}%`
     },
-    { 
-      id: 'campaign-progress', 
-      title: '캠페인 진행 정보', 
-      position: 'bottom-right', 
-      width: `${sizes.bottomRow.right}%` 
+    {
+      id: 'campaign-progress',
+      title: '캠페인 진행 정보',
+      position: 'bottom-right',
+      width: `${sizes.bottomRow.right}%`
     }
   ]);
 
-   // 첫 캠페인 자동 선택 로직
-   useEffect(() => {
+  // 첫 캠페인 자동 선택 로직
+  useEffect(() => {
     if (_campaigns.length > 0 && !selectedCampaign) {
       const firstCampaign = _campaigns[0];
       setSelectedCampaign(firstCampaign.id);
@@ -186,27 +189,27 @@ const MonitorPage = () => {
     }
   }, [_campaigns]);
 
-   // 현재 선택된 캠페인 정보
+  // 현재 선택된 캠페인 정보
   const [currentCampaign, setCurrentCampaign] = useState<Campaign>(initData);
 
-   // 캠페인 데이터 통합 관리 핸들러
-   const handleCampaignDataUpdate = useCallback((campaignId: string, data: any) => {
+  // 캠페인 데이터 통합 관리 핸들러
+  const handleCampaignDataUpdate = useCallback((campaignId: string, data: any) => {
     console.log('Campaign data updated:', campaignId, data);
     // TODO: 필요한 상태 업데이트 로직 추가
   }, []);
-  
+
   // 드래그 시작 핸들러
-  const handleMouseDown = useCallback((e: React.MouseEvent, draggerId: DraggerId) =>  {
+  const handleMouseDown = useCallback((e: React.MouseEvent, draggerId: DraggerId) => {
     e.preventDefault();
     setIsDragging(true);
     setActiveDragger(draggerId);
-    
+
     initialPositionRef.current = {
       x: e.clientX,
       y: e.clientY
     };
-    initialSizesRef.current = {...sizes};
-    
+    initialSizesRef.current = { ...sizes };
+
     document.body.style.userSelect = 'none';
     document.body.style.cursor = draggerId === 'vertical' ? 'row-resize' : 'col-resize';
   }, [sizes]);
@@ -222,7 +225,7 @@ const MonitorPage = () => {
     const deltaYPercent = (deltaY / containerRect.height) * 100;
 
     setSizes(prevSizes => {
-      const newSizes = {...prevSizes};
+      const newSizes = { ...prevSizes };
 
       if (activeDragger === 'vertical') {
         let newTopHeight = initialSizesRef.current!.topHeight + deltaYPercent;
@@ -232,11 +235,11 @@ const MonitorPage = () => {
       else if (activeDragger === 'top-1') {
         let newLeftWidth = initialSizesRef.current!.topRow.left + deltaXPercent;
         newLeftWidth = Math.max(10, Math.min(40, newLeftWidth));
-        
+
         const remainingWidth = 100 - newLeftWidth;
-        const middleRightRatio = initialSizesRef.current!.topRow.middle / 
+        const middleRightRatio = initialSizesRef.current!.topRow.middle /
           (initialSizesRef.current!.topRow.middle + initialSizesRef.current!.topRow.right);
-        
+
         newSizes.topRow = {
           left: newLeftWidth,
           middle: remainingWidth * middleRightRatio,
@@ -247,7 +250,7 @@ const MonitorPage = () => {
         let newMiddleWidth = initialSizesRef.current!.topRow.middle + deltaXPercent;
         const availableWidth = 100 - newSizes.topRow.left;
         newMiddleWidth = Math.max(20, Math.min(availableWidth - 20, newMiddleWidth));
-        
+
         newSizes.topRow = {
           ...newSizes.topRow,
           middle: newMiddleWidth,
@@ -257,7 +260,7 @@ const MonitorPage = () => {
       else if (activeDragger === 'bottom') {
         let newLeftWidth = initialSizesRef.current!.bottomRow.left + deltaXPercent;
         newLeftWidth = Math.max(20, Math.min(80, newLeftWidth));
-        
+
         newSizes.bottomRow = {
           left: newLeftWidth,
           right: 100 - newLeftWidth
@@ -280,13 +283,13 @@ const MonitorPage = () => {
           onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
         });
         setCampaignStatus(currentCampaign.startFlag === 1 ? '시작' : currentCampaign.startFlag === 2 ? '멈춤' : '중지');
-      }else{        
+      } else {
         fetchMain({
           session_key: '',
           tenant_id: tenant_id,
         });
       }
-    },onError: (data) => {      
+    }, onError: (data) => {
       if (data.message.split('||')[0] === '5') {
         setAlertState({
           ...errorMessage,
@@ -308,7 +311,7 @@ const MonitorPage = () => {
         session_key: '',
         tenant_id: tenant_id,
       });
-    },onError: (data) => {      
+    }, onError: (data) => {
       if (data.message.split('||')[0] === '5') {
         setAlertState({
           ...errorMessage,
@@ -323,8 +326,8 @@ const MonitorPage = () => {
     }
   });
 
-   // 캠페인 관련 핸들러
-   const handleStatusChange = (newStatus: string) => {
+  // 캠페인 관련 핸들러
+  const handleStatusChange = (newStatus: string) => {
     setCampaignStatus(newStatus as CampaignStatus);
     fetchCampaignStatusUpdate({
       campaign_id: Number(selectedCampaign)
@@ -333,88 +336,88 @@ const MonitorPage = () => {
     // API 호출 로직 추가
   };
 
-    const handleCampaignSelect = (campaignId: string) => {
-      setSelectedCampaign(campaignId);
-      const tempCampaignInfo = campaigns.find(c => c.campaign_id === Number(campaignId));
-      setCallPacing(tempCampaignInfo?.dial_mode === 2 ? tempCampaignInfo.dial_speed * 2 : tempCampaignInfo?.dial_mode === 3 ? tempCampaignInfo.dial_speed : 0);
-      setDialMode(tempCampaignInfo?.dial_mode || 0);
-      // API 호출 로직 추가
-    };
+  const handleCampaignSelect = (campaignId: string) => {
+    setSelectedCampaign(campaignId);
+    const tempCampaignInfo = campaigns.find(c => c.campaign_id === Number(campaignId));
+    setCallPacing(tempCampaignInfo?.dial_mode === 2 ? tempCampaignInfo.dial_speed * 2 : tempCampaignInfo?.dial_mode === 3 ? tempCampaignInfo.dial_speed : 0);
+    setDialMode(tempCampaignInfo?.dial_mode || 0);
+    // API 호출 로직 추가
+  };
 
-    const handleCallPacingChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = parseInt(e.target.value);
-      if (!isNaN(value) && value >= 0) {
-        setCallPacing(value);
+  const handleCallPacingChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value >= 0) {
+      setCallPacing(value);
+    }
+  }, []);
+
+  const handleCallPacingApply = () => {
+    console.log('Applying call pacing:', callPacing);
+    const tempCampaign = campaigns.find(c => c.campaign_id === Number(selectedCampaign));
+    //캠페인 발신 속도 수정 api 호출
+    fetchDialSpeedUpdate({
+      campaign_id: Number(selectedCampaign),
+      dial_speed: tempCampaign?.dial_mode === 2 ? callPacing / 2 : tempCampaign?.dial_mode === 3 ? callPacing : 0,
+      tenant_id: tempCampaign?.tenant_id ?? 0
+    });
+  };
+
+  const handleRebroadcastEdit = () => {
+    setCampaignIdForUpdateFromSideMenu(selectedCampaign + '');
+    setIsRebroadcastOpen(true);
+  };
+
+  // 스킬 관련 핸들러
+  const handleSkillPopupClose = () => {
+    setIsSkillPopupOpen(false);
+  };
+
+  const handleSkillModify = () => {
+    setIsSkillPopupOpen(true);
+  };
+
+  const handleSkillConfirm = (selectedSkills: string) => {
+    // 여기서 선택된 스킬 처리
+    console.log('Selected skills:', selectedSkills);
+    setIsSkillPopupOpen(false);
+  };
+
+  // 섹션 드래그 관련 핸들러
+  const handleDragStart = useCallback((e: React.DragEvent, sectionId: string) => {
+    e.dataTransfer.setData('text/plain', sectionId);
+    e.dataTransfer.effectAllowed = 'move';
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    e.currentTarget.classList.add('drag-over');
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.currentTarget.classList.remove('drag-over');
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent, targetPosition: Section['position']) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    const sourceSectionId = e.dataTransfer.getData('text/plain');
+
+    setSections(prevSections => {
+      const newSections = [...prevSections];
+
+      const sourceIndex = newSections.findIndex(s => s.id === sourceSectionId);
+      const targetIndex = newSections.findIndex(s => s.position === targetPosition);
+
+      if (sourceIndex !== -1 && targetIndex !== -1) {
+        const temp = newSections[sourceIndex].position;
+        newSections[sourceIndex].position = newSections[targetIndex].position;
+        newSections[targetIndex].position = temp;
       }
-    }, []);
 
-    const handleCallPacingApply = () => {
-      console.log('Applying call pacing:', callPacing);
-      const tempCampaign = campaigns.find(c => c.campaign_id === Number(selectedCampaign));
-      //캠페인 발신 속도 수정 api 호출
-      fetchDialSpeedUpdate({
-        campaign_id: Number(selectedCampaign),
-        dial_speed: tempCampaign?.dial_mode === 2 ? callPacing/2 : tempCampaign?.dial_mode === 3 ? callPacing : 0,
-        tenant_id: tempCampaign?.tenant_id ?? 0
-      });
-    };
-
-    const handleRebroadcastEdit = () => {
-      setCampaignIdForUpdateFromSideMenu(selectedCampaign+'');
-      setIsRebroadcastOpen(true);
-    };
-
-    // 스킬 관련 핸들러
-    const handleSkillPopupClose = () => {
-      setIsSkillPopupOpen(false);
-    };
-  
-    const handleSkillModify  = () => {
-      setIsSkillPopupOpen(true);
-    };
-  
-    const handleSkillConfirm = (selectedSkills: string) => {
-      // 여기서 선택된 스킬 처리
-      console.log('Selected skills:', selectedSkills);
-      setIsSkillPopupOpen(false);
-    };
-
-    // 섹션 드래그 관련 핸들러
-    const handleDragStart = useCallback((e: React.DragEvent, sectionId: string) => {
-      e.dataTransfer.setData('text/plain', sectionId);
-      e.dataTransfer.effectAllowed = 'move';
-    }, []);
-  
-    const handleDragOver = useCallback((e: React.DragEvent) => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      e.currentTarget.classList.add('drag-over');
-    }, []);
-  
-    const handleDragLeave = useCallback((e: React.DragEvent) => {
-      e.currentTarget.classList.remove('drag-over');
-    }, []);
-  
-    const handleDrop = useCallback((e: React.DragEvent, targetPosition: Section['position']) => {
-      e.preventDefault();
-      e.currentTarget.classList.remove('drag-over');
-      const sourceSectionId = e.dataTransfer.getData('text/plain');
-      
-      setSections(prevSections => {
-        const newSections = [...prevSections];
-        
-        const sourceIndex = newSections.findIndex(s => s.id === sourceSectionId);
-        const targetIndex = newSections.findIndex(s => s.position === targetPosition);
-        
-        if (sourceIndex !== -1 && targetIndex !== -1) {
-          const temp = newSections[sourceIndex].position;
-          newSections[sourceIndex].position = newSections[targetIndex].position;
-          newSections[targetIndex].position = temp;
-        }
-        
-        return newSections;
-      });
-    }, []);
+      return newSections;
+    });
+  }, []);
 
 
 
@@ -444,12 +447,12 @@ const MonitorPage = () => {
 
 
   // 드래그 위치 바꾸는 함수들
-  
+
   const renderSectionContent = useCallback((sectionId?: string) => {
     switch (sectionId) {
       case 'campaign-info':
         return (
-          <CampaignInfo 
+          <CampaignInfo
             currentCampaign={currentCampaign}
             selectedCampaign={selectedCampaign}
             campaignStatus={campaignStatus}
@@ -477,9 +480,9 @@ const MonitorPage = () => {
           />
         );
       case 'agent-status':
-        return <AgentStatusMonitoring campaignId={Number(selectedCampaign)} 
-            sessionKey={session_key}
-            tenantId={campaigns.find(c => c.campaign_id === Number(selectedCampaign))?.tenant_id+''}
+        return <AgentStatusMonitoring campaignId={Number(selectedCampaign)}
+          sessionKey={session_key}
+          tenantId={campaigns.find(c => c.campaign_id === Number(selectedCampaign))?.tenant_id + ''}
         />;
       case 'channel-monitor':
         return <ChannelMonitor />;
@@ -489,9 +492,9 @@ const MonitorPage = () => {
         return null;
     }
   }, [
-    currentCampaign, selectedCampaign, campaignStatus, callPacing, 
-    _campaigns, handleCampaignSelect, handleStatusChange, 
-    handleCallPacingChange, handleCallPacingApply, 
+    currentCampaign, selectedCampaign, campaignStatus, callPacing,
+    _campaigns, handleCampaignSelect, handleStatusChange,
+    handleCallPacingChange, handleCallPacingApply,
     handleCampaignDataUpdate
   ]);
 
@@ -516,12 +519,12 @@ const MonitorPage = () => {
   // 캠페인스킬 조회
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
-      setCampaignSkillList( data.result_data);
-      if( skills.length === 0 ){      
-        const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id); 
+      setCampaignSkillList(data.result_data);
+      if (skills.length === 0) {
+        const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
         fetchSkills({
           tenant_id_array: tempTenantIdArray
-        });   
+        });
       }
     }
   });
@@ -532,26 +535,26 @@ const MonitorPage = () => {
         session_key: '',
         tenant_id: 0,
       });
-      if( tenant_id === 0){
-        setCampaignList( data.result_data);
+      if (tenant_id === 0) {
+        setCampaignList(data.result_data);
         setCampaigns(data.result_data);
-      }else{
-        setCampaignList(data.result_data.filter(data=>data.tenant_id === tenant_id));
-        setCampaigns(data.result_data.filter(data=>data.tenant_id === tenant_id));
+      } else {
+        setCampaignList(data.result_data.filter(data => data.tenant_id === tenant_id));
+        setCampaigns(data.result_data.filter(data => data.tenant_id === tenant_id));
       }
     }
   });
-  
+
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
-      if( tenant_id === 0){
+      if (tenant_id === 0) {
         setTenants(data.result_data);
-      }else{
-        setTenants(data.result_data.filter(data=>data.tenant_id === tenant_id));
+      } else {
+        setTenants(data.result_data.filter(data => data.tenant_id === tenant_id));
       }
     }
   });
-  
+
   // 스킬 조회
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
@@ -563,9 +566,9 @@ const MonitorPage = () => {
     setIsCampaignManagerOpen(false);
   };
 
-  useEffect(() => {     
-    if( selectedCampaign !== '' ){
-      const tempCampaign = _campaigns.find(c => c.id === selectedCampaign)||initData;
+  useEffect(() => {
+    if (selectedCampaign !== '') {
+      const tempCampaign = _campaigns.find(c => c.id === selectedCampaign) || initData;
       setCurrentCampaign(tempCampaign);
       setCampaignStatus(tempCampaign.startFlag === 1 ? '시작' : tempCampaign.startFlag === 2 ? '멈춤' : '중지');
       const tempCampaignInfo = campaigns.find(c => c.campaign_id === Number(tempCampaign.id));
@@ -575,25 +578,25 @@ const MonitorPage = () => {
   }, [selectedCampaign]);
 
   useEffect(() => {
-    if( campaignList.length > 0 && campaignSkillList.length > 0 ){
-      const updatedCampaigns:Campaign[] = campaignList.map((data) => ({
+    if (campaignList.length > 0 && campaignSkillList.length > 0) {
+      const updatedCampaigns: Campaign[] = campaignList.map((data) => ({
         id: data.campaign_id,
         name: `[${data.campaign_id}]${data.campaign_name}`,
         skills: campaignSkillList.filter((skill) => skill.campaign_id === data.campaign_id)
-            .map((data) => data.skill_id).join(',').split(',').map((data) => Number(data)),
+          .map((data) => data.skill_id).join(',').split(',').map((data) => Number(data)),
         endTime: '',
         startFlag: data.start_flag,
         tenant_id: data.tenant_id,
       }));
-      if( selectedCampaign === '' ){
+      if (selectedCampaign === '') {
         setSelectedCampaign(updatedCampaigns[0].id);
       }
       _setCampaigns(updatedCampaigns);
-    }      
+    }
 
-  }, [campaignList,campaignSkillList]);
-  
-  useEffect(() => {     
+  }, [campaignList, campaignSkillList]);
+
+  useEffect(() => {
     fetchMain({
       session_key: '',
       tenant_id: tenant_id,
@@ -606,9 +609,9 @@ const MonitorPage = () => {
     // }, 30000);  
     // return () => clearInterval(interval);
   }, [tenant_id]);
-  
-  useEffect(() => {     
-    if( tenants.length === 0 ){
+
+  useEffect(() => {
+    if (tenants.length === 0) {
       fetchTenants({
         session_key: '',
         tenant_id: tenant_id,
@@ -616,97 +619,116 @@ const MonitorPage = () => {
     }
   }, [tenants]);
 
- 
-const renderTopRow = () => {
-  const topSections = sections.filter(s => 
-    s.position === 'top-left' || 
-    s.position === 'top-middle' || 
-    s.position === 'top-right'
-  ).sort((a, b) => {
-    const positions = ['top-left', 'top-middle', 'top-right'];
-    return positions.indexOf(a.position) - positions.indexOf(b.position);
-  });
 
-  return topSections.map((section, index) => {
-    const isNotLast = index < topSections.length - 1;
-    return (
-      <React.Fragment key={`top-section-${section.position}`}>
-        <div 
-          className="border border-[#ebebeb] overflow-auto p-3 flex flex-col"
-          style={{ width: `${getSectionWidth(section.position)}%` }}
-          draggable
-          onDragStart={(e) => handleDragStart(e, section.id)}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={(e) => handleDrop(e, section.position)}
-        >
-          <h2 className="text-sm text-[#333] font-bold flex gap-2 cursor-move">
-            <Image src="/move.svg" alt="drag" width={7} height={10} />
-            {section.title}
-          </h2>
-          <div className="h-[calc(100%-20px)] p-2">
-            {renderSectionContent(section.id)}
-          </div>
-        </div>
-        {isNotLast && (
+  const renderTopRow = () => {
+    const topSections = sections.filter(s =>
+      s.position === 'top-left' ||
+      s.position === 'top-middle' ||
+      s.position === 'top-right'
+    ).sort((a, b) => {
+      const positions = ['top-left', 'top-middle', 'top-right'];
+      return positions.indexOf(a.position) - positions.indexOf(b.position);
+    });
+
+    return topSections.map((section, index) => {
+      const isNotLast = index < topSections.length - 1;
+      return (
+        <React.Fragment key={`top-section-${section.position}`}>
           <div
-            key={`top-divider-${index}`}
-            className="w-1 bg-gray-200 hover:bg-[#55BEC8] active:bg-[#55BEC8] cursor-col-resize select-none"
-            onMouseDown={(e) => handleMouseDown(e, `top-${index + 1}` as DraggerId)}
-          />
-        )}
-      </React.Fragment>
-    );
-  });
-};
-
-const renderBottomRow = () => {
-  const bottomSections = sections.filter(s => 
-    s.position === 'bottom-left' || 
-    s.position === 'bottom-right'
-  ).sort((a, b) => {
-    const positions = ['bottom-left', 'bottom-right'];
-    return positions.indexOf(a.position) - positions.indexOf(b.position);
-  });
-
-  return bottomSections.map((section, index) => {
-    const isNotLast = index < bottomSections.length - 1;
-    return (
-      <React.Fragment key={`bottom-section-${section.position}`}>
-        <div 
-          className="border border-[#ebebeb] overflow-auto p-3 flex flex-col"
-          style={{ width: `${getSectionWidth(section.position)}%` }}
-          draggable
-          onDragStart={(e) => handleDragStart(e, section.id)}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={(e) => handleDrop(e, section.position)}
-        >
-          <h2 className="text-sm text-[#333] font-bold flex gap-2 cursor-move">
-            <Image src="/move.svg" alt="drag" width={7} height={10} />
-            {section.title}
-          </h2>
-          <div className="h-[calc(100%-20px)] p-2">
-            {renderSectionContent(section.id)}
+            className="border border-[#ebebeb] overflow-auto p-3 flex flex-col"
+            style={{ width: `${getSectionWidth(section.position)}%` }}
+            draggable
+            onDragStart={(e) => handleDragStart(e, section.id)}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, section.position)}
+          >
+            <h2 className="text-sm text-[#333] font-bold flex gap-2 cursor-move">
+              <Image src="/move.svg" alt="drag" width={7} height={10} />
+              {section.title}
+            </h2>
+            <div className="h-[calc(100%-20px)] p-2">
+              {renderSectionContent(section.id)}
+            </div>
           </div>
-        </div>
-        {isNotLast && (
+          {isNotLast && (
+            <div
+              key={`top-divider-${index}`}
+              className="w-1 bg-gray-200 hover:bg-[#55BEC8] active:bg-[#55BEC8] cursor-col-resize select-none"
+              onMouseDown={(e) => handleMouseDown(e, `top-${index + 1}` as DraggerId)}
+            />
+          )}
+        </React.Fragment>
+      );
+    });
+  };
+
+  const renderBottomRow = () => {
+    const bottomSections = sections.filter(s =>
+      s.position === 'bottom-left' ||
+      s.position === 'bottom-right'
+    ).sort((a, b) => {
+      const positions = ['bottom-left', 'bottom-right'];
+      return positions.indexOf(a.position) - positions.indexOf(b.position);
+    });
+
+    return bottomSections.map((section, index) => {
+      const isNotLast = index < bottomSections.length - 1;
+      return (
+        <React.Fragment key={`bottom-section-${section.position}`}>
           <div
-            key={`bottom-divider-${index}`}
-            className="w-1 bg-gray-200 hover:bg-[#55BEC8] active:bg-[#55BEC8] cursor-col-resize select-none"
-            onMouseDown={(e) => handleMouseDown(e, 'bottom')}
-          />
-        )}
-      </React.Fragment>
-    );
-  });
-};
+            className="border border-[#ebebeb] overflow-auto p-3 flex flex-col"
+            style={{ width: `${getSectionWidth(section.position)}%` }}
+            draggable
+            onDragStart={(e) => handleDragStart(e, section.id)}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, section.position)}
+          >
+            <h2 className="text-sm text-[#333] font-bold flex gap-2 cursor-move">
+              <Image src="/move.svg" alt="drag" width={7} height={10} />
+              {section.title}
+            </h2>
+            <div className="h-[calc(100%-20px)] p-2">
+              {renderSectionContent(section.id)}
+            </div>
+          </div>
+          {isNotLast && (
+            <div
+              key={`bottom-divider-${index}`}
+              className="w-1 bg-gray-200 hover:bg-[#55BEC8] active:bg-[#55BEC8] cursor-col-resize select-none"
+              onMouseDown={(e) => handleMouseDown(e, 'bottom')}
+            />
+          )}
+        </React.Fragment>
+      );
+    });
+  };
+
+  // tofix a2 0417
+  // 새창 열기로 모니터 페이지가 열리기 때문에 캠페인 매니저에서 수정된 캠페인 정보가 반영되지 않음
+  // 캠페인 관리 페이지에서 broadcast api 를 통해 수정 업데이트 후에 campaignId 를 전달받아 캠페인 정보 업데이트 해야 함
+  // src\app\monitor\page.tsx
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      const { type, campaignId } = event.data;
+
+      toast.info(`캠페인 수정 type , id : ${type} ${campaignId}`);
+    };
 
 
+    campaignChannel.addEventListener("message", handleMessage);
+
+    return () => {
+      campaignChannel.removeEventListener("message", handleMessage);
+    };
+  }, []);
+
+  // 모니터 페이지 렌더링
   return (
     <div ref={containerRef} className="w-full h-screen bg-white overflow-hidden p-4 flex flex-col">
       {/* 상단 섹션 */}
-      <div 
+      <div
         className="flex transition-all duration-75"
         style={{ height: `${sizes.topHeight}%` }}
       >
@@ -714,8 +736,8 @@ const renderBottomRow = () => {
         {renderTopRow()}
       </div>
 
-       {/* 세로 구분선 */}
-       <div className="w-full h-1 group cursor-row-resize select-none flex items-center hover:bg-gray-50 transition-colors">
+      {/* 세로 구분선 */}
+      <div className="w-full h-1 group cursor-row-resize select-none flex items-center hover:bg-gray-50 transition-colors">
         <div
           className="w-full h-1 bg-gray-200 group-hover:bg-[#55BEC8] group-active:bg-[#55BEC8]"
           onMouseDown={(e) => handleMouseDown(e, 'vertical')}
@@ -724,51 +746,51 @@ const renderBottomRow = () => {
 
 
       {/* 하단 섹션 */}
-      <div 
+      <div
         className="flex transition-all duration-75"
         style={{ height: `${100 - sizes.topHeight}%` }}
       >
-         {renderBottomRow()}
+        {renderBottomRow()}
       </div>
-       {/* 캠페인 매니저 모달 */}
-        <CustomAlert
-          isOpen={isCampaignManagerOpen}
-          title="캠페인 수정"
-          message={<CampaignManager campaignId={selectedCampaign} isOpen={isCampaignManagerOpen} onCampaignPopupClose={handleCampaignPopupClose}/>}
-          type="3"
-          onClose={() => setIsCampaignManagerOpen(false)}
-          onCancle={() => setIsCampaignManagerOpen(false)}
-          width="max-w-[1300px]"
-        />
-        {/* 스킬 리스트 팝업 */}
-        <SkillListPopup 
-          isOpen={isSkillPopupOpen}
-          param={currentCampaign.skills || []}
-          tenantId={Number(currentCampaign.tenant_id)}
-          type="1" 
-          onConfirm={handleSkillConfirm}
-          onCancel={handleSkillPopupClose}
-        />
+      {/* 캠페인 매니저 모달 */}
+      <CustomAlert
+        isOpen={isCampaignManagerOpen}
+        title="캠페인 수정"
+        message={<CampaignManager campaignId={selectedCampaign} isOpen={isCampaignManagerOpen} onCampaignPopupClose={handleCampaignPopupClose} />}
+        type="3"
+        onClose={() => setIsCampaignManagerOpen(false)}
+        onCancle={() => setIsCampaignManagerOpen(false)}
+        width="max-w-[1300px]"
+      />
+      {/* 스킬 리스트 팝업 */}
+      <SkillListPopup
+        isOpen={isSkillPopupOpen}
+        param={currentCampaign.skills || []}
+        tenantId={Number(currentCampaign.tenant_id)}
+        type="1"
+        onConfirm={handleSkillConfirm}
+        onCancel={handleSkillPopupClose}
+      />
 
-         {/* 재발신 설정 팝업 */}
-          <CustomAlert
-            isOpen={isRebroadcastOpen}
-            title="재발신 설정"
-            message={<RebroadcastSettingsPanel />}
-            type="1"
-            onClose={() => setIsRebroadcastOpen(false)}
-            onCancle={() => setIsRebroadcastOpen(false)}
-            width="max-w-[1300px]"
-          />
+      {/* 재발신 설정 팝업 */}
+      <CustomAlert
+        isOpen={isRebroadcastOpen}
+        title="재발신 설정"
+        message={<RebroadcastSettingsPanel />}
+        type="1"
+        onClose={() => setIsRebroadcastOpen(false)}
+        onCancle={() => setIsRebroadcastOpen(false)}
+        width="max-w-[1300px]"
+      />
 
-        <CustomAlert
-          message={alertState.message}
-          title={alertState.title}
-          type={alertState.type}
-          isOpen={alertState.isOpen}
-          onClose={() => {
-            alertState.onClose()
-          }}
+      <CustomAlert
+        message={alertState.message}
+        title={alertState.title}
+        type={alertState.type}
+        isOpen={alertState.isOpen}
+        onClose={() => {
+          alertState.onClose()
+        }}
         onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
     </div>
   );

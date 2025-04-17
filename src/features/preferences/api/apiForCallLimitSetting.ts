@@ -1,5 +1,6 @@
 import { axiosInstance } from "@/lib/axios";
 import { CallLimitSettingCreateRequest, CallLimitSettingDeleteRequest, CallLimitSettingListResponse, SuccesResponse, TenantIdCredentials } from "../types/SystemPreferences";
+import { ca } from "date-fns/locale";
 
 // 운영설정 예약콜 제한설정 리스트 요청
 export const fetchCallLimitSettingList = async (credentials: TenantIdCredentials): Promise<CallLimitSettingListResponse> => {
@@ -40,13 +41,20 @@ export const fetchCallLimitSettingList = async (credentials: TenantIdCredentials
 export const createCallLimitSetting = async (credentials: CallLimitSettingCreateRequest): Promise<SuccesResponse> => {
     const requestData = {
         request_data: {
+            // campaign_id: credentials.campaign_id,
             tenant_id: credentials.tenant_id,
             call_kind: credentials.call_kind,
             call_timeout: credentials.call_timeout,
             max_call: credentials.max_call,
-            max_criteria: credentials.max_criteria,
+            daily_init_flag: credentials.daily_init_flag,
+            daily_init_time: credentials.daily_init_time
+
+            // max_criteria: credentials.max_criteria,
         }
     };
+
+    console.log("credentials check !!!!!!!!!!!!!!!!!: ", credentials);
+    
 
     try {
         const { data } = await axiosInstance.post<SuccesResponse>(
@@ -70,7 +78,11 @@ export const UpdateCallLimitSetting = async (credentials: CallLimitSettingCreate
             call_kind: credentials.call_kind,
             call_timeout: credentials.call_timeout,
             max_call: credentials.max_call,
-            max_criteria: credentials.max_criteria,
+
+            daily_init_flag: credentials.daily_init_flag,
+            daily_init_time: credentials.daily_init_time
+
+            // max_criteria: credentials.max_criteria,
         }
     };
 

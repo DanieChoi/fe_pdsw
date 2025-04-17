@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import DataGrid from "react-data-grid";
 import { CommonButton } from "@/components/shared/CommonButton";
@@ -6,14 +7,15 @@ import { Label } from "@/components/ui/label";
 import CampaignModal from '../CampaignModal';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useMainStore, useTabStore } from '@/store';
-import { 
-  useApiForCallLimitSettingCreate, 
-  useApiForCallLimitSettingDelete, 
-  useApiForCallLimitSettingList, 
-  useApiForCallLimitSettingUpdate 
+import {
+  useApiForCallLimitSettingCreate,
+  useApiForCallLimitSettingDelete,
+  useApiForCallLimitSettingList,
+  useApiForCallLimitSettingUpdate
 } from '@/features/preferences/hooks/useApiForCallLimitSetting';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import CustomInputForTime from '@/components/shared/CustomInputForTime';
 
 interface Row {
   campaign_id: string;
@@ -27,7 +29,10 @@ interface LimitSettingItem {
   call_kind: number;
   call_timeout: number;
   max_call: number;
-  max_criteria: number;
+  // max_criteria: number;
+  daily_init_flag?: number; // 추가된 필드
+  daily_init_time?: string; // 추가된 필드
+
 }
 
 const errorMessage = {
@@ -44,18 +49,22 @@ const CampaignSettings = () => {
   const [campaignId, setCampaignId] = useState('');
   const [campaignName, setCampaignName] = useState('');
   const [limitCount, setLimitCount] = useState('');
+
+  const [dailyInitFlag, setDailyInitFlag] = useState(0); // ✅ 추가
+  const [dailyInitTime, setDailyInitTime] = useState("0000"); // ✅ 추가
+
   const [limitSettings, setLimitSettings] = useState<LimitSettingItem[]>([]);
   const [isNewMode, setIsNewMode] = useState(false); // 신규 모드 상태 추가
   const router = useRouter();
   const { activeTabId, openedTabs } = useTabStore()
-  
+
   const [alertState, setAlertState] = useState({
     isOpen: false,
     message: '',
     title: '알림',
     type: '1',
-    onConfirm: () => {},
-    onCancel: () => {}
+    onConfirm: () => { },
+    onCancel: () => { }
   });
 
   const showAlert = (message: string) => {
@@ -65,7 +74,7 @@ const CampaignSettings = () => {
       title: '알림',
       type: '2',
       onConfirm: closeAlert,
-      onCancel: () => {}
+      onCancel: () => { }
     });
   };
 
@@ -92,14 +101,14 @@ const CampaignSettings = () => {
     onSuccess: (data) => {
       setLimitSettings(data.result_data);
       setIsNewMode(false); // 데이터 로드 시 신규 모드 해제
-    },onError: (data) => {      
+    }, onError: (data) => {
       if (data.message.split('||')[0] === '5') {
         setAlertState({
           ...errorMessage,
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
           onConfirm: closeAlert,
-          onCancel: () => {}
+          onCancel: () => { }
         });
         Cookies.remove('session_key');
         setTimeout(() => {
@@ -112,20 +121,19 @@ const CampaignSettings = () => {
   // 제한건수 추가 API 
   const { mutate: createCallLimitSetting } = useApiForCallLimitSettingCreate({
     onSuccess: (data) => {
-      if( data.result_code === -1 ){
+      if (data.result_code === -1) {
         // -9053 메시지 표시
         showAlert('리스트 등록 건수를 초과하였습니다.');
-      }else{
+      } else {
 
         // 저장 성공 후 리스트를 새로 가져오기
         fetchCallLimitSettingList({
           tenant_id_array: tenants.map(tenant => tenant.tenant_id)
         });
-        
-        // 저장 후에도 현재 선택된 캠페인 정보 유지
+
         // 신규 모드는 해제하지만, 선택 상태는 유지
         setIsNewMode(false);
-        
+
         // 저장 성공 메시지 표시
         showAlert('저장되었습니다.');
       }
@@ -137,14 +145,14 @@ const CampaignSettings = () => {
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
           onConfirm: closeAlert,
-          onCancel: () => {}
+          onCancel: () => { }
         });
         Cookies.remove('session_key');
         setTimeout(() => {
           router.push('/login');
         }, 1000);
       } else {
-          showAlert('저장에 실패했습니다: ' + error.message);
+        showAlert('저장에 실패했습니다: ' + error.message);
       }
     }
   });
@@ -152,10 +160,10 @@ const CampaignSettings = () => {
   // 제한건수 수정 API
   const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
     onSuccess: (data) => {
-      if( data.result_code === -1 ){
+      if (data.result_code === -1) {
         // -9053 메시지 표시
         showAlert('리스트 등록 건수를 초과하였습니다.');
-      }else{
+      } else {
 
         fetchCallLimitSettingList({
           tenant_id_array: tenants.map(tenant => tenant.tenant_id)
@@ -171,14 +179,14 @@ const CampaignSettings = () => {
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
           onConfirm: closeAlert,
-          onCancel: () => {}
+          onCancel: () => { }
         });
         Cookies.remove('session_key');
         setTimeout(() => {
           router.push('/login');
         }, 1000);
       } else {
-          showAlert('수정에 실패했습니다: ' + error.message);
+        showAlert('수정에 실패했습니다: ' + error.message);
       }
     }
   });
@@ -198,14 +206,14 @@ const CampaignSettings = () => {
           isOpen: true,
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
           onConfirm: closeAlert,
-          onCancel: () => {}
+          onCancel: () => { }
         });
         Cookies.remove('session_key');
         setTimeout(() => {
           router.push('/login');
         }, 1000);
       } else {
-          showAlert('삭제에 실패했습니다: ' + error.message);
+        showAlert('삭제에 실패했습니다: ' + error.message);
       }
     }
   });
@@ -216,22 +224,28 @@ const CampaignSettings = () => {
     const updatedSetting = limitSettings.find(
       setting => setting.campaign_id === Number(campaignId)
     );
-    
+
     // 찾은 항목이 있을 경우 선택 상태 업데이트
     if (updatedSetting) {
       const campaign = campaigns?.find(
         camp => camp.campaign_id === updatedSetting.campaign_id
       );
-      
+
       // 찾은 데이터로 선택 상태 업데이트
       setSelectedRow({
         campaign_id: updatedSetting.campaign_id.toString(),
         campaign_name: campaign?.campaign_name || '',
         limit_number: updatedSetting.max_call.toString()
       });
-      
+
       // 제한건수도 최신 데이터로 업데이트
       setLimitCount(updatedSetting.max_call.toString());
+
+      // todo3: 
+      setDailyInitFlag(updatedSetting.daily_init_flag ?? 0);
+      setDailyInitTime(updatedSetting.daily_init_time ?? "00:00");
+
+
     }
   };
 
@@ -256,7 +270,7 @@ const CampaignSettings = () => {
   ], []);
 
   // 그리드에 표시할 데이터
-  const rows = useMemo(() => 
+  const rows = useMemo(() =>
     limitSettings?.map(setting => {
       const campaign = campaigns?.find(
         camp => camp.campaign_id === setting.campaign_id
@@ -267,7 +281,7 @@ const CampaignSettings = () => {
         limit_number: setting.max_call.toString()
       };
     }) || [] // 기본값으로 빈 배열 설정
-  , [limitSettings, campaigns]);
+    , [limitSettings, campaigns]);
 
 
   // 저장 버튼 클릭 시 호출되는 함수
@@ -277,30 +291,47 @@ const CampaignSettings = () => {
       showAlert('모든 필드를 입력해주세요.');
       return;
     }
-  
+
     // 선택된 캠페인의 tenant_id 찾기
     const selectedCampaign = campaigns?.find(camp => camp.campaign_id === Number(campaignId));
     if (!selectedCampaign) {
       return;
     }
-  
+
+    // Convert time string (HH:MM) to numeric format (HHMM)
+    const timeToNumber = (timeStr: string): number => {
+      const [hours, minutes] = timeStr.split(':');
+      return parseInt(hours + minutes);
+    };
+
     const saveData = {
       campaign_id: Number(campaignId),
       tenant_id: selectedCampaign.tenant_id,
-      call_kind: 1,  // Callback으로 고정
+      call_kind: 1,
       call_timeout: 0,
       max_call: Number(limitCount),
-      max_criteria: 1
+    
+      daily_init_flag: dailyInitFlag,
+      daily_init_time: dailyInitTime.replace(":", ""), // ✅ string으로 넘긴다!
     };
-  
-    if (selectedRow) {
+    
+
+    console.log("save data check : ", saveData);
+    
+
+    // if (selectedRow) {
+    if (selectedRow?.campaign_id !== null) {
       // 수정
       updateCallLimitSetting(saveData);
-      // showAlert은 mutate의 onSuccess에서 처리
     } else {
+      console.log("s  ave data check : ", saveData);
+
       // 신규 등록
+      // tofix 0416
       createCallLimitSetting(saveData);
       // showAlert은 mutate의 onSuccess에서 처리
+
+
     }
   };
 
@@ -312,14 +343,14 @@ const CampaignSettings = () => {
       showAlert('삭제할 캠페인을 먼저 선택해주세요.');
       return;
     }
-  
+
     // 선택된 캠페인의 tenant_id 찾기
     const selectedCampaign = campaigns?.find(camp => camp.campaign_id === Number(campaignId));
     if (!selectedCampaign) {
       showAlert('캠페인 정보를 찾을 수 없습니다.');
       return;
     }
-  
+
     // 삭제 확인 알림
     showConfirm(
       `선택된 캠페인 [${selectedCampaign.campaign_name}]의 제한건수 설정을 삭제하시겠습니까? \n\n ※주의: 삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해 주세요.`,
@@ -333,14 +364,14 @@ const CampaignSettings = () => {
           {
             onSuccess: () => {
               // showAlert('제한건수 설정이 성공적으로 삭제되었습니다.');
-              
+
               // 삭제 후 데이터 초기화
               setSelectedRow(null);
               setCampaignId('');
               setCampaignName('');
               setLimitCount('');
               setIsNewMode(false);
-              
+
               // 데이터 목록 새로고침 - 이미 onSuccess에서 처리됨
             }
           }
@@ -364,7 +395,9 @@ const CampaignSettings = () => {
     setCampaignId('');
     setCampaignName('');
     setLimitCount('');
-    setIsNewMode(true); 
+    setDailyInitFlag(0); // ✅
+    setDailyInitTime("0000"); // ✅
+    setIsNewMode(true);
   };
 
   // 캠페인 선택 모달에서 캠페인 선택 시 호출되는 함수
@@ -390,26 +423,27 @@ const CampaignSettings = () => {
       // 제한건수가 없으면 입력 필드와 그리드 선택 모두 초기화
       setLimitCount('');
       setSelectedRow(null);
-      setIsNewMode(true); 
+      setIsNewMode(true);
     }
   };
-  
+
   useEffect(() => {
     if (activeTabId === 8) {
       const tempData = openedTabs.filter(tab => tab.id === 8);
-      if( tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
+      if (tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
         setCampaignId(tempData[0].campaignId);
         setCampaignName(tempData[0].campaignName);
       }
-      if( limitSettings.length > 0 && tempData.length > 0 ){
-        const templimitSetting = limitSettings.filter(data=> data.campaign_id === Number(tempData[0].campaignId));
-        if( templimitSetting.length >  0){
-          setLimitCount(templimitSetting[0].max_call+'');
+      if (limitSettings.length > 0 && tempData.length > 0) {
+        const templimitSetting = limitSettings.filter(data => data.campaign_id === Number(tempData[0].campaignId));
+        if (templimitSetting.length > 0) {
+          setLimitCount(templimitSetting[0].max_call + '');
+
         }
       }
     }
-  }, [activeTabId, openedTabs,limitSettings]);
-   
+  }, [activeTabId, openedTabs, limitSettings]);
+
   // 필드가 비활성화되어야 하는지 결정하는 함수
   const isFieldDisabled = () => {
     // 캠페인 아이디가 있으면 항상 입력 가능하게 설정
@@ -421,8 +455,8 @@ const CampaignSettings = () => {
   };
 
   const getRowClass = (row: Row) => {
-    return selectedRow?.campaign_id === row.campaign_id && 
-           selectedRow?.limit_number === row.limit_number ? 'bg-[#FFFAEE]' : '';
+    return selectedRow?.campaign_id === row.campaign_id &&
+      selectedRow?.limit_number === row.limit_number ? 'bg-[#FFFAEE]' : '';
   };
 
   return (
@@ -448,14 +482,14 @@ const CampaignSettings = () => {
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <Label className="w-[5rem] min-w-[5rem]">캠페인 아이디</Label>
-            <CustomInput 
-                value={campaignId} 
-                readOnly 
-                className="w-full"
-                disabled={true}
-             />
-            <CommonButton 
-              variant="outline" 
+            <CustomInput
+              value={campaignId}
+              readOnly
+              className="w-full"
+              disabled={true}
+            />
+            <CommonButton
+              variant="outline"
               size="sm"
               onClick={() => setIsModalOpen(true)}
             >
@@ -465,22 +499,63 @@ const CampaignSettings = () => {
 
           <div className="flex items-center gap-2">
             <Label className="w-[5rem] min-w-[5rem]">캠페인 이름</Label>
-            <CustomInput 
-                value={campaignName} 
-                readOnly 
-                className="w-full"
-                disabled={true}
+            <CustomInput
+              value={campaignName}
+              readOnly
+              className="w-full"
+              disabled={true}
             />
           </div>
 
+          {/* 제한 건수 */}
           <div className="flex items-center gap-2">
             <Label className="w-[5rem] min-w-[5rem]">제한건수</Label>
-            <CustomInput 
+            <CustomInput
               value={limitCount}
               className="w-full"
               onChange={(e) => setLimitCount(e.target.value)}
-              disabled={isFieldDisabled()} 
+              disabled={isFieldDisabled()}
             />
+          </div>
+
+          {/* 일별 초기화 사용 여부 */}
+          <div className="flex items-center gap-4">
+            <Label className="w-[5rem] min-w-[5rem]">일별 초기화</Label>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-1">
+                <input
+                  type="radio"
+                  name="dailyInitFlag"
+                  value={0}
+                  checked={dailyInitFlag === 0}
+                  onChange={() => setDailyInitFlag(0)}
+                />
+                미사용
+              </label>
+              <label className="flex items-center gap-1">
+                <input
+                  type="radio"
+                  name="dailyInitFlag"
+                  value={1}
+                  checked={dailyInitFlag === 1}
+                  onChange={() => setDailyInitFlag(1)}
+                />
+                하루 1회 초기화
+              </label>
+            </div>
+          </div>
+
+          {/* 초기화 시각 입력 (dailyInitFlag === 1 일 때만 활성화) */}
+          <div className="flex items-center gap-2">
+            <Label className="w-[5rem] min-w-[5rem]">시각</Label>
+            <CustomInputForTime
+              value={dailyInitTime}
+              onChange={(value) => setDailyInitTime(value)}
+              disabled={dailyInitFlag !== 1}
+              className="w-[120px]"
+            />
+
+
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

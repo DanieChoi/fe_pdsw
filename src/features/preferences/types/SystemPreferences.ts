@@ -94,14 +94,20 @@ export interface CallLimitSettingListResponse {
 }
 
 // 예약콜 제한설정 추가 요청 타입
+// 0417 수정 
 export interface CallLimitSettingCreateRequest {
-  campaign_id: number;
-  tenant_id: number;
-  call_kind: number;
-  call_timeout: number;
-  max_call: number;
-  max_criteria: number;
+  campaign_id: number; // 캠페인 ID
+
+  // request_data 객체 내부
+  tenant_id: number;   // 테넌트 ID
+  call_kind: number;   // 예약콜 종류 (1: Callback)
+  call_timeout: number; // 예약콜 타임아웃 시간 (단위: 분)
+  max_call: number;     // 예약콜 최대 건수
+
+  daily_init_flag?: number; // 콜백캠페인 리스트 일별 초기화 여부 (0: 미사용, 1: 하루에 한 번씩 리스트 삭제)
+  daily_init_time?: string; // 리스트 초기화 시간 (형식: 24hhmi, 예: 0830)
 }
+
 
 // 예약콜 제한설정 삭제 요청 타입
 export interface CallLimitSettingDeleteRequest {

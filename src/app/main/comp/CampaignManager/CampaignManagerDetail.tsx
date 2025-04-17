@@ -1,3 +1,4 @@
+// src\app\main\comp\CampaignManager\CampaignManagerDetail.tsx
 "use client";
 import { useMainStore, useCampainManagerStore, useTabStore, useAuthStore } from '@/store';
 import Image from 'next/image';
@@ -46,6 +47,7 @@ import { CheckCampaignSaveReturnCode, CampaignManagerInfo } from '@/components/c
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { campaignChannel } from '@/lib/broadcastChannel';
 
 export interface TabItem {
   id: number;
@@ -1067,9 +1069,22 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   }, [campaignInfoChangeYn, campaignSkillChangeYn, callingNumberChangeYn, campaignDialSpeedChangeYn]);
 
   // 캠페인 정보 수정 API 호출
+  // tofix 0417 a3 브라우져 api 로 campaign 정보 변경 후에 
+  // 모니터 페이지에 캠페인 정보 변경을 broadcast로 알림
   const { mutate: fetchCampaignManagerUpdate } = useApiForCampaignManagerUpdate({
     onSuccess: (data) => {
       setCampaignInfoChangeYn(false);
+
+      // tofix 0417 a1 hyun 
+      // 캠페인 정보 수정 후에 모니터 페이지에 
+      // 캠페인 정보가 변경된 것을 반영하기 위해서
+      // broadcast로 캠페인 정보 변경 요청
+
+      campaignChannel.postMessage({
+        type: "campaign_basic_info_update",
+        campaignId: tempCampaignManagerInfo.campaign_id,
+      });
+
     },
     onError: (data) => {
       if (data.message.split('||')[0] === '5') {
@@ -1564,8 +1579,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
 
   return (
     <div className='flex flex-col gap-5 w-[58%]'>
-      {/* campaignId={campaignId} <br />
-      campainId2 : {campaignId} */}
+      여기가 캠페인 관리!
       <div>
         <TitleWrap
           className='border-b border-gray-300 pb-1'
@@ -1666,6 +1680,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
               </SelectContent>
             </Select>
           </div>
+
           <div className='flex items-center gap-2'>
             <Label className="w-[74px] min-w-[74px]">캠페인명</Label>
             <CustomInput
@@ -1673,6 +1688,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
               onChange={(e) => handleInputData(e.target.value, 'campaign_name')}
             />
           </div>
+          
           <div className='flex items-center gap-2'>
             <Label className="w-[90px] min-w-[90px]">다이얼 모드</Label>
             <Select
