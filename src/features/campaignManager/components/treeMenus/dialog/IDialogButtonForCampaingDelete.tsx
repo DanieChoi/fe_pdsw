@@ -50,7 +50,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
   // 스토어 및 API 훅들
   const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
   const { callingNumbers, campaignSkills } = useCampainManagerStore();
-  const { activeTabKey, closeAllTabs, rows, removeTab, campaignIdForUpdateFromSideMenu, setDeletedCampaignId } = useTabStore();
+  const { activeTabKey, closeAllTabs, rows, removeTab , campaignIdForUpdateFromSideMenu} = useTabStore();
   
 
   const { mutate: updateCampaignSkill } = useApiForCampaignSkillUpdate({
