@@ -818,7 +818,7 @@ const RebroadcastSettingsPanel = () => {
                 }else if( data.reason_code === -3){
                     _message = '[-3]상담사과 고객이 통화 중이라 캠페인 통계가 완료되지 않았습니다. \n잠시만 기다려주세요.';
                 }
-                fetchCampaignManagerUpdate(UpdataCampaignInfo(campaigns,Number(campaignId),2));
+                // fetchCampaignManagerUpdate(UpdataCampaignInfo(campaigns,Number(campaignId),2));
 
                 setAlertState({
                     isOpen: true,
@@ -1007,8 +1007,15 @@ const RebroadcastSettingsPanel = () => {
     //캠페인 상태 변경 api 호출
     const { mutate: fetchCampaignStatusUpdate } = useApiForCampaignStatusUpdate({
         onSuccess: (data) => {
-            if (data.result_code === 0 || data.result_code === -13) {
-                
+            if (data.result_code === 0 || data.result_code === -13) {                 
+                setAlertState({
+                    isOpen: true,
+                    message: '재발신 적용 완료했습니다.',
+                    title: '재발신',
+                    type: '2',
+                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                });
             } else {
                 setAlertState({
                     ...errorMessage,

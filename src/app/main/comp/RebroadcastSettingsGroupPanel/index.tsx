@@ -29,6 +29,7 @@ import { CampaignGroupGampaignListItem } from '@/features/campaignManager/types/
 import { CampaignInfoUpdateRequest } from '@/features/campaignManager/types/campaignManagerIndex';
 import { useApiForCampaignManagerUpdate } from '@/features/campaignManager/hooks/useApiForCampaignManagerUpdate';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
 
 interface RebroadcastSettings {
     campaignId: string;
@@ -448,6 +449,7 @@ const RebroadcastSettingsGroupPanel = () => {
                 onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
             });
         }
+        //4-1. 실시간 재발신 적용 - 리스트 건수가 0 보다 큰 경우 실행.
         for( let i=0;i<tempCampaignsCount;i++){
             fetchCampaignRedialPreviewSearch({
                 campaign_id: Number(tempCampaigns[i].campaign_id),
@@ -747,78 +749,78 @@ const RebroadcastSettingsGroupPanel = () => {
                     onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
                     onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 });
+                // for( let j=0;j<tempCampaignsCount;j++){
+                //     const selectedCampaign = tempCampaigns[j];
+                //     const imsiData = {
+                //         ...CampaignManagerInfo,
+                //         campaign_id: selectedCampaign.campaign_id,
+                //         campaign_name: selectedCampaign.campaign_name,
+                //         campaign_desc: selectedCampaign.campaign_desc,
+                //         site_code: selectedCampaign.site_code,
+                //         service_code: selectedCampaign.service_code,
+                //         start_flag: 2,    //멈춤으로.
+                //         end_flag: selectedCampaign.end_flag,
+                //         dial_mode: selectedCampaign.dial_mode,
+                //         callback_kind: selectedCampaign.callback_kind,
+                //         delete_flag: selectedCampaign.delete_flag,
+                //         list_count: selectedCampaign.list_count,
+                //         list_redial_query: selectedCampaign.list_redial_query,
+                //         next_campaign: selectedCampaign.next_campaign,
+                //         token_id: selectedCampaign.token_id,
+                //         phone_order: selectedCampaign.phone_order,
+                //         phone_dial_try1: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(0, 1)[0]) : 0,
+                //         phone_dial_try2: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(1, 2)[0]) : 0,
+                //         phone_dial_try3: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(2, 3)[0]) : 0,
+                //         phone_dial_try4: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(3, 4)[0]) : 0,
+                //         phone_dial_try5: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(4, 5)[0]) : 0,
+                //         dial_try_interval: selectedCampaign.dial_try_interval,
+                //         trunk_access_code: selectedCampaign.trunk_access_code,
+                //         DDD_code: selectedCampaign.DDD_code,
+                //         power_divert_queue: selectedCampaign.power_divert_queue + '',
+                //         max_ring: selectedCampaign.max_ring,
+                //         detect_mode: selectedCampaign.detect_mode,
+                //         auto_dial_interval: selectedCampaign.auto_dial_interval,
+                //         creation_user: selectedCampaign.creation_user + '',
+                //         creation_time: selectedCampaign.creation_time,
+                //         creation_ip: selectedCampaign.creation_ip,
+                //         update_user: selectedCampaign.update_user + '',
+                //         update_time: selectedCampaign.update_time,
+                //         update_ip: selectedCampaign.update_ip,
+                //         dial_phone_id: selectedCampaign.dial_phone_id,
+                //         tenant_id: selectedCampaign.tenant_id,
+                //         alarm_answer_count: selectedCampaign.alarm_answer_count,
+                //         dial_speed: selectedCampaign.dial_speed,
+                //         parent_campaign: selectedCampaign.parent_campaign,
+                //         overdial_abandon_time: selectedCampaign.overdial_abandon_time,
+                //         list_alarm_count: selectedCampaign.list_alarm_count,
+                //         supervisor_phone: selectedCampaign.supervisor_phone,
+                //         reuse_count: selectedCampaign.reuse_count,
+                //         use_counsel_result: selectedCampaign.use_counsel_result,
+                //         use_list_alarm: selectedCampaign.use_list_alarm,
+                //         redial_strategy1: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(0, 1)[0] + '' : '',
+                //         redial_strategy2: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(1, 2)[0] + '' : '',
+                //         redial_strategy3: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(2, 3)[0] + '' : '',
+                //         redial_strategy4: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(3, 4)[0] + '' : '',
+                //         redial_strategy5: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(4, 5)[0] + '' : '',
+                //         dial_mode_option: selectedCampaign.dial_mode_option,
+                //         user_option: selectedCampaign.user_option,
+                //         customer_char_id: 1,
+                //         counsel_script_id: 1,
+                //         announcement_id: 1,
+                //         campaign_level: 0,
+                //         outbound_sequence: ''
+                //     };
+                //     fetchCampaignManagerUpdate(imsiData);
+                // }
+            }else{        
+                //4-4. 실시간 재발신 적용 -  캠페인 상태 시작으로 변경한다.  
                 for( let j=0;j<tempCampaignsCount;j++){
-                    const selectedCampaign = tempCampaigns[j];
-                    const imsiData = {
-                        ...CampaignManagerInfo,
-                        campaign_id: selectedCampaign.campaign_id,
-                        campaign_name: selectedCampaign.campaign_name,
-                        campaign_desc: selectedCampaign.campaign_desc,
-                        site_code: selectedCampaign.site_code,
-                        service_code: selectedCampaign.service_code,
-                        start_flag: 2,    //멈춤으로.
-                        end_flag: selectedCampaign.end_flag,
-                        dial_mode: selectedCampaign.dial_mode,
-                        callback_kind: selectedCampaign.callback_kind,
-                        delete_flag: selectedCampaign.delete_flag,
-                        list_count: selectedCampaign.list_count,
-                        list_redial_query: selectedCampaign.list_redial_query,
-                        next_campaign: selectedCampaign.next_campaign,
-                        token_id: selectedCampaign.token_id,
-                        phone_order: selectedCampaign.phone_order,
-                        phone_dial_try1: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(0, 1)[0]) : 0,
-                        phone_dial_try2: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(1, 2)[0]) : 0,
-                        phone_dial_try3: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(2, 3)[0]) : 0,
-                        phone_dial_try4: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(3, 4)[0]) : 0,
-                        phone_dial_try5: (selectedCampaign.phone_dial_try !== undefined) ? Number(selectedCampaign.phone_dial_try.slice(4, 5)[0]) : 0,
-                        dial_try_interval: selectedCampaign.dial_try_interval,
-                        trunk_access_code: selectedCampaign.trunk_access_code,
-                        DDD_code: selectedCampaign.DDD_code,
-                        power_divert_queue: selectedCampaign.power_divert_queue + '',
-                        max_ring: selectedCampaign.max_ring,
-                        detect_mode: selectedCampaign.detect_mode,
-                        auto_dial_interval: selectedCampaign.auto_dial_interval,
-                        creation_user: selectedCampaign.creation_user + '',
-                        creation_time: selectedCampaign.creation_time,
-                        creation_ip: selectedCampaign.creation_ip,
-                        update_user: selectedCampaign.update_user + '',
-                        update_time: selectedCampaign.update_time,
-                        update_ip: selectedCampaign.update_ip,
-                        dial_phone_id: selectedCampaign.dial_phone_id,
-                        tenant_id: selectedCampaign.tenant_id,
-                        alarm_answer_count: selectedCampaign.alarm_answer_count,
-                        dial_speed: selectedCampaign.dial_speed,
-                        parent_campaign: selectedCampaign.parent_campaign,
-                        overdial_abandon_time: selectedCampaign.overdial_abandon_time,
-                        list_alarm_count: selectedCampaign.list_alarm_count,
-                        supervisor_phone: selectedCampaign.supervisor_phone,
-                        reuse_count: selectedCampaign.reuse_count,
-                        use_counsel_result: selectedCampaign.use_counsel_result,
-                        use_list_alarm: selectedCampaign.use_list_alarm,
-                        redial_strategy1: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(0, 1)[0] + '' : '',
-                        redial_strategy2: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(1, 2)[0] + '' : '',
-                        redial_strategy3: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(2, 3)[0] + '' : '',
-                        redial_strategy4: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(3, 4)[0] + '' : '',
-                        redial_strategy5: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(4, 5)[0] + '' : '',
-                        dial_mode_option: selectedCampaign.dial_mode_option,
-                        user_option: selectedCampaign.user_option,
-                        customer_char_id: 1,
-                        counsel_script_id: 1,
-                        announcement_id: 1,
-                        campaign_level: 0,
-                        outbound_sequence: ''
-                    };
-                    fetchCampaignManagerUpdate(imsiData);
+                    const selectedCampaign = tempCampaigns[j];                         
+                    fetchCampaignStatusUpdate({
+                        campaign_id: selectedCampaign.campaign_id
+                        , campaign_status: 1
+                    });
                 }
-            }else{                
-                setAlertState({
-                    isOpen: true,
-                    message: '재발신 적용 완료했습니다.',
-                    title: '재발신',
-                    type: '2',
-                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-                });
             }
         },
         onError: (data) => {  
@@ -909,32 +911,24 @@ const RebroadcastSettingsGroupPanel = () => {
                     onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 });
             }else if( caseType === 2 ){
-                if( data.result_data.redial_count > 0){           
-                    // setAlertState({
-                    //     isOpen: true,
-                    //     message: `캠페인 아이디 : ${campaignIdForUpdateFromSideMenu} \n캠페인을 바로 시작하시겠습니까?`,
-                    //     title: '재발신 적용',
-                    //     type: '1',
-                    //     onClose: handleCampaignCurrentRedial,
-                    //     onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-                    // });          
-                    setAlertState({
-                        isOpen: true,
-                        message: `현재 발신가능한 리스트가 남아있습니다. \n 그래도 재설정 하시겠습니까?`,
-                        title: '재발신 설정 경고',
-                        type: '1',
-                        onClose: () => {                           
-                            setAlertState({
-                                isOpen: true,
-                                message: `캠페인 아이디 : ${campaignIdForUpdateFromSideMenu} \n캠페인을 바로 시작하시겠습니까?`,
-                                title: '재발신 적용',
-                                type: '1',
-                                onClose: handleCampaignCurrentRedial,
-                                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-                            });  
-                        },
-                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-                    });
+                if( data.result_data.redial_count > 0){       
+                    if( data.result_data.redial_count > 0){           
+                        //4-2. 실시간 재발신 적용 -  리스트 건수가 있는 경우 캠페인 진행 정보 API 호출 호출하여 대기리스트건수확인
+                        const campaignId = data.result_data.campaign_id;
+                        fetchCampaignProgressInformation({
+                            tenantId: campaigns.find(data=>data.campaign_id === campaignId)?.tenant_id||0,
+                            campaignId: campaignId
+                        });                         
+                    }else{        
+                        setAlertState({
+                            isOpen: true,
+                            message: '적용할 리스트 건수가 없습니다.',
+                            title: '리스트 건수 확인',
+                            type: '2',
+                            onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                            onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                        });
+                    }
                 }else{        
                     setAlertState({
                         isOpen: true,
@@ -987,16 +981,86 @@ const RebroadcastSettingsGroupPanel = () => {
         }
     });
 
+    // 캠페인 진행 정보 API 호출 (useMutation 사용)
+    const { mutate: fetchCampaignProgressInformation } = useApiForCampaignProgressInformation({
+        onSuccess: (data) => {      
+            if (data && data.progressInfoList && data.progressInfoList.length > 0 ) {
+                console.log(data.progressInfoList.length);
+                const tempList = data.progressInfoList.sort((a, b) => a.reuseCnt - b.reuseCnt);
+                const campaignProgressInfo = tempList[tempList.length-1];
+                const waitlist = campaignProgressInfo.totLstCnt - campaignProgressInfo.scct
+                    - campaignProgressInfo.buct 
+                    - campaignProgressInfo.fact
+                    - campaignProgressInfo.tect
+                    - campaignProgressInfo.customerOnHookCnt
+                    - campaignProgressInfo.dialToneSilence
+                    - campaignProgressInfo.nact
+                    - campaignProgressInfo.etct
+                    - campaignProgressInfo.lineStopCnt
+                    - campaignProgressInfo.detectSilenceCnt
+                    - campaignProgressInfo.acct
+                    - campaignProgressInfo.recallCnt;
+                 if( waitlist > 0){
+                    //4-3. 실시간 재발신 적용 -  대기리스트 건수가 있는 경우 캠페인 재발신 추출 api 호출 실행하여 재발신 추출한다.
+                    setAlertState({
+                        isOpen: true,
+                        message: `현재 발신가능한 리스트가 남아있습니다. \n 그래도 재설정 하시겠습니까?`,
+                        title: '재발신 설정 경고',
+                        type: '1',
+                        onClose: () => {    
+                            fetchCampaignCurrentRedial({
+                                campaign_id: Number(campaignProgressInfo.campId),
+                                condition: MakeRedialPacket()
+                            });      
+                        },
+                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    });
+
+                 }else{  
+                    setAlertState({
+                        isOpen: true,
+                        message: '적용할 대기리스트 건수가 없습니다.',
+                        title: '리스트 건수 확인',
+                        type: '2',
+                        onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    });
+                 }
+            }else{
+                setAlertState({
+                    isOpen: true,
+                    message: '적용할 대기리스트 건수가 없습니다.',
+                    title: '리스트 건수 확인',
+                    type: '2',
+                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                });
+            }
+        },onError: (data) => {      
+            if (data.message.split('||')[0] === '5') {
+                setAlertState({
+                    ...errorMessage,
+                    isOpen: true,
+                    message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                    type: '2',
+                    onClose: () => goLogin(),
+                });
+            }
+        }
+    });
+
     //캠페인 상태 변경 api 호출
     const { mutate: fetchCampaignStatusUpdate } = useApiForCampaignStatusUpdate({
         onSuccess: (data) => {
-            if (data.result_code === 0 || data.result_code === -13) {
-                for( let k=0;k<tempCampaignsCount;k++){
-                    fetchCampaignCurrentRedial({
-                        campaign_id: tempCampaigns[k].campaign_id,
-                        condition: MakeRedialPacket()
-                    });
-                }
+            if (data.result_code === 0 || data.result_code === -13) {        
+                setAlertState({
+                    isOpen: true,
+                    message: '재발신 적용 완료했습니다.',
+                    title: '재발신',
+                    type: '2',
+                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
+                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                });
             } else { 
                 for( let j=0;j<tempCampaignsCount;j++){
                     const selectedCampaign = tempCampaigns[j];
