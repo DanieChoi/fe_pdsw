@@ -50,7 +50,8 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
   // 스토어 및 API 훅들
   const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
   const { callingNumbers, campaignSkills } = useCampainManagerStore();
-  const { activeTabKey, closeAllTabs, rows, removeTab } = useTabStore();
+  const { activeTabKey, closeAllTabs, rows, removeTab , campaignIdForUpdateFromSideMenu} = useTabStore();
+  
 
   const { mutate: updateCampaignSkill } = useApiForCampaignSkillUpdate({
     onSuccess: () => {
@@ -96,7 +97,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
       refetchTreeDataForCampaignGroupTab();
       // closeCurrentTab();
       const { rowId, sectionId } = findCurrentTabLocation();
-      removeTab(2,"2");
+      // removeTab(2,"2");
     }
   });
 
@@ -104,6 +105,11 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
     onSuccess: (data) => {
       console.log('캠페인 삭제 성공:', data);
       toast.success(`'${campaignName}' 캠페인이 삭제되었습니다.`);
+
+      // todo
+      // tofix 0417
+      // 캠페인 삭제 후 삭제된 아이디를 전달하여 캠페인 관리 패널 캠페인 목록에서 삭제
+
 
       // 삭제 후 스케줄 삭제 등 처리
       deleteCampaignSchedule({
@@ -131,14 +137,6 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
       }
     }
     return { rowId: 'row-1', sectionId: 'default' };
-  };
-
-  const closeCurrentTab = () => {
-    if (!activeTabKey) return;
-    const { rowId, sectionId } = findCurrentTabLocation();
-    setTimeout(() => {
-      closeAllTabs(rowId, sectionId);
-    }, 100);
   };
 
   const handleDelete = () => {

@@ -103,6 +103,7 @@ export function ContextMenuForCampaignForCampaignTab({
   // Get current status directly from the campaigns store to ensure we always have the latest status
   const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
   const [displayStatus, setDisplayStatus] = useState<CampaignStatus>(item.status);
+  
 
   // Update the displayed status whenever the item prop or campaigns state changes
   useEffect(() => {

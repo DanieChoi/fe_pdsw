@@ -43,7 +43,7 @@ export const createCallLimitSetting = async (credentials: CallLimitSettingCreate
             call_kind: credentials.call_kind,
             call_timeout: credentials.call_timeout,
             max_call: credentials.max_call,
-            max_criteria: credentials.max_criteria,
+            // max_criteria: credentials.max_criteria,
         }
     };
 
@@ -69,7 +69,7 @@ export const UpdateCallLimitSetting = async (credentials: CallLimitSettingCreate
             call_kind: credentials.call_kind,
             call_timeout: credentials.call_timeout,
             max_call: credentials.max_call,
-            max_criteria: credentials.max_criteria,
+            // max_criteria: credentials.max_criteria,
         }
     };
 
