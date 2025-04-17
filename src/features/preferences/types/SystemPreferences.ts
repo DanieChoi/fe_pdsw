@@ -161,10 +161,12 @@ export interface MaxCallListCredentials {
   campaign_id: number[];
 }
 
-export interface MaxCallDeleteRequest {
+export interface SingleMaxCallDeleteRequest {
   campaign_id: number;
   agent_id: string;
 }
+
+export type MaxCallDeleteRequest = SingleMaxCallDeleteRequest | SingleMaxCallDeleteRequest[];
 
 export interface MaxCallListDataResponse {
   agent_id: string; 
