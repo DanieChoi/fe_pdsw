@@ -481,7 +481,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         });
       }
     } else {
-
+      setTempCampaignsInfo(CampaignInfo);
+      setTempCampaignSchedule(CampaignScheduleInfo);
     }
     // campaignId 추가하여 masterCampaignId 변경 시에도 재설정되도록 함
   }, [campaignId, selectedCampaign, campaignSkills, callingNumbers, schedules]);
@@ -1656,7 +1657,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
             <Label className="w-[90px] min-w-[90px]">캠페인 아이디</Label>
             <CustomInput
               type="number"
-              value={campaignId}
+              value={tempCampaignInfo.campaign_id === 0 ? 0 :campaignId}
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}
               disabled={true}
             />
@@ -1709,7 +1710,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           </div>
           <div className='flex items-center gap-2 relative'>
             <Label className="w-[74px] min-w-[74px]">스킬</Label>
-            <CustomInput value={inputSkills} className="w-full" readOnly />
+            <CustomInput value={tempCampaignInfo.campaign_id === 0 ? '' :inputSkills} className="w-full" readOnly />
             <button className="absolute right-2 top-[52%] transform -translate-y-1/2">
               <Image
                 src="/skill-popup.svg"
@@ -1728,7 +1729,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           </div>
           <div className='flex items-center gap-2'>
             <Label className="w-[74px] min-w-[74px]">발신번호</Label>
-            <CustomInput value={inputCallingNumber} className="w-full" disabled={selectedCampaign !== null} readOnly />
+            <CustomInput value={tempCampaignInfo.campaign_id === 0 ? '' :inputCallingNumber} className="w-full" disabled={selectedCampaign !== null} readOnly />
             {menu_role_id === 1 ? (
               <CommonButton variant="outline" className="h-[24px]" onClick={() =>
                 setCallingNumberPopupState({

@@ -117,7 +117,6 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   }, [selectedCampaign]);
 
   useEffect(() => {
-    setHeaderInit(true);
     if (typeof campaignId === 'undefined') {
       setMasterCampaignId(campaignIdForUpdateFromSideMenu || '');
     } else {

@@ -201,7 +201,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
 
   // 자동 선택: 목록에 행이 있고 선택된 행이 없으면 첫 번째 행을 선택
   useEffect(() => {
-    if (tempData.length > 0 && campaignId != ''){
+    if (tempData.length > 0 && filteredCampaigns.length > 0 && campaignId != ''){
       const selectedCampaign = campaigns.find(c => c.campaign_id === Number(campaignId));
       const filterCampaign = filteredCampaigns.find(c => c.campaign_id === Number(campaignId));
       const index = tempData.findIndex(d => d.campaignId === Number(campaignId));
@@ -218,7 +218,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
           onRowClick(filteredCampaigns[0].campaign_id.toString());
         }
       }
-    }else if (tempData.length > 0){
+    }else if (tempData.length > 0 && filteredCampaigns.length > 0 ){
       const selectedCampaign = campaigns.find(c => c.campaign_id === tempData[0].campaignId);
       setSelectedCampaign(selectedCampaign ?? null);
       setSelectedCampaignRow(tempData[0]);
