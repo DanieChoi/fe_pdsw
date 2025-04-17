@@ -28,7 +28,7 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { CommonButton } from "@/components/shared/CommonButton";
 import { CustomInputNumber } from '@/components/shared/CustomInputNumber';
-import CampaignIdInputWithDuplicateCheck, { IButtonForCampaignIdDuplicateCheck } from './component/CampaignIdInputWithDuplicateCheck';
+import CampaignIdInputWithDuplicateCheck from './component/CampaignIdInputWithDuplicateCheck';
 
 export interface TabItem {
   id: number;
