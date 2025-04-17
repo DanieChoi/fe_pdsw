@@ -351,7 +351,7 @@ export default function Footer({
         }
       });
     }
-  }, [id, tenant_id, role_id, footerDataSet]);
+  }, [id, tenant_id, role_id]);
 
   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
     const newHeight = currentHeight + d.height;
