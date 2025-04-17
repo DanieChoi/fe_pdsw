@@ -211,6 +211,17 @@ const ChannelMonitor: React.FC = () => {
           setSecondModeEquipment(tempData);
         }
         fetchChannelStateMonitoringList({deviceId:0});
+      },
+      onError: (data) => {
+        // onError 추가한 이유 : 통합모니터링 창이 켜있다가 가장 먼저 통신하는 api이므로
+        // 세션이 만료되었을때 팝업창을 닫는 로직처리를 위한 것입니다.     
+        if (data.message.split('||')[0] === '5') {
+          if (window.opener) {
+            window.opener.postMessage({ type: "sessionFailed" }, "*");
+            // 자기 자신 닫기
+            window.close();
+          }  
+        }
       }
   });
 

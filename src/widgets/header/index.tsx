@@ -45,6 +45,34 @@ export default function Header() {
 
   const popupRef = useRef<Window | null>(null);
 
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === "sessionFailed") {
+        // 팝업창에서 세션만료 메시지가 보내졌다면
+
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: '로그인 세션이 만료되었습니다.',
+          type: '2',
+          onClose: () => {
+            // 로그아웃 처리
+            handleLoginOut();
+          }
+        });
+        // alert를 띄워주고 닫기버튼을 눌렀을때 로그아웃처리되게 하기
+      } // end ofif 
+    };
+  
+    window.addEventListener("message", handleMessage);
+    // 팝업창에서 부모창으로 보내는 사용자 정의 message 이벤트 실행하게 하기
+  
+    return () => {
+      window.removeEventListener("message", handleMessage);
+      // 마지막으로 이벤트 remove
+    };
+  }, []);
+
   const openInNewWindow = () => {
     // 현재 화면의 크기를 가져옵니다
     const width = window.screen.width;

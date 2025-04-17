@@ -12,6 +12,8 @@ export function useApiForGetSkills2(
   return useQuery<SkillListResponse, CampaignApiError>({
     queryKey: ['mainSkills', credentials],
     queryFn: () => fetchSkills(credentials),
+    enabled : true,
+    ...options,
     // enabled: !!credentials && credentials.tenant_id_array.length > 0,
     // ...options,
   });
