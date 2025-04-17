@@ -1580,7 +1580,6 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
 
   return (
     <div className='flex flex-col gap-5 w-[58%]'>
-      여기가 캠페인 관리!
       <div>
         <TitleWrap
           className='border-b border-gray-300 pb-1'
