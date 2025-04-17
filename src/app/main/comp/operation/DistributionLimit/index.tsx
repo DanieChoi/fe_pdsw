@@ -1075,9 +1075,10 @@ const DistributionLimit = () => {
       confirmMessage = `파트 ${contextMenu.part} 의 할당된 콜수를 삭제하시겠습니까?`;
       
       // 파트에 속한 상담사 중 최대분배호수가 0보다 큰 상담사만 ID 수집
+      console.log("rawAgentData : " , rawAgentData);
       agentIds = rawAgentData
         .filter(agent => 
-          agent.part === contextMenu.part && 
+          agent.part === contextMenu.part  && 
           parseInt(agent.max_dist) > 0
         )
         .map(agent => agent.agent_id);
@@ -1105,7 +1106,90 @@ const DistributionLimit = () => {
       setIsLoading(true);
       let successCount = 0;
       let failCount = 0;
+
+      const deleteArr = []; // 삭제할 상담사 ID 배열 초기화
+
+      // agentIds를 100개씩 묶어서 deleteArr에 추가
+      for (let i = 0; i < agentIds.length; i += 100) {
+        deleteArr.push(agentIds.slice(i, i+100));
+      }
+
+      // 선택된 모든 상담사에 대해 삭제 처리
+      for(const agentId of deleteArr){
+        // 100개씩 묶은 배열에 보내기
+
+        const requestData = agentId.map(agentId => {
+          return {
+            campaign_id: parseInt(selectedCampaignId),
+            agent_id: agentId
+          };
+        });
+        // console.log("requestData : ", requestData);
+        try {
+          await new Promise<void>((resolve, reject) => {
+            deleteMaxCallMutation(requestData, {
+              onSuccess: (response) => {
+                if (response.result_code === 0) {
+                  successCount++;
+                  resolve();
+                } else {
+                  failCount++;
+                  reject(new Error(response.result_msg));
+                }
+              },
+              onError: (error) => {
+                failCount++;
+                reject(error);
+              }
+            });
+          });
+        } catch (error) {
+          console.error('삭제 중 오류 발생:', error);
+        }
+
+      } // end of for
+
+      setIsLoading(false);
       
+      // 화면 데이터 업데이트
+      setRawAgentData(prevData => 
+        prevData.map(row => {
+          if (agentIds.includes(row.agent_id)) {
+            return {
+              ...row,
+              max_dist: '0',
+              current_resp: '0',
+              fix_flag: 'N'
+            };
+          }
+          return row;
+        })
+      );
+      
+      // 편집 중인 데이터에서도 제거
+      if (Object.keys(editedRows).length > 0) {
+        const newEditedRows = { ...editedRows };
+        
+        // 해당하는 모든 행 ID에 대해 편집 데이터 제거
+        Object.keys(newEditedRows).forEach(rowId => {
+          const agentId = rowId.replace('agent-', '');
+          if (agentIds.includes(agentId)) {
+            delete newEditedRows[rowId];
+          }
+        });
+        
+        setEditedRows(newEditedRows);
+        setHasChanges(Object.keys(newEditedRows).length > 0);
+      }
+      
+      // showAlert(`삭제 완료`);
+      
+      // 컨텍스트 메뉴 닫기
+      handleCloseContextMenu();
+      
+
+      /* 
+      // 이전 개별 삭제 처리 방식
       // 선택된 모든 상담사에 대해 삭제 처리
       for (const agentId of agentIds) {
         try {
@@ -1171,6 +1255,8 @@ const DistributionLimit = () => {
       
       // 컨텍스트 메뉴 닫기
       handleCloseContextMenu();
+
+      */
     });
   };
 

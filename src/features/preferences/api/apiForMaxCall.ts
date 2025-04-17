@@ -116,16 +116,25 @@ export const updateMaxCall = async (credentials: CreateMaxCallRequest): Promise<
 // 운영설정 분배호수 제한 설정 삭제 API
 export const deleteMaxCall = async (credentials: MaxCallDeleteRequest): Promise<MaxCallDeleteResponse> => {
     const requestData = {
-        request_data: [
+        request_data: Array.isArray(credentials)
+        ? credentials.map((item) => ({
+            agent_id: item.agent_id,
+        }))
+        : [
             {
-                agent_id: credentials.agent_id
+            agent_id: credentials.agent_id,
             }
         ]
     };
 
     try {
+
+        const campaignId = Array.isArray(credentials)
+            ? credentials[0].campaign_id
+            : credentials.campaign_id;
+
         const { data } = await axiosInstance.delete<MaxCallDeleteResponse>(
-            '/campaigns/'+credentials.campaign_id+'/maxcall-ext',
+            `/campaigns/${campaignId}/maxcall-ext`,
             { data: requestData }
         );
         return data;
