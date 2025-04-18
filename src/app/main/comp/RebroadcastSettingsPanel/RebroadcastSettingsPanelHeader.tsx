@@ -78,18 +78,7 @@ const RebroadcastSettingsPanelHeader = ({
 
     //리스트 건수 확인 버튼 클릭 이벤트.
     const handleCheckListCountHeader = () => {
-        if (broadcastType === 'reservation') {   //예약인 경우.
-            setAlertState({
-                isOpen: true,
-                message: `선택된 재발신 조건에 해당되는 리스트 수 : ${listCount}`,
-                title: '리스트 건수 확인',
-                type: '2',
-                onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-            });
-        } else {  //실시간인 경우.
-            handleCheckListCount();
-        }
+        handleCheckListCount();
     };
 
     //추가 버튼 클릭 이벤트.
