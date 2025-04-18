@@ -32,11 +32,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-  useEffect(() => {
-    console.log("🌍 클라이언트 런타임에서 API_URL:", (window as any).__RUNTIME_CONFIG__?.LOGIN_API_URL ?? '');
-  }, []);
-
   return (
     <html lang="en">
       <head>
