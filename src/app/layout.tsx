@@ -5,6 +5,7 @@ import "react-date-picker/dist/DatePicker.css";
 import "./globals.css";
 import ClientProvider from "@/components/providers/ClientProvider";
 import RedisTestButton from "@/components/providers/RedisTestButton";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +34,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script src="/env.js" async></script>
+        <Script src="/env.js" strategy="beforeInteractive" />
+        {/* <script src="/env.js" strategy="beforeInteractive"></script> */}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased body-top`}
