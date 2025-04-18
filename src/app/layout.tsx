@@ -7,7 +7,7 @@ import ClientProvider from "@/components/providers/ClientProvider";
 import Script from 'next/script'
 
 import RedisTestButton from "@/components/providers/RedisTestButton";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
