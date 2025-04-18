@@ -28,9 +28,10 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!pds|_next/static|_next/image|favicon.ico|login|logo).*)',
+    '/((?!_next|favicon.ico|login|env.js|images|icons|assets|public|api|pds|logo).*)',
   ],
 }
+
 
 // src/middleware.ts
 // import { NextResponse } from 'next/server'

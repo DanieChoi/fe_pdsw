@@ -14,6 +14,7 @@ export const loginApi = {
       const LOGIN_URL = getRuntimeEnv('LOGIN_API_URL');
 
       if (!LOGIN_URL) {
+        console.log("🚨 LOGIN_URL이 정의되지 않았습니다.");
         throw new Error('LOGIN_URL이 정의되지 않았습니다.');
       }
 

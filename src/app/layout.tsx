@@ -33,11 +33,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
   return (
     <html lang="en">
 
       <head>
-        <Script src="/env.js" strategy="beforeInteractive" />
+      <Script src="/env.js" strategy="afterInteractive" />
 
       </head>
 
