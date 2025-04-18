@@ -313,7 +313,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   const [callingNumberChangeYn, setCallingNumberChangeYn] = useState<boolean>(false); // 캠페인 발신번호 변경여부
   const [campaignDialSpeedChangeYn, setCampaignDialSpeedChangeYn] = useState<boolean>(false); // 캠페인 발신속도 변경여부
   const [campaignSaveYn, setCampaignSaveYn] = useState<boolean>(false); // 캠페인 저장여부
-  const { tenants
+  const { tenants, campaigns
     , setCampaigns
     , selectedCampaign
     , setSelectedCampaign
@@ -760,6 +760,19 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
+    if( !saveErrorCheck && newCampaignManagerInfo.campaign_id > 0 ){
+      const checkCampaign = campaigns.filter(data => data.campaign_id === newCampaignManagerInfo.campaign_id);
+      if( checkCampaign.length > 0 ){
+        saveErrorCheck = true;
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "중복된 캠페인 아이디가 존재합니다.",
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }
+    }
     if( !saveErrorCheck ){      
       handleCampaignSaveExecute();
     }
@@ -829,7 +842,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     onSuccess: (data) => {
         setTempCampaignId(data.result_data.campaign_id);
         const _tempCampaignSchedule = {...tempCampaignSchedule
-            , tenant_id: newCampaignManagerInfo.tenant_id
+            , tenant_id: Number(newTenantId)
             , campaign_id: data.result_data.campaign_id
         }
         //캠페인 스케줄 수정 api 호출
