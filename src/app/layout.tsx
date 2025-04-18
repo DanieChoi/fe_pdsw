@@ -7,6 +7,7 @@ import ClientProvider from "@/components/providers/ClientProvider";
 import Script from 'next/script'
 
 import RedisTestButton from "@/components/providers/RedisTestButton";
+import Script from "next/script";
 import { useEffect } from "react";
 
 const geistSans = Geist({
@@ -35,10 +36,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+
       <head>
         <Script src="/env.js" strategy="beforeInteractive" />
-        {/* <script src="/env.js" strategy="beforeInteractive"></script> */}
+
       </head>
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased body-top`}
       >
