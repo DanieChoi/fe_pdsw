@@ -36,19 +36,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-<<<<<<< HEAD
-
-      <head>
-        <Script src="/env.js" strategy="beforeInteractive" />
-
-      </head>
-
-=======
       <head>
         <Script src="/env.js" strategy="beforeInteractive" />
         {/* <script src="/env.js" strategy="beforeInteractive"></script> */}
       </head>
->>>>>>> b1fabfb1541ee3a2a1fc7a6a551411ac73d7001c
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased body-top`}
       >
