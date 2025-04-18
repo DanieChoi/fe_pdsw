@@ -61,9 +61,9 @@ jobs:
           port: ${{ secrets.PDSW_PORT }}
           script_stop: true
           script: |
-            sudo cd /home/nexus/fe_pdsw
-            sudo npm -v
-            sudo npm install
-            sudo pm2 delete fe_upds
-            sudo pm2 start ecosystem.config.js --env production
+            cd /home/nexus/fe_pdsw
+            npm -v
+            npm install
+            pm2 delete fe_upds
+            pm2 start ecosystem.config.js --env production
             #pm2 start "npx next start" --name fe_pdsw
