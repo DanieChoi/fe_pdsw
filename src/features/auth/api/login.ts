@@ -7,7 +7,8 @@ import axios from 'axios';
 export const loginApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
-      const LOGIN_URL = process.env.NEXT_PUBLIC_LOGIN_API_URL;
+      // const LOGIN_URL = process.env.NEXT_PUBLIC_LOGIN_API_URL;
+      const LOGIN_URL = window._env?.["LOGIN_API_URL"];
       console.log(LOGIN_URL);
       // 첫 번째 로그인 API 호출 (외부)
       const { data: dataFirst } = await externalAxiosInstance.get<LoginResponseFirst>(

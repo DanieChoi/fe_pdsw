@@ -3,9 +3,9 @@ interface Window {
 }
 
 // 아래와 같이 환경변수의 key들을 strict하게 정의해줄 수도 있습니다.
-// interface Window {
-//   _env?: {
-//     BACKEND_URL: string;
-//     PRIVATE_KEY: string;
-//   };
-// }
+interface Window {
+  _env?: {
+    LOGIN_API_URL: string;
+    API_URL: string;
+  };
+}
