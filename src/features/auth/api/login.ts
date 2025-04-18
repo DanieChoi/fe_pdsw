@@ -69,19 +69,28 @@ export const loginApi = {
         path: '/'
       });
 
+      // ###### 로그인 시간 기준으로 세션키 만료시간 설정 ######
+      const currentDate = new Date();
+      const expiredDate = new Date(currentDate.getTime() + data.expires_in); // 밀리세컨드 더하기
+      // 더한거 어떡할꺼임 store 어디다 넣을거임 와서 결정하셈
+      
+      data.expires_in = expiredDate.getTime(); // 만료일시를 밀리세컨드로 변환하여 저장
+      
       // 사용자 정보 객체 생성
       const userInfo: UserInfoData = {
         id: dataFirst.id,
         tenant_id: data.tenant_id,
         session_key: data.session_key,
         role_id: data.role_id,
-        menu_role_id: data.menu_role_id // `menu_role_id` 확인
+        menu_role_id: data.menu_role_id, // `menu_role_id` 확인
+        // expired_date : expiredDate.toDateString()
       };
 
       // console.log("✅ Constructed userInfo before storing:", userInfo);
 
+      // useStore 사용되는곳이 없음, 일단 주석처리
       // Zustand store 업데이트
-      useStore.getState().setUserInfo(userInfo);
+      // useStore.getState().setUserInfo(userInfo);
 
       // 디버깅: 저장 후 스토어 상태 확인
       setTimeout(() => {

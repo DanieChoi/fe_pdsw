@@ -14,6 +14,7 @@ import { useApiForGetAuthorizedMenusInfoForMenuRoleId } from "./hooks/useApiForG
 import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
 import { useEnvironmentStore } from "@/store/environmentStore";
 import { Button } from "@/components/ui/button";
+import AuthTimeOutCheck from "@/components/providers/AuthTimeOutCheck";
 
 const errorMessage = {
   isOpen: false,
@@ -33,6 +34,7 @@ export default function Header() {
   const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
   const [isSplitDialogOpen, setIsSplitDialogOpen] = useState(false);
 
+
   const {
     availableMenus,
     availableHeaderMenus,
@@ -44,34 +46,6 @@ export default function Header() {
 
 
   const popupRef = useRef<Window | null>(null);
-
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === "sessionFailed") {
-        // 팝업창에서 세션만료 메시지가 보내졌다면
-
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: '로그인 세션이 만료되었습니다.',
-          type: '2',
-          onClose: () => {
-            // 로그아웃 처리
-            handleLoginOut();
-          }
-        });
-        // alert를 띄워주고 닫기버튼을 눌렀을때 로그아웃처리되게 하기
-      } // end ofif 
-    };
-  
-    window.addEventListener("message", handleMessage);
-    // 팝업창에서 부모창으로 보내는 사용자 정의 message 이벤트 실행하게 하기
-  
-    return () => {
-      window.removeEventListener("message", handleMessage);
-      // 마지막으로 이벤트 remove
-    };
-  }, []);
 
   const openInNewWindow = () => {
     // 현재 화면의 크기를 가져옵니다
@@ -113,7 +87,8 @@ export default function Header() {
     tabGroups,
     setActiveTab,
     openCampaignManagerForUpdate,
-    setCampaignIdForUpdateFromSideMenu
+    setCampaignIdForUpdateFromSideMenu,
+    closeAllTabs
   } = useTabStore();
 
   const {
@@ -174,6 +149,9 @@ export default function Header() {
     // AuthStore의 상태를 초기화
     useAuthStore.getState().clearAuth();
 
+    // tabStore의 초기화, 모든 탭 제거
+    useTabStore.getState().closeAllTabs("row-1", "default");
+
     // 통합모니터창이 열려있다면 popup close
     if (popupRef.current && !popupRef.current.closed) {
       popupRef.current.close();
@@ -225,7 +203,7 @@ export default function Header() {
   }
 
   useEffect(() => {
-    if (tenants.length > 0) {
+    if (tenants.length > 0 && _sessionKey !== "") {
       fetchMain({
         session_key: _sessionKey,
         tenant_id: _tenantId
@@ -234,10 +212,12 @@ export default function Header() {
   }, [tenants]);
 
   useEffect(() => {
-    fetchTenants({
-      session_key: _sessionKey,
-      tenant_id: _tenantId,
-    });
+    if( _sessionKey !== ""){
+      fetchTenants({
+        session_key: _sessionKey,
+        tenant_id: _tenantId,
+      });
+    }
   }, [fetchTenants, _sessionKey, _tenantId]);
 
   const { mutate: fetchMain } = useApiForMain({
@@ -279,7 +259,7 @@ export default function Header() {
 
   return (
     <div className="flex flex-col">
-
+      <AuthTimeOutCheck popupRef={popupRef}/>
       <div className="header-top h-[28px] flex items-center">
         <div className="flex justify-between items-center w-full">
           <div className="flex items-center">

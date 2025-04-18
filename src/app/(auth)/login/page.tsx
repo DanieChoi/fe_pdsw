@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Eye, EyeOff } from 'lucide-react';
+import { ExpandIcon, Eye, EyeOff } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from "@/components/ui/checkbox";
@@ -69,7 +69,8 @@ export default function LoginPage() {
         data.tenant_id,                  // tenant_id
         data.session_key,                // session_key
         data.role_id,                    // role_id 추가
-        data.menu_role_id
+        data.menu_role_id,
+        data.expires_in, // 로그인 시 respone 받는 만료시간(밀리세컨드)
       );
 
       // 기억하기가 체크되어 있다면 로컬 스토리지에 저장
