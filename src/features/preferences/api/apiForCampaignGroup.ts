@@ -44,7 +44,7 @@ export const apiForCombinedTenantAndCampaignGroup = async (
                     group_id: [],
                     campaign_id: {
                         start: 1,
-                        end: 100
+                        end: 9999999999
                     }
                 },
                 sort: {
@@ -52,7 +52,7 @@ export const apiForCombinedTenantAndCampaignGroup = async (
                 },
                 page: {
                     index: 1,
-                    items: 10
+                    items: 9999999999
                 }
             })
         ]);

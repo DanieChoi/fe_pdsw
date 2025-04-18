@@ -147,25 +147,11 @@ import { getRuntimeEnv } from '@/lib/getRuntimeEnv';
 export const loginApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
-      // 🔥 환경변수 가져오기
-      const LOGIN_URL = getRuntimeEnv('NEXT_PUBLIC_LOGIN_API_URL');
-      const DEPLOY_ENV = getRuntimeEnv('NEXT_PUBLIC_DEPLOY_ENV');
-      const REST_API_URL = getRuntimeEnv('NEXT_PUBLIC_RESTAPI_URL');
-
-      // ✅ 디버깅용 출력
-      console.log("🌍 LOGIN_API_URL:", LOGIN_URL);
-      console.log("🌍 DEPLOY_ENV:", DEPLOY_ENV);
-      console.log("🌍 REST_API_URL:", REST_API_URL);
-
-      toast.success(`🚀 로그인 URL: ${LOGIN_URL}`);
-      toast.info(`🌐 배포 환경: ${DEPLOY_ENV}`);
-      toast.info(`📦 REST API URL: ${REST_API_URL}`);
-
-      if (!LOGIN_URL) {
-        throw new Error('LOGIN_URL이 정의되지 않았습니다.');
-      }
-
-      // 🔐 첫 번째 외부 로그인
+      // const LOGIN_URL = process.env.NEXT_PUBLIC_LOGIN_API_URL;
+      // const LOGIN_URL = window._env?.["LOGIN_API_URL"];
+      const LOGIN_URL = (window as any).__RUNTIME_CONFIG__?.LOGIN_API_URL ?? ''
+      console.log(">>>URL={}", LOGIN_URL);
+      // 첫 번째 로그인 API 호출 (외부)
       const { data: dataFirst } = await externalAxiosInstance.get<LoginResponseFirst>(
         LOGIN_URL,
         {

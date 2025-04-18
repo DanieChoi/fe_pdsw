@@ -135,7 +135,6 @@ const RebroadcastSettingsPanel = () => {
     const [caseType, setCaseType] = useState<number>(0);
     const [textType, setTextType] = useState<string>('');
     const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoUpdateRequest>(CampaignManagerInfo);
-    const [ realTimeListCount, setRealTimeListCount] = useState<number>(-1);
 
     // 발신결과 체크박스 상태 관리
     const [selectedOutgoingResults, setSelectedOutgoingResults] = useState<{ [key: string]: boolean }>(initOutgoingResult);
@@ -471,29 +470,10 @@ const RebroadcastSettingsPanel = () => {
         }else if (broadcastType === "realtime") {
             setCaseType(2);
             //4-1. 실시간 재발신 적용 - 리스트 건수가 0 보다 큰 경우 실행.
-            if( realTimeListCount < 0 ){
-                //리스트 건수 확인 미실행시 실행.
-                fetchCampaignRedialPreviewSearch({
-                    campaign_id: Number(campaignId),
-                    condition: MakeRedialPacket()
-                });
-            }else if(realTimeListCount == 0){   
-                //리스트 건수가 0 인 경우 실행.
-                setAlertState({
-                    isOpen: true,
-                    message: '적용할 리스트 건수가 없습니다.',
-                    title: '리스트 건수 확인',
-                    type: '2',
-                    onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-                });
-            }else{
-                //4-2. 리스트 건수가 있는 경우 캠페인 진행 정보 API 호출 호출하여 대기리스트건수확인
-                fetchCampaignProgressInformation({
-                    tenantId: campaigns.find(data=>data.campaign_id === campaignId)?.tenant_id||0,
-                    campaignId: campaignId
-                });
-            }
+            fetchCampaignRedialPreviewSearch({
+                campaign_id: Number(campaignId),
+                condition: MakeRedialPacket()
+            });
         }
     };
 
@@ -874,7 +854,6 @@ const RebroadcastSettingsPanel = () => {
     const { mutate: fetchCampaignRedialPreviewSearch } = useApiForCampaignRedialPreviewSearch({
         onSuccess: (data) => {  
             if( caseType === 1 ){            
-                setRealTimeListCount(data.result_data.redial_count);
                 setAlertState({
                     isOpen: true,
                     message: `선택된 재발신 조건에 해당되는 리스트 수 : ${data.result_data.redial_count}`,
@@ -884,7 +863,6 @@ const RebroadcastSettingsPanel = () => {
                     onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 });
             }else if( caseType === 2 ){
-                setRealTimeListCount(data.result_data.redial_count);
                 if( data.result_data.redial_count > 0){           
                     //4-2. 실시간 재발신 적용 -  리스트 건수가 있는 경우 캠페인 진행 정보 API 호출 호출하여 대기리스트건수확인
                     fetchCampaignProgressInformation({

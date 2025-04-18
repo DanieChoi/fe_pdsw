@@ -319,7 +319,8 @@ export default function Footer({
     if (typeof window !== "undefined" && window.EventSource && id !== "") {
       const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
       const eventSource = new EventSource(
-        `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
+        `/notification/${tenant_id}/subscribe/${id}`
+        // `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
       );
       let data: any = {};
       let announce = "";
@@ -350,7 +351,7 @@ export default function Footer({
         }
       });
     }
-  }, [id, tenant_id, role_id, footerDataSet]);
+  }, [id, tenant_id, role_id]);
 
   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
     const newHeight = currentHeight + d.height;

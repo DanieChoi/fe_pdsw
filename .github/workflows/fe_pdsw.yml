@@ -64,6 +64,8 @@ jobs:
             cd /home/nexus/fe_pdsw
             npm -v
             npm install
-            pm2 delete fe_upds
-            pm2 start ecosystem.config.js --env production
-            #pm2 start "npx next start" --name fe_pdsw
+            node env
+            pm2 delete fe_pdsw
+            # pm2 start ecosystem.config.js --env production
+            # pm2 start "npx next start" --name fe_pdsw
+            pm2 start --name fe_pdsw
