@@ -70,7 +70,7 @@ export function AddCampaignGroupDialog({
         setAlertState({
           ...errorMessage,
           isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          message: 'API 연결 세션이 만료되어 캠페인그룹을 생성할 수 없습니다. 로그인을 다시 하신 후 시도해 주시기 바랍니다.',
           type: '2',
           onClose: () => goLogin(),
         });

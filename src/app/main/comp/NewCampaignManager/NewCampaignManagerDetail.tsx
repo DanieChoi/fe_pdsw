@@ -719,7 +719,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     
     let saveErrorCheck = false;
     //2018.11.27 Gideon #23127 캠페인 수정창 연결 IVR 입력 예외 처리
-    if(!saveErrorCheck && newCampaignManagerInfo.dial_mode !== 2 && (newCampaignManagerInfo.power_divert_queue === '0' || newCampaignManagerInfo.power_divert_queue === '')){
+    if(!saveErrorCheck && newCampaignManagerInfo.dial_mode === 1 && (newCampaignManagerInfo.power_divert_queue === '0' || newCampaignManagerInfo.power_divert_queue === '')){
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -790,13 +790,6 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
       , creation_ip: Cookies.get('userHost')+''
     });
   }
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const currentValue = e.target.value;
-    if (currentValue.startsWith("0") && currentValue.length > 1) {
-      e.target.value = currentValue.replace(/^0+/, "");
-    }
-  };
 
   //변경여부 체크
   useEffect(() => {  
@@ -962,7 +955,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
               className="" 
               min="0" 
-              onBlur={handleBlur}
+              maxLength={10}
             />
           </div>
 

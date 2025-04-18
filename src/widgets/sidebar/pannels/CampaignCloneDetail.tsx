@@ -971,7 +971,7 @@ export default function CampaignDetail() {
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
               className="" 
               min="0" 
-              onBlur={handleBlur}
+              maxLength={10}
             />
           </div>
 
