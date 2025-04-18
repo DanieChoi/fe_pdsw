@@ -1,9 +1,11 @@
 // C:\nproject\fe_pdsw\src\app\layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "react-date-picker/dist/DatePicker.css"; 
+import "react-date-picker/dist/DatePicker.css";
 import "./globals.css";
 import ClientProvider from "@/components/providers/ClientProvider";
+import Script from 'next/script'
+
 import RedisTestButton from "@/components/providers/RedisTestButton";
 
 const geistSans = Geist({
@@ -32,6 +34,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+
+      <head>
+        <Script src="/env.js" strategy="beforeInteractive" />
+
+      </head>
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased body-top`}
       >
