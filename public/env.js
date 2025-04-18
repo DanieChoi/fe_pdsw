@@ -1,1 +1,1 @@
-window._env = {"BROWSER":"none","GENERATE_SOURCEMAP":"false","NEXT_PUBLIC_LOGIN_API_URL":"https://jedai-qa-web.nexuscommunity.net:9443/agent/loginCubeC"}
+window._env = {"BROWSER":"none","GENERATE_SOURCEMAP":"false","NEXT_PUBLIC_LOGIN_API_URL":"https://jedai-qa-web.nexuscommunity.net:9443/agent/loginCubeC","NEXT_PUBLIC_API_URL":"http://10.10.30.228"}
