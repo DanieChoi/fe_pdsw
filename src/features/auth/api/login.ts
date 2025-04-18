@@ -11,7 +11,7 @@ export const loginApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
       // ✅ 반드시 함수 안에서 호출해야 env.js 로딩 이후 window 객체에 접근 가능
-      const LOGIN_URL = getRuntimeEnv('NEXT_PUBLIC_LOGIN_API_URL');
+      const LOGIN_URL = getRuntimeEnv('LOGIN_API_URL');
 
       if (!LOGIN_URL) {
         throw new Error('LOGIN_URL이 정의되지 않았습니다.');
