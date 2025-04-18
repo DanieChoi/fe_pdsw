@@ -791,13 +791,6 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     });
   }
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const currentValue = e.target.value;
-    if (currentValue.startsWith("0") && currentValue.length > 1) {
-      e.target.value = currentValue.replace(/^0+/, "");
-    }
-  };
-
   //변경여부 체크
   useEffect(() => {  
     if( changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !callingNumberChangeYn && !campaignDialSpeedChangeYn ){  
@@ -812,8 +805,8 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
-      // setSelectedCampaign( data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0] );
-      // setNewCampaignInfo(data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0]);
+      setSelectedCampaign( data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0] );
+      setNewCampaignInfo(data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0]);
     //   setChangeYn(false);
       setAlertState({
         ...errorMessage,
@@ -962,7 +955,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
               className="" 
               min="0" 
-              onBlur={handleBlur}
+              maxLength={10}
             />
           </div>
 

@@ -927,8 +927,8 @@ export default function CampaignDetail() {
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
-      // setSelectedCampaign( data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0] );
-      // setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0]);
+      setSelectedCampaign( data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0] );
+      setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0]);
       // setChangeYn(false);
       setAlertState({
         ...errorMessage,
@@ -971,7 +971,7 @@ export default function CampaignDetail() {
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
               className="" 
               min="0" 
-              onBlur={handleBlur}
+              maxLength={10}
             />
           </div>
 
