@@ -719,7 +719,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     
     let saveErrorCheck = false;
     //2018.11.27 Gideon #23127 캠페인 수정창 연결 IVR 입력 예외 처리
-    if(!saveErrorCheck && newCampaignManagerInfo.dial_mode !== 2 && (newCampaignManagerInfo.power_divert_queue === '0' || newCampaignManagerInfo.power_divert_queue === '')){
+    if(!saveErrorCheck && newCampaignManagerInfo.dial_mode === 1 && (newCampaignManagerInfo.power_divert_queue === '0' || newCampaignManagerInfo.power_divert_queue === '')){
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -812,8 +812,8 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
-      setSelectedCampaign( data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0] );
-      setNewCampaignInfo(data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0]);
+      // setSelectedCampaign( data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0] );
+      // setNewCampaignInfo(data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0]);
     //   setChangeYn(false);
       setAlertState({
         ...errorMessage,

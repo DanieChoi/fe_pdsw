@@ -461,11 +461,16 @@ const RebroadcastSettingsGroupPanel = () => {
     useEffect(() => {
         if (rebroadcastRunIndex > -1) {
             if( rebroadcastRunIndex < tempCampaignsCount){
-                //4-1. 실시간 재발신 적용 - 리스트 건수가 0 보다 큰 경우 실행.
-                fetchCampaignRedialPreviewSearch({
-                    campaign_id: Number(tempCampaigns[rebroadcastRunIndex].campaign_id),
-                    condition: MakeRedialPacket()
-                });
+                if( tempCampaigns[rebroadcastRunIndex].start_flag === 3){
+                    //4-1. 실시간 재발신 적용 - 리스트 건수가 0 보다 큰 경우 실행.
+                    fetchCampaignRedialPreviewSearch({
+                        campaign_id: Number(tempCampaigns[rebroadcastRunIndex].campaign_id),
+                        condition: MakeRedialPacket()
+                    });
+                }else{                    
+                    setFailCount(prevFailCount => prevFailCount + 1);
+                    setRebroadcastRunIndex(rebroadcastRunIndex + 1);
+                }
             }else{ 
                 setAlertState({
                     isOpen: true,
