@@ -1,3 +1,4 @@
+// C:\nproject\fe_pdsw\public\env.js
 // public/env.js
 window.__RUNTIME_CONFIG__ = {
     NEXT_PUBLIC_API_URL: "http://10.10.30.228/",
