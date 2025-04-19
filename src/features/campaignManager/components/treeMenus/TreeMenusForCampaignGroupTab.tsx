@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react"; // useState 추가
 import { TreeNodeForSideBarCampaignGroupTab } from "./TreeNodeForSideBarCampaignGroupTab";
 import { useAuthStore } from "@/store/authStore";
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
@@ -8,34 +8,59 @@ import SearchBarForSideMenuForCampaignGroupTab from "./searchbar/SearchBarForSid
 import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
 
 export function TreeMenusForCampaignGroupTab() {
+  // forceUpdate 상태 추가
+  const [forceUpdate, setForceUpdate] = useState(0);
+  
   const { tenant_id } = useAuthStore();
   
-  console.log("tenant_id :!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ", tenant_id);
-  
-
   // TanStack Query 커스텀 훅 사용 (tenant_id 자동 적용)
   const { isLoading, error, data } = useApiForGetTreeDataForCampaignGroupTab(tenant_id);
   
-  // Zustand 스토어에서 UI 상태 가져오기
+  // Zustand 스토어에서 UI 상태 가져오기 - removeCampaignFromGroup 추가
   const { 
     treeData, 
     expandedNodes, 
     selectedNodeId,
     toggleNode, 
     selectNode,
-    expandTenantAndGroup
+    expandTenantAndGroup,
+    removeCampaignFromGroup // 이 함수를 추가
   } = useSideMenuCampaignGroupTabStore();
-
-  console.log("treeData 메뉴 캠페인 탭: ", treeData);
   
   // 데이터가 로드된 후 테넌트와 그룹 레벨 확장
   useEffect(() => {
     if (treeData.length > 0) {
-      // 테넌트와 그룹 레벨까지만 확장
       useSideMenuCampaignGroupTabStore.getState().expandTenantAndGroup();
     }
   }, [treeData]);
   
+  // 전역 객체 설정
+  useEffect(() => {
+    window.campaignGroupTreeData = treeData;
+    
+    window.campaignGroupTreeForceUpdate = () => {
+      setForceUpdate(prev => prev + 1);
+    };
+    
+    window.removeCampaignFromGroupTree = (campaignId: string | number) => {
+      const id = typeof campaignId === 'string' ? campaignId : campaignId.toString();
+      
+      // 스토어 함수 호출하여 노드 제거
+      removeCampaignFromGroup(id);
+      
+      // 강제 리렌더링
+      window.campaignGroupTreeForceUpdate?.();
+      
+      console.log(`캠페인 ID ${id}가 그룹 트리에서 제거됨`);
+    };
+    
+    return () => {
+      delete window.campaignGroupTreeData;
+      delete window.campaignGroupTreeForceUpdate;
+      delete window.removeCampaignFromGroupTree;
+    };
+  }, [treeData, removeCampaignFromGroup]);
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center border-b">
@@ -52,7 +77,7 @@ export function TreeMenusForCampaignGroupTab() {
           ) : (
             treeData.map((node) => (
               <TreeNodeForSideBarCampaignGroupTab
-                key={node.id}
+                key={`${node.id}-${forceUpdate}`} // forceUpdate 추가
                 node={node}
                 level={0}
                 expandedNodes={expandedNodes}
@@ -66,4 +91,13 @@ export function TreeMenusForCampaignGroupTab() {
       </div>
     </div>
   );
+}
+
+// window 객체에 타입 확장
+declare global {
+  interface Window {
+    campaignGroupTreeData?: any;
+    campaignGroupTreeForceUpdate?: () => void;
+    removeCampaignFromGroupTree?: (campaignId: string | number) => void;
+  }
 }
