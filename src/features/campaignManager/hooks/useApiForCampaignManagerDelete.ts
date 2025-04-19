@@ -18,7 +18,7 @@ export function useApiForCampaignManagerDelete(
       });
       options?.onSuccess?.(data, variables, context);
 
-    queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu"] });
+    // queryClient.invalidateQueries({ queryKey: ["treeMenuDataForSideMenu"] });
 
     },
     onError: (error: CampaignApiError, variables: CampaignInfoDeleteRequest, context: unknown) => {
