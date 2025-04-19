@@ -301,12 +301,12 @@ export function ContextMenuForCampaignForCampaignTab({
       </ContextMenuSubTrigger>
       <ContextMenuSubContent
         className="min-w-[120px] p-1"
-        onPointerDownOutside={(e) => {
-          if (preventCloseRef.current) {
-            e.preventDefault();
-            preventCloseRef.current = false;
-          }
-        }}
+        // onPointerDownOutside={(e) => {
+        //   if (preventCloseRef.current) {
+        //     e.preventDefault();
+        //     preventCloseRef.current = false;
+        //   }
+        // }}
       >
         {(Object.keys(statusInfo) as Array<CampaignStatus>).map((status) => (
           <ContextMenuItem

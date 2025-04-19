@@ -57,7 +57,7 @@ export const useTreeMenuStore = create<TreeMenuState>()(
     (set) => ({
       // 기본 상태
       campaignSort: {
-        type: 'name',
+        type: 'id',
         direction: 'asc',
       },
       selectedNodeType: 'campaign',
