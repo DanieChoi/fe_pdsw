@@ -454,7 +454,7 @@ export default function CampaignDetail() {
 
   //input data change
   const handleInputData = (value: any, col: string) => {
-    if (col === 'campaign_id' && value !== '') {
+    if (col === 'campaign_id' && value !== '' && value.length <= 10) {
       const numValue = Number(value);
       setTempCampaignsInfo({
           ...tempCampaignInfo,
@@ -845,13 +845,6 @@ export default function CampaignDetail() {
       , creation_ip: Cookies.get('userHost')+''
     });
   }
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const currentValue = e.target.value;
-    if (currentValue.startsWith("0") && currentValue.length > 1) {
-      e.target.value = currentValue.replace(/^0+/, "");
-    }
-  };
 
   //캠페인 정보 수정 api 호출
   const { mutate: fetchCampaignManagerInsert } = useApiForCampaignManagerInsert({
