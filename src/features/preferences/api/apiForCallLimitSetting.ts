@@ -8,7 +8,7 @@ export const fetchCallLimitSettingList = async (credentials: TenantIdCredentials
         filter: {
             campaign_id: {
                 "start": 1,
-                "end": 9999999,
+                "end": 9999999999,
             },
             tenant_id: credentials.tenant_id_array
         },

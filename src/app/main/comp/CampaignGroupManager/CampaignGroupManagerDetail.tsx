@@ -910,7 +910,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
       });
     }
     
-    if (!saveErrorCheck && tempCampaignManagerInfo.power_divert_queue === '0' || tempCampaignManagerInfo.power_divert_queue === '') {
+    if (!saveErrorCheck && tempCampaignManagerInfo.dial_mode === 1 && (tempCampaignManagerInfo.power_divert_queue === '0' || tempCampaignManagerInfo.power_divert_queue === '')) {
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,

@@ -69,7 +69,7 @@ const CampaignDialSpeedInfo: CampaignDialSpeedUpdateRequest = {
   dial_speed: 0
 }
 
-const CampaignManagerInfo: CampaignInfoInsertRequest = {
+export const CampaignManagerInfo: CampaignInfoInsertRequest = {
   campaign_id: 0,
   campaign_name: '',
   campaign_desc: '',
@@ -297,8 +297,11 @@ type Props = {
 }
 
 const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
-  const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoInsertRequest>(CampaignManagerInfo);
-  const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
+  const { newCampaignManagerInfo, setNewCampaignManagerInfo
+    , newCampaignInfo, setNewCampaignInfo 
+    , newTenantId, setNewTenantId
+    , newCampaignSchedule, setNewCampaignSchedule
+  } = useCampainManagerStore();
   const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
   const [tempCallingNumberInfo, setTempCallingNumberInfo] = useState<CallingNumberListDataResponse>(CallingNumberInfo);
   const [tempCampaignSchedule, setTempCampaignSchedule] = useState<CampaignScheDuleListDataResponse>(CampaignScheduleInfo);
@@ -310,13 +313,12 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   const [callingNumberChangeYn, setCallingNumberChangeYn] = useState<boolean>(false); // 캠페인 발신번호 변경여부
   const [campaignDialSpeedChangeYn, setCampaignDialSpeedChangeYn] = useState<boolean>(false); // 캠페인 발신속도 변경여부
   const [campaignSaveYn, setCampaignSaveYn] = useState<boolean>(false); // 캠페인 저장여부
-  const { tenants
+  const { tenants, campaigns
     , setCampaigns
     , selectedCampaign
     , setSelectedCampaign
   } = useMainStore();
   const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab } = useTabStore();
-  const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
   const [ inputSkills, setInputSkills ] = useState('');
   const [ inputCallingNumber, setInputCallingNumber ] = useState('');
   const [ skillPopupState, setSkillPopupState] = useState({
@@ -340,32 +342,32 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   const handleInputData = (value:any, col:string) => {
     if( col === 'campaign_id' && value !== '' ){
       const numValue = Number(value);
-      setTempCampaignsInfo({
-          ...tempCampaignInfo,
+      setNewCampaignInfo({
+          ...newCampaignInfo,
           campaign_id: numValue
       });
-      setTempCampaignManagerInfo({
-          ...tempCampaignManagerInfo,
+      setNewCampaignManagerInfo({
+          ...newCampaignManagerInfo,
           campaign_id: numValue
       });
     }    
     if( col === 'campaign_name' ){
-      setTempCampaignsInfo({
-        ...tempCampaignInfo,
+      setNewCampaignInfo({
+        ...newCampaignInfo,
         campaign_name: value
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
+      setNewCampaignManagerInfo({
+        ...newCampaignManagerInfo,
         campaign_name: value
       });
     }
     if( col === 'campaign_desc' ){
-      setTempCampaignsInfo({
-        ...tempCampaignInfo,
+      setNewCampaignInfo({
+        ...newCampaignInfo,
         campaign_desc: value
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
+      setNewCampaignManagerInfo({
+        ...newCampaignManagerInfo,
         campaign_desc: value
       });
     }
@@ -374,23 +376,23 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   //select data change
   const handleSelectChange = (value: string, type: 'tenant' | 'dialMode') => {
     if( type === 'tenant' && value !== '' ){
-      setTempCampaignsInfo({
-        ...tempCampaignInfo,
+      setNewCampaignInfo({
+        ...newCampaignInfo,
         tenant_id: Number(value)
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
+      setNewCampaignManagerInfo({
+        ...newCampaignManagerInfo,
         tenant_id: Number(value)
       });
     }  
     if( type === 'dialMode' && value !== '' ){
       console.log('dialMode');
-      setTempCampaignsInfo({
-        ...tempCampaignInfo,
+      setNewCampaignInfo({
+        ...newCampaignInfo,
         dial_mode: Number(value)
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
+      setNewCampaignManagerInfo({
+        ...newCampaignManagerInfo,
         dial_mode: Number(value)
       });
       setTempCampaignDialSpeedInfoParam({...tempCampaignDialSpeedInfoParam,
@@ -400,8 +402,8 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   }
   //스킬 선택 팝업 버튼이벤트
   const handleOpenSkillPopup = () => {
-    console.log(tempCampaignInfo.tenant_id);
-    if( tempCampaignInfo.tenant_id < 0){
+    console.log(newTenantId);
+    if( newTenantId === ' '){
       setAlertState({
         ...errorMessage,
         isOpen: true,
@@ -410,8 +412,9 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }else{
-      setSkillPopupState({...skillPopupState,
-        isOpen: true,
+      setSkillPopupState({...skillPopupState
+        , isOpen: true
+        , tenantId: Number(newTenantId)
       });
     }
   }
@@ -422,7 +425,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
       setCampaignSkillChangeYn(true);
       setInputSkills(param);
       setTempCampaignSkills({...tempCampaignSkills
-        , campaign_id: tempCampaignInfo.campaign_id
+        , campaign_id: newCampaignInfo.campaign_id
         , skill_id: param.split(',').map((data) => Number(data))
       });
     }
@@ -435,7 +438,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
       setCallingNumberChangeYn(true);
       setInputCallingNumber(param);
       setTempCallingNumberInfo({...tempCallingNumberInfo
-        , campaign_id: tempCampaignInfo.campaign_id
+        , campaign_id: newCampaignInfo.campaign_id
         , calling_number: param
       });
     }
@@ -445,15 +448,22 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   //캠페인 동작시간 탭 변경
   const handleCampaignScheduleChange = (value: OperationTimeParam) => {
     if( value.campaignInfoChangeYn ){
-      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+      setNewCampaignManagerInfo({...newCampaignManagerInfo
         , start_flag: Number(value.start_flag)
       });
-      setTempCampaignsInfo({...tempCampaignInfo
+      setNewCampaignInfo({...newCampaignInfo
         , start_flag: Number(value.start_flag)
       });
     }
     if( value.campaignScheduleChangeYn ){
       setTempCampaignSchedule({...tempCampaignSchedule
+        , campaign_id: value.campaign_id
+        , start_date: value.start_date
+        , end_date: value.end_date
+        , start_time: value.start_time
+        , end_time: value.end_time
+      });
+      setNewCampaignSchedule({...tempCampaignSchedule
         , campaign_id: value.campaign_id
         , start_date: value.start_date
         , end_date: value.end_date
@@ -473,12 +483,12 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   //캠페인 발신순서 탭 변경
   const handleCampaignOutgoingOrderChange = (value: OutgoingOrderTabParam) => {
     if( value.campaignInfoChangeYn ){
-      setTempCampaignsInfo({...tempCampaignInfo
+      setNewCampaignInfo({...newCampaignInfo
         , dial_phone_id: Number(value.dial_phone_id)
         , phone_dial_try: value.phone_dial_try
         , phone_order: value.phone_order
       });
-      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+      setNewCampaignManagerInfo({...newCampaignManagerInfo
         , dial_phone_id: Number(value.dial_phone_id)
         , phone_dial_try1: value.phone_dial_try[0]
         , phone_dial_try2: value.phone_dial_try[1]
@@ -500,10 +510,10 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   //캠페인 발신전략 탭 변경
   const handleOutgoingStrategyTabChange = (value: OutgoingStrategyTabParam) => {
     if( value.campaignInfoChangeYn ){
-      setTempCampaignsInfo({...tempCampaignInfo
+      setNewCampaignInfo({...newCampaignInfo
         , redial_strategy: value.redial_strategy
       });
-      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+      setNewCampaignManagerInfo({...newCampaignManagerInfo
         , redial_strategy1: value.redial_strategy[0]
         , redial_strategy2: value.redial_strategy[1]
         , redial_strategy3: value.redial_strategy[2]
@@ -513,10 +523,10 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     }  
     //초기화버튼 클릭시
     if( value.onInit ){
-      setTempCampaignsInfo({...tempCampaignInfo
+      setNewCampaignInfo({...newCampaignInfo
         , redial_strategy: CampaignInfo.redial_strategy
       });
-      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+      setNewCampaignManagerInfo({...newCampaignManagerInfo
         , redial_strategy1: CampaignManagerInfo.redial_strategy1
         , redial_strategy2: CampaignManagerInfo.redial_strategy2
         , redial_strategy3: CampaignManagerInfo.redial_strategy3
@@ -536,7 +546,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   //캠페인 발신방법 탭 변경
   const handleOutgoingMethodTabChange = (value: OutgoingMethodTabParam) => {
     if( value.campaignInfoChangeYn ){
-      setTempCampaignsInfo({...tempCampaignInfo
+      setNewCampaignInfo({...newCampaignInfo
         ,trunk_access_code : value.trunk_access_code
         ,dial_try_interval : value.dial_try_interval
         ,alarm_answer_count : value.alarm_answer_count
@@ -553,7 +563,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         ,dial_mode_option : value.dial_mode_option
         ,user_option : value.user_option
       });
-      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+      setNewCampaignManagerInfo({...newCampaignManagerInfo
         ,trunk_access_code : value.trunk_access_code
         ,dial_try_interval : value.dial_try_interval
         ,alarm_answer_count : value.alarm_answer_count
@@ -604,12 +614,12 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   //캠페인 콜백 탭 변경
   const handleCampaignCallbackTabChange = (value: OutgoingOrderTabParam) => {
     if( value.campaignInfoChangeYn ){
-      setTempCampaignsInfo({...tempCampaignInfo
+      setNewCampaignInfo({...newCampaignInfo
         , dial_phone_id: Number(value.dial_phone_id)
         , phone_dial_try: value.phone_dial_try
         , phone_order: value.phone_order
       });
-      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+      setNewCampaignManagerInfo({...newCampaignManagerInfo
         , dial_phone_id: Number(value.dial_phone_id)
         , phone_dial_try1: value.phone_dial_try[0]
         , phone_dial_try2: value.phone_dial_try[1]
@@ -631,11 +641,11 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   //캠페인 콜백 탭 변경
   const handleCallbackTabChange = (value: CallbackTabParam) => {    
     if( value.campaignInfoChangeYn ){
-      setTempCampaignsInfo({...tempCampaignInfo
+      setNewCampaignInfo({...newCampaignInfo
         , callback_kind: Number(value.callback_kind)
         , service_code: value.service_code
       });
-      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+      setNewCampaignManagerInfo({...newCampaignManagerInfo
         , callback_kind: Number(value.callback_kind)
         , service_code: value.service_code
       });
@@ -652,12 +662,12 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   //캠페인 알림 탭 변경
   const handleNotificationTabChange = (value: NotificationTabParam) => {    
     if( value.campaignInfoChangeYn ){
-      setTempCampaignsInfo({...tempCampaignInfo
+      setNewCampaignInfo({...newCampaignInfo
         , list_alarm_count: Number(value.list_alarm_count)
         , supervisor_phone: value.supervisor_phone
         , use_list_alarm: value.use_list_alarm
       });
-      setTempCampaignManagerInfo({...tempCampaignManagerInfo
+      setNewCampaignManagerInfo({...newCampaignManagerInfo
         , list_alarm_count: Number(value.list_alarm_count)
         , supervisor_phone: value.supervisor_phone
         , use_list_alarm: value.use_list_alarm
@@ -709,7 +719,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     
     let saveErrorCheck = false;
     //2018.11.27 Gideon #23127 캠페인 수정창 연결 IVR 입력 예외 처리
-    if(!saveErrorCheck && tempCampaignManagerInfo.dial_mode !== 2 && (tempCampaignManagerInfo.power_divert_queue === '0' || tempCampaignManagerInfo.power_divert_queue === '')){
+    if(!saveErrorCheck && newCampaignManagerInfo.dial_mode === 1 && (newCampaignManagerInfo.power_divert_queue === '0' || newCampaignManagerInfo.power_divert_queue === '')){
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -720,7 +730,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
       });
     }
     // }
-    if(!saveErrorCheck && tempCampaignManagerInfo.campaign_name === '' ){
+    if(!saveErrorCheck && newCampaignManagerInfo.campaign_name === '' ){
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -730,7 +740,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
-    if(!saveErrorCheck && isNaN(tempCampaignManagerInfo.tenant_id) ){
+    if(!saveErrorCheck && newTenantId === ' ' ){
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -750,6 +760,19 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
+    if( !saveErrorCheck && newCampaignManagerInfo.campaign_id > 0 ){
+      const checkCampaign = campaigns.filter(data => data.campaign_id === newCampaignManagerInfo.campaign_id);
+      if( checkCampaign.length > 0 ){
+        saveErrorCheck = true;
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "중복된 캠페인 아이디가 존재합니다.",
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }
+    }
     if( !saveErrorCheck ){      
       handleCampaignSaveExecute();
     }
@@ -759,20 +782,14 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   const handleCampaignSaveExecute = () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     setChangeYn(true);
-    fetchCampaignManagerInsert({...tempCampaignManagerInfo
+    fetchCampaignManagerInsert({...newCampaignManagerInfo
+      , tenant_id: Number(newTenantId)
       , update_user: id
       , creation_user: id
       , update_ip: Cookies.get('userHost')+''
       , creation_ip: Cookies.get('userHost')+''
     });
   }
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const currentValue = e.target.value;
-    if (currentValue.startsWith("0") && currentValue.length > 1) {
-      e.target.value = currentValue.replace(/^0+/, "");
-    }
-  };
 
   //변경여부 체크
   useEffect(() => {  
@@ -789,7 +806,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     onSuccess: (data) => {
       setCampaigns(data.result_data);
       setSelectedCampaign( data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0] );
-      setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0]);
+      setNewCampaignInfo(data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0]);
     //   setChangeYn(false);
       setAlertState({
         ...errorMessage,
@@ -818,7 +835,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
     onSuccess: (data) => {
         setTempCampaignId(data.result_data.campaign_id);
         const _tempCampaignSchedule = {...tempCampaignSchedule
-            , tenant_id: tempCampaignManagerInfo.tenant_id
+            , tenant_id: Number(newTenantId)
             , campaign_id: data.result_data.campaign_id
         }
         //캠페인 스케줄 수정 api 호출
@@ -877,8 +894,8 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   
   useEffect(() => {
     if( id !== ''){        
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
+      setNewCampaignManagerInfo({
+        ...newCampaignManagerInfo
         , update_user: id
         , creation_user: id
       });
@@ -887,16 +904,36 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   
   useEffect(() => {
     if( tenantId !== ''){        
-        setTempCampaignsInfo({
-            ...tempCampaignInfo,
-            tenant_id: Number(tenantId)
-        });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
+      setNewCampaignInfo({
+        ...newCampaignInfo,
+        tenant_id: Number(tenantId)
+      });
+      setNewCampaignManagerInfo({
+        ...newCampaignManagerInfo
         , tenant_id: Number(tenantId)
       });
     }
   }, [tenantId]);
+
+  useEffect(() => {
+    if( newCampaignSchedule && typeof newCampaignSchedule.campaign_id !== 'undefined' ){
+      setTempCampaignSchedule({...newCampaignSchedule});
+    }else{
+      setNewCampaignSchedule(CampaignScheduleInfo);
+    }
+  }, [newCampaignSchedule]);
+
+  useEffect(() => {
+    if( newCampaignManagerInfo && typeof newCampaignManagerInfo.campaign_id !== 'undefined' ){
+      if( !isNaN(newCampaignInfo.tenant_id) && newCampaignInfo.tenant_id > -1 ){
+        setNewTenantId(newCampaignInfo.tenant_id+'');
+      }
+    }else{
+      setNewCampaignManagerInfo(CampaignManagerInfo);
+      setNewCampaignInfo(CampaignInfo);
+      setNewTenantId(tenantId+''||' ');
+    }
+  }, [newCampaignManagerInfo]);
 
   return (
     <div className='flex flex-col gap-5 w-full overflow-auto'>
@@ -914,11 +951,11 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
             <Label className="w-[90px] min-w-[90px]">캠페인 아이디</Label>
             <CustomInput 
               type="number" 
-              value={tempCampaignInfo.campaign_id } 
+              value={newCampaignInfo.campaign_id } 
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
               className="" 
               min="0" 
-              onBlur={handleBlur}
+              maxLength={10}
             />
           </div>
 
@@ -926,14 +963,14 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
             <Label className="w-[74px] min-w-[74px]">테넌트</Label>
             <Select
               onValueChange={(value) => handleSelectChange(value, 'tenant')}
-              value={tempCampaignInfo.tenant_id+'' || ''}
+              value={newTenantId ?? ' '}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="테넌트를 선택하세요" />
               </SelectTrigger>
               <SelectContent>
                 {tenants.map(option => (
-                  <SelectItem key={option.tenant_id} value={option.tenant_id.toString()}>
+                  <SelectItem key={option.tenant_id} value={option.tenant_id+''}>
                     {option.tenant_name}
                   </SelectItem>
                 ))}
@@ -944,7 +981,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
           <div className='flex items-center gap-2'>
             <Label className="w-[74px] min-w-[74px]">캠페인명</Label>
             <CustomInput 
-              value={tempCampaignInfo.campaign_name || ''} 
+              value={newCampaignInfo.campaign_name || ''} 
               onChange={(e) => handleInputData(e.target.value, 'campaign_name')}         
               className="" 
             />
@@ -954,7 +991,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
             <Label className="w-[90px] min-w-[90px]">다이얼 모드</Label>
             <Select
               onValueChange={(value) => handleSelectChange(value, 'dialMode')}
-              value={tempCampaignInfo.dial_mode+''}
+              value={newCampaignInfo.dial_mode+''}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="다이얼 모드를 선택하세요" />
@@ -1001,7 +1038,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
           </div>
           <div className="flex items-center gap-2 col-span-3">
             <Label className="w-[90px] min-w-[90px]">설명</Label>
-            <CustomInput value={tempCampaignInfo.campaign_desc || ''} className="w-full"          
+            <CustomInput value={newCampaignInfo.campaign_desc || ''} className="w-full"          
               onChange={(e) => handleInputData(e.target.value, 'campaign_desc')} 
             /> 
           </div>
@@ -1010,7 +1047,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
       <div>
         <CampaignTab campaignSchedule={tempCampaignSchedule}
           callCampaignMenu={'NewCampaignManager'}
-          campaignInfo={tempCampaignInfo}
+          campaignInfo={newCampaignInfo}
           campaignDialSpeedInfo={tempCampaignDialSpeedInfoParam}
           onCampaignOutgoingOrderChange={(value) => handleCampaignOutgoingOrderChange(value)}
           onCampaignScheduleChange={(value) => handleCampaignScheduleChange(value)}
@@ -1024,7 +1061,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
       </div>
       <SkillListPopup
         param={tempCampaignSkills.skill_id||[]}
-        tenantId={tempCampaignInfo.tenant_id}
+        tenantId={Number(newTenantId||-1)}
         type={skillPopupState.type}
         isOpen={skillPopupState.isOpen}
         onConfirm={(param) => handleSelectSkills(param)}

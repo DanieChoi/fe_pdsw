@@ -53,8 +53,9 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   const { mutate: fetchSchedules } = useApiForSchedules({
     onSuccess: (data) => {
       setSchedules(data.result_data);
-      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
-      fetchSkills({ tenant_id_array: tempTenantIdArray });
+      // const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
+      // fetchSkills({ tenant_id_array: tempTenantIdArray });
+      fetchCallingNumbers({ session_key: session_key, tenant_id: 0 });
     },
     onError: (data) => {
       if (data.message.split('||')[0] === '5') {
@@ -74,13 +75,13 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     router.push('/login');
   };
   // 스킬 조회
-  const { mutate: fetchSkills } = useApiForSkills({
-    onSuccess: (data) => {
-      setSkills(data.result_data || []);
-      fetchCallingNumbers({ session_key: session_key, tenant_id: 0 });
-    },
-    retry: 0,
-  });
+  // const { mutate: fetchSkills } = useApiForSkills({
+  //   onSuccess: (data) => {
+  //     setSkills(data.result_data || []);
+  //     fetchCallingNumbers({ session_key: session_key, tenant_id: 0 });
+  //   },
+  //   retry: 0,
+  // });
   // 전화번호 조회
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {

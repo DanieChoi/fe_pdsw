@@ -5,7 +5,7 @@ import { useTabStore } from '@/store/tabStore'
 import Cookies from 'js-cookie'
 import { MenuItem, menuItems } from '@/widgets/header/model/menuItems'
 import React, { useState, useEffect, useRef } from 'react'
-import { useAuthStore, useMainStore } from '@/store';
+import { useAuthStore, useMainStore,useCampainManagerStore } from '@/store';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 import useApiForFetchCounselorList from '@/features/campaignManager/hooks/useApiForFetchCounselorList';
@@ -14,6 +14,7 @@ import { useApiForGetAuthorizedMenusInfoForMenuRoleId } from "./hooks/useApiForG
 import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
 import { useEnvironmentStore } from "@/store/environmentStore";
 import { Button } from "@/components/ui/button";
+import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 import AuthTimeOutCheck from "@/components/providers/AuthTimeOutCheck";
 
 const errorMessage = {
@@ -33,7 +34,7 @@ export default function Header() {
   const [alertState, setAlertState] = useState(errorMessage);
   const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
   const [isSplitDialogOpen, setIsSplitDialogOpen] = useState(false);
-
+  const { setSkills } = useCampainManagerStore();
 
   const {
     availableMenus,
@@ -98,6 +99,14 @@ export default function Header() {
     environmentData,
     // setEnvironmentData,
   } = useEnvironmentStore();
+
+  //스킬 마스터 조회.
+  const { mutate: fetchSkills } = useApiForSkills({
+    onSuccess: (data) => {
+      setSkills(data.result_data || []);
+    },
+    retry: 0,
+  });
 
   const handleMenuClick = (item: MenuItem, event: React.MouseEvent<HTMLButtonElement>) => {
     if (item.id === 3) {
@@ -224,8 +233,13 @@ export default function Header() {
     onSuccess: (data) => {
       if (tenant_id === 0) {
         setCampaigns(data.result_data);
+        //스킬 마스터 조회.
+        const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
+        fetchSkills({ tenant_id_array: tempTenantIdArray });
       } else {
         setCampaigns(data.result_data.filter(data => data.tenant_id === tenant_id));
+        //스킬 마스터 조회.
+        fetchSkills({ tenant_id_array: [tenant_id] });
       }
       setShouldFetchCounselors(true);  // 이 시점에 상담사 목록 조회 활성화
     }

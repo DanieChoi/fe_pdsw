@@ -8,7 +8,7 @@ export const fetchSchedules = async (credentials: SkillListCredentials): Promise
     filter: {      
       campaign_id: {
         start: 1,
-        end: 9999999,
+        end: 9999999999,
       },    
       tenant_id: credentials.tenant_id_array
     },
@@ -18,7 +18,7 @@ export const fetchSchedules = async (credentials: SkillListCredentials): Promise
     },
     page: {
       index: 1,
-      items: 9999999,
+      items: 9999999999,
     },
   };
 

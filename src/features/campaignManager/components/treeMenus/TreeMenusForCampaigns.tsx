@@ -81,15 +81,12 @@ export function TreeMenusForCampaigns() {
 
   // expandNodes 함수와 원본 아이템을 전역으로 사용할 수 있도록 저장
   useEffect(() => {
-    // @ts-expect-error - 전역 객체에 함수 추가 (window 타입에 정의되지 않은 속성)
     window.treeExpandNodes = expandNodes;
-    // @ts-expect-error - 전역 객체에 원본 아이템 추가 (window 타입에 정의되지 않은 속성)
     window.originalTreeItems = originalItems;
-    // @ts-expect-error - 전역 객체에 함수 추가 (window 타입에 정의되지 않은 속성)
     window.treeSavePreviousState = savePreviousState;
-    // @ts-expect-error - 전역 객체에 함수 추가 (window 타입에 정의되지 않은 속성)
     window.treeRestorePreviousState = restorePreviousState;
   }, [expandNodes, originalItems, savePreviousState, restorePreviousState]);
+  
 
   // 통합 스토어에서 정렬 및 필터링 상태 가져오기
   const {
@@ -449,9 +446,7 @@ export function TreeMenusForCampaigns() {
       }
 
       // 함수를 전역 객체에 등록
-      // @ts-expect-error - 전역 객체에 함수 추가 (window 타입에 정의되지 않은 속성)
       window.expandTenantsOnly = expandTenantsOnly;
-      // @ts-expect-error - 전역 객체에 함수 추가 (window 타입에 정의되지 않은 속성)
       window.expandAllNodes = expandAllNodes;
     }
   }, [isLoading, error, treeData, expandNodes, originalItems, selectedNodeType, viewMode, restorePreviousState]);

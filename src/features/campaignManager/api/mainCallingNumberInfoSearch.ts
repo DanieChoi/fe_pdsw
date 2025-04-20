@@ -8,7 +8,7 @@ export const fetchCallingNumbers = async (credentials: CampaignCredentials): Pro
     filter: {      
       campaign_id: {
         start: 1,
-        end: 9999999,
+        end: 9999999999,
       },    
     },
     sort: {
@@ -16,7 +16,7 @@ export const fetchCallingNumbers = async (credentials: CampaignCredentials): Pro
     },
     page: {
       index: 1,
-      items: 9999999,
+      items: 9999999999,
     },
   };
 

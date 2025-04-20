@@ -14,6 +14,7 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { DataProps } from './CampaignGroupManagerList';
+import { CustomInput } from "@/components/shared/CustomInput";
 
 const errorMessage = {
   isOpen: false,
@@ -69,7 +70,7 @@ export function AddCampaignGroupDialog({
         setAlertState({
           ...errorMessage,
           isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          message: 'API 연결 세션이 만료되어 캠페인그룹을 생성할 수 없습니다. 로그인을 다시 하신 후 시도해 주시기 바랍니다.',
           type: '2',
           onClose: () => goLogin(),
         });
@@ -140,7 +141,7 @@ export function AddCampaignGroupDialog({
       setAlertState({
         ...errorMessage,
         isOpen: true,
-        message: '그룹아이디를 입력해 주세요.',
+        message: '그룹 아이디를 입력해 주세요.',
         type: '2',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
       });
@@ -148,7 +149,7 @@ export function AddCampaignGroupDialog({
       setAlertState({
         ...errorMessage,
         isOpen: true,
-        message: '그룹명을을 입력해 주세요.',
+        message: '그룹명을 입력해 주세요.',
         type: '2',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
       });
@@ -172,6 +173,13 @@ export function AddCampaignGroupDialog({
   // 모든 인풋에 이벤트 전파 방지 적용
   const stopPropagation = (e: React.UIEvent) => {
     e.stopPropagation();
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const currentValue = e.target.value;
+    if (currentValue.startsWith("0") && currentValue.length > 1) {
+      e.target.value = currentValue.replace(/^0+/, "");
+    }
   };
 
   return (
@@ -202,13 +210,14 @@ export function AddCampaignGroupDialog({
           {/* 그룹 아이디 */}
           <div className="flex flex-col space-y-1">
             <Label htmlFor="groupId">캠페인 그룹 아이디</Label>
-            <Input
-              id="groupId"
+            <CustomInput 
+              type="number" 
               value={groupId}
-              onChange={(e) => setGroupId(e.target.value)}
-              placeholder="그룹 아이디를 입력하세요"
-              onClick={stopPropagation}
-              onPointerDown={stopPropagation}
+              onChange={(e) => setGroupId(e.target.value)}      
+              placeholder="그룹 아이디를 입력해 주세요."     
+              className="" 
+              min="0" 
+              onBlur={handleBlur}
             />
           </div>
 
@@ -219,7 +228,7 @@ export function AddCampaignGroupDialog({
               id="groupName"
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
-              placeholder="그룹명을 입력하세요"
+              placeholder="그룹명을 입력해 주세요."
               onClick={stopPropagation}
               onPointerDown={stopPropagation}
             />

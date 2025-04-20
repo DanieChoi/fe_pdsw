@@ -57,7 +57,7 @@ export const useTreeMenuStore = create<TreeMenuState>()(
     (set) => ({
       // 기본 상태
       campaignSort: {
-        type: 'name',
+        type: 'id',
         direction: 'asc',
       },
       selectedNodeType: 'campaign',
@@ -91,16 +91,12 @@ export const useTreeMenuStore = create<TreeMenuState>()(
             setTimeout(() => {
               if (nodeType === 'tenant') {
                 // 테넌트 정렬: 테넌트 노드까지만 확장
-                // @ts-expect-error - 전역 객체에 window.expandTenantsOnly 함수가 타입 정의되지 않음
                 if (window.expandTenantsOnly) {
-                  // @ts-expect-error - 전역 객체에 window.expandTenantsOnly 함수가 타입 정의되지 않음
                   window.expandTenantsOnly();
                 }
               } else {
                 // 캠페인 또는 전체 정렬: 모든 노드 확장
-                // @ts-expect-error - 전역 객체에 window.expandAllNodes 함수가 타입 정의되지 않음
                 if (window.expandAllNodes) {
-                  // @ts-expect-error - 전역 객체에 window.expandAllNodes 함수가 타입 정의되지 않음
                   window.expandAllNodes();
                 }
               }
@@ -127,17 +123,13 @@ export const useTreeMenuStore = create<TreeMenuState>()(
             // 뷰 모드 변경 시 적절한 확장 함수 호출
             setTimeout(() => {
               if (mode === 'tenant') {
-                // @ts-expect-error - 전역 객체에 window.expandTenantsOnly 함수가 타입 정의되지 않음
                 if (window.expandTenantsOnly) {
                   console.log("테넌트 노드만 확장 (모드 변경)");
-                  // @ts-expect-error - 전역 객체에 window.expandTenantsOnly 함수가 타입 정의되지 않음
                   window.expandTenantsOnly();
                 }
               } else {
-                // @ts-expect-error - 전역 객체에 window.expandAllNodes 함수가 타입 정의되지 않음
                 if (window.expandAllNodes) {
                   console.log("모든 노드 확장 (모드 변경)");
-                  // @ts-expect-error - 전역 객체에 window.expandAllNodes 함수가 타입 정의되지 않음
                   window.expandAllNodes();
                 }
               }
