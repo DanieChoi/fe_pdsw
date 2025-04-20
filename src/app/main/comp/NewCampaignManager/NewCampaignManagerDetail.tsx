@@ -340,7 +340,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
 
   //input data change
   const handleInputData = (value:any, col:string) => {
-    if( col === 'campaign_id' && value !== '' ){
+    if( col === 'campaign_id' && value !== '' && value.length <= 10 ){
       const numValue = Number(value);
       setNewCampaignInfo({
           ...newCampaignInfo,

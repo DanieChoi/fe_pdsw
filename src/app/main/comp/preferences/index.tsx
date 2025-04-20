@@ -10,6 +10,8 @@ import TitleWrap from "@/components/shared/TitleWrap";
 import { useEnvironmentStore } from '@/store/environmentStore';
 import { useAuthStore } from '@/store/authStore';
 import { useApirForEnvironmentSave } from '@/features/auth/hooks/useApiForEnvironment';
+import { useApiForOperatingTime } from '@/features/preferences/hooks/useApiForOperatingTime';
+import { useApiForOperatingTimeUpdate } from '@/features/preferences/hooks/useApiForOperatingTimeUpdate';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useRouter } from 'next/navigation';
 import { useTabStore } from '@/store/tabStore';
@@ -102,6 +104,24 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
     }
   };
 
+  const convertBinaryString = (input:string) => {
+    return input
+      .split('')               // 문자열을 문자 배열로 변환
+      .map(char => char === '1' ? 't' : 'f') // 각각 '1'이면 't', 아니면 'f'로
+      .join(',');              // 쉼표로 연결
+  };
+  const convertArrayToBinaryString = (arr: string[]) => {
+    let rtnValue = '';
+    for(let i=0;i<arr.length;i++){
+      if(typeof arr[i] === 'string' && arr[i].indexOf('t') > -1 ){
+        rtnValue = rtnValue+'1';
+      }else{
+        rtnValue = rtnValue+'0';
+      }
+    }
+    return rtnValue.padEnd(7, '0');
+  };
+
   // 환경설정 수정 API 호출
   const { mutate: environmentSave } = useApirForEnvironmentSave({
     onSuccess: (data) => {
@@ -124,6 +144,11 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
           dayOfWeekSetting: dayOfWeek.join(',')
         };
         setEnvironment(updatedData);
+        fetchOperatingTimeUpdate({
+          start_time: startTime,
+          end_time: endTime,
+          days_of_week: convertArrayToBinaryString(dayOfWeek)
+        });
       }
     },
     onError: (error) => {
@@ -132,6 +157,29 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
     }
   });
 
+  // 캠페인 운용 가능 시간 조회 API 호출
+  const { mutate: fetchOperatingTime } = useApiForOperatingTime({
+    onSuccess: (data) => {
+      console.log(data);
+      setStartTime(data.result_data.start_time);
+      setEndTime(data.result_data.end_time);
+      setDayOfWeek([convertBinaryString(data.result_data.days_of_week)]);
+    },
+    onError: (error) => {
+      
+    }
+  });
+  
+  // 캠페인 운용 가능 시간 수정 API 호출
+  const { mutate: fetchOperatingTimeUpdate } = useApiForOperatingTimeUpdate({
+    onSuccess: (data) => {
+      console.log(data);
+    },
+    onError: (error) => {
+      
+    }
+  });
+  
   // 환경설정 데이터가 로드되면 상태 업데이트
   useEffect(() => {
     if (environmentData) {
@@ -143,13 +191,13 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
       setPersonalCampaignAlertOnly(environmentData.personalCampaignAlertOnly === 1);
       setMessageType(environmentData.useAlramPopup === 1 ? "알림만" : "알림과 없음");
       setUnusedWorkHoursCalc(environmentData.unusedWorkHoursCalc === 1);
-      setStartTime(environmentData.sendingWorkStartHours || "");
-      setEndTime(environmentData.sendingWorkEndHours || "");
+      // setStartTime(environmentData.sendingWorkStartHours || "");
+      // setEndTime(environmentData.sendingWorkEndHours || "");
 
       // 요일 설정 파싱
-      if (environmentData.dayOfWeekSetting) {
-        setDayOfWeek(environmentData.dayOfWeekSetting.split(','));
-      }
+      // if (environmentData.dayOfWeekSetting) {
+      //   setDayOfWeek(environmentData.dayOfWeekSetting.split(','));
+      // }
     }
   }, [environmentData]);
 
@@ -263,6 +311,10 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
       onSubmit(requestData);
     }
   };
+
+  useEffect(() => {
+    fetchOperatingTime();
+  }, []);
 
   
   
