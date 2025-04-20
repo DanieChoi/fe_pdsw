@@ -26,13 +26,14 @@ import { useAuthStore } from "@/store";
 
 export function useApiForGetTreeMenuDataForSideMenu() {
   const queryClient = useQueryClient();
-  const { tenant_id, role_id } = useAuthStore();
+  const { tenant_id, role_id, session_key } = useAuthStore();
   
   const getQueryKey = () => ["treeMenuDataForSideMenu", tenant_id, role_id];
 
   const query = useQuery<TabData[], Error>({
     queryKey: getQueryKey(),
     queryFn: () => apiForGetTreeMenuDataForSideMenu(tenant_id, role_id?.toString()),
+    enabled : session_key !== "", // session_key가 있을 때만 (로그아웃시 호출 방지용)
     // 캐시 시간을 조절하여 불필요한 요청 감소
     staleTime: 30 * 1000, // 30초
   });
