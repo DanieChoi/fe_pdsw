@@ -11,6 +11,7 @@ import { useEnvironmentStore } from "@/store/environmentStore";
 import { toast, initToasts } from "./CustomToast";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
+import { useSSEStore } from "@/store/useSSEStore";
 
 type FooterDataType = {
   time: string;
@@ -41,6 +42,7 @@ export default function Footer({
   const { id, tenant_id, role_id } = useAuthStore();
   const { campaigns, setCampaigns } = useMainStore();
   const { useAlramPopup } = useEnvironmentStore();
+  const { initSSE, closeSSE, getConnectionInfo } = useSSEStore();
 
   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
@@ -111,7 +113,7 @@ export default function Footer({
     }
   };
 
-  const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string,campaign_id: string, tempEventData: any): void => {
+  const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, campaign_id: string, tempEventData: any): void => {
     //시간.
     const today = new Date();
     const _time = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0') + ':' + String(today.getSeconds()).padStart(2, '0');
@@ -352,7 +354,7 @@ export default function Footer({
 
         // 푸터 로그 메시지
         _message = '캠페인 동작상태 변경, 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: 진행중';
-        
+
         // 토스트 알림 표시 (한번만 표시)
         if (useAlramPopup === 1) {
           toast.event(`[EVENT] [${campaign_id}] 캠페인 상태 변경`, {
@@ -394,52 +396,118 @@ export default function Footer({
   }, [campaigns, fetchMain, useAlramPopup, debouncedInvalidate, tenant_id]);
 
   // SSE 구독
+  // useEffect(() => {
+  //   // 브라우저 환경인지 확인
+  //   if (typeof window !== 'undefined' && window.EventSource && id !== '') {
+  //     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+  //     console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
+  //     const eventSource = new EventSource(
+  //       `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
+  //     );
+
+  //     let data: any = {};
+  //     let announce = "";
+  //     let command = "";
+  //     let kind = "";
+  //     let campaign_id = "";
+
+  //     eventSource.addEventListener('message', (event) => {
+  //       console.log("footer sse event = ", event.data);
+
+  //       if (event.data !== "Connected!!") {
+  //         const tempEventData = JSON.parse(event.data);
+  //         if (
+  //           announce !== tempEventData["announce"] ||
+  //           !isEqual(data, tempEventData.data) ||
+  //           !isEqual(data, tempEventData["data"]) ||
+  //           kind !== tempEventData["kind"] ||
+  //           campaign_id !== tempEventData["campaign_id"]
+  //         ) {
+  //           announce = tempEventData["announce"];
+  //           command = tempEventData["command"];
+  //           data = tempEventData["data"];
+  //           kind = tempEventData["kind"];
+  //           campaign_id = tempEventData["campaign_id"];
+
+  //           footerDataSet(
+  //             tempEventData["announce"],
+  //             tempEventData["command"],
+  //             tempEventData["data"],
+  //             tempEventData["kind"],
+  //             tempEventData["campaign_id"],
+  //             tempEventData
+  //           );
+  //         }
+  //       }
+  //     });
+  //   }
+  // }, [id, tenant_id, role_id]);
+
+  const logConnectionStatus = useCallback(() => {
+    const connectionInfo = getConnectionInfo();
+    console.log("📊 [SSE 연결 상태]", {
+      연결됨: connectionInfo.isConnected,
+      URL: connectionInfo.url,
+      총연결횟수: connectionInfo.connectionCount,
+      메시지수신횟수: connectionInfo.messageCount,
+      마지막연결시간: connectionInfo.lastConnectedAt,
+    });
+  }, [getConnectionInfo]);
+
+  useEffect(() => {
+    // 브라우저 환경이고, 사용자 ID가 있는 경우에만 실행
+    if (typeof window !== 'undefined' && id !== '') {
+      // 10초마다 연결 상태 로깅
+      const statusInterval = setInterval(() => {
+        logConnectionStatus();
+      }, 10000);
+      
+      return () => {
+        clearInterval(statusInterval);
+      };
+    }
+  }, [id, logConnectionStatus]);
+  
+  // SSE 구독 코드 수정 (기존 useEffect 대체)
   useEffect(() => {
     // 브라우저 환경인지 확인
     if (typeof window !== 'undefined' && window.EventSource && id !== '') {
-      const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-      console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
-      const eventSource = new EventSource(
-        `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
-      );
-
-      let data: any = {};
-      let announce = "";
-      let command = "";
-      let kind = "";
-      let campaign_id = "";
-
-      eventSource.addEventListener('message', (event) => {
-        console.log("footer sse event = ", event.data);
-
-        if (event.data !== "Connected!!") {
-          const tempEventData = JSON.parse(event.data);
-          if (
-            announce !== tempEventData["announce"] ||
-            !isEqual(data, tempEventData.data) ||
-            !isEqual(data, tempEventData["data"]) ||
-            kind !== tempEventData["kind"] ||
-            campaign_id !== tempEventData["campaign_id"]
-          ) {
-            announce = tempEventData["announce"];
-            command = tempEventData["command"];
-            data = tempEventData["data"];
-            kind = tempEventData["kind"];
-            campaign_id = tempEventData["campaign_id"];
-
-            footerDataSet(
-              tempEventData["announce"],
-              tempEventData["command"],
-              tempEventData["data"],
-              tempEventData["kind"],
-              tempEventData["campaign_id"],
-              tempEventData
-            );
-          }
+      // 초기 연결 상태 로깅
+      console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`);
+      
+      // SSE 이벤트 메시지 핸들러
+      const handleSSEMessage = (tempEventData: any) => {
+        try {
+          const { announce, command, data, kind, campaign_id } = tempEventData;
+          
+          footerDataSet(
+            announce,
+            command,
+            data,
+            kind,
+            campaign_id,
+            tempEventData
+          );
+        } catch (error) {
+          console.error("🚨 [SSE 메시지 처리 오류]", error);
         }
-      });
+      };
+      
+      // Zustand 스토어를 통해 SSE 연결 초기화
+      initSSE(id, tenant_id, handleSSEMessage);
+      
+      // 연결 직후 상태 로깅
+      setTimeout(() => {
+        logConnectionStatus();
+      }, 1000);
+      
+      // 컴포넌트 언마운트 시 연결 종료
+      return () => {
+        console.log("🔌 [Footer 컴포넌트 언마운트] SSE 연결 종료");
+        closeSSE();
+      };
     }
-  }, [id, tenant_id, role_id]);
+  }, [id, tenant_id, initSSE, closeSSE, logConnectionStatus]);
 
 
   // 높이 변경 핸들러

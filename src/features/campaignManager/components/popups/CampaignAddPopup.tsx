@@ -78,7 +78,7 @@ const CampaignAddPopup: React.FC<Props> = ({
     error: campaignError
   } = useTotalCampaignListForAddCampaignToCampaignGroup(tenantId, isOpen);
 
-  console.log('캠페인 목록 데이터 for 캠페인 추가 팝업 for 캠페인 그룹:', campaignListData);
+  // console.log('캠페인 목록 데이터 for 캠페인 추가 팝업 for 캠페인 그룹:', campaignListData);
   
 
   const {
@@ -87,7 +87,7 @@ const CampaignAddPopup: React.FC<Props> = ({
     error: skillError
   } = useTotalSkillListForAddCampaignToCampaignGroup(tenantId, isOpen);
 
-  console.log('스킬 목록 데이터 for 캠페인 추가 팝업 for 캠페인 그룹:', skillListData);
+  // console.log('스킬 목록 데이터 for 캠페인 추가 팝업 for 캠페인 그룹:', skillListData);
 
   const {
     data: groupData,
