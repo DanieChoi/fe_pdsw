@@ -79,7 +79,6 @@ const CampaignAddPopup: React.FC<Props> = ({
   } = useTotalCampaignListForAddCampaignToCampaignGroup(tenantId, isOpen);
 
   // console.log('캠페인 목록 데이터 for 캠페인 추가 팝업 for 캠페인 그룹:', campaignListData);
-  
 
   const {
     data: skillListData,

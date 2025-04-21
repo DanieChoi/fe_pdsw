@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronUp, ChevronDown, Bell, BellOff, Trash } from "lucide-react";
 import { debounce, isEqual } from 'lodash';
 import { useAuthStore, useMainStore } from '@/store';
@@ -46,6 +46,8 @@ export default function Footer({
 
   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
+
+  const lastProcessedMessageRef = useRef<string | null>(null);
 
   const debouncedInvalidate = useCallback(
     debounce(() => {
@@ -461,25 +463,56 @@ export default function Footer({
       const statusInterval = setInterval(() => {
         logConnectionStatus();
       }, 10000);
-      
+
       return () => {
         clearInterval(statusInterval);
       };
     }
   }, [id, logConnectionStatus]);
-  
+
   // SSE 구독 코드 수정 (기존 useEffect 대체)
   useEffect(() => {
     // 브라우저 환경인지 확인
     if (typeof window !== 'undefined' && window.EventSource && id !== '') {
       // 초기 연결 상태 로깅
       console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`);
-      
+
+      // SSE 이벤트 메시지 핸들러
+      // const handleSSEMessage = (tempEventData: any) => {
+      //   try {
+      //     const { announce, command, data, kind, campaign_id } = tempEventData;
+
+      //     footerDataSet(
+      //       announce,
+      //       command,
+      //       data,
+      //       kind,
+      //       campaign_id,
+      //       tempEventData
+      //     );
+      //   } catch (error) {
+      //     console.error("🚨 [SSE 메시지 처리 오류]", error);
+      //   }
+      // };
+
       // SSE 이벤트 메시지 핸들러
       const handleSSEMessage = (tempEventData: any) => {
         try {
           const { announce, command, data, kind, campaign_id } = tempEventData;
-          
+
+          // 메시지 중복 체크를 위한 고유 ID 생성
+          const messageId = `${announce}_${command}_${campaign_id}_${JSON.stringify(data)}`;
+
+          // 이미 처리한 메시지인지 확인
+          if (lastProcessedMessageRef.current === messageId) {
+            console.log("🔄 [중복 메시지 감지] 처리 건너뜀:", messageId);
+            return;
+          }
+
+          // 메시지 ID 업데이트
+          lastProcessedMessageRef.current = messageId;
+
+          // 메시지 처리
           footerDataSet(
             announce,
             command,
@@ -492,15 +525,15 @@ export default function Footer({
           console.error("🚨 [SSE 메시지 처리 오류]", error);
         }
       };
-      
+
       // Zustand 스토어를 통해 SSE 연결 초기화
       initSSE(id, tenant_id, handleSSEMessage);
-      
+
       // 연결 직후 상태 로깅
       setTimeout(() => {
         logConnectionStatus();
       }, 1000);
-      
+
       // 컴포넌트 언마운트 시 연결 종료
       return () => {
         console.log("🔌 [Footer 컴포넌트 언마운트] SSE 연결 종료");
