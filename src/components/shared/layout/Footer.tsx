@@ -13,7 +13,7 @@ import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useAp
 import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
 import { useSSEStore } from "@/store/useSSEStore";
 import { cn } from "@/lib/utils";
-import { motion, useSpring } from "framer-motion"; // 꼭 상단 import 추가!
+import { motion } from "framer-motion"; // 꼭 상단 import 추가!
 
 
 type FooterDataType = {
@@ -585,20 +585,32 @@ export default function Footer({
     setIsHeightToggled(!isHeightToggled);
   };
 
-  const animatedHeight = useSpring(currentHeight, {
-    stiffness: 180,
-    damping: 26,
-  });
-
   return (
-    <motion.div
-      animate={{ height: isDrawerOpen ? currentHeight : 32 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-      style={{ height: isDrawerOpen ? animatedHeight : 32 }}
+    <Resizable
+      size={{
+        width: '100%',
+        height: isDrawerOpen ? currentHeight : 32
+      }}
+      minHeight={100}
+      maxHeight={500}
+      enable={{
+        top: isDrawerOpen,
+        right: false,
+        bottom: false,
+        left: false,
+        topRight: false,
+        bottomRight: false,
+        bottomLeft: false,
+        topLeft: false
+      }}
       className={cn(
-        "w-full border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col group overflow-hidden",
-        isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative"
+        "border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col group relative h-[1px]",
+        isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative",
+        !isResizing && "duration-300 ease-in-out",
       )}
+      onResizeStart={handleResizeStartInternal}
+      onResizeStop={handleResizeStop}
+      onResize={handleResizing} // ✅ 추가
     >
       {/* 상단 바 영역 */}
       <div className="flex-none pt-[5px] pb-[4px] px-[20px] border-b bg-white flex justify-between items-center">
@@ -617,9 +629,10 @@ export default function Footer({
                 0건
               </span>
             )}
+
           </span>
         </div>
-  
+
         <div className="flex items-center gap-2">
           {useAlramPopup === 1 ? (
             <>
@@ -635,10 +648,11 @@ export default function Footer({
               <BellOff className="w-4 h-4 text-gray-400" />
             </span>
           )}
-  
+
           {/* 열기/닫기 버튼 */}
           <button
             onClick={toggleDrawer}
+            className=""
             title={isDrawerOpen ? "닫기" : "열기"}
           >
             {isDrawerOpen ? (
@@ -649,16 +663,17 @@ export default function Footer({
           </button>
         </div>
       </div>
-  
-      {/* 푸터 내부 콘텐츠 */}
+
+      {/* 푸터 내부 콘텐츠: isDrawerOpen이 true일 때만 렌더링 */}
       {isDrawerOpen && (
         <div className="flex-1 flex overflow-hidden">
+          {/* D(1단) -> w-full, W(2단) -> w-1/2 + 오른쪽 테이블 */}
           <div
-            className={cn(
-              isExpanded ? "w-1/2" : "w-full",
-              "overflow-auto py-[7px] px-[20px]",
-              isExpanded && "border-r"
-            )}
+            className={`
+              ${isExpanded ? "w-1/2" : "w-full"}
+              overflow-auto py-[7px] px-[20px]
+              ${isExpanded ? "border-r" : ""}
+            `}
           >
             <table className="w-full text-sm">
               <tbody>
@@ -672,8 +687,25 @@ export default function Footer({
               </tbody>
             </table>
           </div>
+
+          {/* 2단(W) 모드일 때만 오른쪽 테이블 표시 */}
+          {/* {isExpanded && (
+            <div className="w-1/2 overflow-auto py-[7px] px-[20px]">
+              <table className="w-full text-sm">
+                <tbody>
+                  {footerDataList.map((log, index) => (
+                    <tr key={index}>
+                      <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
+                      <td className="whitespace-nowrap text-[13px] px-1 hidden">[{log.type}]</td>
+                      <td className="text-[13px]">{log.message}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )} */}
         </div>
       )}
-    </motion.div>
+    </Resizable>
   );
 }
