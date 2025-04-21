@@ -86,7 +86,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
         delete_dial_list: 1,
       });
 
-      refetchTreeDataForCampaignGroupTab();
+      // refetchTreeDataForCampaignGroupTab();
     },
   });
 

@@ -766,6 +766,8 @@ const MonitorPage = () => {
       toast.info(`캠페인 수정 type , id : ${type} ${campaignId}`);
     };
 
+    // todo:
+    // 캠페인 모니터 데이터 갱신 for campaignId
 
     campaignChannel.addEventListener("message", handleMessage);
 

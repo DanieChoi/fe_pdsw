@@ -22,9 +22,7 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
   const { selectedMenus, toggleMenu , } = useTreeMenuStore(); // 통합 스토어 사용
   const { availableCampaignTenantContextMenuIds } = useAvailableMenuStore(); // 권한 있는 메뉴 ID 가져오기
 
-
   const { tenant_id, role_id, session_key } = useAuthStore();
-  
 
   // addTab({
   //   id: 700,
