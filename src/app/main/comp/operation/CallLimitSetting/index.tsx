@@ -121,6 +121,7 @@ const CampaignSettings = () => {
   // 제한건수 추가 API 
   const { mutate: createCallLimitSetting } = useApiForCallLimitSettingCreate({
     onSuccess: (data) => {
+      console.log("create data check : ", data);
       if (data.result_code === -1) {
         // -9053 메시지 표시
         showAlert('리스트 등록 건수를 초과하였습니다.');
@@ -317,7 +318,14 @@ const CampaignSettings = () => {
     
 
     console.log("save data check : ", saveData);
-    
+    console.log("selectedRow check : ", selectedRow);
+
+    if(selectedRow) {
+      console.log("aaaaa : ", selectedRow.campaign_id);
+    } else{
+      console.log("bbbbb : ", selectedRow);
+    }
+
 
     // if (selectedRow) {
     if (selectedRow?.campaign_id !== null) {
@@ -333,6 +341,7 @@ const CampaignSettings = () => {
 
 
     }
+      
   };
 
   // 삭제 버튼 클릭 시 호출되는 함수

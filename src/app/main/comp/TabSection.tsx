@@ -42,6 +42,7 @@ const TabSection: React.FC<TabSectionProps> = ({
     removeTab,
     removeSection,
     setSectionActiveTab, // 새로 사용할 함수
+    setOpenOperationSectionId
   } = useTabStore();
 
   useEffect(() => {
@@ -137,10 +138,16 @@ const TabSection: React.FC<TabSectionProps> = ({
                 //icon={tab.icon}
                 isActive={isActive}
                 // 탭 제거
-                onRemove={() => removeTab(tab.id, tab.uniqueKey)}
+                onRemove={() => { 
+                  if(tab.id === 11){
+                    setOpenOperationSectionId("section1");
+                    // 운영설정 메뉴용 탭 초기화
+                  } 
+                  removeTab(tab.id, tab.uniqueKey)}
+                }
                 // 탭 선택 => 섹션 단위 활성화
-                onSelect={() =>
-                  setSectionActiveTab(rowId, sectionId, tab.uniqueKey)
+                onSelect={() =>{
+                  setSectionActiveTab(rowId, sectionId, tab.uniqueKey)}
                 }
                 rowId={rowId} // Draggable 시 필요
                 sectionId={sectionId}

@@ -12,19 +12,19 @@ import Image from 'next/image'
 import { useTabStore } from '@/store'
 
 export default function OperationBoard() {
-  const [openSectionId, setOpenSectionId] = useState<string>('section1')
-  const { activeTabId } = useTabStore()
+  // const [openSectionId, setOpenSectionId] = useState<string>('section1')
+  const { activeTabId, openOperationSectionId, setOpenOperationSectionId } = useTabStore();
 
   useEffect(() => {
     if (activeTabId === 8) {
-      setOpenSectionId('section3')
+      setOpenOperationSectionId('section3')
     } else if (activeTabId === 9) {
-      setOpenSectionId('section4')
+      setOpenOperationSectionId('section4')
     }
   }, [activeTabId])
 
   const toggleSection = (sectionId: string) => {
-    setOpenSectionId(openSectionId === sectionId ? '' : sectionId)
+    setOpenOperationSectionId(openOperationSectionId === sectionId ? '' : sectionId)
   }
 
   // 섹션 데이터를 배열로 정의
@@ -46,12 +46,12 @@ export default function OperationBoard() {
             <button
               type="button"
               className={`accordion-btn
-                ${openSectionId !== section.id ? 'border-b-0' : ''} 
+                ${openOperationSectionId !== section.id ? 'border-b-0' : ''} 
                 gap-[15px]`}
               onClick={() => toggleSection(section.id)}
-              aria-expanded={openSectionId === section.id}
+              aria-expanded={openOperationSectionId === section.id}
             >
-              <div className={`transform transition-transform duration-200 ${openSectionId === section.id ? 'rotate-180' : ''}`}>
+              <div className={`transform transition-transform duration-200 ${openOperationSectionId === section.id ? 'rotate-180' : ''}`}>
                 <Image 
                   src="/chevron-down.svg"
                   alt="chevron"
@@ -64,11 +64,11 @@ export default function OperationBoard() {
           </h2>
           <div
             className={`transition-[max-height,opacity] duration-200 ease-in-out overflow-hidden
-              ${openSectionId === section.id ? 'opacity-100' : 'max-h-0 opacity-0'}`}
+              ${openOperationSectionId === section.id ? 'opacity-100' : 'max-h-0 opacity-0'}`}
           >
             <div className="py-[35px] px-[40px] border-t border-gray-200">
               {/* 컴포넌트를 조건부 렌더링 */}
-              {openSectionId === section.id && React.createElement(section.component)}
+              {openOperationSectionId === section.id && React.createElement(section.component)}
             </div>
           </div>
         </div>
