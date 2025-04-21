@@ -112,6 +112,8 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
     }
   ], []);
 
+
+  /*
   const rows = useMemo(() => 
     campaigns.map((campaign) => {
       const tenant = tenants.find(t => t.tenant_id === campaign.tenant_id);
@@ -133,12 +135,47 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
         skills: skillNames,
       };
     }), 
-    [campaigns, tenants, skills, campaignSkills]
+    // [campaigns, tenants, skills, campaignSkills]
+    [isOpen]
   );
 
   useEffect(() => {
     setFilteredRows(rows);
   }, [rows]);
+  */
+
+
+  const handleOpen = () => {
+    const updatedRows = campaigns.map((campaign) => {
+      const tenant = tenants.find((t) => t.tenant_id === campaign.tenant_id);
+
+      // 캠페인에 해당하는 스킬 ID 배열 찾기
+      const campaignSkill = campaignSkills.find(
+        (c) => c.campaign_id === campaign.campaign_id
+      );
+
+      // 스킬 ID에 해당하는 스킬 이름 찾기
+      const skillNames = skills
+        .filter((skill) => campaignSkill?.skill_id?.includes(skill.skill_id))
+        .map((skill) => skill.skill_name)
+        .join(", ");
+
+      return {
+        campaign_id: campaign.campaign_id,
+        campaign_name: campaign.campaign_name,
+        tenant_name: tenant?.tenant_name || "",
+        skills: skillNames,
+      };
+    });
+
+    setFilteredRows(updatedRows);
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      handleOpen();
+    }
+  }, [isOpen]);
 
   const handleCellClick = ({ row }: CellClickArgs<Row>) => {
     const campaign = campaigns.find(c => c.campaign_id === row.campaign_id);
