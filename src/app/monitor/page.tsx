@@ -763,7 +763,10 @@ const MonitorPage = () => {
     const handleMessage = (event: MessageEvent) => {
       const { type, campaignId } = event.data;
 
-      toast.info(`캠페인 수정 type , id : ${type} ${campaignId}`);
+      fetchMain({
+        session_key: '',
+        tenant_id: tenant_id,
+      });
     };
 
 
