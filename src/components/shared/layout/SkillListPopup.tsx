@@ -30,12 +30,12 @@ const SkillListPopup = ({
     const { skills } = useCampainManagerStore();
     const [selectedSkills, setSelectedSkills] = useState<Set<number>>(new Set(param));
     const [ rows, setRows ] = useState<Skill[]>([]);
-    
     useEffect(() => {
         if(param !== null){
             setSelectedSkills(new Set(param));
         }
     }, [param]);
+    
 
     useEffect(() => {
       if(tenantId !== null){
@@ -43,10 +43,10 @@ const SkillListPopup = ({
         setRows( skills.filter((skill) => 
             skill.tenant_id === tenantId && skill.skill_id !== 0
         ));
-    
       }
-  }, [tenantId]);
-
+    }, [tenantId, skills]);
+    // tenantId와 skills의 의존성 추가
+    
     const handleConfirm = () => {
         onConfirm(Array.from(selectedSkills).sort().join(','));
     };

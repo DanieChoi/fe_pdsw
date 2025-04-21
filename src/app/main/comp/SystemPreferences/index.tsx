@@ -164,6 +164,18 @@ const SystemPreferences = () => {
             
             setDialingDeviceList(data.result_data);
             
+            // 만약 조회된 장비목록이 있다면, 첫번째 장비를 선택 상태로 설정하기
+            if(data.result_data.length > 0) {
+                const firstRow = {
+                    device_id : data.result_data[0].device_id.toString(),
+                    channel_count : data.result_data[0].channel_count,
+                    device_name : data.result_data[0].device_name,  
+                    usage : getDeviceUsage(data.result_data[0].device_id)
+                }
+                setSelectedDevice(firstRow);
+
+            } // end of if 
+            
             // 현재 저장된 장비를 찾아서 선택 상태로 설정
             if (!equipmentNumber) return;
             

@@ -210,9 +210,10 @@ function CampaignLayout() {
   // 키보드 이벤트 리스너 추가
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowDown') {
-        handleNew();
-      }
+      // 개선 요구사항(신규버튼만 등록) 에 따른 주석처리
+      // if (event.key === 'ArrowDown') {
+      //   handleNew();
+      // }
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -510,7 +511,7 @@ function CampaignLayout() {
           <div className="mt-[20px] text-sm">
             <ul className='space-y-1'>
               <li>• 멤버십 별로 발신번호를 설정할 수 있습니다.</li>
-              <li>• 발신번호를 설정하시려면 그리드에서 키보드 ↓를 누르거나 신규 버튼을 클릭해 주세요.</li>
+              <li>• 발신번호를 설정하시려면 신규 버튼을 클릭해 주세요.</li>
             </ul>
             <p className='mt-[20px]'>※ 변경된 정보는 캠페인의 발신 작업이 재시작 시 반영됩니다.</p>
           </div>

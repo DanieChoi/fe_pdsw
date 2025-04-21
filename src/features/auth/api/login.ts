@@ -18,8 +18,8 @@ export const loginApi = {
         throw new Error('LOGIN_URL이 정의되지 않았습니다.');
       }
 
-      console.log("🌐 LOGIN_URL:", LOGIN_URL);
-      toast.success(`🚀 로그인 URL: ${LOGIN_URL}`);
+      // console.log("🌐 LOGIN_URL:", LOGIN_URL);
+      // toast.success(`🚀 로그인 URL: ${LOGIN_URL}`);
 
       // 🔐 첫 번째 로그인 (외부 인증)
       const { data: dataFirst } = await externalAxiosInstance.get<LoginResponseFirst>(
@@ -72,9 +72,21 @@ export const loginApi = {
         expires: 1,
         secure: false,
         sameSite: 'Lax',
-        path: '/',
+        path: '/'
       });
 
+      // ###### 로그인 시간 기준으로 세션키 만료시간 설정 ######
+      const currentDate = new Date();
+      const expiredDate = new Date(currentDate.getTime() + data.expires_in); // 밀리세컨드 더하기
+      
+      data.expires_in = expiredDate.getTime(); // 만료일시를 밀리세컨드로 변환하여 저장
+      
+      // 디버깅: 저장 후 스토어 상태 확인
+      setTimeout(() => {
+        // console.log("🟢 Current store state after setting (with timeout):", useStore.getState());
+      }, 0);
+
+      // 쿠키 설정
       Cookies.set('session_key', data.session_key, {
         expires: 1,
         path: '/',

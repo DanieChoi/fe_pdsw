@@ -34,7 +34,7 @@ const useApiForFetchCounselorList = ({ credentials, enabled }: Props) => {
   return useQuery({
     queryKey: ['counselorList', credentials],
     queryFn: () => fetchCounselorList(credentials),
-    enabled,
+    enabled : enabled !== undefined ? enabled : credentials.session_key !== "", // enabled 넣어준값이 있으면 그걸 설정하고, session_key가 있을 때만 (로그아웃시 호출 방지용)
   });
 };
 

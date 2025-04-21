@@ -454,7 +454,7 @@ export default function CampaignDetail() {
 
   //input data change
   const handleInputData = (value: any, col: string) => {
-    if (col === 'campaign_id' && value !== '') {
+    if (col === 'campaign_id' && value !== '' && value.length <= 10) {
       const numValue = Number(value);
       setTempCampaignsInfo({
           ...tempCampaignInfo,
@@ -833,25 +833,37 @@ export default function CampaignDetail() {
       handleCampaignSaveExecute();
     }
   }
+  //현재시간 양식 구하기.
+  const getCurrentFormattedTime = () => {
+    const now = new Date();
+  
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // 0부터 시작하므로 +1
+    const day = String(now.getDate()).padStart(2, '0');
+  
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+  
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  };
   
   //캠페인 저장 실행.
   const handleCampaignSaveExecute = () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     setChangeYn(true);
+    const todayTime = getCurrentFormattedTime();
     fetchCampaignManagerInsert({...tempCampaignManagerInfo
       , update_user: id
       , creation_user: id
       , update_ip: Cookies.get('userHost')+''
       , creation_ip: Cookies.get('userHost')+''
+      , list_count: 0
+      , reuse_count: 1
+      , creation_time: todayTime
+      , update_time: todayTime
     });
   }
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const currentValue = e.target.value;
-    if (currentValue.startsWith("0") && currentValue.length > 1) {
-      e.target.value = currentValue.replace(/^0+/, "");
-    }
-  };
 
   //캠페인 정보 수정 api 호출
   const { mutate: fetchCampaignManagerInsert } = useApiForCampaignManagerInsert({
