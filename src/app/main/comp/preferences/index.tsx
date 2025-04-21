@@ -139,16 +139,34 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
           personalCampaignAlertOnly: personalCampaignAlertOnly ? 1 : 0,
           useAlramPopup: messageType === "알림만" ? 1 : 0,
           unusedWorkHoursCalc: unusedWorkHoursCalc ? 1 : 0,
-          sendingWorkStartHours: startTime,
-          sendingWorkEndHours: endTime,
-          dayOfWeekSetting: dayOfWeek.join(',')
+          sendingWorkStartHours: unusedWorkHoursCalc?'0000':startTime,
+          sendingWorkEndHours: unusedWorkHoursCalc?'0000':endTime,
+          dayOfWeekSetting: unusedWorkHoursCalc?'0000000':dayOfWeek.join(',')
         };
         setEnvironment(updatedData);
-        fetchOperatingTimeUpdate({
-          start_time: startTime,
-          end_time: endTime,
-          days_of_week: convertArrayToBinaryString(dayOfWeek)
-        });
+
+        if( unusedWorkHoursCalc ){
+          fetchOperatingTimeUpdate({
+            start_time: '0000',
+            end_time: '0000',
+            days_of_week: '0000000'
+          });
+          setStartTime("0000");
+          setEndTime("0000");             
+          setDayOfWeek(['f','f','f','f','f','f','f']);
+          setUnusedWorkHoursCalc(true);
+        }else{
+          const work = convertArrayToBinaryString(dayOfWeek);
+          fetchOperatingTimeUpdate({
+            start_time: startTime,
+            end_time: endTime,
+            days_of_week: work
+          });
+          setStartTime(startTime);
+          setEndTime(endTime);          
+          setDayOfWeek(dayOfWeek);
+          setUnusedWorkHoursCalc(false);
+        }
       }
     },
     onError: (error) => {
@@ -161,9 +179,20 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   const { mutate: fetchOperatingTime } = useApiForOperatingTime({
     onSuccess: (data) => {
       console.log(data);
-      setStartTime(data.result_data.start_time);
-      setEndTime(data.result_data.end_time);
-      setDayOfWeek([convertBinaryString(data.result_data.days_of_week)]);
+      const startTime = data.result_data.start_time;
+      const endTime = data.result_data.end_time;
+      const work = data.result_data.days_of_week;
+      if( startTime === '0000' && endTime === '0000' && work === '0000000' ){
+        setStartTime("0000");
+        setEndTime("0000");          
+        setDayOfWeek(['f','f','f','f','f','f','f']);
+        setUnusedWorkHoursCalc(true);
+      }else{
+        setStartTime(startTime);
+        setEndTime(endTime);
+        setDayOfWeek(convertBinaryString(work).split(','));
+        setUnusedWorkHoursCalc(false);
+      }
     },
     onError: (error) => {
       
