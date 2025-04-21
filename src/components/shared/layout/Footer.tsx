@@ -330,15 +330,18 @@ export default function Footer({
     else if (announce === '/pds/campaign/schedule') {
       _message = '캠페인 스케쥴';
       if (command === 'INSERT') {
-        _message += '수정, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
+        // _message += '수정, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
+        _message += '수정, 캠페인 아이디 : ' + campaign_id;
         addMessageToFooterList(_time, _type, _message);
       }
       else if (command === 'UPDATE') {
-        _message += '변경, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
+        // _message += '변경, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
+        _message += '변경, 캠페인 아이디 : ' + campaign_id;
         addMessageToFooterList(_time, _type, _message);
       }
       else if (command === 'DELETE') {
-        _message += '삭제, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
+        // _message += '삭제, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
+        _message += '삭제, 캠페인 아이디 : ' + campaign_id;
         addMessageToFooterList(_time, _type, _message);
       }
     }
