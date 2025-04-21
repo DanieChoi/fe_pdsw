@@ -19,6 +19,7 @@ import IContextMenuForCampaignGroupAtCampaignGroup from "./ContextMenus/IContext
 import IContextMenuForTenantAtCampaignGroup from "./ContextMenus/IContextMenuForTenantAtCampaignGroup";
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
 import IDialogButtonForDeleteCampaignGroup from "@/widgets/sidebar/dialogs/IDialogButtonForDeleteCampaignGroup";
+import { set } from "lodash";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -55,7 +56,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   node,
   level,
   expandedNodes,
-  selectedNodeId,
+  // selectedNodeId,
   onNodeToggle,
   onNodeSelect,
 }: TreeNodeProps) {
@@ -64,8 +65,10 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const recentlyClosedDialogRef = useRef(false);
-  const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
+  const { refetchTreeDataForCampaignGroupTab, selectedNodeId, setSelectedNodeId } = useSideMenuCampaignGroupTabStore();
   const { setCampaignGroupManagerInit } = useCampainManagerStore();
+  const nodeRef = useRef<HTMLDivElement>(null);
+  const { campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
 
   const [isBrowser, setIsBrowser] = useState(false);
   useEffect(() => {
@@ -92,7 +95,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
 
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedNodes.has(node.id);
-  const isSelected = selectedNodeId === node.id;
+  const isSelected = campaignIdForUpdateFromSideMenu === node.campaign_id?.toString() || selectedNodeId === node.id;
 
   useEffect(() => {
     if (node.type === "group" && hasChildren) {
@@ -106,6 +109,11 @@ export function TreeNodeForSideBarCampaignGroupTab({
       console.log(`노드 클릭 (타입: ${node.type}, ID: ${node.id}), 자식 수: ${node.children?.length}`);
       onNodeToggle(node.id);
     }
+
+    setSelectedNodeId(node.id);
+    setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
+
+    // setSelectedNodeId(node.id);
   }, [node.id, node.type, hasChildren, node.children?.length, onNodeSelect, onNodeToggle]);
 
   const handleContextMenuEvent = (e: React.MouseEvent) => {
@@ -174,7 +182,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       baseStyle += isSelected ? "" : " text-green-600";
     }
     return baseStyle;
-  }, [isSelected, node.type]);
+  }, [isSelected, node.type, node.id, selectedNodeId, selectedNodeId]);
 
   const renderIcon = useCallback(() => {
     switch (node.type?.toLowerCase()) {
@@ -245,13 +253,66 @@ export function TreeNodeForSideBarCampaignGroupTab({
     );
   };
 
+  const handleDoubleClickCampaign = useCallback(() => {
+    if (node.type !== "campaign") return;
+
+    const { addTabCurrentOnly, setCampaignIdForUpdateFromSideMenu } = useTabStore.getState();
+
+    addTabCurrentOnly({
+      id: 2,
+      uniqueKey: "2",
+      title: `캠페인 관리 ${node.campaign_id}`,
+      content: null,
+      params: {
+        campaignId: node.campaign_id?.toString(),
+        campaignName: node.name,
+        campaignType: node.type,
+      },
+    });
+    setSelectedNodeId(node.id);
+    setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
+  }, [node]);
+
+  // const renderNodeUI = () => (
+  //   <div
+  //     className={getNodeStyle()}
+  //     onClick={handleClick}
+  //     onContextMenu={node.type === "campaign" ? undefined : handleContextMenuEvent}
+  //     style={{ paddingLeft: `${level * 16 + 8}px` }}
+  //   >
+  //     <div className="flex items-center w-full gap-2">
+  //       {hasChildren ? (
+  //         isExpanded ? (
+  //           <Image src="/tree-menu/minus_for_tree.png" alt="접기" width={12} height={12} />
+  //         ) : (
+  //           <Image src="/tree-menu/plus_icon_for_tree.png" alt="펼치기" width={12} height={12} />
+  //         )
+  //       ) : (
+  //         <span className="w-3" />
+  //       )}
+  //       {renderIcon()}
+  //       <span className={`flex text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
+  //         {getStatusIcon(node.start_flag) && <Image src={getStatusIcon(node.start_flag) || ''} alt="상태" width={12} height={12} className="mr-1" />}
+  //         {/* {node.campaign_id}  */}
+  //         {node.type === "group" && `[${node.group_id}]`}         
+  //         {node.type === "campaign" && `[${node.campaign_id}]`}
+  //         {node.name}
+  //         {/* team 인 경우 */}
+  //       </span>
+  //     </div>
+  //   </div>
+  // );
+
   const renderNodeUI = () => (
     <div
+      ref={nodeRef}  // Add this line
       className={getNodeStyle()}
       onClick={handleClick}
+      onDoubleClick={node.type === "campaign" ? handleDoubleClickCampaign : undefined}
       onContextMenu={node.type === "campaign" ? undefined : handleContextMenuEvent}
       style={{ paddingLeft: `${level * 16 + 8}px` }}
     >
+      {/* Rest of the function stays the same */}
       <div className="flex items-center w-full gap-2">
         {hasChildren ? (
           isExpanded ? (
@@ -265,11 +326,9 @@ export function TreeNodeForSideBarCampaignGroupTab({
         {renderIcon()}
         <span className={`flex text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
           {getStatusIcon(node.start_flag) && <Image src={getStatusIcon(node.start_flag) || ''} alt="상태" width={12} height={12} className="mr-1" />}
-          {/* {node.campaign_id}  */}
-          {node.type === "group" && `[${node.group_id}]`}         
+          {node.type === "group" && `[${node.group_id}]`}
           {node.type === "campaign" && `[${node.campaign_id}]`}
           {node.name}
-          {/* team 인 경우 */}
         </span>
       </div>
     </div>
@@ -317,19 +376,43 @@ export function TreeNodeForSideBarCampaignGroupTab({
           onHandleCampaignCopy={handleCopyCampaign}
 
           // tofix 0409 tenantId 전달 해야함 캠페인의 tenantId
-          tenantIdForCampaignTab= {node.tenant_id}
+          tenantIdForCampaignTab={node.tenant_id}
         >
-          {renderNodeUI()} 
+          {renderNodeUI()}
         </IContextMenuForCampaignForCampaignGroup>
       );
     }
     return renderNodeUI();
   };
 
+  useEffect(() => {
+    // Only process this effect for campaign nodes
+    if (node.type === "campaign") {
+      // If this campaign matches the selected campaign ID, select it
+      if (campaignIdForUpdateFromSideMenu &&
+        node.campaign_id?.toString() === campaignIdForUpdateFromSideMenu) {
+
+        // onNodeSelect(node.id);
+        setSelectedNodeId(node.id);
+
+        // Scroll to this node
+        if (nodeRef.current) {
+          setTimeout(() => {
+            nodeRef.current?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'nearest'
+            });
+          }, 100);
+        }
+      }
+    }
+  }, [campaignIdForUpdateFromSideMenu, node.id, node.campaign_id, node.type, onNodeSelect, setCampaignIdForUpdateFromSideMenu, selectedNodeId, setSelectedNodeId],);
+
+  
   return (
     <div className="select-none" data-node-type={node.type} data-node-id={node.id}>
+      {/* isSelected : {isSelected ? "선택됨" : '안선택'} */}
       {renderNodeWithProperContextMenu()}
-
       {/* 테넌트 노드 컨텍스트 메뉴 */}
       <Menu id={tenantMenuId} className="compact-menu">
         <IContextMenuForTenantAtCampaignGroup

@@ -7,6 +7,7 @@ import TitleWrap from "@/components/shared/TitleWrap";
 import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
 import { CampaignHeaderSearch } from './CampaignManagerHeader';
 import { CampaignListDataResponse } from '@/features/campaignManager/types/typeForCampaignForSideBar';
+import { useSideMenuCampaignGroupTabStore } from '@/store/storeForSideMenuCampaignGroupTab';
 
 const dialModeList = [
   { dial_id: 1, dial_name: 'Power' },
@@ -84,6 +85,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
   const { campaigns, setSelectedCampaign, selectedCampaignRow, setSelectedCampaignRow } = useMainStore();
   const { campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const { schedules, callingNumbers, campaignSkills } = useCampainManagerStore();
+  const {setSelectedNodeId, selectedNodeId} = useSideMenuCampaignGroupTabStore();
 
   const [filteredCampaigns, setFilteredCampaigns] = useState<CampaignListDataResponse[]>([]);
   const [tempData, setTempData] = useState<Row[]>([]);
@@ -150,6 +152,8 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
     if (clickedCampaign) {
       setSelectedCampaign(clickedCampaign as any);
       setSelectedCampaignRow(row);
+      setSelectedNodeId(clickedCampaign.campaign_id.toString());
+      
       setCampaignIdForUpdateFromSideMenu(clickedCampaign.campaign_id.toString());
       if (onRowClick) {
         onRowClick(row.campaignId.toString());
@@ -247,6 +251,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
       if (selectedRow && selectedCampaign) {
         setSelectedCampaignRow(selectedRow);
         setSelectedCampaign(selectedCampaign);
+        setSelectedNodeId(selectedCampaign.campaign_id.toString());
 
         // 선택된 행이 어디 있는지 찾기
         const rowIndex = tempData.findIndex(row => row.campaignId === targetCampaignId);
@@ -275,12 +280,13 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
         }
       }
     }
-  }, [campaignIdForUpdateFromSideMenu, tempData, campaigns, setSelectedCampaignRow, setSelectedCampaign]);
+  }, [campaignIdForUpdateFromSideMenu, tempData, campaigns, setSelectedCampaignRow, setSelectedCampaign, selectedNodeId]);
 
   const selectedRowKeys = selectedCampaignRow ? new Set<number>([selectedCampaignRow.campaignId]) : new Set<number>();
 
   return (
     <div className="w-[40%] shrink-0">
+      campaignIdForUpdateFromSideMenu :{campaignIdForUpdateFromSideMenu}
       <div className="flex items-center justify-between mb-2">
         <TitleWrap title="캠페인 목록" totalCount={filteredCampaigns?.length || 0} />
         {/* {viewMode === 'single' && (
