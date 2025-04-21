@@ -51,9 +51,9 @@ export const loginApi = {
       }
 
       // 접근 권한 체크
-      if (!data.menu_role_id) {
-        throw new Error('접근권한이 없습니다.');
-      }
+      // if (!data.menu_role_id) {
+      //   throw new Error('접근권한이 없습니다.');
+      // }
 
       // 🌐 클라이언트 IP 조회
       const { data: dataSecond } = await axios.get<{ ip: string }>(

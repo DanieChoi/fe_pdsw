@@ -83,7 +83,6 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
     },
   ];
 
-  // 사용자가 접근 권한이 있는 메뉴 아이템만 필터링
   const filteredMenuItems = menuItems.filter((menuItem) =>
     availableCampaignTenantContextMenuIds.includes(menuItem.menuId)
   );

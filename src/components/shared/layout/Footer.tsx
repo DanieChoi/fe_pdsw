@@ -13,6 +13,8 @@ import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useAp
 import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
 import { useSSEStore } from "@/store/useSSEStore";
 import { cn } from "@/lib/utils";
+import { motion, useSpring } from "framer-motion"; // 꼭 상단 import 추가!
+
 
 type FooterDataType = {
   time: string;
@@ -29,7 +31,7 @@ interface FooterProps {
   onResizeEnd?: (height: number) => void; // 리사이즈 종료 이벤트 - height 매개변수 추가
 }
 
-
+// 1122
 export default function Footer({
   footerHeight,
   onToggleDrawer,
@@ -44,12 +46,14 @@ export default function Footer({
   const { id, tenant_id, role_id } = useAuthStore();
   const { campaigns, setCampaigns } = useMainStore();
   const { useAlramPopup } = useEnvironmentStore();
-  const { initSSE, closeSSE, getConnectionInfo } = useSSEStore();
+  const [isResizing, setIsResizing] = useState(false);
+  const [isHeightToggled, setIsHeightToggled] = useState(false);
 
   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
-  const [isResizing, setIsResizing] = useState(false);
-  
+
+  const { initSSE, closeSSE, getConnectionInfo } = useSSEStore();
+
   const lastProcessedMessageRef = useRef<string | null>(null);
 
   const debouncedInvalidate = useCallback(
@@ -553,13 +557,13 @@ export default function Footer({
     setIsResizing(true);
     onResizeStart?.();
   };
-  
+
   const handleResizing = (e: any, direction: any, ref: any, d: any) => {
     const newHeight = ref.offsetHeight;
     setCurrentHeight(newHeight);
     onResizeHeight?.(newHeight);
   };
-  
+
   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
     setIsResizing(false);
     const newHeight = ref.offsetHeight; // ✅ 여기서도 offsetHeight 기준으로!
@@ -567,35 +571,34 @@ export default function Footer({
     onResizeHeight?.(newHeight);
     onResizeEnd?.(newHeight);
   };
+
+  const handleToggleHeight = () => {
+    // toast.info("드래그하여 높이를 조절하세요.");
   
+    const minRowHeight = 24; // 각 알림 줄당 높이
+    const padding = 60; // 위 아래 여백 및 테이블 헤더 등 고려
+    const rowCount = footerDataList.length;
+    const calculatedHeight = Math.min(500, Math.max(100, rowCount * minRowHeight + padding));
   
+    setCurrentHeight(isHeightToggled ? 111 : calculatedHeight);
+    onResizeHeight?.(isHeightToggled ? 111 : calculatedHeight);
+    setIsHeightToggled(!isHeightToggled);
+  };
+
+  const animatedHeight = useSpring(currentHeight, {
+    stiffness: 180,
+    damping: 26,
+  });
 
   return (
-    <Resizable
-      size={{
-        width: '100%',
-        height: isDrawerOpen ? currentHeight : 32
-      }}
-      minHeight={100}
-      maxHeight={500}
-      enable={{
-        top: isDrawerOpen,
-        right: false,
-        bottom: false,
-        left: false,
-        topRight: false,
-        bottomRight: false,
-        bottomLeft: false,
-        topLeft: false
-      }}
+    <motion.div
+      animate={{ height: isDrawerOpen ? currentHeight : 32 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      style={{ height: isDrawerOpen ? animatedHeight : 32 }}
       className={cn(
-        "border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col group relative h-[1px]",
-        isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative",
-        !isResizing && "duration-300 ease-in-out",
+        "w-full border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col group overflow-hidden",
+        isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative"
       )}
-      onResizeStart={handleResizeStartInternal}
-      onResizeStop={handleResizeStop}
-      onResize={handleResizing} // ✅ 추가
     >
       {/* 상단 바 영역 */}
       <div className="flex-none pt-[5px] pb-[4px] px-[20px] border-b bg-white flex justify-between items-center">
@@ -603,17 +606,20 @@ export default function Footer({
           <span className="text-[13px] text-[#333]">현재 진행 상태 </span>
           <span className="text-[12px] text-[#666] bg-gray-100 px-1 rounded">
             {footerDataList.length > 0 ? (
-              <span className="text-[#666] bg-gray-100 px-1 rounded">
+              <button
+                onClick={handleToggleHeight}
+                className="text-[12px] text-[#666] bg-gray-100 px-1 rounded cursor-pointer hover:bg-gray-200 transition"
+              >
                 {footerDataList.length}건
-              </span>
+              </button>
             ) : (
-              <span className="text-[#666] bg-gray-100 px-1 rounded">
+              <span className="text-[12px] text-[#666] bg-gray-100 px-1 rounded">
                 0건
               </span>
             )}
           </span>
         </div>
-
+  
         <div className="flex items-center gap-2">
           {useAlramPopup === 1 ? (
             <>
@@ -629,11 +635,10 @@ export default function Footer({
               <BellOff className="w-4 h-4 text-gray-400" />
             </span>
           )}
-
+  
           {/* 열기/닫기 버튼 */}
           <button
             onClick={toggleDrawer}
-            className=""
             title={isDrawerOpen ? "닫기" : "열기"}
           >
             {isDrawerOpen ? (
@@ -644,17 +649,16 @@ export default function Footer({
           </button>
         </div>
       </div>
-
-      {/* 푸터 내부 콘텐츠: isDrawerOpen이 true일 때만 렌더링 */}
+  
+      {/* 푸터 내부 콘텐츠 */}
       {isDrawerOpen && (
         <div className="flex-1 flex overflow-hidden">
-          {/* D(1단) -> w-full, W(2단) -> w-1/2 + 오른쪽 테이블 */}
           <div
-            className={`
-              ${isExpanded ? "w-1/2" : "w-full"}
-              overflow-auto py-[7px] px-[20px]
-              ${isExpanded ? "border-r" : ""}
-            `}
+            className={cn(
+              isExpanded ? "w-1/2" : "w-full",
+              "overflow-auto py-[7px] px-[20px]",
+              isExpanded && "border-r"
+            )}
           >
             <table className="w-full text-sm">
               <tbody>
@@ -668,25 +672,8 @@ export default function Footer({
               </tbody>
             </table>
           </div>
-
-          {/* 2단(W) 모드일 때만 오른쪽 테이블 표시 */}
-          {/* {isExpanded && (
-            <div className="w-1/2 overflow-auto py-[7px] px-[20px]">
-              <table className="w-full text-sm">
-                <tbody>
-                  {footerDataList.map((log, index) => (
-                    <tr key={index}>
-                      <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
-                      <td className="whitespace-nowrap text-[13px] px-1 hidden">[{log.type}]</td>
-                      <td className="text-[13px]">{log.message}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )} */}
         </div>
       )}
-    </Resizable>
+    </motion.div>
   );
 }
