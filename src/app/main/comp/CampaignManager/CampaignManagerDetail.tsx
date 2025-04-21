@@ -906,13 +906,6 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     setChangeYn(false);
     if (campaignInfoChangeYn) {
-      fetchCampaignManagerUpdate(
-        {
-          ...tempCampaignManagerInfo
-          , update_user: user_id
-          , update_ip: Cookies.get('userHost')+''
-        }
-      );
 
       if (tempCampaignManagerInfo.start_flag === 1 && oriCampaignManagerInfo.start_flag != 1) {
         fetchCampaignStatusUpdate({
@@ -1370,7 +1363,14 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const { mutate: fetchCampaignStatusUpdate } = useApiForCampaignStatusUpdate({
     onSuccess: (data) => {
       if (data.result_code === 0) {
-        fetchCampaignManagerUpdate(tempCampaignManagerInfo);
+        // fetchCampaignManagerUpdate(tempCampaignManagerInfo);
+        fetchCampaignManagerUpdate(
+          {
+            ...tempCampaignManagerInfo
+            , update_user: user_id
+            , update_ip: Cookies.get('userHost')+''
+          }
+        );
         if (campaignSkillChangeYn) {
           if (tempCampaignSkills.skill_id[0] === 0) {
             fetchCampaignSkillUpdate({
