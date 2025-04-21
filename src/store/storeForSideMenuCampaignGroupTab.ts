@@ -440,41 +440,88 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
     });
   },
 
+  // removeCampaignFromGroup: (campaignId: string) => {
+  //   set(state => {
+  //     const newTreeData = [...state.treeData];
+  //     const newOriginalData = [...state.originalTreeData];
+
+  //     // Helper function to find and remove the campaign
+  //     const removeFromTree = (nodes: TreeNode[]): boolean => {
+  //       for (let i = 0; i < nodes.length; i++) {
+  //         const node = nodes[i];
+
+  //         // Check if any children match the campaign ID
+  //         if (node.children) {
+  //           const index = node.children.findIndex(child => child.id === campaignId);
+  //           if (index !== -1) {
+  //             // Remove the campaign
+  //             node.children.splice(index, 1);
+  //             return true;
+  //           }
+
+  //           // Recursively search in children
+  //           if (removeFromTree(node.children)) {
+  //             return true;
+  //           }
+  //         }
+  //       }
+  //       return false;
+  //     };
+
+  //     // Remove from both tree data and original data
+  //     removeFromTree(newTreeData);
+  //     removeFromTree(newOriginalData);
+
+  //     return {
+  //       treeData: newTreeData,
+  //       originalTreeData: newOriginalData
+  //     };
+  //   });
+  // },
+
   removeCampaignFromGroup: (campaignId: string) => {
     set(state => {
-      const newTreeData = [...state.treeData];
-      const newOriginalData = [...state.originalTreeData];
-
-      // Helper function to find and remove the campaign
-      const removeFromTree = (nodes: TreeNode[]): boolean => {
-        for (let i = 0; i < nodes.length; i++) {
-          const node = nodes[i];
-
-          // Check if any children match the campaign ID
-          if (node.children) {
-            const index = node.children.findIndex(child => child.id === campaignId);
-            if (index !== -1) {
-              // Remove the campaign
-              node.children.splice(index, 1);
-              return true;
-            }
-
-            // Recursively search in children
-            if (removeFromTree(node.children)) {
-              return true;
-            }
+      console.log(`캠페인 ID ${campaignId} 제거 시작`);
+      
+      // 트리 데이터 복제
+      const newTreeData = JSON.parse(JSON.stringify(state.treeData));
+      const newOriginalData = JSON.parse(JSON.stringify(state.originalTreeData));
+      
+      // 재귀적으로 트리 순회하며 캠페인 노드 제거
+      const removeFromTree = (nodes: TreeNode[]): TreeNode[] => {
+        return nodes.reduce<TreeNode[]>((result, node) => {
+          // 캠페인이고 campaign_id가 일치하면 제외 (중요: id가 아닌 campaign_id로 비교)
+          if (node.type === 'campaign' && node.campaign_id?.toString() === campaignId) {
+            console.log(`캠페인 노드 찾음(제거): ID=${node.campaign_id}, name=${node.name}`);
+            return result; // 이 노드는 제외
           }
-        }
-        return false;
+          
+          // 자식 노드가 있으면 재귀적으로 처리
+          if (node.children && node.children.length > 0) {
+            const childrenBefore = node.children.length;
+            const filteredChildren = removeFromTree(node.children);
+            const childrenAfter = filteredChildren.length;
+            
+            if (childrenBefore !== childrenAfter) {
+              console.log(`노드 ${node.name}에서 자식이 제거됨`);
+            }
+            
+            result.push({ ...node, children: filteredChildren });
+          } else {
+            result.push(node);
+          }
+          
+          return result;
+        }, []);
       };
-
-      // Remove from both tree data and original data
-      removeFromTree(newTreeData);
-      removeFromTree(newOriginalData);
-
+      
+      // 새 트리 데이터 생성
+      const updatedTreeData = removeFromTree(newTreeData);
+      const updatedOriginalData = removeFromTree(newOriginalData);
+      
       return {
-        treeData: newTreeData,
-        originalTreeData: newOriginalData
+        treeData: updatedTreeData,
+        originalTreeData: updatedOriginalData
       };
     });
   },

@@ -70,12 +70,12 @@ export interface CampaignListResponse {
 
 // 캠페인 스킬 조회 요청 인터페이스
 export interface CampaignSkillsRequest {
-  filter: {
-    skill_id?: {
-      start: number;
-      end: number;
-    };
-  };
+  // filter: {
+  //   skill_id?: {
+  //     start: number;
+  //     end: number;
+  //   };
+  // };
   sort?: {
     skill_id?: number;
   };

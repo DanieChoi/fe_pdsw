@@ -517,6 +517,7 @@ export function IContextMenuForCampaignForCampaignGroup({
           onOpenChange={(open) => setIsDeleteDialogOpen(open)}
           campaignId={item.id}
           campaignName={item.label}
+          tenant_id={tenantIdForCampaignTab}
         />
       )}
     </>

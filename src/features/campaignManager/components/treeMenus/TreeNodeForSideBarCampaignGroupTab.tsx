@@ -213,6 +213,8 @@ export function TreeNodeForSideBarCampaignGroupTab({
             groupId={node.group_id || 0}
             groupName={node.name || ''}
             onClose={() => setIsCampaignAddPopupOpen(false)}
+            tenantId={node.tenant_id || 0}
+
           />,
           document.body
         )}
@@ -264,7 +266,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
         <span className={`flex text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
           {getStatusIcon(node.start_flag) && <Image src={getStatusIcon(node.start_flag) || ''} alt="상태" width={12} height={12} className="mr-1" />}
           {/* {node.campaign_id}  */}
-          {node.name}
+          {node.type === "group" && `[${node.group_id}]`} {node.name}
         </span>
       </div>
     </div>

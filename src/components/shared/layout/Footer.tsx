@@ -11,6 +11,7 @@ import { useEnvironmentStore } from "@/store/environmentStore";
 import { toast, initToasts } from "./CustomToast";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
+import { useSSEForFooter } from "@/hooks/useSSE";
 
 type FooterDataType = {
   time: string;
@@ -111,7 +112,7 @@ export default function Footer({
     }
   };
 
-  const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string,campaign_id: string, tempEventData: any): void => {
+  const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, campaign_id: string, tempEventData: any): void => {
     //시간.
     const today = new Date();
     const _time = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0') + ':' + String(today.getSeconds()).padStart(2, '0');
@@ -352,7 +353,7 @@ export default function Footer({
 
         // 푸터 로그 메시지
         _message = '캠페인 동작상태 변경, 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: 진행중';
-        
+
         // 토스트 알림 표시 (한번만 표시)
         if (useAlramPopup === 1) {
           toast.event(`[EVENT] [${campaign_id}] 캠페인 상태 변경`, {
@@ -394,52 +395,59 @@ export default function Footer({
   }, [campaigns, fetchMain, useAlramPopup, debouncedInvalidate, tenant_id]);
 
   // SSE 구독
-  useEffect(() => {
-    // 브라우저 환경인지 확인
-    if (typeof window !== 'undefined' && window.EventSource && id !== '') {
-      const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-      console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
-      const eventSource = new EventSource(
-        `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
-      );
+  // useEffect(() => {
+  //   // 브라우저 환경인지 확인
+  //   if (typeof window !== 'undefined' && window.EventSource && id !== '') {
+  //     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+  //     console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
+  //     const eventSource = new EventSource(
+  //       `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
+  //     );
 
-      let data: any = {};
-      let announce = "";
-      let command = "";
-      let kind = "";
-      let campaign_id = "";
+  //     let data: any = {};
+  //     let announce = "";
+  //     let command = "";
+  //     let kind = "";
+  //     let campaign_id = "";
 
-      eventSource.addEventListener('message', (event) => {
-        console.log("footer sse event = ", event.data);
+  //     eventSource.addEventListener('message', (event) => {
+  //       console.log("footer sse event = ", event.data);
 
-        if (event.data !== "Connected!!") {
-          const tempEventData = JSON.parse(event.data);
-          if (
-            announce !== tempEventData["announce"] ||
-            !isEqual(data, tempEventData.data) ||
-            !isEqual(data, tempEventData["data"]) ||
-            kind !== tempEventData["kind"] ||
-            campaign_id !== tempEventData["campaign_id"]
-          ) {
-            announce = tempEventData["announce"];
-            command = tempEventData["command"];
-            data = tempEventData["data"];
-            kind = tempEventData["kind"];
-            campaign_id = tempEventData["campaign_id"];
+  //       if (event.data !== "Connected!!") {
+  //         const tempEventData = JSON.parse(event.data);
+  //         if (
+  //           announce !== tempEventData["announce"] ||
+  //           !isEqual(data, tempEventData.data) ||
+  //           !isEqual(data, tempEventData["data"]) ||
+  //           kind !== tempEventData["kind"] ||
+  //           campaign_id !== tempEventData["campaign_id"]
+  //         ) {
+  //           announce = tempEventData["announce"];
+  //           command = tempEventData["command"];
+  //           data = tempEventData["data"];
+  //           kind = tempEventData["kind"];
+  //           campaign_id = tempEventData["campaign_id"];
 
-            footerDataSet(
-              tempEventData["announce"],
-              tempEventData["command"],
-              tempEventData["data"],
-              tempEventData["kind"],
-              tempEventData["campaign_id"],
-              tempEventData
-            );
-          }
-        }
-      });
-    }
-  }, [id, tenant_id, role_id]);
+  //           footerDataSet(
+  //             tempEventData["announce"],
+  //             tempEventData["command"],
+  //             tempEventData["data"],
+  //             tempEventData["kind"],
+  //             tempEventData["campaign_id"],
+  //             tempEventData
+  //           );
+  //         }
+  //       }
+  //     });
+  //   }
+  // }, [id, tenant_id, role_id]);
+
+  // 안에서 useEffect 없애고 다음처럼 사용
+  useSSEForFooter({
+    id,
+    tenant_id,
+    onMessage: footerDataSet,
+  });
 
 
   // 높이 변경 핸들러

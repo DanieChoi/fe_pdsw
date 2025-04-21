@@ -25,7 +25,7 @@ export const useApiForGetSkillsWithCampaigns = (
     enabled: isEnabled, // 명시적으로 활성화될 때만 API 호출
     refetchOnWindowFocus: false,
     retry: 1,
-    staleTime: 5 * 60 * 1000, // 5분 캐시
+    // staleTime: 5 * 60 * 1000, // 5분 캐시
     ...options,
   });
 };

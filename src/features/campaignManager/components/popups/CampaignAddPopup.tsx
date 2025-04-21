@@ -30,6 +30,7 @@ interface Props {
   groupName?: string;
   onClose?: () => void;
   onSelect?: (selectedCampaigns: number[]) => void;
+  tenantId: number;
 }
 
 const CampaignAddPopup: React.FC<Props> = ({
@@ -37,7 +38,8 @@ const CampaignAddPopup: React.FC<Props> = ({
   onClose,
   onSelect,
   groupId,
-  groupName
+  groupName,
+  tenantId
 }) => {
   // ----------------------------
   //  State
@@ -68,17 +70,25 @@ const CampaignAddPopup: React.FC<Props> = ({
   // ----------------------------
   //  Query
   // ----------------------------
-  const { data, isLoading, error } = useApiForGetSkillsWithCampaigns(undefined, isOpen);
+  const { data, isLoading, error } = useApiForGetSkillsWithCampaigns(tenantId, isOpen);
+
   const {
     data: campaignListData,
     isLoading: isLoadingCampaigns,
     error: campaignError
-  } = useTotalCampaignListForAddCampaignToCampaignGroup(undefined, isOpen);
+  } = useTotalCampaignListForAddCampaignToCampaignGroup(tenantId, isOpen);
+
+  console.log('캠페인 목록 데이터 for 캠페인 추가 팝업 for 캠페인 그룹:', campaignListData);
+  
+
   const {
     data: skillListData,
     isLoading: isLoadingSkills,
     error: skillError
-  } = useTotalSkillListForAddCampaignToCampaignGroup(undefined, isOpen);
+  } = useTotalSkillListForAddCampaignToCampaignGroup(tenantId, isOpen);
+
+  console.log('스킬 목록 데이터 for 캠페인 추가 팝업 for 캠페인 그룹:', skillListData);
+
   const {
     data: groupData,
     isLoading: isLoadingGroup,
@@ -131,28 +141,73 @@ const CampaignAddPopup: React.FC<Props> = ({
     }
   }, [skillListData]);
 
+  // useEffect(() => {
+  //   if (data?.result_data) {
+  //     const skillMap: Record<number, SkillWithCampaigns> = {};
+  //     data.result_data.forEach(campaign => {
+  //       if (Array.isArray(campaign.skill_id)) {
+  //         campaign.skill_id.forEach(skillId => {
+  //           if (!skillMap[skillId]) {
+  //             skillMap[skillId] = { skillId, campaigns: [] };
+  //           }
+  //           if (!skillMap[skillId].campaigns.some(c => c.campaignId === campaign.campaign_id)) {
+  //             skillMap[skillId].campaigns.push({
+  //               campaignId: campaign.campaign_id,
+  //               tenantId: campaign.tenant_id
+  //             });
+  //           }
+  //         });
+  //       }
+  //     });
+  //     const skillArray = Object.values(skillMap).sort((a, b) => a.skillId - b.skillId);
+  //     setSkillsWithCampaigns(skillArray);
+  //   }
+  // }, [data]);
+
   useEffect(() => {
+    // 데이터 로그 추가
+    console.log("스킬-캠페인 매핑 원본 데이터:", data);
+    
     if (data?.result_data) {
       const skillMap: Record<number, SkillWithCampaigns> = {};
+      
+      // 모든 스킬 ID를 먼저 초기화
+      if (skillListData?.result_data) {
+        skillListData.result_data.forEach(skill => {
+          skillMap[skill.skill_id] = { 
+            skillId: skill.skill_id, 
+            campaigns: [] 
+          };
+        });
+      }
+      
+      // 캠페인-스킬 매핑 처리
       data.result_data.forEach(campaign => {
-        if (Array.isArray(campaign.skill_id)) {
-          campaign.skill_id.forEach(skillId => {
-            if (!skillMap[skillId]) {
-              skillMap[skillId] = { skillId, campaigns: [] };
-            }
-            if (!skillMap[skillId].campaigns.some(c => c.campaignId === campaign.campaign_id)) {
-              skillMap[skillId].campaigns.push({
-                campaignId: campaign.campaign_id,
-                tenantId: campaign.tenant_id
-              });
-            }
-          });
-        }
+        // skill_id가 배열이거나 단일 값인 경우 모두 처리
+        const skillIds = Array.isArray(campaign.skill_id) 
+          ? campaign.skill_id 
+          : (campaign.skill_id ? [campaign.skill_id] : []);
+        
+        skillIds.forEach(skillId => {
+          if (!skillMap[skillId]) {
+            skillMap[skillId] = { skillId, campaigns: [] };
+          }
+          
+          // 이미 추가된 캠페인은 중복 추가하지 않음
+          if (!skillMap[skillId].campaigns.some(c => c.campaignId === campaign.campaign_id)) {
+            skillMap[skillId].campaigns.push({
+              campaignId: campaign.campaign_id,
+              tenantId: campaign.tenant_id
+            });
+          }
+        });
       });
+      
       const skillArray = Object.values(skillMap).sort((a, b) => a.skillId - b.skillId);
+      console.log("가공된 스킬-캠페인 데이터:", skillArray);
       setSkillsWithCampaigns(skillArray);
     }
-  }, [data]);
+  }, [data, skillListData]);
 
   useEffect(() => {
     if (isOpen) {

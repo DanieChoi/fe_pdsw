@@ -1386,6 +1386,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
         isOpen={isCampaignAddPopupOpen}
         groupId={groupInfo.campaignGroupId}
         groupName={groupInfo.campaignGroupName}
+        tenantId={groupInfo.tenantId}
         onClose={handleCloseCampaignDialog}
       />
     </div>

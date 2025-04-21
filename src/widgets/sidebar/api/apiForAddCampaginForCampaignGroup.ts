@@ -159,12 +159,12 @@ export const apiForFetchSkilsWithCampaigns = async (
  */
 export const getSkilsWithCampaigns = async (campaignId?: number): Promise<CampaignSkillsResponse> => {
   const defaultRequest: CampaignSkillsRequest = {
-    filter: {
-      skill_id: {
-        start: 1,
-        end: 99
-      }
-    },
+    // filter: {
+    //   skill_id: {
+    //     start: 1,
+    //     end: 99
+    //   }
+    // },
     sort: {
       
     },
