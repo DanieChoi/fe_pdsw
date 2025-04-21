@@ -12,6 +12,7 @@ import { toast, initToasts } from "./CustomToast";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
 import { useSSEStore } from "@/store/useSSEStore";
+import { cn } from "@/lib/utils";
 
 type FooterDataType = {
   time: string;
@@ -27,6 +28,7 @@ interface FooterProps {
   onResizeStart?: () => void; // 리사이즈 시작 이벤트
   onResizeEnd?: (height: number) => void; // 리사이즈 종료 이벤트 - height 매개변수 추가
 }
+
 
 export default function Footer({
   footerHeight,
@@ -46,7 +48,8 @@ export default function Footer({
 
   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
-
+  const [isResizing, setIsResizing] = useState(false);
+  
   const lastProcessedMessageRef = useRef<string | null>(null);
 
   const debouncedInvalidate = useCallback(
@@ -546,19 +549,26 @@ export default function Footer({
   }, [id, tenant_id, initSSE, closeSSE, logConnectionStatus]);
 
 
-  // 높이 변경 핸들러
-  const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
-    const newHeight = currentHeight + d.height;
-    setCurrentHeight(newHeight);
-
-    if (onResizeHeight) {
-      onResizeHeight(newHeight);
-    }
-
-    if (onResizeEnd) {
-      onResizeEnd(newHeight);
-    }
+  const handleResizeStartInternal = () => {
+    setIsResizing(true);
+    onResizeStart?.();
   };
+  
+  const handleResizing = (e: any, direction: any, ref: any, d: any) => {
+    const newHeight = ref.offsetHeight;
+    setCurrentHeight(newHeight);
+    onResizeHeight?.(newHeight);
+  };
+  
+  const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
+    setIsResizing(false);
+    const newHeight = ref.offsetHeight; // ✅ 여기서도 offsetHeight 기준으로!
+    setCurrentHeight(newHeight);
+    onResizeHeight?.(newHeight);
+    onResizeEnd?.(newHeight);
+  };
+  
+  
 
   return (
     <Resizable
@@ -578,12 +588,14 @@ export default function Footer({
         bottomLeft: false,
         topLeft: false
       }}
-      className={`
-        border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col duration-300 ease-in-out group relative h-[1px] before:content-[''] before:absolute hover:before:bg-[#5BC2C1]
-        ${isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative"}
-      `}
-      onResizeStart={onResizeStart}
+      className={cn(
+        "border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col group relative h-[1px]",
+        isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative",
+        !isResizing && "duration-300 ease-in-out",
+      )}
+      onResizeStart={handleResizeStartInternal}
       onResizeStop={handleResizeStop}
+      onResize={handleResizing} // ✅ 추가
     >
       {/* 상단 바 영역 */}
       <div className="flex-none pt-[5px] pb-[4px] px-[20px] border-b bg-white flex justify-between items-center">
