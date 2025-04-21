@@ -18,8 +18,8 @@ export const loginApi = {
         throw new Error('LOGIN_URL이 정의되지 않았습니다.');
       }
 
-      console.log("🌐 LOGIN_URL:", LOGIN_URL);
-      toast.success(`🚀 로그인 URL: ${LOGIN_URL}`);
+      // console.log("🌐 LOGIN_URL:", LOGIN_URL);
+      // toast.success(`🚀 로그인 URL: ${LOGIN_URL}`);
 
       // 🔐 첫 번째 로그인 (외부 인증)
       const { data: dataFirst } = await externalAxiosInstance.get<LoginResponseFirst>(
