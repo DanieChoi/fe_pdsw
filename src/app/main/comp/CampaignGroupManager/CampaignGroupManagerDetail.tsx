@@ -979,21 +979,21 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
               , start_flag: 2
             });
           // }
-          if (campaignSkillChangeYn) {
+          // if (campaignSkillChangeYn) {
             //캠페인 스킬 수정 api 호출
             fetchCampaignSkillUpdate({
               ...tempCampaignSkills
               , campaign_id: selectCampaignGroupList[i].campaign_id
               , skill_id: inputSkills.split(',').map(Number)
             });
-          }
-          if (campaignScheduleChangeYn) {
+          // }
+          // if (campaignScheduleChangeYn) {
             //캠페인 스케줄 수정 api 호출
             fetchCampaignScheduleUpdate({
               ...tempCampaignSchedule
               , campaign_id: selectCampaignGroupList[i].campaign_id
             });
-          }
+          // }
           if (callingNumberChangeYn) {
             const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignInfo.campaign_id)
               .map((data) => data.calling_number)
@@ -1038,10 +1038,17 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
-      setSelectedCampaign(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
-      setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
+      // setSelectedCampaign(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
+      // setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
       setChangeYn(false);
-      removeTab(Number(activeTabId), activeTabKey + '');
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '작업이 완료되었습니다.',
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+      });
+      // removeTab(Number(activeTabId), activeTabKey + '');
     }
   });
 
