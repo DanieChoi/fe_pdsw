@@ -84,7 +84,7 @@ export function TreeNodeForCampaignTab({
 
   const handleClick = useCallback(() => {
     onNodeSelect(item.id);
-    // setCampaignIdForUpdateFromSideMenu(item.id);
+    setCampaignIdForUpdateFromSideMenu(item.id);
     if (hasChildren) {
       onNodeToggle(item.id);
     }

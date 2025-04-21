@@ -286,7 +286,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
 
   return (
     <div className="w-[40%] shrink-0">
-      campaignIdForUpdateFromSideMenu :{campaignIdForUpdateFromSideMenu}
+      {/* campaignIdForUpdateFromSideMenu :{campaignIdForUpdateFromSideMenu} */}
       <div className="flex items-center justify-between mb-2">
         <TitleWrap title="캠페인 목록" totalCount={filteredCampaigns?.length || 0} />
         {/* {viewMode === 'single' && (

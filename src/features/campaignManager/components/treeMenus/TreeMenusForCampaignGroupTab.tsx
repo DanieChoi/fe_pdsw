@@ -67,7 +67,7 @@ export function TreeMenusForCampaignGroupTab() {
   
   return (
     <div className="flex flex-col h-full">
-      선택된 아이디 정보 출력: {selectedNodeId}
+      {/* 선택된 아이디 정보 출력: {selectedNodeId} */}
       <div className="flex items-center border-b">
         <SearchBarForSideMenuForCampaignGroupTab />
       </div>
