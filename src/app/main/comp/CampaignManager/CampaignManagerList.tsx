@@ -1,6 +1,6 @@
 // src/features/campaignManager/CampaignManagerList.tsx
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import DataGrid, { CellClickArgs, Column as GridColumn } from "react-data-grid";
 import 'react-data-grid/lib/styles.css';
 import TitleWrap from "@/components/shared/TitleWrap";
@@ -30,47 +30,47 @@ type Column = GridColumn<Row>;
 
 // columns 정의 (Grid에 표시될 열들)
 const columns: Column[] = [
-  { 
-    key: "no", 
-    name: "NO.", 
+  {
+    key: "no",
+    name: "NO.",
     width: 60,
-    resizable: true 
+    resizable: true
   },
-  { 
-    key: "idName", 
-    name: "아이디+이름", 
+  {
+    key: "idName",
+    name: "아이디+이름",
     width: 180,
-    resizable: true 
+    resizable: true
   },
-  { 
-    key: "startDate", 
-    name: "시작일자", 
+  {
+    key: "startDate",
+    name: "시작일자",
     width: 120,
-    resizable: true 
+    resizable: true
   },
-  { 
-    key: "endDate", 
-    name: "종료일자", 
+  {
+    key: "endDate",
+    name: "종료일자",
     width: 120,
-    resizable: true 
+    resizable: true
   },
-  { 
-    key: "skill", 
-    name: "스킬", 
+  {
+    key: "skill",
+    name: "스킬",
     width: 100,
-    resizable: true 
+    resizable: true
   },
-  { 
-    key: "dialMode", 
-    name: "다이얼모드", 
+  {
+    key: "dialMode",
+    name: "다이얼모드",
     width: 150,
-    resizable: true 
+    resizable: true
   },
-  { 
-    key: "callingNumber", 
-    name: "발신번호", 
+  {
+    key: "callingNumber",
+    name: "발신번호",
     width: 150,
-    resizable: true 
+    resizable: true
   },
 ];
 
@@ -82,17 +82,19 @@ type Props = {
 
 export default function CampaignManagerList({ campaignId, campaignHeaderSearchParam, onRowClick }: Props) {
   const { campaigns, setSelectedCampaign, selectedCampaignRow, setSelectedCampaignRow } = useMainStore();
-  const { setCampaignIdForUpdateFromSideMenu } = useTabStore();
+  const { campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const { schedules, callingNumbers, campaignSkills } = useCampainManagerStore();
 
   const [filteredCampaigns, setFilteredCampaigns] = useState<CampaignListDataResponse[]>([]);
   const [tempData, setTempData] = useState<Row[]>([]);
+  const gridRef = useRef<HTMLDivElement>(null);
+
 
   // campaignListResponse를 처리하여 filteredCampaigns 업데이트
   useEffect(() => {
     let _filteredCampaigns = campaigns;
     setFilteredCampaigns([]);
-    if( typeof campaignHeaderSearchParam != 'undefined' ){
+    if (typeof campaignHeaderSearchParam != 'undefined') {
       // full view mode: search 파라미터 적용
       if (campaignHeaderSearchParam) {
         if (campaignHeaderSearchParam.tenantId > -1) {
@@ -137,7 +139,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
       }
     }
     setFilteredCampaigns(_filteredCampaigns);
-  }, [ campaignHeaderSearchParam, campaigns ]);
+  }, [campaignHeaderSearchParam, campaigns]);
 
   // 셀 클릭 시 호출 - 클릭한 행의 캠페인 데이터를 선택 상태로 업데이트하고, onRowClick이 있다면 호출
   const handleCellClick = useCallback(({ row }: CellClickArgs<Row>) => {
@@ -160,21 +162,21 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
 
   // filteredCampaigns를 grid 데이터 형식(Row)로 변환
   useEffect(() => {
-    if( filteredCampaigns.length > 0 ){        
+    if (filteredCampaigns.length > 0) {
       const newTempData: Row[] = filteredCampaigns.map((campaign, index) => ({
         no: index + 1,
         campaignId: campaign.campaign_id,
         idName: `[${campaign.campaign_id}]${campaign.campaign_name}`,
         startDate: schedules
           .filter((schedule) => schedule.campaign_id === campaign.campaign_id)
-          .map((data) => data.start_date && data.start_date.length === 8 
-            ? `${data.start_date.substring(0,4)}-${data.start_date.substring(4,6)}-${data.start_date.substring(6,8)}`
+          .map((data) => data.start_date && data.start_date.length === 8
+            ? `${data.start_date.substring(0, 4)}-${data.start_date.substring(4, 6)}-${data.start_date.substring(6, 8)}`
             : '')
           .join(','),
         endDate: schedules
           .filter((schedule) => schedule.campaign_id === campaign.campaign_id)
-          .map((data) => data.end_date && data.end_date.length === 8 
-            ? `${data.end_date.substring(0,4)}-${data.end_date.substring(4,6)}-${data.end_date.substring(6,8)}`
+          .map((data) => data.end_date && data.end_date.length === 8
+            ? `${data.end_date.substring(0, 4)}-${data.end_date.substring(4, 6)}-${data.end_date.substring(6, 8)}`
             : '')
           .join(','),
         skill: campaignSkills
@@ -191,7 +193,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
           .join(',')
       }));
       setTempData(newTempData);
-    }else{
+    } else {
       setTempData([]);
       setSelectedCampaign(null);
       setSelectedCampaignRow(null);
@@ -201,15 +203,15 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
 
   // 자동 선택: 목록에 행이 있고 선택된 행이 없으면 첫 번째 행을 선택
   useEffect(() => {
-    if (tempData.length > 0 && filteredCampaigns.length > 0 && campaignId != ''){
+    if (tempData.length > 0 && filteredCampaigns.length > 0 && campaignId != '') {
       const selectedCampaign = campaigns.find(c => c.campaign_id === Number(campaignId));
       const filterCampaign = filteredCampaigns.find(c => c.campaign_id === Number(campaignId));
       const index = tempData.findIndex(d => d.campaignId === Number(campaignId));
 
-      if (selectedCampaign && index !== -1 && typeof filterCampaign !== 'undefined' ) {
+      if (selectedCampaign && index !== -1 && typeof filterCampaign !== 'undefined') {
         setSelectedCampaign(selectedCampaign ?? null);
         setSelectedCampaignRow(tempData[index]);
-      }else{        
+      } else {
         const selectedCampaign = campaigns.find(c => c.campaign_id === filteredCampaigns[0].campaign_id);
         setSelectedCampaign(selectedCampaign ?? null);
         setSelectedCampaignRow(tempData.filter(data => data.campaignId === filteredCampaigns[0].campaign_id)[0]);
@@ -218,7 +220,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
           onRowClick(filteredCampaigns[0].campaign_id.toString());
         }
       }
-    }else if (tempData.length > 0 && filteredCampaigns.length > 0 ){
+    } else if (tempData.length > 0 && filteredCampaigns.length > 0) {
       const selectedCampaign = campaigns.find(c => c.campaign_id === tempData[0].campaignId);
       setSelectedCampaign(selectedCampaign ?? null);
       setSelectedCampaignRow(tempData[0]);
@@ -227,12 +229,53 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
         onRowClick(tempData[0].campaignId.toString());
       }
     }
-    
-  }, [tempData, filteredCampaigns,campaignId]);
+
+  }, [tempData, filteredCampaigns, campaignId]);
 
   const getCampaignRowClass = useCallback((row: Row) => {
     return selectedCampaignRow?.campaignId === row.campaignId ? 'bg-[#FFFAEE]' : '';
   }, [selectedCampaignRow]);
+
+  // 0421 양방향 캠페인 선택 매핑
+  // campaignIdForUpdateFromSideMenu 변경 시 스크롤 위치 조정
+  useEffect(() => {
+    if (campaignIdForUpdateFromSideMenu && tempData.length > 0 && gridRef.current) {
+      const targetCampaignId = Number(campaignIdForUpdateFromSideMenu);
+      const selectedRow = tempData.find(row => row.campaignId === targetCampaignId);
+      const selectedCampaign = campaigns.find(c => c.campaign_id === targetCampaignId);
+
+      if (selectedRow && selectedCampaign) {
+        setSelectedCampaignRow(selectedRow);
+        setSelectedCampaign(selectedCampaign);
+
+        // 선택된 행이 어디 있는지 찾기
+        const rowIndex = tempData.findIndex(row => row.campaignId === targetCampaignId);
+
+        // 스크롤 조정 (다음 렌더링 사이클에서 실행하기 위해 setTimeout 사용)
+        if (rowIndex !== -1) {
+          setTimeout(() => {
+            // null 체크 한번 더 (setTimeout 내부에서)
+            if (!gridRef.current) return;
+
+            // 행 높이와 헤더 높이를 고려하여 스크롤 위치 계산
+            const rowHeight = 30; // 행 높이
+            const scrollTop = rowIndex * rowHeight;
+
+            // 그리드 컨테이너의 실제 DOM 엘리먼트 찾기
+            const gridContainer = gridRef.current.querySelector('.rdg');
+            if (gridContainer) {
+              // 뷰포트 중앙에 행이 오도록 스크롤 조정
+              const containerHeight = gridContainer.clientHeight;
+              const scrollPosition = scrollTop - (containerHeight / 2) + rowHeight;
+
+              // 스크롤 적용
+              gridContainer.scrollTop = Math.max(0, scrollPosition);
+            }
+          }, 0);
+        }
+      }
+    }
+  }, [campaignIdForUpdateFromSideMenu, tempData, campaigns, setSelectedCampaignRow, setSelectedCampaign]);
 
   const selectedRowKeys = selectedCampaignRow ? new Set<number>([selectedCampaignRow.campaignId]) : new Set<number>();
 
@@ -250,10 +293,10 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
         )} */}
       </div>
       <div className="overflow-x-auto">
-        <div className="grid-custom-wrap h-[500px]"> 
-          <DataGrid 
-            columns={columns} 
-            rows={tempData} 
+        <div className="grid-custom-wrap h-[500px]" ref={gridRef}>
+          <DataGrid
+            columns={columns}
+            rows={tempData}
             className="grid-custom text-align-left rdg-light"
             rowHeight={30}
             rowClass={getCampaignRowClass}

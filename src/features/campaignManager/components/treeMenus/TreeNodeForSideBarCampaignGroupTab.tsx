@@ -266,7 +266,10 @@ export function TreeNodeForSideBarCampaignGroupTab({
         <span className={`flex text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
           {getStatusIcon(node.start_flag) && <Image src={getStatusIcon(node.start_flag) || ''} alt="상태" width={12} height={12} className="mr-1" />}
           {/* {node.campaign_id}  */}
-          {node.type === "group" && `[${node.group_id}]`} {node.name}
+          {node.type === "group" && `[${node.group_id}]`}         
+          {node.type === "campaign" && `[${node.campaign_id}]`}
+          {node.name}
+          {/* team 인 경우 */}
         </span>
       </div>
     </div>

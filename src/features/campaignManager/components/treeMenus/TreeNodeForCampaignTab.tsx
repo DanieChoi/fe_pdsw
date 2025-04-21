@@ -43,10 +43,13 @@ export function TreeNodeForCampaignTab({
       
       // 노드가 보이지 않을 경우 해당 위치로 스크롤
       if (nodeRef.current) {
-        nodeRef.current.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'nearest'
-        });
+        // 약간의 지연 후 스크롤링 수행
+        setTimeout(() => {
+          nodeRef.current?.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'nearest'
+          });
+        }, 100);
       }
     }
   }, [campaignIdForUpdateFromSideMenu, item.id, onNodeSelect]);

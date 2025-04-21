@@ -123,7 +123,7 @@
 //   });
 
 //   console.log("AgentStatusMonitoring data", data);
-  
+
 
 //   useEffect(() => {
 //     if (data && data.counselorStatusList.length > 0) {
@@ -328,7 +328,6 @@ import StatusTimer from "./component/StatusTimer"; // Adjust path if needed
 // }
 // -----------------------------------------------------
 
-
 const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
   sessionKey,
   campaignId,
@@ -370,29 +369,29 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
   useEffect(() => {
     // Check if data exists and has the expected structure
     if (data && data.counselorStatusList && data.counselorStatusList.length >= 0) { // Check >= 0 to handle empty arrays
-        const tempDataList: AgentData[] = data.counselorStatusList.map((item, index) => {
-            let status: AgentData['status'];
-            switch (item.statusCode) {
-                case '204': status = 'waiting'; break;
-                case '205': status = 'processing'; break;
-                case '206': status = 'afterprocessing'; break;
-                default: status = 'rest'; // Assuming any other code means rest
-            }
+      const tempDataList: AgentData[] = data.counselorStatusList.map((item, index) => {
+        let status: AgentData['status'];
+        switch (item.statusCode) {
+          case '204': status = 'waiting'; break;
+          case '205': status = 'processing'; break;
+          case '206': status = 'afterprocessing'; break;
+          default: status = 'rest'; // Assuming any other code means rest
+        }
 
-            return {
-                // Use index as numeric ID to match AgentData type
-                id: index,
-                status: status,
-                agent: item.counselorId,
-                name: item.counselorName,
-                // Keep time as string to match AgentData type
-                time: String(item.statusTime || '0'), // Convert to string, default to '0' if falsy
-            };
-        });
-        setAgentData(tempDataList);
+        return {
+          // Use index as numeric ID to match AgentData type
+          id: index,
+          status: status,
+          agent: item.counselorId,
+          name: item.counselorName,
+          // Keep time as string to match AgentData type
+          time: String(item.statusTime || '0'), // Convert to string, default to '0' if falsy
+        };
+      });
+      setAgentData(tempDataList);
     } else if (!isLoading && !error) {
-        // If data is null/undefined/empty array after loading and no error, clear the list
-        setAgentData([]);
+      // If data is null/undefined/empty array after loading and no error, clear the list
+      setAgentData([]);
     }
     // Add isLoading and error to dependencies if needed, e.g., for clearing data on error
   }, [data, isLoading, error]); // Dependencies for processing data
@@ -444,19 +443,19 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
 
       if (sortField === 'agent' || sortField === 'name') {
         // String comparison (case-insensitive example)
-         compareA = String(compareA).toLowerCase();
-         compareB = String(compareB).toLowerCase();
-         return sortDirection === 'asc'
+        compareA = String(compareA).toLowerCase();
+        compareB = String(compareB).toLowerCase();
+        return sortDirection === 'asc'
           ? compareA.localeCompare(compareB)
           : compareB.localeCompare(compareA);
       }
 
       // *** MODIFICATION: Direct numeric comparison for 'time' ***
       if (sortField === 'time') {
-          // Ensure values are numbers before comparison
-          const numA = typeof compareA === 'string' ? Number(compareA) : compareA;
-          const numB = typeof compareB === 'string' ? Number(compareB) : compareB;
-          return sortDirection === 'asc' ? numA - numB : numB - numA;
+        // Ensure values are numbers before comparison
+        const numA = typeof compareA === 'string' ? Number(compareA) : compareA;
+        const numB = typeof compareB === 'string' ? Number(compareB) : compareB;
+        return sortDirection === 'asc' ? numA - numB : numB - numA;
       }
 
       // Default fallback (shouldn't be reached with defined SortField types)
@@ -486,7 +485,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
       {/* 상단 통계 */}
       <div>
         <TitleWrap
-          title={`상담사 상태 통계`}
+          title={`${Number(tenantId || 0) === 0 ? "전체 " : tenantId} 상담사 상태 통계 `}
           className="border-b border-gray-300 pb-1"
         />
         <Table>
@@ -584,16 +583,16 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
         {/* Use flex-grow to take remaining height */}
         <div className="flex-grow overflow-auto border border-t-0 border-[#ebebeb] rounded-b-[3px]">
           <table className="w-full table-fixed border-separate border-spacing-0"> {/* Use table-fixed for better column control */}
-             <colgroup> {/* Define column widths */}
-                <col style={{ width: '20%' }} />
-                <col style={{ width: '25%' }} />
-                <col style={{ width: '25%' }} />
-                <col style={{ width: '15%' }} />
-                <col style={{ width: '15%' }} />
+            <colgroup> {/* Define column widths */}
+              <col style={{ width: '20%' }} />
+              <col style={{ width: '25%' }} />
+              <col style={{ width: '25%' }} />
+              <col style={{ width: '15%' }} />
+              <col style={{ width: '15%' }} />
             </colgroup>
             <tbody>
-             {isLoading ? (
-                 // Skeleton Loader
+              {isLoading ? (
+                // Skeleton Loader
                 [...Array(6)].map((_, index) => (
                   <tr key={`skeleton-${index}`} className="h-[34px]"> {/* Set skeleton row height */}
                     {Array.from({ length: 5 }).map((_, colIndex) => (
@@ -605,21 +604,21 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
                     ))}
                   </tr>
                 ))
-             ) : error ? (
-                  // Error Message
-                 <tr>
-                    <td colSpan={5} className="text-center text-red-500 py-4">
-                        데이터 로드 중 오류 발생: {error.message}
-                    </td>
-                 </tr>
-             ) : sortedAndFilteredAgents.length === 0 ? (
-                  // No Data Message
-                  <tr>
-                    <td colSpan={5} className="text-center text-gray-500 py-4">
-                        표시할 데이터가 없습니다.
-                    </td>
-                  </tr>
-             ) : (
+              ) : error ? (
+                // Error Message
+                <tr>
+                  <td colSpan={5} className="text-center text-red-500 py-4">
+                    데이터 로드 중 오류 발생: {error.message}
+                  </td>
+                </tr>
+              ) : sortedAndFilteredAgents.length === 0 ? (
+                // No Data Message
+                <tr>
+                  <td colSpan={5} className="text-center text-gray-500 py-4">
+                    표시할 데이터가 없습니다.
+                  </td>
+                </tr>
+              ) : (
                 // Actual Data Rows
                 sortedAndFilteredAgents.map((agent) => (
                   <tr key={agent.id} className="h-[34px]"> {/* Consistent row height */}
@@ -637,7 +636,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
                     <td className="text-center text-sm border-b px-3 py-1 text-[#333] truncate">{agent.agent}</td>
                     <td className="text-center text-sm border-b px-3 py-1 text-[#333] truncate">{agent.name}</td>
                     <td className="text-center text-sm border-b px-3 py-1 text-[#333]">
-                       {/* *** Pass initial time in seconds to StatusTimer *** */}
+                      {/* *** Pass initial time in seconds to StatusTimer *** */}
                       <StatusTimer initialTime={agent.time} />
                     </td>
                     <td className="text-center text-sm border-b px-3 py-1 text-[#333] truncate">
@@ -646,7 +645,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({
                     </td>
                   </tr>
                 ))
-             )}
+              )}
             </tbody>
           </table>
         </div>
