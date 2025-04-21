@@ -102,7 +102,7 @@ export function TreeNodeForCampaignTab({
     addTabCurrentOnly({
       id: 2,
       uniqueKey: "2",
-      title: `캠페인 관리 ${item.id}`,
+      title: `캠페인 관리`,
       // icon: "",
       // href: "",
       content: null,

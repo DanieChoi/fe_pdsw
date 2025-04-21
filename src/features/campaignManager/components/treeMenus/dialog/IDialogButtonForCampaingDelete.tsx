@@ -50,6 +50,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
     closeAllTabs,
     rows,
     removeTab,
+    setCampaignIdForUpdateFromSideMenu,
     campaignIdForUpdateFromSideMenu,
     setDeletedCampaignId,
   } = useTabStore();
@@ -112,6 +113,16 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
           window.removeCampaignFromGroupTree(campaignId);
           console.log(`캠페인 그룹 탭 트리에서 캠페인 ID ${campaignId} 제거 완료`);
         }
+
+        setCampaignIdForUpdateFromSideMenu(null)
+        
+        // 캠페인 탭 삭제
+        const { rowId, sectionId } = findCurrentTabLocation();
+        if (rowId && activeTabKey) {
+          removeTab(Number(rowId), activeTabKey);
+        }
+
+
       }
 
       deleteCampaignSchedule({
