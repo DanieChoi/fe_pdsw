@@ -145,6 +145,10 @@ export interface TabLayoutStore {
 
   // 기존 탭 닫기
   removeExistingTabsByTabId: (tabId: number) => void;
+
+  // 운영설정용 오픈 sectionId 설정
+  openOperationSectionId: string;
+  setOpenOperationSectionId: (id: string) => void;
 }
 
 const generateUniqueId = (prefix: string, existingIds: string[]) => {
@@ -1048,7 +1052,8 @@ export const useTabStore = create<TabLayoutStore>()(
             rows: updatedRows,
             // 전역 activeTabId와 activeTabKey도 null로 설정
             activeTabId: null,
-            activeTabKey: null
+            activeTabKey: null,
+            openOperationSectionId: "section1" // 운영설정용 sectionId 초기화
           };
         }),
 
@@ -1140,6 +1145,10 @@ export const useTabStore = create<TabLayoutStore>()(
             removeTab(tab.id, tab.uniqueKey);
           });
       },
+
+      // 운영설정용 추가
+      openOperationSectionId: "section1", // 기본값
+      setOpenOperationSectionId: (id: string) => set({ openOperationSectionId: id }),
     }),
     {
       name: "tab-store", // localStorage에 저장될 키 이름
@@ -1149,6 +1158,7 @@ export const useTabStore = create<TabLayoutStore>()(
         tabGroups: state.tabGroups,
         activeTabId: state.activeTabId,
         activeTabKey: state.activeTabKey,
+        openSectionId: state.openOperationSectionId,
       }), // 저장할 상태만 선택
     }
   )

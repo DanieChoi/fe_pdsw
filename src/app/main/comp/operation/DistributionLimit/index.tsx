@@ -1801,12 +1801,12 @@ const DistributionLimit = () => {
             disabled={true}
           />
           <div className="text-sm w-full ml-5">
-            응답호수 초기화 시간 : {initTime === "9999" ? "없음" : `${initTime.slice(0, 2)}:${initTime.slice(2)}`}
+            응답호수 초기화 시각 : {initTime === "9999" ? "없음" : `${initTime.slice(0, 2)}:${initTime.slice(2)}`}
           </div>
         </div>
         <div className="flex gap-2">
-          <CommonButton onClick={openTimeSettingModal}>초기화시간 변경</CommonButton>
-          <CommonButton onClick={() => setIsTimeRemoveOpen(true)}>초기화시간 설정해제</CommonButton>
+          <CommonButton onClick={openTimeSettingModal}>초기화시각 변경</CommonButton>
+          <CommonButton onClick={() => setIsTimeRemoveOpen(true)}>초기화시각 설정해제</CommonButton>
           {hasChanges && (
             <>
               <CommonButton variant="outline" onClick={handleCancelChanges}>변경취소</CommonButton>
