@@ -1141,7 +1141,7 @@ const SkillEdit = () => {
   }, [alertState, handleDelete, handleNew, handleSave]);
 
   return (
-    <div className="flex">
+    <div className="flex overflow-x-auto">
       <div className="flex gap-8">
         <div className="w-[800px] flex flex-col gap-3">
           {/* 스킬 목록 그리드 */}
@@ -1291,9 +1291,9 @@ const SkillEdit = () => {
             </div>
           </div>
           <div className="flex justify-end gap-2 pt-4">
-            <CommonButton onClick={handleDelete}>삭제</CommonButton>
             <CommonButton onClick={handleNew}>신규</CommonButton>
             <CommonButton onClick={handleSave}>저장</CommonButton>
+            <CommonButton onClick={handleDelete}>삭제</CommonButton>
           </div>
           <div className="mt-[20px] text-sm">
             <ul className='space-y-1 notice-li'>

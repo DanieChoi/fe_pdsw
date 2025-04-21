@@ -16,6 +16,7 @@ import {
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import CustomInputForTime from '@/components/shared/CustomInputForTime';
+import { is } from 'date-fns/locale';
 
 interface Row {
   campaign_id: string;
@@ -162,6 +163,7 @@ const CampaignSettings = () => {
   const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
     onSuccess: (data) => {
       if (data.result_code === -1) {
+        console.log("update data check : ", data);
         // -9053 메시지 표시
         showAlert('리스트 등록 건수를 초과하였습니다.');
       } else {
@@ -315,31 +317,19 @@ const CampaignSettings = () => {
       daily_init_flag: dailyInitFlag,
       daily_init_time: dailyInitTime.replace(":", ""), // ✅ string으로 넘긴다!
     };
-    
 
-    console.log("save data check : ", saveData);
-    console.log("selectedRow check : ", selectedRow);
-
-    if(selectedRow) {
-      console.log("aaaaa : ", selectedRow.campaign_id);
-    } else{
-      console.log("bbbbb : ", selectedRow);
-    }
-
-
-    // if (selectedRow) {
-    if (selectedRow?.campaign_id !== null) {
-      // 수정
-      updateCallLimitSetting(saveData);
-    } else {
-      console.log("s  ave data check : ", saveData);
-
+    if (selectedRow && !isNewMode) { // selectRow 및 isNewMode 체크 추가
+      if (selectedRow?.campaign_id !== null) {
+        // 수정
+        updateCallLimitSetting(saveData);
+      } 
+    }else {
+      
       // 신규 등록
-      // tofix 0416
       createCallLimitSetting(saveData);
+
+      // tofix 0416
       // showAlert은 mutate의 onSuccess에서 처리
-
-
     }
       
   };
