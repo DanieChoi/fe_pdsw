@@ -570,12 +570,24 @@ const MonitorPage = () => {
   // 캠페인스킬 조회
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
-      setCampaignSkillList(data.result_data);
+      const dataList = data.result_data;
+      setCampaignSkillList(dataList);
       if (skills.length === 0) {
         const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
         fetchSkills({
           tenant_id_array: tempTenantIdArray
         });
+
+      }
+      if( selectedCampaign === modifiedCampaign ){
+        const tempCampaign = _campaigns.find(c => c.id === selectedCampaign) || initData;
+        setCurrentCampaign({...tempCampaign
+          , skills: dataList.find(data=> data.campaign_id === Number(selectedCampaign))?.skill_id.join(',').split(',').map((data) => Number(data))
+        });
+        setCampaignStatus(tempCampaign.startFlag === 1 ? '시작' : tempCampaign.startFlag === 2 ? '멈춤' : '중지');
+        const tempCampaignInfo = campaigns.find(c => c.campaign_id === Number(tempCampaign.id));
+        setCallPacing(tempCampaignInfo?.dial_mode === 2 ? tempCampaignInfo.dial_speed * 2 : tempCampaignInfo?.dial_mode === 3 ? tempCampaignInfo.dial_speed : 0);
+        setDialMode(tempCampaignInfo?.dial_mode || 0);
       }
     }
   });
@@ -593,6 +605,7 @@ const MonitorPage = () => {
         setCampaignList(data.result_data.filter(data => data.tenant_id === tenant_id));
         setCampaigns(data.result_data.filter(data => data.tenant_id === tenant_id));
       }
+      
     }
   });
 
@@ -615,6 +628,10 @@ const MonitorPage = () => {
 
   const handleCampaignPopupClose = () => {
     setIsCampaignManagerOpen(false);
+    fetchMain({
+      session_key: '',
+      tenant_id: tenant_id,
+    });
   };
 
   useEffect(() => {
