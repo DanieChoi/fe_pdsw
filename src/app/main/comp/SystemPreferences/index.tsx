@@ -552,7 +552,7 @@ const SystemPreferences = () => {
         }else {
             setUpdatedChannelAssign((prevAssign) => {
                 const updatedAssign = [...prevAssign];
-                debugger
+                
                 const channelIndex = updatedAssign.findIndex(assign => assign.channelNumber === channelNumber);
                 if (channelIndex !== -1) {
                     updatedAssign[channelIndex].mode = newMode; // 채널 번호에 해당하는 mode 값을 업데이트
@@ -751,7 +751,7 @@ const SystemPreferences = () => {
             showAlert('채널 할당 정보가 올바르지 않습니다. 다시 시도해주세요.');
             return;
         }
-        debugger
+        
         // API 요청 데이터 생성
         const channelEditRequest = {
             device_id: parseInt(selectedDevice.device_id),
