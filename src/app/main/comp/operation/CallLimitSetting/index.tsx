@@ -510,6 +510,7 @@ const CampaignSettings = () => {
               className="w-full"
               onChange={(e) => setLimitCount(e.target.value)}
               disabled={isFieldDisabled()}
+              maxLength={10}
             />
           </div>
 
