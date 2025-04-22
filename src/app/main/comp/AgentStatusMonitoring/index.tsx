@@ -192,6 +192,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   }, [_agentData]);
 
   useEffect(() => {
+    setAgentData([]);
     if (campaignId && campaigns.length > 0) {
       const _tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
       if (_tenantId) {
