@@ -575,12 +575,12 @@ export default function Footer({
 
   const handleToggleHeight = () => {
     // toast.info("드래그하여 높이를 조절하세요.");
-  
+
     const minRowHeight = 24; // 각 알림 줄당 높이
     const padding = 60; // 위 아래 여백 및 테이블 헤더 등 고려
     const rowCount = footerDataList.length;
     const calculatedHeight = Math.min(500, Math.max(100, rowCount * minRowHeight + padding));
-  
+
     setCurrentHeight(isHeightToggled ? 111 : calculatedHeight);
     onResizeHeight?.(isHeightToggled ? 111 : calculatedHeight);
     setIsHeightToggled(!isHeightToggled);

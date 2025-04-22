@@ -1,5 +1,5 @@
 import React, { useEffect, useState} from 'react';
-import { useCampainManagerStore } from '@/store';
+import { useCampainManagerStore, useMainStore } from '@/store';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import DataGrid, { SelectColumn } from 'react-data-grid';
 import 'react-data-grid/lib/styles.css';
@@ -14,7 +14,7 @@ export interface SkillListPopupProps {
     param: number[];
     tenantId: number;
     isOpen?: boolean;
-    type: string; 
+    type: string;
     onConfirm: (param: string) => void;
     onCancel?: () => void;
 }
@@ -28,6 +28,9 @@ const SkillListPopup = ({
     onCancel
 }: SkillListPopupProps) => {
     const { skills } = useCampainManagerStore();
+    // tenantName 가져와야 되는데 store 는?
+    const { tenants } = useMainStore();
+
     const [selectedSkills, setSelectedSkills] = useState<Set<number>>(new Set(param));
     const [ rows, setRows ] = useState<Skill[]>([]);
     useEffect(() => {
@@ -81,20 +84,34 @@ const SkillListPopup = ({
         return selectedSkills.has(row.skill_id) ? 'selected-row' : '';
     };
 
+    console.log("tenants : ", tenants);
+    console.log("tenantId : ", tenantId);
+    
+
+    const tenantName =
+    tenants.find((tenant) => tenant.tenant_id === tenantId)?.tenant_name ?? `ID ${tenantId}`;  
+
     const gridContent = (
         <div className="grid-custom-wrap w-full">
+          {rows.length === 0 ? (
+            <div className="text-center py-4 text-sm text-gray-500">
+              해당 테넌트 에 부여된 스킬이 없습니다
+            </div>
+          ) : (
             <DataGrid
-                columns={columns}
-                rows={rows}
-                className="grid-custom w-full"
-                rowKeyGetter={(row) => row.skill_id}
-                selectedRows={selectedSkills}
-                onSelectedRowsChange={handleSelectedRowsChange}
-                rowClass={rowClass}
-                rowHeight={26}
+              columns={columns}
+              rows={rows}
+              className="grid-custom w-full"
+              rowKeyGetter={(row) => row.skill_id}
+              selectedRows={selectedSkills}
+              onSelectedRowsChange={handleSelectedRowsChange}
+              rowClass={rowClass}
+              rowHeight={26}
             />
+          )}
         </div>
-    );
+      );
+      
 
     return (
         <CustomAlert

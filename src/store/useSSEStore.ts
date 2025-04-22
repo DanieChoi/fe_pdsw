@@ -6,10 +6,14 @@ interface SSEStore {
   messageCount: number;
   lastConnectedAt: string | null;
   connectionsHistory: string[];
-  initSSE: (id: string, tenant_id: number, onMessage: (data: any) => void) => void;
+  initSSE: (
+    id: string,
+    tenant_id: number,
+    onMessage: (data: any) => void
+  ) => void;
   closeSSE: () => void;
-  getConnectionInfo: () => { 
-    isConnected: boolean; 
+  getConnectionInfo: () => {
+    isConnected: boolean;
     url: string | null;
     connectionCount: number;
     messageCount: number;
@@ -26,43 +30,34 @@ export const useSSEStore = create<SSEStore>((set, get) => ({
   connectionsHistory: [],
 
   initSSE: (id, tenant_id, onMessage) => {
-    const current = get().eventSource;
-    const connectionCount = get().connectionCount;
-    const connectionsHistory = get().connectionsHistory;
-  
-    // 현재 연결 상태 로깅
-    console.log(`💡 [SSE 상태 확인] 연결 횟수: ${connectionCount}, 기존 연결 여부: ${current ? "존재함" : "없음"}`);
-  
-    if (current) {
-      console.log("🛑 SSE 이미 연결되어 있음, 재연결 생략");
-      // 기존 연결 정보 로깅
-      console.log(`🔍 [SSE 현재 연결] URL: ${current.url}`);
-      return;
+    if (typeof window !== 'undefined') {
+      const globalSSE = (window as any).SSE_GLOBAL as EventSource | undefined;
+      if (globalSSE) {
+        console.log("♻️ [SSE] 전역 SSE 객체 이미 존재. 중복 연결 방지.");
+        return;
+      }
     }
-  
+
     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
     const url = `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`;
     const es = new EventSource(url);
-    
-    // 새 연결 생성 시점 기록
-    const now = new Date();
-    const connectionTimestamp = now.toISOString();
-    const connectionInfo = `${connectionTimestamp} - ${url} (사용자 ID: ${id})`;
-    
-    console.log(`🟢 [Zustand SSE 연결 #${connectionCount + 1} 생성]: ${url}`);
-    
-    // 연결 이력에 추가
-    set(state => ({ 
+
+    if (typeof window !== 'undefined') {
+      (window as any).SSE_GLOBAL = es;
+    }
+
+    const now = new Date().toISOString();
+    set(state => ({
       eventSource: es,
       connectionCount: state.connectionCount + 1,
-      lastConnectedAt: connectionTimestamp,
-      connectionsHistory: [...state.connectionsHistory, connectionInfo]
+      lastConnectedAt: now,
+      connectionsHistory: [...state.connectionsHistory, `${now} - ${url}`],
     }));
-  
+
     es.addEventListener("open", () => {
-      console.log(`✅ [SSE 연결 #${get().connectionCount} 성공] ${url}`);
+      console.log(`✅ [SSE 연결 성공]: ${url}`);
     });
-    
+
     es.addEventListener("message", (event) => {
       if (event.data !== "Connected!!") {
         try {
@@ -77,22 +72,27 @@ export const useSSEStore = create<SSEStore>((set, get) => ({
         console.log("✅ [SSE Connected!! 메시지]");
       }
     });
-  
+
     es.onerror = (err) => {
-      console.error(`🚨 [Zustand SSE 에러 발생 #${get().connectionCount}]`, err);
-      // 연결 복구 로직이 필요하면 여기에 추가
+      console.error("🚨 [SSE 에러 발생]", err);
+      // 필요시 재시도 로직 추가 가능
     };
-  },  
+  },
 
   closeSSE: () => {
     const current = get().eventSource;
     if (current) {
-      console.log(`🧹 [Zustand SSE 연결 #${get().connectionCount} 종료]`);
+      console.log(`🧹 [Zustand SSE 연결 종료]`);
       current.close();
+
+      if (typeof window !== 'undefined') {
+        delete (window as any).SSE_GLOBAL;
+      }
+
       set({ eventSource: null });
     }
   },
-  
+
   getConnectionInfo: () => {
     const current = get().eventSource;
     return {
@@ -101,7 +101,7 @@ export const useSSEStore = create<SSEStore>((set, get) => ({
       connectionCount: get().connectionCount,
       messageCount: get().messageCount,
       lastConnectedAt: get().lastConnectedAt,
-      connectionsHistory: get().connectionsHistory
+      connectionsHistory: get().connectionsHistory,
     };
   }
 }));
