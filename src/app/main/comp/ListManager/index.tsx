@@ -326,6 +326,7 @@ const ListManager: React.FC = () => {
 
   const [sendColumns, setSendColumns] = useState<Column<SendRow>[]>([]);
   const [sendList, setSendList] = useState<SendRow[]>([]);
+  const [fileSendList, setFileSendList] = useState<SendRow[]>([]);
   
   //파일포맷설정 확인 이벤트.
   const handleFileFormatConfirm = (data:FormatRowData) => {
@@ -567,6 +568,7 @@ const ListManager: React.FC = () => {
               onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
             });
           }
+          
           // Handle file reading errors
           reader.onerror = (error) => {
             console.error("Error reading file:", error);
@@ -649,6 +651,7 @@ const ListManager: React.FC = () => {
     setSelectedFile(row);
     setSelectedFileName(row.fileName);
     setTargetType(row.campaignId.startsWith('G') ? 'general' : 'blacklist');
+    setFileSendList(sendList.filter(data=>data.fileId === row.id));
   };
 
   // rowClass 함수들
@@ -780,6 +783,16 @@ const ListManager: React.FC = () => {
     }  
   }
 
+  useEffect(() => {
+    if ( sendList.length > 0 ) {
+      const fileIndexRow = uploadedFiles[uploadedFiles.length-1];
+      setSelectedFile(fileIndexRow);
+      setSelectedFileName(fileIndexRow.fileName);
+
+      setFileSendList(sendList.filter(data=>data.fileId === fileIndexRow.id));
+    }
+  }, [sendList]);
+   
   useEffect(() => {
     if (activeTabId === 7) {
       const tempData = openedTabs.filter(tab => tab.id === 7);
@@ -980,7 +993,7 @@ const ListManager: React.FC = () => {
       </div>
 
       <div className="flex gap-5">
-      <SenderList headerData={sendColumns} _sendList={sendList} />
+        <SenderList headerData={sendColumns} _sendList={fileSendList} totalCount={sendList.length} />
         <div className="w-1/2">
           <div className="h-[300px] grid-custom-wrap mt-[28px]">
             <div className="grid-top-subject h-[26px]">

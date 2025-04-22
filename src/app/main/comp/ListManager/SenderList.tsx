@@ -57,9 +57,10 @@ interface DataProps {
 interface SenderListProps {
   headerData: Column<SendRow>[];
   _sendList: SendRow[];
+  totalCount: number;
 }
 
-const SenderList: React.FC<SenderListProps> = ({ headerData, _sendList }) => {
+const SenderList: React.FC<SenderListProps> = ({ headerData, _sendList, totalCount }) => {
   
   // 그리드 선택 상태
   const [selectedSendRow, setSelectedSendRow] = useState<SendRow | null>(null);
@@ -87,10 +88,15 @@ const SenderList: React.FC<SenderListProps> = ({ headerData, _sendList }) => {
   
   return (
         <div className="w-1/2">
-          <TitleWrap
-            title="발신 목록"
-            totalCount={sendList.length}
-          />
+          {/* 제목과 총 건수 */}
+          <div className="flex items-center">
+            <h2 className="text-sm">발신 목록</h2>
+            {totalCount !== undefined && (
+              <span className="text-sm text-[#777] pl-2">
+                (전체 : <span className="text-[#F01E29]">{totalCount}</span> 건 해당파일 <span className="text-[#F01E29]">{_sendList.length}</span> 건)
+              </span>
+            )}
+          </div>
           <div className="h-[300px] grid-custom-wrap">
             <DataGrid<SendRow>
               columns={sendColumns}
