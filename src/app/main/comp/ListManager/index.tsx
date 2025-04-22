@@ -639,6 +639,18 @@ const ListManager: React.FC = () => {
       setSendList(prev => prev.filter(data => data.fileId !== selectedFile.id));
       setSelectedFile(null);
       setSelectedFileName("");
+      
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      const newProgressListData = { ...progressListData
+        , id: progressList.length+1
+        , datetime: hours + ':' + minutes + ':' + seconds
+        , message: '현재 로드된 파일 갯수 : ' + (uploadedFiles.length-1)
+      };
+      setProgressList(prev => [newProgressListData, ...prev]);
+      
     }
   };
 
@@ -790,6 +802,8 @@ const ListManager: React.FC = () => {
       setSelectedFileName(fileIndexRow.fileName);
 
       setFileSendList(sendList.filter(data=>data.fileId === fileIndexRow.id));
+    }else{
+      setFileSendList([]);
     }
   }, [sendList]);
    
