@@ -294,7 +294,7 @@ export default function CampaignDetail() {
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
-    if (selectedCampaign !== null) {
+    if (selectedCampaign && selectedCampaign !== null) {
       setTempCampaignsInfo({
         ...tempCampaignInfo,
         campaign_id: 0,
