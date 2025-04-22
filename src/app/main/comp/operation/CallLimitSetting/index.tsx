@@ -16,7 +16,6 @@ import {
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import CustomInputForTime from '@/components/shared/CustomInputForTime';
-import { is } from 'date-fns/locale';
 
 interface Row {
   campaign_id: string;
@@ -122,7 +121,6 @@ const CampaignSettings = () => {
   // 제한건수 추가 API 
   const { mutate: createCallLimitSetting } = useApiForCallLimitSettingCreate({
     onSuccess: (data) => {
-      console.log("create data check : ", data);
       if (data.result_code === -1) {
         // -9053 메시지 표시
         showAlert('리스트 등록 건수를 초과하였습니다.');
@@ -163,11 +161,9 @@ const CampaignSettings = () => {
   const { mutate: updateCallLimitSetting } = useApiForCallLimitSettingUpdate({
     onSuccess: (data) => {
       if (data.result_code === -1) {
-        console.log("update data check : ", data);
         // -9053 메시지 표시
         showAlert('리스트 등록 건수를 초과하였습니다.');
       } else {
-
         fetchCallLimitSettingList({
           tenant_id_array: tenants.map(tenant => tenant.tenant_id)
         });

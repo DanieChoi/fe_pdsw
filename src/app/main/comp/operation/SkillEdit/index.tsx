@@ -8,13 +8,14 @@ import TitleWrap from "@/components/shared/TitleWrap";
 import 'react-data-grid/lib/styles.css';
 import { useApiForCounselorAssignList, useApiForCounselorList } from '@/features/preferences/hooks/useApiForCounselorList';
 import { useApiForCampaignList, useApiForCreateSkill, useApiForDeleteAgentSkill, useApiForDeleteSkill, useApiForSkillAgentList, useApiForSkillCampaignList, useApiForSkillList, useApiForUpdateSkill } from '@/features/preferences/hooks/useApiForSkill';
-import { useAuthStore, useMainStore } from '@/store';
+import { useAuthStore, useCampainManagerStore, useMainStore } from '@/store';
 import { CounselorAssignListResponse } from '@/features/preferences/types/SystemPreferences';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import { SkillListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 
 // 메인 스킬 정보
 interface SkillRow {
@@ -66,6 +67,8 @@ const SkillEdit = () => {
   const [allCampaigns, setAllCampaigns] = useState<CampaignRow[]>([]);
   // 다중 선택 스킬 관리를 위한 상태 추가 (체크박스로 선택된 항목들)
   const [selectedSkillRows, setSelectedSkillRows] = useState<Set<string>>(new Set());
+
+  const { setSkills } = useCampainManagerStore();
   
   const router = useRouter();
 
@@ -84,6 +87,7 @@ const SkillEdit = () => {
   // 수정 가능한 필드들을 위한 상태
   const [editableFields, setEditableFields] = useState({
     tenantId: tenant_id,
+    skillId : '',
     skillName: '',
     description: ''
   });
@@ -181,7 +185,8 @@ const SkillEdit = () => {
     setEditableFields({
       tenantId: row.tenantId,
       skillName: row.skillName,
-      description: row.description
+      description: row.description,
+      skillId: row.skillId
     });
     setIsNewMode(false);
 
@@ -408,7 +413,8 @@ const SkillEdit = () => {
     setEditableFields({
       tenantId: tenant_id,
       skillName: '',
-      description: ''
+      description: '',
+      skillId: generateSkillId()
     });
     setSelectedCampaignRows(new Set());
     setSelectedAgentRows(new Set());
@@ -423,9 +429,13 @@ const SkillEdit = () => {
       showAlert('스킬 이름과 설명을 모두 입력해주세요.');
       return;
     }
+    if(isNewMode && !editableFields.skillId){
+      showAlert('스킬 아이디를 입력해주세요.');
+      return;
+    }
 
     const skillData = {
-      skill_id: Number(selectedSkill?.skillId),
+      skill_id: Number(editableFields?.skillId),
       tenant_id: editableFields.tenantId,
       skill_name: editableFields.skillName,
       skill_description: editableFields.description
@@ -443,7 +453,7 @@ const SkillEdit = () => {
               handleSkillClick({ row: newSkill });
             }
           }, 300);
-          setIsNewMode(false);
+          
         },
         onError: (error) => {
           if (error.message.split('||')[0] === '5') {
@@ -458,6 +468,9 @@ const SkillEdit = () => {
             setTimeout(() => {
               router.push('/login');
             }, 1000);
+          } else if ( error.message.split('||')[0] === '403') {
+            showAlert(`이미 존재하는 스킬 아이디입니다. 다시 입력해주세요.`);
+            console.log(`error info : ${error.message}`);
           } else {
             showAlert(`저장 실패: ${error.message}`);
           }
@@ -571,7 +584,8 @@ const SkillEdit = () => {
           setEditableFields({
             tenantId: tenant_id,
             skillName: '',
-            description: ''
+            description: '',
+            skillId: ''
           });
           setFilteredCampaigns([]);
           setFilteredAgents([]);
@@ -598,7 +612,8 @@ const SkillEdit = () => {
             setEditableFields({
               tenantId: tenant_id,
               skillName: '',
-              description: ''
+              description: '',
+              skillId: ''
             });
             
             // 관련 데이터 초기화
@@ -634,7 +649,7 @@ const SkillEdit = () => {
     }
   };
 
-  const handleInputChange = (field: 'skillName' | 'description', value: string) => {
+  const handleInputChange = (field: 'skillName' | 'description' | 'skillId', value: string) => {
     setEditableFields(prev => ({
       ...prev,
       [field]: value
@@ -704,6 +719,17 @@ const SkillEdit = () => {
   });
 
   const { mutate: fetchSkillList, data: skillData } = useApiForSkillList({
+
+    onSuccess: (data) => {      
+      const skills = data.result_data.map((skill: SkillListDataResponse) => ({
+        tenant_id: skill.tenant_id,
+        skill_id: skill.skill_id,
+        skill_name: skill.skill_name,
+        skill_description: skill.skill_description
+      }));
+      setSkills(skills);
+
+    },
     onError: (error) => {
       if (error.message.split('||')[0] === '5') {
         setAlertState({
@@ -826,8 +852,42 @@ const SkillEdit = () => {
   });
 
   const { mutate: createSkill } = useApiForCreateSkill({
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+
+      if(data.result_code !== 0) {
+        if(data.result_code === -1) {
+          showAlert(`스킬 아이디가 중복되었습니다. 다른 스킬 아이디를 입력해주세요.`);
+          return;
+        }
+        else  {
+          showAlert(`저장 실패: ${data.result_msg} , ${data.result_code}`);
+          return;
+        }
+      }
+
+      // 스킬 리스트 새로고침
+      fetchSkillList({ tenant_id_array: tenants.map((tenant) => tenant.tenant_id) });
+
+      // 새로 생성된 스킬 데이터
+      const newSkill = {
+        center: getSelectedTenantCenterName()|| '',
+        tenant: tenants.find((tenant) => tenant.tenant_id === variables.tenant_id)?.tenant_name || '',
+        tenantId: variables.tenant_id,
+        skillId: String(variables.skill_id),
+        skillName: variables.skill_name,
+        description: variables.skill_description,
+        campaignCount: 0,
+        agentCount: 0,
+      };
+
+      // rows에 새로 생성된 스킬 추가
+      setRows((prevRows) => [...prevRows, newSkill]);
+
+      // 새로 생성된 스킬 ID로 handleSkillClick 호출
+      handleSkillClick({ row : newSkill });
+
       showAlert('스킬이 성공적으로 추가되었습니다.');
+
     },
     onError: (error) => {
       if (error.message.split('||')[0] === '5') {
@@ -842,7 +902,10 @@ const SkillEdit = () => {
         setTimeout(() => {
           router.push('/login');
         }, 1000);
-      } else {
+      } else if(error.message.split('||')[0] === '403') {
+        showAlert(`이미 존재하는 스킬아이디 입니다.`);
+      }
+      else{
         showAlert(`스킬 추가 실패: ${error.message}`);
       }
     }
@@ -1016,12 +1079,14 @@ const SkillEdit = () => {
         if (updatedSkill.center !== selectedSkill.center || 
             updatedSkill.tenant !== selectedSkill.tenant ||
             updatedSkill.skillName !== selectedSkill.skillName ||
-            updatedSkill.description !== selectedSkill.description) {
+            updatedSkill.description !== selectedSkill.description ||
+            updatedSkill.skillId !== selectedSkill.skillId) {
           setSelectedSkill(updatedSkill);
           setEditableFields({
             tenantId: updatedSkill.tenantId,
             skillName: updatedSkill.skillName,
-            description: updatedSkill.description
+            description: updatedSkill.description,
+            skillId: updatedSkill.skillId
           });
         }
       }
@@ -1152,12 +1217,18 @@ const SkillEdit = () => {
                 columns={skillColumns}
                 rows={rows}
                 className="grid-custom"
-                // onCellClick={handleSkillClick}
                 onCellClick={(props) => {
                   // SelectColumn을 클릭한 경우는 제외하고 로우 선택 처리
                   if (props.column.key !== SelectColumn.key) {
+                    // 현재 선택된 스킬과 클릭한 스킬이 동일한지 확인
+                    if (selectedSkill?.skillId === props.row.skillId) {
+                      // 동일한 셀을 클릭한 경우 아무 작업도 하지 않음
+                      return;
+                    }
+                    // 다른 셀을 클릭한 경우 데이터 변경
                     handleSkillClick(props);
                   }
+                  
                 }}
                 rowKeyGetter={(row) => row.skillId}
                 // selectedRows={selectedSkill ? new Set<string>([selectedSkill.skillId]) : new Set<string>()}
@@ -1265,10 +1336,12 @@ const SkillEdit = () => {
             </div>
             <div className="flex items-center gap-2">
               <Label className="w-[8rem] min-w-[8rem]">스킬아이디</Label>
-              <CustomInput 
-                value={selectedSkill?.skillId || ''}
+              <CustomInput
+                type="number"
+                value={editableFields.skillId || ''}
+                onChange={(e) => handleInputChange('skillId', e.target.value)}
                 className="w-full"
-                disabled
+                disabled={!isNewMode} // 비활성화 조건 추가
               />
             </div>
             <div className="flex items-center gap-2">
