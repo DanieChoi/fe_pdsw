@@ -455,44 +455,19 @@ export default function Footer({
   //   }
   // }, [id, tenant_id, role_id]);
 
-  const logConnectionStatus = useCallback(() => {
-    const connectionInfo = getConnectionInfo();
-    console.log("📊 [SSE 연결 상태]", {
-      연결됨: connectionInfo.isConnected,
-      URL: connectionInfo.url,
-      총연결횟수: connectionInfo.connectionCount,
-      메시지수신횟수: connectionInfo.messageCount,
-      마지막연결시간: connectionInfo.lastConnectedAt,
-    });
-  }, [getConnectionInfo]);
-
-  useEffect(() => {
-    // 브라우저 환경이고, 사용자 ID가 있는 경우에만 실행
-    if (typeof window !== 'undefined' && id !== '') {
-      // 10초마다 연결 상태 로깅
-      const statusInterval = setInterval(() => {
-        logConnectionStatus();
-      }, 10000);
-
-      return () => {
-        clearInterval(statusInterval);
-      };
-    }
-  }, [id, logConnectionStatus]);
-
   const handleSSEMessage = (tempEventData: any) => {
     try {
       const { announce, command, data, kind, campaign_id, skill_id } = tempEventData;
-  
+
       const messageId = `${announce}_${command}_${campaign_id}_${skill_id}_${JSON.stringify(data)}`;
-  
+
       if (lastProcessedMessageRef.current === messageId) {
         console.log("🔄 [중복 메시지 감지] 처리 건너뜀:", messageId);
         return;
       }
-  
+
       lastProcessedMessageRef.current = messageId;
-  
+
       footerDataSet(
         announce,
         command,
@@ -506,7 +481,43 @@ export default function Footer({
       console.error("🚨 [SSE 메시지 처리 오류]", error);
     }
   };
-  
+
+  const logConnectionStatus = useCallback(() => {
+    const connectionInfo = getConnectionInfo();
+    console.log("📊 [SSE 연결 상태]", {
+      연결됨: connectionInfo.isConnected,
+      URL: connectionInfo.url,
+      총연결횟수: connectionInfo.connectionCount,
+      메시지수신횟수: connectionInfo.messageCount,
+      마지막연결시간: connectionInfo.lastConnectedAt,
+    });
+  }, [getConnectionInfo]);
+
+  // SSE 구독 코드 수정 (기존 useEffect 대체)
+  // src/components/Footer.tsx — 수정 후
+  useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      window.EventSource &&
+      id !== '' &&
+      !(window as any).SSE_GLOBAL
+    ) {
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/notification/${tenant_id}/subscribe/${id}`
+      if (sessionStorage.getItem('SSE_CONNECTED') === url) {
+        console.log(`♻️ [SSE] sessionStorage 중복 연결 방지: ${url}`)
+        return
+      }
+      console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`)
+      initSSE(id, tenant_id, handleSSEMessage)
+      setTimeout(() => {
+        logConnectionStatus()
+      }, 1000)
+      return () => {
+        console.log('🔌 [Footer 언마운트] SSE 연결 종료')
+        closeSSE()
+      }
+    }
+  }, [id, tenant_id, initSSE, closeSSE, logConnectionStatus])
 
   // SSE 구독 코드 수정 (기존 useEffect 대체)
   useEffect(() => {
@@ -517,20 +528,20 @@ export default function Footer({
       !(window as any).SSE_GLOBAL // ✅ 전역 SSE 없을 때만 실행
     ) {
       console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`);
-  
+
       initSSE(id, tenant_id, handleSSEMessage);
-  
+
       setTimeout(() => {
         logConnectionStatus();
       }, 1000);
-  
+
       return () => {
         console.log("🔌 [Footer 컴포넌트 언마운트] SSE 연결 종료");
         closeSSE();
       };
     }
   }, []);
-  
+
 
 
   const handleResizeStartInternal = () => {
@@ -668,22 +679,7 @@ export default function Footer({
             </table>
           </div>
 
-          {/* 2단(W) 모드일 때만 오른쪽 테이블 표시 */}
-          {/* {isExpanded && (
-            <div className="w-1/2 overflow-auto py-[7px] px-[20px]">
-              <table className="w-full text-sm">
-                <tbody>
-                  {footerDataList.map((log, index) => (
-                    <tr key={index}>
-                      <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
-                      <td className="whitespace-nowrap text-[13px] px-1 hidden">[{log.type}]</td>
-                      <td className="text-[13px]">{log.message}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )} */}
+
         </div>
       )}
     </Resizable>
