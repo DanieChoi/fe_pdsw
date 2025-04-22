@@ -1,9 +1,734 @@
+// // 'use client';
+
+// // import { useState, useEffect, useCallback, useRef } from "react";
+// // import { ChevronUp, ChevronDown, Bell, BellOff, Trash } from "lucide-react";
+// // import { debounce, isEqual } from 'lodash';
+// // import { useAuthStore, useMainStore } from '@/store';
+// // import { Resizable } from "re-resizable";
+// // import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
+// // import { useEnvironmentStore } from "@/store/environmentStore";
+// // import { toast, initToasts } from "./CustomToast";
+// // import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
+// // import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
+// // import { useSSEStore } from "@/store/useSSEStore";
+// // import { useFooterDataProcessor } from "./utils/footer_dataset";
+
+// // export type FooterDataType = {
+// //   time: string;
+// //   type: string;
+// //   message: string;
+// // };
+
+// // export interface FooterProps {
+// //   footerHeight: number;      // 열려 있을 때 푸터의 높이(px)
+// //   startResizing?: () => void; // 드래그로 푸터 높이를 조절하기 위한 함수
+// //   onToggleDrawer?: (isOpen: boolean) => void; // 부모 컴포넌트에 열림/닫힘 상태 전달
+// //   onResizeHeight?: (height: number) => void; // 리사이즈된 높이를 부모 컴포넌트에 전달
+// //   onResizeStart?: () => void; // 리사이즈 시작 이벤트
+// //   onResizeEnd?: (height: number) => void; // 리사이즈 종료 이벤트 - height 매개변수 추가
+// // }
+
+// // export default function Footer({
+// //   footerHeight,
+// //   onToggleDrawer,
+// //   onResizeHeight,
+// //   onResizeStart,
+// //   onResizeEnd
+// // }: FooterProps) {
+// //   const [isExpanded, setIsExpanded] = useState(false);   // D(1단) / W(2단) 모드 토글
+// //   const [isDrawerOpen, setIsDrawerOpen] = useState(true); // 푸터 열기/닫기 토글
+// //   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
+// //   const [currentHeight, setCurrentHeight] = useState(footerHeight);
+// //   const { id, tenant_id, role_id } = useAuthStore();
+// //   const { campaigns, setCampaigns } = useMainStore();
+// //   const { useAlramPopup } = useEnvironmentStore();
+// //   const { initSSE, closeSSE, getConnectionInfo } = useSSEStore();
+
+// //   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
+// //   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
+
+// //   const lastProcessedMessageRef = useRef<string | null>(null);
+// //   const processEventDataRef = useRef<any>(null);
+
+// //   const debouncedInvalidate = useCallback(
+// //     debounce(() => {
+// //       invalidateTreeMenuData();
+// //       invalidateCampaignGroupTreeData();
+// //     }, 500),
+// //     [invalidateTreeMenuData, invalidateCampaignGroupTreeData]
+// //   );
+
+// //   useEffect(() => {
+// //     initToasts();
+// //   }, []);
+
+// //   // 부모 컴포넌트에 열림/닫힘 상태 변경 알림
+// //   useEffect(() => {
+// //     if (onToggleDrawer) {
+// //       onToggleDrawer(isDrawerOpen);
+// //     }
+// //   }, [isDrawerOpen, onToggleDrawer]);
+
+// //   // D(1단) <-> W(2단) 전환
+// //   const toggleExpanded = () => {
+// //     setIsExpanded((prev) => !prev);
+// //     // 만약 닫혀 있었다면(32px 상태) W 모드 누를 때 자동 열기 (원치 않으면 제거)
+// //     if (!isDrawerOpen) {
+// //       setIsDrawerOpen(true);
+// //       if (onToggleDrawer) {
+// //         onToggleDrawer(true);
+// //       }
+// //     }
+// //   };
+
+// //   // 열기/닫기
+// //   const toggleDrawer = () => {
+// //     const newState = !isDrawerOpen;
+// //     setIsDrawerOpen(newState);
+// //     if (onToggleDrawer) {
+// //       onToggleDrawer(newState);
+// //     }
+// //   };
+
+// //   // 알림 모두 비우기 기능
+// //   const handleClearNotifications = () => {
+// //     setFooterDataList([]);
+// //   };
+
+// //   //캠페인 정보 조회 api 호출
+// //   const { mutate: fetchMain } = useApiForMain({
+// //     onSuccess: (data) => {
+// //       setCampaigns(data.result_data);
+// //     }
+// //   });
+
+// //   // Helper function to add a message to footerDataList
+// //   const addMessageToFooterList = useCallback((time: string, type: string, message: string) => {
+// //     if (message !== '') {
+// //       setFooterDataList((prev) => [
+// //         {
+// //           time,
+// //           type,
+// //           message
+// //         },
+// //         ...prev.slice(0, 9) // 상위 10개만 보이게
+// //       ]);
+// //     }
+// //   }, []);
+
+// //   const logConnectionStatus = useCallback(() => {
+// //     const connectionInfo = getConnectionInfo();
+// //     console.log("📊 [SSE 연결 상태]", {
+// //       연결됨: connectionInfo.isConnected,
+// //       URL: connectionInfo.url,
+// //       총연결횟수: connectionInfo.connectionCount,
+// //       메시지수신횟수: connectionInfo.messageCount,
+// //       마지막연결시간: connectionInfo.lastConnectedAt,
+// //     });
+// //   }, [getConnectionInfo]);
+
+// //   // Initialize the hook for processing footer data
+// //   // Important: This must be after all the callback definitions to avoid dependency issues
+// //   const { processEventData } = useFooterDataProcessor(
+// //     campaigns,
+// //     fetchMain,
+// //     useAlramPopup,
+// //     debouncedInvalidate,
+// //     tenant_id,
+// //     addMessageToFooterList
+// //   );
+
+// //   // Store the latest processEventData function in a ref to avoid dependency cycles
+// //   useEffect(() => {
+// //     processEventDataRef.current = processEventData;
+// //   }, [processEventData]);
+
+// //   // Connection status logging
+// //   useEffect(() => {
+// //     // 브라우저 환경이고, 사용자 ID가 있는 경우에만 실행
+// //     if (typeof window !== 'undefined' && id !== '') {
+// //       // 10초마다 연결 상태 로깅
+// //       const statusInterval = setInterval(() => {
+// //         logConnectionStatus();
+// //       }, 10000);
+
+// //       return () => {
+// //         clearInterval(statusInterval);
+// //       };
+// //     }
+// //   }, [id, logConnectionStatus]);
+
+// //   // SSE 구독 코드 수정
+// //   useEffect(() => {
+// //     // 브라우저 환경인지 확인
+// //     if (typeof window !== 'undefined' && window.EventSource && id !== '') {
+// //       // 초기 연결 상태 로깅
+// //       console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`);
+
+// //       // SSE 이벤트 메시지 핸들러
+// //       const handleSSEMessage = (tempEventData: any) => {
+// //         try {
+// //           const { announce, command, data, kind, campaign_id } = tempEventData;
+
+// //           // 메시지 중복 체크를 위한 고유 ID 생성
+// //           const messageId = `${announce}_${command}_${campaign_id}_${JSON.stringify(data)}`;
+
+// //           // 이미 처리한 메시지인지 확인
+// //           if (lastProcessedMessageRef.current === messageId) {
+// //             console.log("🔄 [중복 메시지 감지] 처리 건너뜀:", messageId);
+// //             return;
+// //           }
+
+// //           // 메시지 ID 업데이트
+// //           lastProcessedMessageRef.current = messageId;
+
+// //           // Use the ref to get the latest process function
+// //           if (processEventDataRef.current) {
+// //             processEventDataRef.current(
+// //               announce,
+// //               command,
+// //               data,
+// //               kind,
+// //               campaign_id,
+// //               tempEventData
+// //             );
+// //           }
+// //         } catch (error) {
+// //           console.error("🚨 [SSE 메시지 처리 오류]", error);
+// //         }
+// //       };
+
+// //       // Zustand 스토어를 통해 SSE 연결 초기화
+// //       initSSE(id, tenant_id, handleSSEMessage);
+
+// //       // 연결 직후 상태 로깅
+// //       const timer = setTimeout(() => {
+// //         logConnectionStatus();
+// //       }, 1000);
+
+// //       // 컴포넌트 언마운트 시 연결 종료
+// //       return () => {
+// //         clearTimeout(timer);
+// //         console.log("🔌 [Footer 컴포넌트 언마운트] SSE 연결 종료");
+// //         closeSSE();
+// //       };
+// //     }
+// //   // eslint-disable-next-line react-hooks/exhaustive-deps
+// //   }, [id, tenant_id, initSSE, closeSSE]);
+
+// //   // 높이 변경 핸들러
+// //   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
+// //     const newHeight = currentHeight + d.height;
+// //     setCurrentHeight(newHeight);
+
+// //     if (onResizeHeight) {
+// //       onResizeHeight(newHeight);
+// //     }
+
+// //     if (onResizeEnd) {
+// //       onResizeEnd(newHeight);
+// //     }
+// //   };
+
+// //   return (
+// //     <Resizable
+// //       size={{
+// //         width: '100%',
+// //         height: isDrawerOpen ? currentHeight : 32
+// //       }}
+// //       minHeight={100}
+// //       maxHeight={500}
+// //       enable={{
+// //         top: isDrawerOpen,
+// //         right: false,
+// //         bottom: false,
+// //         left: false,
+// //         topRight: false,
+// //         bottomRight: false,
+// //         bottomLeft: false,
+// //         topLeft: false
+// //       }}
+// //       className={`
+// //         border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col duration-300 ease-in-out group relative h-[1px] before:content-[''] before:absolute hover:before:bg-[#5BC2C1]
+// //         ${isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative"}
+// //       `}
+// //       onResizeStart={onResizeStart}
+// //       onResizeStop={handleResizeStop}
+// //     >
+// //       {/* 상단 바 영역 */}
+// //       <div className="flex-none pt-[5px] pb-[4px] px-[20px] border-b bg-white flex justify-between items-center">
+// //         <div className="flex items-center gap-1">
+// //           <span className="text-[13px] text-[#333]">현재 진행 상태 </span>
+// //           <span className="text-[12px] text-[#666] bg-gray-100 px-1 rounded">
+// //             {footerDataList.length > 0 ? (
+// //               <span className="text-[#666] bg-gray-100 px-1 rounded">
+// //                 {footerDataList.length}건
+// //               </span>
+// //             ) : (
+// //               <span className="text-[#666] bg-gray-100 px-1 rounded">
+// //                 0건
+// //               </span>
+// //             )}
+// //           </span>
+// //         </div>
+
+// //         <div className="flex items-center gap-2">
+// //           {useAlramPopup === 1 ? (
+// //             <>
+// //               <span title="알림 활성화">
+// //                 <Bell className="w-4 h-4 text-blue-500" />
+// //               </span>
+// //               <button onClick={handleClearNotifications} title="알림 모두 비우기">
+// //                 <Trash className="w-4 h-4 text-gray-500" />
+// //               </button>
+// //             </>
+// //           ) : (
+// //             <span title="알림 비활성화">
+// //               <BellOff className="w-4 h-4 text-gray-400" />
+// //             </span>
+// //           )}
+
+// //           {/* 열기/닫기 버튼 */}
+// //           <button
+// //             onClick={toggleDrawer}
+// //             className=""
+// //             title={isDrawerOpen ? "닫기" : "열기"}
+// //           >
+// //             {isDrawerOpen ? (
+// //               <ChevronDown className="w-4 h-4" />
+// //             ) : (
+// //               <ChevronUp className="w-4 h-4" />
+// //             )}
+// //           </button>
+// //         </div>
+// //       </div>
+
+// //       {/* 푸터 내부 콘텐츠: isDrawerOpen이 true일 때만 렌더링 */}
+// //       {isDrawerOpen && (
+// //         <div className="flex-1 flex overflow-hidden">
+// //           {/* D(1단) -> w-full, W(2단) -> w-1/2 + 오른쪽 테이블 */}
+// //           <div
+// //             className={`
+// //               ${isExpanded ? "w-1/2" : "w-full"}
+// //               overflow-auto py-[7px] px-[20px]
+// //               ${isExpanded ? "border-r" : ""}
+// //             `}
+// //           >
+// //             <table className="w-full text-sm">
+// //               <tbody>
+// //                 {footerDataList.map((log, index) => (
+// //                   <tr key={index}>
+// //                     <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
+// //                     <td className="whitespace-nowrap text-[13px] px-1 hidden">[{log.type}]</td>
+// //                     <td className="text-[13px]">{log.message}</td>
+// //                   </tr>
+// //                 ))}
+// //               </tbody>
+// //             </table>
+// //           </div>
+
+// //           {/* 2단(W) 모드일 때만 오른쪽 테이블 표시 */}
+// //           {isExpanded && (
+// //             <div className="w-1/2 overflow-auto py-[7px] px-[20px]">
+// //               <table className="w-full text-sm">
+// //                 <tbody>
+// //                   {footerDataList.map((log, index) => (
+// //                     <tr key={index}>
+// //                       <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
+// //                       <td className="whitespace-nowrap text-[13px] px-1 hidden">[{log.type}]</td>
+// //                       <td className="text-[13px]">{log.message}</td>
+// //                     </tr>
+// //                   ))}
+// //                 </tbody>
+// //               </table>
+// //             </div>
+// //           )}
+// //         </div>
+// //       )}
+// //     </Resizable>
+// //   );
+// // }
+
+// 'use client';
+
+// import { useState, useEffect, useCallback, useRef } from "react";
+// import { ChevronUp, ChevronDown, Bell, BellOff, Trash } from "lucide-react";
+// import { debounce } from 'lodash';
+// import { useAuthStore, useMainStore } from '@/store';
+// import { Resizable } from "re-resizable";
+// import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
+// import { useEnvironmentStore } from "@/store/environmentStore";
+// import { toast, initToasts } from "./CustomToast";
+// import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
+// import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
+// import { useSSEStore } from "@/store/useSSEStore";
+// import { useFooterDataProcessor } from "./utils/footer_dataset";
+
+// export type FooterDataType = {
+//   time: string;
+//   type: string;
+//   message: string;
+// };
+
+// export interface FooterProps {
+//   footerHeight: number;      // 열려 있을 때 푸터의 높이(px)
+//   startResizing?: () => void; // 드래그로 푸터 높이를 조절하기 위한 함수
+//   onToggleDrawer?: (isOpen: boolean) => void; // 부모 컴포넌트에 열림/닫힘 상태 전달
+//   onResizeHeight?: (height: number) => void; // 리사이즈된 높이를 부모 컴포넌트에 전달
+//   onResizeStart?: () => void; // 리사이즈 시작 이벤트
+//   onResizeEnd?: (height: number) => void; // 리사이즈 종료 이벤트 - height 매개변수 추가
+// }
+
+// export default function Footer({
+//   footerHeight,
+//   onToggleDrawer,
+//   onResizeHeight,
+//   onResizeStart,
+//   onResizeEnd
+// }: FooterProps) {
+//   const [isExpanded, setIsExpanded] = useState(false);   // D(1단) / W(2단) 모드 토글
+//   const [isDrawerOpen, setIsDrawerOpen] = useState(true); // 푸터 열기/닫기 토글
+//   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
+//   const [currentHeight, setCurrentHeight] = useState(footerHeight);
+//   const { id, tenant_id, role_id } = useAuthStore();
+//   const { campaigns, setCampaigns } = useMainStore();
+//   const { useAlramPopup } = useEnvironmentStore();
+  
+//   // 향상된 SSE 스토어 사용
+//   const { 
+//     initSSE, 
+//     closeSSE, 
+//     getConnectionInfo,
+//     isConnected: sseConnected
+//   } = useSSEStore();
+
+//   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
+//   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
+
+//   const lastProcessedMessageRef = useRef<string | null>(null);
+//   const processEventDataRef = useRef<any>(null);
+//   const sseInitializedRef = useRef<boolean>(false);
+
+//   const debouncedInvalidate = useCallback(
+//     debounce(() => {
+//       invalidateTreeMenuData();
+//       invalidateCampaignGroupTreeData();
+//     }, 500),
+//     [invalidateTreeMenuData, invalidateCampaignGroupTreeData]
+//   );
+
+//   useEffect(() => {
+//     initToasts();
+//   }, []);
+
+//   // 부모 컴포넌트에 열림/닫힘 상태 변경 알림
+//   useEffect(() => {
+//     if (onToggleDrawer) {
+//       onToggleDrawer(isDrawerOpen);
+//     }
+//   }, [isDrawerOpen, onToggleDrawer]);
+
+//   // D(1단) <-> W(2단) 전환
+//   const toggleExpanded = () => {
+//     setIsExpanded((prev) => !prev);
+//     // 만약 닫혀 있었다면(32px 상태) W 모드 누를 때 자동 열기 (원치 않으면 제거)
+//     if (!isDrawerOpen) {
+//       setIsDrawerOpen(true);
+//       if (onToggleDrawer) {
+//         onToggleDrawer(true);
+//       }
+//     }
+//   };
+
+//   // 열기/닫기
+//   const toggleDrawer = () => {
+//     const newState = !isDrawerOpen;
+//     setIsDrawerOpen(newState);
+//     if (onToggleDrawer) {
+//       onToggleDrawer(newState);
+//     }
+//   };
+
+//   // 알림 모두 비우기 기능
+//   const handleClearNotifications = () => {
+//     setFooterDataList([]);
+//   };
+
+//   //캠페인 정보 조회 api 호출
+//   const { mutate: fetchMain } = useApiForMain({
+//     onSuccess: (data) => {
+//       setCampaigns(data.result_data);
+//     }
+//   });
+
+//   // Helper function to add a message to footerDataList - memoized to prevent unnecessary re-renders
+//   const addMessageToFooterList = useCallback((time: string, type: string, message: string) => {
+//     if (message !== '') {
+//       setFooterDataList((prev) => [
+//         {
+//           time,
+//           type,
+//           message
+//         },
+//         ...prev.slice(0, 9) // 상위 10개만 보이게
+//       ]);
+//     }
+//   }, []);
+
+//   // 연결 상태 로깅 함수 - memoized
+//   const logConnectionStatus = useCallback(() => {
+//     const connectionInfo = getConnectionInfo();
+//     console.log("📊 [SSE 연결 상태]", {
+//       연결됨: connectionInfo.isConnected,
+//       URL: connectionInfo.url,
+//       총연결횟수: connectionInfo.connectionCount,
+//       메시지수신횟수: connectionInfo.messageCount,
+//       마지막연결시간: connectionInfo.lastConnectedAt,
+//     });
+//   }, [getConnectionInfo]);
+
+//   // SSE 메시지 처리기 - memoized
+//   const handleSSEMessage = useCallback((tempEventData: any) => {
+//     try {
+//       const { announce, command, data, kind, campaign_id } = tempEventData;
+
+//       // 메시지 중복 체크를 위한 고유 ID 생성
+//       const messageId = `${announce}_${command}_${campaign_id}_${JSON.stringify(data)}`;
+
+//       // 이미 처리한 메시지인지 확인
+//       if (lastProcessedMessageRef.current === messageId) {
+//         console.log("🔄 [중복 메시지 감지] 처리 건너뜀:", messageId);
+//         return;
+//       }
+
+//       // 메시지 ID 업데이트
+//       lastProcessedMessageRef.current = messageId;
+
+//       // Use the ref to get the latest process function
+//       if (processEventDataRef.current) {
+//         processEventDataRef.current(
+//           announce,
+//           command,
+//           data,
+//           kind,
+//           campaign_id,
+//           tempEventData
+//         );
+//       }
+//     } catch (error) {
+//       console.error("🚨 [SSE 메시지 처리 오류]", error);
+//     }
+//   }, []);
+
+//   // Initialize the hook for processing footer data
+//   // Important: This must be after all the callback definitions to avoid dependency issues
+//   const { processEventData } = useFooterDataProcessor(
+//     campaigns,
+//     fetchMain,
+//     useAlramPopup,
+//     debouncedInvalidate,
+//     tenant_id,
+//     addMessageToFooterList
+//   );
+
+//   // Store the latest processEventData function in a ref to avoid dependency cycles
+//   useEffect(() => {
+//     processEventDataRef.current = processEventData;
+//   }, [processEventData]);
+
+//   // Connection status logging at interval
+//   useEffect(() => {
+//     // 브라우저 환경이고, 사용자 ID가 있는 경우에만 실행
+//     if (typeof window !== 'undefined' && id !== '') {
+//       // 10초마다 연결 상태 로깅
+//       const statusInterval = setInterval(() => {
+//         logConnectionStatus();
+//       }, 10000);
+
+//       return () => {
+//         clearInterval(statusInterval);
+//       };
+//     }
+//   }, [id, logConnectionStatus]);
+
+//   // SSE 연결 설정 - 컴포넌트 마운트시 한 번만 초기화
+//   useEffect(() => {
+//     // 브라우저 환경인지 확인 및 사용자 ID 확인
+//     if (typeof window !== 'undefined' && window.EventSource && id !== '' && !sseInitializedRef.current) {
+//       // 초기 연결 상태 로깅
+//       console.log(`🔄 [SSE 연결 초기화] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`);
+      
+//       // SSE 연결 초기화 (Zustand 스토어를 통해)
+//       initSSE(id, tenant_id, handleSSEMessage);
+      
+//       // 초기화 완료 플래그 설정
+//       sseInitializedRef.current = true;
+      
+//       // 연결 직후 상태 로깅
+//       const timer = setTimeout(() => {
+//         logConnectionStatus();
+//       }, 1000);
+
+//       return () => {
+//         clearTimeout(timer);
+//       };
+//     }
+//   }, [id, tenant_id, initSSE, handleSSEMessage, logConnectionStatus]);
+
+//   // 컴포넌트 언마운트 시 연결 종료 방지 (페이지 이동 시 연결 유지)
+//   // SSE 연결은 앱 종료 시에만 종료하거나, 명시적으로 종료해야 할 때만 종료합니다.
+//   useEffect(() => {
+//     return () => {
+//       // 여기서는 closeSSE()를 호출하지 않음 - 연결을 유지하기 위해
+//       console.log("🔌 [Footer 컴포넌트 언마운트] SSE 연결 유지");
+//     };
+//   }, []);
+
+//   // 브라우저 종료 시 SSE 연결 종료를 위한 이벤트 리스너
+//   useEffect(() => {
+//     const handleBeforeUnload = () => {
+//       console.log("🌐 [브라우저 종료] SSE 연결 종료");
+//       closeSSE();
+//     };
+
+//     window.addEventListener('beforeunload', handleBeforeUnload);
+    
+//     return () => {
+//       window.removeEventListener('beforeunload', handleBeforeUnload);
+//     };
+//   }, [closeSSE]);
+
+//   // 높이 변경 핸들러
+//   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
+//     const newHeight = currentHeight + d.height;
+//     setCurrentHeight(newHeight);
+
+//     if (onResizeHeight) {
+//       onResizeHeight(newHeight);
+//     }
+
+//     if (onResizeEnd) {
+//       onResizeEnd(newHeight);
+//     }
+//   };
+
+//   // SSE 연결 상태 표시
+//   const ConnectionStatusIndicator = () => (
+//     <div 
+//       className={`w-2 h-2 rounded-full mr-1 ${sseConnected ? 'bg-green-500' : 'bg-red-500'}`} 
+//       title={sseConnected ? "SSE 연결됨" : "SSE 연결 안됨"}
+//     />
+//   );
+
+//   return (
+//     <Resizable
+//       size={{
+//         width: '100%',
+//         height: isDrawerOpen ? currentHeight : 32
+//       }}
+//       minHeight={100}
+//       maxHeight={500}
+//       enable={{
+//         top: isDrawerOpen,
+//         right: false,
+//         bottom: false,
+//         left: false,
+//         topRight: false,
+//         bottomRight: false,
+//         bottomLeft: false,
+//         topLeft: false
+//       }}
+//       className={`
+//         border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col duration-300 ease-in-out group relative h-[1px] before:content-[''] before:absolute hover:before:bg-[#5BC2C1]
+//         ${isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative"}
+//       `}
+//       onResizeStart={onResizeStart}
+//       onResizeStop={handleResizeStop}
+//     >
+//       {/* 상단 바 영역 */}
+//       <div className="flex-none pt-[5px] pb-[4px] px-[20px] border-b bg-white flex justify-between items-center">
+//         <div className="flex items-center gap-1">
+//           <ConnectionStatusIndicator />
+//           <span className="text-[13px] text-[#333]">현재 진행 상태 </span>
+//           <span className="text-[12px] text-[#666] bg-gray-100 px-1 rounded">
+//             {footerDataList.length > 0 ? (
+//               <span className="text-[#666] bg-gray-100 px-1 rounded">
+//                 {footerDataList.length}건
+//               </span>
+//             ) : (
+//               <span className="text-[#666] bg-gray-100 px-1 rounded">
+//                 0건
+//               </span>
+//             )}
+//           </span>
+//         </div>
+
+//         <div className="flex items-center gap-2">
+//           {useAlramPopup === 1 ? (
+//             <>
+//               <span title="알림 활성화">
+//                 <Bell className="w-4 h-4 text-blue-500" />
+//               </span>
+//               <button onClick={handleClearNotifications} title="알림 모두 비우기">
+//                 <Trash className="w-4 h-4 text-gray-500" />
+//               </button>
+//             </>
+//           ) : (
+//             <span title="알림 비활성화">
+//               <BellOff className="w-4 h-4 text-gray-400" />
+//             </span>
+//           )}
+
+//           {/* 열기/닫기 버튼 */}
+//           <button
+//             onClick={toggleDrawer}
+//             className=""
+//             title={isDrawerOpen ? "닫기" : "열기"}
+//           >
+//             {isDrawerOpen ? (
+//               <ChevronDown className="w-4 h-4" />
+//             ) : (
+//               <ChevronUp className="w-4 h-4" />
+//             )}
+//           </button>
+//         </div>
+//       </div>
+
+//       {/* 푸터 내부 콘텐츠: isDrawerOpen이 true일 때만 렌더링 */}
+//       {isDrawerOpen && (
+//         <div className="flex-1 flex overflow-hidden">
+//           {/* D(1단) -> w-full, W(2단) -> w-1/2 + 오른쪽 테이블 */}
+//           <div
+//             className={`
+//               ${isExpanded ? "w-1/2" : "w-full"}
+//               overflow-auto py-[7px] px-[20px]
+//               ${isExpanded ? "border-r" : ""}
+//             `}
+//           >
+//             <table className="w-full text-sm">
+//               <tbody>
+//                 {footerDataList.map((log, index) => (
+//                   <tr key={index}>
+//                     <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
+//                     <td className="whitespace-nowrap text-[13px] px-1 hidden">[{log.type}]</td>
+//                     <td className="text-[13px]">{log.message}</td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+//           </div>
+
+//         </div>
+//       )}
+//     </Resizable>
+//   );
+// }
 
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ChevronUp, ChevronDown, Bell, BellOff, Trash } from "lucide-react";
-import { debounce, isEqual } from 'lodash';
+import { ChevronUp, ChevronDown, Bell, BellOff, Trash, Info } from "lucide-react";
+import { debounce } from 'lodash';
 import { useAuthStore, useMainStore } from '@/store';
 import { Resizable } from "re-resizable";
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
@@ -12,17 +737,15 @@ import { toast, initToasts } from "./CustomToast";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
 import { useSSEStore } from "@/store/useSSEStore";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion"; // 꼭 상단 import 추가!
+import { useFooterDataProcessor } from "./utils/footer_dataset";
 
-
-type FooterDataType = {
+export type FooterDataType = {
   time: string;
   type: string;
   message: string;
 };
 
-interface FooterProps {
+export interface FooterProps {
   footerHeight: number;      // 열려 있을 때 푸터의 높이(px)
   startResizing?: () => void; // 드래그로 푸터 높이를 조절하기 위한 함수
   onToggleDrawer?: (isOpen: boolean) => void; // 부모 컴포넌트에 열림/닫힘 상태 전달
@@ -31,7 +754,9 @@ interface FooterProps {
   onResizeEnd?: (height: number) => void; // 리사이즈 종료 이벤트 - height 매개변수 추가
 }
 
-// 1122
+// 페이지 로드 시간 기록 - 새로고침 감지용
+const PAGE_LOAD_TIME = Date.now();
+
 export default function Footer({
   footerHeight,
   onToggleDrawer,
@@ -43,18 +768,27 @@ export default function Footer({
   const [isDrawerOpen, setIsDrawerOpen] = useState(true); // 푸터 열기/닫기 토글
   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
   const [currentHeight, setCurrentHeight] = useState(footerHeight);
+  const [showDebugInfo, setShowDebugInfo] = useState(false); // 디버그 정보 표시 상태
+  const [debugInfo, setDebugInfo] = useState<{[key: string]: any}>({});
   const { id, tenant_id, role_id } = useAuthStore();
   const { campaigns, setCampaigns } = useMainStore();
   const { useAlramPopup } = useEnvironmentStore();
-  const [isResizing, setIsResizing] = useState(false);
-  const [isHeightToggled, setIsHeightToggled] = useState(false);
+  
+  // 향상된 SSE 스토어 사용
+  const { 
+    initSSE, 
+    closeSSE, 
+    getConnectionInfo,
+    isConnected: sseConnected,
+  } = useSSEStore();
 
   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
 
-  const { initSSE, closeSSE, getConnectionInfo } = useSSEStore();
-
   const lastProcessedMessageRef = useRef<string | null>(null);
+  const processEventDataRef = useRef<any>(null);
+  const sseInitializedRef = useRef<boolean>(false);
+  const mountTimeRef = useRef<number>(Date.now());
 
   const debouncedInvalidate = useCallback(
     debounce(() => {
@@ -66,6 +800,19 @@ export default function Footer({
 
   useEffect(() => {
     initToasts();
+    
+    // 페이지 로드시 디버그 정보 업데이트
+    const isRefresh = document.visibilityState === 'visible' && 
+                     (PAGE_LOAD_TIME - (parseInt(localStorage.getItem('lastPageLoadTime') || '0')) < 3000);
+    
+    localStorage.setItem('lastPageLoadTime', PAGE_LOAD_TIME.toString());
+    
+    setDebugInfo(prev => ({
+      ...prev,
+      mountTime: new Date(mountTimeRef.current).toLocaleTimeString(),
+      isRefresh: isRefresh ? '새로고침' : '최초 로드',
+      pageLoadTime: new Date(PAGE_LOAD_TIME).toLocaleTimeString()
+    }));
   }, []);
 
   // 부모 컴포넌트에 열림/닫힘 상태 변경 알림
@@ -101,6 +848,34 @@ export default function Footer({
     setFooterDataList([]);
   };
 
+  // 디버그 정보 토글
+  const toggleDebugInfo = () => {
+    setShowDebugInfo(prev => !prev);
+    if (!showDebugInfo) {
+      updateDebugInfo();
+    }
+  };
+
+  // 디버그 정보 업데이트
+  const updateDebugInfo = useCallback(() => {
+    const connectionInfo = getConnectionInfo();
+    
+    setDebugInfo({
+      connectionId: connectionInfo.connectionId || 'N/A',
+      isConnected: connectionInfo.isConnected ? '연결됨' : '연결안됨',
+      connectionCount: connectionInfo.connectionCount,
+      messageCount: connectionInfo.messageCount,
+      lastConnectedAt: connectionInfo.lastConnectedAt 
+                      ? new Date(connectionInfo.lastConnectedAt).toLocaleString()
+                      : 'N/A',
+      mountTime: new Date(mountTimeRef.current).toLocaleString(),
+      pageLoadTime: new Date(PAGE_LOAD_TIME).toLocaleString(),
+      userId: id,
+      tenantId: tenant_id,
+      url: connectionInfo.url || 'N/A'
+    });
+  }, [getConnectionInfo, id, tenant_id]);
+
   //캠페인 정보 조회 api 호출
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
@@ -108,8 +883,8 @@ export default function Footer({
     }
   });
 
-  // Helper function to add a message to footerDataList
-  const addMessageToFooterList = (time: string, type: string, message: string) => {
+  // Helper function to add a message to footerDataList - memoized to prevent unnecessary re-renders
+  const addMessageToFooterList = useCallback((time: string, type: string, message: string) => {
     if (message !== '') {
       setFooterDataList((prev) => [
         {
@@ -120,367 +895,9 @@ export default function Footer({
         ...prev.slice(0, 9) // 상위 10개만 보이게
       ]);
     }
-  };
+  }, []);
 
-  const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, campaign_id: string, skill_id: string, tempEventData: any): void => {
-    //시간.
-    const today = new Date();
-    const _time = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0') + ':' + String(today.getSeconds()).padStart(2, '0');
-
-    // Check if we need to invalidate tree menu data
-    const shouldInvalidateTreeMenu = (
-      // 캠페인 추가/수정/삭제
-      (announce === '/pds/campaign' && ['INSERT', 'UPDATE', 'DELETE'].includes(command)) ||
-      // 캠페인 상태 변경
-      (announce === '/pds/campaign/status' && command === 'UPDATE') ||
-      // 스킬 추가/수정/삭제
-      (announce === '/pds/skill' && ['INSERT', 'UPDATE', 'DELETE'].includes(command)) ||
-      // 캠페인 요구스킬 수정
-      (announce === '/pds/campaign/skill' && command === 'UPDATE') ||
-      // 상담사 리소스 수정/삭제
-      (announce === 'update-agent' && ['UPDATE', 'DELETE'].includes(command))
-    );
-
-    // 필요한 경우 트리 메뉴 데이터 갱신
-    if (shouldInvalidateTreeMenu) {
-      debouncedInvalidate();
-    }
-
-    //타입.
-    let _type = 'Event';
-    if (kind === 'event') {
-      _type = 'Event';
-    } else if (kind === 'alram') {
-      _type = 'Event';
-    }
-
-    //메시지.
-    let _message = '';
-    let _message2 = '';
-
-    //운영설정>캠페인별 발신번호설정
-    if (announce === '/pds/campaign/calling-number') {
-      _message = '캠페인 : ';
-      if (command === 'INSERT') {
-        _message += '[' + campaign_id + '], 사용자 발신번호 설정 추가 성공';
-      } else if (command === 'DELETE') {
-        _message += '[' + campaign_id + '], 사용자 발신번호 설정 삭제 성공';
-      } else if (command === 'UPDATE') {
-        _message += '[' + campaign_id + '], 사용자 발신번호 설정 변경 성공';
-      }
-      addMessageToFooterList(_time, _type, _message);
-    }
-    //장비 사용, 장비 사용중지
-    else if (announce === 'dialing-device') {
-      if (command === 'UPDATE' && data['device_status'] === 'run') {
-        _message = 'CIDS 작동중';
-        // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
-        const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
-          detail: {
-            device_id: data['device_id'].toString(),
-            device_status: 'run'
-          }
-        });
-        window.dispatchEvent(deviceStatusEvent);
-        addMessageToFooterList(_time, _type, _message);
-      } else if (command === 'UPDATE' && data['device_status'] === 'down') {
-        _message = 'CIDS 작동중지';
-        // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
-        const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
-          detail: {
-            device_id: data['device_id'].toString(),
-            device_status: 'down'
-          }
-        });
-        window.dispatchEvent(deviceStatusEvent);
-        addMessageToFooterList(_time, _type, _message);
-      }
-    }
-    //캠페인수정>콜페이싱 수정
-    else if (announce === '/pds/campaign/dial-speed') {
-      _message = '[콜페이싱] ';
-      if (command === 'UPDATE') {
-        const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === Number(campaign_id));
-        if (tempCampaign && tempCampaign.dial_mode === 2) {
-          _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'] * 2;
-        } else {
-          _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'] * 2;
-        }
-        addMessageToFooterList(_time, _type, _message);
-      }
-    }
-    //캠페인.
-    else if (announce === '/pds/campaign') {
-      _message = '캠페인 ';
-      let _start_flag = '';
-      if (data['start_flag'] === 1) {
-        _start_flag = '시작';
-      } else if (data['start_flag'] === 2) {
-        _start_flag = '멈춤';
-      } else if (data['start_flag'] === 3) {
-        _start_flag = '중지';
-      }
-      let _end_flag = '';
-      if (data['end_flag'] === 1) {
-        _end_flag = '진행중';
-      } else if (data['end_flag'] === 2) {
-        _end_flag = '완료';
-      }
-
-      if (command === 'INSERT') {
-        _message += '추가, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
-        _message2 = `[EVENT] [${campaign_id}] 캠페인 추가`;
-
-        // 캠페인 추가 시 토스트 메시지
-        if (useAlramPopup === 1) {
-          toast.event(_message2, {
-            duration: 6000
-          });
-        }
-        addMessageToFooterList(_time, _type, _message);
-      } else if (command === 'UPDATE') {
-        _message += '수정, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
-        _message2 = `[EVENT] [${campaign_id}] 캠페인 수정`;
-
-        // 캠페인 수정 시 토스트 메시지
-        if (useAlramPopup === 1) {
-          toast.event(_message2, {
-            duration: 6000
-          });
-        }
-        addMessageToFooterList(_time, _type, _message);
-      } else if (command === 'DELETE') {
-        _message += '삭제, 캠페인 아이디 : ' + campaign_id;
-        _message2 = `[EVENT] [${campaign_id}] 캠페인 삭제`;
-
-        // 캠페인 삭제 시 토스트 메시지
-        if (useAlramPopup === 1) {
-          toast.event(_message2, {
-            duration: 6000
-          });
-        }
-        addMessageToFooterList(_time, _type, _message);
-      }
-
-      fetchMain({
-        session_key: '',
-        tenant_id: tenant_id,
-      });
-
-      if (data['start_flag'] === 3) {
-        const statusMessage = '캠페인 동작상태 변경, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
-
-        // 알림 설정이 활성화되어 있으면 토스트 표시
-        if (useAlramPopup === 1) {
-          toast.event(`[EVENT] [${campaign_id}] 캠페인 상태 변경`, {
-            duration: 6000,
-          });
-        }
-
-        // 이미 위에서 메시지를 추가했으므로 여기서는 추가하지 않음
-      }
-    }
-    //스킬.
-    else if (announce === '/pds/skill/agent-list') {
-      const tempAgentIdList = data['agent_id'];
-      const _skillId = skill_id;
-
-      if (tempAgentIdList && tempAgentIdList.length > 0) {
-        let actionType = '';
-        if (command === 'UPDATE' || command === 'INSERT') {
-          actionType = '할당';
-        } else if (command === 'DELETE') {
-          actionType = '해제';
-        }
-
-        const _message = '[EVENT] 상담사 스킬 ' + actionType;
-        addMessageToFooterList(_time, _type, _message);
-
-        // 토스트 알림은 한 번만 표시
-        if (useAlramPopup === 1) {
-          toast.event(`[EVENT] [${_skillId}] 상담사 스킬 ${actionType}`, {
-            duration: 6000
-          });
-        }
-      }
-    }
-    //스킬편집
-    else if (announce === '/pds/skill') {
-      _message = '[스킬 ';
-      if (command === 'INSERT') {
-        _message += '추가] 스킬 아이디 : ' + skill_id + ' , 스킬 이름 : ' + data['skill_name'];
-      } else if (command === 'UPDATE') {
-        _message += '변경] 스킬 아이디 : ' + skill_id + ' , 스킬 이름 : ' + data['skill_name'];
-      } else if (command === 'DELETE') {
-        _message += '삭제] 스킬 아이디 : ' + skill_id + ' , 스킬 이름 : ' + data['skill_name'];
-      }
-      addMessageToFooterList(_time, _type, _message);
-    }
-    //캠페인 요구스킬 수정
-    else if (announce === '/pds/campaign/skill') {
-      if (command === 'UPDATE') {
-        _message = '캠페인 요구스킬 수정, 캠페인 아이디 : ' + campaign_id;
-        addMessageToFooterList(_time, _type, _message);
-      }
-    }
-    //상담사 자원 수정/삭제
-    else if (announce === 'update-agent') {
-      _message = '[상담사 자원 ';
-      if (command === 'UPDATE') {
-        _message += '수정] 상담사 아이디 : ' + data['employee_id'] + ' , 상담사 이름 : ' + data['agent_name'];
-      } else if (command === 'DELETE') {
-        _message += '삭제] 상담사 아이디 : ' + data['employee_id'] + ' , 상담사 이름 : ' + data['agent_name'];
-      }
-      addMessageToFooterList(_time, _type, _message);
-    }
-    //캠페인수정>동작시간 추가
-    else if (announce === '/pds/campaign/schedule') {
-      _message = '캠페인 스케쥴';
-      if (command === 'INSERT') {
-        // _message += '수정, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
-        _message += '수정, 캠페인 아이디 : ' + campaign_id;
-        addMessageToFooterList(_time, _type, _message);
-      }
-      else if (command === 'UPDATE') {
-        // _message += '변경, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
-        _message += '변경, 캠페인 아이디 : ' + campaign_id;
-        addMessageToFooterList(_time, _type, _message);
-      }
-      else if (command === 'DELETE') {
-        // _message += '삭제, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
-        _message += '삭제, 캠페인 아이디 : ' + campaign_id;
-        addMessageToFooterList(_time, _type, _message);
-      }
-    }
-    //캠페인 동작상태 변경
-    else if (announce === '/pds/campaign/status') {
-      if (command === 'UPDATE') {
-        let _start_flag = '';
-        if (data['campaign_status'] === 1) {
-          _start_flag = '시작';
-        } else if (data['campaign_status'] === 2) {
-          _start_flag = '멈춤';
-        } else if (data['campaign_status'] === 3) {
-          _start_flag = '중지';
-        }
-
-        // 푸터 로그 메시지
-        _message = '캠페인 동작상태 변경, 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: 진행중';
-
-        // 토스트 알림 표시 (한번만 표시)
-        if (useAlramPopup === 1) {
-          toast.event(`[EVENT] [${campaign_id}] 캠페인 상태 변경`, {
-            duration: 6000,
-          });
-        }
-
-        // 푸터 데이터 리스트에 추가
-        addMessageToFooterList(_time, _type, _message);
-      }
-    }
-    //발신리스트등록
-    else if (announce === '/pds/campaign/calling-list') {
-      if (command === 'INSERT') {
-        let list_flag = '';
-        if (data['list_flag'] === 'I') {
-          list_flag = '신규리스트';
-        } else if (data['list_flag'] === 'A') {
-          list_flag = '추가리스트';
-        } else if (data['list_flag'] === 'D') {
-          list_flag = '삭제리스트';
-        } else if (data['list_flag'] === 'L') {
-          list_flag = '초기화';
-        }
-        _message = '발신리스트등록, 캠페인 아이디 : ' + campaign_id + ' , 리스트구분 : ' + list_flag;
-        _message2 = `[EVENT] [${campaign_id}] 발신리스트 ${list_flag} 등록`;
-
-        // 토스트 알림 표시
-        if (useAlramPopup === 1) {
-          toast.event(_message2, {
-            duration: 6000
-          });
-        }
-
-        addMessageToFooterList(_time, _type, _message);
-      }
-    }
-
-  }, [campaigns, fetchMain, useAlramPopup, debouncedInvalidate, tenant_id]);
-
-  // SSE 구독
-  useEffect(() => {
-    // 브라우저 환경인지 확인
-    if (typeof window !== 'undefined' && window.EventSource && id !== '') {
-      const eventSource = new EventSource(
-        `/notification/${tenant_id}/subscribe/${id}`
-      );
-
-      let data: any = {};
-      let announce = "";
-      let command = "";
-      let kind = "";
-      let campaign_id = "";
-
-      eventSource.addEventListener('message', (event) => {
-        console.log("footer sse event = ", event.data);
-
-        if (event.data !== "Connected!!") {
-          const tempEventData = JSON.parse(event.data);
-          if (
-            announce !== tempEventData["announce"] ||
-            !isEqual(data, tempEventData.data) ||
-            !isEqual(data, tempEventData["data"]) ||
-            kind !== tempEventData["kind"] ||
-            campaign_id !== tempEventData["campaign_id"]
-          ) {
-            announce = tempEventData["announce"];
-            command = tempEventData["command"];
-            data = tempEventData["data"];
-            kind = tempEventData["kind"];
-            campaign_id = tempEventData["campaign_id"];
-
-            footerDataSet(
-              tempEventData["announce"],
-              tempEventData["command"],
-              tempEventData["data"],
-              tempEventData["kind"],
-              tempEventData["campaign_id"],
-              tempEventData["skill_id"] || "", // skill_id 추가 (없을 경우 빈 문자열)
-              tempEventData // tempEventData는 7번째 매개변수로
-            );
-          }
-        }
-      });
-    }
-  }, [id, tenant_id]);
-
-  const handleSSEMessage = (tempEventData: any) => {
-    try {
-      const { announce, command, data, kind, campaign_id, skill_id } = tempEventData;
-
-      const messageId = `${announce}_${command}_${campaign_id}_${skill_id}_${JSON.stringify(data)}`;
-
-      if (lastProcessedMessageRef.current === messageId) {
-        console.log("🔄 [중복 메시지 감지] 처리 건너뜀:", messageId);
-        return;
-      }
-
-      lastProcessedMessageRef.current = messageId;
-
-      footerDataSet(
-        announce,
-        command,
-        data,
-        kind,
-        campaign_id,
-        skill_id,
-        tempEventData
-      );
-    } catch (error) {
-      console.error("🚨 [SSE 메시지 처리 오류]", error);
-    }
-  };
-
+  // 연결 상태 로깅 함수 - memoized
   const logConnectionStatus = useCallback(() => {
     const connectionInfo = getConnectionInfo();
     console.log("📊 [SSE 연결 상태]", {
@@ -489,89 +906,199 @@ export default function Footer({
       총연결횟수: connectionInfo.connectionCount,
       메시지수신횟수: connectionInfo.messageCount,
       마지막연결시간: connectionInfo.lastConnectedAt,
+      연결ID: connectionInfo.connectionId
     });
+    
+    // 디버그 정보도 업데이트
+    updateDebugInfo();
+    
+    return connectionInfo;
+  }, [getConnectionInfo, updateDebugInfo]);
+
+  // SSE 메시지 처리기 - memoized
+  const handleSSEMessage = useCallback((tempEventData: any) => {
+    try {
+      const { announce, command, data, kind, campaign_id } = tempEventData;
+
+      // 메시지 중복 체크를 위한 고유 ID 생성
+      const messageId = `${announce}_${command}_${campaign_id}_${JSON.stringify(data)}`;
+
+      // 이미 처리한 메시지인지 확인
+      if (lastProcessedMessageRef.current === messageId) {
+        console.log("🔄 [중복 메시지 감지] 처리 건너뜀:", messageId);
+        return;
+      }
+
+      // 메시지 ID 업데이트
+      lastProcessedMessageRef.current = messageId;
+
+      // Use the ref to get the latest process function
+      if (processEventDataRef.current) {
+        processEventDataRef.current(
+          announce,
+          command,
+          data,
+          kind,
+          campaign_id,
+          tempEventData
+        );
+      }
+      
+      // 디버그 정보 업데이트
+      setDebugInfo(prev => ({
+        ...prev,
+        lastMessageReceived: new Date().toLocaleTimeString(),
+        lastMessageType: announce
+      }));
+      
+    } catch (error) {
+      console.error("🚨 [SSE 메시지 처리 오류]", error);
+    }
+  }, []);
+
+  // Initialize the hook for processing footer data
+  // Important: This must be after all the callback definitions to avoid dependency issues
+  const { processEventData } = useFooterDataProcessor(
+    campaigns,
+    fetchMain,
+    useAlramPopup,
+    debouncedInvalidate,
+    tenant_id,
+    addMessageToFooterList
+  );
+
+  // Store the latest processEventData function in a ref to avoid dependency cycles
+  useEffect(() => {
+    processEventDataRef.current = processEventData;
+  }, []);
+
+  // Connection status logging at interval
+  useEffect(() => {
+    // 브라우저 환경이고, 사용자 ID가 있는 경우에만 실행
+    if (typeof window !== 'undefined' && id !== '') {
+      // 10초마다 연결 상태 로깅
+      const statusInterval = setInterval(() => {
+        const info = logConnectionStatus();
+        
+        // 연결 상태가 변경되면 디버그 정보에 표시
+        setDebugInfo(prev => ({
+          ...prev,
+          isConnected: info.isConnected ? '연결됨' : '연결안됨',
+          lastStatusCheck: new Date().toLocaleTimeString()
+        }));
+      }, 10000);
+
+      return () => {
+        clearInterval(statusInterval);
+      };
+    }
+  }, [id, logConnectionStatus]);
+
+  // SSE 연결 설정 - 컴포넌트 마운트시 한 번만 초기화
+  useEffect(() => {
+    // 브라우저 환경인지 확인 및 사용자 ID 확인
+    if (typeof window !== 'undefined' && window.EventSource && id !== '' && !sseInitializedRef.current) {
+      // 초기 연결 상태 로깅
+      console.log(`🔄 [SSE 연결 초기화] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`);
+      
+      const isRefresh = 
+        document.visibilityState === 'visible' && 
+        (PAGE_LOAD_TIME - (parseInt(localStorage.getItem('lastPageLoadTime') || '0')) < 3000);
+      
+      console.log(`🔍 [페이지 로드 유형] ${isRefresh ? '새로고침' : '최초 로드'}`);
+      
+      // SSE 연결 초기화 (Zustand 스토어를 통해)
+      initSSE(id, tenant_id, handleSSEMessage);
+      
+      // 초기화 완료 플래그 설정
+      sseInitializedRef.current = true;
+      
+      // 연결 직후 상태 로깅
+      const timer = setTimeout(() => {
+        const info = logConnectionStatus();
+        
+        // 디버그 정보 업데이트
+        setDebugInfo(prev => ({
+          ...prev,
+          initTime: new Date().toLocaleTimeString(),
+          isConnected: info.isConnected ? '연결됨' : '연결안됨',
+          connectionId: info.connectionId || 'N/A'
+        }));
+      }, 1000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [id, tenant_id, initSSE, handleSSEMessage, logConnectionStatus]);
+
+  // 컴포넌트 언마운트 시 연결 종료 방지 (페이지 이동 시 연결 유지)
+  // SSE 연결은 앱 종료 시에만 종료하거나, 명시적으로 종료해야 할 때만 종료합니다.
+  useEffect(() => {
+    return () => {
+      // 여기서는 closeSSE()를 호출하지 않음 - 연결을 유지하기 위해
+      console.log("🔌 [Footer 컴포넌트 언마운트] SSE 연결 유지");
+    };
+  }, []);
+
+  // 브라우저 종료 시 SSE 연결 종료를 위한 이벤트 리스너
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      console.log("🌐 [브라우저 종료] SSE 연결 종료");
+      closeSSE();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [closeSSE]);
+
+  // 페이지 가시성 변경 감지 (새로고침 감지)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 [페이지 가시성 변경] 페이지가 보이게 됨 - 새로고침 또는 탭 활성화');
+        
+        // 디버그 정보 업데이트
+        const connectionInfo = getConnectionInfo();
+        setDebugInfo(prev => ({
+          ...prev,
+          visibilityChange: new Date().toLocaleTimeString(),
+          isConnected: connectionInfo.isConnected ? '연결됨' : '연결안됨',
+        }));
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [getConnectionInfo]);
 
-  // SSE 구독 코드 수정 (기존 useEffect 대체)
-  // src/components/Footer.tsx — 수정 후
-  // useEffect(() => {
-  //   if (
-  //     typeof window !== 'undefined' &&
-  //     window.EventSource &&
-  //     id !== '' &&
-  //     !(window as any).SSE_GLOBAL
-  //   ) {
-  //     const url = `/notification/${tenant_id}/subscribe/${id}`
-  //     if (sessionStorage.getItem('SSE_CONNECTED') === url) {
-  //       console.log(`♻️ [SSE] sessionStorage 중복 연결 방지: ${url}`)
-  //       return
-  //     }
-  //     console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`)
-  //     initSSE(id, tenant_id, handleSSEMessage)
-  //     setTimeout(() => {
-  //       logConnectionStatus()
-  //     }, 1000)
-  //     return () => {
-  //       console.log('🔌 [Footer 언마운트] SSE 연결 종료')
-  //       closeSSE()
-  //     }
-  //   }
-  // }, [id, tenant_id, initSSE, closeSSE, logConnectionStatus])
-
-  // SSE 구독 코드 수정 (기존 useEffect 대체)
-  // useEffect(() => {
-  //   if (
-  //     typeof window !== 'undefined' &&
-  //     window.EventSource &&
-  //     id !== '' &&
-  //     !(window as any).SSE_GLOBAL // ✅ 전역 SSE 없을 때만 실행
-  //   ) {
-  //     console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`);
-
-  //     initSSE(id, tenant_id, handleSSEMessage);
-
-  //     setTimeout(() => {
-  //       logConnectionStatus();
-  //     }, 1000);
-
-  //     return () => {
-  //       console.log("🔌 [Footer 컴포넌트 언마운트] SSE 연결 종료");
-  //       closeSSE();
-  //     };
-  //   }
-  // }, []);
-
-  const handleResizeStartInternal = () => {
-    setIsResizing(true);
-    onResizeStart?.();
-  };
-
-  const handleResizing = (e: any, direction: any, ref: any, d: any) => {
-    const newHeight = ref.offsetHeight;
-    setCurrentHeight(newHeight);
-    onResizeHeight?.(newHeight);
-  };
-
+  // 높이 변경 핸들러
   const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
-    setIsResizing(false);
-    const newHeight = ref.offsetHeight; // ✅ 여기서도 offsetHeight 기준으로!
+    const newHeight = currentHeight + d.height;
     setCurrentHeight(newHeight);
-    onResizeHeight?.(newHeight);
-    onResizeEnd?.(newHeight);
+
+    if (onResizeHeight) {
+      onResizeHeight(newHeight);
+    }
+
+    if (onResizeEnd) {
+      onResizeEnd(newHeight);
+    }
   };
 
-  const handleToggleHeight = () => {
-    // toast.info("드래그하여 높이를 조절하세요.");
-
-    const minRowHeight = 24; // 각 알림 줄당 높이
-    const padding = 60; // 위 아래 여백 및 테이블 헤더 등 고려
-    const rowCount = footerDataList.length;
-    const calculatedHeight = Math.min(500, Math.max(100, rowCount * minRowHeight + padding));
-
-    setCurrentHeight(isHeightToggled ? 111 : calculatedHeight);
-    onResizeHeight?.(isHeightToggled ? 111 : calculatedHeight);
-    setIsHeightToggled(!isHeightToggled);
-  };
+  // SSE 연결 상태 표시
+  const ConnectionStatusIndicator = () => (
+    <div 
+      className={`w-2 h-2 rounded-full mr-1 ${sseConnected ? 'bg-green-500' : 'bg-red-500'}`} 
+      title={sseConnected ? "SSE 연결됨" : "SSE 연결 안됨"}
+    />
+  );
 
   return (
     <Resizable
@@ -591,34 +1118,36 @@ export default function Footer({
         bottomLeft: false,
         topLeft: false
       }}
-      className={cn(
-        "border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col group relative h-[1px]",
-        isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative",
-        !isResizing && "duration-300 ease-in-out",
-      )}
-      onResizeStart={handleResizeStartInternal}
+      className={`
+        border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col duration-300 ease-in-out group relative h-[1px] before:content-[''] before:absolute hover:before:bg-[#5BC2C1]
+        ${isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative"}
+      `}
+      onResizeStart={onResizeStart}
       onResizeStop={handleResizeStop}
-      onResize={handleResizing} // ✅ 추가
     >
       {/* 상단 바 영역 */}
       <div className="flex-none pt-[5px] pb-[4px] px-[20px] border-b bg-white flex justify-between items-center">
         <div className="flex items-center gap-1">
+          <ConnectionStatusIndicator />
           <span className="text-[13px] text-[#333]">현재 진행 상태 </span>
           <span className="text-[12px] text-[#666] bg-gray-100 px-1 rounded">
             {footerDataList.length > 0 ? (
-              <button
-                onClick={handleToggleHeight}
-                className="text-[12px] text-[#666] bg-gray-100 px-1 rounded cursor-pointer hover:bg-gray-200 transition"
-              >
+              <span className="text-[#666] bg-gray-100 px-1 rounded">
                 {footerDataList.length}건
-              </button>
+              </span>
             ) : (
-              <span className="text-[12px] text-[#666] bg-gray-100 px-1 rounded">
+              <span className="text-[#666] bg-gray-100 px-1 rounded">
                 0건
               </span>
             )}
-
           </span>
+          <button 
+            onClick={toggleDebugInfo} 
+            className="ml-2 text-blue-500 hover:text-blue-700"
+            title="SSE 연결 디버그 정보"
+          >
+            <Info size={16} />
+          </button>
         </div>
 
         <div className="flex items-center gap-2">
@@ -652,6 +1181,29 @@ export default function Footer({
         </div>
       </div>
 
+      {/* 디버그 정보 패널 */}
+      {showDebugInfo && (
+        <div className="bg-gray-100 p-2 text-xs border-b">
+          <div className="flex justify-between mb-1">
+            <h4 className="font-bold">SSE 연결 디버그 정보</h4>
+            <button 
+              className="text-blue-500 hover:text-blue-700"
+              onClick={updateDebugInfo}
+            >
+              새로고침
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+            {Object.entries(debugInfo).map(([key, value]) => (
+              <div key={key} className="flex">
+                <span className="font-medium mr-1">{key}:</span>
+                <span>{value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* 푸터 내부 콘텐츠: isDrawerOpen이 true일 때만 렌더링 */}
       {isDrawerOpen && (
         <div className="flex-1 flex overflow-hidden">
@@ -676,7 +1228,22 @@ export default function Footer({
             </table>
           </div>
 
-
+          {/* 2단(W) 모드일 때만 오른쪽 테이블 표시 */}
+          {isExpanded && (
+            <div className="w-1/2 overflow-auto py-[7px] px-[20px]">
+              <table className="w-full text-sm">
+                <tbody>
+                  {footerDataList.map((log, index) => (
+                    <tr key={index}>
+                      <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
+                      <td className="whitespace-nowrap text-[13px] px-1 hidden">[{log.type}]</td>
+                      <td className="text-[13px]">{log.message}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
     </Resizable>
