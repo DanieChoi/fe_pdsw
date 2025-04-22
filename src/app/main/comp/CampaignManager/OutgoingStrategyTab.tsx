@@ -278,6 +278,8 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
       }else if( newRows[i].duration7 > 100 ){
         newRows[i].duration7 = 100;
         check = false;
+      }else if( newRows[i].count1+newRows[i].count2+newRows[i].count3+newRows[i].count4+newRows[i].count5+newRows[i].count6+newRows[i].count7 > 15 ){
+        check = false;
       }
     }
     if(check){

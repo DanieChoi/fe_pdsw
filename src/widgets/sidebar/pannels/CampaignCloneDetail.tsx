@@ -294,7 +294,7 @@ export default function CampaignDetail() {
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
-    if (selectedCampaign !== null) {
+    if (selectedCampaign && selectedCampaign !== null) {
       setTempCampaignsInfo({
         ...tempCampaignInfo,
         campaign_id: 0,
@@ -819,6 +819,19 @@ export default function CampaignDetail() {
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
+    if( !saveErrorCheck && tempCampaignManagerInfo.campaign_id > 0 ){
+      const checkCampaign = campaigns.filter(data => data.campaign_id === tempCampaignManagerInfo.campaign_id);
+      if( checkCampaign.length > 0 ){
+        saveErrorCheck = true;
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "중복된 캠페인 아이디가 존재합니다.",
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }
+    }
     if( !saveErrorCheck && tempCampaignSchedule.start_time.length === 0){
       saveErrorCheck = true;
       setAlertState({
@@ -883,6 +896,14 @@ export default function CampaignDetail() {
           message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
           type: '2',
           onClose: () => goLogin(),
+        });
+      }else{
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: '캠페인 생성을 실패했습니다.',
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
         });
       }
     }
