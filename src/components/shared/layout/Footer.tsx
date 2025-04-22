@@ -502,7 +502,7 @@ export default function Footer({
       id !== '' &&
       !(window as any).SSE_GLOBAL
     ) {
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/notification/${tenant_id}/subscribe/${id}`
+      const url = `/notification/${tenant_id}/subscribe/${id}`
       if (sessionStorage.getItem('SSE_CONNECTED') === url) {
         console.log(`♻️ [SSE] sessionStorage 중복 연결 방지: ${url}`)
         return
@@ -520,29 +520,27 @@ export default function Footer({
   }, [id, tenant_id, initSSE, closeSSE, logConnectionStatus])
 
   // SSE 구독 코드 수정 (기존 useEffect 대체)
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      window.EventSource &&
-      id !== '' &&
-      !(window as any).SSE_GLOBAL // ✅ 전역 SSE 없을 때만 실행
-    ) {
-      console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`);
+  // useEffect(() => {
+  //   if (
+  //     typeof window !== 'undefined' &&
+  //     window.EventSource &&
+  //     id !== '' &&
+  //     !(window as any).SSE_GLOBAL // ✅ 전역 SSE 없을 때만 실행
+  //   ) {
+  //     console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`);
 
-      initSSE(id, tenant_id, handleSSEMessage);
+  //     initSSE(id, tenant_id, handleSSEMessage);
 
-      setTimeout(() => {
-        logConnectionStatus();
-      }, 1000);
+  //     setTimeout(() => {
+  //       logConnectionStatus();
+  //     }, 1000);
 
-      return () => {
-        console.log("🔌 [Footer 컴포넌트 언마운트] SSE 연결 종료");
-        closeSSE();
-      };
-    }
-  }, []);
-
-
+  //     return () => {
+  //       console.log("🔌 [Footer 컴포넌트 언마운트] SSE 연결 종료");
+  //       closeSSE();
+  //     };
+  //   }
+  // }, []);
 
   const handleResizeStartInternal = () => {
     setIsResizing(true);
