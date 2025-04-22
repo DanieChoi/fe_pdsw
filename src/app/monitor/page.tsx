@@ -114,6 +114,7 @@ const MonitorPage = () => {
   const [isSkillPopupOpen, setIsSkillPopupOpen] = useState(false);
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
   const router = useRouter();
+  const [modifiedCampaign, setModifiedCampaign] = useState<string>('');
 
   // 크기 조정 상태
   const [sizes, setSizes] = useState<Sizes>({
@@ -582,8 +583,8 @@ const MonitorPage = () => {
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       fetchCampaignSkills({
-        session_key: '',
-        tenant_id: 0,
+        session_key: session_key,
+        tenant_id: tenant_id,
       });
       if (tenant_id === 0) {
         setCampaignList(data.result_data);
@@ -762,6 +763,7 @@ const MonitorPage = () => {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       const { type, campaignId } = event.data;
+      setModifiedCampaign(campaignId);
 
       fetchMain({
         session_key: '',
