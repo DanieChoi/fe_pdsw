@@ -122,7 +122,7 @@ export default function Footer({
     }
   };
 
-  const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, campaign_id: string, tempEventData: any): void => {
+  const footerDataSet = useCallback((announce: string, command: string, data: any, kind: string, campaign_id: string, skill_id: string, tempEventData: any): void => {
     //시간.
     const today = new Date();
     const _time = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0') + ':' + String(today.getSeconds()).padStart(2, '0');
@@ -283,7 +283,7 @@ export default function Footer({
     //스킬.
     else if (announce === '/pds/skill/agent-list') {
       const tempAgentIdList = data['agent_id'];
-      const _skillId = data['skill_id'];
+      const _skillId = skill_id;
 
       if (tempAgentIdList && tempAgentIdList.length > 0) {
         let actionType = '';
@@ -308,11 +308,11 @@ export default function Footer({
     else if (announce === '/pds/skill') {
       _message = '[스킬 ';
       if (command === 'INSERT') {
-        _message += '추가] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
+        _message += '추가] 스킬 아이디 : ' + skill_id + ' , 스킬 이름 : ' + data['skill_name'];
       } else if (command === 'UPDATE') {
-        _message += '변경] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
+        _message += '변경] 스킬 아이디 : ' + skill_id + ' , 스킬 이름 : ' + data['skill_name'];
       } else if (command === 'DELETE') {
-        _message += '삭제] 스킬 아이디 : ' + data['skill_id'] + ' , 스킬 이름 : ' + data['skill_name'];
+        _message += '삭제] 스킬 아이디 : ' + skill_id + ' , 스킬 이름 : ' + data['skill_name'];
       }
       addMessageToFooterList(_time, _type, _message);
     }
@@ -508,10 +508,10 @@ export default function Footer({
       // SSE 이벤트 메시지 핸들러
       const handleSSEMessage = (tempEventData: any) => {
         try {
-          const { announce, command, data, kind, campaign_id } = tempEventData;
+          const { announce, command, data, kind, campaign_id, skill_id } = tempEventData;
 
           // 메시지 중복 체크를 위한 고유 ID 생성
-          const messageId = `${announce}_${command}_${campaign_id}_${JSON.stringify(data)}`;
+          const messageId = `${announce}_${command}_${campaign_id}_${skill_id}_${JSON.stringify(data)}`;
 
           // 이미 처리한 메시지인지 확인
           if (lastProcessedMessageRef.current === messageId) {
@@ -529,6 +529,7 @@ export default function Footer({
             data,
             kind,
             campaign_id,
+            skill_id,
             tempEventData
           );
         } catch (error) {
