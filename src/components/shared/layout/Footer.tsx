@@ -414,7 +414,7 @@ export default function Footer({
       const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
       console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
       const eventSource = new EventSource(
-        `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
+        `/notification/${tenant_id}/subscribe/${id}`
       );
 
       let data: any = {};
