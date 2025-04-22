@@ -408,52 +408,53 @@ export default function Footer({
   }, [campaigns, fetchMain, useAlramPopup, debouncedInvalidate, tenant_id]);
 
   // SSE 구독
-  // useEffect(() => {
-  //   // 브라우저 환경인지 확인
-  //   if (typeof window !== 'undefined' && window.EventSource && id !== '') {
-  //     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-  //     console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
-  //     const eventSource = new EventSource(
-  //       `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
-  //     );
+  useEffect(() => {
+    // 브라우저 환경인지 확인
+    if (typeof window !== 'undefined' && window.EventSource && id !== '') {
+      const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+      console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
+      const eventSource = new EventSource(
+        `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
+      );
 
-  //     let data: any = {};
-  //     let announce = "";
-  //     let command = "";
-  //     let kind = "";
-  //     let campaign_id = "";
+      let data: any = {};
+      let announce = "";
+      let command = "";
+      let kind = "";
+      let campaign_id = "";
 
-  //     eventSource.addEventListener('message', (event) => {
-  //       console.log("footer sse event = ", event.data);
+      eventSource.addEventListener('message', (event) => {
+        console.log("footer sse event = ", event.data);
 
-  //       if (event.data !== "Connected!!") {
-  //         const tempEventData = JSON.parse(event.data);
-  //         if (
-  //           announce !== tempEventData["announce"] ||
-  //           !isEqual(data, tempEventData.data) ||
-  //           !isEqual(data, tempEventData["data"]) ||
-  //           kind !== tempEventData["kind"] ||
-  //           campaign_id !== tempEventData["campaign_id"]
-  //         ) {
-  //           announce = tempEventData["announce"];
-  //           command = tempEventData["command"];
-  //           data = tempEventData["data"];
-  //           kind = tempEventData["kind"];
-  //           campaign_id = tempEventData["campaign_id"];
+        if (event.data !== "Connected!!") {
+          const tempEventData = JSON.parse(event.data);
+          if (
+            announce !== tempEventData["announce"] ||
+            !isEqual(data, tempEventData.data) ||
+            !isEqual(data, tempEventData["data"]) ||
+            kind !== tempEventData["kind"] ||
+            campaign_id !== tempEventData["campaign_id"]
+          ) {
+            announce = tempEventData["announce"];
+            command = tempEventData["command"];
+            data = tempEventData["data"];
+            kind = tempEventData["kind"];
+            campaign_id = tempEventData["campaign_id"];
 
-  //           footerDataSet(
-  //             tempEventData["announce"],
-  //             tempEventData["command"],
-  //             tempEventData["data"],
-  //             tempEventData["kind"],
-  //             tempEventData["campaign_id"],
-  //             tempEventData
-  //           );
-  //         }
-  //       }
-  //     });
-  //   }
-  // }, [id, tenant_id, role_id]);
+            footerDataSet(
+              tempEventData["announce"],
+              tempEventData["command"],
+              tempEventData["data"],
+              tempEventData["kind"],
+              tempEventData["campaign_id"],
+              tempEventData["skill_id"] || "", // skill_id 추가 (없을 경우 빈 문자열)
+              tempEventData // tempEventData는 7번째 매개변수로
+            );
+          }
+        }
+      });
+    }
+  }, [id, tenant_id]);
 
   const handleSSEMessage = (tempEventData: any) => {
     try {
@@ -495,29 +496,29 @@ export default function Footer({
 
   // SSE 구독 코드 수정 (기존 useEffect 대체)
   // src/components/Footer.tsx — 수정 후
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      window.EventSource &&
-      id !== '' &&
-      !(window as any).SSE_GLOBAL
-    ) {
-      const url = `/notification/${tenant_id}/subscribe/${id}`
-      if (sessionStorage.getItem('SSE_CONNECTED') === url) {
-        console.log(`♻️ [SSE] sessionStorage 중복 연결 방지: ${url}`)
-        return
-      }
-      console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`)
-      initSSE(id, tenant_id, handleSSEMessage)
-      setTimeout(() => {
-        logConnectionStatus()
-      }, 1000)
-      return () => {
-        console.log('🔌 [Footer 언마운트] SSE 연결 종료')
-        closeSSE()
-      }
-    }
-  }, [id, tenant_id, initSSE, closeSSE, logConnectionStatus])
+  // useEffect(() => {
+  //   if (
+  //     typeof window !== 'undefined' &&
+  //     window.EventSource &&
+  //     id !== '' &&
+  //     !(window as any).SSE_GLOBAL
+  //   ) {
+  //     const url = `/notification/${tenant_id}/subscribe/${id}`
+  //     if (sessionStorage.getItem('SSE_CONNECTED') === url) {
+  //       console.log(`♻️ [SSE] sessionStorage 중복 연결 방지: ${url}`)
+  //       return
+  //     }
+  //     console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`)
+  //     initSSE(id, tenant_id, handleSSEMessage)
+  //     setTimeout(() => {
+  //       logConnectionStatus()
+  //     }, 1000)
+  //     return () => {
+  //       console.log('🔌 [Footer 언마운트] SSE 연결 종료')
+  //       closeSSE()
+  //     }
+  //   }
+  // }, [id, tenant_id, initSSE, closeSSE, logConnectionStatus])
 
   // SSE 구독 코드 수정 (기존 useEffect 대체)
   // useEffect(() => {
