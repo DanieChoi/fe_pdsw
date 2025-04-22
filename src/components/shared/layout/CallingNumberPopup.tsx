@@ -40,6 +40,7 @@ const CallingNumberPopup = ({
                     const value = e.target.value.replace(/\D/g, '');
                     setInputValue(value);
                 }}
+                maxLength={11}
             />
         </div>
     );
