@@ -201,6 +201,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
               type="text"
               value={tempOutgoingMethodTab.trunk_access_code}
               onChange={(e) => handleNumericInput(e, 'setTrunkAccessCode')}
+              maxLength={10}
             />
           </div>
 
@@ -224,6 +225,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
               type="text"
               value={tempOutgoingMethodTab.alarm_answer_count}
               onChange={(e) => handleNumericInput(e, 'setCallGoal')}
+              maxLength={3}
             />
           </div>
 
@@ -333,6 +335,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
               type="text"
               value={tempOutgoingMethodTab.DDD_code}
               onChange={(e) => handleNumericInput(e, 'setDddNumber')}
+              maxLength={3}
             />
           </div>
 
@@ -356,6 +359,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
               type="text"
               value={tempOutgoingMethodTab.token_id}
               onChange={(e) => handleNumericInput(e, 'setTokenId')}
+              maxLength={1}
             />
           </div>
 
@@ -386,6 +390,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
               type="text"
               value={tempOutgoingMethodTab.power_divert_queue}
               onChange={(e) => handleNumericInput(e, 'setIvrNo')}
+              maxLength={16}
             />
           </div>
 

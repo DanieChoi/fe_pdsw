@@ -15,10 +15,13 @@ export const fetchMaxCallList = async (credentials: MaxCallListCredentials): Pro
             campaign_id: 0,
             agent_id: 0
         },
+        // 일괄 분배호수 수정 결과가 페이지처리만큼 보여서 제외시킴 0422
+        /*
         page: {
             index: 1,
             items: 10
         }
+        */    
     };
 
     try {
