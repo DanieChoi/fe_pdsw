@@ -8,6 +8,7 @@ import { SkillListDataResponse
 } from '../features/campaignManager/types/campaignManagerIndex';
 import { CampaignInfoInsertRequest } from '@/features/campaignManager/hooks/useApiForCampaignManagerInsert';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { campaignChannel } from '@/lib/broadcastChannel';
 
 interface CampainManagerState {
   skills: SkillListDataResponse[];
@@ -52,7 +53,10 @@ export const useCampainManagerStore = create<CampainManagerStore>((set) => ({
   newCampaignInfo: {} as MainDataResponse,
   newTenantId: ' ',
   newCampaignSchedule: {} as CampaignScheDuleListDataResponse,
-  setSkills: (skills) => set({ skills }),
+  setSkills: (skills) => {set({ skills });  campaignChannel.postMessage({
+    type: "skills_info_update",
+    skillsId: skills.map((skill) => skill.skill_id),
+    });},
   setCallingNumbers: (callingNumbers) => set({ callingNumbers }),
   setSchedules: (schedules) => set({ schedules }),
   setCampaignSkills: (campaignSkills) => set({ campaignSkills }),

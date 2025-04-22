@@ -25,6 +25,7 @@ import { useApiForDialSpeedUpdate } from '@/features/campaignManager/hooks/useAp
 import { campaignChannel } from '@/lib/broadcastChannel';
 import { toast } from 'react-toastify';
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
+import CounsellorGroupActions from '@/components/shared/layout/comp/TabActions/CounsellorGroupActions';
 
 
 const errorMessage: CustomAlertRequest = {
@@ -123,7 +124,6 @@ const MonitorPage = () => {
     bottomRow: { left: 40, right: 60 }
   });
 
-
   // 캠페인 관련 상태(가짜 데이터)
   // const [campaigns] = useState<Campaign[]>([
   //   { 
@@ -147,6 +147,7 @@ const MonitorPage = () => {
   const [_campaigns, _setCampaigns] = useState<Campaign[]>([]);
   const [campaignList, setCampaignList] = useState<any[]>([]);
   const [campaignSkillList, setCampaignSkillList] = useState<any[]>([]);
+
 
   // 섹션 상태
   const [sections, setSections] = useState<Section[]>([
@@ -780,8 +781,16 @@ const MonitorPage = () => {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       const { type, campaignId } = event.data;
-      setModifiedCampaign(campaignId);
-
+     
+      if( type === 'skills_info_update' ){
+        const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
+        fetchSkills({
+            tenant_id_array: tempTenantIdArray
+        });
+      }
+      else{
+        setModifiedCampaign(campaignId);        
+      }
       fetchMain({
         session_key: '',
         tenant_id: tenant_id,
