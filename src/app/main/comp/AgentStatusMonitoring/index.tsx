@@ -193,24 +193,52 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
 
   useEffect(() => {
     if (campaignId && campaigns.length > 0) {
-      const tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
-      if (tenantId) {
+      const _tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
+      if (_tenantId) {
         fetchAgentStateMonitoringList({
-          tenantId: tenantId,
+          tenantId: _tenantId,
           campaignId: Number(campaignId)
         });
         if( statisticsUpdateCycle > 0 ){        
-          const interval = setInterval(() => {  
+          const campaignInterval = setInterval(() => {  
             fetchAgentStateMonitoringList({
-              tenantId: tenantId,
+              tenantId: _tenantId,
               campaignId: Number(campaignId)
             });
           }, statisticsUpdateCycle * 1000);  
-          return () => clearInterval(interval);
+          return () => clearInterval(campaignInterval);
         }
       }
+    }else if( tenantId && campaigns.length > 0) {
+      fetchAgentStateMonitoringList({
+        tenantId: Number(tenantId),
+        campaignId: 0
+      });
+      if( statisticsUpdateCycle > 0 ){        
+        const tenantInterval = setInterval(() => {  
+          fetchAgentStateMonitoringList({
+            tenantId: Number(tenantId),
+            campaignId: 0
+          });
+        }, statisticsUpdateCycle * 1000);  
+        return () => clearInterval(tenantInterval);
+      }
+    }else if( campaignId === 0 && Number(tenantId) === 0 && campaigns.length > 0) {
+      fetchAgentStateMonitoringList({
+        tenantId: 0,
+        campaignId: 0
+      });
+      if( statisticsUpdateCycle > 0 ){        
+        const centerInterval = setInterval(() => {  
+          fetchAgentStateMonitoringList({
+            tenantId: 0,
+            campaignId: 0
+          });
+        }, statisticsUpdateCycle * 1000);  
+        return () => clearInterval(centerInterval);
+      }
     }
-  }, [campaignId,campaigns,statisticsUpdateCycle]);
+  }, [campaignId,tenantId,campaigns,statisticsUpdateCycle]);
 
   return (
     <div className="w-full h-full flex flex-col gap-4">
