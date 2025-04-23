@@ -378,11 +378,11 @@ function CampaignLayout() {
       return;
     }
   
-    // 발신번호가 없는 경우 알림
-    if (!selectedCallingNumber || selectedCallingNumber.trim() === '') {
-      showAlert('선택한 캠페인에 등록된 발신번호가 없습니다.');
-      return;
-    }
+    // 발신번호가 없는 경우 알림 ==> 삭제인데 발신번호 검사할필요가 없음
+    // if (!selectedCallingNumber || selectedCallingNumber.trim() === '') {
+    //   showAlert('선택한 캠페인에 등록된 발신번호가 없습니다.');
+    //   return;
+    // }
   
     // 삭제 확인 알림
     showConfirm(

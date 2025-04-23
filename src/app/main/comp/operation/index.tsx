@@ -33,7 +33,7 @@ export default function OperationBoard() {
     { id: 'section1', title: '캠페인별 발신번호 변경', component: CampaignLayout },
     { id: 'section2', title: '전화번호별 설명 편집', component: EditDescription },
     { id: 'section3', title: '예약콜 제한 설정', component: CallLimitSetting },
-    { id: 'section8', title: '콜백 리스트 초기화 시간 설정', component: SystemCallBackTimeSetting },
+    { id: 'section8', title: '콜백 리스트 초기화 시각 설정', component: SystemCallBackTimeSetting },
     { id: 'section4', title: '분배호수 제한 설정', component: DistributionLimit },
     { id: 'section5', title: '스킬편집', component: SkillEdit },
     // { id: 'section6', title: '상담 결과코드 설정', component: ConsultResultSetting },
