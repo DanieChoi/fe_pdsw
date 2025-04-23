@@ -55,6 +55,8 @@ export default function Footer({
   const { initSSE, closeSSE, getConnectionInfo } = useSSEStore();
 
   const lastProcessedMessageRef = useRef<string | null>(null);
+  const processedMessagesSet = useRef(new Set<string>());
+
 
   const debouncedInvalidate = useCallback(
     debounce(() => {
@@ -407,155 +409,195 @@ export default function Footer({
 
   }, [campaigns, fetchMain, useAlramPopup, debouncedInvalidate, tenant_id]);
 
-
-
   // SSE 구독
-  // 기존 SSE 연결 코드 제거하고 대신 이 코드로 대체
+  // useEffect(() => {
+  //   // 브라우저 환경인지 확인
+  //   if (typeof window !== 'undefined' && window.EventSource && id !== '') {
+  //     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+  //     console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
+  //     const eventSource = new EventSource(
+  //       `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
+  //     );
+
+  //     let data: any = {};
+  //     let announce = "";
+  //     let command = "";
+  //     let kind = "";
+  //     let campaign_id = "";
+
+  //     eventSource.addEventListener('message', (event) => {
+  //       console.log("footer sse event = ", event.data);
+
+  //       if (event.data !== "Connected!!") {
+  //         const tempEventData = JSON.parse(event.data);
+  //         if (
+  //           announce !== tempEventData["announce"] ||
+  //           !isEqual(data, tempEventData.data) ||
+  //           !isEqual(data, tempEventData["data"]) ||
+  //           kind !== tempEventData["kind"] ||
+  //           campaign_id !== tempEventData["campaign_id"]
+  //         ) {
+  //           announce = tempEventData["announce"];
+  //           command = tempEventData["command"];
+  //           data = tempEventData["data"];
+  //           kind = tempEventData["kind"];
+  //           campaign_id = tempEventData["campaign_id"];
+
+  //           footerDataSet(
+  //             tempEventData["announce"],
+  //             tempEventData["command"],
+  //             tempEventData["data"],
+  //             tempEventData["kind"],
+  //             tempEventData["campaign_id"],
+  //             tempEventData["skill_id"] || "", // skill_id 추가 (없을 경우 빈 문자열)
+  //             tempEventData // tempEventData는 7번째 매개변수로
+  //           );
+  //         }
+  //       }
+  //     });
+  //   }
+  // }, [id, tenant_id]);
+
+  // SSE 구독 - 훅 오류 수정
   useEffect(() => {
-    // SSE 메시지 이벤트 리스너 등록
-    const handleSSEMessage = (event: CustomEvent) => {
-      try {
+    console.log("🚀 [Footer] useEffect 실행 - SSE 리스너 설정");
+
+    // 스토어에서 값을 가져오기 (훅 호출 아님, 메서드 호출임)
+    const eventSource = useSSEStore.getState().eventSource;
+
+    // EventSource가 있는 경우 직접 이벤트 리스너 등록
+    if (eventSource) {
+      console.log("📡 [Footer] EventSource에 리스너 등록:",
+        (eventSource as any).url || '알 수 없는 URL');
+
+      // 메시지 핸들러 함수 정의
+      function messageHandler(event: MessageEvent) {
+        // 연결 확인 메시지는 무시
+        if (event.data === "Connected!!") return;
+
+        try {
+          const tempEventData = JSON.parse(event.data);
+
+          // 필수 필드 확인
+          if (!tempEventData.announce || !tempEventData.command) {
+            console.log("⚠️ 유효하지 않은 메시지 형식:", tempEventData);
+            return;
+          }
+
+          // 메시지 고유 ID 생성 (중복 방지용)
+          const messageId = `${tempEventData.announce}_${tempEventData.command}_${tempEventData.campaign_id || ''}_${JSON.stringify(tempEventData.data || {})}`;
+
+          // 이미 처리한 메시지는 스킵
+          if (processedMessagesSet.current.has(messageId)) {
+            console.log("🔄 중복 메시지 스킵:", messageId);
+            return;
+          }
+
+          // 메시지 ID 저장 (최대 100개까지 저장)
+          processedMessagesSet.current.add(messageId);
+          if (processedMessagesSet.current.size > 100) {
+            const firstItem = processedMessagesSet.current.values().next().value;
+            if (firstItem !== undefined) {
+              processedMessagesSet.current.delete(firstItem);
+            }
+          }
+
+          console.log("✅ 메시지 처리:", {
+            announce: tempEventData.announce,
+            command: tempEventData.command
+          });
+
+          // 메시지 처리
+          footerDataSet(
+            tempEventData.announce,
+            tempEventData.command,
+            tempEventData.data || {},
+            tempEventData.kind || '',
+            tempEventData.campaign_id || '',
+            tempEventData.skill_id || '',
+            tempEventData
+          );
+        } catch (error) {
+          console.error("🚨 메시지 파싱 오류:", error);
+        }
+      }
+
+      // 이벤트 리스너 등록
+      eventSource.addEventListener('message', messageHandler);
+
+      // 연결 상태 확인 함수 (훅 사용 없음)
+      function checkConnection() {
+        if (eventSource && eventSource.readyState === EventSource.CLOSED) {
+          console.log("🔌 SSE 연결이 끊겼습니다.");
+
+          // 재연결 시도는 스토어의 메서드를 통해 처리
+          // 여기서 훅을 직접 호출하면 안 됨
+        }
+      }
+
+      // 주기적으로 연결 상태 확인 (10초마다)
+      const connectionCheckInterval = setInterval(checkConnection, 10000);
+
+      // 컴포넌트 언마운트 시 이벤트 리스너와 인터벌 제거
+      return () => {
+        console.log("🧹 [Footer] 이벤트 리스너 정리");
+        eventSource.removeEventListener('message', messageHandler);
+        clearInterval(connectionCheckInterval);
+      };
+    } else {
+      // EventSource가 없는 경우, 커스텀 이벤트 사용
+      console.log("⚠️ [Footer] EventSource 없음, 커스텀 이벤트 리스너 등록");
+
+      // 커스텀 이벤트용 핸들러
+      function customEventHandler(event: CustomEvent) {
+        if (!event.detail) return;
+
         const tempEventData = event.detail;
 
-        // 중복 메시지 처리 방지
-        const { announce, command, data, kind, campaign_id, skill_id } = tempEventData;
-        const messageId = `${announce}_${command}_${campaign_id}_${skill_id}_${JSON.stringify(data)}`;
-
-        if (lastProcessedMessageRef.current === messageId) {
-          console.log("🔄 [중복 메시지 감지] 처리 건너뜀:", messageId);
+        // 필수 필드 확인
+        if (!tempEventData.announce || !tempEventData.command) {
+          console.log("⚠️ 유효하지 않은 커스텀 이벤트:", tempEventData);
           return;
         }
 
-        lastProcessedMessageRef.current = messageId;
+        // 메시지 고유 ID 생성 (중복 방지용)
+        const messageId = `${tempEventData.announce}_${tempEventData.command}_${tempEventData.campaign_id || ''}_${JSON.stringify(tempEventData.data || {})}`;
 
-        // 메시지 처리 로직 호출
+        // 이미 처리한 메시지는 스킵
+        if (processedMessagesSet.current.has(messageId)) {
+          console.log("🔄 중복 커스텀 이벤트 스킵:", messageId);
+          return;
+        }
+
+        // 메시지 ID 저장
+        processedMessagesSet.current.add(messageId);
+
+        console.log("✅ 커스텀 이벤트 처리:", {
+          announce: tempEventData.announce,
+          command: tempEventData.command
+        });
+
+        // 데이터 처리
         footerDataSet(
-          announce,
-          command,
-          data,
-          kind,
-          campaign_id,
-          skill_id || "",
+          tempEventData.announce,
+          tempEventData.command,
+          tempEventData.data || {},
+          tempEventData.kind || '',
+          tempEventData.campaign_id || '',
+          tempEventData.skill_id || '',
           tempEventData
         );
-      } catch (error) {
-        console.error("🚨 [SSE 메시지 처리 오류]", error);
-      }
-    };
-
-    // 이벤트 리스너 등록
-    window.addEventListener('sse-message', handleSSEMessage as EventListener);
-
-    // 컴포넌트 언마운트 시 이벤트 리스너 제거
-    return () => {
-      window.removeEventListener('sse-message', handleSSEMessage as EventListener);
-    };
-  }, [footerDataSet]);
-
-  // SSE 연결 상태 로깅 (선택 사항)
-  useEffect(() => {
-    const logConnectionInterval = setInterval(() => {
-      const connectionInfo = getConnectionInfo();
-      console.log("📊 [SSE 연결 상태]", {
-        연결됨: connectionInfo.isConnected,
-        URL: connectionInfo.url,
-        총연결횟수: connectionInfo.connectionCount,
-        메시지수신횟수: connectionInfo.messageCount,
-        마지막연결시간: connectionInfo.lastConnectedAt,
-      });
-    }, 60000); // 1분마다 로그
-
-    return () => {
-      clearInterval(logConnectionInterval);
-    };
-  }, [getConnectionInfo]);
-
-  const handleSSEMessage = (tempEventData: any) => {
-    try {
-      const { announce, command, data, kind, campaign_id, skill_id } = tempEventData;
-
-      const messageId = `${announce}_${command}_${campaign_id}_${skill_id}_${JSON.stringify(data)}`;
-
-      if (lastProcessedMessageRef.current === messageId) {
-        console.log("🔄 [중복 메시지 감지] 처리 건너뜀:", messageId);
-        return;
       }
 
-      lastProcessedMessageRef.current = messageId;
+      // 커스텀 이벤트 리스너 등록
+      window.addEventListener('sse-message', customEventHandler as EventListener);
 
-      footerDataSet(
-        announce,
-        command,
-        data,
-        kind,
-        campaign_id,
-        skill_id,
-        tempEventData
-      );
-    } catch (error) {
-      console.error("🚨 [SSE 메시지 처리 오류]", error);
+      // 언마운트 시 커스텀 이벤트 리스너 제거
+      return () => {
+        window.removeEventListener('sse-message', customEventHandler as EventListener);
+      };
     }
-  };
-
-  const logConnectionStatus = useCallback(() => {
-    const connectionInfo = getConnectionInfo();
-    console.log("📊 [SSE 연결 상태]", {
-      연결됨: connectionInfo.isConnected,
-      URL: connectionInfo.url,
-      총연결횟수: connectionInfo.connectionCount,
-      메시지수신횟수: connectionInfo.messageCount,
-      마지막연결시간: connectionInfo.lastConnectedAt,
-    });
-  }, [getConnectionInfo]);
-
-  // SSE 구독 코드 수정 (기존 useEffect 대체)
-  // src/components/Footer.tsx — 수정 후
-  // useEffect(() => {
-  //   if (
-  //     typeof window !== 'undefined' &&
-  //     window.EventSource &&
-  //     id !== '' &&
-  //     !(window as any).SSE_GLOBAL
-  //   ) {
-  //     const url = `/notification/${tenant_id}/subscribe/${id}`
-  //     if (sessionStorage.getItem('SSE_CONNECTED') === url) {
-  //       console.log(`♻️ [SSE] sessionStorage 중복 연결 방지: ${url}`)
-  //       return
-  //     }
-  //     console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`)
-  //     initSSE(id, tenant_id, handleSSEMessage)
-  //     setTimeout(() => {
-  //       logConnectionStatus()
-  //     }, 1000)
-  //     return () => {
-  //       console.log('🔌 [Footer 언마운트] SSE 연결 종료')
-  //       closeSSE()
-  //     }
-  //   }
-  // }, [id, tenant_id, initSSE, closeSSE, logConnectionStatus])
-
-  // SSE 구독 코드 수정 (기존 useEffect 대체)
-  // useEffect(() => {
-  //   if (
-  //     typeof window !== 'undefined' &&
-  //     window.EventSource &&
-  //     id !== '' &&
-  //     !(window as any).SSE_GLOBAL // ✅ 전역 SSE 없을 때만 실행
-  //   ) {
-  //     console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`);
-
-  //     initSSE(id, tenant_id, handleSSEMessage);
-
-  //     setTimeout(() => {
-  //       logConnectionStatus();
-  //     }, 1000);
-
-  //     return () => {
-  //       console.log("🔌 [Footer 컴포넌트 언마운트] SSE 연결 종료");
-  //       closeSSE();
-  //     };
-  //   }
-  // }, []);
+  }, []);
 
   const handleResizeStartInternal = () => {
     setIsResizing(true);

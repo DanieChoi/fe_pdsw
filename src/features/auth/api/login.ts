@@ -1,3 +1,4 @@
+
 // // features/auth/api/login.ts
 // import { LoginCredentials, LoginRequest, LoginResponse, LoginResponseFirst } from '../types/loginIndex';
 // import { axiosInstance, externalAxiosInstance } from '@/lib/axios';
@@ -6,6 +7,7 @@
 // import axios from 'axios';
 // import { toast } from 'react-toastify';
 // import { getRuntimeEnv } from '@/lib/getRuntimeEnv';
+// import { useSSEStore } from '@/store/useSSEStore';
 
 // export const loginApi = {
 //   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
@@ -17,9 +19,6 @@
 //         console.log("🚨 LOGIN_URL이 정의되지 않았습니다.");
 //         throw new Error('LOGIN_URL이 정의되지 않았습니다.');
 //       }
-
-//       // console.log("🌐 LOGIN_URL:", LOGIN_URL);
-//       // toast.success(`🚀 로그인 URL: ${LOGIN_URL}`);
 
 //       // 🔐 첫 번째 로그인 (외부 인증)
 //       const { data: dataFirst } = await externalAxiosInstance.get<LoginResponseFirst>(
@@ -50,11 +49,6 @@
 //         throw new Error(data.result_msg || '로그인 실패');
 //       }
 
-//       // 접근 권한 체크
-//       // if (!data.menu_role_id) {
-//       //   throw new Error('접근권한이 없습니다.');
-//       // }
-
 //       // 🌐 클라이언트 IP 조회
 //       const { data: dataSecond } = await axios.get<{ ip: string }>(
 //         `https://api.ipify.org?format=json`
@@ -80,11 +74,6 @@
 //       const expiredDate = new Date(currentDate.getTime() + data.expires_in); // 밀리세컨드 더하기
       
 //       data.expires_in = expiredDate.getTime(); // 만료일시를 밀리세컨드로 변환하여 저장
-      
-//       // 디버깅: 저장 후 스토어 상태 확인
-//       setTimeout(() => {
-//         // console.log("🟢 Current store state after setting (with timeout):", useStore.getState());
-//       }, 0);
 
 //       // 쿠키 설정
 //       Cookies.set('session_key', data.session_key, {
@@ -116,6 +105,33 @@
 //       };
 
 //       useStore.getState().setUserInfo(userInfo);
+
+//       // 🔄 SSE 연결 초기화 (이 부분이 추가됨)
+//       // 브라우저 환경에서만 실행
+//       if (typeof window !== 'undefined' && window.EventSource) {
+//         try {
+//           // SSE 연결을 처리할 핸들러 함수 - 실제 메시지 처리는 Footer에서 수행
+//           const sseMessageHandler = (eventData: any) => {
+//             // SSE 이벤트를 발생시켜 Footer 등의 컴포넌트에서 받아서 처리하도록 함
+//             const sseEvent = new CustomEvent('sse-message', { 
+//               detail: eventData 
+//             });
+//             window.dispatchEvent(sseEvent);
+//           };
+          
+//           // SSE 연결 초기화
+//           useSSEStore.getState().initSSE(
+//             dataFirst.id,
+//             String(data.tenant_id),
+//             sseMessageHandler
+//           );
+          
+//           console.log("🔌 로그인 성공 - SSE 연결 초기화됨");
+//         } catch (error) {
+//           console.error("🚨 SSE 초기화 오류:", error);
+//           // SSE 연결 실패는 로그인 실패로 취급하지 않음 - 사용자 경험을 위해
+//         }
+//       }
 
 //       return data;
 //     } catch (error: Error | unknown) {
@@ -233,20 +249,20 @@ export const loginApi = {
 
       useStore.getState().setUserInfo(userInfo);
 
-      // 🔄 SSE 연결 초기화 (이 부분이 추가됨)
+      // 🔄 SSE 연결 초기화 (Zustand 스토어 사용)
       // 브라우저 환경에서만 실행
       if (typeof window !== 'undefined' && window.EventSource) {
         try {
-          // SSE 연결을 처리할 핸들러 함수 - 실제 메시지 처리는 Footer에서 수행
+          // SSE 메시지 핸들러 함수
           const sseMessageHandler = (eventData: any) => {
-            // SSE 이벤트를 발생시켜 Footer 등의 컴포넌트에서 받아서 처리하도록 함
+            // CustomEvent를 발생시켜 Footer 등의 컴포넌트에서 처리할 수 있도록 함
             const sseEvent = new CustomEvent('sse-message', { 
               detail: eventData 
             });
             window.dispatchEvent(sseEvent);
           };
           
-          // SSE 연결 초기화
+          // useSSEStore의 initSSE 메서드 호출하여 SSE 연결 초기화
           useSSEStore.getState().initSSE(
             dataFirst.id,
             String(data.tenant_id),
