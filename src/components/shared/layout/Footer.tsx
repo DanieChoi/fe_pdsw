@@ -485,16 +485,16 @@ export default function Footer({
     }
   };
 
-  const logConnectionStatus = useCallback(() => {
-    const connectionInfo = getConnectionInfo();
-    console.log("📊 [SSE 연결 상태]", {
-      연결됨: connectionInfo.isConnected,
-      URL: connectionInfo.url,
-      총연결횟수: connectionInfo.connectionCount,
-      메시지수신횟수: connectionInfo.messageCount,
-      마지막연결시간: connectionInfo.lastConnectedAt,
-    });
-  }, [getConnectionInfo]);
+  // const logConnectionStatus = useCallback(() => {
+  //   const connectionInfo = getConnectionInfo();
+  //   console.log("📊 [SSE 연결 상태]", {
+  //     연결됨: connectionInfo.isConnected,
+  //     URL: connectionInfo.url,
+  //     총연결횟수: connectionInfo.connectionCount,
+  //     메시지수신횟수: connectionInfo.messageCount,
+  //     마지막연결시간: connectionInfo.lastConnectedAt,
+  //   });
+  // }, [getConnectionInfo]);
 
   // SSE 구독 코드 수정 (기존 useEffect 대체)
   // src/components/Footer.tsx — 수정 후
