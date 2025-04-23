@@ -5,6 +5,8 @@ import { NotificationSetup } from "@/app/_components/NotificationSetup";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSseStore } from "@/store/useSSEStore";
+import { useAuthStore } from "@/store";
 
 
 const queryClient = new QueryClient({
@@ -44,6 +46,17 @@ export default function ClientProvider({ children }: { children: React.ReactNode
       clearInterval(interval);
     }, 1000);
   }, []);
+
+  const start = useSseStore((s) => s.start);
+
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_API_URL ) {
+      const { id, tenant_id } = useAuthStore.getState();
+      const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+      const url = `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`;
+      start(url);
+    }
+  }, [start]);
 
   if (!isEnvLoaded) {
     return <div className="text-center py-10 text-sm text-gray-500">환경 설정 로딩 중...</div>;

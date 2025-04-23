@@ -13,6 +13,7 @@ import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useAp
 import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion"; // 꼭 상단 import 추가!
+import { useSseStore } from "@/store/useSSEStore";
 
 
 type FooterDataType = {
@@ -43,6 +44,10 @@ export default function Footer({
   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
   const [currentHeight, setCurrentHeight] = useState(footerHeight);
   const { id, tenant_id, role_id } = useAuthStore();
+
+  const lastMessage = useSseStore((s) => s.lastMessage);
+  const startSSE = useSseStore((s) => s.start);
+
   const { campaigns, setCampaigns } = useMainStore();
   const { useAlramPopup } = useEnvironmentStore();
   const [isResizing, setIsResizing] = useState(false);
@@ -406,55 +411,68 @@ export default function Footer({
   }, [campaigns, fetchMain, useAlramPopup, debouncedInvalidate, tenant_id]);
 
 
-  
+
   // SSE 구독
+  // useEffect(() => {
+  //   // 브라우저 환경인지 확인
+  //   if (typeof window !== 'undefined' && window.EventSource && id !== '') {
+  //     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+  //     console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
+  //     const eventSource = new EventSource(
+  //       `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
+  //     );
+
+  //     let data: any = {};
+  //     let announce = "";
+  //     let command = "";
+  //     let kind = "";
+  //     let campaign_id = "";
+
+  //     eventSource.addEventListener('message', (event) => {
+  //       console.log("footer sse event = ", event.data);
+
+  //       if (event.data !== "Connected!!") {
+  //         const tempEventData = JSON.parse(event.data);
+  //         if (
+  //           announce !== tempEventData["announce"] ||
+  //           !isEqual(data, tempEventData.data) ||
+  //           !isEqual(data, tempEventData["data"]) ||
+  //           kind !== tempEventData["kind"] ||
+  //           campaign_id !== tempEventData["campaign_id"]
+  //         ) {
+  //           announce = tempEventData["announce"];
+  //           command = tempEventData["command"];
+  //           data = tempEventData["data"];
+  //           kind = tempEventData["kind"];
+  //           campaign_id = tempEventData["campaign_id"];
+
+  //           footerDataSet(
+  //             tempEventData["announce"],
+  //             tempEventData["command"],
+  //             tempEventData["data"],
+  //             tempEventData["kind"],
+  //             tempEventData["campaign_id"],
+  //             tempEventData["skill_id"] || "", // skill_id 추가 (없을 경우 빈 문자열)
+  //             tempEventData // tempEventData는 7번째 매개변수로
+  //           );
+  //         }
+  //       }
+  //     });
+  //   }
+  // }, [id, tenant_id]);
+
   useEffect(() => {
-    // 브라우저 환경인지 확인
-    if (typeof window !== 'undefined' && window.EventSource && id !== '') {
-      const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-      console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
-      const eventSource = new EventSource(
-        `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
-      );
-
-      let data: any = {};
-      let announce = "";
-      let command = "";
-      let kind = "";
-      let campaign_id = "";
-
-      eventSource.addEventListener('message', (event) => {
-        console.log("footer sse event = ", event.data);
-
-        if (event.data !== "Connected!!") {
-          const tempEventData = JSON.parse(event.data);
-          if (
-            announce !== tempEventData["announce"] ||
-            !isEqual(data, tempEventData.data) ||
-            !isEqual(data, tempEventData["data"]) ||
-            kind !== tempEventData["kind"] ||
-            campaign_id !== tempEventData["campaign_id"]
-          ) {
-            announce = tempEventData["announce"];
-            command = tempEventData["command"];
-            data = tempEventData["data"];
-            kind = tempEventData["kind"];
-            campaign_id = tempEventData["campaign_id"];
-
-            footerDataSet(
-              tempEventData["announce"],
-              tempEventData["command"],
-              tempEventData["data"],
-              tempEventData["kind"],
-              tempEventData["campaign_id"],
-              tempEventData["skill_id"] || "", // skill_id 추가 (없을 경우 빈 문자열)
-              tempEventData // tempEventData는 7번째 매개변수로
-            );
-          }
-        }
-      });
+    if (process.env.NEXT_PUBLIC_API_URL && id !== "") {
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/notification/${tenant_id}/subscribe/${id}`;
+      startSSE(url);
     }
-  }, [id, tenant_id]);
+  }, [id, tenant_id, startSSE]);
+
+  // ▸ 메시지 도착 시 처리
+  useEffect(() => {
+    if (!lastMessage) return;
+    handleSSEMessage(lastMessage);     // 기존 로직 재사용
+  }, [lastMessage]);
 
   const handleSSEMessage = (tempEventData: any) => {
     try {
