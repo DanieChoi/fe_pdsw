@@ -11,7 +11,6 @@ import { useEnvironmentStore } from "@/store/environmentStore";
 import { toast, initToasts } from "./CustomToast";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
-import { useSSEStore } from "@/store/useSSEStore";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion"; // 꼭 상단 import 추가!
 
@@ -52,7 +51,6 @@ export default function Footer({
   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
 
-  const { initSSE } = useSSEStore();
 
   const lastProcessedMessageRef = useRef<string | null>(null);
 

@@ -7,7 +7,6 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { getRuntimeEnv } from '@/lib/getRuntimeEnv';
-import { useSSEStore } from '@/store/useSSEStore';
 
 export const loginApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
@@ -120,11 +119,6 @@ export const loginApi = {
           };
           
           // useSSEStore의 initSSE 메서드 호출하여 SSE 연결 초기화
-          useSSEStore.getState().initSSE(
-            dataFirst.id,
-            String(data.tenant_id),
-            sseMessageHandler
-          );
           
           console.log("🔌 로그인 성공 - SSE 연결 초기화됨");
         } catch (error) {

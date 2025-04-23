@@ -45,20 +45,12 @@ export default function ClientProvider({ children }: { children: React.ReactNode
     }, 1000);
   }, []);
 
-  // Only render the SSE connection manager when environment is loaded
-  const SSEManager = () => {
-    // Initialize the SSE singleton connection
-    return null; // This component doesn't render anything
-  };
-
   if (!isEnvLoaded) {
     return <div className="text-center py-10 text-sm text-gray-500">환경 설정 로딩 중...</div>;
   }
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Initialize the SSE connection */}
-      {/* <SSEManager /> */}
       
       {children}
 
