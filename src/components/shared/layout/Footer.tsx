@@ -52,7 +52,7 @@ export default function Footer({
   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
 
-  const { initSSE, closeSSE, getConnectionInfo } = useSSEStore();
+  const { initSSE } = useSSEStore();
 
   const lastProcessedMessageRef = useRef<string | null>(null);
 
