@@ -1,254 +1,141 @@
-
 'use client';
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-// 전역 싱글톤을 위한 브라우저 window 확장
-declare global {
-  interface Window {
-    __SSE_INSTANCE__?: {
-      eventSource: EventSource | null;
-      active: boolean;
-      userId: string | null;
-      tenantId: number | null;
-      initTimestamp: number; // 초기화 타임스탬프 추가
-    };
-  }
-}
-
-// 새로운 로컬 스토리지 이름 - 기존 값을 무시하기 위해
-const STORAGE_KEY = 'sse-storage-v2';
-
-// 애플리케이션 실행 시 로컬 스토리지 초기화
-if (typeof window !== 'undefined') {
-  // 기존 스토리지 키 삭제 (초기화 목적)
-  localStorage.removeItem('sse-storage');
-  
-  // 위의 초기화를 한번만 하기 위해 체크
-  if (!localStorage.getItem('sse-reset-done')) {
-    localStorage.setItem('sse-reset-done', 'true');
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      state: {
-        connectionCount: 0,
-        messageCount: 0
-      },
-      version: 0
-    }));
-  }
-}
-
-// 글로벌 상태 초기화
-if (typeof window !== 'undefined' && !window.__SSE_INSTANCE__) {
-  window.__SSE_INSTANCE__ = {
-    eventSource: null,
-    active: false,
-    userId: null,
-    tenantId: null,
-    initTimestamp: Date.now()
-  };
-}
-
 interface SSEState {
   isConnected: boolean;
+  url: string | null;
+  eventSource: EventSource | null;
+  lastConnectedAt: string | null;
   connectionCount: number;
   messageCount: number;
-  lastConnectedAt: string | null;
-  url: string | null;
-  connectionId: string;
   
+  // Methods
+  initSSE: (userId: string, tenantId: string, messageHandler: (data: any) => void) => void;
+  closeSSE: () => void;
   getConnectionInfo: () => {
     isConnected: boolean;
+    url: string | null;
     connectionCount: number;
     messageCount: number;
     lastConnectedAt: string | null;
-    url: string | null;
-    connectionId: string;
   };
-  
-  initSSE: (userId: string, tenantId: number, onMessage: (data: any) => void) => void;
-  closeSSE: () => void;
-  incrementMessageCount: () => void;
-  resetCounters: () => void;
 }
-
-const generateConnectionId = () => {
-  return Date.now().toString(36) + Math.random().toString(36).substring(2);
-};
 
 export const useSSEStore = create<SSEState>()(
   persist(
     (set, get) => ({
-      isConnected: typeof window !== 'undefined' ? !!window.__SSE_INSTANCE__?.active : false,
+      isConnected: false,
+      url: null,
+      eventSource: null,
+      lastConnectedAt: null,
       connectionCount: 0,
       messageCount: 0,
-      lastConnectedAt: null,
-      url: null,
-      connectionId: generateConnectionId(),
       
-      getConnectionInfo: () => ({
-        isConnected: typeof window !== 'undefined' ? !!window.__SSE_INSTANCE__?.active : false,
-        connectionCount: get().connectionCount,
-        messageCount: get().messageCount,
-        lastConnectedAt: get().lastConnectedAt,
-        url: get().url,
-        connectionId: get().connectionId,
-      }),
-      
-      resetCounters: () => {
-        set({
-          connectionCount: 0,
-          messageCount: 0
-        });
-      },
-      
-      initSSE: (userId, tenantId, onMessage) => {
-        // 브라우저 환경 확인
-        if (typeof window === 'undefined') return;
+      initSSE: (userId, tenantId, messageHandler) => {
+        // Close existing connection if any
+        const { closeSSE } = get();
+        closeSSE();
         
-        // 이미 전역 연결이 존재하는지 확인
-        if (
-          window.__SSE_INSTANCE__?.eventSource && 
-          window.__SSE_INSTANCE__?.active &&
-          window.__SSE_INSTANCE__?.userId === userId &&
-          window.__SSE_INSTANCE__?.tenantId === tenantId
-        ) {
-          console.log('🔵 [SSE 이미 연결되어 있음] 기존 연결 재사용, 연결 ID:', get().connectionId);
-          
-          // 연결 정보만 업데이트하고 반환
-          set({
-            isConnected: true,
-          });
-          
+        // Only run in browser environment
+        if (typeof window === 'undefined' || !window.EventSource) {
+          console.warn('SSE not supported in this environment');
           return;
         }
         
-        // 기존 전역 연결이 있으면 정리
-        if (window.__SSE_INSTANCE__?.eventSource) {
-          console.log('🔄 [SSE 재연결 시도] 이전 연결 종료');
-          window.__SSE_INSTANCE__.eventSource.close();
-          window.__SSE_INSTANCE__.eventSource = null;
-          window.__SSE_INSTANCE__.active = false;
-        }
-        
         try {
-          const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-          const url = `${DOMAIN}/notification/${tenantId}/subscribe/${userId}`;
+          // Connection URL
+          const url = `/notification/${tenantId}/subscribe/${userId}`;
           
-          console.log(`🔄 [SSE 연결 시도] URL: ${url}`);
-          
-          // 새 EventSource 생성
+          // Create new EventSource
           const eventSource = new EventSource(url);
           
-          // 전역 객체에 할당
-          window.__SSE_INSTANCE__ = {
-            eventSource,
-            active: false,
-            userId,
-            tenantId,
-            initTimestamp: Date.now()
-          };
-          
-          // 연결 성공 이벤트
+          // Set connected state on open
           eventSource.onopen = () => {
-            console.log('🟢 [SSE 연결 성공] 연결 ID:', get().connectionId);
+            console.log('🔌 [SSE] Connection established:', url);
+            set(state => ({
+              isConnected: true,
+              url,
+              eventSource,
+              lastConnectedAt: new Date().toISOString(),
+              connectionCount: state.connectionCount + 1
+            }));
             
-            if (window.__SSE_INSTANCE__) {
-              window.__SSE_INSTANCE__.active = true;
-            }
+            // Store connection info in sessionStorage to prevent duplicate connections
+            sessionStorage.setItem('SSE_CONNECTED', url);
             
-            // 새 페이지 로드에서 첫 번째 연결인 경우에만 카운트 증가
-            // 첫 연결이라면 connectionCount는 이미 0으로 초기화되어 있어야 함
-            if (get().connectionCount === 0) {
-              set((state) => ({
-                isConnected: true,
-                connectionCount: 1, // 카운트를 1로 설정 (0에서 증가)
-                lastConnectedAt: new Date().toISOString(),
-                url: url,
-              }));
-              console.log('📈 [SSE 연결 카운트] 첫 번째 연결 (카운트: 1)');
-            } else {
-              // 이미 카운트가 증가된 경우라면 다시 증가시키지 않음
-              set({
-                isConnected: true,
-                lastConnectedAt: new Date().toISOString(),
-                url: url,
-              });
-              console.log('📊 [SSE 연결 카운트] 유지 (카운트: ' + get().connectionCount + ')');
-            }
+            // Set global flag to prevent multiple connections
+            (window as any).SSE_GLOBAL = true;
           };
           
-          // 메시지 수신 이벤트
+          // Handle messages
           eventSource.addEventListener('message', (event) => {
-            // 초기 연결 메시지는 무시
-            if (event.data === 'Connected!!') {
-              console.log('✅ [SSE 초기 연결 확인] 연결 ID:', get().connectionId);
-              return;
-            }
-            
-            try {
-              const data = JSON.parse(event.data);
-              onMessage(data);
-              
-              // 메시지 카운터 증가
-              set((state) => ({
-                messageCount: state.messageCount + 1,
-              }));
-            } catch (error) {
-              console.error('❌ [SSE 메시지 파싱 오류]:', error);
+            if (event.data !== "Connected!!") {
+              try {
+                const data = JSON.parse(event.data);
+                messageHandler(data);
+                
+                // Update message count
+                set(state => ({ messageCount: state.messageCount + 1 }));
+              } catch (error) {
+                console.error('🚨 [SSE] Failed to parse message:', error);
+              }
             }
           });
           
-          // 에러 처리
+          // Handle errors
           eventSource.onerror = (error) => {
-            // console.error('🔴 [SSE 연결 오류] 연결 ID:', get().connectionId, error);
+            console.error('🚨 [SSE] Connection error:', error);
             
-            // 연결 상태 업데이트
-            if (window.__SSE_INSTANCE__) {
-              window.__SSE_INSTANCE__.active = false;
-            }
-            
-            set({ isConnected: false });
-            
-            // 3초 후 재연결 시도
-            setTimeout(() => {
-              console.log('🔄 [SSE 재연결 시도] 이전 연결 ID:', get().connectionId);
-              get().initSSE(userId, tenantId, onMessage);
-            }, 3000);
+            // We don't set isConnected to false here as the browser will try to reconnect automatically
+            // Only if we call closeSSE() explicitly should isConnected be set to false
           };
+          
+          // Set initial state
+          set({ 
+            eventSource,
+            url,
+            // Keep isConnected as false until onopen fires
+          });
+          
         } catch (error) {
-          console.error('❌ [SSE 초기화 오류]:', error);
-          if (window.__SSE_INSTANCE__) {
-            window.__SSE_INSTANCE__.active = false;
-          }
+          console.error('🚨 [SSE] Failed to initialize:', error);
+          set({ isConnected: false, url: null, eventSource: null });
         }
       },
       
       closeSSE: () => {
-        if (typeof window === 'undefined') return;
+        const { eventSource } = get();
         
-        if (window.__SSE_INSTANCE__?.eventSource) {
-          console.log('🔌 [SSE 연결 종료] 연결 ID:', get().connectionId);
-          window.__SSE_INSTANCE__.eventSource.close();
-          window.__SSE_INSTANCE__.eventSource = null;
-          window.__SSE_INSTANCE__.active = false;
-          set({ isConnected: false });
+        if (eventSource) {
+          console.log('🔌 [SSE] Closing connection');
+          eventSource.close();
+          
+          // Clear sessionStorage flag
+          sessionStorage.removeItem('SSE_CONNECTED');
+          
+          // Clear global flag
+          if (typeof window !== 'undefined') {
+            (window as any).SSE_GLOBAL = false;
+          }
         }
+        
+        set({ isConnected: false, eventSource: null });
       },
       
-      incrementMessageCount: () => {
-        set((state) => ({
-          messageCount: state.messageCount + 1,
-        }));
-      },
+      getConnectionInfo: () => {
+        const { isConnected, url, connectionCount, messageCount, lastConnectedAt } = get();
+        return { isConnected, url, connectionCount, messageCount, lastConnectedAt };
+      }
     }),
     {
-      name: STORAGE_KEY, // 새 스토리지 키 사용
+      name: 'sse-storage',
+      // Only persist these fields
       partialize: (state) => ({
         connectionCount: state.connectionCount,
         messageCount: state.messageCount,
         lastConnectedAt: state.lastConnectedAt,
-        connectionId: state.connectionId,
       }),
     }
   )

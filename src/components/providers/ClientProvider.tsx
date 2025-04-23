@@ -59,7 +59,7 @@ export default function ClientProvider({ children }: { children: React.ReactNode
   return (
     <QueryClientProvider client={queryClient}>
       {/* Initialize the SSE connection */}
-      <SSEManager />
+      {/* <SSEManager /> */}
       
       {children}
 
