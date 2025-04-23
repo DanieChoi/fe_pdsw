@@ -189,7 +189,9 @@ export const useSSEStore = create<SSEState>()(
               processedMessageIds.add(messageId);
               if (processedMessageIds.size > 500) {
                 const oldestId = processedMessageIds.values().next().value;
-                processedMessageIds.delete(oldestId);
+                if (oldestId !== undefined) {
+                  processedMessageIds.delete(oldestId);
+                }
               }
               
               // 상태 업데이트
