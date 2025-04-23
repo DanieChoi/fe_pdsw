@@ -29,6 +29,7 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { CommonButton } from "@/components/shared/CommonButton";
 import { CampaignInfo } from '@/app/main/comp/CreateCampaignFormPanel/variables/variablesForCreateCampaignForm';
+import { useEnvironmentStore } from "@/store/environmentStore";
 
 export interface TabItem {
   id: number;
@@ -291,6 +292,9 @@ export default function CampaignDetail() {
   });
   const router = useRouter();
   const { id, menu_role_id } = useAuthStore();
+  const { environmentData } = useEnvironmentStore();
+  const [ officeStartTime , setOfficeStartTime ] = useState<string>('0000');
+  const [ officeEndTime, setOfficeEndTime ] = useState<string>('0000');
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
@@ -842,6 +846,26 @@ export default function CampaignDetail() {
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
+    if( !saveErrorCheck && environmentData ){
+      if( !(officeStartTime === '0000' && officeEndTime === '0000')){
+        let timeCheck = false;
+        for( let i=0;i< tempCampaignSchedule.start_time.length ;i++ ){
+          if( officeStartTime > tempCampaignSchedule.start_time[i] || officeEndTime < tempCampaignSchedule.end_time[i] ){
+            timeCheck = true;
+          }
+        }
+        if( timeCheck ){
+          saveErrorCheck = true;
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: "설정된 발신 업무 시간에 맞지 않은 스케줄이 존재 합니다. 동작시간 탭의 시작 시간 또는 종료 시간을 변경해 주세요.",
+            type: '2',
+            onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+          });
+        }
+      }
+    }
     if( !saveErrorCheck ){      
       handleCampaignSaveExecute();
     }
@@ -978,6 +1002,13 @@ export default function CampaignDetail() {
     removeTab(Number(activeTabId),activeTabKey+'');
   };
 
+  useEffect(() => {
+    if( environmentData ){ 
+      setOfficeStartTime( environmentData.sendingWorkStartHours);
+      setOfficeEndTime( environmentData.sendingWorkEndHours);
+    }
+  }, [environmentData]);
+  
   useEffect(() => {
     if( campaigns ){
       setSelectedCampaign(campaigns.filter(data => data.campaign_id === Number(campaignIdForCopyCampaign))[0]);

@@ -26,6 +26,7 @@ import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { CommonButton } from "@/components/shared/CommonButton";
+import { useEnvironmentStore } from "@/store/environmentStore";
 
 export interface TabItem {
   id: number;
@@ -337,6 +338,9 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   const router = useRouter();
   const [tempCampaignId, setTempCampaignId] = useState<number>(0);
   const { id, menu_role_id, session_key, tenant_id } = useAuthStore();
+  const { environmentData } = useEnvironmentStore();
+  const [ officeStartTime , setOfficeStartTime ] = useState<string>('0000');
+  const [ officeEndTime, setOfficeEndTime ] = useState<string>('0000');
 
   //input data change
   const handleInputData = (value:any, col:string) => {
@@ -760,6 +764,26 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
+    if( !saveErrorCheck && environmentData ){
+      if( !(officeStartTime === '0000' && officeEndTime === '0000')){
+        let timeCheck = false;
+        for( let i=0;i< tempCampaignSchedule.start_time.length ;i++ ){
+          if( officeStartTime > tempCampaignSchedule.start_time[i] || officeEndTime < tempCampaignSchedule.end_time[i] ){
+            timeCheck = true;
+          }
+        }
+        if( timeCheck ){
+          saveErrorCheck = true;
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: "설정된 발신 업무 시간에 맞지 않은 스케줄이 존재 합니다. 동작시간 탭의 시작 시간 또는 종료 시간을 변경해 주세요.",
+            type: '2',
+            onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+          });
+        }
+      }
+    }
     if( !saveErrorCheck && newCampaignManagerInfo.campaign_id > 0 ){
       const checkCampaign = campaigns.filter(data => data.campaign_id === newCampaignManagerInfo.campaign_id);
       if( checkCampaign.length > 0 ){
@@ -891,6 +915,13 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
       setCampaignDialSpeedChangeYn(false);
     }
   });
+    
+  useEffect(() => {
+    if( environmentData ){ 
+      setOfficeStartTime( environmentData.sendingWorkStartHours);
+      setOfficeEndTime( environmentData.sendingWorkEndHours);
+    }
+  }, [environmentData]);
   
   useEffect(() => {
     if( id !== ''){        
