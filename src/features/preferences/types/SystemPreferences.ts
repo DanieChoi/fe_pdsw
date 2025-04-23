@@ -105,7 +105,7 @@ export interface CallLimitSettingCreateRequest {
   max_call: number;     // 예약콜 최대 건수
 
   daily_init_flag?: number; // 콜백캠페인 리스트 일별 초기화 여부 (0: 미사용, 1: 하루에 한 번씩 리스트 삭제)
-  daily_init_time?: string; // 리스트 초기화 시간 (형식: 24hhmi, 예: 0830)
+  daily_init_time?: string | null; // 리스트 초기화 시간 (형식: 24hhmi, 예: 0830)
 }
 
 

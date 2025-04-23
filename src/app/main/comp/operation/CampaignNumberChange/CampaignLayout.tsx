@@ -496,7 +496,7 @@ function CampaignLayout() {
 
           {/* 버튼 영역 */}
           <div className="flex justify-end gap-2 pt-4">
-            <CommonButton onClick={handleNew}>
+            <CommonButton onClick={() => setIsModalOpen(true)}>
               신규
             </CommonButton>
             <CommonButton onClick={handleSave}>
@@ -510,7 +510,7 @@ function CampaignLayout() {
           {/* 안내 텍스트 */}
           <div className="mt-[20px] text-sm">
             <ul className='space-y-1'>
-              <li>• 멤버십 별로 발신번호를 설정할 수 있습니다.</li>
+              <li>• 캠페인 별로 발신번호를 설정할 수 있습니다.</li>
               <li>• 발신번호를 설정하시려면 신규 버튼을 클릭해 주세요.</li>
             </ul>
             <p className='mt-[20px]'>※ 변경된 정보는 캠페인의 발신 작업이 재시작 시 반영됩니다.</p>

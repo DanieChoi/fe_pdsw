@@ -48,6 +48,7 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { campaignChannel } from '@/lib/broadcastChannel';
+import { useEnvironmentStore } from "@/store/environmentStore";
 
 export interface TabItem {
   id: number;
@@ -308,6 +309,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     type: '1',
   });
   const router = useRouter();
+  const { environmentData } = useEnvironmentStore();
+  const [ officeStartTime , setOfficeStartTime ] = useState<string>('0000');
+  const [ officeEndTime, setOfficeEndTime ] = useState<string>('0000');
 
   // 캠페인 정보 초기화 (campaignId, selectedCampaign, 관련 데이터가 변경될 때마다 실행)
   useEffect(() => {
@@ -882,6 +886,27 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         type: '2',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
+    }
+    
+    if( environmentData ){
+      if( !(officeStartTime === '0000' && officeEndTime === '0000')){
+        let timeCheck = false;
+        for( let i=0;i< tempCampaignSchedule.start_time.length ;i++ ){
+          if( officeStartTime > tempCampaignSchedule.start_time[i] || officeEndTime < tempCampaignSchedule.end_time[i] ){
+            timeCheck = true;
+          }
+        }
+        if( timeCheck ){
+          saveCheck = false;
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: "설정된 발신 업무 시간에 맞지 않은 스케줄이 존재 합니다. 동작시간 탭의 시작 시간 또는 종료 시간을 변경해 주세요.",
+            type: '2',
+            onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+          });
+        }
+      }
     }
     return saveCheck;
   };
@@ -1578,6 +1603,13 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     }, 50);
   };
 
+  useEffect(() => {
+    if( environmentData ){ 
+      setOfficeStartTime( environmentData.sendingWorkStartHours);
+      setOfficeEndTime( environmentData.sendingWorkEndHours);
+    }
+  }, [environmentData]);
+  
   return (
     <div className='flex flex-col gap-5 w-[58%]'>
       <div>

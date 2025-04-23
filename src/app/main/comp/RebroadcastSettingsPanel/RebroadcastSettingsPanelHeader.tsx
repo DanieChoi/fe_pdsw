@@ -115,7 +115,7 @@ const RebroadcastSettingsPanelHeader = ({
     }, [reservationShouldShowApply, reservationShouldShowAdd, reservationShouldShowDelete]);
 
     useEffect(() => {
-        if (campaigns && campaignId !== '0') {
+        if (campaigns && campaigns.length > 0 && campaignId !== '0') {
             setHeaderCampaignId(campaignId + '');
             const tempCampaign = campaigns.filter(data => Number(campaignId) === data.campaign_id);
             if (tempCampaign.length > 0) {
