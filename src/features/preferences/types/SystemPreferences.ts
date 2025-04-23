@@ -115,6 +115,21 @@ export interface CallLimitSettingDeleteRequest {
   tenant_id: number;
 }
 
+
+// 시스템 콜백 리스트 초기화 시간 데이터 타입
+export interface SystemCallBackTimeResponse {
+  result_code: number;
+  result_msg: string;
+  result_data: {use_flag: number, init_hour?: string;};
+}
+
+// 시스템 콜백 리스트 초기화 시간 수정 요청 타입
+export interface SystemCallBackTimeUpdateRequest {
+  init_flag: number; // 0: 미사용, 1: 사용
+  init_hour?: string; // "01" string 옵셔널값, init_flag가 1이면 보내야하고, 0이면 안보낸다
+}
+
+
 // 상담사 리스트
 export interface CounselorListCredentials {
   tenantId: number;

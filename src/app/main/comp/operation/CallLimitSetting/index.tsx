@@ -51,7 +51,7 @@ const CampaignSettings = () => {
   const [limitCount, setLimitCount] = useState('');
 
   const [dailyInitFlag, setDailyInitFlag] = useState(0); // ✅ 추가
-  const [dailyInitTime, setDailyInitTime] = useState("0000"); // ✅ 추가
+  const [dailyInitTime, setDailyInitTime] = useState<string | null>(null); // ✅ 추가
 
   const [limitSettings, setLimitSettings] = useState<LimitSettingItem[]>([]);
   const [isNewMode, setIsNewMode] = useState(false); // 신규 모드 상태 추가
@@ -242,7 +242,7 @@ const CampaignSettings = () => {
 
       // todo3: 
       setDailyInitFlag(updatedSetting.daily_init_flag ?? 0);
-      setDailyInitTime(updatedSetting.daily_init_time ?? "00:00");
+      setDailyInitTime(updatedSetting.daily_init_time ?? null);
 
 
     }
@@ -311,10 +311,12 @@ const CampaignSettings = () => {
       max_call: Number(limitCount),
     
       daily_init_flag: dailyInitFlag,
-      daily_init_time: dailyInitTime.replace(":", ""), // ✅ string으로 넘긴다!
+      daily_init_time: dailyInitTime !== null ? dailyInitTime.replace(":", "") : null,
     };
 
-    if (selectedRow && !isNewMode) { // selectRow 및 isNewMode 체크 추가
+    console.log('saveData', saveData);
+
+    if (selectedRow) { // selectRow 및 isNewMode 체크 추가
       if (selectedRow?.campaign_id !== null) {
         // 수정
         updateCallLimitSetting(saveData);
@@ -377,10 +379,18 @@ const CampaignSettings = () => {
 
   // 그리드 셀 클릭 시 호출되는 함수
   const handleCellClick = ({ row }: { row: Row }) => {
+    
     setSelectedRow(row);
     setCampaignId(row.campaign_id);
     setCampaignName(row.campaign_name);
     setLimitCount(row.limit_number);
+    setIsNewMode(true);
+    limitSettings.forEach((item) => {
+      if (item.campaign_id === Number(row.campaign_id)) {
+        setDailyInitFlag(item.daily_init_flag ?? 0); // ✅
+        setDailyInitTime(item.daily_init_time ?? null); // ✅
+      }
+    });
   };
 
   // 신규 버튼 클릭 시 호출되는 함수
@@ -400,6 +410,7 @@ const CampaignSettings = () => {
   const handleCampaignSelect = (id: string, name: string) => {
     setCampaignId(id);
     setCampaignName(name);
+    setIsNewMode(true);
     // 선택된 캠페인의 제한건수가 있는지 체크
     const matchingSetting = limitSettings.find(
       (item) => item.campaign_id === Number(id)
@@ -453,6 +464,7 @@ const CampaignSettings = () => {
     return selectedRow?.campaign_id === row.campaign_id &&
       selectedRow?.limit_number === row.limit_number ? 'bg-[#FFFAEE]' : '';
   };
+
 
   return (
     <div className="flex gap-8">
@@ -525,6 +537,7 @@ const CampaignSettings = () => {
                   value={0}
                   checked={dailyInitFlag === 0}
                   onChange={() => setDailyInitFlag(0)}
+                  disabled={isFieldDisabled()}
                 />
                 미사용
               </label>
@@ -535,19 +548,49 @@ const CampaignSettings = () => {
                   value={1}
                   checked={dailyInitFlag === 1}
                   onChange={() => setDailyInitFlag(1)}
+                  disabled={isFieldDisabled()}
                 />
-                하루 1회 초기화
+                사용
+              </label>
+            </div>
+          </div>
+
+          {/* 하루 1회 초기화 여부 */}
+          <div className="flex items-center gap-4">
+            <Label className="w-[5rem] min-w-[5rem]">하루 1회 초기화</Label>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-1">
+                <input
+                  type="radio"
+                  name="dailyInitTime"
+                  value={0}
+                  checked={dailyInitTime === null} // dailyInitTime이 null일 때 "미사용" 체크
+                  onChange={() => setDailyInitTime(null)} // "미사용" 선택 시 dailyInitTime을 null로 설정
+                  disabled={isFieldDisabled()} 
+                />
+                미사용
+              </label>
+              <label className="flex items-center gap-1">
+                <input
+                  type="radio"
+                  name="dailyInitTime"
+                  value={1}
+                  checked={dailyInitTime !== null} // dailyInitTime이 null이 아닐 때 "사용" 체크
+                  onChange={() => setDailyInitTime("0000")} // "사용" 선택 시 기본값 설정
+                  disabled={isFieldDisabled()}
+                />
+                사용
               </label>
             </div>
           </div>
 
           {/* 초기화 시각 입력 (dailyInitFlag === 1 일 때만 활성화) */}
           <div className="flex items-center gap-2">
-            <Label className="w-[5rem] min-w-[5rem]">시각</Label>
+            <Label className="w-[5rem] min-w-[5rem]">초기화 시각</Label>
             <CustomInputForTime
-              value={dailyInitTime}
+              value={dailyInitTime ?? " "}
               onChange={(value) => setDailyInitTime(value)}
-              disabled={dailyInitFlag !== 1}
+              disabled={dailyInitTime === null} // dailyInitTime이 null이 아닐 때 비활성화
               className="w-[120px]"
             />
 
@@ -570,7 +613,12 @@ const CampaignSettings = () => {
 
       <CampaignModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setDailyInitFlag(0); 
+          setDailyInitTime(null); 
+          setIsNewMode(false);
+        }}
         onSelect={handleCampaignSelect}
       />
 
