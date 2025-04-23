@@ -52,7 +52,7 @@ export default function Footer({
   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
 
-  const { initSSE, closeSSE, getConnectionInfo } = useSSEStore();
+  const { initSSE } = useSSEStore();
 
   const lastProcessedMessageRef = useRef<string | null>(null);
 
@@ -416,7 +416,7 @@ export default function Footer({
       const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
       console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
       const eventSource = new EventSource(
-        `/notification/${tenant_id}/subscribe/${id}`
+        `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
       );
 
       let data: any = {};
