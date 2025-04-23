@@ -393,7 +393,7 @@
 //   const { id, tenant_id, role_id } = useAuthStore();
 //   const { campaigns, setCampaigns } = useMainStore();
 //   const { useAlramPopup } = useEnvironmentStore();
-  
+
 //   // 향상된 SSE 스토어 사용
 //   const { 
 //     initSSE, 
@@ -557,13 +557,13 @@
 //     if (typeof window !== 'undefined' && window.EventSource && id !== '' && !sseInitializedRef.current) {
 //       // 초기 연결 상태 로깅
 //       console.log(`🔄 [SSE 연결 초기화] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`);
-      
+
 //       // SSE 연결 초기화 (Zustand 스토어를 통해)
 //       initSSE(id, tenant_id, handleSSEMessage);
-      
+
 //       // 초기화 완료 플래그 설정
 //       sseInitializedRef.current = true;
-      
+
 //       // 연결 직후 상태 로깅
 //       const timer = setTimeout(() => {
 //         logConnectionStatus();
@@ -592,7 +592,7 @@
 //     };
 
 //     window.addEventListener('beforeunload', handleBeforeUnload);
-    
+
 //     return () => {
 //       window.removeEventListener('beforeunload', handleBeforeUnload);
 //     };
@@ -769,15 +769,15 @@ export default function Footer({
   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
   const [currentHeight, setCurrentHeight] = useState(footerHeight);
   const [showDebugInfo, setShowDebugInfo] = useState(false); // 디버그 정보 표시 상태
-  const [debugInfo, setDebugInfo] = useState<{[key: string]: any}>({});
+  const [debugInfo, setDebugInfo] = useState<{ [key: string]: any }>({});
   const { id, tenant_id, role_id } = useAuthStore();
   const { campaigns, setCampaigns } = useMainStore();
   const { useAlramPopup } = useEnvironmentStore();
-  
+
   // 향상된 SSE 스토어 사용
-  const { 
-    initSSE, 
-    closeSSE, 
+  const {
+    initSSE,
+    closeSSE,
     getConnectionInfo,
     isConnected: sseConnected,
   } = useSSEStore();
@@ -800,13 +800,13 @@ export default function Footer({
 
   useEffect(() => {
     initToasts();
-    
+
     // 페이지 로드시 디버그 정보 업데이트
-    const isRefresh = document.visibilityState === 'visible' && 
-                     (PAGE_LOAD_TIME - (parseInt(localStorage.getItem('lastPageLoadTime') || '0')) < 3000);
-    
+    const isRefresh = document.visibilityState === 'visible' &&
+      (PAGE_LOAD_TIME - (parseInt(localStorage.getItem('lastPageLoadTime') || '0')) < 3000);
+
     localStorage.setItem('lastPageLoadTime', PAGE_LOAD_TIME.toString());
-    
+
     setDebugInfo(prev => ({
       ...prev,
       mountTime: new Date(mountTimeRef.current).toLocaleTimeString(),
@@ -859,15 +859,15 @@ export default function Footer({
   // 디버그 정보 업데이트
   const updateDebugInfo = useCallback(() => {
     const connectionInfo = getConnectionInfo();
-    
+
     setDebugInfo({
       connectionId: connectionInfo.connectionId || 'N/A',
       isConnected: connectionInfo.isConnected ? '연결됨' : '연결안됨',
       connectionCount: connectionInfo.connectionCount,
       messageCount: connectionInfo.messageCount,
-      lastConnectedAt: connectionInfo.lastConnectedAt 
-                      ? new Date(connectionInfo.lastConnectedAt).toLocaleString()
-                      : 'N/A',
+      lastConnectedAt: connectionInfo.lastConnectedAt
+        ? new Date(connectionInfo.lastConnectedAt).toLocaleString()
+        : 'N/A',
       mountTime: new Date(mountTimeRef.current).toLocaleString(),
       pageLoadTime: new Date(PAGE_LOAD_TIME).toLocaleString(),
       userId: id,
@@ -908,10 +908,10 @@ export default function Footer({
       마지막연결시간: connectionInfo.lastConnectedAt,
       연결ID: connectionInfo.connectionId
     });
-    
+
     // 디버그 정보도 업데이트
     updateDebugInfo();
-    
+
     return connectionInfo;
   }, [getConnectionInfo, updateDebugInfo]);
 
@@ -943,14 +943,14 @@ export default function Footer({
           tempEventData
         );
       }
-      
+
       // 디버그 정보 업데이트
       setDebugInfo(prev => ({
         ...prev,
         lastMessageReceived: new Date().toLocaleTimeString(),
         lastMessageType: announce
       }));
-      
+
     } catch (error) {
       console.error("🚨 [SSE 메시지 처리 오류]", error);
     }
@@ -979,7 +979,7 @@ export default function Footer({
       // 10초마다 연결 상태 로깅
       const statusInterval = setInterval(() => {
         const info = logConnectionStatus();
-        
+
         // 연결 상태가 변경되면 디버그 정보에 표시
         setDebugInfo(prev => ({
           ...prev,
@@ -1000,23 +1000,23 @@ export default function Footer({
     if (typeof window !== 'undefined' && window.EventSource && id !== '' && !sseInitializedRef.current) {
       // 초기 연결 상태 로깅
       console.log(`🔄 [SSE 연결 초기화] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`);
-      
-      const isRefresh = 
-        document.visibilityState === 'visible' && 
+
+      const isRefresh =
+        document.visibilityState === 'visible' &&
         (PAGE_LOAD_TIME - (parseInt(localStorage.getItem('lastPageLoadTime') || '0')) < 3000);
-      
+
       console.log(`🔍 [페이지 로드 유형] ${isRefresh ? '새로고침' : '최초 로드'}`);
-      
+
       // SSE 연결 초기화 (Zustand 스토어를 통해)
       initSSE(id, tenant_id, handleSSEMessage);
-      
+
       // 초기화 완료 플래그 설정
       sseInitializedRef.current = true;
-      
+
       // 연결 직후 상태 로깅
       const timer = setTimeout(() => {
         const info = logConnectionStatus();
-        
+
         // 디버그 정보 업데이트
         setDebugInfo(prev => ({
           ...prev,
@@ -1049,7 +1049,7 @@ export default function Footer({
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
-    
+
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
@@ -1060,7 +1060,7 @@ export default function Footer({
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         console.log('🔄 [페이지 가시성 변경] 페이지가 보이게 됨 - 새로고침 또는 탭 활성화');
-        
+
         // 디버그 정보 업데이트
         const connectionInfo = getConnectionInfo();
         setDebugInfo(prev => ({
@@ -1072,7 +1072,7 @@ export default function Footer({
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
@@ -1094,8 +1094,8 @@ export default function Footer({
 
   // SSE 연결 상태 표시
   const ConnectionStatusIndicator = () => (
-    <div 
-      className={`w-2 h-2 rounded-full mr-1 ${sseConnected ? 'bg-green-500' : 'bg-red-500'}`} 
+    <div
+      className={`w-2 h-2 rounded-full mr-1 ${sseConnected ? 'bg-green-500' : 'bg-red-500'}`}
       title={sseConnected ? "SSE 연결됨" : "SSE 연결 안됨"}
     />
   );
@@ -1126,10 +1126,10 @@ export default function Footer({
       onResizeStop={handleResizeStop}
     >
       {/* 상단 바 영역 */}
-      <div className="flex-none pt-[5px] pb-[4px] px-[20px] border-b bg-white flex justify-between items-center">
+      <div className="flex-none pt-[5px] pb-[4px] px-[10px] border-b bg-white flex justify-between items-center">
         <div className="flex items-center gap-1">
           <ConnectionStatusIndicator />
-          <span className="text-[13px] text-[#333]">현재 진행 상태 </span>
+          <span className="text-[13px] text-[#333]">현재 진행 상태</span>
           <span className="text-[12px] text-[#666] bg-gray-100 px-1 rounded">
             {footerDataList.length > 0 ? (
               <span className="text-[#666] bg-gray-100 px-1 rounded">
@@ -1141,16 +1141,19 @@ export default function Footer({
               </span>
             )}
           </span>
-          <button 
-            onClick={toggleDebugInfo} 
+
+        </div>
+
+        <div className="flex items-center gap-2">
+
+          <button
+            onClick={toggleDebugInfo}
             className="ml-2 text-blue-500 hover:text-blue-700"
             title="SSE 연결 디버그 정보"
           >
             <Info size={16} />
           </button>
-        </div>
 
-        <div className="flex items-center gap-2">
           {useAlramPopup === 1 ? (
             <>
               <span title="알림 활성화">
@@ -1186,7 +1189,7 @@ export default function Footer({
         <div className="bg-gray-100 p-2 text-xs border-b">
           <div className="flex justify-between mb-1">
             <h4 className="font-bold">SSE 연결 디버그 정보</h4>
-            <button 
+            <button
               className="text-blue-500 hover:text-blue-700"
               onClick={updateDebugInfo}
             >
