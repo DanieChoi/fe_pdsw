@@ -23,7 +23,9 @@ export function connectSSE(url: string, listener: OnMessage) {
   const handle = (e: MessageEvent) => {
     if (e.data?.type === 'sse') {
       try {
-        listener(JSON.parse(e.data.data));
+        if (e.data.data !== "Connected!!"){
+            listener(JSON.parse(e.data.data));
+        } 
       } catch (err) {
         console.error('JSON parse error', err);
       }
