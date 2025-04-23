@@ -63,15 +63,15 @@ const RebroadcastSettingsPanelHeader = ({
     , handleCheckListCount
 }: Props) => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
-    const { campaigns } = useMainStore();
+    const { campaigns, reBroadcastType, setReBroadcastType } = useMainStore();
     const { removeTab } = useTabStore();
 
     const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
     const [broadcastType, setBroadcastType] = useState("reservation");
     const [listCount, setListCount] = useState<number>(0);
-    const [shouldShowApply, setShouldShowApply] = useState<boolean>(false);    //적용 버튼.
-    const [shouldShowAdd, setShouldShowAdd] = useState<boolean>(false);        //추가 버튼.
-    const [shouldShowAddDelete, setShouldShowDelete] = useState<boolean>(false);    //삭제 버튼.
+    const [shouldShowApply, setShouldShowApply] = useState<boolean>(true);    //적용 버튼.
+    const [shouldShowAdd, setShouldShowAdd] = useState<boolean>(true);        //추가 버튼.
+    const [shouldShowAddDelete, setShouldShowDelete] = useState<boolean>(true);    //삭제 버튼.
 
     const [headerCampaignId, setHeaderCampaignId] = useState<string>('');
     const [realtime, setRealtime] = useState<boolean>(false);
@@ -93,8 +93,9 @@ const RebroadcastSettingsPanelHeader = ({
 
     //예약, 실시간 변경 이벤트.
     const handleBroadcastType = (value: string) => {
-        setBroadcastType(value);
-        handleBroadcastTypeChange(value);
+        // setBroadcastType(value);
+        // handleBroadcastTypeChange(value);
+        setReBroadcastType(value);
         if (value === 'realtime') {
             setShouldShowApply(true);
         } else {
@@ -109,9 +110,19 @@ const RebroadcastSettingsPanelHeader = ({
 
     //적용 버튼 
     useEffect(() => {
-        setShouldShowApply(reservationShouldShowApply);
-        setShouldShowAdd(reservationShouldShowAdd);
-        setShouldShowDelete(reservationShouldShowDelete);
+        // setShouldShowApply(reservationShouldShowApply);
+        // setShouldShowAdd(reservationShouldShowAdd);
+        // setShouldShowDelete(reservationShouldShowDelete);
+        
+        if (reBroadcastType === 'realtime' ) {
+            setShouldShowApply(true);
+            setShouldShowAdd(false);
+            setShouldShowDelete(false);
+        }else{            
+            setShouldShowApply(reservationShouldShowApply);
+            setShouldShowAdd(reservationShouldShowAdd);
+            setShouldShowDelete(reservationShouldShowDelete);
+        }
     }, [reservationShouldShowApply, reservationShouldShowAdd, reservationShouldShowDelete]);
 
     useEffect(() => {
@@ -130,6 +141,13 @@ const RebroadcastSettingsPanelHeader = ({
             // setListCount(campaigns.filter(data=>Number(campaignId) === data.campaign_id)[0].list_count);
         }
     }, [campaignId, campaigns]);
+
+    useEffect(() => {
+        if (reBroadcastType != '' ) {
+            setBroadcastType(reBroadcastType);
+            handleBroadcastTypeChange(reBroadcastType);
+        }
+    }, [reBroadcastType]);
 
     return (
         <div className="flex title-background justify-between">
@@ -156,7 +174,10 @@ const RebroadcastSettingsPanelHeader = ({
                     <CustomInput
                         className="w-[140px]"
                         disabled
-                        value={headerCampaignId === '' ? '' : campaigns.filter(data => Number(headerCampaignId) === data.campaign_id)[0].campaign_name || ''}
+                        value={headerCampaignId === '' ? '' 
+                            : campaigns ? campaigns.filter(data => Number(headerCampaignId) === data.campaign_id)[0].campaign_name || ''
+                            : ''
+                        }
                     />
                 </div>
                 <CommonRadio
