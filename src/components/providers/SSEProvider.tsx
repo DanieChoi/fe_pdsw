@@ -26,11 +26,11 @@ export default function SSEProvider({
      2)  Zustand 스토어에서 messageCount만 갱신
          (setState를 직접 호출해도 OK)
   -------------------------------------------------- */
-  const incrementMessageCount = useCallback(() => {
-    useSSEStore.setState((state) => ({
-      messageCount: state.messageCount + 1,
-    }));
-  }, []);
+  // const incrementMessageCount = useCallback(() => {
+  //   useSSEStore.setState((state) => ({
+  //     messageCount: state.messageCount + 1,
+  //   }));
+  // }, []);
 
   /* --------------------------------------------------
      3)  SSE 수신 콜백
@@ -46,12 +46,12 @@ export default function SSEProvider({
         );
 
         /* messageCount 1 증가 */
-        incrementMessageCount();
+        // incrementMessageCount();
       } catch (err) {
         console.error("🚨 [SSEProvider] JSON 파싱 실패:", err);
       }
     },
-    [incrementMessageCount],
+    [],
   );
 
   /* --------------------------------------------------
