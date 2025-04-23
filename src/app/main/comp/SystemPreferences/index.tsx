@@ -521,7 +521,7 @@ const SystemPreferences = () => {
                   onChange={(e) =>
                     handleModeChange(row.channelNumber, e.target.value)
                   }
-                  className="p-1 text-sm w-full h-full"
+                  className="p-1 text-sm w-full h-full bg-transparent focus:outline-none" // select 태그 투명하게해서 cell 스타일 적용하기
                   style={{
                     textAlign: "center",
                     padding: "0.25rem",
