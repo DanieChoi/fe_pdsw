@@ -78,11 +78,20 @@ const SystemCallBackTimeSetting = () => {
         '10시', '11시', '12시', '13시', '14시', '15시', '16시', '17시', '18시', '19시', '20시', '21시', '22시', '23시'];
 
     
-    // 콜백 리스트 초기화 시간 조회
+    // 콜백 리스트 초기화 시각 조회
     const { mutate: fetchSystemCallBackTime } = useApiForSystemCallBackTimeSetting({
         onSuccess: (data) => {
-            setSystemCallBackTimeData(data.result_data); // 시스템 콜백 리스트 초기화 시간 설정
-            setSelectSystemCallBackTime(data.result_data?.use_flag === 0 ? '미사용' : data.result_data.init_hour || ''); // 시스템 콜백 리스트 초기화 시간 설정
+
+            const { use_flag, init_hour } = data.result_data;
+
+            const formattedHour = use_flag === 0
+                ? '미사용'
+                : parseInt(init_hour ?? '0').toString() + '시'; // "0100" -> "1시"
+
+            setSystemCallBackTimeData(data.result_data);
+            setSelectSystemCallBackTime(formattedHour);
+            // setSystemCallBackTimeData(data.result_data); // 시스템 콜백 리스트 초기화 시간 설정
+            // setSelectSystemCallBackTime(data.result_data?.use_flag === 0 ? '미사용' : data.result_data.init_hour || ''); // 시스템 콜백 리스트 초기화 시간 설정
         },
         onError: (data) => {     
             if (data.message.split('||')[0] === '5') {
@@ -155,15 +164,17 @@ const SystemCallBackTimeSetting = () => {
             return;
         }
         // init_flag 값 설정
-        const init_flag = selectSystemCallBackTime === '미사용' ? 0 : 1;
+        const use_flag = selectSystemCallBackTime === '미사용' ? 0 : 1;
 
-        // selectSystemCallBackTime가 0시부터 09시까지는 "0"을 더해서 00, 01, 02, ... 형식으로 변환하고 0000, 0100, 1400, ... 형식으로 변환
-        const formattedTime = selectSystemCallBackTime === '미사용' ? '00' : selectSystemCallBackTime.replace('시', '').padStart(2, '0') + '00';
+        // selectSystemCallBackTime가 0시부터 9시까지는 "0"을 더해서 00, 01, 02, ... 형식으로 변환하고 10, 11.. 으론 그대로
+        const formattedTime = selectSystemCallBackTime === '미사용'
+            ? '00'
+            : `${selectSystemCallBackTime.replace('시', '').padStart(2, '0')}`;
         
         // 요청 데이터 생성
         const requestData: SystemCallBackTimeUpdateRequest = {
-            init_flag,
-            ...(init_flag === 1 && { init_hour: formattedTime }), // init_flag가 1일 때만 init_hour 포함
+            use_flag,
+            ...(use_flag === 1 && { init_hour: formattedTime }), // init_flag가 1일 때만 init_hour 포함
         };
         
         // console.log('Request Data:', requestData);
@@ -180,19 +191,14 @@ const SystemCallBackTimeSetting = () => {
     }; // end of handleSystemCallBackTimeSave
 
     
-
-
-    
-
-    
     return (
 
         <div className="flex gap-3">
             <div className="w-[580px]">
                 <div className='pt-3 flex items-center gap-3'>
-                <Label className="w-[15rem] min-w-[15rem]">콜백 리스트 초기화 시간 설정</Label>
+                <Label className="w-[15rem] min-w-[15rem]">콜백 리스트 초기화 시각 설정</Label>
                     <Select
-                    value={systemCallBackTimeData?.use_flag === 0 || selectSystemCallBackTime === '미사용' ? '미사용' : parseInt(selectSystemCallBackTime).toString() + "시" } // "01" -> "1시" 
+                    value={selectSystemCallBackTime} // "01" -> "1시" 
                     onValueChange={handleSystemCallBackTimeChange}
                     >
                         <SelectTrigger className="w-[140px]">

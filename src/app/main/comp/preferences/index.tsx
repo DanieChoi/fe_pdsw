@@ -492,7 +492,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   checked={unusedWorkHoursCalc}
                   onCheckedChange={(checked) => setUnusedWorkHoursCalc(checked as boolean)}
                 />
-                <Label htmlFor="worktime-enable" className="text-sm">업무시간 계산 미사용</Label>
+                <Label htmlFor="worktime-enable" className="text-sm">업무시간 제한 미사용</Label>
               </div>
             </div>
           </div>

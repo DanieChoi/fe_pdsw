@@ -24,13 +24,13 @@ export const SystemCallBackTimeSetting = async (): Promise<SystemCallBackTimeRes
 export const UpdateSystemCallBackTime = async (credentials: SystemCallBackTimeUpdateRequest): Promise<SuccesResponse> => {
     const requestData = {
         request_data: {
-            init_flag: credentials.init_flag,
-            ...(credentials.init_flag === 1 && { init_hour: credentials.init_hour }), // init_flag가 1일 때만 init_hour 포함
+            use_flag: credentials.use_flag,
+            ...(credentials.use_flag === 1 && { init_hour: credentials.init_hour }), // init_flag가 1일 때만 init_hour 포함
         }
     };
 
     try {
-        const { data } = await axiosInstance.post<SuccesResponse>(
+        const { data } = await axiosInstance.put<SuccesResponse>(
             '/callback-daily-init-time',
             requestData
         );
