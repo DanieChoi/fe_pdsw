@@ -504,14 +504,14 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                 </TableHeader>
                 <TableCell className="w-[17rem]">
                   <div className="flex items-center gap-2">
-                    <Label>시작시간</Label>
+                    <Label>시작시각</Label>
                     <CustomInputForTime
                       value={startTime}
                       onChange={(value) => setStartTime(value)}
                       className="w-16"
                       disabled={unusedWorkHoursCalc}
                     />
-                    <Label>종료시간</Label>
+                    <Label>종료시각</Label>
                     <CustomInputForTime
                       value={endTime}
                       onChange={(value) => setEndTime(value)}

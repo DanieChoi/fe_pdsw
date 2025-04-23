@@ -461,16 +461,11 @@ const RebroadcastSettingsGroupPanel = () => {
     useEffect(() => {
         if (rebroadcastRunIndex > -1) {
             if( rebroadcastRunIndex < tempCampaignsCount){
-                if( tempCampaigns[rebroadcastRunIndex].start_flag === 3){
-                    //4-1. 실시간 재발신 적용 - 리스트 건수가 0 보다 큰 경우 실행.
-                    fetchCampaignRedialPreviewSearch({
-                        campaign_id: Number(tempCampaigns[rebroadcastRunIndex].campaign_id),
-                        condition: MakeRedialPacket()
-                    });
-                }else{                    
-                    setFailCount(prevFailCount => prevFailCount + 1);
-                    setRebroadcastRunIndex(rebroadcastRunIndex + 1);
-                }
+                //4-1. 실시간 재발신 적용 - 리스트 건수가 0 보다 큰 경우 실행.
+                fetchCampaignRedialPreviewSearch({
+                    campaign_id: Number(tempCampaigns[rebroadcastRunIndex].campaign_id),
+                    condition: MakeRedialPacket()
+                });
             }else{ 
                 setAlertState({
                     isOpen: true,
@@ -874,8 +869,11 @@ const RebroadcastSettingsGroupPanel = () => {
                         condition: MakeRedialPacket()
                     });      
                  }else{ 
-                    setFailCount(prevFailCount => prevFailCount + 1);
-                    setRebroadcastRunIndex(rebroadcastRunIndex + 1);
+                    //4-3. 실시간 재발신 적용 -  대기리스트 건수가 있는 경우 캠페인 재발신 추출 api 호출 실행하여 재발신 추출한다.  
+                    fetchCampaignCurrentRedial({
+                        campaign_id: Number(campaignProgressInfo.campId),
+                        condition: MakeRedialPacket()
+                    });      
                  }
             }else{
                 setFailCount(prevFailCount => prevFailCount + 1);
@@ -1042,27 +1040,6 @@ const RebroadcastSettingsGroupPanel = () => {
         }
     });
     
-    //캠페인 실시간 적용 이벤트.  
-    const handleCampaignCurrentRedial = () => {
-        // fetchCampaignCurrentRedial({
-        //     campaign_id: Number(campaignIdForUpdateFromSideMenu),
-        //     condition: MakeRedialPacket()
-        // });
-        for( let i=0;i<tempCampaignsCount;i++){
-            if( tempCampaigns[i].start_flag === 1){
-                fetchCampaignCurrentRedial({
-                    campaign_id: tempCampaigns[i].campaign_id,
-                    condition: MakeRedialPacket()
-                });
-            }else{
-                fetchCampaignStatusUpdate({
-                    campaign_id: Number(tempCampaigns[i].campaign_id)
-                  , campaign_status: 1
-                });
-            }
-        }
-    };
-
     //실시간 리스트 건수 확인 버튼 클릭 이벤트.
     const handleCheckListCount = async () => {
         setCaseType(1);
