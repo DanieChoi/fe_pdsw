@@ -934,7 +934,7 @@ const RebroadcastSettingsPanel = () => {
                     - campaignProgressInfo.acct
                     - campaignProgressInfo.recallCnt;
                  if( waitlist > 0){
-                    //4-3. 실시간 재발신 적용 -  대기리스트 건수가 있는 경우 캠페인 재발신 추출 api 호출 실행하여 재발신 추출한다.
+                    //4-3. 실시간 재발신 적용 -  대기리스트 건수가 있는 경우 경고창 호출 후 캠페인 재발신 추출 api 호출 실행하여 재발신 추출한다.
                     setAlertState({
                         isOpen: true,
                         message: `현재 발신가능한 리스트가 남아있습니다. \n 그래도 재설정 하시겠습니까?`,
@@ -950,19 +950,16 @@ const RebroadcastSettingsPanel = () => {
                     });
 
                  }else{  
-                    setAlertState({
-                        isOpen: true,
-                        message: '적용할 대기리스트 건수가 없습니다.',
-                        title: '리스트 건수 확인',
-                        type: '2',
-                        onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
-                    });
+                    //4-3. 실시간 재발신 적용 -  대기리스트 건수가 없는 경우 캠페인 재발신 추출 api 호출 실행하여 재발신 추출한다.
+                    fetchCampaignCurrentRedial({
+                        campaign_id: Number(campaignId),
+                        condition: MakeRedialPacket()
+                    });   
                  }
             }else{
                 setAlertState({
                     isOpen: true,
-                    message: '적용할 대기리스트 건수가 없습니다.',
+                    message: '적용할 리스트 건수가 없습니다.',
                     title: '리스트 건수 확인',
                     type: '2',
                     onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),

@@ -7,7 +7,7 @@ import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-c
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import DataGrid, { Column as DataGridColumn } from 'react-data-grid';
 import { useApiForCallProgressStatus } from '@/features/monitoring/hooks/useApiForCallProgressStatus';
-import { useMainStore, useCampainManagerStore } from '@/store';
+import { useMainStore, useCampainManagerStore, useAuthStore } from '@/store';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useEnvironmentStore } from '@/store/environmentStore';
@@ -96,6 +96,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 }) => {
   const [internalSelectedCampaign, setInternalSelectedCampaign] = useState<string>('all');
   const { campaigns } = useMainStore();
+  const { tenant_id, session_key } = useAuthStore();
   const { campaignSkills, setCampaignSkills,phoneDescriptions, setPhoneDescriptions } = useCampainManagerStore();
   const [ _campaignData, _setCampaignData ] = useState<CampaignDataMap>({});
   const [ waitingCounselorCnt, setWaitingCounselorCnt ] = useState<number>(0);
@@ -286,22 +287,22 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-    if( value !== 'all'){
-      const campaignInfo = campaigns.find(data => data.campaign_id === Number(value));
-      const tenantId = campaignInfo?.tenant_id + '' || '1';
-      const campaignId = campaignInfo?.campaign_id + '' || '0';
-      fetchCallProgressStatus({ tenantId, campaignId });
-      if( statisticsUpdateCycle > 0 ){  
-        intervalRef.current = setInterval(() => {
-          fetchCallProgressStatus({ tenantId, campaignId });
-        }, statisticsUpdateCycle * 1000);     
-      }
-    }else{
-      fetchCallProgressStatus({
-        tenantId: '1',
-        campaignId: '0'
-      });
-    }
+    // if( value !== 'all'){
+    //   const campaignInfo = campaigns.find(data => data.campaign_id === Number(value));
+    //   const tenantId = campaignInfo?.tenant_id + '' || '1';
+    //   const campaignId = campaignInfo?.campaign_id + '' || '0';
+    //   fetchCallProgressStatus({ tenantId, campaignId });
+    //   if( statisticsUpdateCycle > 0 ){  
+    //     intervalRef.current = setInterval(() => {
+    //       fetchCallProgressStatus({ tenantId, campaignId });
+    //     }, statisticsUpdateCycle * 1000);     
+    //   }
+    // }else{
+    //   fetchCallProgressStatus({
+    //     tenantId: '1',
+    //     campaignId: '0'
+    //   });
+    // }
   };
 
   useEffect(() => {
@@ -427,6 +428,33 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       setCampaignSkills(data.result_data);
     }
   });
+
+  useEffect(() => {
+    if( selectedCampaign != 'all' ){
+      const campaignInfo = campaigns.find(data => data.campaign_id === Number(selectedCampaign));
+      const tenantId = campaignInfo?.tenant_id+'' || '1';
+      const campaignId = campaignInfo?.campaign_id+'' || '0';
+      fetchCallProgressStatus({ tenantId, campaignId });
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      if( statisticsUpdateCycle > 0 ){  
+        intervalRef.current = setInterval(() => {
+          fetchCallProgressStatus({ tenantId, campaignId });
+        }, statisticsUpdateCycle * 1000);     
+      }
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      };
+    }else{
+      fetchCallProgressStatus({
+        tenantId: tenant_id+'',
+        campaignId: '0'
+      });
+    }
+  }, [selectedCampaign,statisticsUpdateCycle]);
   
   useEffect(() => {
     if( externalCampaignId ){
@@ -454,22 +482,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   }, [externalCampaignId,statisticsUpdateCycle]);
 
   useEffect(() => {
-    if( externalCampaignId ){
-      const campaignInfo = campaigns.find(data => data.campaign_id === Number(externalCampaignId));
-      fetchCallProgressStatus({
-        tenantId: campaignInfo?.tenant_id+'' || '1',
-        campaignId: campaignInfo?.campaign_id+'' || '0'
-      });
-      setShouldRenderSelect(false);
-    }else{
-      setShouldRenderSelect(true);
-    }
-  }, [externalCampaignId]);
-
-  useEffect(() => {
     if( campaignSkills.length > 0 && phoneDescriptions.length > 0){
       fetchCallProgressStatus({
-        tenantId: '1',
+        tenantId: tenant_id+'',
         campaignId: '0'
       });
     }
@@ -479,15 +494,15 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     let count = 0;
     if( campaignSkills.length === 0){
       fetchCampaignSkills({
-        session_key: '',
-        tenant_id: 0,
+        session_key: session_key,
+        tenant_id: tenant_id,
       });
       count++;
     }
     if( phoneDescriptions.length === 0){
       fetchPhoneDescriptions({
-        session_key: '',
-        tenant_id: 0,
+        session_key: session_key,
+        tenant_id: tenant_id,
       });
       count++;
     }
