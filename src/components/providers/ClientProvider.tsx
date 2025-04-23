@@ -5,7 +5,7 @@ import { NotificationSetup } from "@/app/_components/NotificationSetup";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import useSSEConnection from "@/hooks/useSSEConnection";
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -48,7 +48,6 @@ export default function ClientProvider({ children }: { children: React.ReactNode
   // Only render the SSE connection manager when environment is loaded
   const SSEManager = () => {
     // Initialize the SSE singleton connection
-    useSSEConnection();
     return null; // This component doesn't render anything
   };
 
