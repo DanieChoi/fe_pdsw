@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { NotificationSetup } from "@/app/_components/NotificationSetup";
 import { NotificationListener } from "@/app/_components/NotificationListener";
-import { AppNotificationSetup } from "@/components/shared/CustomNoticePopUpForBrowser";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ToastContainer } from "react-toastify";
