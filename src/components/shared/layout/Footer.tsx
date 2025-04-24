@@ -410,11 +410,13 @@ export default function Footer({
   // SSE 구독
   useEffect(() => {
     // 브라우저 환경인지 확인
-    if (typeof window !== 'undefined' && window.EventSource && id !== '') {
+    const isConnected = sessionStorage.getItem("sse_connected");
+    if (typeof window !== 'undefined' && window.EventSource && id !== '' && !isConnected) {
       const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
       console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
       const eventSource = new EventSource(
-        `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`
+        // `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`  //로컬테스트시 사용..
+        `/notification/${tenant_id}/subscribe/${id}`  //개발
       );
 
       let data: any = {};
@@ -453,6 +455,7 @@ export default function Footer({
           }
         }
       });
+      sessionStorage.setItem("sse_connected", "true");
     }
   }, [id, tenant_id]);
 

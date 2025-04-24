@@ -287,22 +287,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-    // if( value !== 'all'){
-    //   const campaignInfo = campaigns.find(data => data.campaign_id === Number(value));
-    //   const tenantId = campaignInfo?.tenant_id + '' || '1';
-    //   const campaignId = campaignInfo?.campaign_id + '' || '0';
-    //   fetchCallProgressStatus({ tenantId, campaignId });
-    //   if( statisticsUpdateCycle > 0 ){  
-    //     intervalRef.current = setInterval(() => {
-    //       fetchCallProgressStatus({ tenantId, campaignId });
-    //     }, statisticsUpdateCycle * 1000);     
-    //   }
-    // }else{
-    //   fetchCallProgressStatus({
-    //     tenantId: '1',
-    //     campaignId: '0'
-    //   });
-    // }
   };
 
   useEffect(() => {
