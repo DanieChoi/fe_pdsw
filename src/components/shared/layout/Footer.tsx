@@ -408,13 +408,73 @@ export default function Footer({
 
   
   // SSE 구독
+  // useEffect(() => {
+  //   // 브라우저 환경인지 확인
+  //   const isConnected = sessionStorage.getItem("sse_connected");
+  //   if (typeof window !== 'undefined' && window.EventSource && id !== '' && !isConnected) {
+  //     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
+  //     console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
+  //     const eventSource = new EventSource(
+  //       // `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`  //로컬테스트시 사용..
+  //       `/notification/${tenant_id}/subscribe/${id}`  //개발
+  //     );
+
+  //     let data: any = {};
+  //     let announce = "";
+  //     let command = "";
+  //     let kind = "";
+  //     let campaign_id = "";
+
+  //     eventSource.addEventListener('message', (event) => {
+  //       console.log("footer sse event = ", event.data);
+
+  //       if (event.data !== "Connected!!") {
+  //         const tempEventData = JSON.parse(event.data);
+  //         if (
+  //           announce !== tempEventData["announce"] ||
+  //           !isEqual(data, tempEventData.data) ||
+  //           !isEqual(data, tempEventData["data"]) ||
+  //           kind !== tempEventData["kind"] ||
+  //           campaign_id !== tempEventData["campaign_id"]
+  //         ) {
+  //           announce = tempEventData["announce"];
+  //           command = tempEventData["command"];
+  //           data = tempEventData["data"];
+  //           kind = tempEventData["kind"];
+  //           campaign_id = tempEventData["campaign_id"];
+
+  //           footerDataSet(
+  //             tempEventData["announce"],
+  //             tempEventData["command"],
+  //             tempEventData["data"],
+  //             tempEventData["kind"],
+  //             tempEventData["campaign_id"],
+  //             tempEventData["skill_id"] || "", // skill_id 추가 (없을 경우 빈 문자열)
+  //             tempEventData // tempEventData는 7번째 매개변수로
+  //           );
+  //         }
+  //       }
+  //     });
+  //     eventSource.onerror = (err) => {
+  //       console.warn("SSE 에러 발생...", err);
+  //     };
+  //     sessionStorage.setItem("sse_connected", "true");
+  //   }
+  // }, [id, tenant_id]);
   useEffect(() => {
-    // 브라우저 환경인지 확인
-    const isConnected = sessionStorage.getItem("sse_connected");
-    if (typeof window !== 'undefined' && window.EventSource && id !== '' && !isConnected) {
+    let eventSource: EventSource | null = null;
+    let reconnectTimeout: NodeJS.Timeout | null = null;
+
+    const connectSSE = () => {
+      if (typeof window === 'undefined' || !window.EventSource || id === '') return;
+      const isConnected = sessionStorage.getItem("sse_connected");
+      if (isConnected) return;
+
       const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-      console.info(">>>>설정값: ", process.env.NEXT_PUBLIC_API_URL)
-      const eventSource = new EventSource(
+      console.info(">>>>설정값: ", DOMAIN);
+
+      // 도메인 사용 원할 시 수정
+      eventSource = new EventSource(
         // `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`  //로컬테스트시 사용..
         `/notification/${tenant_id}/subscribe/${id}`  //개발
       );
@@ -429,37 +489,57 @@ export default function Footer({
         console.log("footer sse event = ", event.data);
 
         if (event.data !== "Connected!!") {
-          const tempEventData = JSON.parse(event.data);
-          if (
-            announce !== tempEventData["announce"] ||
-            !isEqual(data, tempEventData.data) ||
-            !isEqual(data, tempEventData["data"]) ||
-            kind !== tempEventData["kind"] ||
-            campaign_id !== tempEventData["campaign_id"]
-          ) {
-            announce = tempEventData["announce"];
-            command = tempEventData["command"];
-            data = tempEventData["data"];
-            kind = tempEventData["kind"];
-            campaign_id = tempEventData["campaign_id"];
+          try {
+            const tempEventData = JSON.parse(event.data);
+            if (
+              announce !== tempEventData["announce"] ||
+              !isEqual(data, tempEventData["data"]) ||
+              kind !== tempEventData["kind"] ||
+              campaign_id !== tempEventData["campaign_id"]
+            ) {
+              announce = tempEventData["announce"];
+              command = tempEventData["command"];
+              data = tempEventData["data"];
+              kind = tempEventData["kind"];
+              campaign_id = tempEventData["campaign_id"];
 
-            footerDataSet(
-              tempEventData["announce"],
-              tempEventData["command"],
-              tempEventData["data"],
-              tempEventData["kind"],
-              tempEventData["campaign_id"],
-              tempEventData["skill_id"] || "", // skill_id 추가 (없을 경우 빈 문자열)
-              tempEventData // tempEventData는 7번째 매개변수로
-            );
+              footerDataSet(
+                announce,
+                command,
+                data,
+                kind,
+                campaign_id,
+                tempEventData["skill_id"] || "",
+                tempEventData
+              );
+            }
+          } catch (error) {
+            console.error("SSE JSON parse error: ", error);
           }
         }
       });
+
       eventSource.onerror = (err) => {
         console.warn("SSE 에러 발생...", err);
+        eventSource?.close();
+        sessionStorage.removeItem("sse_connected");
+
+        // 재접속 시도 (3초 후)
+        reconnectTimeout = setTimeout(() => {
+          connectSSE();
+        }, 3000);
       };
+
       sessionStorage.setItem("sse_connected", "true");
-    }
+    };
+
+    connectSSE();
+
+    return () => {
+      eventSource?.close();
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      sessionStorage.removeItem("sse_connected");
+    };
   }, [id, tenant_id]);
 
   const handleSSEMessage = (tempEventData: any) => {
