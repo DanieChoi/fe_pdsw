@@ -63,7 +63,7 @@ const RebroadcastSettingsPanelHeader = ({
     , handleCheckListCount
 }: Props) => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
-    const { campaigns } = useMainStore();
+    const { campaigns, reBroadcastType } = useMainStore();
     const { removeTab } = useTabStore();
 
     const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
@@ -166,7 +166,7 @@ const RebroadcastSettingsPanelHeader = ({
                     defaultValue="reservation"
                     className="flex gap-5"
                     onValueChange={(value) => handleBroadcastType(value)}
-                    value={broadcastType}
+                    value={reBroadcastType}
                     disabled={realtime}
                 >
                     <div className="flex items-center space-x-2">
@@ -181,7 +181,7 @@ const RebroadcastSettingsPanelHeader = ({
             </div>
 
             <div className="flex gap-2 items-center">
-                {broadcastType === 'reservation' && textType !== '' ?
+                {reBroadcastType === 'reservation' && textType !== '' ?
                     <div className="px-2 py-1 text-sm font-medium text-gray-700 bg-blue-100 border border-blue-200 rounded-md shadow-sm inline-flex items-center mr-[200px]">
                         {textType}
                     </div>
