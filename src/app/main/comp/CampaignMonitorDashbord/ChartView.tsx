@@ -164,11 +164,18 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
                   innerRadius={30}
                   outerRadius={70}
                   paddingAngle={0}
-                  label={({ value, x, y }) => (
-                    <text x={x} y={y} className="text-[10px]" textAnchor="middle">
-                      {`${value}%`}
-                    </text>
-                  )}
+                  label={({ value, x, y }) => {
+                    // 총합 계산
+                    const total = tempCallStatusData.reduce((sum, entry) => sum + entry.value, 0);
+                    // 비율 계산
+                    const percentage = total > 0 ? ((value / total) * 100).toFixed() : "0";
+              
+                    return (
+                      <text x={x} y={y} className="text-[10px]" textAnchor="middle">
+                        {`${percentage}%`}
+                      </text>
+                    );
+                  }}
                   dataKey="value"
                 >
                   {tempCallStatusData.map((entry, index) => (
@@ -196,11 +203,18 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
                   innerRadius={30}
                   outerRadius={70}
                   paddingAngle={0}
-                  label={({ value, x, y }) => (
-                    <text x={x} y={y} className="text-[10px]" textAnchor="middle">
-                      {`${value}%`}
-                    </text>
-                  )}
+                  label={({ value, x, y }) => {
+                    // 총합 계산
+                    const total = tempListStatusData.reduce((sum, entry) => sum + entry.value, 0);
+                    // 비율 계산
+                    const percentage = total > 0 ? ((value / total) * 100).toFixed() : "0";
+              
+                    return (
+                      <text x={x} y={y} className="text-[10px]" textAnchor="middle">
+                        {`${percentage}%`}
+                      </text>
+                    );
+                  }}
                   dataKey="value"
                 >
                   {tempListStatusData.map((entry, index) => (

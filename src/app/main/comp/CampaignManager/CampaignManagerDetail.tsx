@@ -489,7 +489,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       setTempCampaignSchedule(CampaignScheduleInfo);
     }
     // campaignId 추가하여 masterCampaignId 변경 시에도 재설정되도록 함
-  }, [campaignId, selectedCampaign, campaignSkills, callingNumbers, schedules]);
+  }, [campaignId, selectedCampaign, campaignSkills, callingNumbers, schedules, callingNumberChangeYn]);
 
   // input 데이터 변경
   const handleInputData = (value: any, col: string) => {
@@ -573,8 +573,19 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     setSkillPopupState((prev) => ({ ...prev, isOpen: false }));
   };
 
+  const showAlert = (message: string) => {
+    setAlertState({
+      isOpen: true,
+      message,
+      title: '알림',
+      type: '2',
+      onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+    });
+  };
+
   // 발신번호 팝업
   const handleCallingNumlber = (param: string) => {
+    
     if (inputCallingNumber !== param) {
       setCallingNumberChangeYn(true);
       setInputCallingNumber(param);
@@ -584,6 +595,41 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         calling_number: param
       });
     }
+    // 0424 발신번호 변경 api 추가
+
+    // 발신번호가 비어있는 경우
+    if (!param || param.trim().length === 0) {
+      showAlert('발신번호를 입력해주세요.');
+      return; // 여기서 바로 종료
+    }
+
+    // 발신번호가 숫자가 아닌 경우
+    const isNumber = /^[0-9]+$/.test(param);
+
+    if (!isNumber) {
+      showAlert('발신번호는 숫자로만 입력해주세요.');
+      return; // 여기서 바로 종료
+    }
+
+    // 발신번호가 이미 존재하는지 확인
+    const existingCallingNumber = callingNumbers.find(num => num.campaign_id === Number(campaignId));
+    const saveRequest = {
+      campaign_id: Number(campaignId),
+      calling_number: param,
+    };
+    
+    // 발신번호 처리 후, api 요청이 성공하면 팝업을 닫는다
+    
+    if (existingCallingNumber) {
+      fetchCallingNumberUpdate(saveRequest);
+      // showAlert은 mutate의 onSuccess에서 처리
+    } else {
+      fetchCallingNumberInsert(saveRequest);
+      // showAlert은 mutate의 onSuccess에서 처리
+    }
+    
+
+    // 발신번호가 유효하고, 처리 후 팝업을 닫을 때만 호출
     setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }));
   };
 
@@ -1381,6 +1427,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const { mutate: fetchCallingNumberUpdate } = useApiForCallingNumberUpdate({
     onSuccess: (data) => {
       setCallingNumberChangeYn(false);
+      fetchCallingNumbers({ session_key: '', tenant_id: 0 });
     }
   });
 

@@ -16,11 +16,14 @@ import {
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import CustomInputForTime from '@/components/shared/CustomInputForTime';
+import { useApiForSystemCallBackTimeSetting } from '@/features/preferences/hooks/useApiForSystemCallBackTimeSetting';
 
 interface Row {
   campaign_id: string;
   campaign_name: string;
   limit_number: string;
+  daily_init_flag : string,
+  daily_init_time : string
 }
 
 interface LimitSettingItem {
@@ -94,6 +97,19 @@ const CampaignSettings = () => {
 
   const closeAlert = () => {
     setAlertState(prev => ({ ...prev, isOpen: false }));
+  };
+
+
+  // 시간 변환 함수
+  const formatTime = (time: string | number | null | undefined): string => {
+    if (!time) return "미사용";
+  
+    const timeStr = time.toString().padStart(4, '0'); // '900' → '0900'
+  
+    const hours = timeStr.slice(0, 2);
+    const minutes = timeStr.slice(2, 4);
+  
+    return `${hours}:${minutes}`;
   };
 
   // 예약콜 제한건수 조회
@@ -234,7 +250,9 @@ const CampaignSettings = () => {
       setSelectedRow({
         campaign_id: updatedSetting.campaign_id.toString(),
         campaign_name: campaign?.campaign_name || '',
-        limit_number: updatedSetting.max_call.toString()
+        limit_number: updatedSetting.max_call.toString(),
+        daily_init_flag : updatedSetting.daily_init_flag === 1 ? "사용" : "미사용",
+        daily_init_time : updatedSetting.daily_init_time != null ? formatTime(updatedSetting.daily_init_time) : "미사용"
       });
 
       // 제한건수도 최신 데이터로 업데이트
@@ -248,10 +266,48 @@ const CampaignSettings = () => {
     }
   };
 
+  const [systemCallBackTimeData, setSystemCallBackTimeData] = useState<string>(); // response 시스템 콜백 리스트 초기화 시간 설정 데이터
+
+  // 콜백 리스트 초기화 시각 조회
+  const { mutate: fetchSystemCallBackTime } = useApiForSystemCallBackTimeSetting({
+    onSuccess: (data) => {
+
+        const { use_flag, init_hour } = data.result_data;
+
+        const formattedHour = use_flag === 0
+            ? '미사용'
+            : parseInt(init_hour ?? '0').toString() + '시'; // "0100" -> "1시"
+
+        setSystemCallBackTimeData(formattedHour);
+        
+        // setSystemCallBackTimeData(data.result_data); // 시스템 콜백 리스트 초기화 시간 설정
+        // setSelectSystemCallBackTime(data.result_data?.use_flag === 0 ? '미사용' : data.result_data.init_hour || ''); // 시스템 콜백 리스트 초기화 시간 설정
+    },
+    onError: (data) => {     
+        if (data.message.split('||')[0] === '5') {
+
+            setAlertState({
+                ...errorMessage,
+                isOpen: true,
+                message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                onConfirm: closeAlert,
+                onCancel: () => {}
+            });
+            Cookies.remove('session_key');
+            setTimeout(() => {
+                router.push('/login');
+            }, 1000);
+        } else {
+            showAlert(`조회 실패: ${data.message}`);
+        }
+    }
+  }); // end of useApiForSystemCallBackTimeSetting
+
   useEffect(() => {
     if (campaignId && !isNewMode) {
       updateSelectionAfterAPICall();
     }
+    fetchSystemCallBackTime();
   }, [limitSettings]);
 
   useEffect(() => {
@@ -260,12 +316,15 @@ const CampaignSettings = () => {
     });
     // 초기 로딩 시 신규 모드 비활성화
     setIsNewMode(false);
+    fetchSystemCallBackTime();
   }, [fetchCallLimitSettingList, tenants])
 
   const columns = useMemo(() => [
-    { key: 'campaign_id', name: '캠페인 아이디' },
-    { key: 'campaign_name', name: '캠페인 이름' },
-    { key: 'limit_number', name: '제한건수' }
+    { key: 'campaign_id', name: '캠페인 아이디' , width: 120 },
+    { key: 'campaign_name', name: '캠페인 이름' , width: 150},
+    { key: 'limit_number', name: '제한건수' , width: 120},
+    { key: 'daily_init_flag', name: '일별 초기화', width: 100 },
+    { key: 'daily_init_time', name: '마감 초기화 시각'}
   ], []);
 
   // 그리드에 표시할 데이터
@@ -277,7 +336,10 @@ const CampaignSettings = () => {
       return {
         campaign_id: setting.campaign_id.toString(),
         campaign_name: campaign?.campaign_name || '',
-        limit_number: setting.max_call.toString()
+        limit_number: setting.max_call.toString(),
+        daily_init_flag : setting.daily_init_flag === 1 ? "사용" : "미사용",
+        daily_init_time : setting.daily_init_time !== null ? formatTime(setting.daily_init_time) : "미사용"
+
       };
     }) || [] // 기본값으로 빈 배열 설정
     , [limitSettings, campaigns]);
@@ -297,11 +359,31 @@ const CampaignSettings = () => {
       return;
     }
 
-    // Convert time string (HH:MM) to numeric format (HHMM)
-    const timeToNumber = (timeStr: string): number => {
-      const [hours, minutes] = timeStr.split(':');
-      return parseInt(hours + minutes);
+    // systemCallBackTimeData
+
+    // let originTime = dailyInitTime !== null ? dailyInitTime.replace(":", "") : null;
+    /*
+    const convertToHHmm = (timeStr: string): string | null => {
+      if (timeStr === '미사용') return null;
+    
+      const match = timeStr.match(/^(\d{1,2})시$/);
+      if (match) {
+        const hour = match[1].padStart(2, '0');
+        return `${hour}00`;
+      }
+    
+      return null;
     };
+
+    const isBefore = (targetTime: string, compareTime: string): boolean => {
+      const target = convertToHHmm(targetTime);
+      if (!target) return false; // '미사용' 등 예외 처리
+    
+      return target < compareTime;
+    };
+    */
+    // ############ 시간 짜잉나
+
 
     const saveData = {
       campaign_id: Number(campaignId),
@@ -331,6 +413,8 @@ const CampaignSettings = () => {
     }
       
   };
+
+  
 
   // 삭제 버튼 클릭 시 호출되는 함수
   // 선택된 캠페인 아이디가 없을 경우 알림
@@ -422,7 +506,10 @@ const CampaignSettings = () => {
       setSelectedRow({
         campaign_id: id,
         campaign_name: name,
-        limit_number: limitStr
+        limit_number: limitStr,
+        daily_init_flag : matchingSetting.daily_init_flag === 1 ? "사용" : "미사용",
+        daily_init_time : matchingSetting.daily_init_time != null ? formatTime(matchingSetting.daily_init_time) : "미사용"
+        
       });
       setIsNewMode(false);
     } else {
@@ -465,6 +552,8 @@ const CampaignSettings = () => {
       selectedRow?.limit_number === row.limit_number ? 'bg-[#FFFAEE]' : '';
   };
 
+  
+
 
   return (
     <div className="flex gap-8">
@@ -482,6 +571,16 @@ const CampaignSettings = () => {
             rowClass={getRowClass}
             enableVirtualization={false}
           />
+        </div>
+
+        <div className="flex justify-end items-center pt-4">
+            <Label className="w-[10rem] min-w-[10rem] flex items-center gap-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#333]">콜백 리스트 초기화 시각</Label>
+            <CustomInput
+              value={systemCallBackTimeData}
+              readOnly
+              className="w-[80px]"
+              disabled={true}
+            />
         </div>
       </div>
 
@@ -527,12 +626,12 @@ const CampaignSettings = () => {
           </div>
 
           {/* 일별 초기화 사용 여부 */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 pt-1">
             <Label className="w-[5rem] min-w-[5rem]">일별 초기화</Label>
             <div className="flex items-center gap-4">
-              <label className="flex items-center gap-1">
+              <label className="flex items-center gap-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#333]">
                 <input
-                  type="radio"
+                  type="checkbox"
                   name="dailyInitFlag"
                   value={0}
                   checked={dailyInitFlag === 0}
@@ -541,9 +640,9 @@ const CampaignSettings = () => {
                 />
                 미사용
               </label>
-              <label className="flex items-center gap-1">
+              <label className="flex items-center gap-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#333]">
                 <input
-                  type="radio"
+                  type="checkbox"
                   name="dailyInitFlag"
                   value={1}
                   checked={dailyInitFlag === 1}
@@ -556,12 +655,12 @@ const CampaignSettings = () => {
           </div>
 
           {/* 하루 1회 초기화 여부 */}
-          <div className="flex items-center gap-4">
-            <Label className="w-[5rem] min-w-[5rem]">하루 1회 초기화</Label>
+          <div className="flex items-center gap-3 pt-1">
+            <Label className="w-[5rem] min-w-[5rem]">리스트 삭제 <br></br> 마감 초기화</Label>
             <div className="flex items-center gap-4">
-              <label className="flex items-center gap-1">
+              <label className="flex items-center gap-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#333]">
                 <input
-                  type="radio"
+                  type="checkbox"
                   name="dailyInitTime"
                   value={0}
                   checked={dailyInitTime === null} // dailyInitTime이 null일 때 "미사용" 체크
@@ -570,9 +669,9 @@ const CampaignSettings = () => {
                 />
                 미사용
               </label>
-              <label className="flex items-center gap-1">
+              <label className="flex items-center gap-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-[#333]">
                 <input
-                  type="radio"
+                  type="checkbox"
                   name="dailyInitTime"
                   value={1}
                   checked={dailyInitTime !== null} // dailyInitTime이 null이 아닐 때 "사용" 체크
@@ -585,8 +684,8 @@ const CampaignSettings = () => {
           </div>
 
           {/* 초기화 시각 입력 (dailyInitFlag === 1 일 때만 활성화) */}
-          <div className="flex items-center gap-2">
-            <Label className="w-[5rem] min-w-[5rem]">초기화 시각</Label>
+          <div className="flex items-center gap-2 pt-1">
+            <Label className="w-[5rem] min-w-[5rem]">리스트 마감 <br></br> 시각</Label>
             <CustomInputForTime
               value={dailyInitTime ?? " "}
               onChange={(value) => setDailyInitTime(value)}
@@ -606,6 +705,7 @@ const CampaignSettings = () => {
             <ul className='space-y-1'>
               <li>• 필요 이상의 예약콜/ 콜백에 대한 제한이 필요한 경우</li>
               <li>• 입력 받을 콜 수를 제한 할 수 있습니다.</li>
+              <li>• 리스트 마감 시각은 콜백 리스트 초기화 시각 전으로 설정하여야 합니다.</li>
             </ul>
           </div>
         </div>
