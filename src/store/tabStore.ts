@@ -554,7 +554,7 @@ export const useTabStore = create<TabLayoutStore>()(
               rows: state.rows.filter((r) => r.id !== rowId),
             };
           }),
-          
+
         // ------------------------
         // 섹션 추가/제거
         // ------------------------
@@ -579,95 +579,20 @@ export const useTabStore = create<TabLayoutStore>()(
             return { ...state, rows: updatedRows };
           }),
 
-        // removeSection: (rowId, sectionId) =>
-
         removeSection: (rowId, sectionId) =>
           set((state) => {
-            // Find the row containing the section
-            const row = state.rows.find(r => r.id === rowId);
-            if (!row) return state;
-            
-            // Find the section being removed
-            const sectionToRemove = row.sections.find(s => s.id === sectionId);
-            if (!sectionToRemove) return state;
-            
-            // Collect all tabs from the section being removed
-            const tabsToPreserve = [...sectionToRemove.tabs];
-            
-            // If no tabs to preserve, just remove the section
-            if (tabsToPreserve.length === 0) {
-              return {
-                ...state,
-                rows: state.rows.map(r => 
-                  r.id === rowId
-                    ? {
-                        ...r,
-                        sections: adjustSectionWidths(
-                          r.sections.filter(s => s.id !== sectionId)
-                        )
-                      }
-                    : r
-                )
-              };
-            }
-            
-            // Find another section in the same row to move tabs to
-            // Prefer the first section (often 'default')
-            const targetSection = row.sections.find(s => s.id !== sectionId);
-            if (!targetSection) return state;
-            
-            const updatedRows = state.rows.map(r => {
-              if (r.id !== rowId) return r;
-              
-              return {
-                ...r,
-                sections: adjustSectionWidths(
-                  r.sections
-                    .filter(s => s.id !== sectionId) // Remove the section
-                    .map(s => {
-                      // If this is the first remaining section, add the tabs from the removed section
-                      if (s.id === targetSection.id) {
-                        // Get the last tab to make it active
-                        const tabToActivate = tabsToPreserve[tabsToPreserve.length - 1];
-                        
-                        return {
-                          ...s,
-                          tabs: [...s.tabs, ...tabsToPreserve],
-                          // Make the last moved tab active
-                          activeTabKey: tabToActivate ? tabToActivate.uniqueKey : s.activeTabKey
-                        };
-                      }
-                      return s;
-                    })
-                )
-              };
-            });
-            
-            // Get the last tab to make it globally active
-            const lastTab = tabsToPreserve[tabsToPreserve.length - 1];
-            
-            return {
-              ...state,
-              rows: updatedRows,
-              // Update the global active tab if we have a tab to activate
-              activeTabId: lastTab ? lastTab.id : state.activeTabId,
-              activeTabKey: lastTab ? lastTab.uniqueKey : state.activeTabKey
-            };
+            const updatedRows = state.rows.map((row) =>
+              row.id === rowId
+                ? {
+                  ...row,
+                  sections: adjustSectionWidths(
+                    row.sections.filter((s) => s.id !== sectionId)
+                  ),
+                }
+                : row
+            );
+            return { ...state, rows: updatedRows };
           }),
-
-        //   set((state) => {
-        //     const updatedRows = state.rows.map((row) =>
-        //       row.id === rowId
-        //         ? {
-        //           ...row,
-        //           sections: adjustSectionWidths(
-        //             row.sections.filter((s) => s.id !== sectionId)
-        //           ),
-        //         }
-        //         : row
-        //     );
-        //     return { ...state, rows: updatedRows };
-        //   }),
 
         // ------------------------
         // 드래그앤드롭
