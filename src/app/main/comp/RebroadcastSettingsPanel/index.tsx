@@ -107,7 +107,7 @@ const initOutgoingResult = {
 
 const RebroadcastSettingsPanel = () => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
-    const { campaigns, reBroadcastType } = useMainStore();
+    const { campaigns, reBroadcastType, setReBroadcastType } = useMainStore();
     const { activeTabId, openedTabs,campaignIdForUpdateFromSideMenu } = useTabStore();
     const router = useRouter();
 
@@ -479,6 +479,7 @@ const RebroadcastSettingsPanel = () => {
 
     //예약, 실시간 변경 이벤트.
     const handleBroadcastTypeChange = (param:string) => {
+        setReBroadcastType(param);
         setBroadcastType(param);        
         resetAllStates();
         if( param === 'realtime' ){
@@ -499,7 +500,7 @@ const RebroadcastSettingsPanel = () => {
                 setSelectedRebroadcastId(rebroadcastList[0].id);
                 setListRedialQuery(rebroadcastList[0].redialCondition);
                 //발신결과 disabled 설정. 
-                // setOutgoingResultChecked(false);
+                setOutgoingResultChecked(false);
                 setOutgoingTypeChecked(false);
                 setOutgoingTimeChecked(false);
                 setOutgoingResultDisabled(true);   

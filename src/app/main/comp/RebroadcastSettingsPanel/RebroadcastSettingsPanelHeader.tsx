@@ -63,7 +63,7 @@ const RebroadcastSettingsPanelHeader = ({
     , handleCheckListCount
 }: Props) => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
-    const { campaigns, setReBroadcastType } = useMainStore();
+    const { campaigns } = useMainStore();
     const { removeTab } = useTabStore();
 
     const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
@@ -95,7 +95,6 @@ const RebroadcastSettingsPanelHeader = ({
     const handleBroadcastType = (value: string) => {
         setBroadcastType(value);
         handleBroadcastTypeChange(value);
-        setReBroadcastType(value);
         if (value === 'realtime') {
             setShouldShowApply(true);
         } else {

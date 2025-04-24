@@ -354,11 +354,11 @@ export default function Footer({
     else if (announce === '/pds/campaign/status') {
       if (command === 'UPDATE') {
         let _start_flag = '';
-        if (data['campaign_status'] === 1) {
+        if (data['campaign_status'] === '1') {
           _start_flag = '시작';
-        } else if (data['campaign_status'] === 2) {
+        } else if (data['campaign_status'] === '2') {
           _start_flag = '멈춤';
-        } else if (data['campaign_status'] === 3) {
+        } else if (data['campaign_status'] === '3') {
           _start_flag = '중지';
         }
 
@@ -473,11 +473,11 @@ export default function Footer({
       const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
       console.info(">>>>설정값: ", DOMAIN);
 
-      // 도메인 사용 원할 시 수정
-      eventSource = new EventSource(
-        // `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`  //로컬테스트시 사용..
-        `/notification/${tenant_id}/subscribe/${id}`  //개발
-      );
+      let dominUrl = `/notification/${tenant_id}/subscribe/${id}`;
+      if( window.location.hostname === 'localhost'){
+        dominUrl = `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`;
+      }
+      eventSource = new EventSource( dominUrl );
 
       let data: any = {};
       let announce = "";
@@ -520,7 +520,6 @@ export default function Footer({
       });
 
       eventSource.onerror = (err) => {
-        console.warn("SSE 에러 발생...", err);
         eventSource?.close();
         sessionStorage.removeItem("sse_connected");
 
