@@ -75,6 +75,12 @@ export default function TabSection({
     setScrolling(null);
   };
 
+  // 섹션 삭제 핸들러
+  const handleSectionRemove = () => {
+    // 섹션 삭제 전에 업데이트된 removeSection 함수 호출
+    removeSection(rowId, sectionId);
+  };
+
   // Now perform conditional checks after all hooks have been called
   const row = rows.find((r) => r.id === rowId);
   if (!row) return null;
@@ -164,7 +170,7 @@ export default function TabSection({
             variant="tabEtc"
             size="sm"
             className="flex-none flex items-center justify-center px-3"
-            onClick={() => removeSection(rowId, sectionId)}
+            onClick={handleSectionRemove}
           >
             <Image src="/header-menu/tab_minus.svg" alt="remove" width={8} height={8} />
           </CommonButton>

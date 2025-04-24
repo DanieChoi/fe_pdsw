@@ -579,20 +579,97 @@ export const useTabStore = create<TabLayoutStore>()(
             return { ...state, rows: updatedRows };
           }),
 
+        // removeSection: (rowId, sectionId) =>
+
         removeSection: (rowId, sectionId) =>
           set((state) => {
-            const updatedRows = state.rows.map((row) =>
-              row.id === rowId
+            const row = state.rows.find((r) => r.id === rowId);
+            if (!row) return state;
+        
+            // 지울 섹션 찾기
+            const sectionToRemove = row.sections.find((s) => s.id === sectionId);
+            if (!sectionToRemove) return state;
+        
+            // 첫번째 섹션 찾기 (대상 섹션)
+            const firstSection = row.sections.find((s) => s.id !== sectionId);
+            if (!firstSection) return state; // 섹션이 하나뿐이라면 삭제하지 않음
+        
+            // 현재 삭제할 섹션의 활성 탭이 있는지 확인
+            const hasActiveTab = sectionToRemove.activeTabKey !== null;
+            let lastMovedTabKey = null;
+        
+            // 삭제할 섹션의 모든 탭을 첫번째 섹션으로 이동
+            const updatedFirstSection = {
+              ...firstSection,
+              tabs: [...firstSection.tabs, ...sectionToRemove.tabs],
+              // 삭제할 섹션에 활성 탭이 있었다면 그 탭을 첫번째 섹션의 활성 탭으로 설정
+              // 아니면 첫번째 섹션의 원래 활성 탭 유지
+              activeTabKey: hasActiveTab 
+                ? sectionToRemove.activeTabKey 
+                : firstSection.activeTabKey
+            };
+        
+            // 만약 삭제할 섹션에 활성 탭이 있었다면 마지막으로 이동한 탭의 키 저장
+            if (hasActiveTab) {
+              lastMovedTabKey = sectionToRemove.activeTabKey;
+            } else if (sectionToRemove.tabs.length > 0) {
+              // 활성 탭이 없지만 탭은 있는 경우, 마지막 탭을 저장
+              lastMovedTabKey = sectionToRemove.tabs[sectionToRemove.tabs.length - 1].uniqueKey;
+            }
+        
+            const updatedSections = row.sections
+              .filter((s) => s.id !== sectionId)
+              .map((s) => (s.id === firstSection.id ? updatedFirstSection : s));
+        
+            // 섹션 너비 조정
+            const adjustedSections = adjustSectionWidths(updatedSections);
+        
+            // 전역 activeTab 업데이트 (삭제되는 섹션의 활성 탭이 있었을 경우)
+            const activeTab = hasActiveTab 
+              ? sectionToRemove.tabs.find(tab => tab.uniqueKey === sectionToRemove.activeTabKey)
+              : null;
+        
+            const updatedRows = state.rows.map((r) =>
+              r.id === rowId
                 ? {
-                  ...row,
-                  sections: adjustSectionWidths(
-                    row.sections.filter((s) => s.id !== sectionId)
-                  ),
-                }
-                : row
+                    ...r,
+                    sections: adjustedSections,
+                  }
+                : r
             );
-            return { ...state, rows: updatedRows };
+        
+            // 전역 활성 탭 업데이트
+            const newState = { ...state, rows: updatedRows };
+            
+            // 기존 전역 활성 탭이 삭제되는 섹션에 있었을 경우에만 업데이트
+            if (activeTab && state.activeTabKey === sectionToRemove.activeTabKey) {
+              newState.activeTabId = activeTab.id;
+              newState.activeTabKey = activeTab.uniqueKey;
+            } else if (lastMovedTabKey && !state.activeTabKey) {
+              // 전역 활성 탭이 없었던 경우, 이동된 탭 중 마지막 탭을 활성화
+              const lastTab = sectionToRemove.tabs.find(tab => tab.uniqueKey === lastMovedTabKey);
+              if (lastTab) {
+                newState.activeTabId = lastTab.id;
+                newState.activeTabKey = lastTab.uniqueKey;
+              }
+            }
+        
+            return newState;
           }),
+
+        //   set((state) => {
+        //     const updatedRows = state.rows.map((row) =>
+        //       row.id === rowId
+        //         ? {
+        //           ...row,
+        //           sections: adjustSectionWidths(
+        //             row.sections.filter((s) => s.id !== sectionId)
+        //           ),
+        //         }
+        //         : row
+        //     );
+        //     return { ...state, rows: updatedRows };
+        //   }),
 
         // ------------------------
         // 드래그앤드롭
