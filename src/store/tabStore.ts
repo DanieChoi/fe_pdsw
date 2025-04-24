@@ -150,6 +150,15 @@ export interface TabLayoutStore {
   // 운영설정용 오픈 sectionId 설정
   openOperationSectionId: string;
   setOpenOperationSectionId: (id: string) => void;
+
+  moveTabWithinSection: (
+    tabId: number,
+    tabKey: string,
+    rowId: string,
+    sectionId: string,
+    destinationIndex: number
+  ) => void;
+
 }
 
 const generateUniqueId = (prefix: string, existingIds: string[]) => {
@@ -1006,6 +1015,47 @@ export const useTabStore = create<TabLayoutStore>()(
               activeTabId: null,
               activeTabKey: null,
               openOperationSectionId: "section1" // 운영설정용 sectionId 초기화
+            };
+          }),
+
+        moveTabWithinSection: (
+          tabId: number,
+          tabKey: string,
+          rowId: string,
+          sectionId: string,
+          destinationIndex: number
+        ) =>
+          set((state) => {
+            const row = state.rows.find(r => r.id === rowId);
+            if (!row) return state;
+            const section = row.sections.find(s => s.id === sectionId);
+            if (!section) return state;
+
+            const tabIndex = section.tabs.findIndex(t => t.id === tabId && t.uniqueKey === tabKey);
+            if (tabIndex === -1) return state;
+
+            const newTabs = [...section.tabs];
+            const [movedTab] = newTabs.splice(tabIndex, 1);
+            newTabs.splice(destinationIndex, 0, movedTab);
+
+            const updatedRows = state.rows.map(r =>
+              r.id !== rowId
+                ? r
+                : {
+                  ...r,
+                  sections: r.sections.map(s =>
+                    s.id !== sectionId
+                      ? s
+                      : { ...s, tabs: newTabs, activeTabKey: tabKey }
+                  ),
+                }
+            );
+
+            return {
+              ...state,
+              rows: updatedRows,
+              activeTabId: tabId,
+              activeTabKey: tabKey,
             };
           }),
 

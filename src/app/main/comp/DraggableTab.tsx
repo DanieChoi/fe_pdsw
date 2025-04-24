@@ -2,7 +2,7 @@
 "use client";
 
 import React from "react";
-import { useDraggable } from "@dnd-kit/core";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { X } from "lucide-react";
 import Image from "next/image";
@@ -33,6 +33,7 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
   rowId,
   sectionId,
 }) => {
+  // Draggable
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: uniqueKey,
     data: {
@@ -44,19 +45,39 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
     },
   });
 
+  // Droppable 추가
+  const { setNodeRef: setDropRef, isOver } = useDroppable({
+    id: uniqueKey,
+    data: {
+      type: "tab",
+      id,
+      uniqueKey,
+      rowId,
+      sectionId,
+    },
+  });
+
+  // 드래그와 드롭 ref를 모두 연결
+  const combinedRef = (node: HTMLElement | null) => {
+    setNodeRef(node);
+    setDropRef(node);
+  };
+
   const style = {
     transform: CSS.Translate.toString(transform),
+    zIndex: isOver ? 10 : undefined,
   };
 
   return (
     <div
-      ref={setNodeRef}
+      ref={combinedRef}
       style={style}
       {...attributes}
       {...listeners}
       className={`
         flex items-center gap-2 px-3 py-1.5 h-[30px] drag-tab cursor-pointer
         ${isActive ? "bg-[#56CAD6] text-white" : "bg-white text-[#777]"}
+        ${isOver ? "ring-2 ring-blue-400" : ""}
       `}
       onClick={onSelect}
     >
@@ -79,9 +100,10 @@ const DraggableTab: React.FC<DraggableTabProps> = ({
         }}
         className={`
           p-0 min-w-[8px]
-          ${isActive ? "hover:bg-[transparent]" : "hover:bg-[transparent]"}`}
+          ${isActive ? "hover:bg-[transparent]" : "hover:bg-[transparent]"}
+        `}
       >
-      <Image
+        <Image
           src={isActive ? "/header-menu/maintap_colse_on.png" : "/header-menu/maintap_colse_off.png"}
           alt="닫기"
           width={8}
