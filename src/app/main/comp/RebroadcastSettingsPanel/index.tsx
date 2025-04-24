@@ -107,7 +107,7 @@ const initOutgoingResult = {
 
 const RebroadcastSettingsPanel = () => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
-    const { campaigns } = useMainStore();
+    const { campaigns, reBroadcastType } = useMainStore();
     const { activeTabId, openedTabs,campaignIdForUpdateFromSideMenu } = useTabStore();
     const router = useRouter();
 
@@ -499,7 +499,7 @@ const RebroadcastSettingsPanel = () => {
                 setSelectedRebroadcastId(rebroadcastList[0].id);
                 setListRedialQuery(rebroadcastList[0].redialCondition);
                 //발신결과 disabled 설정. 
-                setOutgoingResultChecked(false);
+                // setOutgoingResultChecked(false);
                 setOutgoingTypeChecked(false);
                 setOutgoingTimeChecked(false);
                 setOutgoingResultDisabled(true);   
@@ -889,12 +889,12 @@ const RebroadcastSettingsPanel = () => {
                 message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
                 type: '2',
                 onClose: () => goLogin(),
-              });
+              });       
             }else{
                 if( caseType === 1 ){     
                     setAlertState({
                         isOpen: true,
-                        message: '선택된 재발신 조건에 해당되는 리스트 수 : 0',
+                        message: '재발신 추출조건이 없습니다.',
                         title: '리스트 건수 확인',
                         type: '2',
                         onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
@@ -1064,6 +1064,12 @@ const RebroadcastSettingsPanel = () => {
     }
     }, [activeTabId, openedTabs]);
        
+    useEffect(() => {
+        if (reBroadcastType != '' ) {
+            handleBroadcastTypeChange(reBroadcastType);
+        }
+    }, [reBroadcastType]);
+
     return (
         <div className="limit-width">
             <div className="flex flex-col gap-6">
