@@ -343,7 +343,7 @@ export default function TabSection({
         >
           <Image src="/header-menu/rightArrow.svg" alt="right" width={8} height={8} />
         </CommonButton>
-
+          
         {/* Remove section - 높이를 동일하게 */}
         {canRemove && row.sections.length > 1 && (
           <CommonButton
