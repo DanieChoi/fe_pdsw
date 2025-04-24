@@ -1,6 +1,6 @@
-
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { useTabStore } from "@/store/tabStore";
+import { useDroppable } from "@dnd-kit/core";
 import PreferencesBoard from "./preferences";
 import SystemPreferences from "./SystemPreferences";
 import Campaignprogress from "./Campaignprogress";
@@ -27,135 +27,190 @@ import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCam
 import CampaignDeletePanel from "@/widgets/sidebar/pannels/CampaignDeletePanel";
 import CampaignGroupBulkUpdatePanel from "./CampaignGroupBulkUpdatePanel";
 
-// 탭 ID별 실제 화면을 매핑
-const renderContent = (tabId: number | null, campaignId?: string, campaignName?: string, params?: any) => {
+// Define the Tab interface
+interface Tab {
+  id: number;
+  uniqueKey: string;
+  campaignId?: string;
+  campaignName?: string;
+  params?: Record<string, any>;
+}
 
-  switch (tabId) {
-    case 1:
-      return <CampaignGroupManager
-        groupId={params?.groupId}
-        groupName={params?.groupName}
-      />;
-    case 2:
-      return <CampaignManager 
-        campaignId={params?.campaignId}
-      />;
-    case 3:
-      return <IntegratedMonitoringDashboard />;
-    case 4:
-      return <Campaignprogress />;
-    case 5:
-      return <OutboundCallProgressPanel />;
-    case 6:
-      return <ChannelMonitor />;
-    case 7:
-      return <ListManager />;
-    case 8:
-      return <OperationBoard />;
-    case 9:
-      return <OperationBoard />;
-    case 10:
-      return <SystemPreferences />;
-    case 11:
-      return <OperationBoard />;
-    case 12:
-      return <PreferencesBoard />;
-    case 13:
-      // 새 캠페인 입력용 패널
-      return <NewCampaignManager tenantId={params?.tenantId} />;
-    case 14:
-      return <StatusCampaign />;
-    case 20:
-      return <RebroadcastSettingsPanel />;
-    case 21:
-      return <CampaignMonitorDashbord campaignId={campaignId} />;
-    // case 22:
-    //   return <AgentStatusMonitoring campaignId={params?.campainId}/>;
-    case 22:
-      // 상담원 상태 모니터 
-      return (
-        <AgentStatusMonitoring
-          sessionKey={params?.sessionKey}
+// Define the Section interface
+interface Section {
+  id: string;
+  width: number;
+  activeTabKey: string | null;
+  tabs: Tab[];
+}
+
+// 개별 섹션 컴포넌트를 분리하여 훅 규칙 문제 해결
+const SectionContent = ({ 
+  section, 
+  rowId, 
+  tabIdToRender, 
+  campaignId, 
+  campaignName, 
+  params, 
+  width, 
+  activeTabId, 
+  activeTabKey, 
+  setActiveTab 
+}: {
+  section: Section;
+  rowId: string;
+  tabIdToRender: number | null;
+  campaignId?: string;
+  campaignName?: string;
+  params?: Record<string, any>;
+  width: number;
+  activeTabId: number | null;
+  activeTabKey: string | null;
+  setActiveTab: (id: number, uniqueKey: string) => void;
+}) => {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `content-drop-${rowId}-${section.id}`,
+    data: {
+      type: "content-area",
+      rowId,
+      sectionId: section.id
+    }
+  });
+
+  // 이 컴포넌트에서 렌더링할 콘텐츠
+  const renderContent = (tabId, campaignId, campaignName, params) => {
+    switch (tabId) {
+      case 1:
+        return <CampaignGroupManager
+          groupId={params?.groupId}
+          groupName={params?.groupName}
+        />;
+      case 2:
+        return <CampaignManager
           campaignId={params?.campaignId}
-          tenantId={params?.tenantId}
-        />
-      );
-    case 23:
-      return <SystemMonitoring />;
-    case 24:
-      return <RebroadcastSettingsGroupPanel />;
-    case 100:
-      return <>잘못된 스킬 할당 탭입니다.</>;
-    case 130: // 캠페인 복사 화면 리턴
-      return <CampaignClonePanel />;
-
-    case 131: // 캠페인 삭제 패널
-      return <CampaignDeletePanel campaignId={campaignId} campaignName={campaignName} />;
-
-    case 501:
-      return (
-        <div className="flex justify-left w-full">
-          <BlackListCountPopup />
-        </div>
-      );
-
-    case 600: // 상담사 스킬 할당 탭
-      return (
-        <div className="flex justify-left w-full">
-          <div className="max-w-[500px] w-full">
-            <SkillAssignmentTab />
+        />;
+      case 3:
+        return <IntegratedMonitoringDashboard />;
+      case 4:
+        return <Campaignprogress />;
+      case 5:
+        return <OutboundCallProgressPanel />;
+      case 6:
+        return <ChannelMonitor />;
+      case 7:
+        return <ListManager />;
+      case 8:
+        return <OperationBoard />;
+      case 9:
+        return <OperationBoard />;
+      case 10:
+        return <SystemPreferences />;
+      case 11:
+        return <OperationBoard />;
+      case 12:
+        return <PreferencesBoard />;
+      case 13:
+        return <NewCampaignManager tenantId={params?.tenantId} />;
+      case 14:
+        return <StatusCampaign />;
+      case 20:
+        return <RebroadcastSettingsPanel />;
+      case 21:
+        return <CampaignMonitorDashbord campaignId={campaignId} />;
+      case 22:
+        return (
+          <AgentStatusMonitoring
+            sessionKey={params?.sessionKey}
+            campaignId={params?.campaignId}
+            tenantId={params?.tenantId}
+          />
+        );
+      case 23:
+        return <SystemMonitoring />;
+      case 24:
+        return <RebroadcastSettingsGroupPanel />;
+      case 100:
+        return <>잘못된 스킬 할당 탭입니다.</>;
+      case 130:
+        return <CampaignClonePanel />;
+      case 131:
+        return <CampaignDeletePanel campaignId={campaignId} campaignName={campaignName} />;
+      case 501:
+        return (
+          <div className="flex justify-left w-full">
+            <BlackListCountPopup />
           </div>
-        </div>
-      );
-
-    case 601: // 팀 스킬 할당 탭
-      return (
-        <div className="flex justify-left w-full">
-          <div className="max-w-[530px] w-full">
-            <TeamSkillAssignmentTab />
+        );
+      case 600:
+        return (
+          <div className="flex justify-left w-full">
+            <div className="max-w-[500px] w-full">
+              <SkillAssignmentTab />
+            </div>
           </div>
-        </div>
-      );
-
-    case 602: // 그룹 스킬 할당 탭
-      return (
-        <div className="flex justify-left w-full">
-          <div className="max-w-[500px] w-full">
-            <GroupSkillAssignmentTab />
+        );
+      case 601:
+        return (
+          <div className="flex justify-left w-full">
+            <div className="max-w-[530px] w-full">
+              <TeamSkillAssignmentTab />
+            </div>
           </div>
-        </div>
-      );
-
-    case 603: // 스킬 옵션 설정 for 캠페인탭 필터
-      return (
-        <div className="flex justify-left w-full">
-          <div className="max-w-[500px] w-full">
-            <SkilFilterOptionPannelForCampaignTab />
+        );
+      case 602:
+        return (
+          <div className="flex justify-left w-full">
+            <div className="max-w-[500px] w-full">
+              <GroupSkillAssignmentTab />
+            </div>
           </div>
-        </div>
-      );
-
-    case 700:
-      return (
-        <div className="flex justify-left w-full">
-          <div className="max-w-[1000px] w-full">
-            {/* <CampaignGroupBulkUpdatePanel /> */}
-            <CampaignGroupBulkUpdatePanel
-              groupId={params?.groupId}
-              groupName={params?.groupName}
-            />
+        );
+      case 603:
+        return (
+          <div className="flex justify-left w-full">
+            <div className="max-w-[500px] w-full">
+              <SkilFilterOptionPannelForCampaignTab />
+            </div>
           </div>
-        </div>
-      )
+        );
+      case 700:
+        return (
+          <div className="flex justify-left w-full">
+            <div className="max-w-[1000px] w-full">
+              <CampaignGroupBulkUpdatePanel
+                groupId={params?.groupId}
+                groupName={params?.groupName}
+              />
+            </div>
+          </div>
+        );
+      default:
+        return (
+          <div className="flex items-center justify-center h-full text-gray-500">
+            탭을 선택!
+          </div>
+        );
+    }
+  };
 
-
-    default:
-      return (
-        <div className="flex items-center justify-center h-full text-gray-500">
-          탭을 선택!
-        </div>
-      );
-  }
+  return (
+    <div
+      ref={setNodeRef}
+      className={`overflow-auto transition-all duration-75 ease-out ${width < 100 ? 'p-2' : ''} ${isOver ? 'bg-blue-100 ring-1 ring-blue-300' : ''}`}
+      style={{
+        width: `${width}%`,
+        border: width < 100 ? '1px solid #bbb' : 'none'
+      }}
+      onClick={() => {
+        const activeTab = section.tabs.find(t => t.uniqueKey === section.activeTabKey);
+        if (activeTab) {
+          setActiveTab(activeTab.id, activeTab.uniqueKey);
+        }
+      }}
+    >
+      {renderContent(tabIdToRender, campaignId, campaignName, params)}
+    </div>
+  );
 };
 
 const TabContent = () => {
@@ -243,27 +298,25 @@ const TabContent = () => {
             const activeTab = section.tabs.find((t) => t.uniqueKey === activeKey);
             const isActiveGlobal = activeTabId === activeTab?.id && activeTabKey === activeTab?.uniqueKey;
             const tabIdToRender = isActiveGlobal ? activeTabId : activeTab?.id ?? null;
-            // 현재 활성화된 탭에서 campaignId 가져오기
             const campaignId = activeTab?.campaignId;
             const campaignName = activeTab?.campaignName;
-            const params = activeTab?.params; // params 추출 추가
+            const params = activeTab?.params;
 
             return (
               <React.Fragment key={section.id}>
-                <div
-                  className={`overflow-auto transition-all duration-75 ease-out ${sections.length === 2 ? 'p-2' : ''}`}
-                  style={{
-                    width: `${section.width}%`,
-                    border: sections.length === 2 ? '1px solid #bbb' : 'none'
-                  }}
-                  onClick={() => {
-                    if (activeTab) {
-                      setActiveTab(activeTab.id, activeTab.uniqueKey);
-                    }
-                  }}
-                >
-                  {renderContent(tabIdToRender, campaignId, campaignName, params)}
-                </div>
+                <SectionContent 
+                  section={section}
+                  rowId={row.id}
+                  tabIdToRender={tabIdToRender}
+                  campaignId={campaignId}
+                  campaignName={campaignName}
+                  params={params}
+                  width={section.width}
+                  activeTabId={activeTabId}
+                  activeTabKey={activeTabKey}
+                  setActiveTab={setActiveTab}
+                />
+                
                 {index === 0 && sections.length === 2 && (
                   <div
                     ref={dragRef}

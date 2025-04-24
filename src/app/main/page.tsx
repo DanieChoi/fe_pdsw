@@ -27,15 +27,16 @@ const MainPage = () => {
   const [activeTab, setActiveTab] = React.useState<ActiveTabState | null>(null);
 
   const {
-    rows,
-    openedTabs,
-    activeTabId,
-    activeTabKey,
-    moveTabToSection,
-    moveTabToGroup,
-    moveTabWithinSection,
-    setActiveTab: setGlobalActiveTab,
-  } = useTabStore();
+      rows,
+      openedTabs,
+      activeTabId,
+      activeTabKey,
+      moveTabToSection,
+      moveTabToGroup,
+      moveTabWithinSection,
+      setActiveTab: setGlobalActiveTab,
+      addSection,
+    } = useTabStore();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -64,11 +65,61 @@ const MainPage = () => {
     }
   };
 
+  // const handleDragEnd = (event: DragEndEvent) => {
+  //   const { active, over } = event;
+  //   if (!over) return;
+  
+  //   console.log("handleDragEnd fired", {
+  //     activeData: active.data.current,
+  //     activeId: active.id,
+  //     overId: over.id,
+  //     overData: over.data.current,
+  //     overType: over.data.current?.type,
+  //   });
+  
+  //   const isTab = active.data.current?.type === "tab";
+  //   if (!isTab) return;
+  
+  //   const tabId = active.data.current?.id;
+  //   const uniqueKey = active.data.current?.uniqueKey;
+  //   const overType = over.data.current?.type;
+  //   const activeRowId = active.data.current?.rowId;
+  //   const activeSectionId = active.data.current?.sectionId;
+  
+  //   // 새로운 Case: 탭을 콘텐츠 영역에 드롭
+  //   if (overType === "content-area") {
+  //     const targetRowId = over.data.current?.rowId;
+  //     const targetSectionId = over.data.current?.sectionId;
+      
+  //     // 현재 행에서 섹션 수 확인
+  //     const currentRow = rows.find(r => r.id === targetRowId);
+  //     if (currentRow && currentRow.sections.length < 2) {
+  //       // 새 섹션을 추가하고 탭 이동을 한번에 처리
+  //       useTabStore.getState().addSectionAndMoveTab(tabId, uniqueKey, targetRowId, activeSectionId);
+  //     } else if (activeRowId !== targetRowId || activeSectionId !== targetSectionId) {
+  //       // 이미 섹션이 2개라면 기존 섹션으로 이동 (같은 섹션이 아닌 경우에만)
+  //       moveTabToSection(tabId, targetRowId, targetSectionId, uniqueKey);
+  //     }
+  //   }
+    
+  //   // 기존 로직 유지
+  //   else if (overType === "tab") {
+  //     // 기존 탭 이동 로직...
+  //   } 
+  //   else if (overType === "section") {
+  //     // 기존 섹션 이동 로직...
+  //   } 
+  //   else if (overType === "group") {
+  //     // 기존 그룹 이동 로직...
+  //   }
+  
+  //   setActiveTab(null);
+  // };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
-
-    // 상세 로그 출력
+  
     console.log("handleDragEnd fired", {
       activeData: active.data.current,
       activeId: active.id,
@@ -76,32 +127,40 @@ const MainPage = () => {
       overData: over.data.current,
       overType: over.data.current?.type,
     });
-
+  
     const isTab = active.data.current?.type === "tab";
     if (!isTab) return;
-
+  
     const tabId = active.data.current?.id;
     const uniqueKey = active.data.current?.uniqueKey;
     const overType = over.data.current?.type;
     const activeRowId = active.data.current?.rowId;
     const activeSectionId = active.data.current?.sectionId;
-
-    // Case 1: 탭을 다른 탭 위에 드롭한 경우
-    if (overType === "tab") {
+  
+    // 새로운 Case: 탭을 콘텐츠 영역에 드롭
+    if (overType === "content-area") {
+      const targetRowId = over.data.current?.rowId;
+      const targetSectionId = over.data.current?.sectionId;
+      
+      // 현재 행에서 섹션 수 확인
+      const currentRow = rows.find(r => r.id === targetRowId);
+      if (currentRow && currentRow.sections.length < 2) {
+        // 새 섹션을 추가하고 탭 이동을 한번에 처리
+        useTabStore.getState().addSectionAndMoveTab(tabId, uniqueKey, targetRowId, activeSectionId);
+      } else if (activeRowId !== targetRowId || activeSectionId !== targetSectionId) {
+        // 이미 섹션이 2개라면 기존 섹션으로 이동 (같은 섹션이 아닌 경우에만)
+        moveTabToSection(tabId, targetRowId, targetSectionId, uniqueKey);
+      }
+    }
+    // 탭 위에 드롭한 경우
+    else if (overType === "tab") {
       const overRowId = over.data.current?.rowId;
       const overSectionId = over.data.current?.sectionId;
       const targetTabId = over.data.current?.id;
       const targetUniqueKey = over.data.current?.uniqueKey;
-
-      // 같은 섹션 내에서의 드래그 (기존 로직)
+  
+      // 같은 섹션 내에서의 드래그
       if (activeRowId === overRowId && activeSectionId === overSectionId) {
-        console.log("Tab order change within same section detected:", {
-          sourceTab: { tabId, uniqueKey },
-          targetTab: { targetTabId, targetUniqueKey },
-          rowId: activeRowId,
-          sectionId: activeSectionId
-        });
-
         const row = rows.find(r => r.id === activeRowId);
         const section = row?.sections.find(s => s.id === activeSectionId);
         
@@ -116,17 +175,8 @@ const MainPage = () => {
         const targetIndex = section.tabs.findIndex(
           t => t.id === targetTabId && t.uniqueKey === targetUniqueKey
         );
-
-        console.log("Tab positions:", { sourceIndex, targetIndex });
-
-        if (
-          typeof sourceIndex === "number" &&
-          typeof targetIndex === "number" &&
-          sourceIndex !== -1 &&
-          targetIndex !== -1 &&
-          sourceIndex !== targetIndex
-        ) {
-          console.log(`Moving tab from index ${sourceIndex} to ${targetIndex}`);
+  
+        if (sourceIndex !== -1 && targetIndex !== -1 && sourceIndex !== targetIndex) {
           moveTabWithinSection(
             tabId,
             uniqueKey,
@@ -136,34 +186,24 @@ const MainPage = () => {
           );
         }
       } 
-      // 서로 다른 섹션 간의 드래그 (새로운 기능)
-      else {
-        console.log("Cross-section tab drop detected:", {
-          sourceTab: { tabId, uniqueKey, rowId: activeRowId, sectionId: activeSectionId },
-          targetTab: { targetTabId, targetUniqueKey, rowId: overRowId, sectionId: overSectionId }
-        });
-        
-        // 다른 섹션으로 탭 이동
-        if (overRowId && overSectionId) {
-          console.log(`Moving tab to section ${overSectionId} in row ${overRowId}`);
-          moveTabToSection(tabId, overRowId, overSectionId, uniqueKey);
-        }
+      // 서로 다른 섹션 간의 드래그
+      else if (overRowId && overSectionId) {
+        moveTabToSection(tabId, overRowId, overSectionId, uniqueKey);
       }
-    } 
-    // Case 2: 섹션에 직접 드롭된 경우 (기존 로직)
+    }
+    // 섹션에 직접 드롭된 경우
     else if (overType === "section") {
       const targetRowId = over.data.current?.rowId;
       const targetSectionId = over.data.current?.sectionId;
       if (targetRowId && targetSectionId) {
-        console.log(`Moving tab to section ${targetSectionId} in row ${targetRowId}`);
         moveTabToSection(tabId, targetRowId, targetSectionId, uniqueKey);
       }
-    } 
-    // Case 3: 그룹에 드롭된 경우 (기존 로직)
+    }
+    // 그룹에 드롭된 경우
     else if (overType === "group") {
       moveTabToGroup(tabId, over.data.current?.id);
     }
-
+  
     setActiveTab(null);
   };
 

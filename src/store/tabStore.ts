@@ -159,7 +159,14 @@ export interface TabLayoutStore {
     destinationIndex: number
   ) => void;
 
-}
+  addSectionAndMoveTab: (
+    tabId: number,
+    tabKey: string,
+    rowId: string,
+    sectionId: string
+  )
+    => void;
+};   
 
 const generateUniqueId = (prefix: string, existingIds: string[]) => {
   let counter = 1;
@@ -1225,6 +1232,94 @@ export const useTabStore = create<TabLayoutStore>()(
             });
         },
 
+        addSectionAndMoveTab: (
+          tabId: number,
+          tabKey: string,
+          rowId: string,
+          sectionId: string
+        ) =>
+          set((state) => {
+            // 1. 현재 행 찾기
+            const row = state.rows.find(r => r.id === rowId);
+            if (!row || row.sections.length >= 2) return state;
+        
+            // 2. 새 섹션 ID 생성
+            const existingIds = row.sections.map(s => s.id);
+            const newSectionId = generateUniqueId("section", existingIds);
+        
+            // 3. 행 업데이트와 함께 새 섹션 추가
+            const updatedRows = state.rows.map(r => {
+              if (r.id !== rowId) return r;
+              return {
+                ...r,
+                sections: adjustSectionWidths([
+                  ...r.sections,
+                  {
+                    id: newSectionId,
+                    tabs: [], // 처음엔 빈 탭 배열
+                    width: 0,  // adjustSectionWidths에서 조정됨
+                    activeTabKey: null,
+                  },
+                ]),
+              };
+            });
+        
+            // 4. 기존 섹션에서 탭 찾기
+            const tab = state.openedTabs.find(
+              t => t.id === tabId && t.uniqueKey === tabKey
+            );
+            if (!tab) return { ...state, rows: updatedRows }; // 탭을 찾지 못하면 섹션만 추가
+        
+            // 5. 기존 섹션에서 탭 제거하고 새 섹션에 추가하는 로직
+            const updatedRowsWithTabMoved = updatedRows.map(r => {
+              if (r.id !== rowId) return r;
+              
+              return {
+                ...r,
+                sections: r.sections.map(sec => {
+                  // 기존 섹션에서 탭 제거
+                  if (sec.id === sectionId) {
+                    // 다음 활성 탭 키 결정 (undefined 방지)
+                    let nextActiveKey: string | null = null;
+                    if (sec.activeTabKey === tabKey) {
+                      const remainingTabs = sec.tabs.filter(t => !(t.id === tabId && t.uniqueKey === tabKey));
+                      nextActiveKey = remainingTabs.length > 0 
+                        ? remainingTabs[remainingTabs.length - 1].uniqueKey 
+                        : null;
+                    } else {
+                      nextActiveKey = sec.activeTabKey;
+                    }
+                    
+                    return {
+                      ...sec,
+                      tabs: sec.tabs.filter(t => !(t.id === tabId && t.uniqueKey === tabKey)),
+                      activeTabKey: nextActiveKey
+                    };
+                  }
+                  
+                  // 새 섹션에 탭 추가
+                  if (sec.id === newSectionId) {
+                    return {
+                      ...sec,
+                      tabs: [tab],
+                      activeTabKey: tab.uniqueKey
+                    };
+                  }
+                  
+                  return sec;
+                }),
+              };
+            });
+        
+            // 6. 전역 활성 탭 업데이트
+            return {
+              ...state,
+              rows: updatedRowsWithTabMoved,
+              activeTabId: tab.id,
+              activeTabKey: tab.uniqueKey
+            };
+          }),
+        
         // 운영설정용 추가
         openOperationSectionId: "section1", // 기본값
         setOpenOperationSectionId: (id: string) => set({ openOperationSectionId: id }),
