@@ -45,17 +45,17 @@ interface Section {
 }
 
 // 개별 섹션 컴포넌트를 분리하여 훅 규칙 문제 해결
-const SectionContent = ({ 
-  section, 
-  rowId, 
-  tabIdToRender, 
-  campaignId, 
-  campaignName, 
-  params, 
-  width, 
-  activeTabId, 
-  activeTabKey, 
-  setActiveTab 
+const SectionContent = ({
+  section,
+  rowId,
+  tabIdToRender,
+  campaignId,
+  campaignName,
+  params,
+  width,
+  activeTabId,
+  activeTabKey,
+  setActiveTab
 }: {
   section: Section;
   rowId: string;
@@ -78,7 +78,12 @@ const SectionContent = ({
   });
 
   // 이 컴포넌트에서 렌더링할 콘텐츠
-  const renderContent = (tabId, campaignId, campaignName, params) => {
+  const renderContent = (
+    tabId: number | null,
+    campaignId?: string,
+    campaignName?: string,
+    params?: Record<string, any>
+  ) => {
     switch (tabId) {
       case 1:
         return <CampaignGroupManager
@@ -304,7 +309,7 @@ const TabContent = () => {
 
             return (
               <React.Fragment key={section.id}>
-                <SectionContent 
+                <SectionContent
                   section={section}
                   rowId={row.id}
                   tabIdToRender={tabIdToRender}
@@ -316,7 +321,7 @@ const TabContent = () => {
                   activeTabKey={activeTabKey}
                   setActiveTab={setActiveTab}
                 />
-                
+
                 {index === 0 && sections.length === 2 && (
                   <div
                     ref={dragRef}
