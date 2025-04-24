@@ -370,10 +370,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       }
       if( statisticsUpdateCycle > 0 ){  
         intervalRef.current = setInterval(() => {
-          fetchCallProgressStatus({
-            tenantId: tenant_id+'',
-            campaignId: '0'
-          });
+          const tenantId = tenant_id+'' || '1';
+          const campaignId =  '0';
+          fetchCallProgressStatus({ tenantId, campaignId });
         }, statisticsUpdateCycle * 1000);     
       }
     }
@@ -411,19 +410,21 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 
   useEffect(() => {
     if( campaignSkills.length > 0 && phoneDescriptions.length > 0){
-      fetchCallProgressStatus({
-        tenantId: tenant_id+'',
-        campaignId: '0'
-      });
+      // fetchCallProgressStatus({
+      //   tenantId: tenant_id+'',
+      //   campaignId: '0'
+      // });
+        const tenantId = tenant_id+'' || '1';
+        const campaignId =  '0';
+        fetchCallProgressStatus({ tenantId, campaignId });
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
       if( statisticsUpdateCycle > 0 ){  
         intervalRef.current = setInterval(() => {
-          fetchCallProgressStatus({
-            tenantId: tenant_id+'',
-            campaignId: '0'
-          });
+          const tenantId = tenant_id+'' || '1';
+          const campaignId =  '0';
+          fetchCallProgressStatus({ tenantId, campaignId });
         }, statisticsUpdateCycle * 1000);     
       }
       return () => {

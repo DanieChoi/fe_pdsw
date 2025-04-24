@@ -93,8 +93,7 @@ const RebroadcastSettingsPanelHeader = ({
 
     //예약, 실시간 변경 이벤트.
     const handleBroadcastType = (value: string) => {
-        // setBroadcastType(value);
-        // handleBroadcastTypeChange(value);
+        setBroadcastType(value);
         setReBroadcastType(value);
         if (value === 'realtime') {
             setShouldShowApply(true);
@@ -110,19 +109,9 @@ const RebroadcastSettingsPanelHeader = ({
 
     //적용 버튼 
     useEffect(() => {
-        // setShouldShowApply(reservationShouldShowApply);
-        // setShouldShowAdd(reservationShouldShowAdd);
-        // setShouldShowDelete(reservationShouldShowDelete);
-        
-        if (reBroadcastType === 'realtime' ) {
-            setShouldShowApply(true);
-            setShouldShowAdd(false);
-            setShouldShowDelete(false);
-        }else{            
-            setShouldShowApply(reservationShouldShowApply);
-            setShouldShowAdd(reservationShouldShowAdd);
-            setShouldShowDelete(reservationShouldShowDelete);
-        }
+        setShouldShowApply(reservationShouldShowApply);
+        setShouldShowAdd(reservationShouldShowAdd);
+        setShouldShowDelete(reservationShouldShowDelete);
     }, [reservationShouldShowApply, reservationShouldShowAdd, reservationShouldShowDelete]);
 
     useEffect(() => {
@@ -141,13 +130,6 @@ const RebroadcastSettingsPanelHeader = ({
             // setListCount(campaigns.filter(data=>Number(campaignId) === data.campaign_id)[0].list_count);
         }
     }, [campaignId, campaigns]);
-
-    useEffect(() => {
-        if (reBroadcastType != '' ) {
-            setBroadcastType(reBroadcastType);
-            handleBroadcastTypeChange(reBroadcastType);
-        }
-    }, [reBroadcastType]);
 
     return (
         <div className="flex title-background justify-between">

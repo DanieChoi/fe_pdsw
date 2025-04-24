@@ -83,11 +83,7 @@ const SkillListPopup = ({
     const rowClass = (row: Skill) => {
         return selectedSkills.has(row.skill_id) ? 'selected-row' : '';
     };
-
-    console.log("tenants : ", tenants);
-    console.log("tenantId : ", tenantId);
     
-
     const tenantName =
     tenants.find((tenant) => tenant.tenant_id === tenantId)?.tenant_name ?? `ID ${tenantId}`;  
 

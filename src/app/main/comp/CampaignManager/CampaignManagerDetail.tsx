@@ -289,7 +289,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const [campaignScheduleChangeYn, setCampaignScheduleChangeYn] = useState<boolean>(false);
   const [campaignDialSpeedChangeYn, setCampaignDialSpeedChangeYn] = useState<boolean>(false);
   const [rtnMessage, setRtnMessage] = useState<string>('');
-  const { tenants, setCampaigns, selectedCampaign, setSelectedCampaign, setSelectedCampaignRow } = useMainStore();
+  const { tenants, setCampaigns, selectedCampaign, setSelectedCampaign, setReBroadcastType } = useMainStore();
   const { id: user_id, tenant_id, menu_role_id, session_key } = useAuthStore();
   const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab, campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
@@ -1583,6 +1583,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     if (campaignIdForUpdateFromSideMenu == null || campaignIdForUpdateFromSideMenu === '') {
       setCampaignIdForUpdateFromSideMenu(campaignId + '');
     }
+    setReBroadcastType('');
     const existingTabs = openedTabs.filter(tab => tab.id === 20);
     existingTabs.forEach(tab => {
       removeTab(tab.id, tab.uniqueKey);
