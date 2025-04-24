@@ -1,3 +1,4 @@
+
 // import React from "react";
 // import { useDraggable } from "@dnd-kit/core";
 // import { useDroppable } from "@dnd-kit/core";
@@ -85,6 +86,8 @@
 //       {...attributes}
 //       data-tab-id={id}
 //       data-tab-key={uniqueKey}
+//       data-row-id={rowId}
+//       data-section-id={sectionId}
 //     >
 //       {/* 드롭 가능한 영역임을 표시하는 간단한 시각적 표시 */}
 //       {isOver && !isDragging && (
@@ -197,7 +200,7 @@ export default function DraggableTab({
         cursor-pointer select-none
         ${isActive ? "bg-[#56CAD6] text-white" : "bg-white text-[#777]"}
         ${isDragging ? "opacity-70 shadow-md" : "opacity-100"}
-        ${isOver && !isDragging ? "bg-blue-100 border-b border-blue-500" : ""}
+        ${isOver && !isDragging ? "bg-blue-100 border-b-2 border-blue-500" : ""}
       `}
       onClick={onSelect}
       {...listeners}
@@ -207,9 +210,9 @@ export default function DraggableTab({
       data-row-id={rowId}
       data-section-id={sectionId}
     >
-      {/* 드롭 가능한 영역임을 표시하는 간단한 시각적 표시 */}
+      {/* 드롭 가능한 영역임을 표시하는 간단한 시각적 표시 - 더 명확하게 */}
       {isOver && !isDragging && (
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
       )}
 
       {/* 탭 제목 */}
