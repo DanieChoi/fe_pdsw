@@ -36,23 +36,43 @@ export function TreeNodeForCampaignTab({
   } = useTabStore();
   const nodeRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // campaignIdForUpdateFromSideMenu가 현재 노드의 ID와 일치하면 해당 노드 선택
-    if (campaignIdForUpdateFromSideMenu && campaignIdForUpdateFromSideMenu === item.id) {
-      onNodeSelect(item.id);
+  // useEffect(() => {
+  //   // campaignIdForUpdateFromSideMenu가 현재 노드의 ID와 일치하면 해당 노드 선택
+  //   if (campaignIdForUpdateFromSideMenu && campaignIdForUpdateFromSideMenu === item.id) {
+  //     onNodeSelect(item.id);
       
-      // 노드가 보이지 않을 경우 해당 위치로 스크롤
+  //     // 노드가 보이지 않을 경우 해당 위치로 스크롤
+  //     if (nodeRef.current) {
+  //       // 약간의 지연 후 스크롤링 수행
+  //       setTimeout(() => {
+  //         nodeRef.current?.scrollIntoView({ 
+  //           behavior: 'smooth', 
+  //           block: 'nearest'
+  //         });
+  //       }, 100);
+  //     }
+  //   }
+  // }, [campaignIdForUpdateFromSideMenu, item.id, onNodeSelect]);
+
+  useEffect(() => {
+    if (
+      campaignIdForUpdateFromSideMenu &&
+      campaignIdForUpdateFromSideMenu === item.id &&
+      item.type === "campaign" // 캠페인 타입일 경우에만 선택
+    ) {
+      onNodeSelect(item.id);
+  
       if (nodeRef.current) {
-        // 약간의 지연 후 스크롤링 수행
         setTimeout(() => {
-          nodeRef.current?.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'nearest'
+          nodeRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
           });
         }, 100);
       }
     }
-  }, [campaignIdForUpdateFromSideMenu, item.id, onNodeSelect]);
+  }, [campaignIdForUpdateFromSideMenu, item.id, item.type, onNodeSelect]);
+  
 
   // Get the most current status from the campaigns store
   const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
