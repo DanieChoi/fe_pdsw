@@ -104,28 +104,29 @@ export const loginApi = {
       };
 
       useStore.getState().setUserInfo(userInfo);
+      sessionStorage.removeItem("sse_connected");
 
       // 🔄 SSE 연결 초기화 (Zustand 스토어 사용)
       // 브라우저 환경에서만 실행
-      if (typeof window !== 'undefined' && window.EventSource) {
-        try {
-          // SSE 메시지 핸들러 함수
-          const sseMessageHandler = (eventData: any) => {
-            // CustomEvent를 발생시켜 Footer 등의 컴포넌트에서 처리할 수 있도록 함
-            const sseEvent = new CustomEvent('sse-message', { 
-              detail: eventData 
-            });
-            window.dispatchEvent(sseEvent);
-          };
+      // if (typeof window !== 'undefined' && window.EventSource) {
+      //   try {
+      //     // SSE 메시지 핸들러 함수
+      //     const sseMessageHandler = (eventData: any) => {
+      //       // CustomEvent를 발생시켜 Footer 등의 컴포넌트에서 처리할 수 있도록 함
+      //       const sseEvent = new CustomEvent('sse-message', { 
+      //         detail: eventData 
+      //       });
+      //       window.dispatchEvent(sseEvent);
+      //     };
           
-          // useSSEStore의 initSSE 메서드 호출하여 SSE 연결 초기화
+      //     // useSSEStore의 initSSE 메서드 호출하여 SSE 연결 초기화
           
-          console.log("🔌 로그인 성공 - SSE 연결 초기화됨");
-        } catch (error) {
-          console.error("🚨 SSE 초기화 오류:", error);
-          // SSE 연결 실패는 로그인 실패로 취급하지 않음 - 사용자 경험을 위해
-        }
-      }
+      //     console.log("🔌 로그인 성공 - SSE 연결 초기화됨");
+      //   } catch (error) {
+      //     console.error("🚨 SSE 초기화 오류:", error);
+      //     // SSE 연결 실패는 로그인 실패로 취급하지 않음 - 사용자 경험을 위해
+      //   }
+      // }
 
       return data;
     } catch (error: Error | unknown) {

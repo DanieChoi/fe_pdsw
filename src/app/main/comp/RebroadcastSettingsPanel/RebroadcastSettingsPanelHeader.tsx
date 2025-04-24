@@ -175,7 +175,7 @@ const RebroadcastSettingsPanelHeader = ({
                         className="w-[140px]"
                         disabled
                         value={headerCampaignId === '' ? '' 
-                            : campaigns ? campaigns.filter(data => Number(headerCampaignId) === data.campaign_id)[0].campaign_name || ''
+                            : campaigns && campaigns.length > 0 ? campaigns.filter(data => Number(headerCampaignId) === data.campaign_id)[0].campaign_name || ''
                             : ''
                         }
                     />
