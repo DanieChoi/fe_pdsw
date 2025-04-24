@@ -832,3 +832,12 @@ html, body {
 .react-calendar__month-view__weekdays {
   display: none !important;
 }
+
+/* 스크롤바 관련 */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
