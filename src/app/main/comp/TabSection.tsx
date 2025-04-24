@@ -231,6 +231,11 @@ export default function TabSection({
   canRemove = true,
   showDivider = false,
 }: TabSectionProps) {
+  // Move all hooks to the top before any conditional returns
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [scrolling, setScrolling] = useState<"left" | "right" | null>(null);
+  
   const { isOver, setNodeRef } = useDroppable({
     id: `section-${rowId}-${sectionId}`,
     data: { type: "section", rowId, sectionId },
@@ -243,15 +248,6 @@ export default function TabSection({
     setSectionActiveTab,
     setOpenOperationSectionId,
   } = useTabStore();
-
-  const row = rows.find((r) => r.id === rowId);
-  if (!row) return null;
-  const section = row.sections.find((s) => s.id === sectionId);
-  if (!section) return null;
-
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [scrolling, setScrolling] = useState<"left" | "right" | null>(null);
 
   useEffect(() => {
     return () => {
@@ -279,6 +275,13 @@ export default function TabSection({
     }
     setScrolling(null);
   };
+
+  // Now perform conditional checks after all hooks have been called
+  const row = rows.find((r) => r.id === rowId);
+  if (!row) return null;
+  
+  const section = row.sections.find((s) => s.id === sectionId);
+  if (!section) return null;
 
   return (
     <div
