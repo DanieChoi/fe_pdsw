@@ -437,6 +437,8 @@ const RebroadcastSettingsGroupPanel = () => {
 
     //적용 버튼 클릭 이벤트.
     const handleApplyRebroadcast = () => {
+        setFailCount(0);
+        setSuccessCount(0);
         setCaseType(2);
         // fetchCampaignRedialPreviewSearch({
         //     campaign_id: Number(campaignIdForUpdateFromSideMenu),
