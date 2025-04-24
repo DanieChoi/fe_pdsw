@@ -171,10 +171,17 @@ const SkillEdit = () => {
       .map(id => parseInt(id, 10));
     
     // 최대값 찾기
-    const maxSkillId = numericSkillIds.length > 0 ? Math.max(...numericSkillIds) : 0;
+    // const maxSkillId = numericSkillIds.length > 0 ? Math.max(...numericSkillIds) : 0;
+
+    // 최소값 찾아내기 하자###
+    const minSkillId = numericSkillIds.find((skillId, idx) => {
+      if(skillId !== idx + 1){
+        return skillId;
+      }
+    });
     
-    // 최대값 + 1 반환
-    return String(maxSkillId + 1);
+    // 비어있는(존재하지않는 스킬아이디) 최소값 반환
+    return String(minSkillId ? minSkillId - 1 : 1);
   };
 
   // 스킬 로우 클릭 이벤트 핸들러
@@ -504,6 +511,12 @@ const SkillEdit = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleDelete = () => {
+
+    if (!selectedSkill || rows.find((row) => row.skillId === selectedSkill?.skillId) === undefined) {
+      showAlert('생성되지 않은 스킬아이디는 삭제 할 수 없습니다.');
+      return;
+    }
+
     // 체크박스로 선택된 스킬이 있는 경우 다중 삭제 진행
     if (selectedSkillRows.size > 0) {
       // 선택된 스킬 ID 배열 생성
@@ -520,7 +533,7 @@ const SkillEdit = () => {
         showAlert(`다음 스킬은 사용 중이므로 삭제할 수 없습니다: ${inUseSkillNames}`);
         return;
       }
-      
+
       // 확인 메시지
       const confirmMessage = selectedSkillIds.length === 1
         ? '선택한 스킬을 삭제하시겠습니까?\n\n※주의 : 삭제시 데이터베이스에서 완전 삭제됩니다. \n다시 한번 확인해 주시고 삭제해주세요.'
@@ -657,7 +670,7 @@ const SkillEdit = () => {
   };
 
   const handleTenantChange = (value: string) => {
-    const tenantId = parseInt(value, 10);
+    const tenantId = parseInt(value);
     setEditableFields(prev => ({
       ...prev,
       tenantId
@@ -696,6 +709,8 @@ const SkillEdit = () => {
   // API 상태 관리
   const [campaignData, setCampaignData] = useState<any>(null);
   const [agentData, setAgentData] = useState<any>(null);
+
+  
 
   // API Hooks
   const { mutate: fetchCounselorList, data: counselorData } = useApiForCounselorList({
@@ -1028,11 +1043,11 @@ const SkillEdit = () => {
   // 테넌트 선택시 관련 센터 정보 가져오기
   const getSelectedTenantCenterName = () => {
     if (!counselorData?.organizationList || !selectedSkill) return '';
-    
+
     // 선택된 테넌트 ID에 해당하는 센터 이름 찾기
     for (const org of counselorData.organizationList) {
       const tenant = org.tenantInfo.find(t => t.tenantId === String(editableFields.tenantId));
-      if (tenant) {
+      if (tenant || editableFields.tenantId === 0) {
         return org.centerName;
       }
     }
@@ -1121,8 +1136,14 @@ const SkillEdit = () => {
             tenantName: tenant.tenantName
           };
         });
+        if (!tenantMap["0"]) {
+          tenantMap["0"] = {
+            centerName,
+            tenantName: tenants.find((tenant) => tenant.tenant_id === 0)?.tenant_name ?? 'NONE'
+          }
+        };
       });
-      
+
       const campaignResultData = (campaignData?.result_data) || [];
       const agentResultData = (agentData?.result_data) || [];
       
@@ -1312,7 +1333,7 @@ const SkillEdit = () => {
               <Label className="w-[8rem] min-w-[8rem]">테넌트</Label>
               {isNewMode ? (
                 <Select 
-                  value={editableFields.tenantId ? String(editableFields.tenantId) : ''}
+                  value={editableFields.tenantId !== null ? String(editableFields.tenantId) : ''}
                   onValueChange={handleTenantChange}
                 >
                   <SelectTrigger className="w-full">
