@@ -455,6 +455,9 @@ export default function Footer({
           }
         }
       });
+      eventSource.onerror = (err) => {
+        console.warn("SSE 에러 발생...", err);
+      };
       sessionStorage.setItem("sse_connected", "true");
     }
   }, [id, tenant_id]);

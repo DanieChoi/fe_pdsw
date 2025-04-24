@@ -61,6 +61,7 @@ interface MainState {
   selectedCampaignRow: DataProps | null; // Added selectedCampaignRow
   totalCount: number;
   reBroadcastType: string;
+  sendingStatusCampaignId: string;
 }
 
 interface MainActions {
@@ -71,6 +72,7 @@ interface MainActions {
   setSelectedCampaignRow: (row: DataProps | null) => void; // Added setter for selectedCampaignRow
   setTotalCount: (count: number) => void;
   setReBroadcastType: (reBroadcastType:string) => void;
+  setSendingStatusCampaignId: (sendingStatusCampaignId:string) => void;
 }
 
 type MainStore = MainState & MainActions;
@@ -83,6 +85,7 @@ export const useMainStore = create<MainStore>((set) => ({
   selectedCampaignRow: null, // Initialize selectedCampaignRow as null
   totalCount: 0,
   reBroadcastType: '',
+  sendingStatusCampaignId: '',
   
   setCampaigns: (campaigns) => set({ campaigns }),
   setTenants: (tenants) => set({ tenants }),
@@ -91,4 +94,5 @@ export const useMainStore = create<MainStore>((set) => ({
   setSelectedCampaignRow: (row) => set({ selectedCampaignRow: row }), // Set selectedCampaignRow
   setTotalCount: (totalCount) => set({ totalCount }),
   setReBroadcastType: (reBroadcastType) => set({ reBroadcastType }),
+  setSendingStatusCampaignId: (sendingStatusCampaignId) => set({ sendingStatusCampaignId }),
 }));

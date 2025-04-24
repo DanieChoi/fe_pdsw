@@ -95,7 +95,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   onDataUpdate
 }) => {
   const [internalSelectedCampaign, setInternalSelectedCampaign] = useState<string>('all');
-  const { campaigns } = useMainStore();
+  const { campaigns, sendingStatusCampaignId, setSendingStatusCampaignId } = useMainStore();
   const { tenant_id, session_key } = useAuthStore();
   const { campaignSkills, setCampaignSkills,phoneDescriptions, setPhoneDescriptions } = useCampainManagerStore();
   const [ _campaignData, _setCampaignData ] = useState<CampaignDataMap>({});
@@ -123,80 +123,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     ],
     gridData: []
   };
-
-  // 캠페인별 데이터
-  // const campaignData: CampaignDataMap = {
-  //   test1: {
-  //     stats: {
-  //       waiting: 2,
-  //       firstCall: 3,
-  //       retryCall: 2,
-  //       distributing: 1
-  //     },
-  //     barData: [
-  //       { name: '최초 발신용', value: 80 },
-  //       { name: '재시도 발신용', value: 50 },
-  //       { name: '분배 대기', value: 30 }
-  //     ],
-  //     gridData: [
-  //       {
-  //         skillId: '1246',
-  //         campaignId: '0125',
-  //         campaignName: 'test1캠페인',
-  //         priority: '2',
-  //         custKey: '241545',
-  //         custName: '김철수',
-  //         phoneType: '일반전화',
-  //         phone1: '01087654321',
-  //         attempt1: '1',
-  //         phone2: '01087654321',
-  //         attempt2: '1',
-  //         phone3: '01087654321',
-  //         attempt3: '2',
-  //         phone4: '01087654321',
-  //         attempt4: '2',
-  //         phone5: '01087654321',
-  //         attempt5: '2',
-  //         result: '실패'
-  //       }
-  //     ]
-  //   },
-  //   test2: {
-  //     stats: {
-  //       waiting: 1,
-  //       firstCall: 2,
-  //       retryCall: 1,
-  //       distributing: 0
-  //     },
-  //     barData: [
-  //       { name: '최초 발신용', value: 60 },
-  //       { name: '재시도 발신용', value: 40 },
-  //       { name: '분배 대기', value: 20 }
-  //     ],
-  //     gridData: [
-  //       {
-  //         skillId: '1247',
-  //         campaignId: '0126',
-  //         campaignName: 'test2캠페인',
-  //         priority: '3',
-  //         custKey: '241546',
-  //         custName: '이영희',
-  //         phoneType: '회사전화',
-  //         phone1: '01098765432',
-  //         attempt1: '2',
-  //         phone2: '01098765432',
-  //         attempt2: '1',
-  //         phone3: '01098765432',
-  //         attempt3: '1',
-  //         phone4: '01087654321',
-  //         attempt4: '2',
-  //         phone5: '01087654321',
-  //         attempt5: '2',
-  //         result: '진행중'
-  //       }
-  //     ]
-  //   }
-  // };
 
   // 전체 데이터 계산을 위한 useMemo 훅 사용
   const allCampaignData = useMemo<CampaignData>(() => {
@@ -287,7 +213,14 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
+    setSendingStatusCampaignId(value);
   };
+
+  useEffect(() => {
+    if( sendingStatusCampaignId != ''){
+      setInternalSelectedCampaign(sendingStatusCampaignId);
+    }
+  }, [sendingStatusCampaignId]);
 
   useEffect(() => {
     return () => {
@@ -427,17 +360,28 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
           fetchCallProgressStatus({ tenantId, campaignId });
         }, statisticsUpdateCycle * 1000);     
       }
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-        }
-      };
     }else{
       fetchCallProgressStatus({
         tenantId: tenant_id+'',
         campaignId: '0'
       });
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      if( statisticsUpdateCycle > 0 ){  
+        intervalRef.current = setInterval(() => {
+          fetchCallProgressStatus({
+            tenantId: tenant_id+'',
+            campaignId: '0'
+          });
+        }, statisticsUpdateCycle * 1000);     
+      }
     }
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, [selectedCampaign,statisticsUpdateCycle]);
   
   useEffect(() => {
@@ -471,6 +415,22 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         tenantId: tenant_id+'',
         campaignId: '0'
       });
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      if( statisticsUpdateCycle > 0 ){  
+        intervalRef.current = setInterval(() => {
+          fetchCallProgressStatus({
+            tenantId: tenant_id+'',
+            campaignId: '0'
+          });
+        }, statisticsUpdateCycle * 1000);     
+      }
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      };
     }
   }, [campaignSkills, phoneDescriptions]);
 
