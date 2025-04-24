@@ -48,6 +48,12 @@ const CustomInputForTime = React.forwardRef<HTMLInputElement, CustomInputForTime
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       let newValue = e.target.value;
+
+      // 커서 위치 저장
+      const cursorSave = e.target.selectionStart ?? 0;
+
+      // 입력 전에 포맷된 값
+      const beforeFormatted = displayValue;
       
       // Remove any non-digit characters
       newValue = newValue.replace(/[^0-9]/g, '');
@@ -59,6 +65,46 @@ const CustomInputForTime = React.forwardRef<HTMLInputElement, CustomInputForTime
       
       // Pass the raw value (without colon) to parent component
       onChange(newValue);
+
+      // setTimeout으로 렌더 후 커서 위치 설정
+      setTimeout(() => {
+        if (inputRef.current) {
+          
+          const formatted = (() => {
+            if (newValue.length <= 2) {
+              return newValue
+            };
+            return `${newValue.slice(0, 2)}:${newValue.slice(2)}`;
+          })(); // (() => {...}) () 함수를 선언하고 즉시 실행하여 결과값을 변수에 할당
+
+          // 입력전 text(beforeFormatted) 의 길이와 입력후 text(formatted)의 길이 비교
+          const colonRemoved = beforeFormatted.length > formatted.length;
+
+          // 변경된 포맷 기준 커서 위치 재계산
+          let cursorOffset = cursorSave;
+
+          // 예외 상황 처리
+          // colon 추가되면서 커서 뒤로 밀림
+          if (newValue.length === 3 && cursorSave === 3) {
+            cursorOffset++; // ':' 추가되는 위치에서 밀림
+          } 
+
+          // colon 제거되면서 커서 보정 (Backspace 등)
+          if (newValue.length === 2 && beforeFormatted.includes(':')) {
+            if (cursorSave === 3) {
+              cursorOffset--;
+            }
+          }
+
+          // 완전한 4자리 입력 상태에서 3번째 숫자 삭제 시 (00:30 → 00:0)
+          if (newValue.length === 3 && colonRemoved && cursorSave >= 3) {
+            cursorOffset--;
+          }
+
+          inputRef.current.setSelectionRange(cursorOffset, cursorOffset);
+
+        }
+      }, 10);
     };
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -77,7 +123,7 @@ const CustomInputForTime = React.forwardRef<HTMLInputElement, CustomInputForTime
           }, 100);
         }
       } else if (value.length > 0) {
-        toast.error("Please enter a complete time in HH:MM format.", {
+        toast.error("잘못된 시간 형식입니다. 올바른 시간을 입력하세요 (00:00-23:59).", {
            toastId: validationErrorToastId // 동일 ID 사용 또는 다른 ID 사용 가능
         });
         setTimeout(() => {
