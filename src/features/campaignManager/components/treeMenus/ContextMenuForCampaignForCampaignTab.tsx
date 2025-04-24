@@ -87,7 +87,7 @@ export function ContextMenuForCampaignForCampaignTab({
   onHandleCampaignCopy,
 }: ContextMenuForTreeNodeProps) {
   const isFolder = item.type === "folder";
-  const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab, addMultiTab } = useTabStore();
+  const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, addTab, addMultiTab, addOnlyTab } = useTabStore();
   const [isBlacklistPopupOpen, setIsBlacklistPopupOpen] = useState(false);
   const [blackListCount, setBlackListCount] = useState<number>(0);
   const [maxBlacklistCount, setMaxBlacklistCount] = useState<number>(1000000);
@@ -103,14 +103,14 @@ export function ContextMenuForCampaignForCampaignTab({
   // Get current status directly from the campaigns store to ensure we always have the latest status
   const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
   const [displayStatus, setDisplayStatus] = useState<CampaignStatus>(item.status);
-  
+
 
   // Update the displayed status whenever the item prop or campaigns state changes
   useEffect(() => {
     if (currentCampaign) {
       const statusMap: Record<number, CampaignStatus> = {
         1: "started",
-        2: "pending", 
+        2: "pending",
         3: "stopped"
       };
       const updatedStatus = statusMap[currentCampaign.campaign_status] || item.status;
@@ -180,17 +180,21 @@ export function ContextMenuForCampaignForCampaignTab({
     setCampaignIdForUpdateFromSideMenu(item.id);
   };
 
-  const handleProgressInfoClick = (campaignId: any, campaignName: string) => {
+  // tofix-0424 동일한 캠페인 진행 정보 탭이 중복으로 추가 되지 않도록 수정 필요 
+  const handleProgressInfoClick = (campaignId: string, campaignName: string) => {
     const uniqueKey = `progress-info-${campaignId}-${Date.now()}`;
-    addMultiTab({
-      id: 21,
-      uniqueKey: uniqueKey,
-      title: `캠페인 진행정보 - ${campaignName}`,
-      icon: '',
-      href: '',
-      content: null,
-      campaignId: campaignId,
-    });
+    useTabStore.getState().addOnlyTab(
+      {
+        id: 21,
+        uniqueKey,
+        title: `캠페인 진행정보 - ${campaignName}`,
+        icon: '',
+        href: '',
+        content: null,
+        campaignId,
+      },
+      (tab) => tab.id === 21 && tab.campaignId === campaignId
+    );
   };
 
   const handleRebroadcastClick = (campaignId: any) => {
@@ -237,31 +241,31 @@ export function ContextMenuForCampaignForCampaignTab({
     if (displayStatus === status || updateCampaignStatusMutation.isPending) {
       return;
     }
-    
+
     try {
       preventCloseRef.current = true;
       // Set optimistic update for better UX
       setDisplayStatus(status);
-      
+
       await updateCampaignStatusMutation.mutateAsync({
         campaign_id: Number(item.id),
         campaign_status: getStatusNumber(status),
       });
-      
+
       // The fetchMain will be called in onSuccess callback
     } catch (error) {
       // Revert to the actual status if there's an error
       if (currentCampaign) {
         const statusMap: Record<number, CampaignStatus> = {
           1: "started",
-          2: "pending", 
+          2: "pending",
           3: "stopped"
         };
         setDisplayStatus(statusMap[currentCampaign.campaign_status] || item.status);
       } else {
         setDisplayStatus(item.status);
       }
-      
+
       console.error('Error changing campaign status:', {
         campaignId: item.id,
         campaignName: item.label,
@@ -301,12 +305,12 @@ export function ContextMenuForCampaignForCampaignTab({
       </ContextMenuSubTrigger>
       <ContextMenuSubContent
         className="min-w-[120px] p-1"
-        // onPointerDownOutside={(e) => {
-        //   if (preventCloseRef.current) {
-        //     e.preventDefault();
-        //     preventCloseRef.current = false;
-        //   }
-        // }}
+      // onPointerDownOutside={(e) => {
+      //   if (preventCloseRef.current) {
+      //     e.preventDefault();
+      //     preventCloseRef.current = false;
+      //   }
+      // }}
       >
         {(Object.keys(statusInfo) as Array<CampaignStatus>).map((status) => (
           <ContextMenuItem
@@ -389,7 +393,7 @@ export function ContextMenuForCampaignForCampaignTab({
         <div className="py-1" key="delete">
           <IDialogButtonForCampaingDelete
             campaignId={item.id}
-            tenant_id = {tenantIdForCampaignTab}
+            tenant_id={tenantIdForCampaignTab}
             campaignName={item.label}
             variant="ghost"
             size="sm"
