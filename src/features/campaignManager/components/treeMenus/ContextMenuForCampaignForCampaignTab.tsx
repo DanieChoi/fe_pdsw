@@ -27,6 +27,7 @@ import useApiForCampaignListDelete from "@/features/listManager/hooks/useApiForC
 import BlackListCountPopup from "@/features/campaignManager/components/popups/BlackListCountPopup";
 import CustomAlert, { CustomAlertRequest } from "@/components/shared/layout/CustomAlert";
 import IDialogButtonForCampaingDelete from "./dialog/IDialogButtonForCampaingDelete";
+import { customAlertService } from "@/components/shared/layout/utils/CustomAlertService";
 
 
 export type CampaignStatus = "started" | "pending" | "stopped";
@@ -136,6 +137,13 @@ export function ContextMenuForCampaignForCampaignTab({
     onSuccess: () => {
       preventCloseRef.current = true;
       // Refresh campaigns data after status update
+
+      customAlertService.success(
+        '캠페인 상태가 성공적으로 변경되었습니다!',
+        '캠페인 상태 변경 완료'
+      );;
+
+
       fetchMain({ session_key, tenant_id });
     },
     onError: (error) => {
