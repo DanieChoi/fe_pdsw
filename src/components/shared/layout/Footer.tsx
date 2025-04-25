@@ -433,6 +433,20 @@ export default function Footer({
 
       addMessageToFooterList(_time, _type, _message);
     }
+    //업무시간설정
+    else if (announce === '/pds/operating-time') {
+      _message = `[업무시간 변경] [${data['start_time']}~${data['end_time']}]`;
+      _message2 = `[업무시간 변경]`;
+
+      // 토스트 알림 표시
+      if (useAlramPopup === 1) {
+        toast.event(_message2, {
+          duration: 6000
+        });
+      }
+      
+      addMessageToFooterList(_time, _type, _message);
+    }
     //채널할당
     else if (announce === '/pds/channel-assign') {
       _message = `[채널할당] 장비번호: [${data['device_id']}], 채널번호: [${data['channel_count']}], 할당방법: `;
