@@ -324,7 +324,9 @@ export default function Footer({
     //상담사 자원 수정/삭제
     else if (announce === 'update-agent') {
       _message = '[상담사 자원 ';
-      if (command === 'UPDATE') {
+      if (command === 'INSERT') {
+        _message += '추가] 상담사 아이디 : ' + data['employee_id'] + ' , 상담사 이름 : ' + data['agent_name'];
+      } else if (command === 'UPDATE') {
         _message += '수정] 상담사 아이디 : ' + data['employee_id'] + ' , 상담사 이름 : ' + data['agent_name'];
       } else if (command === 'DELETE') {
         _message += '삭제] 상담사 아이디 : ' + data['employee_id'] + ' , 상담사 이름 : ' + data['agent_name'];
