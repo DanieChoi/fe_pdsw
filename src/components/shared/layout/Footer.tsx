@@ -457,6 +457,16 @@ export default function Footer({
       
       addMessageToFooterList(_time, _type, _message);
     }
+    //콜백 리스트 초기화 시각 설정
+    else if (announce === '/pds/callback-daily-init-time') {
+      _message = '[콜백 리스트 초기화 시각 설정 ';
+      if (data['use_flag'] === 0) {
+        _message += '미사용';
+      } else {
+        _message += `사용[${data['init_hour']}시]`;
+      }
+      addMessageToFooterList(_time, _type, _message);
+    }
 
   }, [campaigns, fetchMain, useAlramPopup, debouncedInvalidate, tenant_id]);
 
