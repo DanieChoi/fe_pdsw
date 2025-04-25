@@ -589,16 +589,23 @@ export default function Footer({
       });
 
       eventSource.onerror = (err) => {
-        if (eventSource?.readyState === EventSource.CLOSED) {
-          console.warn("SSE connection closed. Attempting to reconnect...");
-          eventSource?.close();
-          sessionStorage.removeItem("sse_connected");
+        // if (eventSource?.readyState === EventSource.CLOSED) {
+        //   console.warn("SSE connection closed. Attempting to reconnect...");
+        //   eventSource?.close();
+        //   sessionStorage.removeItem("sse_connected");
       
-          // 3초 후 재연결
-          reconnectTimeout = setTimeout(() => {
-            connectSSE();
-          }, 3000);
-        }
+        //   // 3초 후 재연결
+        //   reconnectTimeout = setTimeout(() => {
+        //     connectSSE();
+        //   }, 3000);
+        // }
+        eventSource?.close();
+        sessionStorage.removeItem("sse_connected");
+
+        // 재접속 시도 (3초 후)
+        reconnectTimeout = setTimeout(() => {
+          connectSSE();
+        }, 3000);
       };
 
     };
