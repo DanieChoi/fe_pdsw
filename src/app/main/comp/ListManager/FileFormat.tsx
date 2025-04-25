@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
@@ -19,7 +19,7 @@ export interface FormatRow {
   field: string;
 }
 
-const initData: FormatRow[] = [{
+export const initData: FormatRow[] = [{
   id: '1',
   name: '고객키(1)',
   start: 1,
@@ -52,11 +52,12 @@ const errorMessage: CustomAlertRequest = {
 
 interface FileFormatProps {
   isOpen: boolean;
+  _formatRows: FormatRow[];
   onConfirm: (data: FormatRowData) => void;
   onClose: () => void;
 }
 
-const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) => {
+const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose, _formatRows }) => {
   const [delimiter, setDelimiter] = useState<string>(',');
   const [originaldataYn, setOriginaldataYn] = useState<boolean>(true);
   const [tabValue, setTabValue] = useState("format-field");
@@ -410,6 +411,12 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose }) =>
     setSelectedPositionRowIndex(null);
     onClose();
   };
+  
+  useEffect(() => {
+    if ( _formatRows.length > 0 ) {
+      setFormatRows(_formatRows);
+    }
+  }, [_formatRows]);   
  
   const modalContent = (
     <div className="w-full">

@@ -53,6 +53,14 @@ export interface DataProps {
   callingNumber: string;
 }
 
+export interface FormatRow {
+  id?: string;
+  name: string;
+  start: number;
+  length: number;
+  field: string;
+}
+
 interface MainState {
   campaigns: MainDataResponse[];
   tenants: TenantListDataResponse[];
@@ -62,6 +70,7 @@ interface MainState {
   totalCount: number;
   reBroadcastType: string;
   sendingStatusCampaignId: string;
+  listManagerFileFormatRows: FormatRow[];
 }
 
 interface MainActions {
@@ -73,6 +82,7 @@ interface MainActions {
   setTotalCount: (count: number) => void;
   setReBroadcastType: (reBroadcastType:string) => void;
   setSendingStatusCampaignId: (sendingStatusCampaignId:string) => void;
+  setListManagerFileFormatRows: (listManagerFileFormatRows:FormatRow[]) => void;
 }
 
 type MainStore = MainState & MainActions;
@@ -86,6 +96,7 @@ export const useMainStore = create<MainStore>((set) => ({
   totalCount: 0,
   reBroadcastType: '',
   sendingStatusCampaignId: '',
+  listManagerFileFormatRows: [],
   
   setCampaigns: (campaigns) => set({ campaigns }),
   setTenants: (tenants) => set({ tenants }),
@@ -95,4 +106,5 @@ export const useMainStore = create<MainStore>((set) => ({
   setTotalCount: (totalCount) => set({ totalCount }),
   setReBroadcastType: (reBroadcastType) => set({ reBroadcastType }),
   setSendingStatusCampaignId: (sendingStatusCampaignId) => set({ sendingStatusCampaignId }),
+  setListManagerFileFormatRows: (listManagerFileFormatRows) => set({ listManagerFileFormatRows }),
 }));

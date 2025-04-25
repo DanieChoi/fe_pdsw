@@ -31,7 +31,7 @@ import { useApiForBlacklistDelete } from '@/features/listManager/hooks/useApiFor
 import DataGrid, { Column, CellClickArgs } from "react-data-grid";
 
 // 모달
-import FileFormat,{FormatRowData, FormatRow} from './FileFormat';
+import FileFormat,{FormatRowData, FormatRow, initData} from './FileFormat';
 import LoadingModal from './LoadingModal';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
@@ -115,7 +115,7 @@ interface ProgressRow {
 
 const ListManager: React.FC = () => {
   const router = useRouter();
-  const { campaigns } = useMainStore();
+  const { campaigns,listManagerFileFormatRows,setListManagerFileFormatRows } = useMainStore();
   const { activeTabId, openedTabs } = useTabStore();
   const [delimiter, setDelimiter] = useState<string>('');
   const [_callListInsertData, setCallListInsertData] = useState<CallingListInsertRequest>(callListInsertData);
@@ -333,12 +333,13 @@ const ListManager: React.FC = () => {
     setIsFileFormatOpen(false);
     setDelimiter(data.delimiter);
     setOriginaldataYn(data.originDataSaveYn);
-    setHeaderColumnData(data.datalist);
-    const tempList: Column<SendRow>[] = data.datalist.map((tempData) => ({
-      key: tempData.field,
-      name: tempData.name
-    }));  
-    setSendColumns(tempList);
+    // setHeaderColumnData(data.datalist);
+    setListManagerFileFormatRows(data.datalist);
+    // const tempList: Column<SendRow>[] = data.datalist.map((tempData) => ({
+    //   key: tempData.field,
+    //   name: tempData.name
+    // }));  
+    // setSendColumns(tempList);
   };
 
   // 파일 관련 핸들러
@@ -870,6 +871,19 @@ const ListManager: React.FC = () => {
       }
     }
   }, [workFileIndex]);
+
+  useEffect(() => {
+    if ( listManagerFileFormatRows.length === 0 ) {
+      setListManagerFileFormatRows(initData);
+    }else if ( listManagerFileFormatRows.length > 1 ) {
+      setHeaderColumnData(listManagerFileFormatRows);
+      const tempList: Column<SendRow>[] = listManagerFileFormatRows.map((tempData) => ({
+        key: tempData.field,
+        name: tempData.name
+      }));  
+      setSendColumns(tempList);
+    }
+  }, [listManagerFileFormatRows]);
    
   return (
     <div className="flex flex-col gap-5 limit-width">
@@ -1039,6 +1053,7 @@ const ListManager: React.FC = () => {
        {/* 파일포맷모달 */}
        <FileFormat 
         isOpen={isFileFormatOpen}
+        _formatRows={listManagerFileFormatRows}
         onConfirm={handleFileFormatConfirm}
         onClose={handleFileFormatClose}
       />
