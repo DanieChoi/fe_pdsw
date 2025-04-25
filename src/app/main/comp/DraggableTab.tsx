@@ -196,8 +196,8 @@ export default function DraggableTab({
       ref={setNodeRef}
       style={style}
       className={`
-        flex-none flex items-center gap-2 px-3 border-r border-[#ebebeb] relative h-full
-        cursor-pointer select-none
+        flex-none flex items-center gap-2 px-3 border-r border-t border-[#ebebeb] relative h-full
+        cursor-pointer select-none rounded-t-[3px] rounded-b-none
         ${isActive ? "bg-[#56CAD6] text-white" : "bg-white text-[#777]"}
         ${isDragging ? "opacity-70 shadow-md" : "opacity-100"}
         ${isOver && !isDragging ? "bg-blue-100 border-b-2 border-blue-500" : ""}

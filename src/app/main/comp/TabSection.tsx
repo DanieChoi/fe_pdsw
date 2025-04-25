@@ -326,7 +326,7 @@ export default function TabSection({
       data-row-id={rowId}
     >
       {/* 높이를 일관되게 맞춘 컨테이너 */}
-      <div className="flex items-stretch h-9 border-b border-[#ebebeb]">
+      <div className="flex items-stretch">
         {/* Left scroll - 높이를 동일하게 */}
         <CommonButton
           variant="tabEtc"
