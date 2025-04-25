@@ -381,18 +381,20 @@ export default function Footer({
     //발신리스트등록
     else if (announce === '/pds/campaign/calling-list') {
       if (command === 'INSERT') {
-        let list_flag = '';
-        if (data['list_flag'] === 'I') {
-          list_flag = '신규리스트';
-        } else if (data['list_flag'] === 'A') {
-          list_flag = '추가리스트';
-        } else if (data['list_flag'] === 'D') {
-          list_flag = '삭제리스트';
-        } else if (data['list_flag'] === 'L') {
-          list_flag = '초기화';
-        }
-        _message = '발신리스트등록, 캠페인 아이디 : ' + campaign_id + ' , 리스트구분 : ' + list_flag;
-        _message2 = `[EVENT] [${campaign_id}] 발신리스트 ${list_flag} 등록`;
+        // let list_flag = '';
+        // if (data['list_flag'] === 'I') {
+        //   list_flag = '신규리스트';
+        // } else if (data['list_flag'] === 'A') {
+        //   list_flag = '추가리스트';
+        // } else if (data['list_flag'] === 'D') {
+        //   list_flag = '삭제리스트';
+        // } else if (data['list_flag'] === 'L') {
+        //   list_flag = '초기화';
+        // }
+        // _message = '발신리스트등록, 캠페인 아이디 : ' + campaign_id + ' , 리스트구분 : ' + list_flag;
+        // _message2 = `[EVENT] [${campaign_id}] 발신리스트 ${list_flag} 등록`;
+        _message = '발신리스트등록, 캠페인 아이디 : ' + campaign_id;
+        _message2 = `[EVENT] [${campaign_id}] 발신리스트 등록`;
 
         // 토스트 알림 표시
         if (useAlramPopup === 1) {
@@ -402,6 +404,16 @@ export default function Footer({
         }
 
         addMessageToFooterList(_time, _type, _message);
+      }else if (command === 'DELETE') {
+        _message = '발신리스트 초기화, 캠페인 아이디 : ' + campaign_id;
+        _message2 = `[EVENT] [${campaign_id}] 발신리스트 초기화`;
+
+        // 토스트 알림 표시
+        if (useAlramPopup === 1) {
+          toast.event(_message2, {
+            duration: 6000
+          });
+        }
       }
     }
     //예약 재발신
