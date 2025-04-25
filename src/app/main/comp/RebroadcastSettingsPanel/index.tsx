@@ -1075,6 +1075,8 @@ const RebroadcastSettingsPanel = () => {
                     setReservationShouldShowDelete(true);
                 }
             }
+        }else{
+            setReBroadcastType('reservation');
         }
     }, [reBroadcastType]);
 
