@@ -94,7 +94,7 @@ const initialState: EnvironmentState = {
 
   // 환경설정 데이터 초기값
   campaignListAlram: 0,
-  statisticsUpdateCycle: 0,
+  statisticsUpdateCycle: 0,  // 통계 갱신 주기
   serverConnectionTime: 0,
   showChannelCampaignDayScop: 0,
   personalCampaignAlertOnly: 0,

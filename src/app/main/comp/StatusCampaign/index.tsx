@@ -1,12 +1,31 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
-import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
-import { useCampainManagerStore, useMainStore } from '@/store';
-import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
+
+"use client";
+
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/shared/CustomSelect";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
+import { useApiForCampaignSkill } from "@/features/campaignManager/hooks/useApiForCampaignSkill";
+import { useApiForSkills } from "@/features/campaignManager/hooks/useApiForSkills";
+import { useCampainManagerStore, useMainStore } from "@/store";
 import { CommonButton } from "@/components/shared/CommonButton";
-import { useEnvironmentStore } from '@/store/environmentStore';
+import { useEnvironmentStore } from "@/store/environmentStore";
+import { useMultiCampaignProgressQuery } from "./hook/useMultiCampaignProgressQuery";
+import { toast } from "react-toastify";
 
 interface ChartDataItem {
   name: string;
@@ -14,7 +33,6 @@ interface ChartDataItem {
   success: number;
 }
 
-// 나중에 실제 API 연동 시 사용할 데이터 타입
 interface DispatchStatusData {
   campaign_id: number;
   dispatch_type: string;
@@ -28,167 +46,132 @@ interface DispatchDataType {
   dispatch_name: string;
 }
 
-const DISPATCH_TYPES = {
-  INITIAL: '최초발신',
-  FIRST: '1차재발신',
-  SECOND: '2차재발신',
-  THIRD: '3차재발신',
-  FOURTH: '4차재발신'
-} as const;
-
-type DispatchType = typeof DISPATCH_TYPES[keyof typeof DISPATCH_TYPES];
-
 const StatusCampaign: React.FC = () => {
-  const [selectedSkill, setSelectedSkill] = useState<string>('total');
-  const [selectedDispatch, setSelectedDispatch] = useState<string>('0');
+  const [selectedSkill, setSelectedSkill] = useState("total");
+  const [selectedDispatch, setSelectedDispatch] = useState("0");
   const { campaignSkills, setCampaignSkills } = useCampainManagerStore();
-  const { campaigns } = useMainStore();
   const [skills, setSkills] = useState<any[]>([]);
   const [chartData, setChartData] = useState<ChartDataItem[]>([]);
   const [campaignInfoList, setCampaignInfoList] = useState<DispatchStatusData[]>([]);
-  const [selectedCampaignId, setSelectedCampaignId] = useState<number>(0);
-  const [selectedCampaignIdIndex, setSelectedCampaignIdIndex] = useState<number>(0);
-  const [maxDispatchCount, setMaxDispatchCount] = useState<number>(0);
+  const [maxDispatchCount, setMaxDispatchCount] = useState(0);
   const [dispatchTypeList, setDispatchTypeList] = useState<DispatchDataType[]>([]);
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null);
+  const { campaigns } = useMainStore();
   const { statisticsUpdateCycle } = useEnvironmentStore();
+  
 
-  // 캠페인 진행 정보 API 호출 (useMutation 사용)
-  const { 
-    mutate: fetchCampaignProgressInformation, 
-    data: progressData,
-    isPending, 
-    isError
-  } = useApiForCampaignProgressInformation({
-    onSuccess: (data) => {
-      if (data && data.progressInfoList && campaigns.length > 0 && selectedCampaignIdIndex < campaigns.length) {
-        const tempList = data.progressInfoList.sort((a, b) => a.reuseCnt - b.reuseCnt);
-        
-        if (tempList.length > 0) {
-          const tempDataList: DispatchStatusData[] = tempList.map((item, i) => ({
-            campaign_id: item.campId || selectedCampaignId,
-            dispatch_type: i.toString(),
-            campaign_name: campaigns[selectedCampaignIdIndex].campaign_name,
-            progress: item.totLstCnt === 0 ? 0 : parseFloat(((item.nonTTCT / item.totLstCnt) * 100).toFixed(1)),
-            success: item.totLstCnt === 0 ? 0 : parseFloat(((item.scct / item.totLstCnt) * 100).toFixed(1)),
-          }));
-          
-          setCampaignInfoList(prev => [...prev, ...tempDataList]);
-          
-          if (maxDispatchCount < tempList.length) {
-            setMaxDispatchCount(tempList.length);
-          }
-        }
+  const { data: progressData, isLoading, isError, refetch } = useMultiCampaignProgressQuery(campaigns);
 
-        // 다음 캠페인으로 이동
-        const index = selectedCampaignIdIndex + 1;
-        if (index < campaigns.length) {
-          setSelectedCampaignId(campaigns[index].campaign_id);
-          setSelectedCampaignIdIndex(index);
-        } else {
-          const tempList = Array.from({ length: maxDispatchCount }, (_, i) => ({
-            dispatch_id: i,
-            dispatch_name: i === 0 ? '최초발신' : `${i}차재발신`
-          }));
-          setDispatchTypeList(tempList);
-          fetchSkills({
-            tenant_id_array: []
-          });
-        }
-      }
-    }
-  });
-
-  // 데이터 갱신 함수
-  const refreshData = useCallback(() => {
-    setIsRefreshing(true);
-    
-    // 초기화
-    setSelectedCampaignId(campaigns[0]?.campaign_id || 0);
-    setSelectedCampaignIdIndex(0);
-    setCampaignInfoList([]);
-    
-    // campaigns이 있을 경우에만 API 호출
-    if (campaigns.length > 0) {
-      fetchCampaignProgressInformation({
-        tenantId: campaigns[0].tenant_id,
-        campaignId: campaigns[0].campaign_id
-      });
-    }
-
-    // 타이머로 isRefreshing 상태 해제
-    setTimeout(() => setIsRefreshing(false), 1000);
-  }, [campaigns, fetchCampaignProgressInformation]);
-
-  // 스킬 조회
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data);
-      fetchCampaignSkills({
-        session_key: '',
-        tenant_id: 0,
-      });
-    }
+      fetchCampaignSkills({ session_key: "", tenant_id: 0 });
+    },
   });
 
-  // 캠페인 스킬 조회
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
       setCampaignSkills(data.result_data);
-      // 여기에 나중에 발신 상태 API 연동
       processDataForChart(data.result_data, selectedSkill, selectedDispatch);
-    }
+    },
   });
 
-  // 테스트용 발신 상태 데이터 생성 함수 (나중에 API로 대체)
-  const generateDispatchStatusData = (campaignId: number) => {
-    const tempDataList = campaignInfoList.filter(data => data.campaign_id === campaignId);
-    const temp: { [key: string]: any } = { campaign_id: campaignId };
+  const refreshData = useCallback(() => {
+    setIsRefreshing(true);
+    const startTime = new Date();
+    
+    // Show toast message when starting refresh
+    // const toastId = toast.loading('데이터를 새로고침 중입니다...', {
+    //   position: 'top-right',
+    // });
+    
+    refetch()
+      .then(() => {
+        const endTime = new Date();
+        const refreshDuration = (endTime.getTime() - startTime.getTime()) / 1000; // in seconds
+        
+        // Update success toast with refresh time
+        // toast.success(`데이터가 갱신되었습니다!`, {
+        //   autoClose: 2000,
+        //   position: 'top-center',
+        // });
+        
+        setLastRefreshTime(endTime);
+      })
+      .catch((error) => {
+        // Show error toast if refresh fails
+        // toast.error('데이터 갱신에 실패했습니다.', {
+        //   id: toastId,
+        //   duration: 3000,
+        //   position: 'top-right',
+        // });
+      })
+      .finally(() => {
+        setTimeout(() => setIsRefreshing(false), 1000);
+      });
+  }, [refetch]);
 
+  useEffect(() => {
+    if (progressData) {
+      const flat: DispatchStatusData[] = [];
+      let maxReuse = 0;
+
+      progressData.forEach(({ campaign_id, campaign_name, progressInfoList }) => {
+        progressInfoList.sort((a, b) => a.reuseCnt - b.reuseCnt).forEach((item, i) => {
+          flat.push({
+            campaign_id,
+            dispatch_type: i.toString(),
+            campaign_name,
+            progress: item.totLstCnt === 0 ? 0 : parseFloat(((item.nonTTCT / item.totLstCnt) * 100).toFixed(1)),
+            success: item.totLstCnt === 0 ? 0 : parseFloat(((item.scct / item.totLstCnt) * 100).toFixed(1)),
+          });
+        });
+        if (progressInfoList.length > maxReuse) maxReuse = progressInfoList.length;
+      });
+
+      setCampaignInfoList(flat);
+      setMaxDispatchCount(maxReuse);
+      setDispatchTypeList(
+        Array.from({ length: maxReuse }, (_, i) => ({
+          dispatch_id: i,
+          dispatch_name: i === 0 ? "최초발신" : `${i}차재발신`,
+        }))
+      );
+    }
+  }, [progressData]);
+
+  const generateDispatchStatusData = (campaignId: number) => {
+    const tempDataList = campaignInfoList.filter((data) => data.campaign_id === campaignId);
+    const temp: { [key: string]: any } = { campaign_id: campaignId };
     for (let j = 0; j < maxDispatchCount; j++) {
       const data = tempDataList[j] || { progress: 0, success: 0 };
       temp[`dispatch${j}`] = { progress: data.progress, success: data.success };
     }
-
     return temp;
   };
 
-  // 차트 데이터 처리 함수
-  const processDataForChart = (
-    campaignSkillsData: any[], 
-    currentSkill: string, 
-    dispatchType: string
-  ) => {
-    let filteredCampaigns = campaignSkillsData.sort((a, b) => a.campaign_id - b.campaign_id);
-    
-    // 스킬 필터링
-    if (currentSkill !== 'total') {
-      filteredCampaigns = campaignSkillsData.filter(campaign => 
-        campaign.skill_id?.includes(Number(currentSkill))
-      );
-    } else {
-      filteredCampaigns = campaigns.sort((a, b) => a.campaign_id - b.campaign_id);
-    }
+  const processDataForChart = (campaignSkillsData: any[], currentSkill: string, dispatchType: string) => {
+    let filtered = currentSkill === "total"
+      ? campaigns
+      : campaignSkillsData.filter((c) => c.skill_id?.includes(Number(currentSkill)));
 
-    // 각 캠페인에 대해 발신 단계 데이터 생성
-    const processedData = filteredCampaigns.map((campaign) => {
-      // API에서 받아올 데이터 구조
-      const statusData = generateDispatchStatusData(campaign.campaign_id);
+    filtered = filtered.sort((a, b) => a.campaign_id - b.campaign_id);
+
+    const processedData = filtered.map((c) => {
+      const statusData = generateDispatchStatusData(c.campaign_id);
       const dispatchKey = `dispatch${dispatchType}` as keyof typeof statusData;
-      const campaignInfo = campaigns.find(data => data.campaign_id === campaign.campaign_id);
-      const campaignName = campaignInfo ? campaignInfo.campaign_name : '알 수 없음';
-
+      const campaignName = c.campaign_name || "알 수 없음";
       return {
-        name: `[${campaign.campaign_id}]${campaignName}`,
-        progress: typeof statusData[dispatchKey] === 'object' ? statusData[dispatchKey].progress : 0,
-        success: typeof statusData[dispatchKey] === 'object' ? statusData[dispatchKey].success : 0,
+        name: `[${c.campaign_id}]${campaignName}`,
+        progress: statusData[dispatchKey]?.progress || 0,
+        success: statusData[dispatchKey]?.success || 0,
       };
     });
-    
+
     setChartData(processedData);
   };
 
-  // 스킬 선택 변경 핸들러
   const handleSkillChange = (value: string) => {
     setSelectedSkill(value);
     if (campaignSkills.length > 0) {
@@ -196,7 +179,6 @@ const StatusCampaign: React.FC = () => {
     }
   };
 
-  // 발신 단계 선택 변경 핸들러
   const handleDispatchChange = (value: string) => {
     setSelectedDispatch(value);
     if (campaignSkills.length > 0) {
@@ -204,49 +186,49 @@ const StatusCampaign: React.FC = () => {
     }
   };
 
-  const itemHeight = 50;
-  const chartHeight = Math.max(chartData.length * itemHeight + 100, 300);
-
-  // 컴포넌트 마운트 시 및 selectedCampaignId 변경 시 데이터 로드
-  useEffect(() => {
-    if (selectedCampaignId > 0 && campaigns.length > 0 && selectedCampaignIdIndex < campaigns.length) {
-      fetchCampaignProgressInformation({
-        tenantId: campaigns[selectedCampaignIdIndex].tenant_id,
-        campaignId: selectedCampaignId
-      });
-    }
-  }, [selectedCampaignId, selectedCampaignIdIndex, campaigns, fetchCampaignProgressInformation]);
-
-  // 통계 갱신 주기에 따른 자동 새로고침 설정
   useEffect(() => {
     if (statisticsUpdateCycle > 0) {
       const interval = setInterval(() => {
+        // Show toast notification before auto-refresh
+        // toast.loading(`자동 새로고침 시작 (${statisticsUpdateCycle}초 주기)`, {
+        //   duration: 2000,
+        //   position: 'top-right'
+        // });
+        
         refreshData();
       }, statisticsUpdateCycle * 1000);
-      
       return () => clearInterval(interval);
     }
   }, [statisticsUpdateCycle, refreshData]);
 
-  // 캠페인 목록 변경 시 초기 데이터 설정
   useEffect(() => {
     if (campaigns.length > 0) {
-      setSelectedCampaignId(campaigns[0].campaign_id);
-      setSelectedCampaignIdIndex(0);
-      setCampaignInfoList([]);
+      fetchSkills({ tenant_id_array: [] });
     }
   }, [campaigns]);
 
+  const chartHeight = Math.max(chartData.length * 50 + 100, 300);
+
+  // Format the last refresh time
+  const formattedLastRefreshTime = lastRefreshTime ? 
+    `마지막 갱신: ${lastRefreshTime.toLocaleTimeString()}` : 
+    '아직 갱신되지 않음';
+
   return (
-    <div className="">
+    <div>
+      {/* <div className="flex justify-between items-center mb-2">
+        <span>갱신 주기: {statisticsUpdateCycle}초</span>
+        <span className="text-sm text-gray-500">{formattedLastRefreshTime}</span>
+      </div> */}
+      
       <div className="flex gap-4 mb-6 items-center">
         <Select value={selectedSkill} onValueChange={handleSkillChange}>
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="스킬전체보기"/>
+            <SelectValue placeholder="스킬전체보기" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="total">스킬전체보기</SelectItem>
-            {skills.map(skill => (
+            {skills.map((skill) => (
               <SelectItem key={skill.skill_id} value={skill.skill_id.toString()}>
                 {skill.skill_name}
               </SelectItem>
@@ -256,10 +238,10 @@ const StatusCampaign: React.FC = () => {
 
         <Select value={selectedDispatch} onValueChange={handleDispatchChange}>
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="최초발신"/>
+            <SelectValue placeholder="최초발신" />
           </SelectTrigger>
           <SelectContent>
-            {dispatchTypeList.map(option => (
+            {dispatchTypeList.map((option) => (
               <SelectItem key={option.dispatch_id} value={option.dispatch_id.toString()}>
                 {option.dispatch_name}
               </SelectItem>
@@ -267,16 +249,16 @@ const StatusCampaign: React.FC = () => {
           </SelectContent>
         </Select>
 
-        <CommonButton 
-          variant="secondary" 
-          onClick={refreshData} 
-          disabled={isPending || isRefreshing}
+        <CommonButton
+          variant="secondary"
+          onClick={refreshData}
+          disabled={isLoading || isRefreshing}
         >
-          {isRefreshing ? '새로고침 중...' : '새로고침'}
+          {isRefreshing ? "새로고침 중..." : "새로고침"}
         </CommonButton>
       </div>
 
-      {isPending && !isRefreshing ? (
+      {isLoading && !isRefreshing ? (
         <div className="border p-2 rounded flex items-center justify-center" style={{ height: chartHeight }}>
           <p>데이터를 로드 중입니다...</p>
         </div>
@@ -294,26 +276,10 @@ const StatusCampaign: React.FC = () => {
                 margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  type="number" 
-                  tick={{ fontSize: 13 }}
-                  axisLine={{ stroke: '#999' }}
-                />
-                <YAxis 
-                  type="category" 
-                  dataKey="name"
-                  tick={{ fontSize: 13 }}
-                  axisLine={{ stroke: '#999' }}
-                />
+                <XAxis type="number" tick={{ fontSize: 13 }} axisLine={{ stroke: "#999" }} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 13 }} axisLine={{ stroke: "#999" }} />
                 <Tooltip />
-                <Legend 
-                  verticalAlign="top"
-                  align="left"
-                  wrapperStyle={{
-                    paddingBottom: '20px',
-                    fontSize: '14px'
-                  }}
-                />
+                <Legend verticalAlign="top" align="left" wrapperStyle={{ paddingBottom: "20px", fontSize: "14px" }} />
                 <Bar dataKey="success" fill="#FF8DA0" name="성공률" />
                 <Bar dataKey="progress" fill="#4AD3C8" name="진행률" />
               </BarChart>
