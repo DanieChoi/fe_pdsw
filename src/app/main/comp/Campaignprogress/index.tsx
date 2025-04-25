@@ -117,6 +117,8 @@ const initDispatchStatusData:DispatchStatusDataType = {
   , failSendCount: 0
 };
 
+// campaigns → 캠페인 진행 정보 → 스킬 정보 → 캠페인 스킬 정보 → 데이터 가공
+
 export default function Campaignprogress() {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set(['center-1']));
   const [selectedCampaign, setSelectedCampaign] = useState<string>('전체보기');
@@ -134,6 +136,7 @@ export default function Campaignprogress() {
   const [isColumnSetOpen, setIsColumnSetOpen] = useState(false);
   const [initData, setInitData] = useState<TreeRow[]>([]);
   const [columns, setColumns] = useState<Column<TreeRow>[]>(defaultColumnsData);
+
   const transformToTreeData = (dataList: DispatchStatusDataType[]) => {
     const result: any[] = [];
 
@@ -516,6 +519,7 @@ export default function Campaignprogress() {
       }
       
       const index = selectedCampaignIdIndex+1;
+
       if( index < campaigns.length){
         setSelectedCampaignId(campaigns[index].campaign_id);
         setSelectedCampaignIdIndex(index);
