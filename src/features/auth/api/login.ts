@@ -131,7 +131,7 @@ export const loginApi = {
       return data;
     } catch (error: Error | unknown) {
       const err = error as Error;
-      toast.error(`❌ 로그인 실패: ${err.message}`);
+      // toast.error(`❌ 로그인 실패: ${err.message}`);
       throw err;
     }
   },
