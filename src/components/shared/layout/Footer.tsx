@@ -145,11 +145,11 @@ export default function Footer({
     }
 
     //타입.
-    let _type = 'Event';
+    let _type = 'EVENT';
     if (kind === 'event') {
-      _type = 'Event';
+      _type = 'EVENT';
     } else if (kind === 'alram') {
-      _type = 'Event';
+      _type = 'ALRAM';
     }
 
     //메시지.
