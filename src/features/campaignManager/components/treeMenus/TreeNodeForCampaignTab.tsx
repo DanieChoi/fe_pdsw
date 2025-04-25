@@ -40,7 +40,7 @@
 //     // campaignIdForUpdateFromSideMenu가 현재 노드의 ID와 일치하면 해당 노드 선택
 //     if (campaignIdForUpdateFromSideMenu && campaignIdForUpdateFromSideMenu === item.id) {
 //       onNodeSelect(item.id);
-      
+
 //       // 노드가 보이지 않을 경우 해당 위치로 스크롤
 //       if (nodeRef.current) {
 //         nodeRef.current.scrollIntoView({ 
@@ -392,13 +392,13 @@ export function TreeNodeForCampaignTab({
 
   const currentStatus = currentCampaign
     ? (() => {
-        switch (currentCampaign.campaign_status) {
-          case 1: return "started";
-          case 2: return "pending";
-          case 3: return "stopped";
-          default: return item.status;
-        }
-      })()
+      switch (currentCampaign.campaign_status) {
+        case 1: return "started";
+        case 2: return "pending";
+        case 3: return "stopped";
+        default: return item.status;
+      }
+    })()
     : item.status;
 
   const updatedItem = { ...item, status: currentStatus };
@@ -411,7 +411,10 @@ export function TreeNodeForCampaignTab({
   const handleClick = useCallback(() => {
     onNodeSelect(item.id);
     setSelectedNodeType(item.type);
-    setCampaignIdForUpdateFromSideMenu(item.id);
+    // setCampaignIdForUpdateFromSideMenu(item.id);
+    if(item.type === "campaign") {
+      setCampaignIdForCopyCampaign(item.id);
+    }
     if (hasChildren) onNodeToggle(item.id);
   }, [item.id, item.type, hasChildren, onNodeSelect, onNodeToggle, setSelectedNodeType, setCampaignIdForUpdateFromSideMenu]);
 

@@ -111,8 +111,9 @@ export function TreeNodeForSideBarCampaignGroupTab({
     }
 
     setSelectedNodeId(node.id);
-    setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
-
+    if (node.type === "campaign") {
+      setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
+    }
     // setSelectedNodeId(node.id);
   }, [node.id, node.type, hasChildren, node.children?.length, onNodeSelect, onNodeToggle]);
 
