@@ -340,12 +340,13 @@ const MonitorPage = () => {
   // 캠페인 스킬 수정 API 호출
   const { mutate: fetchCampaignSkillUpdate } = useApiForCampaignSkillUpdate({
     onSuccess: (data, variables) => {
-      
+      console.log('####data ', data);
+      console.log('####variables ', variables);
       if (data.result_code === 0) {
         // 현재 선택된 캠페인의 스킬을 업데이트해서 최신 상태 반영
         setCurrentCampaign((prev) => ({
           ...prev,
-          skills: variables.skill_id,
+          skills: variables.skill_id[0] === 0 ? [] : variables.skill_id,
         }));
         // 캠페인 목록 다시 가져오기
         fetchMain({
@@ -572,12 +573,15 @@ const MonitorPage = () => {
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
       const dataList = data.result_data;
+      console.log('############dataList : ', dataList);
+
       setCampaignSkillList(dataList);
       if (skills.length === 0) {
         const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
         fetchSkills({
           tenant_id_array: tempTenantIdArray
         });
+        
 
       }
       if( selectedCampaign === modifiedCampaign ){
@@ -651,8 +655,19 @@ const MonitorPage = () => {
       const updatedCampaigns: Campaign[] = campaignList.map((data) => ({
         id: data.campaign_id,
         name: `[${data.campaign_id}]${data.campaign_name}`,
-        skills: campaignSkillList.filter((skill) => skill.campaign_id === data.campaign_id)
-          .map((data) => data.skill_id).join(',').split(',').map((data) => Number(data)),
+        skills: campaignSkillList
+        .filter((skill) => skill.campaign_id === data.campaign_id)
+        .map((data) => data.skill_id)
+        .join(',')
+        .split(',')
+        .map((data) => Number(data))[0] === 0
+          ? [] // skill_id가 [0]이면 빈 배열 반환
+          : campaignSkillList
+              .filter((skill) => skill.campaign_id === data.campaign_id)
+              .map((data) => data.skill_id)
+              .join(',')
+              .split(',')
+              .map((data) => Number(data)),
         endTime: '',
         startFlag: data.start_flag,
         tenant_id: data.tenant_id,

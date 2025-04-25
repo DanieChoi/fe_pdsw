@@ -88,7 +88,7 @@ const CampaignInfo = ({
         </div>
         <div className='flex justify-between items-center'>
           <div className='text-sm'>
-            캠페인 스킬: {currentCampaign?.skills?.join(', ') || '-'}
+            캠페인 스킬: {currentCampaign?.skills?.join(',') || ''}
           </div>
           <CommonButton 
             variant="outline" 
