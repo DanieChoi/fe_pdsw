@@ -104,7 +104,7 @@ export const loginApi = {
       };
 
       useStore.getState().setUserInfo(userInfo);
-      sessionStorage.removeItem("sse_connected");
+      sessionStorage.setItem('just_logged_in', 'true');
 
       // 🔄 SSE 연결 초기화 (Zustand 스토어 사용)
       // 브라우저 환경에서만 실행
