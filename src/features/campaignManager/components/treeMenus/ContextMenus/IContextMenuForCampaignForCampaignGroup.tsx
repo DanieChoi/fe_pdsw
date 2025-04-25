@@ -1,33 +1,549 @@
+// "use client";
+
+// import {
+//   ContextMenu,
+//   ContextMenuContent,
+//   ContextMenuItem,
+//   ContextMenuSub,
+//   ContextMenuSubContent,
+//   ContextMenuSubTrigger,
+//   ContextMenuTrigger,
+//   ContextMenuSeparator,
+// } from "@/components/ui/context-menu";
+// import { useTabStore } from "@/store/tabStore";
+// import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
+// import { useAvailableMenuStore } from "@/store/useAvailableMenuStore"; // 권한 관리 스토어 추가
+// import { Check } from "lucide-react";
+// import { useState, useRef } from "react";
+// import BlackListCountPopup from '@/features/campaignManager/components/popups/BlackListCountPopup';
+// import { toast } from 'react-toastify';
+// import { useApiForCampaignBlacklistCount } from "@/features/listManager/hooks/useApiForCampaignBlacklistCount";
+// import { cn } from "@/lib/utils";
+// import Image from "next/image";
+// import useApiForCampaignListDelete from "@/features/listManager/hooks/useApiForCampaignListDelete";
+// import { useApiForCampaignStatusUpdate } from "@/features/campaignManager/hooks/useApiForCampaignStatusUpdate";
+// import IDialogButtonForCampaingDelete from "../dialog/IDialogButtonForCampaingDelete";
+// import React from "react";
+// import { useCampainManagerStore } from "@/store/campainManagerStore";
+// import { useApiForMain } from "@/features/auth/hooks/useApiForMain";
+// import { useMainStore } from "@/store/mainStore";
+// import { useAuthStore } from "@/store/authStore";
+
+// export type CampaignStatus = 'started' | 'pending' | 'stopped';
+
+// export const getStatusIcon = (status?: string) => {
+//   switch (status) {
+//     case 'started':
+//       return '/sidebar-menu/tree_play.svg';
+//     case 'pending':
+//       return '/sidebar-menu/tree_pause.svg';
+//     case 'stopped':
+//       return '/sidebar-menu/tree_stop.svg';
+//     default:
+//       return null;
+//   }
+// };
+
+// // 인터페이스 정의
+// interface ContextMenuForTreeNodeProps {
+//   children: React.ReactNode;
+//   item: {
+//     id: any;
+//     label: string;
+//     type: any;
+//     status: CampaignStatus;
+//   };
+//   onEdit?: () => void;
+//   onMonitor?: () => void;
+//   onHandleCampaignCopy?: () => void;
+//   tenantIdForCampaignTab: any;
+// }
+
+// export const getStatusFromFlag = (flag?: number): CampaignStatus => {
+//   switch (flag) {
+//     case 1: return 'started';
+//     case 2: return 'pending';
+//     case 3: return 'stopped';
+//     default: return 'stopped';
+//   }
+// };
+
+// export function IContextMenuForCampaignForCampaignGroup({
+//   children,
+//   item,
+//   onEdit,
+//   onMonitor,
+//   onHandleCampaignCopy,
+//   tenantIdForCampaignTab,
+// }: ContextMenuForTreeNodeProps) {
+//   const isFolder = item.type === "folder";
+//   const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, setCampaignIdForCopyCampaign, addTab, addMultiTab } = useTabStore();
+
+//   // Zustand 스토어에서 updateCampaignStatus 함수 가져오기
+//   const { updateCampaignStatus, refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
+
+//   // 권한 관리 스토어에서 사용 가능한 메뉴 ID 가져오기
+//   const availableMenuIds = useAvailableMenuStore(
+//     (state) => state.availableMenuIdsForCampaignGroupTabCampaign
+//   );
+
+//   const [isBlacklistPopupOpen, setIsBlacklistPopupOpen] = useState(false);
+//   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+//   const [currentStatus, setCurrentStatus] = useState<CampaignStatus>(item.status);
+//   const [blackListCount, setBlackListCount] = useState<number>(0);
+//   const preventCloseRef = useRef(false);
+
+//   const { tenant_id, role_id, session_key } = useAuthStore();
+
+//   const { tenants
+//     , setCampaigns
+//     , selectedCampaign
+//     , setSelectedCampaign
+//   } = useMainStore();
+
+//   const { mutate: fetchMain } = useApiForMain({
+//     onSuccess: (data) => {
+//       setCampaigns(data.result_data);
+//       // if( tenant_id === 0){
+//       //   setCampaigns(data.result_data);
+//       // }else{
+//       //   setCampaigns(data.result_data.filter(data=>data.tenant_id === tenant_id));
+//       // }
+//       setSelectedCampaign(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
+//     }
+//   });
+
+//   // 상태 관련 정보
+//   const statusInfo = {
+//     started: { label: "시작", color: "#22c55e" },
+//     pending: { label: "멈춤", color: "#eab308" },
+//     stopped: { label: "중지", color: "#ef4444" },
+//   };
+
+//   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
+//     onSuccess: (data) => {
+//       // toast.success("캠페인 상태가 변경되었습니다22.");
+//       preventCloseRef.current = true;
+
+//       console.log("캠페인 상태 업데이트");
+
+//       fetchMain({
+//         session_key: session_key,
+//         tenant_id: tenant_id
+//       });
+
+//     },
+//     onError: (error) => {
+//       toast.error(error.message || "상태 변경 중 오류가 발생했습니다.");
+//     },
+//   });
+
+//   const { mutate: deleteCampaignList } = useApiForCampaignListDelete({
+//     // onSuccess: (data) => {
+//     //   toast.success(".");
+//     // },
+//     // onError: (error) => {
+//     //   toast.error(error.message || "리스트 삭제 중 오류가 발생했습니다.");
+//     // },
+//   });
+
+//   const handleCampaignListDelete = (campaignId: any) => {
+//     if (currentStatus !== 'stopped') {
+//       toast.error("캠페인이 중지 상태일 때만 리스트를 삭제할 수 있습니다.");
+//       return;
+//     }
+//     deleteCampaignList(campaignId);
+//   };
+
+//   const handleEditMenuClick = () => {
+//     if (onEdit) {
+//       onEdit();
+//       return;
+//     }
+
+//     simulateHeaderMenuClick(2);
+//     setCampaignIdForUpdateFromSideMenu(item.id);
+//   };
+
+//   const handleProgressInfoClick = (campaignId: any, campaignName: string) => {
+//     const uniqueKey = `progress-info-${campaignId}-${Date.now()}`;
+
+//     addMultiTab({
+//       id: 21,
+//       uniqueKey: uniqueKey,
+//       title: `캠페인 진행정보 - ${campaignName}`,
+//       icon: '',
+//       href: '',
+//       content: null,
+//       campaignId: campaignId
+//     });
+//   };
+
+//   const handleRebroadcastClick = (campaignId: any) => {
+//     setCampaignIdForUpdateFromSideMenu(campaignId);
+//     addTab({
+//       id: 20,
+//       uniqueKey: '20',
+//       title: '재발신 설정',
+//       icon: '',
+//       href: '',
+//       content: null,
+//     });
+//   };
+
+//   const handleMonitorClick = (tenantIdForCampaignTab:any , campaignId: any, campaignName: string) => {
+//     // if (onMonitor) {
+//     //   onMonitor();
+//     //   return;
+//     // }
+
+//     console.log("캠페인 그룹에서 상담원 상태 모니터 클릭 했을때 tenantId : ", tenantIdForCampaignTab);
+
+
+//     const uniqueKey = `monitor-${Date.now()}`;
+
+//     addMultiTab({
+//       id: 22,
+//       uniqueKey: uniqueKey,
+//       title: `상담사 상태 모니터 - ${campaignName}`,
+//       icon: '',
+//       href: '',
+//       content: null,
+//       campaignId: campaignId,
+//       params: {
+//         campaignId: campaignId,
+//         campaignName: campaignName,
+//         tenantId: tenantIdForCampaignTab,
+//       }
+//     });
+//   };
+
+//   const handleCampaignCopy = () => {
+//     if (onHandleCampaignCopy) {
+//       onHandleCampaignCopy();
+//       return;
+//     }
+
+//     console.log(`캠페인 복사: ${item.label} (ID: ${item.id})`);
+//     setCampaignIdForUpdateFromSideMenu(item.id);
+//     setCampaignIdForCopyCampaign(item.id);
+//     addTab({
+//       id: 130,
+//       uniqueKey: "130",
+//       title: "캠페인 복사",
+//       icon: "",
+//       href: "",
+//       content: null,
+//     });
+//   };
+
+//   const onCampaignDelete = (status: string) => {
+//     if (status !== 'stopped') {
+//       toast.error("캠페인이 중지 상태일 때만 삭제할 수 있습니다.");
+//       return;
+//     }
+
+//     // 다이얼로그 열기
+//     setIsDeleteDialogOpen(true);
+//   };
+
+//   const getStatusNumber = (status: CampaignStatus): number => {
+//     switch (status) {
+//       case 'started': return 1;
+//       case 'pending': return 2;
+//       case 'stopped': return 3;
+//       default: return 0;
+//     }
+//   };
+
+//   const handleStartClick = async (status: CampaignStatus) => {
+//     if (currentStatus === status || updateCampaignStatusMutation.isPending) {
+//       return;
+//     }
+
+//     try {
+//       preventCloseRef.current = true;
+
+//       // 상태 번호 얻기
+//       const statusNumber = getStatusNumber(status);
+
+//       // API 호출
+//       await updateCampaignStatusMutation.mutateAsync({
+//         campaign_id: Number(item.id),
+//         campaign_status: statusNumber
+//       });
+
+//       // 로컬 상태 업데이트
+//       setCurrentStatus(status);
+
+//       // 트리 데이터의 상태도 업데이트 (API 호출이 성공한 후)
+//       updateCampaignStatus(item.id, statusNumber);
+
+//       // 전체 트리 데이터 다시 가져오기 (렌더링 강제)
+//       await refetchTreeDataForCampaignGroupTab();
+
+//     } catch (error) {
+//       console.error('Error changing campaign status:', error);
+//     }
+//   };
+
+//   // 캠페인 블랙리스트 건수 조회 API 호출
+//   const { mutate: fetchCampaignBlacklistCount } = useApiForCampaignBlacklistCount({
+//     onSuccess: (data) => {
+//       setBlackListCount(data.result_data.blacklist_count);
+//       setTimeout(() => {
+//         setIsBlacklistPopupOpen(true);
+//       }, 100);
+//     }
+//   });
+
+//   // 캠페인 블랙리스트 건수 조회 클릭 이벤트
+//   const handleBlacklistCountCheckClick = () => {
+//     fetchCampaignBlacklistCount(Number(item.id));
+//   };
+
+//   // 메뉴 아이템 정의 (JSON의 SGC 값 기준)
+//   const menuItems = [
+//     // 첫 번째 그룹
+//     {
+//       id: 46,
+//       group: 1,
+//       key: "edit-campaign",
+//       label: "캠페인 수정",
+//       action: handleEditMenuClick
+//     },
+//     {
+//       id: 47,
+//       group: 1,
+//       key: "start-division",
+//       label: "시작구분",
+//       isSubmenu: true,
+//       subItems: [
+//         { id: 48, key: "start", label: "시작", status: "started" },
+//         { id: 49, key: "pause", label: "멈춤", status: "pending" },
+//         { id: 50, key: "stop", label: "중지", status: "stopped" }
+//       ],
+//       render: () => (
+//         <ContextMenuSub>
+//           <ContextMenuSubTrigger onPointerDown={() => { preventCloseRef.current = false; }}>
+//             <span className="flex items-center">
+//               시작구분:
+//               <span className="ml-1 flex items-center">
+//                 <div className="w-4 h-4 mr-1">
+//                   <Image
+//                     src={getStatusIcon(currentStatus) || ''}
+//                     alt={currentStatus}
+//                     width={16}
+//                     height={16}
+//                   />
+//                 </div>
+//                 {statusInfo[currentStatus].label}
+//               </span>
+//             </span>
+//           </ContextMenuSubTrigger>
+
+//           <ContextMenuSubContent
+//             className="min-w-[110px] p-1"
+//             onPointerDownOutside={(e) => {
+//               if (preventCloseRef.current) {
+//                 e.preventDefault();
+//                 preventCloseRef.current = false;
+//               }
+//             }}
+//           >
+//             {(Object.keys(statusInfo) as Array<CampaignStatus>).map((status) => (
+//               <ContextMenuItem
+//                 key={status}
+//                 onClick={(e) => {
+//                   e.stopPropagation();
+//                   handleStartClick(status);
+//                   preventCloseRef.current = true;
+//                 }}
+//                 className={cn(
+//                   "flex items-center justify-between text-sm px-2 py-1.5",
+//                   currentStatus === status ? "bg-gray-50" : "",
+//                   updateCampaignStatusMutation.isPending ? "opacity-70" : ""
+//                 )}
+//                 disabled={updateCampaignStatusMutation.isPending}
+//               >
+//                 <div className="flex items-center">
+//                   <div className="w-4 h-4 mr-2">
+//                     <Image
+//                       src={getStatusIcon(status) || ''}
+//                       alt={status}
+//                       width={16}
+//                       height={16}
+//                     />
+//                   </div>
+//                   <span>{statusInfo[status].label}</span>
+//                 </div>
+
+//                 {currentStatus === status && (
+//                   <Check className="h-3 w-3 text-green-500" />
+//                 )}
+//               </ContextMenuItem>
+//             ))}
+//           </ContextMenuSubContent>
+//         </ContextMenuSub>
+//       )
+//     },
+//     {
+//       id: 51,
+//       group: 1,
+//       key: "progress-info",
+//       label: "캠페인 진행정보",
+//       action: () => handleProgressInfoClick(item.id, item.label)
+//     },
+
+//     // 두 번째 그룹
+//     {
+//       id: 52,
+//       group: 2,
+//       key: "rebroadcast",
+//       label: "재발신",
+//       action: () => handleRebroadcastClick(item.id)
+//     },
+
+//     // 세 번째 그룹
+//     {
+//       id: 53,
+//       group: 3,
+//       key: "copy-campaign",
+//       label: "캠페인 복사",
+//       action: handleCampaignCopy
+//     },
+//     {
+//       id: 54,
+//       group: 3,
+//       key: "delete-campaign",
+//       label: "캠페인 삭제",
+//       action: () => onCampaignDelete(currentStatus),
+//       className: "text-red-500",
+//       condition: !isFolder
+//     },
+
+//     // 네 번째 그룹
+//     {
+//       id: 55,
+//       group: 4,
+//       key: "delete-campaign-list",
+//       label: "캠페인 리스트 삭제",
+//       action: () => handleCampaignListDelete(item.id),
+//       condition: currentStatus === 'stopped'
+//     },
+//     {
+//       id: 56,
+//       group: 4,
+//       key: "monitor",
+//       label: "상담사 상태 모니터22",
+//       action: () => handleMonitorClick(tenantIdForCampaignTab, item.id, item.label)
+//     },
+//     {
+//       id: 57,
+//       group: 4,
+//       key: "blacklist-count",
+//       label: "블랙리스트 건수 조회",
+//       action: handleBlacklistCountCheckClick
+//     }
+//   ];
+
+//   // 권한에 따라 메뉴 항목 필터링
+//   const visibleMenuItems = availableMenuIds?.length > 0
+//     ? menuItems.filter(item =>
+//       availableMenuIds.includes(item.id) &&
+//       (item.condition === undefined || item.condition)
+//     )
+//     : [];
+
+//   // 표시할 메뉴 항목이 없으면 기본 컨텍스트 메뉴만 표시
+//   if (visibleMenuItems.length === 0) {
+//     return (
+//       <ContextMenu>
+//         <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+//         <ContextMenuContent className="w-[150px]">
+//           <ContextMenuItem disabled>
+//             권한이 없습니다
+//           </ContextMenuItem>
+//         </ContextMenuContent>
+//       </ContextMenu>
+//     );
+//   }
+
+//   return (
+//     <>
+//       <ContextMenu>
+//         <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+//         <ContextMenuContent className="w-[150px]">
+//           {visibleMenuItems.map((item, index, arr) => {
+//             // 현재 아이템과 이전 아이템이 다른 그룹인 경우 구분선 추가
+//             const prevItem = index > 0 ? arr[index - 1] : null;
+//             const showSeparator = prevItem && prevItem.group !== item.group;
+
+//             return (
+//               <React.Fragment key={item.key}>
+//                 {showSeparator && <ContextMenuSeparator className="my-1" />}
+
+//                 {item.isSubmenu ? (
+//                   item.render()
+//                 ) : (
+//                   <ContextMenuItem
+//                     onClick={item.action}
+//                     className={item.className}
+//                   >
+//                     {item.label}
+//                   </ContextMenuItem>
+//                 )}
+//               </React.Fragment>
+//             );
+//           })}
+//         </ContextMenuContent>
+//       </ContextMenu>
+
+//       {/* 블랙리스트 팝업 */}
+//       {isBlacklistPopupOpen && (
+//         <BlackListCountPopup
+//           campaignId={item.id}
+//           blackListCount={blackListCount}
+//           isOpen={isBlacklistPopupOpen}
+//           onConfirm={() => setIsBlacklistPopupOpen(false)}
+//           onCancel={() => setIsBlacklistPopupOpen(false)}
+//         />
+//       )}
+
+//       {/* 캠페인 삭제 다이얼로그 */}
+//       {isDeleteDialogOpen && (
+//         <IDialogButtonForCampaingDelete
+//           isOpen={isDeleteDialogOpen}
+//           onOpenChange={(open) => setIsDeleteDialogOpen(open)}
+//           campaignId={item.id}
+//           campaignName={item.label}
+//           tenant_id={tenantIdForCampaignTab}
+//         />
+//       )}
+//     </>
+//   );
+// }
+
 "use client";
 
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
-  ContextMenuTrigger,
-  ContextMenuSeparator,
-} from "@/components/ui/context-menu";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { toast } from 'react-toastify';
+import Image from "next/image";
+import { Check, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 import { useTabStore } from "@/store/tabStore";
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
-import { useAvailableMenuStore } from "@/store/useAvailableMenuStore"; // 권한 관리 스토어 추가
-import { Check } from "lucide-react";
-import { useState, useRef } from "react";
-import BlackListCountPopup from '@/features/campaignManager/components/popups/BlackListCountPopup';
-import { toast } from 'react-toastify';
+import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
 import { useApiForCampaignBlacklistCount } from "@/features/listManager/hooks/useApiForCampaignBlacklistCount";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
 import useApiForCampaignListDelete from "@/features/listManager/hooks/useApiForCampaignListDelete";
 import { useApiForCampaignStatusUpdate } from "@/features/campaignManager/hooks/useApiForCampaignStatusUpdate";
-import IDialogButtonForCampaingDelete from "../dialog/IDialogButtonForCampaingDelete";
-import React from "react";
-import { useCampainManagerStore } from "@/store/campainManagerStore";
 import { useApiForMain } from "@/features/auth/hooks/useApiForMain";
 import { useMainStore } from "@/store/mainStore";
 import { useAuthStore } from "@/store/authStore";
+
+import IDialogButtonForCampaingDelete from "../dialog/IDialogButtonForCampaingDelete";
+import BlackListCountPopup from '@/features/campaignManager/components/popups/BlackListCountPopup';
 
 export type CampaignStatus = 'started' | 'pending' | 'stopped';
 
@@ -68,6 +584,12 @@ export const getStatusFromFlag = (flag?: number): CampaignStatus => {
   }
 };
 
+// 메뉴 구분선 컴포넌트
+const MenuSeparator = () => {
+  return <div className="h-px bg-gray-200 my-1" />;
+};
+
+// 메인 컴포넌트
 export function IContextMenuForCampaignForCampaignGroup({
   children,
   item,
@@ -76,6 +598,8 @@ export function IContextMenuForCampaignForCampaignGroup({
   onHandleCampaignCopy,
   tenantIdForCampaignTab,
 }: ContextMenuForTreeNodeProps) {
+  const menuRef = useRef<HTMLDivElement>(null);
+  const subMenuRef = useRef<HTMLDivElement>(null);
   const isFolder = item.type === "folder";
   const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, setCampaignIdForCopyCampaign, addTab, addMultiTab } = useTabStore();
 
@@ -91,25 +615,46 @@ export function IContextMenuForCampaignForCampaignGroup({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<CampaignStatus>(item.status);
   const [blackListCount, setBlackListCount] = useState<number>(0);
-  const preventCloseRef = useRef(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeSubMenu, setActiveSubMenu] = useState<string | null>(null);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [menuWidth, setMenuWidth] = useState(120); // 메뉴 너비 상태 추가
 
-  const { tenant_id, role_id, session_key } = useAuthStore();
+  const { tenant_id, session_key } = useAuthStore();
 
-  const { tenants
-    , setCampaigns
-    , selectedCampaign
-    , setSelectedCampaign
+  const {
+    setCampaigns,
+    selectedCampaign,
+    setSelectedCampaign
   } = useMainStore();
+
+  // 컴포넌트가 마운트될 때 상태 초기화
+  useEffect(() => {
+    setCurrentStatus(item.status);
+  }, [item.status]);
+
+  // 메뉴 너비 측정 (메뉴가 열렸을 때)
+  useEffect(() => {
+    if (menuOpen && menuRef.current) {
+      setMenuWidth(menuRef.current.offsetWidth);
+    }
+  }, [menuOpen]);
 
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
-      // if( tenant_id === 0){
-      //   setCampaigns(data.result_data);
-      // }else{
-      //   setCampaigns(data.result_data.filter(data=>data.tenant_id === tenant_id));
-      // }
-      setSelectedCampaign(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
+      if (selectedCampaign) {
+        const updatedCampaign = data.result_data.find(
+          (campaign) => campaign.campaign_id === selectedCampaign.campaign_id
+        );
+        if (updatedCampaign) {
+          setSelectedCampaign(updatedCampaign);
+        }
+      }
+      // 데이터 리프레시 후 사이드 메뉴 트리 데이터도 업데이트
+      refetchTreeDataForCampaignGroupTab();
     }
   });
 
@@ -121,41 +666,59 @@ export function IContextMenuForCampaignForCampaignGroup({
   };
 
   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
-    onSuccess: (data) => {
-      // toast.success("캠페인 상태가 변경되었습니다22.");
-      preventCloseRef.current = true;
-      
+    onSuccess: () => {
       console.log("캠페인 상태 업데이트");
-    
       fetchMain({
         session_key: session_key,
         tenant_id: tenant_id
       });
-
+      setIsProcessing(false);
     },
     onError: (error) => {
       toast.error(error.message || "상태 변경 중 오류가 발생했습니다.");
+      setIsProcessing(false);
     },
   });
 
   const { mutate: deleteCampaignList } = useApiForCampaignListDelete({
-    // onSuccess: (data) => {
-    //   toast.success(".");
-    // },
-    // onError: (error) => {
-    //   toast.error(error.message || "리스트 삭제 중 오류가 발생했습니다.");
-    // },
+    onSuccess: () => {
+      toast.success("캠페인 리스트가 삭제되었습니다.");
+      refetchTreeDataForCampaignGroupTab();
+      setIsProcessing(false);
+    },
+    onError: (error) => {
+      toast.error(error?.message || "리스트 삭제 중 오류가 발생했습니다.");
+      setIsProcessing(false);
+    }
   });
 
-  const handleCampaignListDelete = (campaignId: any) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation(); // 버블링 방지
+
+    // 현재 처리 중이면 메뉴를 열지 않음
+    if (isProcessing) return;
+
+    // 기존에 열려 있는 메뉴 닫기
+    setActiveSubMenu(null);
+    setHoveredItem(null);
+
+    // 새 메뉴 위치 설정
+    setMenuPosition({ x: e.clientX, y: e.clientY });
+    setMenuOpen(true);
+  }, [isProcessing]);
+
+  const handleCampaignListDelete = useCallback((campaignId: any) => {
     if (currentStatus !== 'stopped') {
       toast.error("캠페인이 중지 상태일 때만 리스트를 삭제할 수 있습니다.");
       return;
     }
+    setIsProcessing(true);
     deleteCampaignList(campaignId);
-  };
+    setMenuOpen(false);
+  }, [currentStatus, deleteCampaignList]);
 
-  const handleEditMenuClick = () => {
+  const handleEditMenuClick = useCallback(() => {
     if (onEdit) {
       onEdit();
       return;
@@ -163,9 +726,10 @@ export function IContextMenuForCampaignForCampaignGroup({
 
     simulateHeaderMenuClick(2);
     setCampaignIdForUpdateFromSideMenu(item.id);
-  };
+    setMenuOpen(false);
+  }, [onEdit, simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu, item.id]);
 
-  const handleProgressInfoClick = (campaignId: any, campaignName: string) => {
+  const handleProgressInfoClick = useCallback((campaignId: any, campaignName: string) => {
     const uniqueKey = `progress-info-${campaignId}-${Date.now()}`;
 
     addMultiTab({
@@ -177,9 +741,10 @@ export function IContextMenuForCampaignForCampaignGroup({
       content: null,
       campaignId: campaignId
     });
-  };
+    setMenuOpen(false);
+  }, [addMultiTab]);
 
-  const handleRebroadcastClick = (campaignId: any) => {
+  const handleRebroadcastClick = useCallback((campaignId: any) => {
     setCampaignIdForUpdateFromSideMenu(campaignId);
     addTab({
       id: 20,
@@ -189,16 +754,11 @@ export function IContextMenuForCampaignForCampaignGroup({
       href: '',
       content: null,
     });
-  };
+    setMenuOpen(false);
+  }, [setCampaignIdForUpdateFromSideMenu, addTab]);
 
-  const handleMonitorClick = (tenantIdForCampaignTab:any , campaignId: any, campaignName: string) => {
-    // if (onMonitor) {
-    //   onMonitor();
-    //   return;
-    // }
-
+  const handleMonitorClick = useCallback((tenantIdForCampaignTab: any, campaignId: any, campaignName: string) => {
     console.log("캠페인 그룹에서 상담원 상태 모니터 클릭 했을때 tenantId : ", tenantIdForCampaignTab);
-    
 
     const uniqueKey = `monitor-${Date.now()}`;
 
@@ -216,28 +776,24 @@ export function IContextMenuForCampaignForCampaignGroup({
         tenantId: tenantIdForCampaignTab,
       }
     });
-  };
+    setMenuOpen(false);
+  }, [addMultiTab]);
 
-  const handleCampaignCopy = () => {
-    if (onHandleCampaignCopy) {
-      onHandleCampaignCopy();
-      return;
-    }
+  const handleCampaignCopy = useCallback(() => {
+    // if (onHandleCampaignCopy) {
+    //   onHandleCampaignCopy();
+    //   return;
+    // }
 
     console.log(`캠페인 복사: ${item.label} (ID: ${item.id})`);
     setCampaignIdForUpdateFromSideMenu(item.id);
     setCampaignIdForCopyCampaign(item.id);
-    addTab({
-      id: 130,
-      uniqueKey: "130",
-      title: "캠페인 복사",
-      icon: "",
-      href: "",
-      content: null,
-    });
-  };
+    // setSelectedNodeType(item.type);
+    addTab({ id: 130, uniqueKey: "130", title: "캠페인 복사", icon: "", href: "", content: null });
+    setMenuOpen(false);
+  }, [onHandleCampaignCopy, item.label, item.id, setCampaignIdForUpdateFromSideMenu, setCampaignIdForCopyCampaign, addTab]);
 
-  const onCampaignDelete = (status: string) => {
+  const onCampaignDelete = useCallback((status: string) => {
     if (status !== 'stopped') {
       toast.error("캠페인이 중지 상태일 때만 삭제할 수 있습니다.");
       return;
@@ -245,7 +801,8 @@ export function IContextMenuForCampaignForCampaignGroup({
 
     // 다이얼로그 열기
     setIsDeleteDialogOpen(true);
-  };
+    setMenuOpen(false);
+  }, []);
 
   const getStatusNumber = (status: CampaignStatus): number => {
     switch (status) {
@@ -256,13 +813,13 @@ export function IContextMenuForCampaignForCampaignGroup({
     }
   };
 
-  const handleStartClick = async (status: CampaignStatus) => {
-    if (currentStatus === status || updateCampaignStatusMutation.isPending) {
+  const handleStartClick = useCallback(async (status: CampaignStatus) => {
+    if (currentStatus === status || updateCampaignStatusMutation.isPending || isProcessing) {
       return;
     }
 
     try {
-      preventCloseRef.current = true;
+      setIsProcessing(true);
 
       // 상태 번호 얻기
       const statusNumber = getStatusNumber(status);
@@ -279,13 +836,15 @@ export function IContextMenuForCampaignForCampaignGroup({
       // 트리 데이터의 상태도 업데이트 (API 호출이 성공한 후)
       updateCampaignStatus(item.id, statusNumber);
 
-      // 전체 트리 데이터 다시 가져오기 (렌더링 강제)
-      await refetchTreeDataForCampaignGroupTab();
+      // 메뉴 닫기
+      setMenuOpen(false);
+      setActiveSubMenu(null);
 
     } catch (error) {
       console.error('Error changing campaign status:', error);
+      setIsProcessing(false);
     }
-  };
+  }, [currentStatus, updateCampaignStatusMutation, item.id, updateCampaignStatus, isProcessing]);
 
   // 캠페인 블랙리스트 건수 조회 API 호출
   const { mutate: fetchCampaignBlacklistCount } = useApiForCampaignBlacklistCount({
@@ -298,9 +857,10 @@ export function IContextMenuForCampaignForCampaignGroup({
   });
 
   // 캠페인 블랙리스트 건수 조회 클릭 이벤트
-  const handleBlacklistCountCheckClick = () => {
+  const handleBlacklistCountCheckClick = useCallback(() => {
     fetchCampaignBlacklistCount(Number(item.id));
-  };
+    setMenuOpen(false);
+  }, [fetchCampaignBlacklistCount, item.id]);
 
   // 메뉴 아이템 정의 (JSON의 SGC 값 기준)
   const menuItems = [
@@ -318,74 +878,27 @@ export function IContextMenuForCampaignForCampaignGroup({
       key: "start-division",
       label: "시작구분",
       isSubmenu: true,
+      renderLabel: () => (
+        <div className="flex items-center text-xs">
+          시작구분:
+          <span className="ml-1 flex items-center">
+            <div className="w-3 h-3 mr-1">
+              <Image
+                src={getStatusIcon(currentStatus) || ''}
+                alt={currentStatus}
+                width={12}
+                height={12}
+              />
+            </div>
+            {statusInfo[currentStatus].label}
+          </span>
+        </div>
+      ),
       subItems: [
         { id: 48, key: "start", label: "시작", status: "started" },
         { id: 49, key: "pause", label: "멈춤", status: "pending" },
         { id: 50, key: "stop", label: "중지", status: "stopped" }
-      ],
-      render: () => (
-        <ContextMenuSub>
-          <ContextMenuSubTrigger onPointerDown={() => { preventCloseRef.current = false; }}>
-            <span className="flex items-center">
-              시작구분:
-              <span className="ml-1 flex items-center">
-                <div className="w-4 h-4 mr-1">
-                  <Image
-                    src={getStatusIcon(currentStatus) || ''}
-                    alt={currentStatus}
-                    width={16}
-                    height={16}
-                  />
-                </div>
-                {statusInfo[currentStatus].label}
-              </span>
-            </span>
-          </ContextMenuSubTrigger>
-
-          <ContextMenuSubContent
-            className="min-w-[110px] p-1"
-            onPointerDownOutside={(e) => {
-              if (preventCloseRef.current) {
-                e.preventDefault();
-                preventCloseRef.current = false;
-              }
-            }}
-          >
-            {(Object.keys(statusInfo) as Array<CampaignStatus>).map((status) => (
-              <ContextMenuItem
-                key={status}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleStartClick(status);
-                  preventCloseRef.current = true;
-                }}
-                className={cn(
-                  "flex items-center justify-between text-sm px-2 py-1.5",
-                  currentStatus === status ? "bg-gray-50" : "",
-                  updateCampaignStatusMutation.isPending ? "opacity-70" : ""
-                )}
-                disabled={updateCampaignStatusMutation.isPending}
-              >
-                <div className="flex items-center">
-                  <div className="w-4 h-4 mr-2">
-                    <Image
-                      src={getStatusIcon(status) || ''}
-                      alt={status}
-                      width={16}
-                      height={16}
-                    />
-                  </div>
-                  <span>{statusInfo[status].label}</span>
-                </div>
-
-                {currentStatus === status && (
-                  <Check className="h-3 w-3 text-green-500" />
-                )}
-              </ContextMenuItem>
-            ))}
-          </ContextMenuSubContent>
-        </ContextMenuSub>
-      )
+      ]
     },
     {
       id: 51,
@@ -435,7 +948,7 @@ export function IContextMenuForCampaignForCampaignGroup({
       id: 56,
       group: 4,
       key: "monitor",
-      label: "상담사 상태 모니터22",
+      label: "상담사 상태 모니터",
       action: () => handleMonitorClick(tenantIdForCampaignTab, item.id, item.label)
     },
     {
@@ -455,49 +968,190 @@ export function IContextMenuForCampaignForCampaignGroup({
     )
     : [];
 
-  // 표시할 메뉴 항목이 없으면 기본 컨텍스트 메뉴만 표시
-  if (visibleMenuItems.length === 0) {
-    return (
-      <ContextMenu>
-        <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-        <ContextMenuContent className="w-[150px]">
-          <ContextMenuItem disabled>
-            권한이 없습니다
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
-    );
-  }
+  // 다이얼로그 닫힘 처리 함수
+  const handleDialogClose = useCallback((open: boolean) => {
+    if (!open) {
+      setIsDeleteDialogOpen(false);
+      // 데이터 리프레시
+      setTimeout(() => {
+        refetchTreeDataForCampaignGroupTab();
+      }, 100);
+    }
+  }, [refetchTreeDataForCampaignGroupTab]);
+
+  // 메뉴 항목 hover 이벤트 처리
+  const handleMenuItemMouseEnter = useCallback((key: string) => {
+    setHoveredItem(key);
+
+    // 서브메뉴 항목이면 서브메뉴를 열고 그렇지 않으면 닫기
+    const menuItem = menuItems.find(item => item.key === key);
+    if (menuItem && menuItem.isSubmenu) {
+      setActiveSubMenu(key);
+    } else {
+      setActiveSubMenu(null);
+    }
+  }, [menuItems]);
+
+  // 메뉴 항목 hover 이벤트 처리
+  const handleMenuItemMouseLeave = useCallback(() => {
+    // 서브메뉴가 열려있을 때는 호버 상태 유지
+    if (!activeSubMenu) {
+      setHoveredItem(null);
+    }
+  }, [activeSubMenu]);
+
+  // 이벤트 핸들러 등록 및 정리
+  useEffect(() => {
+    // 외부 클릭 시 메뉴 닫기
+    const handleClickOutside = (e: MouseEvent) => {
+      // 블랙리스트 팝업이나 삭제 다이얼로그가 열려있으면 무시
+      if (isBlacklistPopupOpen || isDeleteDialogOpen) {
+        return;
+      }
+
+      // 메뉴 외부 클릭 처리
+      if (menuRef.current && !menuRef.current.contains(e.target as Node) &&
+        subMenuRef.current && !subMenuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+        setActiveSubMenu(null);
+        setHoveredItem(null);
+      }
+    };
+
+    // ESC 키 누르면 메뉴 닫기
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+        setActiveSubMenu(null);
+        setHoveredItem(null);
+      }
+    };
+
+    if (menuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [menuOpen, isBlacklistPopupOpen, isDeleteDialogOpen]);
+
+  // 마우스 이벤트 등록: 서브메뉴를 벗어나면 닫기
+  const handleSubMenuMouseLeave = useCallback(() => {
+    // 일정 시간 후에 서브메뉴 닫기 (갑작스럽게 닫히는 것 방지)
+    setTimeout(() => {
+      if (!hoveredItem) {
+        setActiveSubMenu(null);
+      }
+    }, 100);
+  }, [hoveredItem]);
 
   return (
     <>
-      <ContextMenu>
-        <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
-        <ContextMenuContent className="w-[150px]">
+      <div onContextMenu={handleContextMenu}>
+        {children}
+      </div>
+
+      {/* 컨텍스트 메뉴 */}
+      {menuOpen && visibleMenuItems.length > 0 && (
+        <div
+          ref={menuRef}
+          className="fixed min-w-[120px] bg-white rounded-md shadow-md border border-gray-200 z-50 py-1"
+          style={{
+            left: `${menuPosition.x}px`,
+            top: `${menuPosition.y}px`
+          }}
+        >
           {visibleMenuItems.map((item, index, arr) => {
             // 현재 아이템과 이전 아이템이 다른 그룹인 경우 구분선 추가
             const prevItem = index > 0 ? arr[index - 1] : null;
             const showSeparator = prevItem && prevItem.group !== item.group;
+            const isHovered = hoveredItem === item.key;
+            const isSubmenuActive = activeSubMenu === item.key;
 
             return (
               <React.Fragment key={item.key}>
-                {showSeparator && <ContextMenuSeparator className="my-1" />}
+                {showSeparator && <MenuSeparator />}
 
-                {item.isSubmenu ? (
-                  item.render()
-                ) : (
-                  <ContextMenuItem
-                    onClick={item.action}
-                    className={item.className}
+                <div
+                  className="relative"
+                  onMouseEnter={() => handleMenuItemMouseEnter(item.key)}
+                  onMouseLeave={handleMenuItemMouseLeave}
+                >
+                  <button
+                    type="button"
+                    className={cn(
+                      "w-full flex items-center justify-between text-xs px-2 py-1.5",
+                      isHovered ? "bg-blue-50" : "",
+                      item.className
+                    )}
+                    onClick={item.isSubmenu ? undefined : item.action}
+                    disabled={isProcessing}
                   >
-                    {item.label}
-                  </ContextMenuItem>
-                )}
+                    {item.isSubmenu ? (
+                      <div className="flex items-center justify-between w-full">
+                        {item.renderLabel?.()}
+                        <ChevronRight className="h-3 w-3 ml-1" />
+                      </div>
+                    ) : (
+                      item.label
+                    )}
+                  </button>
+
+                  {/* 서브메뉴 */}
+                  {item.isSubmenu && isSubmenuActive && (
+                    <div
+                      ref={subMenuRef}
+                      className="absolute right-0 top-0 min-w-[100px] bg-white rounded-md shadow-md border border-gray-200 z-50 py-1"
+                      style={{
+                        marginTop: '-1px',
+                        transform: 'translateX(100%)',  // 오른쪽으로 100% 이동 (부모 요소 너비만큼)
+                        marginRight: '-2px'
+                      }}
+                      onMouseLeave={handleSubMenuMouseLeave}
+                    >
+                      {item.subItems.map((subItem) => (
+                        <button
+                          key={subItem.key}
+                          type="button"
+                          className={cn(
+                            "w-full text-left flex items-center justify-between text-xs px-2 py-1.5",
+                            hoveredItem === subItem.key ? "bg-blue-50" : "",
+                            currentStatus === subItem.status ? "bg-gray-50" : "",
+                            (updateCampaignStatusMutation.isPending || currentStatus === subItem.status || isProcessing)
+                              ? "opacity-70 cursor-not-allowed"
+                              : "cursor-pointer"
+                          )}
+                          onClick={() => handleStartClick(subItem.status as CampaignStatus)}
+                          disabled={updateCampaignStatusMutation.isPending || currentStatus === subItem.status || isProcessing}
+                          onMouseEnter={() => setHoveredItem(subItem.key)}
+                        >
+                          <div className="flex items-center">
+                            <div className="w-3 h-3 mr-1">
+                              <Image
+                                src={getStatusIcon(subItem.status) || ''}
+                                alt={subItem.status}
+                                width={12}
+                                height={12}
+                              />
+                            </div>
+                            <span>{subItem.label}</span>
+                          </div>
+                          {currentStatus === subItem.status && (
+                            <Check className="h-2 w-2 text-green-500 ml-1" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </React.Fragment>
             );
           })}
-        </ContextMenuContent>
-      </ContextMenu>
+        </div>
+      )}
 
       {/* 블랙리스트 팝업 */}
       {isBlacklistPopupOpen && (
@@ -514,7 +1168,7 @@ export function IContextMenuForCampaignForCampaignGroup({
       {isDeleteDialogOpen && (
         <IDialogButtonForCampaingDelete
           isOpen={isDeleteDialogOpen}
-          onOpenChange={(open) => setIsDeleteDialogOpen(open)}
+          onOpenChange={handleDialogClose}
           campaignId={item.id}
           campaignName={item.label}
           tenant_id={tenantIdForCampaignTab}

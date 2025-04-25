@@ -1,3 +1,4 @@
+
 // import React, { useRef, useEffect, useState } from "react";
 // import { useDroppable } from "@dnd-kit/core";
 // import { CommonButton } from "@/components/shared/CommonButton";
@@ -91,7 +92,11 @@
 //   return (
 //     <div
 //       ref={setNodeRef}
-//       className={`flex-none relative transition-colors duration-200 ${isOver ? "bg-gray-100" : "bg-white"}${
+//       className={`flex-none relative transition-colors duration-200 ${
+//         isOver 
+//           ? "bg-blue-100 shadow-inner ring-2 ring-blue-300" // 강조된 하이라이트 스타일
+//           : "bg-white"
+//       }${
 //         showDivider ? " border-r border-gray-200" : ""
 //       }`}
 //       style={{ width: `${width}%` }}
@@ -117,7 +122,10 @@
 //         {/* Tabs container - 높이와 정렬 일치 */}
 //         <div
 //           ref={scrollRef}
-//           className="flex-1 flex items-stretch overflow-x-auto scrollbar-none"
+//           className={`flex-1 flex items-stretch overflow-x-auto scrollbar-none ${
+//             isOver ? "bg-blue-50" // 탭 컨테이너도 하이라이트
+//             : ""
+//           }`}
 //           data-droppable-tabs-container={true}
 //         >
 //           {section.tabs.map((tab, index) => {
@@ -176,6 +184,11 @@
 //           </CommonButton>
 //         )}
 //       </div>
+      
+//       {/* 추가: 드롭 가능한 영역에 대한 시각적 표시 */}
+//       {isOver && (
+//         <div className="absolute inset-0 pointer-events-none border-2 border-blue-400 bg-blue-50 bg-opacity-30 z-10"></div>
+//       )}
 //     </div>
 //   );
 // }
@@ -206,6 +219,7 @@ export default function TabSection({
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [scrolling, setScrolling] = useState<"left" | "right" | null>(null);
+  const prevTabsLengthRef = useRef<number | null>(null);
   
   // 섹션 ID 일관성 있게 생성
   const droppableId = `section-${rowId}-${sectionId}`;
@@ -229,6 +243,36 @@ export default function TabSection({
     activeTabId,
     activeTabKey,
   } = useTabStore();
+  
+  // 현재 row와 section 찾기
+  const row = rows.find((r) => r.id === rowId);
+  const section = row?.sections.find((s) => s.id === sectionId);
+  const currentTabsLength = section?.tabs.length || 0;
+
+  // 탭 추가 감지 및 자동 스크롤 처리
+  useEffect(() => {
+    // 처음 렌더링이 아니고, 이전 탭 개수보다 현재 탭 개수가 많아졌을 경우
+    if (prevTabsLengthRef.current !== null && currentTabsLength > prevTabsLengthRef.current) {
+      // 오른쪽 끝으로 스크롤
+      if (scrollRef.current) {
+        // 즉시 실행과 약간의 지연 후 실행(애니메이션이나 렌더링 완료 후)
+        scrollToEnd();
+        
+        // 추가로 약간의 지연을 두고 한 번 더 스크롤 (렌더링이 완전히 끝난 후)
+        setTimeout(scrollToEnd, 100);
+      }
+    }
+    
+    // 현재 탭 개수 저장
+    prevTabsLengthRef.current = currentTabsLength;
+  }, [currentTabsLength]);
+
+  // 오른쪽 끝으로 스크롤하는 함수
+  const scrollToEnd = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
+    }
+  };
 
   useEffect(() => {
     return () => {
@@ -264,10 +308,7 @@ export default function TabSection({
   };
 
   // Now perform conditional checks after all hooks have been called
-  const row = rows.find((r) => r.id === rowId);
   if (!row) return null;
-  
-  const section = row.sections.find((s) => s.id === sectionId);
   if (!section) return null;
 
   return (
