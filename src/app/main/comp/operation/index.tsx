@@ -9,12 +9,13 @@ import SkillEdit from './SkillEdit'
 // import ConsultResultSetting from './ConsultResultSetting'
 import SuspendView from './SuspendView'
 import Image from 'next/image'
-import { useTabStore } from '@/store'
+import { useAuthStore, useTabStore } from '@/store'
 import SystemCallBackTimeSetting from './SystemCallBackTimeSetting'
 
 export default function OperationBoard() {
   // const [openSectionId, setOpenSectionId] = useState<string>('section1')
   const { activeTabId, openOperationSectionId, setOpenOperationSectionId } = useTabStore();
+  const {tenant_id} = useAuthStore();
 
   useEffect(() => {
     if (activeTabId === 8) {
@@ -42,7 +43,13 @@ export default function OperationBoard() {
 
   return (
     <div className="divide-y accordion-wrap limit-width">
-      {sections.map((section) => (
+      {sections.filter((section) => {
+        // tenant_id가 0이 아니고 section.id가 section8인 경우(SystemCallBackTimeSetting 컴포넌트) 제외
+        if (tenant_id !== 0 && section.id === 'section8' && section.component === SystemCallBackTimeSetting) {
+          return false;
+        }
+        return true;
+      }).map((section) => (
         <div key={section.id} className="accordion">
           <h2>
             <button
@@ -70,6 +77,7 @@ export default function OperationBoard() {
           >
             <div className="py-[35px] px-[40px] border-t border-gray-200">
               {/* 컴포넌트를 조건부 렌더링 */}
+              
               {openOperationSectionId === section.id && React.createElement(section.component)}
             </div>
           </div>

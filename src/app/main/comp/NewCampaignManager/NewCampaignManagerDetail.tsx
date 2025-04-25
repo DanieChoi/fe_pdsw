@@ -344,7 +344,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
 
   //input data change
   const handleInputData = (value:any, col:string) => {
-    if( col === 'campaign_id' && value !== '' && value.length <= 10 ){
+    if( col === 'campaign_id' && value.length <= 10 ){
       const numValue = Number(value);
       setNewCampaignInfo({
           ...newCampaignInfo,
@@ -981,11 +981,14 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
           <div className='flex items-center gap-2'>
             <Label className="w-[90px] min-w-[90px]">캠페인 아이디</Label>
             <CustomInput 
-              type="number" 
-              value={newCampaignInfo.campaign_id } 
-              onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
+              type="text" 
+              value={newCampaignInfo.campaign_id || ''} 
+              onChange={e => {
+                // 숫자만 반영
+                const val = e.target.value.replace(/[^0-9]/g, '');
+                handleInputData(val, 'campaign_id'); // 빈 문자열일 경우 '0'으로 설정
+              }}
               className="" 
-              min="0" 
               maxLength={10}
             />
           </div>
