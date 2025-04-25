@@ -556,6 +556,16 @@ export function TreeNodeForSideBarCampaignGroupTab({
     return [];
   }, [node.type, node.children]);
 
+  // 캠페인 이름 배열도 필요
+  const campaignNames = useMemo(() => {
+    if (node.type === "group" && node.children && Array.isArray(node.children)) {
+      return node.children
+        .filter(child => child.type === "campaign" && child.name)
+        .map(child => child.name);
+    }
+    return [];
+  }, [node.type, node.children]);
+
   const { mutate: deleteCampaignGroup, isPending: isDeleting } = useApiForDeleteCampaignGroup({
     onSuccess: () => {
       toast.success("캠페인 그룹이 삭제되었습니다.");
@@ -872,7 +882,8 @@ export function TreeNodeForSideBarCampaignGroupTab({
         <IContextMenuForCampaignGroupAtCampaignGroup
           node={{
             ...node,
-            campaignIds: campaignIds // Extract campaign IDs from children and pass them
+            campaignIds: campaignIds ,
+            campaignNamess: campaignIds 
           }}
           setIsCampaignAddPopupOpen={setIsCampaignAddPopupOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
