@@ -433,13 +433,26 @@ export default function Footer({
     }
     //채널할당
     else if (announce === '/pds/channel-assign') {
-      _message = `[채널할당] 장비번호: [${data['device_id']}], 채널번호: [${data['channel_count']}], 할당방법: `
+      _message = `[채널할당] 장비번호: [${data['device_id']}], 채널번호: [${data['channel_count']}], 할당방법: `;
       if (data['assign_kind'] === 1) {
-        _message = _message + '캠페인으로 할당'
+        _message = _message + '캠페인으로 할당';
       } else if (data['assign_kind'] === 2) {
-        _message = _message + '발신모드로 할당'
+        _message = _message + '발신모드로 할당';
       } else if (data['assign_kind'] === 3) {
-        _message = _message + '채널그룹으로 할당'
+        _message = _message + '채널그룹으로 할당';
+      }
+
+      addMessageToFooterList(_time, _type, _message);
+    }
+    //에약콜 제한 설정
+    else if (announce === '/pds/campaign/reserved-call') {
+      _message = '[예약콜 제한설정 ';
+      if (command === 'INSERT') {
+        _message = _message + `추가] 캠페인 아이디: [${campaign_id}], 제한건수: [${data['max_call']}]`;
+      } else if (command === 'UPDATE') {
+        _message = _message + `수정] 캠페인 아이디: [${campaign_id}], 제한건수: [${data['max_call']}]`;
+      } else if (command === 'DELETE') {
+        _message = _message + `삭제] 캠페인 아이디: [${campaign_id}]`;
       }
       
       addMessageToFooterList(_time, _type, _message);
