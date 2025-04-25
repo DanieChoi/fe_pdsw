@@ -35,10 +35,11 @@ const CallPacingTab: React.FC<Props> = ({ callCampaignMenu,campaignDialSpeedInfo
 
   const handleDecrement = (type: 'predictive' | 'progressive') => {
     if (type === 'predictive') {
-      setPredictiveValue(Math.max(50, predictiveValue - predictiveUnit));
+      const tempValue = Math.max(50, predictiveValue - predictiveUnit);
+      setPredictiveValue(tempValue);
       onHandleCallPacingTabChange({...tempCallPacingTabParam
         , campaignDialSpeedChangeYn: true
-        , predictive_dial_speed: Math.max(50, predictiveValue - predictiveUnit)
+        , predictive_dial_speed: tempValue
       });
     } else {
       setProgressiveValue(Math.max(25, progressiveValue - progressiveUnit));
@@ -51,10 +52,11 @@ const CallPacingTab: React.FC<Props> = ({ callCampaignMenu,campaignDialSpeedInfo
 
   const handleIncrement = (type: 'predictive' | 'progressive') => {
     if (type === 'predictive') {
-      setPredictiveValue(Math.min(100, predictiveValue + predictiveUnit));
+      const tempValue = Math.min(100, predictiveValue + predictiveUnit);
+      setPredictiveValue(tempValue);
       onHandleCallPacingTabChange({...tempCallPacingTabParam
         , campaignDialSpeedChangeYn: true
-        , predictive_dial_speed: Math.min(100, predictiveValue + predictiveUnit)
+        , predictive_dial_speed: tempValue
       });
     } else {
       setProgressiveValue(Math.min(500, progressiveValue + progressiveUnit));
@@ -77,6 +79,7 @@ const CallPacingTab: React.FC<Props> = ({ callCampaignMenu,campaignDialSpeedInfo
         setPredictiveDisabled(true);
         setProgressiveValueDisabled(true);
       }
+      setTempCallPacingTabParam(campaignDialSpeedInfo);
       setProgressiveValue( campaignDialSpeedInfo.progressive_dial_speed * 2 < 25 ?25:campaignDialSpeedInfo.progressive_dial_speed * 2 );
       setPredictiveValue( campaignDialSpeedInfo.predictive_dial_speed < 50?50:campaignDialSpeedInfo.predictive_dial_speed );
     }
