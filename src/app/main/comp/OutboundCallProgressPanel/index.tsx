@@ -205,6 +205,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 
   // 캠페인 변경 핸들러
   const handleCampaignChange = (value: string): void => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
     if (onCampaignChange) {
       onCampaignChange(value);
     } else {
@@ -414,9 +417,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       //   tenantId: tenant_id+'',
       //   campaignId: '0'
       // });
-        const tenantId = tenant_id+'' || '1';
-        const campaignId =  '0';
-        fetchCallProgressStatus({ tenantId, campaignId });
+      const tenantId = tenant_id+'' || '1';
+      const campaignId =  '0';
+      fetchCallProgressStatus({ tenantId, campaignId });
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }

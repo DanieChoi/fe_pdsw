@@ -46,65 +46,79 @@ const CustomInputForTime = React.forwardRef<HTMLInputElement, CustomInputForTime
       return hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59;
     };
 
+
+    const [keyPressed, setKeyPressed] = React.useState<string | null>(null); // 키 저장
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      setKeyPressed(e.key); // key 값을 state로 저장
+    };
+
+
+
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       let newValue = e.target.value;
-
-      // 커서 위치 저장
-      const cursorSave = e.target.selectionStart ?? 0;
-
-      // 입력 전에 포맷된 값
-      const beforeFormatted = displayValue;
-      
-      // Remove any non-digit characters
+    
+      // 현재 커서 위치 저장
+      const cursorPosition = e.target.selectionStart ?? 0;
+      const prevFormatted = e.target.value;
+    
+      // 입력값에서 숫자만 추출
       newValue = newValue.replace(/[^0-9]/g, '');
-      
-      // Limit to 4 digits
+    
+      // 최대 4자리로 제한
       if (newValue.length > 4) {
         newValue = newValue.substring(0, 4);
       }
-      
-      // Pass the raw value (without colon) to parent component
+    
       onChange(newValue);
 
-      // setTimeout으로 렌더 후 커서 위치 설정
       setTimeout(() => {
         if (inputRef.current) {
+          let adjustedCursor = cursorPosition;
           
-          const formatted = (() => {
-            if (newValue.length <= 2) {
-              return newValue
-            };
-            return `${newValue.slice(0, 2)}:${newValue.slice(2)}`;
-          })(); // (() => {...}) () 함수를 선언하고 즉시 실행하여 결과값을 변수에 할당
+          // 1. 18:20에서 0 뒤(backspace, cursorPosition === 5) → 18:2, 커서는 2 뒤(3)에 있어야 함
+          if (
+            prevFormatted.length === 5 &&
+            newValue.length === 3 &&
+            (cursorPosition === 5 || cursorPosition === 5)
+          ) {
+            adjustedCursor = 3;
+          }
+          // 2. 18:20에서 2와 0 사이(backspace, cursorPosition === 4) → 18:0, 커서는 0 앞(3)에 있어야 함
+          if (
+            prevFormatted.length === 4 &&
+            newValue.length === 3 &&
+            cursorPosition === 3
+          ) {
+            adjustedCursor = 3;
+          }
+          // 3. 3자리 입력 시 콜론 추가로 커서 한 칸 뒤로
+          else if (newValue.length === 3 && cursorPosition === 3) {
+            adjustedCursor = 4;
+          }
+          // 4. 4자리 입력 시 콜론 포함 커서 한 칸 뒤로
+          else if (newValue.length === 4 && cursorPosition === 4) {
+            adjustedCursor = 5;
+          }
+          // 5. 콜론 앞에서 삭제 시(2자리로 줄어들 때)
+          else if (newValue.length === 2 && prevFormatted.includes(":") && cursorPosition === 3) {
+            adjustedCursor = 2;
+          }
+          // : 를 기준으로 backspace나 delete키를 누를때
+          else if (newValue.length === 4 && !prevFormatted.includes(":") && cursorPosition === 2) {
 
-          // 입력전 text(beforeFormatted) 의 길이와 입력후 text(formatted)의 길이 비교
-          const colonRemoved = beforeFormatted.length > formatted.length;
-
-          // 변경된 포맷 기준 커서 위치 재계산
-          let cursorOffset = cursorSave;
-
-          // 예외 상황 처리
-          // colon 추가되면서 커서 뒤로 밀림
-          if (newValue.length === 3 && cursorSave === 3) {
-            cursorOffset++; // ':' 추가되는 위치에서 밀림
-          } 
-
-          // colon 제거되면서 커서 보정 (Backspace 등)
-          if (newValue.length === 2 && beforeFormatted.includes(':')) {
-            if (cursorSave === 3) {
-              cursorOffset--;
+            if (keyPressed === "Backspace") {
+              adjustedCursor = 2;
+            } else if (keyPressed === "Delete") {
+              adjustedCursor = 3; 
             }
           }
-
-          // 완전한 4자리 입력 상태에서 3번째 숫자 삭제 시 (00:30 → 00:0)
-          if (newValue.length === 3 && colonRemoved && cursorSave >= 3) {
-            cursorOffset--;
-          }
-
-          inputRef.current.setSelectionRange(cursorOffset, cursorOffset);
-
+          inputRef.current.setSelectionRange(adjustedCursor, adjustedCursor);
         }
-      }, 10);
+
+      }, 0);
+      
     };
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -148,6 +162,7 @@ const CustomInputForTime = React.forwardRef<HTMLInputElement, CustomInputForTime
         ref={combinedRef}
         value={displayValue}
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         maxLength={5} // 5 characters for format HH:MM
         placeholder="HH:MM"

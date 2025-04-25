@@ -239,7 +239,7 @@ const CampaignSettings = () => {
     const updatedSetting = limitSettings.find(
       setting => setting.campaign_id === Number(campaignId)
     );
-
+    
     // 찾은 항목이 있을 경우 선택 상태 업데이트
     if (updatedSetting) {
       const campaign = campaigns?.find(
@@ -347,7 +347,7 @@ const CampaignSettings = () => {
 
   // 저장 버튼 클릭 시 호출되는 함수
   // 캠페인 아이디, 캠페인 이름, 제한건수 모두 입력되어야 저장 가능
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!campaignId || !campaignName || !limitCount) {
       showAlert('모든 필드를 입력해주세요.');
       return;
@@ -359,59 +359,84 @@ const CampaignSettings = () => {
       return;
     }
 
-    // systemCallBackTimeData
+    const originTime = dailyInitTime !== null ? dailyInitTime.replace(":", "") : null;
+    // "0000" 4자리 숫자
 
-    // let originTime = dailyInitTime !== null ? dailyInitTime.replace(":", "") : null;
-    /*
+    // 들어온 4자리 시간 string(미사용이거나 null이거나 "19시" 같은것)을 변환하기
     const convertToHHmm = (timeStr: string): string | null => {
+      
       if (timeStr === '미사용') return null;
-    
+      
       const match = timeStr.match(/^(\d{1,2})시$/);
       if (match) {
         const hour = match[1].padStart(2, '0');
         return `${hour}00`;
       }
-    
       return null;
     };
 
+    // 첫번째 인수(리스트 마감 시각) 와 두번째 인수(콜백 리스트 초기화 시각) 시간비교
     const isBefore = (targetTime: string, compareTime: string): boolean => {
       const target = convertToHHmm(targetTime);
       if (!target) return false; // '미사용' 등 예외 처리
-    
+
       return target < compareTime;
-    };
-    */
-    // ############ 시간 짜잉나
-
-
-    const saveData = {
-      campaign_id: Number(campaignId),
-      tenant_id: selectedCampaign.tenant_id,
-      call_kind: 1,
-      call_timeout: 0,
-      max_call: Number(limitCount),
+    };  
     
-      daily_init_flag: dailyInitFlag,
-      daily_init_time: dailyInitTime !== null ? dailyInitTime.replace(":", "") : null,
+    let checkCallBackTime = true; // showConfirm 닫기나 취소를 대비한 boolean 변수
+
+    // showConfirm을 처리한후 이후 로직이 작동되도록 비동기처리
+    const confirmAsync = (message: string): Promise<boolean> => {
+      return new Promise((resolve) => {
+        showConfirm(
+          message,
+          () => resolve(true), // 확인 버튼 클릭 시 true 반환
+        );
+      });
     };
+    
+    // 시간이 입력되었으며 입력된 시간이 콜백 리스트 초기화 시각과 비교한 결과
+    if (originTime && isBefore(systemCallBackTimeData ?? "미사용", originTime)) {
+      checkCallBackTime = false; // Cancel 처리를 위한 false 처리
 
-    console.log('saveData', saveData);
-
-    if (selectedRow) { // selectRow 및 isNewMode 체크 추가
-      if (selectedRow?.campaign_id !== null) {
-        // 수정
-        updateCallLimitSetting(saveData);
-      } 
-    }else {
-      
-      // 신규 등록
-      createCallLimitSetting(saveData);
-
-      // tofix 0416
-      // showAlert은 mutate의 onSuccess에서 처리
+      checkCallBackTime = await confirmAsync(
+        `해당 시각은 콜백 리스트 초기화 시각보다 이후 시각입니다. 설정하시겠습니까?`
+      );
     }
+    
+    if(checkCallBackTime){
+      const saveData = {
+        campaign_id: Number(campaignId),
+        tenant_id: selectedCampaign.tenant_id,
+        call_kind: 1,
+        call_timeout: 0,
+        max_call: Number(limitCount),
       
+        daily_init_flag: dailyInitFlag,
+        daily_init_time: dailyInitTime !== null ? dailyInitTime.replace(":", "") : null,
+      };
+  
+      // console.log('saveData', saveData);
+  
+      if (selectedRow) { // selectRow 및 isNewMode 체크 추가
+        if (selectedRow?.campaign_id !== null) {
+          // 수정
+          updateCallLimitSetting(saveData);
+        } 
+      }else {
+        
+        // 신규 등록
+        createCallLimitSetting(saveData);
+  
+        // tofix 0416
+        // showAlert은 mutate의 onSuccess에서 처리
+      }
+    } else {
+
+      fetchCallLimitSettingList({
+        tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+      });
+    }  
   };
 
   
