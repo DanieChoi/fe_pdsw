@@ -205,6 +205,10 @@ export default function Footer({
           _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'] * 2;
         }
         addMessageToFooterList(_time, _type, _message);
+        fetchMain({
+          session_key: '',
+          tenant_id: tenant_id,
+        });
       }
     }
     //캠페인.

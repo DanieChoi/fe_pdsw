@@ -732,7 +732,9 @@ const SystemPreferences = () => {
 
         // 변경된 부분만 반영
         updatedChannelAssign.forEach(({ channelNumber, mode }) => {
-            updatedAssign[channelNumber] = parseInt(mode);
+            if (channelNumber >= 0 && channelNumber < updatedAssign.length) {
+                updatedAssign[channelNumber] = parseInt(mode);
+            }
         });
 
         // 유효성 검사: updatedAssign 배열이 유효한지 확인
