@@ -529,27 +529,13 @@ export default function Footer({
   //   }
   // }, [id, tenant_id]);
   useEffect(() => {
-    if (typeof window === 'undefined' || !id) return;
-    
-    // 새로고침 감지
-    const isReload = performance?.navigation?.type === 1 || 
-    (performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming)?.type === "reload";
-
-    const justLoggedIn = sessionStorage.getItem('just_logged_in') === 'true';
-    if (isReload && !justLoggedIn) {
-      console.log("🚫 새로고침, SSE 실행 안 함");
-      return;
-    }
-
     let eventSource: EventSource | null = null;
     let reconnectTimeout: NodeJS.Timeout | null = null;
 
-    sessionStorage.removeItem("just_logged_in"); // ✅ 한 번만 사용
     const connectSSE = () => {
       if (typeof window === 'undefined' || !window.EventSource || id === '') return;
-      const isConnected = sessionStorage.getItem("just_logged_in");
+      const isConnected = sessionStorage.getItem("sse_connected");
       if (isConnected) return;
-      sessionStorage.setItem("sse_connected", "true");
 
       const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
       console.info(">>>>설정값: ", DOMAIN);
@@ -601,16 +587,6 @@ export default function Footer({
       });
 
       eventSource.onerror = (err) => {
-        // if (eventSource?.readyState === EventSource.CLOSED) {
-        //   console.warn("SSE connection closed. Attempting to reconnect...");
-        //   eventSource?.close();
-        //   sessionStorage.removeItem("sse_connected");
-      
-        //   // 3초 후 재연결
-        //   reconnectTimeout = setTimeout(() => {
-        //     connectSSE();
-        //   }, 3000);
-        // }
         eventSource?.close();
         sessionStorage.removeItem("sse_connected");
 
@@ -620,10 +596,11 @@ export default function Footer({
         }, 3000);
       };
 
+      sessionStorage.setItem("sse_connected", "true");
     };
 
     connectSSE();
-    
+
     return () => {
       eventSource?.close();
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
