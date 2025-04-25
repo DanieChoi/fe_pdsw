@@ -12,7 +12,7 @@ import { useApiForCampaignGroupSearch } from '@/features/campaignGroupManager/ho
 import { useApiForCampaignGroupCampaignList } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupCampaignList';
 import { useApiForCampaignGroupCampaignListDelete } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupCampaignListDelete';
 import { useApiForCampaignGroupDelete } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupDelete';
-import { useMainStore, useCampainManagerStore, useTabStore } from '@/store';
+import { useMainStore, useCampainManagerStore, useTabStore, useAuthStore } from '@/store';
 import { CampaignGroupGampaignListItem } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import Cookies from 'js-cookie';
@@ -48,6 +48,7 @@ type Props = {
 const CampaignGroupManager = ({ groupId, groupName }: Props) => {
 
   const { tenants,campaigns } = useMainStore();
+  const { id: user_id, tenant_id, session_key } = useAuthStore();
   const { campaignIdForUpdateFromSideMenu } = useTabStore();
   const [_campaignGroupList, _setCampasignGroupList] = useState<DataProps[]>([]);
   const [tempCampaignListData, setTempCampaignListData] = useState<downDataProps[]>([]);
@@ -133,8 +134,8 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
     onSuccess: (data) => {
       setSkills(data.result_data);
       fetchCallingNumbers({
-        session_key: '',
-        tenant_id: 0,
+        session_key: session_key,
+        tenant_id: tenant_id,
       });
     }
   });
@@ -143,8 +144,8 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
     onSuccess: (data) => {
       setCallingNumbers(data.result_data||[]);
       fetchCampaignSkills({
-        session_key: '',
-        tenant_id: 0,
+        session_key: session_key,
+        tenant_id: tenant_id,
       });
     }
   });
@@ -153,8 +154,8 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
     onSuccess: (data) => {
       setCampaignSkills(data.result_data);
       fetchPhoneDescriptions({
-        session_key: '',
-        tenant_id: 0,
+        session_key: session_key,
+        tenant_id: tenant_id,
       });
     }
   });
@@ -352,7 +353,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
       <AddCampaignGroupDialog
         isOpen={addGroupParam.isOpen}
         onClose={handleCloseAddGroupDialog}
-        tenantId={0}
+        tenantId={tenant_id}
         tenantName={''}
         campaignGroupList={_campaignGroupList}
         onAddGroup={handleAddGroup}

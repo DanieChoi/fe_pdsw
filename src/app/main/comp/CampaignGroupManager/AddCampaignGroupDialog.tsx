@@ -194,7 +194,7 @@ export function AddCampaignGroupDialog({
           {/* 테넌트 아이디 */}
           <div className="flex flex-col space-y-1">
             <Label className="pr-[15px]">테넌트</Label>
-            <Select defaultValue='all' value={_tenantId} onValueChange={setTenantId}>
+            <Select defaultValue='all' value={_tenantId} onValueChange={setTenantId} disabled={tenants.length === 1}>
                 <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="테넌트" />
                 </SelectTrigger>
