@@ -22,7 +22,7 @@ const errorMessage = {
   title: '로그인',
   type: '0',
   onClose: () => { },
-  onCancle: () => { },
+  onCancel: () => { },
 };
 
 interface AddCampaignGroupDialogProps {
@@ -263,7 +263,7 @@ export function AddCampaignGroupDialog({
         onClose={() => {
           alertState.onClose()
         }}
-        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
+        onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
     </CommonDialogForSideMenu>
   );
 }

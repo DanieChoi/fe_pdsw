@@ -49,7 +49,7 @@ const errorMessage: CustomAlertRequest = {
   title: '캠페인',
   type: '1',
   onClose: () => { },
-  onCancle: () => { },
+  onCancel: () => { },
 };
 
 interface ContextMenuForTreeNodeProps {
@@ -99,7 +99,7 @@ export function ContextMenuForTreeNode({
         //   type: '2',
         //   message: '캠페인 상태가 성공적으로 변경되었습니다.',
         //   onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
-        //   onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        //   onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
           
         // });
         // 로컬 상태 업데이트
@@ -112,7 +112,7 @@ export function ContextMenuForTreeNode({
           type: '2',
           message: CheckCampaignSaveReturnCode(data.reason_code),
           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
-          onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+          onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
         });
       }
       // toast.success("캠페인 상태가 성공적으로 변경되었습니다.", {
@@ -496,7 +496,7 @@ export function ContextMenuForTreeNode({
         onClose={() => {
           alertState.onClose()
         }}
-        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
+        onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
     </>
   );
 }

@@ -11,7 +11,7 @@ interface CustomAlertOptions {
   title: string;
   type: string;
   onClose?: () => void;
-  onCancle?: () => void;
+  onCancel?: () => void;
   width?: string;
   showButtons?: boolean;
   confirmDisabled?: boolean;
@@ -45,7 +45,7 @@ class CustomAlertService {
     title,
     type,
     onClose,
-    onCancle,
+    onCancel,
     width = 'max-w-sm',
     showButtons = true,
     confirmDisabled = false
@@ -62,7 +62,7 @@ class CustomAlertService {
 
     // 내부적으로 사용할 취소 함수
     const handleCancel = () => {
-      if (onCancle) onCancle();
+      if (onCancel) onCancel();
       this.hide();
     };
 
@@ -73,7 +73,7 @@ class CustomAlertService {
         onOpenChange={(open) => {
           // 다이얼로그가 닫힐 때(ESC키, 오버레이 클릭 등)는 취소 동작 호출
           if (!open) {
-            if (onCancle) {
+            if (onCancel) {
               handleCancel();
             } else {
               handleClose();
@@ -109,7 +109,7 @@ class CustomAlertService {
                     >
                       확인
                     </CommonButton>
-                    {onCancle && (
+                    {onCancel && (
                       <CommonButton variant="outline" onClick={handleCancel}>
                         닫기
                       </CommonButton>
@@ -181,7 +181,7 @@ class CustomAlertService {
       title,
       type: '1',
       onClose: onConfirm,
-      onCancle: onCancel
+      onCancel: onCancel
     });
   }
 

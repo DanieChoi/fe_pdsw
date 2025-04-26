@@ -32,7 +32,7 @@ const errorMessage: CustomAlertRequest = {
     title: '재발신 설정',
     type: '0',
     onClose: () => { },
-    onCancle: () => { },
+    onCancel: () => { },
 };
 
 type Props = {
@@ -223,7 +223,7 @@ const RebroadcastSettingsPanelHeader = ({
                 onClose={() => {
                     alertState.onClose()
                 }}
-                onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
+                onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
         </div>
 
     );

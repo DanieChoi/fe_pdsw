@@ -418,7 +418,7 @@ export function IDialogForTeamSkilAssignment({
       message={renderContent()}
       type="1"
       onClose={onClose}
-      onCancle={onClose}
+      onCancel={onClose}
       width="min-w-[800px]"
       showButtons={false}
     />

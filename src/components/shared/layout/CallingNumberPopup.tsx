@@ -8,7 +8,7 @@ export interface CallingNumberPopupProps {
     isOpen?: boolean;
     type: string;
     onConfirm: (param: string) => void;
-    onCancle?: () => void;
+    onCancel?: () => void;
 }
 
 const CallingNumberPopup = ({
@@ -16,7 +16,7 @@ const CallingNumberPopup = ({
     type,
     isOpen = true,
     onConfirm,
-    onCancle
+    onCancel
 }: CallingNumberPopupProps) => {
     const [inputValue, setInputValue] = useState(param);
 
@@ -53,7 +53,7 @@ const CallingNumberPopup = ({
             onClose={() => {
                 onConfirm(inputValue);  // 확인 버튼이 눌렸을 때는 입력값 전달
             }}
-            onCancle={onCancle}  // 취소 버튼, ESC, 닫기 버튼
+            onCancel={onCancel}  // 취소 버튼, ESC, 닫기 버튼
             type={type}
         />
     );

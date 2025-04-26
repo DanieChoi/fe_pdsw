@@ -1903,7 +1903,7 @@ const DistributionLimit = () => {
         title="초기화 시간 설정"
         type="1"
         onClose={handleTimeSettingSave}
-        onCancle={() => setIsTimeSettingOpen(false)}
+        onCancel={() => setIsTimeSettingOpen(false)}
       />
 
       {/* 최대분배호수 일괄 변경 모달 */}
@@ -1961,7 +1961,7 @@ const DistributionLimit = () => {
         title="최대분배호수 일괄 변경"
         type="1"
         onClose={handleApplyBulkLimit}
-        onCancle={() => setBulkLimitModal(prev => ({ ...prev, isOpen: false }))}
+        onCancel={() => setBulkLimitModal(prev => ({ ...prev, isOpen: false }))}
       />
 
       <CustomAlert
@@ -1970,7 +1970,7 @@ const DistributionLimit = () => {
         title="초기화 시간 설정해제"
         type="1"
         onClose={handleTimeRemove}
-        onCancle={() => setIsTimeRemoveOpen(false)}
+        onCancel={() => setIsTimeRemoveOpen(false)}
       />
 
       <CustomAlert
@@ -1979,7 +1979,7 @@ const DistributionLimit = () => {
         title={alertState.title}
         type={alertState.type}
         onClose={alertState.onConfirm}
-        onCancle={alertState.onCancel}
+        onCancel={alertState.onCancel}
       />
     </div>
   );

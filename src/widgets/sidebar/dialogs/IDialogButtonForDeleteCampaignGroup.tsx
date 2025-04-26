@@ -32,7 +32,7 @@ const IDialogButtonForDeleteCampaignGroup: React.FC<IDialogButtonForDeleteCampai
       message={message}
       type="1"
       onClose={onDelete}
-      onCancle={onCancel}
+      onCancel={onCancel}
       width="max-w-md"
       confirmDisabled={isDeleting}
     />

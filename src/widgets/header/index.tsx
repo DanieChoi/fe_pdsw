@@ -23,7 +23,7 @@ const errorMessage = {
   title: '로그인',
   type: '1',
   onClose: () => { },
-  onCancle: () => { },
+  onCancel: () => { },
 };
 
 export default function Header() {
@@ -385,7 +385,7 @@ export default function Header() {
         onClose={() => {
           alertState.onClose()
         }}
-        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
+        onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
     </div>
   );
 }

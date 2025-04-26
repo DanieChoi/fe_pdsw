@@ -664,7 +664,7 @@ const CampaignAddPopup: React.FC<Props> = ({
           title={confirmRemove ? '캠페인 제거 확인' : '캠페인 추가 확인'}
           isOpen={showAlert}
           onClose={handleAlertConfirm}
-          onCancle={() => setShowAlert(false)}
+          onCancel={() => setShowAlert(false)}
           message={
             <div>
               {alertMessage}

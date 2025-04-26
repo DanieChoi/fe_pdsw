@@ -73,7 +73,7 @@ const errorMessage: CustomAlertRequest = {
   title: '캠페인',
   type: '1',
   onClose: () => { },
-  onCancle: () => { },
+  onCancel: () => { },
 };
 
 const CampaignSkillInfo: CampaignSkillUpdateRequest = {
@@ -898,7 +898,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         isOpen: true,
         message: '캠페인 편집창을 종료하시겠습니까?',
         onClose: handleCampaignClosedExecute,
-        onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
   };
@@ -967,7 +967,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           + '\n 캠페인 이름 : ' + tempCampaignManagerInfo.campaign_name
           + '\n 캠페인을 수정하시겠습니까?',
         onClose: handleCampaignSaveExecute,
-        onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
   };
@@ -1091,7 +1091,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         + '\n 삭제된 캠페인은 복구가 불가능합니다.'
         + '\n 캠페인을 삭제하시겠습니까?',
       onClose: handleCampaignDeleteExecute,
-      onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
     });
   };
 
@@ -1110,7 +1110,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         isOpen: true,
         message: '캠페인 삭제는 중지 상태에서만 가능합니다.',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
-        onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
   };
@@ -1577,7 +1577,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         + '\n 삭제된 발신리스트와 캠페인 진행정보는 복구가 불가능합니다.'
         + '\n 발신리스트를 삭제하시겠습니까?',
       onClose: () => fetchCallingListDelete(campaignId),
-      onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
     });
   };
 
@@ -1860,14 +1860,14 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         type={alertState.type}
         isOpen={alertState.isOpen}
         onClose={() => { alertState.onClose() }}
-        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
+        onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
       />
       <CallingNumberPopup
         param={inputCallingNumber}
         type={callingNumberPopupState.type}
         isOpen={callingNumberPopupState.isOpen}
         onConfirm={(param) => handleCallingNumlber(param)}
-        onCancle={() => setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))}
+        onCancel={() => setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))}
       />
     </div>
   );

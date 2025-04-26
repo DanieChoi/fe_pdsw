@@ -401,7 +401,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
       isOpen: true,
       message: '캠페인 편집창을 종료하시겠습니까?',
       onClose: handleCampaignClosedExecute,
-      onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
     });
   }
 
@@ -613,7 +613,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
         type={alertState.type}
         isOpen={alertState.isOpen}
         onClose={() => alertState.onClose()}
-        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
+        onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
       />
 
     </div>

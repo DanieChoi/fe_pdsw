@@ -132,7 +132,7 @@ export const errorMessage: CustomAlertRequest = {
     title: '캠페인',
     type: '1',
     onClose: () => { },
-    onCancle: () => { },
+    onCancel: () => { },
 };
 
 export const CampaignSkillInfo: CampaignSkillUpdateRequest = {

@@ -80,7 +80,7 @@ const BlackListCountPopup = ({
             title="블랙리스트 건수 조회"
             message={content}
             onClose={onConfirm}
-            onCancle={onCancel}  // Changed from onCancel to onCancle
+            onCancel={onCancel}  // Changed from onCancel to onCancel
             type="info"
         />
     );

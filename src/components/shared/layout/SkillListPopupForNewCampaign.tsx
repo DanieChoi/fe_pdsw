@@ -21,7 +21,7 @@ export interface SkillListPopupProps {
   isOpen?: boolean;
   type: string;
   onConfirm: (param: string, updatedTenantId?: number) => void;
-onCancle?: () => void;
+onCancel?: () => void;
 }
 
 // API 대체 함수 - 실제 환경에서는 제거
@@ -49,7 +49,7 @@ const SkillListPopupForNewCampaign = ({
   type,
   isOpen = true,
   onConfirm,
-  onCancle
+  onCancel
 }: SkillListPopupProps) => {
   // 실제 API 사용 (프로덕션에서 사용)
   const { data: skillsData, isLoading, isError } = useApiForGetSkills2({
@@ -132,7 +132,7 @@ const SkillListPopupForNewCampaign = ({
             <span className="ml-2">스킬 정보를 불러오는 중입니다...</span>
           </div>
         }
-        onClose={onCancle || (() => {})}
+        onClose={onCancel || (() => {})}
         type={type}
       />
     );
@@ -149,7 +149,7 @@ const SkillListPopupForNewCampaign = ({
             스킬 정보를 불러오는 중 오류가 발생했습니다.
           </div>
         }
-        onClose={onCancle || (() => {})}
+        onClose={onCancel || (() => {})}
         type={type}
       />
     );
@@ -183,7 +183,7 @@ const SkillListPopupForNewCampaign = ({
       title="캠페인 스킬 선택"
       message={gridContent}
       onClose={handleConfirm}
-      onCancle={onCancle}
+      onCancel={onCancel}
       type={type}
       // width={420}
       // height={400}
@@ -216,7 +216,7 @@ export default SkillListPopupForNewCampaign;
 //   isOpen?: boolean;
 //   type: string;
 //   onConfirm: (param: string, updatedTenantId?: number) => void;
-//   onCancle?: () => void;
+//   onCancel?: () => void;
 //   allowTenantChange?: boolean;
 // }
 
@@ -226,7 +226,7 @@ export default SkillListPopupForNewCampaign;
 //   type,
 //   isOpen = true,
 //   onConfirm,
-//   onCancle,
+//   onCancel,
 //   allowTenantChange = true
 // }: SkillListPopupProps) => {
 //   // 내부 tenantId 상태 관리
@@ -360,7 +360,7 @@ export default SkillListPopupForNewCampaign;
 //             <span className="ml-2">스킬 정보를 불러오는 중입니다...</span>
 //           </div>
 //         }
-//         onClose={onCancle || (() => {})}
+//         onClose={onCancel || (() => {})}
 //         type={type}
 //       />
 //     );
@@ -377,7 +377,7 @@ export default SkillListPopupForNewCampaign;
 //             스킬 정보를 불러오는 중 오류가 발생했습니다.
 //           </div>
 //         }
-//         onClose={onCancle || (() => {})}
+//         onClose={onCancel || (() => {})}
 //         type={type}
 //       />
 //     );
@@ -454,7 +454,7 @@ export default SkillListPopupForNewCampaign;
 //       title="캠페인 스킬 선택"
 //       message={gridContent}
 //       onClose={handleConfirm}
-//       onCancle={onCancle}
+//       onCancel={onCancel}
 //       type={type}
 //       width="lg"
 //     />

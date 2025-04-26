@@ -104,7 +104,7 @@ const errorMessage: CustomAlertRequest = {
   title: '캠페인',
   type: '1',
   onClose: () => {},
-  onCancle: () => {},
+  onCancel: () => {},
 };
 
 interface ProgressRow {
@@ -1067,7 +1067,7 @@ const ListManager: React.FC = () => {
         onClose={() => {
           alertState.onClose()
         }}
-        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}/>
+        onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}/>
       
       {/* 로딩 모달 */}
        <LoadingModal 

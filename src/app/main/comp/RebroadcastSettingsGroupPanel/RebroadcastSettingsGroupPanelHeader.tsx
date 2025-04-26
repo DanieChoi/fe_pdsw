@@ -32,7 +32,7 @@ const errorMessage: CustomAlertRequest = {
   title: '재발신 설정',
   type: '0',
   onClose: () => {},
-  onCancle: () => {},
+  onCancel: () => {},
 };
 
 type Props = {
@@ -78,7 +78,7 @@ const RebroadcastSettingsGroupPanelHeader = ({campaignGroupId,campaignGroupName,
                 title: '리스트 건수 확인',
                 type: '2',
                 onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
             });
         }else{  //실시간인 경우.
             handleCheckListCount();
@@ -211,7 +211,7 @@ const RebroadcastSettingsGroupPanelHeader = ({campaignGroupId,campaignGroupName,
                         onClose={() => {
                         alertState.onClose()
                         }}
-                        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}/>
+                        onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}/>
                 </div>
 
     );

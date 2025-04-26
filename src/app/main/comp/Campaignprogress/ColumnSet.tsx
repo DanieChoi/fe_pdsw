@@ -372,7 +372,7 @@ const ColumnSet: React.FC<ColumnSetProps> = ({ isOpen, onConfirm, onClose, colum
       message={modalContent}
       type="1"
       onClose={handleConfirm}
-      onCancle={onClose}
+      onCancel={onClose}
       width="max-w-modal-lm"
     />
   );

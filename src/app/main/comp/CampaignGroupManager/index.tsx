@@ -27,7 +27,7 @@ const errorMessage = {
   title: '로그인',
   type: '0',
   onClose: () => { },
-  onCancle: () => { },
+  onCancel: () => { },
 };
 
 const _addGroupParam = {
@@ -366,7 +366,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
         onClose={() => {
           alertState.onClose()
         }}
-        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
+        onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
     </div>
   )
 }

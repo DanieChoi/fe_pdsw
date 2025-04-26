@@ -30,7 +30,7 @@ const errorMessage: CustomAlertRequest = {
   title: "캠페인 동작시간",
   type: "0",
   onClose: () => {},
-  onCancle: () => {},
+  onCancel: () => {},
 };
 
 type Props = {
@@ -471,7 +471,7 @@ const OperationTimeTab: React.FC<Props> = ({
         onClose={() => {
           setAlertState((prev) => ({ ...prev, isOpen: false }));
         }}
-        onCancle={() => {
+        onCancel={() => {
           setAlertState((prev) => ({ ...prev, isOpen: false }));
         }}
       />

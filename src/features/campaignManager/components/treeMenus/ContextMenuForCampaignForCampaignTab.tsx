@@ -51,7 +51,7 @@ const errorMessage: CustomAlertRequest = {
   title: '캠페인',
   type: '1',
   onClose: () => { },
-  onCancle: () => { },
+  onCancel: () => { },
 };
 
 interface ContextMenuForTreeNodeProps {
@@ -501,7 +501,7 @@ export function ContextMenuForCampaignForCampaignTab({
         onClose={() => {
           alertState.onClose();
         }}
-        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
+        onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
       />
     </>
   );

@@ -192,7 +192,7 @@ const ConsultResultSetting = () => {
         title={alertState.title}
         type={alertState.type}
         onClose={alertState.onConfirm}
-        onCancle={alertState.onCancel}
+        onCancel={alertState.onCancel}
       />
     </div>
   );

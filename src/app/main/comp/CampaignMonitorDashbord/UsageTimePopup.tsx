@@ -123,7 +123,7 @@ const UsageTimePopup: React.FC<UsageTimePopupProps> = ({ campaignIdList,dialKind
       message={modalContent}
       type="2"
       onClose={onClose}
-      onCancle={onClose}
+      onCancel={onClose}
       width="max-w-modal" 
     />
   );

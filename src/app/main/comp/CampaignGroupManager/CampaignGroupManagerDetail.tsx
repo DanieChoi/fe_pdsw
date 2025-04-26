@@ -50,7 +50,7 @@ const errorMessage: CustomAlertRequest = {
   title: '캠페인',
   type: '1',
   onClose: () => { },
-  onCancle: () => { },
+  onCancel: () => { },
 };
 
 const CampaignSkillInfo: CampaignSkillUpdateRequest = {
@@ -884,7 +884,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
       isOpen: true,
       message: '캠페인 편집창을 종료하시겠습니까?',
       onClose: handleCampaignClosedExecute,
-      onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
     });
   }
 
@@ -958,7 +958,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
         message: '변경된 캠페인은 복구가 불가능 합니다.'
           + '\n 캠페인을 수정하시겠습니까?',
         onClose: handleCampaignSaveExecute,
-        onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
   }
@@ -1236,7 +1236,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
                   message: '정말로 캠페인 그룹 '+groupInfo.campaignGroupName+'을(를) 삭제하시겠습니까?'
                     + '\n 이 작업은 되돌릴 수 없습니다.',
                   onClose: handleCampaignDeleteExecute,
-                  onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+                  onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
                 });
               }
             },
@@ -1381,13 +1381,13 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
         onClose={() => {
           alertState.onClose()
         }}
-        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
+        onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
       <CallingNumberPopup
         param={inputCallingNumber}
         type={callingNumberPopupState.type}
         isOpen={callingNumberPopupState.isOpen}
         onConfirm={(param) => handleCallingNumlber(param)}
-        onCancle={() => setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))}
+        onCancel={() => setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))}
       />
       <CampaignAddPopup
         isOpen={isCampaignAddPopupOpen}

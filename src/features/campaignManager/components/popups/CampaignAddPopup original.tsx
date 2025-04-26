@@ -526,7 +526,7 @@ const CampaignAddPopup = ({
             title="캠페인 추가/제외"
             message={content}
             onClose={onConfirm}
-            onCancle={onCancel}
+            onCancel={onCancel}
             type="1"
             width="m-w-1080"
         />

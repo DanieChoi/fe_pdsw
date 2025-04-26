@@ -61,7 +61,7 @@ const errorMessage: CustomAlertRequest = {
     title: '재발신 설정',
     type: '1',
     onClose: () => { },
-    onCancle: () => { },
+    onCancel: () => { },
 };
 
 const today = new Date();
@@ -386,7 +386,7 @@ const RebroadcastSettingsGroupPanel = () => {
                 title: '알림',
                 type: '1',
                 onClose: handleWorkDelete,
-                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
             });
             return;
         }
@@ -451,7 +451,7 @@ const RebroadcastSettingsGroupPanel = () => {
                 title: '캠페인 건수',
                 type: '2',
                 onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
             });
         }
         
@@ -475,7 +475,7 @@ const RebroadcastSettingsGroupPanel = () => {
                     title: '재발신',
                     type: '2',
                     onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 });
             }
         }
@@ -790,7 +790,7 @@ const RebroadcastSettingsGroupPanel = () => {
                     title: '리스트 건수 확인',
                     type: '2',
                     onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 });
             }else if( caseType === 2 ){
                 if( data.result_data.redial_count > 0){       
@@ -828,7 +828,7 @@ const RebroadcastSettingsGroupPanel = () => {
                         title: '리스트 건수 확인',
                         type: '2',
                         onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                        onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                     });
                 }else if( caseType === 2 ){    
                     setFailCount(prevFailCount => prevFailCount + 1);
@@ -1285,7 +1285,7 @@ const RebroadcastSettingsGroupPanel = () => {
                 onClose={() => {
                   alertState.onClose()
                 }}
-                onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
+                onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
         </div>
     );
 };

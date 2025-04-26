@@ -405,7 +405,7 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
       message={modalContent}
       type="1"
       onClose={handleConfirm}
-      onCancle={handleClose}
+      onCancel={handleClose}
       width="max-w-modal" 
     />
   );

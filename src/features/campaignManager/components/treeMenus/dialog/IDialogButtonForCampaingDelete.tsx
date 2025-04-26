@@ -200,7 +200,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
           title="캠페인 삭제"
           message={alertMessage}
           onClose={handleDelete}
-          onCancle={closeDialog}
+          onCancel={closeDialog}
           type="1"
           confirmDisabled={isDeleting}
         />

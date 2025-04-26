@@ -115,7 +115,7 @@ const SkillListPopup = ({
             title="캠페인 스킬 선택"
             message={gridContent}
             onClose={handleConfirm}
-            onCancle={onCancel}
+            onCancel={onCancel}
             type={type}
         />
     );

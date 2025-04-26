@@ -3,16 +3,16 @@ import { AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogHeader } 
 import { CommonButton } from "@/components/shared/CommonButton";
 
 export interface CustomAlertRequest {
-    message: ReactNode;
-    title: string;
+    message: React.ReactNode;
+    title: React.ReactNode;
     type: string;
     isOpen?: boolean;
     onClose: () => void;
-    onCancle?: () => void;
+    onCancel?: () => void; // ← 오타 수정!
     width?: string;
     showButtons?: boolean;
     confirmDisabled?: boolean;
-    isShowForCancleButton?: boolean; // New prop to control cancel button visibility
+    isShowForCancelButton?: boolean;
 }
 
 const CustomAlert = ({
@@ -21,11 +21,11 @@ const CustomAlert = ({
     type,
     isOpen = true,
     onClose,
-    onCancle,
+    onCancel, // ← 오타 수정!
     width = 'max-w-sm',
     showButtons = true,
     confirmDisabled = false,
-    isShowForCancleButton = false // Default to false to maintain backward compatibility
+    isShowForCancelButton = false
 }: CustomAlertRequest) => {
     return (
         <AlertDialog
@@ -33,8 +33,8 @@ const CustomAlert = ({
             onOpenChange={(open) => {
                 // 다이얼로그가 닫힐 때(ESC키, 오버레이 클릭 등)는 취소 동작 호출
                 if (!open) {
-                    if (onCancle) {
-                        onCancle();
+                    if (onCancel) {
+                        onCancel();
                     } else {
                         onClose();
                     }
@@ -69,8 +69,8 @@ const CustomAlert = ({
                                     >
                                         확인
                                     </CommonButton>
-                                    {(onCancle || isShowForCancleButton) && (
-                                        <CommonButton variant="outline" onClick={onCancle || onClose}>
+                                    {(onCancel || isShowForCancelButton) && (
+                                        <CommonButton variant="outline" onClick={onCancel || onClose}>
                                             닫기
                                         </CommonButton>
                                     )}
@@ -84,7 +84,7 @@ const CustomAlert = ({
                                     >
                                         확인
                                     </CommonButton>
-                                    <CommonButton variant="outline" onClick={onCancle || onClose}>
+                                    <CommonButton variant="outline" onClick={onCancel || onClose}>
                                         닫기
                                     </CommonButton>
                                 </>
@@ -100,8 +100,8 @@ const CustomAlert = ({
                                     >
                                         확인
                                     </CommonButton>
-                                    {isShowForCancleButton && (
-                                        <CommonButton variant="outline" onClick={onCancle || onClose}>
+                                    {isShowForCancelButton && (
+                                        <CommonButton variant="outline" onClick={onCancel || onClose}>
                                             닫기
                                         </CommonButton>
                                     )}

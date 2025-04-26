@@ -566,7 +566,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
         onClose={() => {
           setAlertState((prev) => ({ ...prev, isOpen: false }));
         }}
-        onCancle={() => {
+        onCancel={() => {
           setAlertState((prev) => ({ ...prev, isOpen: false }));
         }}
       />

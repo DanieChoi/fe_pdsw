@@ -34,7 +34,7 @@ const errorMessage: CustomAlertRequest = {
   title: '캠페인',
   type: '1',
   onClose: () => { },
-  onCancle: () => { },
+  onCancel: () => { },
 };
 
 // 타입 정의
@@ -283,7 +283,7 @@ const MonitorPage = () => {
           isOpen: true,
           message: CheckCampaignSaveReturnCode(data.reason_code),
           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
-          onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+          onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
         });
         setCampaignStatus(currentCampaign.startFlag === 1 ? '시작' : currentCampaign.startFlag === 2 ? '멈춤' : '중지');
       } else {
@@ -842,7 +842,7 @@ const MonitorPage = () => {
         message={<CampaignManager campaignId={selectedCampaign} isOpen={isCampaignManagerOpen} onCampaignPopupClose={handleCampaignPopupClose} />}
         type="3"
         onClose={() => setIsCampaignManagerOpen(false)}
-        onCancle={() => setIsCampaignManagerOpen(false)}
+        onCancel={() => setIsCampaignManagerOpen(false)}
         width="max-w-[1300px]"
       />
       {/* 스킬 리스트 팝업 */}
@@ -862,7 +862,7 @@ const MonitorPage = () => {
         message={<RebroadcastSettingsPanel />}
         type="1"
         onClose={() => setIsRebroadcastOpen(false)}
-        onCancle={() => setIsRebroadcastOpen(false)}
+        onCancel={() => setIsRebroadcastOpen(false)}
         width="max-w-[1300px]"
       />
 
@@ -874,7 +874,7 @@ const MonitorPage = () => {
         onClose={() => {
           alertState.onClose()
         }}
-        onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
+        onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
     </div>
   );
 };

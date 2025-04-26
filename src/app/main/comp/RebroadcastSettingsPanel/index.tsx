@@ -58,7 +58,7 @@ const errorMessage: CustomAlertRequest = {
     title: '재발신 설정',
     type: '1',
     onClose: () => { },
-    onCancle: () => { },
+    onCancel: () => { },
 };
 
 const today = new Date();
@@ -390,7 +390,7 @@ const RebroadcastSettingsPanel = () => {
                 title: '알림',
                 type: '1',
                 onClose: handleWorkDelete,
-                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
             });
             return;
         }
@@ -454,7 +454,7 @@ const RebroadcastSettingsPanel = () => {
                     title: '알림',
                     type: '0',
                     onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 });
                 return;
             }
@@ -772,7 +772,7 @@ const RebroadcastSettingsPanel = () => {
                     title: '리스트 오류',
                     type: '2',
                     onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 });
             }else{       
                 if( caseType === 2 ){    
@@ -788,7 +788,7 @@ const RebroadcastSettingsPanel = () => {
                                 , campaign_status: 1
                             });
                         },
-                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                        onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                     });  
                 }else{      
                     setAlertState({
@@ -797,7 +797,7 @@ const RebroadcastSettingsPanel = () => {
                         title: '재발신',
                         type: '2',
                         onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                        onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                     });
                 }   
                       
@@ -810,7 +810,7 @@ const RebroadcastSettingsPanel = () => {
                 title: '리스트 오류',
                 type: '2',
                 onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
             });
             fetchCampaignManagerUpdate(UpdataCampaignInfo(campaigns,Number(campaignId),2));
         }
@@ -826,7 +826,7 @@ const RebroadcastSettingsPanel = () => {
                     title: '리스트 건수 확인',
                     type: '2',
                     onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 });
             }else if( caseType === 2 ){
                 if( data.result_data.redial_count > 0){           
@@ -842,7 +842,7 @@ const RebroadcastSettingsPanel = () => {
                         title: '리스트 건수 확인',
                         type: '2',
                         onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                        onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                     });
                 }
             }
@@ -864,7 +864,7 @@ const RebroadcastSettingsPanel = () => {
                         title: '리스트 건수 확인',
                         type: '2',
                         onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                        onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                     });
                 }else if( caseType === 2 ){     
                     setAlertState({
@@ -873,7 +873,7 @@ const RebroadcastSettingsPanel = () => {
                         title: '리스트 건수 확인',
                         type: '2',
                         onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                        onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                     });
                 }
             }
@@ -912,7 +912,7 @@ const RebroadcastSettingsPanel = () => {
                                 condition: MakeRedialPacket()
                             });      
                         },
-                        onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                        onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                     });
 
                  }else{  
@@ -929,7 +929,7 @@ const RebroadcastSettingsPanel = () => {
                     title: '리스트 건수 확인',
                     type: '2',
                     onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                    onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 });
             }
         },onError: (data) => {      
@@ -955,7 +955,7 @@ const RebroadcastSettingsPanel = () => {
                 //     title: '재발신',
                 //     type: '2',
                 //     onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
-                //     onCancle: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                //     onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 // });
             } else {
                 setAlertState({
@@ -963,7 +963,7 @@ const RebroadcastSettingsPanel = () => {
                     isOpen: true,
                     message: CheckCampaignSaveReturnCode(data.reason_code),
                     onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
-                    onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+                    onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
                 });
             }
         },onError: (data) => {      
@@ -1294,7 +1294,7 @@ const RebroadcastSettingsPanel = () => {
                 onClose={() => {
                   alertState.onClose()
                 }}
-                onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
+                onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
         </div>
     );
 };

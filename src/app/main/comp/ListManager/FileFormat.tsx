@@ -47,7 +47,7 @@ const errorMessage: CustomAlertRequest = {
   title: '캠페인',
   type: '1',
   onClose: () => {},
-  onCancle: () => {},
+  onCancel: () => {},
 };
 
 interface FileFormatProps {
@@ -711,7 +711,7 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose, _for
       message={modalContent}
       type="1"
       onClose={handleConfirm}
-      onCancle={handleCancle}
+      onCancel={handleCancle}
       width="max-w-modal"
     />
   );

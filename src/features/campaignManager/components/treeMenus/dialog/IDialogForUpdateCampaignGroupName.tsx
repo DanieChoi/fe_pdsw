@@ -112,7 +112,7 @@ const IDialogForUpdateCampaignGroupName: FC<IDialogForUpdateCampaignGroupNamePro
       title="캠페인 그룹 이름 변경"
       message={content}
       onClose={onClose}
-      onCancle={onClose}
+      onCancel={onClose}
       type="1"
       showButtons={false} // 내부 커스텀 버튼 사용
     />

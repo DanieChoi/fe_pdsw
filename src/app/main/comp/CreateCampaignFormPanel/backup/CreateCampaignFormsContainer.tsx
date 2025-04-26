@@ -51,7 +51,7 @@
 //   title: '캠페인',
 //   type: '1',
 //   onClose: () => { },
-//   onCancle: () => { },
+//   onCancel: () => { },
 // };
 
 // const CampaignSkillInfo: CampaignSkillUpdateRequest = {
@@ -746,7 +746,7 @@
 //       isOpen: true,
 //       message: '캠페인 편집창을 종료하시겠습니까?',
 //       onClose: handleCampaignClosedExecute,
-//       onCancle: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+//       onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
 //     });
 //   }
 
@@ -941,7 +941,7 @@
 //         type={alertState.type}
 //         isOpen={alertState.isOpen}
 //         onClose={() => alertState.onClose()}
-//         onCancle={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
+//         onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))}
 //       />
 
 //       {/* <CallingNumberPopup
@@ -949,7 +949,7 @@
 //         type={callingNumberPopupState.type}
 //         isOpen={callingNumberPopupState.isOpen}
 //         onConfirm={(param) => handleCallingNumlber(param)}
-//         onCancle={() => setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))}
+//         onCancel={() => setCallingNumberPopupState((prev) => ({ ...prev, isOpen: false }))}
 //       /> */}
 //     </div>
 //   );
