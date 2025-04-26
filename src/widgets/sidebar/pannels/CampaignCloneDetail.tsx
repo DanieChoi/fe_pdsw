@@ -506,11 +506,13 @@ export default function CampaignDetail() {
     if (type === 'dialMode' && value !== '') {
       setTempCampaignsInfo({
         ...tempCampaignInfo,
-        dial_mode: Number(value)
+        dial_mode: Number(value),
+        dial_speed: 0,
       });
       setTempCampaignManagerInfo({
         ...tempCampaignManagerInfo,
-        dial_mode: Number(value)
+        dial_mode: Number(value),
+        dial_speed: 0,
       });
       setTempCampaignDialSpeedInfoParam({
         ...tempCampaignDialSpeedInfoParam,
@@ -695,7 +697,6 @@ export default function CampaignDetail() {
   //캠페인 콜페이싱 탭 변경
   const handleCallPacingTabChange = (value: CallPacingTabParam) => {
     if (value.campaignDialSpeedChangeYn) {
-      setCampaignDialSpeedChangeYn(value.campaignDialSpeedChangeYn);
       setTempCampaignDialSpeedInfoParam({
         ...tempCampaignDialSpeedInfoParam
         , predictive_dial_speed: value.predictive_dial_speed

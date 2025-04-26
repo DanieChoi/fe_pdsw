@@ -546,11 +546,13 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     if (type === 'dialMode' && value !== '') {
       setTempCampaignsInfo({
         ...tempCampaignInfo,
-        dial_mode: Number(value)
+        dial_mode: Number(value),
+        dial_speed: 0,
       });
       setTempCampaignManagerInfo({
         ...tempCampaignManagerInfo,
-        dial_mode: Number(value)
+        dial_mode: Number(value),
+        dial_speed: 0,
       });
       setTempCampaignDialSpeedInfoParam({
         ...tempCampaignDialSpeedInfoParam,

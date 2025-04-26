@@ -184,6 +184,34 @@ const SkillEdit = () => {
     return String(minSkillId ? minSkillId - 1 : 1);
   };
 
+  useEffect(() => {
+    const handleAgentStatusChange = (event: CustomEvent) => {
+      const { agent_id, agent_status, skill_id } = event.detail;
+      console.log('######### 상담사 상태 변경 수신:', agent_id, agent_status);
+      
+      
+      fetchCounselorList({ tenantId: tenant_id, roleId: role_id });
+      fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
+      fetchSkillCampaignList();
+      fetchSkillAgentList();
+      fetchCampaignList();
+      campaignSkillList({
+        session_key: '',
+        tenant_id: tenant_id
+      });
+
+      
+      // 여기에 필요한 처리 로직 작성
+    };
+  
+    window.addEventListener('agentStatusEvent', handleAgentStatusChange as EventListener);
+  
+    // 언마운트 시 정리
+    return () => {
+      window.removeEventListener('agentStatusEvent', handleAgentStatusChange as EventListener);
+    };
+  }, []);
+
   // 스킬 로우 클릭 이벤트 핸들러
   const handleSkillClick = ({ row }: { row: SkillRow }) => {
     setSelectedSkill(row);
@@ -787,7 +815,8 @@ const SkillEdit = () => {
 
   const { mutate: fetchSkillAgentList } = useApiForSkillAgentList({
     onSuccess: (data) => {
-      setAgentData(data);
+      // console.log("data : ", data);
+      setAgentData(data.result_data);
     },
     onError: (error) => {
       if (error.message.split('||')[0] === '5') {
@@ -1145,13 +1174,15 @@ const SkillEdit = () => {
       });
 
       const campaignResultData = (campaignData?.result_data) || [];
-      const agentResultData = (agentData?.result_data) || [];
+      const agentResultData = (agentData) || [];
+      // console.log('agentResultData : ', agentResultData);
       
       const skillRows: SkillRow[] = skillData.result_data.map(skill => {
         const tenantInfo = tenantMap[String(skill.tenant_id)] || { centerName: '', tenantName: '' };
         const campaignEntry = campaignResultData.find((item: any) => String(item.skill_id) === String(skill.skill_id));
         const agentEntry = agentResultData.find((item: any) => String(item.skill_id) === String(skill.skill_id));
         
+        // console.log('agentEntry : ', agentEntry);
         return {
           center: tenantInfo.centerName,
           tenant: tenantInfo.tenantName,

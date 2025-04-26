@@ -144,16 +144,16 @@ export const fetchSkillAgentList = async(): Promise<SkillAgentListResponse> => {
         filter: {
             skill_id: {
                 "start": 1,
-                "end": 99
+                "end": 99999
             }
         },
         sort: {
             skill_id: 0
         },
-        page: {
-            index: 1,
-            items: 10
-        }
+        // page: {
+        //     index: 1,
+        //     items: 10
+        // }
     };
 
     try {

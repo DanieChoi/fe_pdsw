@@ -205,6 +205,10 @@ export default function Footer({
           _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'] * 2;
         }
         addMessageToFooterList(_time, _type, _message);
+        fetchMain({
+          session_key: '',
+          tenant_id: tenant_id,
+        });
       }
     }
     //캠페인.
@@ -293,6 +297,16 @@ export default function Footer({
 
         const _message = '[EVENT] 상담사 스킬 ' + actionType;
         addMessageToFooterList(_time, _type, _message);
+
+        // 커스텀 이벤트 발생 - 상담사 상태 변경을 다른 컴포넌트에 알림
+        const agentStatusEvent = new CustomEvent('agentStatusEvent', {
+          detail: {
+            skill_id : _skillId.toString(),
+            agent_id : data['agent_id'].toString(),
+            agent_status: 'update'
+          }
+        });
+        window.dispatchEvent(agentStatusEvent);
 
         // 토스트 알림은 한 번만 표시
         if (useAlramPopup === 1) {
