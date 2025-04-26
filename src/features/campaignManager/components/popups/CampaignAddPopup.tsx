@@ -674,7 +674,7 @@ const CampaignAddPopup: React.FC<Props> = ({
           type="custom"
           width="max-w-md"
           confirmDisabled={false} // 항상 확인 버튼 활성화
-          isShowForCancleButton={true} // 취소 버튼 표시 여부
+          isShowForCancelButton={true} // 취소 버튼 표시 여부
         />
       )}
     </>
