@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { BatchUpdateResult, updateMultipleCampaignStatus } from '../api/apiForMultiUpdateCampaignProgressStatus';
 
 type UpdateStatusState = {
@@ -15,6 +16,7 @@ type UpdateStatusState = {
  * 를 호출해야 함
  */
 export const useApiForMultiUpdateCampaignProgressStatus = () => {
+  const queryClient = useQueryClient();
   const [state, setState] = useState<UpdateStatusState>({
     loading: false,
     error: null,
@@ -49,6 +51,11 @@ export const useApiForMultiUpdateCampaignProgressStatus = () => {
     try {
       // 각 캠페인에 대해 병렬로 상태 변경 요청
       const batchResult = await updateMultipleCampaignStatus(campaignIds, status);
+      
+      // 캠페인 그룹 트리 데이터 갱신 (무효화)
+      queryClient.invalidateQueries({
+        queryKey: ['campaignTreeDataForCampaignGroupTab']
+      });
 
       setState({
         loading: false,

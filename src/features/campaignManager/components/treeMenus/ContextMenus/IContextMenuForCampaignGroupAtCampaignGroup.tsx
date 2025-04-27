@@ -49,6 +49,10 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
 }) => {
   const { addTabCurrentOnly } = useTabStore.getState();
 
+  console.log("ContextMenuForCampaignGroupAtCampaignGroup 렌더링 !!!!!!!!!!!!!!!!!!!", node);
+  console.log("ContextMenuForCampaignGroupAtCampaignGroup 렌더링 !!!!!!!!!!!!!!!!!!!", node.tenant_id);
+  
+
   // 사용 가능한 메뉴 ID들을 스토어에서 가져오기
   const availableMenuIds = useAvailableMenuStore(
     (state) => state.availableMenuIdsForCampaignGroupTabCampaignGroup
