@@ -26,6 +26,7 @@ import { GroupSkillAssignmentTab } from "@/features/campaignManager/components/t
 import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCampaignTab";
 import CampaignDeletePanel from "@/widgets/sidebar/pannels/CampaignDeletePanel";
 import CampaignGroupBulkUpdatePanel from "./CampaignGroupBulkUpdatePanel";
+import SkilAdminPannelForSystemAdmin from "@/widgets/SkilAdminPannelForSystemAdmin";
 
 // Define the Tab interface
 interface Tab {
@@ -189,6 +190,16 @@ const SectionContent = ({
             </div>
           </div>
         );
+
+      case 701:
+        return (
+          <div className="flex justify-left w-full">
+            <div className="max-w-[1000px] w-full">
+              <SkilAdminPannelForSystemAdmin />
+            </div>
+          </div>
+        )
+
       default:
         return (
           <div className="flex items-center justify-center h-full text-gray-500">

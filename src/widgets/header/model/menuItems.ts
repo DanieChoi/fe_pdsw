@@ -122,4 +122,14 @@ export const menuItems: MenuItem[] = [
     href: '/settings',
     content: null
   },
+
+  // {
+  //   id: 701,
+  //   menuId: 701,
+  //   title: '스킬 관리',
+  //   icon: '/header-menu/캠페인관리.svg',
+  //   href: '/skil-admin',
+  //   content: null,
+  // },
+
 ];

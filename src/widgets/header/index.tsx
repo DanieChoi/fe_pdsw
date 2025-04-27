@@ -398,7 +398,7 @@ export default function Header() {
         {/* useAlramPopup: {useAlramPopup} */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between header-padding">
-            <nav className="flex overflow-x-auto gap-3">
+            {/* <nav className="flex overflow-x-auto gap-3">
               {menuItems
                 // availableHeaderMenuIds에 있는 메뉴만 필터링
                 .filter(item => availableHeaderMenuIds?.includes(item.menuId))
@@ -436,7 +436,63 @@ export default function Header() {
                     </div>
                   );
                 })}
-            </nav>
+            </nav> */}
+
+<nav className="flex overflow-x-auto gap-3">
+  {menuItems
+    .filter(item =>
+      availableHeaderMenuIds?.includes(item.menuId) ||
+      item.id === 701   // 15번은 예외로 무조건 출력
+    )
+    .map((item) => {
+      const count = getTabCountById(item.id);
+      const isActive = isActiveTab(item.id);
+      const isOpened = isTabOpened(item.id);
+
+      return (
+        <div key={`menu-${item.id}`} className="menu-item">
+          <CommonButton
+            variant={
+              isActive
+                ? 'menuActive'
+                : isOpened
+                  ? 'menuOpened'
+                  : 'menu'
+            }
+            size="default"
+            onClick={(e) => handleMenuClick(item, e)}
+            className="relative py-1.5 px-2"
+          >
+            <div className="flex items-center justify-center">
+              <Image
+                src={item.icon}
+                alt={item.title}
+                width={32}
+                height={32}
+                className="object-contain"
+              />
+            </div>
+            <div className="flex items-center">
+              <span
+                className={`text-xs whitespace-nowrap ${
+                  isActive ? 'text-white' : 'text-[#333]'
+                }`}
+              >
+                {item.title}
+              </span>
+              {count > 1 && (
+                <span className="ml-1 px-1.5 py-0.5 text-[10px] leading-none bg-[#E5F3F3] text-[#5BC2C1] rounded-full min-w-[16px] text-center">
+                  {count}
+                </span>
+              )}
+            </div>
+          </CommonButton>
+        </div>
+      );
+    })}
+</nav>
+
+
             <div>
 
             </div>
