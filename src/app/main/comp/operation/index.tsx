@@ -1,3 +1,190 @@
+// 'use client'
+
+// import React, { useEffect, useState } from 'react'
+// import CampaignLayout from './CampaignNumberChange/CampaignLayout'
+// import EditDescription from './NumberEditDescription/EditDescription'
+// import CallLimitSetting from './CallLimitSetting'
+// import DistributionLimit from './DistributionLimit'
+// import SkillEdit from './SkillEdit'
+// // import ConsultResultSetting from './ConsultResultSetting'
+// import SuspendView from './SuspendView'
+// import Image from 'next/image'
+// import { useAuthStore, useTabStore } from '@/store'
+// import SystemCallBackTimeSetting from './SystemCallBackTimeSetting'
+
+// export default function OperationBoard() {
+//   // const [openSectionId, setOpenSectionId] = useState<string>('section1')
+//   const { activeTabId, openOperationSectionId, setOpenOperationSectionId } = useTabStore();
+//   const {tenant_id} = useAuthStore();
+
+//   useEffect(() => {
+//     if (activeTabId === 8) {
+//       setOpenOperationSectionId('section3')
+//     } else if (activeTabId === 9) {
+//       setOpenOperationSectionId('section4')
+//     }
+//   }, [activeTabId])
+
+//   const toggleSection = (sectionId: string) => {
+//     setOpenOperationSectionId(openOperationSectionId === sectionId ? '' : sectionId)
+//   }
+
+//   // 섹션 데이터를 배열로 정의
+//   const sections = [
+//     { id: 'section1', title: '캠페인별 발신번호 변경', component: CampaignLayout },
+//     { id: 'section2', title: '전화번호별 설명 편집', component: EditDescription },
+//     { id: 'section3', title: '예약콜 제한 설정', component: CallLimitSetting },
+//     { id: 'section8', title: '콜백 리스트 초기화 시각 설정', component: SystemCallBackTimeSetting },
+//     { id: 'section4', title: '분배호수 제한 설정', component: DistributionLimit },
+//     { id: 'section5', title: '스킬편집', component: SkillEdit },
+//     // { id: 'section6', title: '상담 결과코드 설정', component: ConsultResultSetting },
+//     { id: 'section7', title: '서스팬드', component: SuspendView },
+//   ]
+
+//   return (
+//     <div className="divide-y accordion-wrap limit-width">
+//       {sections.filter((section) => {
+//         // tenant_id가 0이 아니고 section.id가 section8인 경우(SystemCallBackTimeSetting 컴포넌트) 제외
+//         if (tenant_id !== 0 && section.id === 'section8' && section.component === SystemCallBackTimeSetting) {
+//           return false;
+//         }
+//         return true;
+//       }).map((section) => (
+//         <div key={section.id} className="accordion">
+//           <h2>
+//             <button
+//               type="button"
+//               className={`accordion-btn
+//                 ${openOperationSectionId !== section.id ? 'border-b-0' : ''} 
+//                 gap-[15px]`}
+//               onClick={() => toggleSection(section.id)}
+//               aria-expanded={openOperationSectionId === section.id}
+//             >
+//               <div className={`transform transition-transform duration-200 ${openOperationSectionId === section.id ? 'rotate-180' : ''}`}>
+//                 <Image 
+//                   src="/chevron-down.svg"
+//                   alt="chevron"
+//                   width={10}
+//                   height={10}
+//                 />
+//               </div>
+//               <span className='text-sm'>{section.title}</span>
+//             </button>
+//           </h2>
+//           <div
+//             className={`transition-[max-height,opacity] duration-200 ease-in-out overflow-hidden
+//               ${openOperationSectionId === section.id ? 'opacity-100' : 'max-h-0 opacity-0'}`}
+//           >
+//             <div className="py-[35px] px-[40px] border-t border-gray-200">
+//               {/* 컴포넌트를 조건부 렌더링 */}
+              
+//               {openOperationSectionId === section.id && React.createElement(section.component)}
+//             </div>
+//           </div>
+//         </div>
+//       ))}
+//     </div>
+//   )
+// }
+
+// 'use client'
+
+// import React, { useEffect, useState } from 'react'
+// import CampaignLayout from './CampaignNumberChange/CampaignLayout'
+// import EditDescription from './NumberEditDescription/EditDescription'
+// import CallLimitSetting from './CallLimitSetting'
+// import DistributionLimit from './DistributionLimit'
+// import SkillEdit from './SkillEdit'
+// // import ConsultResultSetting from './ConsultResultSetting'
+// import SuspendView from './SuspendView'
+// import Image from 'next/image'
+// import { useAuthStore, useTabStore } from '@/store'
+// import SystemCallBackTimeSetting from './SystemCallBackTimeSetting'
+
+// // uniqueKey 속성 추가
+// interface OperationBoardProps {
+//   uniqueKey?: string; // 고유 인스턴스 식별용
+// }
+
+// export default function OperationBoard({ uniqueKey }: OperationBoardProps) {
+//   // 글로벌 상태 대신 로컬 상태만 사용
+//   const [localOpenSectionId, setLocalOpenSectionId] = useState<string>('');
+//   const { activeTabId } = useTabStore();
+//   const { tenant_id } = useAuthStore();
+
+//   useEffect(() => {
+//     // 첫 렌더링 시에만 초기 섹션 설정
+//     if (activeTabId === 8) {
+//       setLocalOpenSectionId('section3');
+//     } else if (activeTabId === 9) {
+//       setLocalOpenSectionId('section4');
+//     } else if (activeTabId === 11) {
+//       setLocalOpenSectionId('section1');
+//     }
+//   }, []);  // 의존성 배열이 비어있어 컴포넌트 마운트 시에만 실행
+
+//   // 로컬 상태만 변경하는 토글 함수
+//   const toggleSection = (sectionId: string) => {
+//     setLocalOpenSectionId(localOpenSectionId === sectionId ? '' : sectionId);
+//   }
+
+//   // 섹션 데이터를 배열로 정의
+//   const sections = [
+//     { id: 'section1', title: '캠페인별 발신번호 변경', component: CampaignLayout },
+//     { id: 'section2', title: '전화번호별 설명 편집', component: EditDescription },
+//     { id: 'section3', title: '예약콜 제한 설정', component: CallLimitSetting },
+//     { id: 'section8', title: '콜백 리스트 초기화 시각 설정', component: SystemCallBackTimeSetting },
+//     { id: 'section4', title: '분배호수 제한 설정', component: DistributionLimit },
+//     { id: 'section5', title: '스킬편집', component: SkillEdit },
+//     // { id: 'section6', title: '상담 결과코드 설정', component: ConsultResultSetting },
+//     { id: 'section7', title: '서스팬드', component: SuspendView },
+//   ]
+
+//   return (
+//     <div className="divide-y accordion-wrap limit-width">
+//       {sections.filter((section) => {
+//         // tenant_id가 0이 아니고 section.id가 section8인 경우(SystemCallBackTimeSetting 컴포넌트) 제외
+//         if (tenant_id !== 0 && section.id === 'section8' && section.component === SystemCallBackTimeSetting) {
+//           return false;
+//         }
+//         return true;
+//       }).map((section) => (
+//         <div key={`${uniqueKey}-${section.id}`} className="accordion">
+//           <h2>
+//             <button
+//               type="button"
+//               className={`accordion-btn
+//                 ${localOpenSectionId !== section.id ? 'border-b-0' : ''} 
+//                 gap-[15px]`}
+//               onClick={() => toggleSection(section.id)}
+//               aria-expanded={localOpenSectionId === section.id}
+//             >
+//               <div className={`transform transition-transform duration-200 ${localOpenSectionId === section.id ? 'rotate-180' : ''}`}>
+//                 <Image 
+//                   src="/chevron-down.svg"
+//                   alt="chevron"
+//                   width={10}
+//                   height={10}
+//                 />
+//               </div>
+//               <span className='text-sm'>{section.title}</span>
+//             </button>
+//           </h2>
+//           <div
+//             className={`transition-[max-height,opacity] duration-200 ease-in-out overflow-hidden
+//               ${localOpenSectionId === section.id ? 'opacity-100' : 'max-h-0 opacity-0'}`}
+//           >
+//             <div className="py-[35px] px-[40px] border-t border-gray-200">
+//               {/* 컴포넌트를 조건부 렌더링 */}
+//               {localOpenSectionId === section.id && React.createElement(section.component)}
+//             </div>
+//           </div>
+//         </div>
+//       ))}
+//     </div>
+//   )
+// }
+
 'use client'
 
 import React, { useEffect, useState } from 'react'
@@ -11,22 +198,44 @@ import SuspendView from './SuspendView'
 import Image from 'next/image'
 import { useAuthStore, useTabStore } from '@/store'
 import SystemCallBackTimeSetting from './SystemCallBackTimeSetting'
+import { useOperationStore } from './store/OperationStore'
 
-export default function OperationBoard() {
-  // const [openSectionId, setOpenSectionId] = useState<string>('section1')
-  const { activeTabId, openOperationSectionId, setOpenOperationSectionId } = useTabStore();
-  const {tenant_id} = useAuthStore();
+// uniqueKey 속성 추가
+interface OperationBoardProps {
+  uniqueKey?: string; // 고유 인스턴스 식별용
+}
 
+export default function OperationBoard({ uniqueKey }: OperationBoardProps) {
+  // 로컬 상태 (UI 표시용)
+  const [localOpenSectionId, setLocalOpenSectionId] = useState<string>('');
+  
+  // 전역 상태 사용
+  const { openSectionId, setOpenSectionId, lastActiveTabId, setActiveTab } = useOperationStore();
+  
+  const { activeTabId } = useTabStore();
+  const { tenant_id } = useAuthStore();
+
+  // 컴포넌트 마운트 시 초기 섹션 설정
   useEffect(() => {
-    if (activeTabId === 8) {
-      setOpenOperationSectionId('section3')
-    } else if (activeTabId === 9) {
-      setOpenOperationSectionId('section4')
+    if (activeTabId) {
+      // 탭이 처음 열릴 때 자동으로 해당 아코디언 메뉴 열기
+      setActiveTab(activeTabId);
+      
+      // 로컬 상태에도 반영
+      setLocalOpenSectionId(openSectionId);
     }
-  }, [activeTabId])
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 전역 상태 변경 감지하여 로컬 상태 동기화
+  useEffect(() => {
+    setLocalOpenSectionId(openSectionId);
+  }, [openSectionId]);
+
+  // 토글 함수
   const toggleSection = (sectionId: string) => {
-    setOpenOperationSectionId(openOperationSectionId === sectionId ? '' : sectionId)
+    const newSectionId = localOpenSectionId === sectionId ? '' : sectionId;
+    setLocalOpenSectionId(newSectionId);
+    setOpenSectionId(newSectionId);
   }
 
   // 섹션 데이터를 배열로 정의
@@ -50,17 +259,17 @@ export default function OperationBoard() {
         }
         return true;
       }).map((section) => (
-        <div key={section.id} className="accordion">
+        <div key={`${uniqueKey}-${section.id}`} className="accordion">
           <h2>
             <button
               type="button"
               className={`accordion-btn
-                ${openOperationSectionId !== section.id ? 'border-b-0' : ''} 
+                ${localOpenSectionId !== section.id ? 'border-b-0' : ''} 
                 gap-[15px]`}
               onClick={() => toggleSection(section.id)}
-              aria-expanded={openOperationSectionId === section.id}
+              aria-expanded={localOpenSectionId === section.id}
             >
-              <div className={`transform transition-transform duration-200 ${openOperationSectionId === section.id ? 'rotate-180' : ''}`}>
+              <div className={`transform transition-transform duration-200 ${localOpenSectionId === section.id ? 'rotate-180' : ''}`}>
                 <Image 
                   src="/chevron-down.svg"
                   alt="chevron"
@@ -73,12 +282,11 @@ export default function OperationBoard() {
           </h2>
           <div
             className={`transition-[max-height,opacity] duration-200 ease-in-out overflow-hidden
-              ${openOperationSectionId === section.id ? 'opacity-100' : 'max-h-0 opacity-0'}`}
+              ${localOpenSectionId === section.id ? 'opacity-100' : 'max-h-0 opacity-0'}`}
           >
             <div className="py-[35px] px-[40px] border-t border-gray-200">
               {/* 컴포넌트를 조건부 렌더링 */}
-              
-              {openOperationSectionId === section.id && React.createElement(section.component)}
+              {localOpenSectionId === section.id && React.createElement(section.component)}
             </div>
           </div>
         </div>
