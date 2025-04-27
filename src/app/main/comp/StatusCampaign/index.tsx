@@ -161,7 +161,8 @@ const StatusCampaign: React.FC = () => {
     const processedData = filtered.map((c) => {
       const statusData = generateDispatchStatusData(c.campaign_id);
       const dispatchKey = `dispatch${dispatchType}` as keyof typeof statusData;
-      const campaignName = c.campaign_name || "알 수 없음";
+      const campaignName = campaigns.find((cam) => cam.campaign_id === c.campaign_id)?.campaign_name || "알 수 없음";
+      // filtered의 campaign_name 속성이 없으므로 filtered의 campaign_id와 campaigns의 campaign_id와 같다면 campaigns의 campaign_name 사용
       return {
         name: `[${c.campaign_id}]${campaignName}`,
         progress: statusData[dispatchKey]?.progress || 0,
@@ -254,12 +255,14 @@ const StatusCampaign: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-4">
+            {/* 요청으로 주석처리
             <div className="flex items-center text-xs text-gray-500 bg-slate-50 px-3 py-1.5 rounded">
               <div className="h-2 w-2 rounded-full bg-green-500 mr-2 animate-pulse"></div>
               <span>갱신 주기: <span className="font-medium text-blue-600">{statisticsUpdateCycle}초</span></span>
               <span className="mx-2">•</span>
               <span>{formattedLastRefreshTime}</span>
             </div>
+            */}
             
             <CommonButton
               variant="outline"
