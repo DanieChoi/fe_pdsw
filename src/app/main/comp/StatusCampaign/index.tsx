@@ -214,85 +214,147 @@ const StatusCampaign: React.FC = () => {
     `마지막 갱신: ${lastRefreshTime.toLocaleTimeString()}` : 
     '아직 갱신되지 않음';
 
-  return (
-    <div>
-      {/* <div className="flex justify-between items-center mb-2">
-        <span>갱신 주기: {statisticsUpdateCycle}초</span>
-        <span className="text-sm text-gray-500">{formattedLastRefreshTime}</span>
-      </div> */}
-      
-      <div className="flex gap-4 mb-6 items-center">
-        <Select value={selectedSkill} onValueChange={handleSkillChange}>
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="스킬전체보기" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="total">스킬전체보기</SelectItem>
-            {skills.map((skill) => (
-              <SelectItem key={skill.skill_id} value={skill.skill_id.toString()}>
-                {skill.skill_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={selectedDispatch} onValueChange={handleDispatchChange}>
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="최초발신" />
-          </SelectTrigger>
-          <SelectContent>
-            {dispatchTypeList.map((option) => (
-              <SelectItem key={option.dispatch_id} value={option.dispatch_id.toString()}>
-                {option.dispatch_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <CommonButton
-          variant="secondary"
-          onClick={refreshData}
-          disabled={isLoading || isRefreshing}
-        >
-          {isRefreshing ? "새로고침 중..." : "새로고침"}
-        </CommonButton>
-      </div>
-
-      {isLoading && !isRefreshing ? (
-        <div className="border p-2 rounded flex items-center justify-center" style={{ height: chartHeight }}>
-          <p>데이터를 로드 중입니다...</p>
-        </div>
-      ) : isError ? (
-        <div className="border p-2 rounded flex items-center justify-center" style={{ height: chartHeight }}>
-          <p>데이터 로드 중 오류가 발생했습니다. 새로고침을 시도해주세요.</p>
-        </div>
-      ) : (
-        <div style={{ height: chartHeight }} className="border p-2 rounded">
-          {chartData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                layout="vertical"
-                data={chartData}
-                margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
+    return (
+      <div className="space-y-6">
+        {/* Combined filter, info and action controls in one row */}
+        <div className="flex flex-wrap items-center justify-between gap-y-3">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-600">스킬:</span>
+              <Select value={selectedSkill} onValueChange={handleSkillChange}>
+                <SelectTrigger className="w-40 h-9">
+                  <SelectValue placeholder="스킬전체보기" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="total">스킬전체보기</SelectItem>
+                  {skills.map((skill) => (
+                    <SelectItem key={skill.skill_id} value={skill.skill_id.toString()}>
+                      {skill.skill_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+    
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-600">발신:</span>
+              <Select value={selectedDispatch} onValueChange={handleDispatchChange}>
+                <SelectTrigger className="w-40 h-9">
+                  <SelectValue placeholder="최초발신" />
+                </SelectTrigger>
+                <SelectContent>
+                  {dispatchTypeList.map((option) => (
+                    <SelectItem key={option.dispatch_id} value={option.dispatch_id.toString()}>
+                      {option.dispatch_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="flex items-center text-xs text-gray-500 bg-slate-50 px-3 py-1.5 rounded">
+              <div className="h-2 w-2 rounded-full bg-green-500 mr-2 animate-pulse"></div>
+              <span>갱신 주기: <span className="font-medium text-blue-600">{statisticsUpdateCycle}초</span></span>
+              <span className="mx-2">•</span>
+              <span>{formattedLastRefreshTime}</span>
+            </div>
+            
+            <CommonButton
+              variant="outline"
+              size="sm"
+              onClick={refreshData}
+              disabled={isLoading || isRefreshing}
+              className="flex items-center gap-1 whitespace-nowrap"
+            >
+              <svg 
+                className={`h-3 w-3 ${isRefreshing ? "animate-spin" : ""}`} 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
               >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" tick={{ fontSize: 13 }} axisLine={{ stroke: "#999" }} />
-                <YAxis type="category" dataKey="name" tick={{ fontSize: 13 }} axisLine={{ stroke: "#999" }} />
-                <Tooltip />
-                <Legend verticalAlign="top" align="left" wrapperStyle={{ paddingBottom: "20px", fontSize: "14px" }} />
-                <Bar dataKey="success" fill="#FF8DA0" name="성공률" />
-                <Bar dataKey="progress" fill="#4AD3C8" name="진행률" />
-              </BarChart>
-            </ResponsiveContainer>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {isRefreshing ? "갱신중" : "새로고침"}
+            </CommonButton>
+          </div>
+        </div>
+    
+        {/* Chart container with loading states */}
+        <div 
+          className={`border rounded-lg overflow-hidden transition-all duration-300 ${
+            isRefreshing ? "opacity-70" : "opacity-100"
+          }`} 
+          style={{ height: chartHeight }}
+        >
+          {isLoading && !isRefreshing ? (
+            <div className="h-full flex flex-col items-center justify-center bg-slate-50">
+              <div className="w-12 h-12 border-4 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+              <p className="text-gray-600">데이터를 로드 중입니다...</p>
+            </div>
+          ) : isError ? (
+            <div className="h-full flex flex-col items-center justify-center bg-red-50">
+              <div className="w-12 h-12 flex items-center justify-center rounded-full bg-red-100 mb-4">
+                <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <p className="text-red-600 font-medium">데이터 로드 중 오류가 발생했습니다.</p>
+              <button 
+                onClick={refreshData}
+                className="mt-3 px-4 py-2 text-sm bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
+              >
+                다시 시도
+              </button>
+            </div>
           ) : (
-            <div className="flex items-center justify-center h-full">
-              <p>표시할 데이터가 없습니다.</p>
+            <div className="p-4 h-full">
+              {chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    layout="vertical"
+                    data={chartData}
+                    margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" tick={{ fontSize: 13 }} axisLine={{ stroke: "#999" }} />
+                    <YAxis type="category" dataKey="name" tick={{ fontSize: 13 }} axisLine={{ stroke: "#999" }} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        borderRadius: '8px', 
+                        border: 'none', 
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)' 
+                      }} 
+                    />
+                    <Legend 
+                      verticalAlign="top" 
+                      align="left" 
+                      wrapperStyle={{ 
+                        paddingBottom: "20px", 
+                        fontSize: "14px" 
+                      }} 
+                    />
+                    <Bar dataKey="success" fill="#FF8DA0" name="성공률" radius={[0, 2, 2, 0]} />
+                    <Bar dataKey="progress" fill="#4AD3C8" name="진행률" radius={[0, 2, 2, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center">
+                    <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2z" />
+                    </svg>
+                    <p className="mt-1 text-gray-500">표시할 데이터가 없습니다.</p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
-      )}
-    </div>
-  );
+      </div>
+    );
 };
 
 export default StatusCampaign;
