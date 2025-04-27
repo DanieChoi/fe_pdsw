@@ -77,7 +77,7 @@ const IDialogButtonForSkilMasterForSystemAdmin = ({
           type="1"
           isOpen={true}
           onClose={handleCreate}
-          onCancle={() => setOpen(false)}
+          onCancel={() => setOpen(false)}
           message={
             <div className="space-y-4">
               <div>
