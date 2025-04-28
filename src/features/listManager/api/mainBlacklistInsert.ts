@@ -17,7 +17,7 @@ export const fetchBlacklistInsert = async (credentials: CallingListInsertRequest
 
   try {
     const { data } = await axiosInstance.post<CallingListInsertResponse>(
-      'campaigns/'+credentials.campaign_id+'/blacklist', 
+      'campaigns/'+credentials.campaign_id+'/black-list', 
       blacklistInsertRequestData
     );
     return data;
