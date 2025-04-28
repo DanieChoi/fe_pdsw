@@ -168,29 +168,37 @@ export default function Footer({
       }
       addMessageToFooterList(_time, _type, _message);
     }
-    //장비 사용, 장비 사용중지
+    //장비 추가/삭제/상태(사용, 사용중지)    
     else if (announce === 'dialing-device') {
-      if (command === 'UPDATE' && data['device_status'] === 'run') {
-        _message = 'CIDS 작동중';
-        // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
-        const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
-          detail: {
-            device_id: data['device_id'].toString(),
-            device_status: 'run'
-          }
-        });
-        window.dispatchEvent(deviceStatusEvent);
+      if (command === 'INSERT') {
+        _message = '[장비추가]장비아이디: ' + data['device_id'];
         addMessageToFooterList(_time, _type, _message);
-      } else if (command === 'UPDATE' && data['device_status'] === 'down') {
-        _message = 'CIDS 작동중지';
-        // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
-        const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
-          detail: {
-            device_id: data['device_id'].toString(),
-            device_status: 'down'
-          }
-        });
-        window.dispatchEvent(deviceStatusEvent);
+      } else if (command === 'UPDATE') {
+        if (data['device_status'] === 'run') {
+          _message = 'CIDS 작동중';
+          // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
+          const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
+            detail: {
+              device_id: data['device_id'].toString(),
+              device_status: 'run'
+            }
+          });
+          window.dispatchEvent(deviceStatusEvent);
+          addMessageToFooterList(_time, _type, _message);
+        } else if (data['device_status'] === 'down') {
+          _message = 'CIDS 작동중지';
+          // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
+          const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
+            detail: {
+              device_id: data['device_id'].toString(),
+              device_status: 'down'
+            }
+          });
+          window.dispatchEvent(deviceStatusEvent);
+          addMessageToFooterList(_time, _type, _message);  
+        }
+      } else if (command === 'DELETE') {
+        _message = '[장비제거]장비아이디: ' + data['device_id'];
         addMessageToFooterList(_time, _type, _message);
       }
     }
