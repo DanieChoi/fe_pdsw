@@ -45,6 +45,7 @@ interface FileRow {
   fileSize: string;
   deletable: boolean;
   listFlag: string;
+  targetType: string;
 }
 
 interface SendRow {
@@ -382,7 +383,8 @@ const ListManager: React.FC = () => {
             campaignId: campaignId+'',
             fileSize: (file.size / 1024).toFixed(2) + " KB",
             deletable: false,
-            listFlag: listFlag
+            listFlag: listFlag,
+            targetType: targetType
           };
           setUploadedFiles((prev) => [...prev, newFileData]);
           setSelectedFileName(file.name);
@@ -864,7 +866,7 @@ const ListManager: React.FC = () => {
 
       if( uploadedFiles[workFileIndex].listFlag === 'T'){
         fetchBlacklistDelete(Number(uploadedFiles[workFileIndex].campaignId));
-      }else if( targetType === 'general' ){
+      }else if( uploadedFiles[workFileIndex].targetType === 'general' ){
         fetchCallingListInsert(callingListInsertData);
       }else{
         fetchBlacklistInsert(callingListInsertData);
