@@ -7,7 +7,7 @@ export const fetchBlacklistDelete = async (credentials: number): Promise<DeleteR
     
   try {
     const { data } = await axiosInstance.delete<DeleteResponse>(
-      'campaigns/' + credentials + '/blacklist',
+      'campaigns/' + credentials + '/black-list',
       {
         headers: {
           'Content-Type': 'application/json' 
