@@ -267,7 +267,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                   <TableHeader className="!bg-[#DDF4F2] w-[120px]"><Label>총발신</Label></TableHeader>
                   <TableCell className="text-center text-sm">{selectedCall?.totDialCnt || 0}</TableCell>
                   <TableHeader className="!bg-[#FEE9EC] w-[120px]"><Label>발신 시도</Label></TableHeader>
-                  <TableCell className="text-center text-sm">{selectedCall?.retryCall || 0}</TableCell>
+                  <TableCell className="text-center text-sm">{selectedCall?.dialingCall || 0}</TableCell>
                   <TableHeader className="!bg-[#FEE9EC] w-[120px]"><Label>발신 성공</Label></TableHeader>
                   <TableCell className="text-center text-sm">{selectedCall?.scct || 0}</TableCell>
                   <TableHeader className="!bg-[#FEE9EC] w-[120px]"><Label>발신 실패</Label></TableHeader>
@@ -296,7 +296,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                       <tbody>
                         <TableRow>
                           <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>발신시도</Label></TableHeader>
-                          <TableCell className="text-center text-sm">{selectedCall?.firstCall||0}</TableCell>
+                          <TableCell className="text-center text-sm">{selectedCall?.dialingCall||0}</TableCell>
                         </TableRow>
                         <TableRow>
                           <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>발신성공</Label></TableHeader>

@@ -162,6 +162,28 @@ const DistributionLimit = () => {
     });
   };
 
+  // Footer에서 발생하는 이벤트 수신을 위한 이벤트 리스너 추가
+  useEffect( ()=> {
+    const campaignSkillUpdateStatusChange = (event: any) => {
+      const { campaign_id, campaign_status } = event.detail; 
+      if( campaign_status.toString() === 'update' && campaign_id.toString() === selectedCampaignId){
+        fetchCampaignAgentList({
+          campaign_id: [Number(campaign_id)]
+        })
+        fetchMaxCallList({
+          campaign_id: [Number(campaign_id)]
+        });
+      }
+    };
+    
+    window.addEventListener('campaignSkillUpdateStatus', campaignSkillUpdateStatusChange as EventListener);
+          
+    // 컴포넌트 언마운트 시 리스너 제거
+    return () => {
+        window.removeEventListener('campaignSkillUpdateStatus', campaignSkillUpdateStatusChange as EventListener);
+    };
+  },[])
+
   const transformToTreeData = (agentData: Row[]) => {
     const result: Row[] = [];
     

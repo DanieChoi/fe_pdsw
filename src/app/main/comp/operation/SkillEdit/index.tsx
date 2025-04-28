@@ -1385,15 +1385,26 @@ const SkillEdit = () => {
             <div className="flex items-center gap-2">
               <Label className="w-[8rem] min-w-[8rem]">스킬아이디</Label>
               <CustomInput
-                type="text"
+                type="number"
                 value={editableFields.skillId || ''}
                 onChange={e => {
-                  // 숫자만 반영
-                  const val = e.target.value.replace(/[^0-9]/g, '');
-                  handleInputChange('skillId', val);
-                }}
-                className="w-full"
-                disabled={!isNewMode}
+                  const raw = e.target.value;
+
+                  // 빈 값이면 그대로 반영 (백스페이스 등 허용)
+                  if (raw === '') {
+                    handleInputChange('skillId', '');
+                    return;
+                  }
+
+                  // 숫자인지 확인 (소수점/문자 방지)
+                  const num = Number(raw);
+                  if (!Number.isNaN(num) && Number.isInteger(num) && num >= 0) {
+                    handleInputChange('skillId', String(num));
+                  }
+              }}
+                
+              className="w-full"
+              disabled={!isNewMode}
               />
             </div>
             <div className="flex items-center gap-2">
