@@ -94,13 +94,16 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
       setTempBarChartData(tempBarChartData);
     }
   }, [selectedCall]);
+
+  console.log('totLstCnt : ' , selectedCall?.totLstCnt);
+  console.log('nonTTCT : ' , selectedCall?.nonTTCT);
   
   return (
       <div className="flex flex-col gap-2">
           
           <div className="flex gap-5">
               <div className="w-1/2">
-                <TitleWrap title="발신구분" />
+                <TitleWrap title="발신 실패 사유" />
                 <div className="border rounded h-[170px] flex items-center justify-center">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -277,9 +280,9 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                 {/* 두 번째 행 */}
                 <TableRow>
                   <TableHeader className="!bg-[#DDF4F2] w-[120px]"><Label>미발신</Label></TableHeader>
-                  <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-failCnt-(selectedCall?.recallCnt || 0)}</TableCell>
+                  <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-(selectedCall?.recallCnt || 0)}</TableCell>
                   <TableHeader className="!bg-[#FEE9EC] w-[120px]"><Label>대기리스트</Label></TableHeader>
-                  <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-failCnt-(selectedCall?.recallCnt || 0)}</TableCell>
+                  <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)}</TableCell>
                   <TableHeader className="!bg-[#FEE9EC] w-[120px]"><Label>방지리스트</Label></TableHeader>
                   <TableCell colSpan={3} className="text-sm text-center">{selectedCall?.nogdeleteGL || 0}</TableCell>
                 </TableRow>
@@ -402,7 +405,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                       <tbody>
                         <TableRow>
                           <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>대기리스트</Label></TableHeader>
-                          <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-failCnt-(selectedCall?.recallCnt || 0)-(selectedCall?.nogdeleteGL || 0)}</TableCell>
+                          <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)}</TableCell>
                         </TableRow>
                         <TableRow>
                           <TableHeader className="w-[170px]"><Label>진행 대기</Label></TableHeader>

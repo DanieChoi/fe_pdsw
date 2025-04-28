@@ -136,14 +136,15 @@ export default function Header() {
         11: '예약콜 제한'
       };
 
-      toast.info(`${tabNames[item.id]}은(는) 1탭으로 제한합니다.`, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true
-      });
+      // 2-219 요청으로 주석처리
+      // toast.info(`${tabNames[item.id]}은(는) 1탭으로 제한합니다.`, {
+      //   position: "top-right",
+      //   autoClose: 3000,
+      //   hideProgressBar: false,
+      //   closeOnClick: true,
+      //   pauseOnHover: true,
+      //   draggable: true
+      // });
 
       // 2) 새 탭 생성 및 추가
       const newTabKey = `${item.id}-${Date.now()}`;
