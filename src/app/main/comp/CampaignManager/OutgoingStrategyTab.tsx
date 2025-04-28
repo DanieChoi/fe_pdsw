@@ -78,7 +78,7 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
   const [tempOutgoingStrategyTab, setTempOutgoingStrategyTab] = useState<OutgoingStrategyTabParam>(CampaignOutgoingOrderTab);
   const [maxCallsRows, setMaxCallsRows] = useState<MaxCallsRow[]>([
     {
-      call1: 3,
+      call1: 7,
       call2: 7,
       call3: 7,
       call4: 7,
@@ -170,13 +170,32 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
   ];
 
   const handleMaxCallsRowsChange = (newRows: MaxCallsRow[]) => {
-    setMaxCallsRows(newRows);
-    const tempdata = newRows[0].call1+','+newRows[0].call2+','+newRows[0].call3+','+newRows[0].call4+','+newRows[0].call5
-    onCampaignOutgoingStrategyChange({...tempOutgoingStrategyTab      
-        , changeYn: true
-        , campaignInfoChangeYn: true
-        , redial_strategy: tempOutgoingStrategyTab.redial_strategy.map((val,index) => tempdata.split(',')[index]+val.substring(val.indexOf(':')))
-    });
+    let check = true;
+    if( newRows[0].call1 > 29 ){
+      newRows[0].call1 = 29;
+      check = false;
+    }else if( newRows[0].call2 > 29 ){
+      newRows[0].call2 = 29;
+      check = false;
+    }else if( newRows[0].call3 > 29 ){
+      newRows[0].call3 = 29;
+      check = false;
+    }else if( newRows[0].call4 > 29 ){
+      newRows[0].call4 = 29;
+      check = false;
+    }else if( newRows[0].call5 > 29 ){
+      newRows[0].call5 = 29;
+      check = false;
+    }
+    if(check){
+      const tempdata = newRows[0].call1+','+newRows[0].call2+','+newRows[0].call3+','+newRows[0].call4+','+newRows[0].call5;
+      setMaxCallsRows(newRows);
+      onCampaignOutgoingStrategyChange({...tempOutgoingStrategyTab      
+          , changeYn: true
+          , campaignInfoChangeYn: true
+          , redial_strategy: tempOutgoingStrategyTab.redial_strategy.map((val,index) => tempdata.split(',')[index]+val.substring(val.indexOf(':')))
+      });
+    }
   };
 
   const changeRedialStrategyData = (row: MainRow,value:string) => {
@@ -299,11 +318,11 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
       }); 
       setMaxCallsRows(maxCallsRows.map(row => ({
         ...row,
-        call1: Number(campaignInfo.redial_strategy[0].substring(0, 1)),
-        call2: Number(campaignInfo.redial_strategy[1].substring(0, 1)),
-        call3: Number(campaignInfo.redial_strategy[2].substring(0, 1)),
-        call4: Number(campaignInfo.redial_strategy[3].substring(0, 1)),
-        call5: Number(campaignInfo.redial_strategy[4].substring(0, 1))
+        call1: Number(campaignInfo.redial_strategy[0].split(':')[0]),
+        call2: Number(campaignInfo.redial_strategy[1].split(':')[0]),
+        call3: Number(campaignInfo.redial_strategy[2].split(':')[0]),
+        call4: Number(campaignInfo.redial_strategy[3].split(':')[0]),
+        call5: Number(campaignInfo.redial_strategy[4].split(':')[0])
       })));
       setRows(rows.map((row, index) => ({
         ...row,
