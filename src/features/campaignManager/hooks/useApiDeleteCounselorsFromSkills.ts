@@ -2,6 +2,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CounselorSkillAssignmentResponse, CounselorSkillApiError } from '../types/typeForCounselorSkill';
 import { apiForDeleteCounselorsForSpecificSkill } from '../api/apiForCounselorSkil';
+import { useAgentSkillStatusStore } from '@/store/agenSkillStatus';
+
 
 interface DeleteCounselorsFromSkillsParams {
   skillIds: number[];
@@ -22,6 +24,8 @@ interface BatchDeleteResult {
  */
 export function useApiDeleteCounselorsFromSkills(tenantId: string) {
   const queryClient = useQueryClient();
+
+  const {setAgentSkillStatus} = useAgentSkillStatusStore();
 
   // 배치 처리 유틸리티 함수
   const processBatchDeletion = async ({
@@ -93,6 +97,10 @@ export function useApiDeleteCounselorsFromSkills(tenantId: string) {
       queryClient.invalidateQueries({
         queryKey: ['assignedSkills', tenantId]
       });
+
+      // 다른 컴포넌트에 알리기위한 상담사 스킬 변경 상태
+      setAgentSkillStatus(true);
+
     }
   });
 }

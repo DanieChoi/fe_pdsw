@@ -16,6 +16,7 @@ import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiF
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { SkillListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
+import { useAgentSkillStatusStore } from '@/store/agenSkillStatus';
 
 // 메인 스킬 정보
 interface SkillRow {
@@ -69,6 +70,9 @@ const SkillEdit = () => {
   const [selectedSkillRows, setSelectedSkillRows] = useState<Set<string>>(new Set());
 
   const { setSkills } = useCampainManagerStore();
+
+  // 사이드바에서 상담사 스킬 할당 변경 감지용 store
+  const { agentSkillStatus } = useAgentSkillStatusStore();
   
   const router = useRouter();
 
@@ -184,11 +188,10 @@ const SkillEdit = () => {
     return String(minSkillId ? minSkillId - 1 : 1);
   };
 
+  // 사이드바에서 상담사 스킬 할당 변경 감지용 store
   useEffect(() => {
-    const handleAgentStatusChange = (event: CustomEvent) => {
-      const { agent_id, agent_status, skill_id } = event.detail;
-      console.log('######### 상담사 상태 변경 수신:', agent_id, agent_status);
-      
+    if(agentSkillStatus === true){
+      // console.log('######### 상담사 상태 변경 수신');
       
       fetchCounselorList({ tenantId: tenant_id, roleId: role_id });
       fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
@@ -200,17 +203,10 @@ const SkillEdit = () => {
         tenant_id: tenant_id
       });
 
-      
-      // 여기에 필요한 처리 로직 작성
-    };
-  
-    window.addEventListener('agentStatusEvent', handleAgentStatusChange as EventListener);
-  
-    // 언마운트 시 정리
-    return () => {
-      window.removeEventListener('agentStatusEvent', handleAgentStatusChange as EventListener);
-    };
-  }, []);
+      useAgentSkillStatusStore.getState().setAgentSkillStatus(false);
+    }
+    
+  }, [agentSkillStatus]);
 
   // 스킬 로우 클릭 이벤트 핸들러
   const handleSkillClick = ({ row }: { row: SkillRow }) => {
