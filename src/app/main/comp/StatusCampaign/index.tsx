@@ -254,7 +254,7 @@ const StatusCampaign: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           {/* 요청으로 주석처리
             <div className="flex items-center text-xs text-gray-500 bg-slate-50 px-3 py-1.5 rounded">
               <div className="h-2 w-2 rounded-full bg-green-500 mr-2 animate-pulse"></div>
@@ -264,26 +264,26 @@ const StatusCampaign: React.FC = () => {
             </div>
             */}
 
-          {/* <div className="flex items-center gap-3 text-xs text-gray-500">
-            <div className="flex items-center gap-1 bg-slate-50 px-3 py-1.5 rounded-md">
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               <span>
                 갱신 주기: <span className="font-medium text-blue-600">{statisticsUpdateCycle}초</span>
               </span>
             </div>
 
-            <div className="flex items-center gap-1 bg-slate-50 px-3 py-1.5 rounded-md">
+            <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md">
               <span>마지막 갱신:</span>
               <span className="font-medium text-blue-600">{formattedLastRefreshTime}</span>
             </div>
-          </div> */}
+          </div>
 
           <CommonButton
             variant="outline"
             size="sm"
             onClick={refreshData}
             disabled={isLoading || isRefreshing}
-            className="flex items-center gap-1 whitespace-nowrap mr-2"
+            className="flex items-center whitespace-nowrap mr-2"
           >
             <svg
               className={`h-3 w-3 ${isRefreshing ? "animate-spin" : ""}`}
