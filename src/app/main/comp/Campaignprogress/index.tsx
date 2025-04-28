@@ -574,8 +574,10 @@ export default function Campaignprogress() {
     }
   }, [selectedCampaignId,selectedCampaignIdIndex]);
 
+  
   useEffect(() => {
     if( campaigns.length > 0 ){
+      // 캠페인즈를 가져와서 캠페인 아이디를 설정합니다.
       setSelectedCampaignId(campaigns[0].campaign_id);
       setSelectedCampaignIdIndex(0);
       setTempCampaignInfoList([]);

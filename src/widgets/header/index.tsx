@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 import AuthTimeOutCheck from "@/components/providers/AuthTimeOutCheck";
 import { useOperationStore } from "@/app/main/comp/operation/store/OperationStore";
+import { toast } from 'react-toastify';
+
 
 const errorMessage = {
   isOpen: false,
@@ -117,7 +119,7 @@ export default function Header() {
       openInNewWindow();
       return;
     }
-  
+
     // 운영설정 탭들(8, 9, 11) 전용 처리
     if ([8, 9, 11].includes(item.id)) {
       // 1) 기존에 열려있던 8,9,11 탭 모두 제거
@@ -126,28 +128,44 @@ export default function Header() {
           .filter(tab => tab.id === idToRemove)
           .forEach(tab => removeTab(tab.id, tab.uniqueKey));
       });
-  
+
+      // 2) 토스트 메시지 표시
+      const tabNames: { [key: number]: string } = {
+        8: '운영설정',
+        9: '분배 호수',
+        11: '예약콜 제한'
+      };
+
+      toast.info(`${tabNames[item.id]}은(는) 1탭으로 제한합니다.`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true
+      });
+
       // 2) 새 탭 생성 및 추가
       const newTabKey = `${item.id}-${Date.now()}`;
       const newTab = { ...item, uniqueKey: newTabKey, content: item.content || null };
       addTab(newTab);
-  
+
       // 3) 현재 활성 탭이 속한 섹션 찾기 (없으면 첫 섹션)
       const sectionId =
         rows[0].sections.find(sec =>
           sec.tabs.some(t => t.uniqueKey === activeTabKey)
         )?.id ?? rows[0].sections[0].id;
-  
+
       // 4) 해당 섹션으로 새 탭 이동
       moveTabToSection(item.id, rows[0].id, sectionId, newTabKey);
-  
+
       // 5) 탭 활성화 및 운영설정 스토어 업데이트
       setActiveTab(item.id, newTabKey);
       useOperationStore.getState().setActiveTab(item.id);
       setCampaignIdForUpdateFromSideMenu(null);
       return;
     }
-  
+
     // 일반 메뉴 클릭 처리
     if (event.ctrlKey) {
       duplicateTab(item.id);
@@ -156,17 +174,17 @@ export default function Header() {
       openedTabs
         .filter(tab => tab.id === item.id)
         .forEach(tab => removeTab(tab.id, tab.uniqueKey));
-  
+
       // 새 탭 추가 및 활성화
       const newTabKey = `${item.id}-${Date.now()}`;
       const newTab = { ...item, uniqueKey: newTabKey, content: item.content || null };
       addTab(newTab);
       setActiveTab(item.id, newTabKey);
     }
-  
+
     setCampaignIdForUpdateFromSideMenu(null);
   };
-  
+
 
   const isTabOpened = (itemId: number) => {
     const existingTabs = openedTabs.filter(tab => tab.id === itemId);
@@ -400,59 +418,58 @@ export default function Header() {
                 })}
             </nav> */}
 
-<nav className="flex overflow-x-auto gap-3">
-  {menuItems
-    .filter(item =>
-      availableHeaderMenuIds?.includes(item.menuId) ||
-      item.id === 701   // 15번은 예외로 무조건 출력
-    )
-    .map((item) => {
-      const count = getTabCountById(item.id);
-      const isActive = isActiveTab(item.id);
-      const isOpened = isTabOpened(item.id);
+            <nav className="flex overflow-x-auto gap-3">
+              {menuItems
+                .filter(item =>
+                  availableHeaderMenuIds?.includes(item.menuId) ||
+                  item.id === 701   // 15번은 예외로 무조건 출력
+                )
+                .map((item) => {
+                  const count = getTabCountById(item.id);
+                  const isActive = isActiveTab(item.id);
+                  const isOpened = isTabOpened(item.id);
 
-      return (
-        <div key={`menu-${item.id}`} className="menu-item">
-          <CommonButton
-            variant={
-              isActive
-                ? 'menuActive'
-                : isOpened
-                  ? 'menuOpened'
-                  : 'menu'
-            }
-            size="default"
-            onClick={(e) => handleMenuClick(item, e)}
-            className="relative py-1.5 px-2"
-          >
-            <div className="flex items-center justify-center">
-              <Image
-                src={item.icon}
-                alt={item.title}
-                width={32}
-                height={32}
-                className="object-contain"
-              />
-            </div>
-            <div className="flex items-center">
-              <span
-                className={`text-xs whitespace-nowrap ${
-                  isActive ? 'text-white' : 'text-[#333]'
-                }`}
-              >
-                {item.title}
-              </span>
-              {count > 1 && (
-                <span className="ml-1 px-1.5 py-0.5 text-[10px] leading-none bg-[#E5F3F3] text-[#5BC2C1] rounded-full min-w-[16px] text-center">
-                  {count}
-                </span>
-              )}
-            </div>
-          </CommonButton>
-        </div>
-      );
-    })}
-</nav>
+                  return (
+                    <div key={`menu-${item.id}`} className="menu-item">
+                      <CommonButton
+                        variant={
+                          isActive
+                            ? 'menuActive'
+                            : isOpened
+                              ? 'menuOpened'
+                              : 'menu'
+                        }
+                        size="default"
+                        onClick={(e) => handleMenuClick(item, e)}
+                        className="relative py-1.5 px-2"
+                      >
+                        <div className="flex items-center justify-center">
+                          <Image
+                            src={item.icon}
+                            alt={item.title}
+                            width={32}
+                            height={32}
+                            className="object-contain"
+                          />
+                        </div>
+                        <div className="flex items-center">
+                          <span
+                            className={`text-xs whitespace-nowrap ${isActive ? 'text-white' : 'text-[#333]'
+                              }`}
+                          >
+                            {item.title}
+                          </span>
+                          {count > 1 && (
+                            <span className="ml-1 px-1.5 py-0.5 text-[10px] leading-none bg-[#E5F3F3] text-[#5BC2C1] rounded-full min-w-[16px] text-center">
+                              {count}
+                            </span>
+                          )}
+                        </div>
+                      </CommonButton>
+                    </div>
+                  );
+                })}
+            </nav>
 
 
             <div>
