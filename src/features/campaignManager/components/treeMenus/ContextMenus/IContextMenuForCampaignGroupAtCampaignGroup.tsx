@@ -1,3 +1,377 @@
+// import React, { useState } from "react";
+// import { useTabStore } from "@/store/tabStore";
+// import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
+// import { Separator } from "react-contexify";
+// import { useApiForMultiUpdateCampaignProgressStatus } from "../hook/useApiForMultiUpdateCampaignProgressStatus";
+// import IConfirmPopupForMultiUpdateCampaignProgress from "@/features/campaignManager/components/popups/IConfirmPopupForMultiUpdateCampaignProgress";
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogFooter,
+// } from "@/components/ui/dialog";
+// import { Button } from "@/components/ui/button";
+// import { AlertCircle, CheckCircle, Play, Pause, StopCircle, Edit2, Trash2, PlusCircle, RefreshCcw } from "lucide-react";
+
+// interface IContextMenuForCampaignGroupAtCampaignGroupProps {
+//   node: any;
+//   setIsCampaignAddPopupOpen: (open: boolean) => void;
+//   setIsDeleteDialogOpen: (open: boolean) => void;
+//   setIsRenameDialogOpen: (open: boolean) => void;
+//   onBulkAction?: (actionKey: "start" | "complete" | "stop") => void;
+// }
+
+// // 공통 스타일 설정
+// const itemStyle: React.CSSProperties = {
+//   fontSize: "14px",
+//   padding: "7px 14px",
+//   borderRadius: "5px",
+//   display: "flex",
+//   alignItems: "center",
+//   gap: "8px",
+//   cursor: "pointer",
+//   transition: "background 0.15s",
+// };
+
+// const statusMap = {
+//   start: { code: "1", label: "시작", icon: <Play className="w-4 h-4 text-green-600" /> },
+//   complete: { code: "2", label: "멈춤", icon: <Pause className="w-4 h-4 text-yellow-600" /> },
+//   stop: { code: "3", label: "중지", icon: <StopCircle className="w-4 h-4 text-red-600" /> },
+// };
+
+// const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampaignGroupAtCampaignGroupProps> = ({
+//   node,
+//   setIsCampaignAddPopupOpen,
+//   setIsDeleteDialogOpen,
+//   setIsRenameDialogOpen,
+//   onBulkAction,
+// }) => {
+//   const { addTabCurrentOnly } = useTabStore.getState();
+
+//   console.log("ContextMenuForCampaignGroupAtCampaignGroup 렌더링 !!!!!!!!!!!!!!!!!!!", node);
+//   console.log("ContextMenuForCampaignGroupAtCampaignGroup 렌더링 !!!!!!!!!!!!!!!!!!!", node.tenant_id);
+  
+
+//   // 사용 가능한 메뉴 ID들을 스토어에서 가져오기
+//   const availableMenuIds = useAvailableMenuStore(
+//     (state) => state.availableMenuIdsForCampaignGroupTabCampaignGroup
+//   );
+
+//   // 캠페인 상태 일괄 변경 훅
+//   const { updateCampaignsStatus } = useApiForMultiUpdateCampaignProgressStatus();
+
+//   // 멀티업데이트 팝업 상태
+//   const [confirmPopup, setConfirmPopup] = useState<{
+//     open: boolean;
+//     actionKey: "start" | "complete" | "stop" | "";
+//   }>({ open: false, actionKey: "" });
+
+//   // 결과 dialog 상태 관리
+//   const [resultDialog, setResultDialog] = useState({
+//     open: false,
+//     title: "",
+//     description: null as React.ReactNode,
+//     isError: false
+//   });
+
+//   // 캠페인 그룹 내 캠페인 ID/이름 배열 추출
+//   const campaignIds: string[] = node.campaignIds || [];
+//   const campaignNames: string[] = node.campaignNames || campaignIds;
+//   // 캠페인 정보 배열 (이름+상태)
+//   const campaignInfos: { name: string; status: number }[] = node.campaignInfos || [];
+
+//   // 일괄 작업 실행
+//   const handleConfirmBulkAction = async () => {
+//     const actionKey = confirmPopup.actionKey;
+//     if (!actionKey || !statusMap[actionKey]) return;
+
+//     try {
+//       const result = await updateCampaignsStatus(
+//         campaignIds,
+//         statusMap[actionKey].code
+//       );
+//       setConfirmPopup({ open: false, actionKey: "" });
+//       setResultDialog({
+//         open: true,
+//         title: `일괄 ${statusMap[actionKey].label} 결과`,
+//         description: (
+//           <div className="space-y-3">
+//             <div className="flex items-center">
+//               <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+//               <span>
+//                 총 <span className="font-semibold">{result?.totalCount}</span>개 캠페인 중
+//                 <span className="font-semibold text-green-600"> {result?.successCount}</span>개 성공,
+//                 {(result?.failCount ?? 0) > 0 && (
+//                   <span className="font-semibold text-red-600"> {result?.failCount ?? 0}</span>
+//                 )}
+//                 {(result?.failCount ?? 0) === 0 && (
+//                   <span className="font-semibold"> {result?.failCount ?? 0}</span>
+//                 )}개 실패
+//               </span>
+//             </div>
+//             {result?.results && result.results.filter(r => !r.success).length > 0 && (
+//               <div className="flex items-start">
+//                 <AlertCircle className="h-5 w-5 text-red-500 mt-1 mr-2" />
+//                 <div>
+//                   <p className="font-medium">실패 캠페인:</p>
+//                   <p className="text-red-600">{result.results.filter(r => !r.success).map(r => r.campaignId).join(", ")}</p>
+//                 </div>
+//               </div>
+//             )}
+//           </div>
+//         ),
+//         isError: false
+//       });
+//     } catch (e: any) {
+//       setConfirmPopup({ open: false, actionKey: "" });
+//       setResultDialog({
+//         open: true,
+//         title: `일괄 ${statusMap[actionKey].label} 실패`,
+//         description: (
+//           <div className="flex items-start">
+//             <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-2" />
+//             <span>{e?.message || `일괄 ${statusMap[actionKey].label} 작업 중 오류가 발생했습니다.`}</span>
+//           </div>
+//         ),
+//         isError: true
+//       });
+//     }
+//   };
+
+//   // 일괄 액션 메뉴 아이템 (시작, 멈춤, 중지)
+//   const bulkActionItems = [
+//     {
+//       id: 39,
+//       group: 1,
+//       key: "bulk-start",
+//       label: (
+//         <span className="flex items-center gap-2">
+//           {statusMap.start.icon}
+//           <span>캠페인 그룹 일괄 시작</span>
+//         </span>
+//       ),
+//       action: () => {
+//         if (onBulkAction) {
+//           onBulkAction("start");
+//         } else {
+//           setConfirmPopup({ open: true, actionKey: "start" });
+//         }
+//       }
+//     },
+//     {
+//       id: 40,
+//       group: 1,
+//       key: "bulk-complete",
+//       label: (
+//         <span className="flex items-center gap-2">
+//           {statusMap.complete.icon}
+//           <span>캠페인 그룹 일괄 멈춤</span>
+//         </span>
+//       ),
+//       action: () => {
+//         if (onBulkAction) {
+//           onBulkAction("complete");
+//         } else {
+//           setConfirmPopup({ open: true, actionKey: "complete" });
+//         }
+//       }
+//     },
+//     {
+//       id: 41,
+//       group: 1,
+//       key: "bulk-stop",
+//       label: (
+//         <span className="flex items-center gap-2">
+//           {statusMap.stop.icon}
+//           <span>캠페인 그룹 일괄 중지</span>
+//         </span>
+//       ),
+//       action: () => {
+//         if (onBulkAction) {
+//           onBulkAction("stop");
+//         } else {
+//           setConfirmPopup({ open: true, actionKey: "stop" });
+//         }
+//       }
+//     }
+//   ];
+
+//   // 메뉴 아이템 정의 (메뉴 ID, 그룹, 레이블, 동작 함수)
+//   const menuItems = [
+//     {
+//       id: 38,
+//       group: 1,
+//       key: "bulk-update",
+//       label: (
+//         <span className="flex items-center gap-2">
+//           <RefreshCcw className="w-4 h-4 text-blue-500" />
+//           <span>캠페인 그룹 일괄 수정</span>
+//         </span>
+//       ),
+//       action: () => {
+//         addTabCurrentOnly({
+//           id: 1,
+//           title: `캠페인 그룹 관리: ${node.name}`,
+//           uniqueKey: `groupBulkUpdate_${node.group_id}_${Date.now()}`,
+//           params: {
+//             groupId: node.group_id,
+//             groupName: node.name,
+//           },
+//         });
+//       }
+//     },
+//     ...bulkActionItems,
+//     {
+//       id: 42,
+//       group: 2,
+//       key: "rename",
+//       label: (
+//         <span className="flex items-center gap-2">
+//           <Edit2 className="w-4 h-4 text-gray-700" />
+//           <span>캠페인 그룹 이름 변경</span>
+//         </span>
+//       ),
+//       action: () => {
+//         setIsRenameDialogOpen(true);
+//       }
+//     },
+//     {
+//       id: 43,
+//       group: 2,
+//       key: "delete",
+//       label: (
+//         <span className="flex items-center gap-2">
+//           <Trash2 className="w-4 h-4 text-red-500" />
+//           <span>캠페인 그룹 삭제</span>
+//         </span>
+//       ),
+//       action: () => {
+//         setIsDeleteDialogOpen(true);
+//       }
+//     },
+//     {
+//       id: 44,
+//       group: 3,
+//       key: "add-campaign",
+//       label: (
+//         <span className="flex items-center gap-2">
+//           <PlusCircle className="w-4 h-4 text-green-600" />
+//           <span>캠페인 그룹에 캠페인 추가</span>
+//         </span>
+//       ),
+//       action: () => {
+//         setIsCampaignAddPopupOpen(true);
+//       }
+//     },
+//     {
+//       id: 45,
+//       group: 3,
+//       key: "resend",
+//       label: (
+//         <span className="flex items-center gap-2">
+//           <RefreshCcw className="w-4 h-4 text-blue-500" />
+//           <span>캠페인 그룹 실시간 재발신</span>
+//         </span>
+//       ),
+//       action: () => {
+//         addTabCurrentOnly({
+//           id: 24,
+//           title: `재발신: ${node.name}`,
+//           campaignId: node.group_id,
+//           campaignName: node.name,
+//           uniqueKey: `groupBulkUpdate_${node.group_id}_${Date.now()}`,
+//           params: {
+//             groupId: node.group_id,
+//             groupName: node.name,
+//           },
+//         });
+//       }
+//     }
+//   ];
+
+//   // 허용된 메뉴 ID에 따라 메뉴 아이템 필터링
+//   const visibleMenuItems = availableMenuIds?.length > 0
+//     ? menuItems.filter(item => availableMenuIds.includes(item.id))
+//     : [];
+
+//   if (visibleMenuItems.length === 0) {
+//     return null;
+//   }
+
+//   // 메뉴 렌더링 함수 (구분선 처리 포함)
+//   const renderMenuItems = () => {
+//     const elements: React.ReactElement[] = [];
+//     let currentGroup = -1;
+
+//     visibleMenuItems.forEach(item => {
+//       // 그룹이 변경되면 구분선 추가 (첫 그룹 제외)
+//       if (currentGroup !== -1 && item.group !== currentGroup) {
+//         elements.push(<Separator key={`separator-${item.group}`} />);
+//       }
+
+//       // 메뉴 아이템 추가
+//       elements.push(
+//         <div
+//           key={item.key}
+//           style={itemStyle}
+//           className="contexify-custom-item hover:bg-[#F5F7FA] transition"
+//           onClick={item.action}
+//         >
+//           {item.label}
+//         </div>
+//       );
+
+//       currentGroup = item.group;
+//     });
+
+//     return elements;
+//   };
+
+//   return (
+//     <>
+//       <div className="py-1 min-w-[220px]">{renderMenuItems()}</div>
+
+//       {/* 일괄 동작 확인 팝업 (onBulkAction이 없을 때만 내부에서 사용) */}
+//       {!onBulkAction && (
+//         <IConfirmPopupForMultiUpdateCampaignProgress
+//           open={confirmPopup.open}
+//           actionKey={confirmPopup.actionKey as "start" | "complete" | "stop"}
+//           items={campaignInfos}
+//           onConfirm={handleConfirmBulkAction}
+//           onCancel={() => setConfirmPopup({ open: false, actionKey: "" })}
+//         />
+//       )}
+
+//       {/* 결과 Dialog */}
+//       <Dialog open={resultDialog.open} onOpenChange={() => setResultDialog(prev => ({ ...prev, open: false }))}>
+//         <DialogContent className="sm:max-w-md">
+//           <DialogHeader>
+//             <DialogTitle className={resultDialog.isError ? "text-red-600" : ""}>
+//               {resultDialog.title}
+//             </DialogTitle>
+//           </DialogHeader>
+//           <div className="py-2">
+//             {resultDialog.description}
+//           </div>
+//           <DialogFooter className="sm:justify-end">
+//             <Button
+//               variant="default"
+//               onClick={() => setResultDialog(prev => ({ ...prev, open: false }))}
+//             >
+//               확인
+//             </Button>
+//           </DialogFooter>
+//         </DialogContent>
+//       </Dialog>
+//     </>
+//   );
+// };
+// export default IContextMenuForCampaignGroupAtCampaignGroup;
+
+// src/features/campaignManager/components/menus/IContextMenuForCampaignGroupAtCampaignGroup.tsx
+'use client';
+
 import React, { useState } from "react";
 import { useTabStore } from "@/store/tabStore";
 import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
@@ -12,7 +386,18 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, CheckCircle, Play, Pause, StopCircle, Edit2, Trash2, PlusCircle, RefreshCcw } from "lucide-react";
+import {
+  Play,
+  Pause,
+  StopCircle,
+  Pencil,
+  Trash2,
+  PlusCircle,
+  RefreshCcw,
+  AlertTriangle,
+  CheckCircle,
+} from "lucide-react";
+
 
 interface IContextMenuForCampaignGroupAtCampaignGroupProps {
   node: any;
@@ -22,7 +407,6 @@ interface IContextMenuForCampaignGroupAtCampaignGroupProps {
   onBulkAction?: (actionKey: "start" | "complete" | "stop") => void;
 }
 
-// 공통 스타일 설정
 const itemStyle: React.CSSProperties = {
   fontSize: "14px",
   padding: "7px 14px",
@@ -35,12 +419,26 @@ const itemStyle: React.CSSProperties = {
 };
 
 const statusMap = {
-  start: { code: "1", label: "시작", icon: <Play className="w-4 h-4 text-green-600" /> },
-  complete: { code: "2", label: "멈춤", icon: <Pause className="w-4 h-4 text-yellow-600" /> },
-  stop: { code: "3", label: "중지", icon: <StopCircle className="w-4 h-4 text-red-600" /> },
+  start: {
+    code: "1",
+    label: "시작",
+    icon: <Play className="w-4 h-4 text-green-600" />,
+  },
+  complete: {
+    code: "2",
+    label: "멈춤",
+    icon: <Pause className="w-4 h-4 text-yellow-600" />,
+  },
+  stop: {
+    code: "3",
+    label: "중지",
+    icon: <StopCircle className="w-4 h-4 text-red-600" />,
+  },
 };
 
-const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampaignGroupAtCampaignGroupProps> = ({
+const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<
+  IContextMenuForCampaignGroupAtCampaignGroupProps
+> = ({
   node,
   setIsCampaignAddPopupOpen,
   setIsDeleteDialogOpen,
@@ -48,10 +446,6 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
   onBulkAction,
 }) => {
   const { addTabCurrentOnly } = useTabStore.getState();
-
-  console.log("ContextMenuForCampaignGroupAtCampaignGroup 렌더링 !!!!!!!!!!!!!!!!!!!", node);
-  console.log("ContextMenuForCampaignGroupAtCampaignGroup 렌더링 !!!!!!!!!!!!!!!!!!!", node.tenant_id);
-  
 
   // 사용 가능한 메뉴 ID들을 스토어에서 가져오기
   const availableMenuIds = useAvailableMenuStore(
@@ -72,13 +466,11 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
     open: false,
     title: "",
     description: null as React.ReactNode,
-    isError: false
+    isError: false,
   });
 
-  // 캠페인 그룹 내 캠페인 ID/이름 배열 추출
+  // 캠페인 그룹 내 캠페인 ID/이름/정보 배열 추출
   const campaignIds: string[] = node.campaignIds || [];
-  const campaignNames: string[] = node.campaignNames || campaignIds;
-  // 캠페인 정보 배열 (이름+상태)
   const campaignInfos: { name: string; status: number }[] = node.campaignInfos || [];
 
   // 일괄 작업 실행
@@ -100,28 +492,29 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
             <div className="flex items-center">
               <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
               <span>
-                총 <span className="font-semibold">{result?.totalCount}</span>개 캠페인 중
-                <span className="font-semibold text-green-600"> {result?.successCount}</span>개 성공,
-                {(result?.failCount ?? 0) > 0 && (
-                  <span className="font-semibold text-red-600"> {result?.failCount ?? 0}</span>
-                )}
-                {(result?.failCount ?? 0) === 0 && (
-                  <span className="font-semibold"> {result?.failCount ?? 0}</span>
-                )}개 실패
+                총 <span className="font-semibold">{result?.totalCount}</span>개 캠페인 중{" "}
+                <span className="font-semibold text-green-600">{result?.successCount}</span>개 성공,
+                <span className={`font-semibold ${result?.failCount ? "text-red-600" : ""}`}>
+                  {" "}
+                  {result?.failCount ?? 0}
+                </span>
+                개 실패
               </span>
             </div>
             {result?.results && result.results.filter(r => !r.success).length > 0 && (
               <div className="flex items-start">
-                <AlertCircle className="h-5 w-5 text-red-500 mt-1 mr-2" />
+                <CheckCircle className="h-5 w-5 text-red-500 mt-1 mr-2" />
                 <div>
                   <p className="font-medium">실패 캠페인:</p>
-                  <p className="text-red-600">{result.results.filter(r => !r.success).map(r => r.campaignId).join(", ")}</p>
+                  <p className="text-red-600">
+                    {result.results.filter(r => !r.success).map(r => r.campaignId).join(", ")}
+                  </p>
                 </div>
               </div>
             )}
           </div>
         ),
-        isError: false
+        isError: false,
       });
     } catch (e: any) {
       setConfirmPopup({ open: false, actionKey: "" });
@@ -130,74 +523,38 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
         title: `일괄 ${statusMap[actionKey].label} 실패`,
         description: (
           <div className="flex items-start">
-            <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-2" />
-            <span>{e?.message || `일괄 ${statusMap[actionKey].label} 작업 중 오류가 발생했습니다.`}</span>
+            <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5 mr-2" />
+            <span>
+              {e?.message || `일괄 ${statusMap[actionKey].label} 작업 중 오류가 발생했습니다.`}
+            </span>
           </div>
         ),
-        isError: true
+        isError: true,
       });
     }
   };
 
-  // 일괄 액션 메뉴 아이템 (시작, 멈춤, 중지)
-  const bulkActionItems = [
-    {
-      id: 39,
-      group: 1,
-      key: "bulk-start",
-      label: (
-        <span className="flex items-center gap-2">
-          {statusMap.start.icon}
-          <span>캠페인 그룹 일괄 시작</span>
-        </span>
-      ),
-      action: () => {
-        if (onBulkAction) {
-          onBulkAction("start");
-        } else {
-          setConfirmPopup({ open: true, actionKey: "start" });
-        }
+  // 일괄 액션 메뉴 아이템
+  const bulkActionItems = (["start", "complete", "stop"] as const).map((key, idx) => ({
+    id: 39 + idx,
+    group: 1,
+    key: `bulk-${key}`,
+    label: (
+      <span className="flex items-center gap-2">
+        {statusMap[key].icon}
+        <span>캠페인 그룹 일괄 {statusMap[key].label}</span>
+      </span>
+    ),
+    action: () => {
+      if (onBulkAction) {
+        onBulkAction(key);
+      } else {
+        setConfirmPopup({ open: true, actionKey: key });
       }
     },
-    {
-      id: 40,
-      group: 1,
-      key: "bulk-complete",
-      label: (
-        <span className="flex items-center gap-2">
-          {statusMap.complete.icon}
-          <span>캠페인 그룹 일괄 멈춤</span>
-        </span>
-      ),
-      action: () => {
-        if (onBulkAction) {
-          onBulkAction("complete");
-        } else {
-          setConfirmPopup({ open: true, actionKey: "complete" });
-        }
-      }
-    },
-    {
-      id: 41,
-      group: 1,
-      key: "bulk-stop",
-      label: (
-        <span className="flex items-center gap-2">
-          {statusMap.stop.icon}
-          <span>캠페인 그룹 일괄 중지</span>
-        </span>
-      ),
-      action: () => {
-        if (onBulkAction) {
-          onBulkAction("stop");
-        } else {
-          setConfirmPopup({ open: true, actionKey: "stop" });
-        }
-      }
-    }
-  ];
+  }));
 
-  // 메뉴 아이템 정의 (메뉴 ID, 그룹, 레이블, 동작 함수)
+  // 메뉴 아이템 정의
   const menuItems = [
     {
       id: 38,
@@ -205,7 +562,7 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
       key: "bulk-update",
       label: (
         <span className="flex items-center gap-2">
-          <RefreshCcw className="w-4 h-4 text-blue-500" />
+          <Pencil className="w-4 h-4 text-gray-700" />
           <span>캠페인 그룹 일괄 수정</span>
         </span>
       ),
@@ -214,12 +571,9 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
           id: 1,
           title: `캠페인 그룹 관리: ${node.name}`,
           uniqueKey: `groupBulkUpdate_${node.group_id}_${Date.now()}`,
-          params: {
-            groupId: node.group_id,
-            groupName: node.name,
-          },
+          params: { groupId: node.group_id, groupName: node.name },
         });
-      }
+      },
     },
     ...bulkActionItems,
     {
@@ -228,13 +582,11 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
       key: "rename",
       label: (
         <span className="flex items-center gap-2">
-          <Edit2 className="w-4 h-4 text-gray-700" />
+          <Pencil className="w-4 h-4 text-gray-700" />
           <span>캠페인 그룹 이름 변경</span>
         </span>
       ),
-      action: () => {
-        setIsRenameDialogOpen(true);
-      }
+      action: () => setIsRenameDialogOpen(true),
     },
     {
       id: 43,
@@ -246,9 +598,7 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
           <span>캠페인 그룹 삭제</span>
         </span>
       ),
-      action: () => {
-        setIsDeleteDialogOpen(true);
-      }
+      action: () => setIsDeleteDialogOpen(true),
     },
     {
       id: 44,
@@ -260,9 +610,7 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
           <span>캠페인 그룹에 캠페인 추가</span>
         </span>
       ),
-      action: () => {
-        setIsCampaignAddPopupOpen(true);
-      }
+      action: () => setIsCampaignAddPopupOpen(true),
     },
     {
       id: 45,
@@ -278,39 +626,28 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
         addTabCurrentOnly({
           id: 24,
           title: `재발신: ${node.name}`,
-          campaignId: node.group_id,
-          campaignName: node.name,
-          uniqueKey: `groupBulkUpdate_${node.group_id}_${Date.now()}`,
-          params: {
-            groupId: node.group_id,
-            groupName: node.name,
-          },
+          uniqueKey: `groupResend_${node.group_id}_${Date.now()}`,
+          params: { groupId: node.group_id, groupName: node.name },
         });
-      }
-    }
+      },
+    },
   ];
 
-  // 허용된 메뉴 ID에 따라 메뉴 아이템 필터링
-  const visibleMenuItems = availableMenuIds?.length > 0
-    ? menuItems.filter(item => availableMenuIds.includes(item.id))
-    : [];
+  const visibleMenuItems =
+    availableMenuIds?.length > 0
+      ? menuItems.filter((item) => availableMenuIds.includes(item.id))
+      : [];
 
-  if (visibleMenuItems.length === 0) {
-    return null;
-  }
+  if (visibleMenuItems.length === 0) return null;
 
-  // 메뉴 렌더링 함수 (구분선 처리 포함)
   const renderMenuItems = () => {
     const elements: React.ReactElement[] = [];
     let currentGroup = -1;
 
-    visibleMenuItems.forEach(item => {
-      // 그룹이 변경되면 구분선 추가 (첫 그룹 제외)
+    visibleMenuItems.forEach((item) => {
       if (currentGroup !== -1 && item.group !== currentGroup) {
-        elements.push(<Separator key={`separator-${item.group}`} />);
+        elements.push(<Separator key={`sep-${item.group}`} />);
       }
-
-      // 메뉴 아이템 추가
       elements.push(
         <div
           key={item.key}
@@ -321,7 +658,6 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
           {item.label}
         </div>
       );
-
       currentGroup = item.group;
     });
 
@@ -332,7 +668,6 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
     <>
       <div className="py-1 min-w-[220px]">{renderMenuItems()}</div>
 
-      {/* 일괄 동작 확인 팝업 (onBulkAction이 없을 때만 내부에서 사용) */}
       {!onBulkAction && (
         <IConfirmPopupForMultiUpdateCampaignProgress
           open={confirmPopup.open}
@@ -343,21 +678,25 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
         />
       )}
 
-      {/* 결과 Dialog */}
-      <Dialog open={resultDialog.open} onOpenChange={() => setResultDialog(prev => ({ ...prev, open: false }))}>
+      <Dialog
+        open={resultDialog.open}
+        onOpenChange={() =>
+          setResultDialog((prev) => ({ ...prev, open: false }))
+        }
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className={resultDialog.isError ? "text-red-600" : ""}>
               {resultDialog.title}
             </DialogTitle>
           </DialogHeader>
-          <div className="py-2">
-            {resultDialog.description}
-          </div>
+          <div className="py-2">{resultDialog.description}</div>
           <DialogFooter className="sm:justify-end">
             <Button
               variant="default"
-              onClick={() => setResultDialog(prev => ({ ...prev, open: false }))}
+              onClick={() =>
+                setResultDialog((prev) => ({ ...prev, open: false }))
+              }
             >
               확인
             </Button>
@@ -367,4 +706,5 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<IContextMenuForCampa
     </>
   );
 };
+
 export default IContextMenuForCampaignGroupAtCampaignGroup;

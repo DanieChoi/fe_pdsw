@@ -43,6 +43,7 @@ const statusConfig = {
   },
 };
 
+// icon: <img src="/icons/play.svg" className="w-4 h-4" alt="시작 아이콘" />
 const statusText = (flag?: number) => {
   switch (flag) {
     case 1:
@@ -50,31 +51,32 @@ const statusText = (flag?: number) => {
         label: "시작",
         icon: <Play className="h-4 w-4" />,
         color: "text-emerald-600",
-        bgColor: "bg-emerald-50"
+        bgColor: "bg-white", // 수정
       };
     case 2:
       return {
         label: "멈춤",
         icon: <Pause className="h-4 w-4" />,
-        color: "text-amber-600",
-        bgColor: "bg-amber-50"
+        color: "text-gray-600", // 색도 회색으로 살짝 바꿔주면 더 자연스러움
+        bgColor: "bg-white", // 수정
       };
     case 3:
       return {
         label: "중지",
         icon: <StopCircle className="h-4 w-4" />,
         color: "text-rose-600",
-        bgColor: "bg-rose-50"
+        bgColor: "bg-white", // 수정
       };
     default:
       return {
         label: "알수없음",
         icon: null,
         color: "text-gray-400",
-        bgColor: "bg-gray-50"
+        bgColor: "bg-white" // 수정
       };
   }
 };
+
 
 // 상태 변환 매핑
 const getTargetStatus = (currentStatus: number, actionKey: string) => {
