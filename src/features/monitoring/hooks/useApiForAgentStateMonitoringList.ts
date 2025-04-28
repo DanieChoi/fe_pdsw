@@ -2,11 +2,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { fetchAgentStateMonitoringList } from '../api/mainAgentStateMonitoringList';
 import { UseMutationOptions } from '@tanstack/react-query';
-import { CampaignProgressInformationRequest, AgentStateMonitoringListResponse, MonitoringApiError } from '../types/monitoringIndex';
+import { AgentStatusMonitoringRequest, AgentStateMonitoringListResponse, MonitoringApiError } from '../types/monitoringIndex';
 
 // 상담 모니터 목록
 export function useApiForAgentStateMonitoringList(
-  options?: UseMutationOptions<AgentStateMonitoringListResponse, MonitoringApiError, CampaignProgressInformationRequest>
+  options?: UseMutationOptions<AgentStateMonitoringListResponse, MonitoringApiError, AgentStatusMonitoringRequest>
 ) {
   return useMutation({
     mutationKey: ['mainAgentStateMonitoringList'],
@@ -19,7 +19,7 @@ export function useApiForAgentStateMonitoringList(
       });
       options?.onSuccess?.(data, variables, context);
     },
-    onError: (error: MonitoringApiError, variables: CampaignProgressInformationRequest, context: unknown) => {
+    onError: (error: MonitoringApiError, variables: AgentStatusMonitoringRequest, context: unknown) => {
       options?.onError?.(error, variables, context);
     },
   });
