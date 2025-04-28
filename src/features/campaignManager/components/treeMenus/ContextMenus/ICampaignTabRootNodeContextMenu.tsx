@@ -41,7 +41,7 @@ export function IRootNodeContextMenu({ item }: RootNodeContextMenuProps) {
       params: {
         sessionKey: session_key,
         campaignId: 0,
-        tenantId: 0,
+        tenantId: "A",
       }
     });
   }, [addTab, session_key]);
