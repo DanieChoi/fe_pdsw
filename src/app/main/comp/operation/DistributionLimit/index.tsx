@@ -56,7 +56,7 @@ const errorMessage = {
 
 const DistributionLimit = () => {
   const { tenant_id, role_id } = useAuthStore();
-  const { campaigns, setSelectedCampaign } = useMainStore();
+  const { campaigns } = useMainStore(); // 다른 컴포넌트 영향으로 인하여 setSelectedCampaign 제거
   const [treeData, setTreeData] = useState<Row[]>([]);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set([]));
   const [selectedCampaignId, setSelectedCampaignId] = useState('');
@@ -454,7 +454,7 @@ const DistributionLimit = () => {
     const campaign = campaigns.find(c => c.campaign_id.toString() === value);
     if (campaign) {
       setSelectedCampaignName(campaign.campaign_name);
-      setSelectedCampaign(campaign);
+      // setSelectedCampaign(campaign);
     }
   };
 
@@ -464,10 +464,12 @@ const DistributionLimit = () => {
       showConfirm("저장되지 않은 변경사항이 있습니다. 계속하시겠습니까?", () => {
         setSelectedCampaignId(campaignId);
         setSelectedCampaignName(campaignName);
-        const campaign = campaigns.find(c => c.campaign_id === Number(campaignId));
-        if (campaign) {
-          setSelectedCampaign(campaign);
-        }
+        // const campaign = campaigns.find(c => c.campaign_id === Number(campaignId));
+        // if (campaign) {
+        //   setSelectedCampaign(campaign);
+        // }
+        // 위 코드 이유 무엇? ==> store set을 해줘서 다른 컴포넌트를 멀티탭으로 띄운경우 데이터 덮어씌우기 발생 ==> 주석처리로 사용 X
+
         // 편집 데이터와 변경사항 초기화
         setEditedRows({});
         setHasChanges(false);
@@ -475,10 +477,11 @@ const DistributionLimit = () => {
     } else {
       setSelectedCampaignId(campaignId);
       setSelectedCampaignName(campaignName);
-      const campaign = campaigns.find(c => c.campaign_id === Number(campaignId));
-      if (campaign) {
-        setSelectedCampaign(campaign);
-      }
+      // const campaign = campaigns.find(c => c.campaign_id === Number(campaignId));
+      // if (campaign) {
+      //   setSelectedCampaign(campaign);
+      // }
+      // 위 코드 이유 무엇? ==> store set을 해줘서 다른 컴포넌트를 멀티탭으로 띄운경우 데이터 덮어씌우기 발생 ==> 주석처리로 사용 X
     }
   };
 
@@ -1738,13 +1741,15 @@ const DistributionLimit = () => {
         setSelectedCampaignName(tempData[0].campaignName);
         
         // 캠페인 객체도 업데이트
-        const campaign = campaigns.find(c => c.campaign_id.toString() === tempData[0].campaignId);
-        if (campaign) {
-          setSelectedCampaign(campaign);
-        }
+        // const campaign = campaigns.find(c => c.campaign_id.toString() === tempData[0].campaignId);
+        // if (campaign) {
+        //   setSelectedCampaign(campaign);
+        // }
+        // 위 코드 이유 무엇? ==> store set을 해줘서 다른 컴포넌트를 멀티탭으로 띄운경우 데이터 덮어씌우기 발생 ==> 주석처리로 사용 X
+        
       }
     }
-  }, [activeTabId, openedTabs, campaigns, setSelectedCampaign]);
+  }, [activeTabId, openedTabs, campaigns]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -1779,7 +1784,7 @@ const DistributionLimit = () => {
                 showConfirm("저장되지 않은 변경사항이 있습니다. 계속하시겠습니까?", () => {
                   setSelectedCampaignId('');
                   setSelectedCampaignName('');
-                  setSelectedCampaign(null);
+                  // setSelectedCampaign(null);
                   setEditedRows({});
                   setHasChanges(false);
                   setIsModalOpen(true);
@@ -1787,7 +1792,7 @@ const DistributionLimit = () => {
               } else {
                 setSelectedCampaignId('');
                 setSelectedCampaignName('');
-                setSelectedCampaign(null);
+                // setSelectedCampaign(null);
                 setIsModalOpen(true);
               }
             }}
