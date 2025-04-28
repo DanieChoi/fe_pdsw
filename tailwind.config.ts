@@ -14,6 +14,7 @@ export default {
 			'bp': {'max': '1706px'} // 1200px 이하에서 적용
 		  },
 		  fontFamily: {
+			sans: ['Pretendard', 'sans-serif'], // 🔥 font-sans 자체를 Pretendard로 재정의
 			myFont: ['Pretendard', 'sans-serif'],
 		  },
   		colors: {
