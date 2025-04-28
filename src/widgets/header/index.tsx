@@ -90,7 +90,9 @@ export default function Header() {
     setActiveTab,
     openCampaignManagerForUpdate,
     setCampaignIdForUpdateFromSideMenu,
-    closeAllTabs
+    closeAllTabs,
+    moveTabToSection,
+
   } = useTabStore();
 
   const {
@@ -110,101 +112,61 @@ export default function Header() {
     retry: 0,
   });
 
-  // const handleMenuClick = (item: MenuItem, event: React.MouseEvent<HTMLButtonElement>) => {
-  //   if (item.id === 3) {
-  //     openInNewWindow();
-  //     return;
-  //   }
-
-  //   if (event.ctrlKey) {
-  //     duplicateTab(item.id);
-  //   } else {
-  //     // 해당 아이템의 이전 탭들을 모두 찾아서 제거
-  //     const existingTabs = openedTabs.filter(tab => tab.id === item.id);
-  //     existingTabs.forEach(tab => {
-  //       removeTab(tab.id, tab.uniqueKey);
-  //     });
-
-  //     // 새로운 탭 추가
-  //     const newTabKey = `${item.id}-${Date.now()}`;
-  //     const newTab = {
-  //       ...item,
-  //       uniqueKey: newTabKey,
-  //       content: item.content || null
-  //     };
-  //     addTab(newTab);
-
-  //     // 탭을 추가한 후 활성 탭 설정
-  //     setActiveTab(item.id, newTabKey);
-  //   }
-
-  //   setCampaignIdForUpdateFromSideMenu(null);
-  // };
-
-  // Header.tsx 파일의 handleMenuClick 함수 수정 부분
-
   const handleMenuClick = (item: MenuItem, event: React.MouseEvent<HTMLButtonElement>) => {
     if (item.id === 3) {
       openInNewWindow();
       return;
     }
   
-    // 운영설정 관련 탭(8, 9, 11)은 특별 처리
-    if (item.id === 8 || item.id === 9 || item.id === 11) {
-      // 기존에 열려있는 8, 9, 11 탭을 모두 찾아서 제거
-      const operationTabIds = [8, 9, 11];
-      operationTabIds.forEach(operationId => {
-        const existingTabs = openedTabs.filter(tab => tab.id === operationId);
-        existingTabs.forEach(tab => {
-          removeTab(tab.id, tab.uniqueKey);
-        });
+    // 운영설정 탭들(8, 9, 11) 전용 처리
+    if ([8, 9, 11].includes(item.id)) {
+      // 1) 기존에 열려있던 8,9,11 탭 모두 제거
+      [8, 9, 11].forEach(idToRemove => {
+        openedTabs
+          .filter(tab => tab.id === idToRemove)
+          .forEach(tab => removeTab(tab.id, tab.uniqueKey));
       });
   
-      // 이제 새 탭 추가
+      // 2) 새 탭 생성 및 추가
       const newTabKey = `${item.id}-${Date.now()}`;
-      const newTab = {
-        ...item,
-        uniqueKey: newTabKey,
-        content: item.content || null
-      };
+      const newTab = { ...item, uniqueKey: newTabKey, content: item.content || null };
       addTab(newTab);
   
-      // 탭을 추가한 후 활성 탭 설정
+      // 3) 현재 활성 탭이 속한 섹션 찾기 (없으면 첫 섹션)
+      const sectionId =
+        rows[0].sections.find(sec =>
+          sec.tabs.some(t => t.uniqueKey === activeTabKey)
+        )?.id ?? rows[0].sections[0].id;
+  
+      // 4) 해당 섹션으로 새 탭 이동
+      moveTabToSection(item.id, rows[0].id, sectionId, newTabKey);
+  
+      // 5) 탭 활성화 및 운영설정 스토어 업데이트
       setActiveTab(item.id, newTabKey);
-  
-      // 운영설정 스토어에도 활성 탭 알림 (아코디언 메뉴 자동 열림)
-      // 직접 스토어의 setState 함수 호출
       useOperationStore.getState().setActiveTab(item.id);
-  
       setCampaignIdForUpdateFromSideMenu(null);
       return;
     }
   
-    // 기존 동작 (다른 탭들)
+    // 일반 메뉴 클릭 처리
     if (event.ctrlKey) {
       duplicateTab(item.id);
     } else {
-      // 해당 아이템의 이전 탭들을 모두 찾아서 제거
-      const existingTabs = openedTabs.filter(tab => tab.id === item.id);
-      existingTabs.forEach(tab => {
-        removeTab(tab.id, tab.uniqueKey);
-      });
+      // 기존 동일 ID 탭 제거
+      openedTabs
+        .filter(tab => tab.id === item.id)
+        .forEach(tab => removeTab(tab.id, tab.uniqueKey));
   
-      // 새로운 탭 추가
+      // 새 탭 추가 및 활성화
       const newTabKey = `${item.id}-${Date.now()}`;
-      const newTab = {
-        ...item,
-        uniqueKey: newTabKey,
-        content: item.content || null
-      };
+      const newTab = { ...item, uniqueKey: newTabKey, content: item.content || null };
       addTab(newTab);
-  
-      // 탭을 추가한 후 활성 탭 설정
       setActiveTab(item.id, newTabKey);
     }
   
     setCampaignIdForUpdateFromSideMenu(null);
   };
+  
 
   const isTabOpened = (itemId: number) => {
     const existingTabs = openedTabs.filter(tab => tab.id === itemId);
