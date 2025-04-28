@@ -899,7 +899,22 @@ const RebroadcastSettingsPanel = () => {
                     - campaignProgressInfo.detectSilenceCnt
                     - campaignProgressInfo.acct
                     - campaignProgressInfo.recallCnt;
-                 if( waitlist > 0){
+                if( campaignProgressInfo.scct > 0 && ( MakeRedialPacket().indexOf('35233@') > -1 || MakeRedialPacket().indexOf('35210@') > -1 ) ){
+                    //4-3. 실시간 재발신 적용 -  발신 성공 상담원 연결성공이 포함될 경우 경고창 호출 후 캠페인 재발신 추출 api 호출 실행하여 재발신 추출한다.
+                    setAlertState({
+                        isOpen: true,
+                        message: `발신결과 '성공'을 선택하셨습니다. \n기존에 발신되어 고객과 연결된 콜을 다시 발신할 수 있습니다. \n계속하시겠습니까?`,
+                        title: '발신결과 선택',
+                        type: '1',
+                        onClose: () => {    
+                            fetchCampaignCurrentRedial({
+                                campaign_id: Number(campaignId),
+                                condition: MakeRedialPacket()
+                            });      
+                        },
+                        onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
+                    });
+                }else if( waitlist > 0){
                     //4-3. 실시간 재발신 적용 -  대기리스트 건수가 있는 경우 경고창 호출 후 캠페인 재발신 추출 api 호출 실행하여 재발신 추출한다.
                     setAlertState({
                         isOpen: true,
@@ -915,7 +930,7 @@ const RebroadcastSettingsPanel = () => {
                         onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                     });
 
-                 }else{  
+                }else{  
                     //4-3. 실시간 재발신 적용 -  대기리스트 건수가 없는 경우 캠페인 재발신 추출 api 호출 실행하여 재발신 추출한다.
                     fetchCampaignCurrentRedial({
                         campaign_id: Number(campaignId),
