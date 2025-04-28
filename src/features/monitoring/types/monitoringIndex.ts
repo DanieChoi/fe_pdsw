@@ -6,6 +6,12 @@ export interface CampaignProgressInformationRequest {
   campaignId: number;
 }
 
+// 상담사 상태 모니터링 요청 
+export interface AgentStatusMonitoringRequest {
+  tenantId: string;
+  campaignId: number;
+}
+
 export interface IRequestTypeForFetchConsultantStatusMonitorData {
   tenantId: number;
   campaignId: number;
