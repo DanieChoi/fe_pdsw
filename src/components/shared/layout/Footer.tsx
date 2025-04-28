@@ -516,9 +516,9 @@ export default function Footer({
     else if (announce === '/pds/campaign/maxcall-ext') {
       _message = '[분배호수 제한설정 ';
       if (command === 'INSERT') {
-        _message += `추가] 캠페인 아이디: [${campaign_id}], 상담사 아이디: [${data['agent_id']}], 최대분배호수: [${data['max_call']}]`;
+        _message += `추가] 캠페인 아이디: [${campaign_id}]`;
       } else if (command === 'UPDATE') {
-        _message += `수정] 캠페인 아이디: [${campaign_id}], 상담사 아이디: [${data['agent_id']}], 최대분배호수: [${data['max_call']}]`;
+        _message += `수정] 캠페인 아이디: [${campaign_id}]`;
       } else if (command === 'DELETE') {
         _message += `삭제] 캠페인 아이디: [${campaign_id}]`;
       }
