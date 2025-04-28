@@ -43,7 +43,6 @@ const statusConfig = {
   },
 };
 
-// icon: <img src="/icons/play.svg" className="w-4 h-4" alt="시작 아이콘" />
 const statusText = (flag?: number) => {
   switch (flag) {
     case 1:

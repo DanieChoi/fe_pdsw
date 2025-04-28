@@ -102,7 +102,7 @@ const SkillListPopup = ({
               selectedRows={selectedSkills}
               onSelectedRowsChange={handleSelectedRowsChange}
               rowClass={rowClass}
-              rowHeight={26}
+              rowHeight={36}
             />
           )}
         </div>
