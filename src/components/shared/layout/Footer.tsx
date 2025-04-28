@@ -862,7 +862,7 @@ export default function Footer({
                 {footerDataList.map((log, index) => (
                   <tr key={index}>
                     <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
-                    <td className="whitespace-nowrap text-[13px] px-1 hidden">[{log.type}]</td>
+                    <td className="whitespace-nowrap text-[13px] px-1">[{log.type}]</td>
                     <td className="text-[13px]">{log.message}</td>
                   </tr>
                 ))}
