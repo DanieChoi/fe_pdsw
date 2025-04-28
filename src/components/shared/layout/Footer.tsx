@@ -331,6 +331,14 @@ export default function Footer({
       if (command === 'UPDATE') {
         _message = '[캠페인 요구스킬 수정] 캠페인 아이디 : ' + campaign_id;
         addMessageToFooterList(_time, _type, _message);
+        // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
+        const campaignSkillUpdateStatus = new CustomEvent('campaignSkillUpdateStatus', {
+          detail: {
+            campaign_id: campaign_id.toString(),
+            campaign_status: 'update'
+          }
+        });
+        window.dispatchEvent(campaignSkillUpdateStatus);
       }
     }
     //상담사 자원 수정/삭제

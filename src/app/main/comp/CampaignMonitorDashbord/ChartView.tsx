@@ -21,6 +21,16 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
   const [tempListStatusData, setTempListStatusData] = useState<ChartData[]>([]);
   const [failCnt, setFailCnt] = useState<number>(0);
 
+
+  const [activeSection, setActiveSection] = useState<string>('발신성공'); // 클릭된 섹션 상태
+
+  const handleToDialPieClick = (data: any) => {
+
+    setActiveSection(data.name.split(":")[0].toString()); // 클릭된 섹션의 이름을 상태로 저장
+  };
+
+  
+
   const renderCustomizedLegend = (props: any) => {
     const { payload } = props;
     
@@ -102,6 +112,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
       ];
       setTempCallStatusData(callStatusData);
     }
+    setActiveSection('발신성공');
   }, [selectedCall]);
   
   return (
@@ -177,6 +188,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
                     );
                   }}
                   dataKey="value"
+                  onClick={handleToDialPieClick}
                 >
                   {tempCallStatusData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -216,6 +228,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
                     );
                   }}
                   dataKey="value"
+                  onClick={handleToDialPieClick}
                 >
                   {tempListStatusData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -233,7 +246,9 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
           </div>
         </div>
       </div>
-      <div>
+      
+      {activeSection === '발신성공' && (
+        <div>
         <TitleWrap title="발신성공" />
         <Table className='table-continued'>
           <tbody>
@@ -250,7 +265,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
               <TableHeader className="w-[120px] !text-center border-r border-b">
                 <Label>상담사 무응답</Label>
               </TableHeader>
-              <TableHeader className="w-[120px] !text-center">
+              <TableHeader className="w-[120px] !text-center border-r border-b">
                 <Label>상담사 통화중</Label>
               </TableHeader>
             </TableRow>
@@ -285,7 +300,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
               <TableHeader className="w-[120px] !text-center border-r border-b">
                 <Label>고객 최대 대기시간 초과</Label>
               </TableHeader>
-              <TableHeader className="w-[120px] !text-center">
+              <TableHeader className="w-[120px] !text-center border-r border-b">
                 <Label>멘트 청취 후 상담사 연결 안함</Label>
               </TableHeader>
             </TableRow>
@@ -305,7 +320,220 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
             </TableRow>
           </tbody>
         </Table>
-      </div>
+        </div>
+      )}
+
+
+      {activeSection === '발신실패' && (
+        <div>
+          <TitleWrap title="발신실패" />
+          <Table className='table-continued'>
+            <tbody>
+              <TableRow>
+                <TableHeader className="w-[120px] !text-center border-r border-b">
+                  <Label>통화중</Label>
+                </TableHeader>
+                <TableHeader className="w-[160px] !text-center border-r border-b">
+                  <Label>무응답</Label>
+                </TableHeader>
+                <TableHeader className="w-[120px] !text-center border-r border-b">
+                  <Label>팩스/모뎀</Label>
+                </TableHeader>
+                <TableHeader className="w-[120px] !text-center border-r border-b">
+                  <Label>기타</Label>
+                </TableHeader>
+                <TableHeader className="w-[120px] !text-center border-r border-b">
+                  <Label>전화번호 오류</Label>
+                </TableHeader>
+              </TableRow>
+              <TableRow>
+                <TableCell className="text-sm !text-center">
+                  
+                  {selectedCall?.buct||0}
+                </TableCell>
+                <TableCell className="text-sm !text-center">
+                  {selectedCall?.nact||0}
+                </TableCell>
+                <TableCell className="text-sm !text-center">
+                  {selectedCall?.fact||0}
+                </TableCell>
+                <TableCell className="text-sm !text-center">
+                  {selectedCall?.etct||0}
+                </TableCell>
+                <TableCell className="text-sm !text-center">
+                  {selectedCall?.tect||0}
+                </TableCell>
+              </TableRow>
+            </tbody>
+          </Table>
+          <Table>
+            <tbody>
+              <TableRow>
+                <TableHeader className="w-[120px] !text-center border-r border-b">
+                  <Label>회선 오류</Label>
+                </TableHeader>
+                <TableHeader className="w-[160px] !text-center border-r border-b">
+                  <Label>고객 바로 끊음</Label>
+                </TableHeader>
+                <TableHeader className="w-[120px] !text-center border-r border-b">
+                  <Label>통화음 없음</Label>
+                </TableHeader>
+                <TableHeader className="w-[120px] !text-center border-r border-b">
+                  <Label>다이얼음 없음</Label>
+                </TableHeader>
+                <TableHeader className="w-[120px] !text-center border-r border-b">
+                  <Label>기계음</Label>
+                </TableHeader>
+              </TableRow>
+              <TableRow>
+                <TableCell className="text-sm !text-center">
+                  {selectedCall?.lineStopCnt||0}
+                </TableCell>
+                <TableCell className="text-sm !text-center">
+                  {selectedCall?.customerOnHookCnt||0}
+                </TableCell>
+                <TableCell className="text-sm !text-center">
+                  {selectedCall?.detectSilenceCnt||0}
+                </TableCell>
+                <TableCell className="text-sm !text-center">
+                  {selectedCall?.dialToneSilence||0}
+                </TableCell>
+                <TableCell className="text-sm !text-center">
+                  {selectedCall?.acct||0}
+                </TableCell>
+              </TableRow>
+            </tbody>
+          </Table>
+          
+        </div>
+      )}
+
+
+      {activeSection === '대기리스트' && (
+        <div>
+        <TitleWrap title="대기리스트" />
+        <Table className='table-continued'>
+          <tbody>
+            <TableRow>
+              <TableHeader className="w-[120px] !text-center border-r border-b">
+                <Label>스케줄 대기(발신가능)</Label>
+              </TableHeader>
+              <TableHeader className="w-[160px] !text-center border-r border-b">
+                <Label>진행 대기(발신가능)</Label>
+              </TableHeader>
+              
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-sm !text-center border-r border-b">
+                {(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-failCnt-(selectedCall?.recallCnt || 0)-(selectedCall?.nogblockTime || 0)-(selectedCall?.nogdeleteGL || 0)}
+              </TableCell>
+              <TableCell className="text-sm !text-center border-r border-b">
+                {selectedCall?.nogblockTime||0}
+              </TableCell>
+            </TableRow>
+          </tbody>
+        </Table>
+        </div>
+      )}
+
+
+      {activeSection === '방지리스트' && (
+        <div>
+        <TitleWrap title="방지리스트" />
+        <Table className='table-continued'>
+          <tbody>
+            <TableRow>
+              <TableHeader className="w-[120px] !text-center border-r border-b">
+                <Label>블랙리스트</Label>
+              </TableHeader>
+              <TableHeader className="w-[160px] !text-center border-r border-b">
+                <Label>실시간 리스트 삭제</Label>
+              </TableHeader>
+              <TableHeader className="w-[120px] !text-center border-r border-b">
+                <Label>스케줄 설정 실패</Label>
+              </TableHeader>
+              <TableHeader className="w-[120px] !text-center border-r border-b">
+                <Label>콜백 타임 아웃</Label>
+              </TableHeader>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-sm !text-center">
+                {selectedCall?.blackList||0}
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                {selectedCall?.nogdeleteGL||0}
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                {selectedCall?.nogtimeContradictory||0}
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                {selectedCall?.nogtimeOutCallback||0}
+              </TableCell>
+            </TableRow>
+          </tbody>
+        </Table>
+        <Table>
+          <tbody>
+            <TableRow>
+              <TableHeader className="w-[120px] !text-center border-r border-b">
+                <Label>팝업 후 상담사 미발신 선택</Label>
+              </TableHeader>
+              <TableHeader className="w-[160px] !text-center border-r border-b">
+                <Label>팝업 후 발신 여부 미선택</Label>
+              </TableHeader>
+              <TableHeader className="w-[120px] !text-center border-r border-b">
+                <Label>팝업 후 상담사 상태 변경</Label>
+              </TableHeader>
+              <TableHeader className="w-[120px] !text-center border-r border-b">
+                <Label>팝업 후 상담사 모드 변경</Label>
+              </TableHeader>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-sm !text-center">
+                {selectedCall?.nogautoPopNotDial||0}
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                {selectedCall?.nogautoPopNoAnswer||0}
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                {selectedCall?.nogautoPopNoReady||0}
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                {selectedCall?.nogautoPopFailMode||0}
+              </TableCell>
+            </TableRow>
+          </tbody>
+        </Table>
+        <Table>
+          <tbody>
+            <TableRow>
+              <TableHeader className="w-[120px] !text-center border-r border-b">
+                <Label>발신확인 전 상담사 상태 변경</Label>
+              </TableHeader>
+              <TableHeader className="w-[160px] !text-center border-r border-b">
+                <Label>발신확인 전 상담사 모드 변경</Label>
+              </TableHeader>
+              <TableHeader className="w-[120px] !text-center border-r border-b">
+                <Label>지정 상담사 정보 미입력</Label>
+              </TableHeader>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-sm !text-center">
+                {selectedCall?.nogautoDialNoReady||0}
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                {selectedCall?.nogautoPopFailMode||0}
+              </TableCell>
+              <TableCell className="text-sm !text-center">
+                {selectedCall?.nogautoNoEmployeeId||0}
+              </TableCell>
+            </TableRow>
+          </tbody>
+        </Table>
+        </div>
+      )}
+        
+      
     </div>
   );
 };
