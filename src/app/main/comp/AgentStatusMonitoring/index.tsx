@@ -197,13 +197,13 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
       const _tenantId = campaigns.find(data => data.campaign_id === Number(campaignId))?.tenant_id;
       if (_tenantId) {
         fetchAgentStateMonitoringList({
-          tenantId: _tenantId,
+          tenantId: _tenantId+'',
           campaignId: Number(campaignId)
         });
         if( statisticsUpdateCycle > 0 ){        
           const campaignInterval = setInterval(() => {  
             fetchAgentStateMonitoringList({
-              tenantId: _tenantId,
+              tenantId: _tenantId+'',
               campaignId: Number(campaignId)
             });
           }, statisticsUpdateCycle * 1000);  
@@ -212,13 +212,13 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
       }
     }else if( tenantId && campaigns.length > 0) {
       fetchAgentStateMonitoringList({
-        tenantId: Number(tenantId),
+        tenantId: tenantId,
         campaignId: 0
       });
       if( statisticsUpdateCycle > 0 ){        
         const tenantInterval = setInterval(() => {  
           fetchAgentStateMonitoringList({
-            tenantId: Number(tenantId),
+            tenantId: tenantId,
             campaignId: 0
           });
         }, statisticsUpdateCycle * 1000);  
@@ -226,13 +226,13 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
       }
     }else if( campaignId === 0 && Number(tenantId) === 0 && campaigns.length > 0) {
       fetchAgentStateMonitoringList({
-        tenantId: 0,
+        tenantId: '0',
         campaignId: 0
       });
       if( statisticsUpdateCycle > 0 ){        
         const centerInterval = setInterval(() => {  
           fetchAgentStateMonitoringList({
-            tenantId: 0,
+            tenantId: '0',
             campaignId: 0
           });
         }, statisticsUpdateCycle * 1000);  

@@ -1,9 +1,9 @@
 // src/features/campaignManager/api/apiForCampaignAssignmentAgentList.ts
 import { axiosRedisInstance } from "@/lib/axios";
-import { CampaignProgressInformationRequest, AgentStateMonitoringListResponse, IRequestTypeForFetchConsultantStatusMonitorData } from '../types/monitoringIndex';
+import { AgentStatusMonitoringRequest, AgentStateMonitoringListResponse, IRequestTypeForFetchConsultantStatusMonitorData } from '../types/monitoringIndex';
 import { getCookie } from '@/lib/cookies';
 
-export const fetchAgentStateMonitoringList = async (credentials: CampaignProgressInformationRequest): Promise<AgentStateMonitoringListResponse> => {
+export const fetchAgentStateMonitoringList = async (credentials: AgentStatusMonitoringRequest): Promise<AgentStateMonitoringListResponse> => {
   const agentStateMonitoringListRequestData = {
     tenantId: credentials.tenantId,
     campaignId: credentials.campaignId,
