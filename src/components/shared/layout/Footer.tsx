@@ -295,7 +295,7 @@ export default function Footer({
           actionType = '해제';
         }
 
-        const _message = '[EVENT] 상담사 스킬 ' + actionType;
+        const _message = '[상담사 스킬' + actionType + '] 스킬아이디: ' + data['skill_id'];
         addMessageToFooterList(_time, _type, _message);
 
         // 커스텀 이벤트 발생 - 상담사 상태 변경을 다른 컴포넌트에 알림
