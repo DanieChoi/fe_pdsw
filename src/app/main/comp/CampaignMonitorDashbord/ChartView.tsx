@@ -89,7 +89,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
       setFailCnt(totalCnt);
       setTempCallStatusData([]);
       const callStatusData: ChartData[] = [
-        { name: '발신시도:'+(selectedCall.firstCall), value: selectedCall.firstCall, color: '#40E0D0' },
+        { name: '발신시도:'+(selectedCall.dialingCall), value: selectedCall.dialingCall, color: '#40E0D0' },
         { name: '발신성공:'+(selectedCall.scct), value: selectedCall.scct, color: '#2CC7B5' },
         { name: '발신실패:'+totalCnt, value: totalCnt, color: '#20AE9C' }
       ];
