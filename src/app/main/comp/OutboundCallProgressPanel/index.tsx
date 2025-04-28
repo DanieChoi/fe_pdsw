@@ -7,7 +7,7 @@ import { Table, TableRow, TableHeader, TableCell } from "@/components/ui/table-c
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import DataGrid, { Column as DataGridColumn } from 'react-data-grid';
 import { useApiForCallProgressStatus } from '@/features/monitoring/hooks/useApiForCallProgressStatus';
-import { useMainStore, useCampainManagerStore, useAuthStore } from '@/store';
+import { useMainStore, useCampainManagerStore, useAuthStore, useTabStore } from '@/store';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useEnvironmentStore } from '@/store/environmentStore';
@@ -94,17 +94,19 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   onCampaignChange,
   onDataUpdate
 }) => {
-  const [internalSelectedCampaign, setInternalSelectedCampaign] = useState<string>('all');
-  const { campaigns, sendingStatusCampaignId, setSendingStatusCampaignId } = useMainStore();
+  // const [internalSelectedCampaign, setInternalSelectedCampaign] = useState<string>('all');
+  const { campaigns } = useMainStore();
   const { tenant_id, session_key } = useAuthStore();
   const { campaignSkills, setCampaignSkills,phoneDescriptions, setPhoneDescriptions } = useCampainManagerStore();
   const [ _campaignData, _setCampaignData ] = useState<CampaignDataMap>({});
   const [ waitingCounselorCnt, setWaitingCounselorCnt ] = useState<number>(0);
   const { statisticsUpdateCycle } = useEnvironmentStore();
   const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
+  const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab} = useTabStore();
 
   // 실제 사용할 캠페인 ID 결정
-  const selectedCampaign = externalCampaignId ?? internalSelectedCampaign;
+  // const selectedCampaign = externalCampaignId ?? internalSelectedCampaign;
+  const [ selectedCampaign, setSelectedCampaign] = useState<string>('all');
 
 
 
@@ -205,33 +207,32 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 
   // 캠페인 변경 핸들러
   const handleCampaignChange = (value: string): void => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
     if (onCampaignChange) {
       onCampaignChange(value);
     } else {
-      setInternalSelectedCampaign(value);
+      setSelectedCampaign(value);
     }
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-    setSendingStatusCampaignId(value);
+
+    
+    const existingTabs = openedTabs.filter(tab => tab.id === 5);
+    existingTabs.forEach(tab => {
+      removeTab(tab.id, tab.uniqueKey);
+    });
+    const newTabKey = `5-${Date.now()}`;
+    addTab({
+      id: 5,
+      campaignId: value,
+      campaignName: campaigns.find(data=>data.campaign_id === Number(value))?.campaign_name,
+      uniqueKey: '5',
+      title: '발신진행상태',
+      icon: '',
+      href: '',
+      content: null,
+    });
+    setTimeout(function () {
+      setActiveTab(5, newTabKey);
+    }, 50);
   };
-
-  useEffect(() => {
-    if( sendingStatusCampaignId != ''){
-      setInternalSelectedCampaign(sendingStatusCampaignId);
-    }
-  }, [sendingStatusCampaignId]);
-
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, []);
 
   // Select 컴포넌트 렌더링 여부 결정
   const [ shouldRenderSelect , setShouldRenderSelect ] = useState<boolean>(false);
@@ -350,14 +351,15 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   });
 
   useEffect(() => {
-    if( selectedCampaign != 'all' ){
+    // 먼저 이전 interval 제거
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    if( selectedCampaign != 'all' && campaigns && campaigns.length > 0 ){
       const campaignInfo = campaigns.find(data => data.campaign_id === Number(selectedCampaign));
       const tenantId = campaignInfo?.tenant_id+'' || '1';
       const campaignId = campaignInfo?.campaign_id+'' || '0';
       fetchCallProgressStatus({ tenantId, campaignId });
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
       if( statisticsUpdateCycle > 0 ){  
         intervalRef.current = setInterval(() => {
           fetchCallProgressStatus({ tenantId, campaignId });
@@ -368,9 +370,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         tenantId: tenant_id+'',
         campaignId: '0'
       });
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
       if( statisticsUpdateCycle > 0 ){  
         intervalRef.current = setInterval(() => {
           const tenantId = tenant_id+'' || '1';
@@ -384,8 +383,19 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         clearInterval(intervalRef.current);
       }
     };
-  }, [selectedCampaign,statisticsUpdateCycle]);
+  }, [selectedCampaign,statisticsUpdateCycle,campaigns]);
   
+  useEffect(() => {
+    if (activeTabId === 5) {
+      const tempData = openedTabs.filter(tab => tab.id === 5);
+      if (tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
+        setSelectedCampaign(tempData[0].campaignId);
+      }else{
+        setSelectedCampaign('all');
+      }
+    }
+  }, [activeTabId, openedTabs]);
+
   useEffect(() => {
     if( externalCampaignId ){
       const campaignInfo = campaigns.find(data => data.campaign_id === Number(externalCampaignId));
@@ -410,33 +420,6 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       setShouldRenderSelect(true);
     }
   }, [externalCampaignId,statisticsUpdateCycle]);
-
-  useEffect(() => {
-    if( campaignSkills.length > 0 && phoneDescriptions.length > 0){
-      // fetchCallProgressStatus({
-      //   tenantId: tenant_id+'',
-      //   campaignId: '0'
-      // });
-      const tenantId = tenant_id+'' || '1';
-      const campaignId =  '0';
-      fetchCallProgressStatus({ tenantId, campaignId });
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      if( statisticsUpdateCycle > 0 ){  
-        intervalRef.current = setInterval(() => {
-          const tenantId = tenant_id+'' || '1';
-          const campaignId =  '0';
-          fetchCallProgressStatus({ tenantId, campaignId });
-        }, statisticsUpdateCycle * 1000);     
-      }
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-        }
-      };
-    }
-  }, [campaignSkills, phoneDescriptions]);
 
   useEffect(() => {
     let count = 0;
