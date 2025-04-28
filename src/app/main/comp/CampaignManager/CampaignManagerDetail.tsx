@@ -360,7 +360,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         use_counsel_result: selectedCampaign.use_counsel_result,
         use_list_alarm: selectedCampaign.use_list_alarm,
         dial_mode_option: selectedCampaign.dial_mode_option,
-        user_option: selectedCampaign.user_option
+        user_option: selectedCampaign.user_option,
+        redial_strategy: selectedCampaign.redial_strategy
       });
 
       const tempSkill = campaignSkills
@@ -1172,7 +1173,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       setCampaigns(data.result_data);
       setSelectedCampaign(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
       setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
-      setCampaignInfoChangeYn(true);
+      setCampaignInfoChangeYn(false);
       setRtnMessage('');
       setAlertState({
         ...errorMessage,
