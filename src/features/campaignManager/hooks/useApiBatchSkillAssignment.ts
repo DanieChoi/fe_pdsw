@@ -3,6 +3,7 @@ import { useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-
 import { CounselorSkillAssignmentResponse, CounselorSkillApiError } from '../types/typeForCounselorSkill';
 import { apiForAddCounselorsForSpecificSkill } from '../api/apiForCounselorSkil';
 import { apiForDeleteCounselorsForSpecificSkill } from '../api/apiForCounselorSkil';
+import { useAgentSkillStatusStore } from '@/store/agenSkillStatus';
 
 interface BatchSkillAssignmentParams {
   skillIds: number[];
@@ -24,6 +25,8 @@ interface BatchSkillResult {
  */
 export function useApiBatchSkillAssignment(tenantId: string) {
   const queryClient = useQueryClient();
+
+  const {setAgentSkillStatus} = useAgentSkillStatusStore();
 
   // 배치 처리 유틸리티 함수
   const processBatchSkillAssignment = async ({
@@ -96,6 +99,9 @@ export function useApiBatchSkillAssignment(tenantId: string) {
       queryClient.invalidateQueries({
         queryKey: ['counselorList', tenantId]
       });
+
+      // 다른 컴포넌트에 알리기위한 상담사 스킬 변경 상태
+      setAgentSkillStatus(true);
     }
   });
 }

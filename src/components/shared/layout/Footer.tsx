@@ -221,7 +221,7 @@ export default function Footer({
     }
     //캠페인.
     else if (announce === '/pds/campaign') {
-      _message = '캠페인 ';
+      _message = '[캠페인 ';
       let _start_flag = '';
       if (data['start_flag'] === 1) {
         _start_flag = '시작';
@@ -238,7 +238,7 @@ export default function Footer({
       }
 
       if (command === 'INSERT') {
-        _message += '추가, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
+        _message += '추가] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
         _message2 = `[EVENT] [${campaign_id}] 캠페인 추가`;
 
         // 캠페인 추가 시 토스트 메시지
@@ -249,7 +249,7 @@ export default function Footer({
         }
         addMessageToFooterList(_time, _type, _message);
       } else if (command === 'UPDATE') {
-        _message += '수정, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
+        _message += '수정] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
         _message2 = `[EVENT] [${campaign_id}] 캠페인 수정`;
 
         // 캠페인 수정 시 토스트 메시지
@@ -260,7 +260,7 @@ export default function Footer({
         }
         addMessageToFooterList(_time, _type, _message);
       } else if (command === 'DELETE') {
-        _message += '삭제, 캠페인 아이디 : ' + campaign_id;
+        _message += '삭제] 캠페인 아이디 : ' + campaign_id;
         _message2 = `[EVENT] [${campaign_id}] 캠페인 삭제`;
 
         // 캠페인 삭제 시 토스트 메시지
@@ -303,18 +303,8 @@ export default function Footer({
           actionType = '해제';
         }
 
-        const _message = '[상담사 스킬' + actionType + '] 스킬아이디: ' + data['skill_id'];
+        const _message = '[상담사 스킬' + actionType + '] 스킬아이디: ' + skill_id;
         addMessageToFooterList(_time, _type, _message);
-
-        // 커스텀 이벤트 발생 - 상담사 상태 변경을 다른 컴포넌트에 알림
-        const agentStatusEvent = new CustomEvent('agentStatusEvent', {
-          detail: {
-            skill_id : _skillId.toString(),
-            agent_id : data['agent_id'].toString(),
-            agent_status: 'update'
-          }
-        });
-        window.dispatchEvent(agentStatusEvent);
 
         // 토스트 알림은 한 번만 표시
         if (useAlramPopup === 1) {
@@ -339,7 +329,7 @@ export default function Footer({
     //캠페인 요구스킬 수정
     else if (announce === '/pds/campaign/skill') {
       if (command === 'UPDATE') {
-        _message = '캠페인 요구스킬 수정, 캠페인 아이디 : ' + campaign_id;
+        _message = '[캠페인 요구스킬 수정] 캠페인 아이디 : ' + campaign_id;
         addMessageToFooterList(_time, _type, _message);
       }
     }
@@ -357,20 +347,20 @@ export default function Footer({
     }
     //캠페인수정>동작시간 추가
     else if (announce === '/pds/campaign/schedule') {
-      _message = '캠페인 스케쥴';
+      _message = '[캠페인 스케쥴';
       if (command === 'INSERT') {
         // _message += '수정, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
-        _message += '수정, 캠페인 아이디 : ' + campaign_id;
+        _message += '수정] 캠페인 아이디 : ' + campaign_id;
         addMessageToFooterList(_time, _type, _message);
       }
       else if (command === 'UPDATE') {
         // _message += '변경, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
-        _message += '변경, 캠페인 아이디 : ' + campaign_id;
+        _message += '변경] 캠페인 아이디 : ' + campaign_id;
         addMessageToFooterList(_time, _type, _message);
       }
       else if (command === 'DELETE') {
-        // _message += '삭제, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
-        _message += '삭제, 캠페인 아이디 : ' + campaign_id;
+        // _message += '삭제] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
+        _message += '삭제] 캠페인 아이디 : ' + campaign_id;
         addMessageToFooterList(_time, _type, _message);
       }
     }
@@ -387,7 +377,7 @@ export default function Footer({
         }
 
         // 푸터 로그 메시지
-        _message = '캠페인 동작상태 변경, 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: 진행중';
+        _message = '[캠페인 동작상태 변경] 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: 진행중';
 
         // 토스트 알림 표시 (한번만 표시)
         if (useAlramPopup === 1) {
@@ -415,7 +405,7 @@ export default function Footer({
         // }
         // _message = '발신리스트등록, 캠페인 아이디 : ' + campaign_id + ' , 리스트구분 : ' + list_flag;
         // _message2 = `[EVENT] [${campaign_id}] 발신리스트 ${list_flag} 등록`;
-        _message = '발신리스트등록, 캠페인 아이디 : ' + campaign_id;
+        _message = '[발신리스트등록] 캠페인 아이디 : ' + campaign_id;
         _message2 = `[EVENT] [${campaign_id}] 발신리스트 등록`;
 
         // 토스트 알림 표시
