@@ -507,7 +507,24 @@ export default function Footer({
       }
       addMessageToFooterList(_time, _type, _message);
     }
-
+    //분배호수 제한 초기화 시간설정
+    else if (announce === '/pds/maxcall-init-time') {
+      _message = `[분배호수 제한 초기화 시간설정] ${data['init_time']}`;
+      addMessageToFooterList(_time, _type, _message);
+    }
+    //분배호수 제한설정
+    else if (announce === '/pds/campaign/maxcall-ext') {
+      _message = '[분배호수 제한설정 ';
+      if (command === 'INSERT') {
+        _message = _message + `추가] 캠페인 아이디: [${campaign_id}], 상담사 아이디: [${data['agent_id']}], 최대분배호수: [${data['max_call']}]`;
+      } else if (command === 'UPDATE') {
+        _message = _message + `수정] 캠페인 아이디: [${campaign_id}], 상담사 아이디: [${data['agent_id']}], 최대분배호수: [${data['max_call']}]`;
+      } else if (command === 'DELETE') {
+        _message = _message + `삭제] 캠페인 아이디: [${campaign_id}]`;
+      }
+      
+      addMessageToFooterList(_time, _type, _message);
+    }
   }, [campaigns, fetchMain, useAlramPopup, debouncedInvalidate, tenant_id]);
 
 
