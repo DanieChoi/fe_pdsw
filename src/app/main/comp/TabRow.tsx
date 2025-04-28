@@ -1,120 +1,107 @@
-
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useTabStore } from "@/store/tabStore";
-import TabSection from "./TabSection";
-import TabRowMenu from "./TabRowMenu";
-import { CommonButton } from "@/components/shared/CommonButton";
-import Image from "next/image";
+import UnifiedTabSection from "./UnifiedTabSection";
+import ResizableDivider from "./ResizableDivider";
 
-interface TabRowProps {
-  rowId: string;
-}
+// 통합된 메인 컴포넌트 (탭 + 콘텐츠)
+const UnifiedTabView: React.FC = () => {
+  const [isResizing, setIsResizing] = useState(false);
 
-const TabRow: React.FC<TabRowProps> = ({ rowId }) => {
-  const { rows, addRow, addSection, removeRow } = useTabStore();
-  const [menuOpen, setMenuOpen] = useState(false); // 메뉴 열림/닫힘 상태
+  const {
+    rows,
+    openedTabs,
+    addSection,
+    activeTabId,
+    activeTabKey,
+    isResizing: storeResizing,
+    setResizing: setStoreResizing
+  } = useTabStore();
 
-  const row = rows.find((r) => r.id === rowId);
-  if (!row) return null;
+  // 리사이징 시작 함수
+  const handleResizeStart = useCallback(() => {
+    setIsResizing(true);
+    setStoreResizing(true);
+  }, [setStoreResizing]);
 
-  // `+` 버튼 클릭 시 분할 동작
-  const handleSplitClick = () => {
-    if (row.sections.length === 1) {
-      // 현재 행에 새로운 섹션 추가 (최대 2개)
-      addSection(rowId);
-    } 
-    // else if (row.sections.length === 2) {
-    //   // 만약 섹션이 이미 2개라면, 새 행 추가
-    //   addRow();
-    // }
-  };
+  // 리사이징 종료 함수
+  const handleResizeEnd = useCallback(() => {
+    setIsResizing(false);
+    setStoreResizing(false);
+  }, [setStoreResizing]);
 
-  // 행 삭제 핸들러
-  const handleRemoveRow = () => {
-    removeRow(rowId);
-  };
-
-  // 드롭다운 토글 처리
-  const handleDropdownToggle = () => {
-    setMenuOpen(!menuOpen);
-  };
-
-  const canRemove = rowId !== "row-1"; // 예시로 첫 번째 행은 삭제 불가능
+  // 섹션 추가 버튼 핸들러
+  const handleAddSection = useCallback(() => {
+    if (rows[0]?.sections.length < 2) {
+      addSection('row-1');
+    }
+  }, [rows, addSection]);
 
   return (
-    <div className="flex items-stretch w-full border-b border-[#ebebeb] relative">
-      {/* 섹션들 (탭 목록 부분) */}
-      <div className="flex-1 flex w-[calc(100%-46px)]">
-        {row.sections.map((section, idx) => {
-          // TabSection에서 탭들을 렌더링
+    <div className="flex flex-col h-full bg-white overflow-hidden">
+      {/* 툴바 영역 */}
+      {/* <div className="flex-none flex items-center p-2 bg-gray-50 border-b border-gray-200">
+        <button 
+          className="px-3 py-1 bg-blue-500 text-white rounded text-sm mr-2"
+          onClick={handleAddSection}
+          disabled={rows[0]?.sections.length >= 2}
+        >
+          섹션 추가 {rows[0]?.sections.length}/2
+        </button>
+        
+        <div className="ml-auto text-xs text-gray-500">
+          {rows[0]?.sections.length === 2 && (
+            `분할 비율: ${rows[0]?.sections.map(s => Math.round(s.width)).join(' : ')}`
+          )}
+        </div>
+      </div> */}
+      
+      {/* 탭 컨테이너 */}
+      <div className={`flex-1 overflow-hidden ${isResizing || storeResizing ? 'is-resizing' : ''}`}>
+        {rows.map((row) => {
+          const rowId = row.id;
+
           return (
-            <TabSection
-              key={section.id}
-              rowId={rowId}
-              sectionId={section.id}
-              width={section.width}
-              canRemove={section.id !== "default"}
-              showDivider={idx < row.sections.length - 1}
-            />
+            <div key={rowId} className="flex h-full">
+              {row.sections.map((section, idx) => {
+                const isLastSection = idx === row.sections.length - 1;
+                
+                return (
+                  <React.Fragment key={section.id}>
+                    <UnifiedTabSection
+                      rowId={rowId}
+                      sectionId={section.id}
+                      section={{
+                        tabs: section.tabs,
+                        activeTabKey: section.activeTabKey || undefined // null 대신 undefined로 변환
+                      }}
+                      width={section.width}
+                      openedTabs={openedTabs}
+                      activeTabId={activeTabId}
+                      activeTabKey={activeTabKey}
+                      canRemove={section.id !== "default"}
+                      showDivider={idx < row.sections.length - 1}
+                    />
+                    
+                    {/* 마지막 섹션이 아니고 섹션이 2개일 때만 리사이즈 분할선 표시 */}
+                    {!isLastSection && row.sections.length === 2 && (
+                      <ResizableDivider
+                        rowId={rowId}
+                        onResizeStart={handleResizeStart}
+                        onResizeEnd={handleResizeEnd}
+                        className={isResizing || storeResizing ? "bg-[#55BEC8]" : ""}
+                      />
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </div>
           );
         })}
       </div>
-
-      {/* 행 우측의 +, - 버튼 */}
-      <div className="flex-none flex items-stretch">
-        <CommonButton
-          variant="tabEtc"
-          size="icon"
-          className="flex items-center justify-center h-full px-3"
-          onClick={handleSplitClick}
-        >
-          <Image
-            src="/header-menu/tab_plus.svg"
-            alt="plus"
-            width={8}
-            height={8}
-          />
-        </CommonButton>
-        <CommonButton
-          variant="tabEtc"
-          size="icon"
-          className="flex items-center justify-center h-full px-3"
-          onClick={handleDropdownToggle}
-        >
-          <Image
-            src="/header-menu/dropdown-toggle.png"
-            alt="dropdown-toggle"
-            width={3}
-            height={10}
-          />
-        </CommonButton>
-
-        {canRemove && (
-          <CommonButton
-            variant="tabEtc"
-            size="icon"
-            className="flex items-center justify-center h-full px-3"
-            onClick={handleRemoveRow}
-          >
-            <Image
-              src="/header-menu/tab_minus.svg"
-              alt="minus"
-              width={8}
-              height={8}
-            />
-          </CommonButton>
-        )}
-      </div>
-      {/* 드롭다운 메뉴 컴포넌트 */}
-      <TabRowMenu 
-        rowId={rowId} 
-        isOpen={menuOpen} 
-        onClose={() => setMenuOpen(false)} 
-      />
     </div>
   );
 };
 
-export default TabRow;
+export default UnifiedTabView;

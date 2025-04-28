@@ -935,3 +935,104 @@ html, body {
   width: 12px;
   height: 12px;
 }
+
+
+
+
+
+
+
+
+
+/* global.css 또는 별도 CSS 파일에 추가 */
+
+/* 리사이즈 디바이더 스타일 */
+.resizable-divider {
+  width: 6px !important;
+  background-color: #eaeaea;
+  cursor: col-resize !important;
+  position: relative;
+  z-index: 50;
+  margin: 0 -3px;
+  align-self: stretch;
+  touch-action: none;
+  transition: background-color 0.2s;
+}
+
+.resizable-divider:hover {
+  background-color: #55BEC8 !important;
+}
+
+.resizable-divider:active {
+  background-color: #55BEC8 !important;
+}
+
+.resizable-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 30px;
+  background-color: #999;
+  border-radius: 1px;
+}
+
+.resizable-divider:hover::after {
+  background-color: #fff;
+}
+
+/* 탭 스타일 */
+.tab-header {
+  display: flex;
+  height: 40px;
+  border-bottom: 1px solid #eaeaea;
+  background-color: #ffffff;
+  user-select: none;
+}
+
+.tab-content {
+  flex: 1;
+  overflow: auto;
+  height: calc(100% - 40px);
+}
+
+/* 스크롤바 숨기기 */
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
+/* 드래그 앤 드롭 관련 */
+.drag-over {
+  background-color: rgba(59, 130, 246, 0.1);
+  box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.4);
+}
+
+/* 리사이징 중 표시 */
+.is-resizing {
+  pointer-events: none;
+  user-select: none;
+}
+
+.is-resizing .resizable-divider {
+  background-color: #55BEC8 !important;
+}
+
+.is-resizing .resizable-divider::after {
+  background-color: white;
+}
+
+/* 레이아웃 부모 요소에 적용할 클래스 */
+.tab-layout-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}

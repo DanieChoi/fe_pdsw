@@ -37,12 +37,12 @@ interface Tab {
   params?: Record<string, any>;
 }
 
-// Define the Section interface
+// Define the Section interface to match TabSection from the store
 interface Section {
   id: string;
   width: number;
-  activeTabKey: string | null;
   tabs: Tab[];
+  activeTabKey: string | null; // Changed from string | undefined to string | null
 }
 
 // 개별 섹션 컴포넌트를 분리하여 훅 규칙 문제 해결
@@ -230,13 +230,13 @@ const SectionContent = ({
 };
 
 const TabContent = () => {
-  const { rows, activeTabId, activeTabKey, setActiveTab } = useTabStore();
+  const { rows, activeTabId, activeTabKey, setActiveTab, updateSectionWidths } = useTabStore();
   const [isDragging, setIsDragging] = useState(false);
   const dragRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const widthsRef = useRef({ left: 50, right: 50 });
   const startXRef = useRef(0);
-  const [sections, setSections] = useState(rows[0]?.sections || []);
+  const [sections, setSections] = useState<Section[]>([]);
 
   // Performance optimization using requestAnimationFrame
   const updateWidths = useCallback((leftWidth: number) => {
@@ -250,9 +250,14 @@ const TabContent = () => {
         newSections[1] = { ...newSections[1], width: right };
         setSections(newSections);
         widthsRef.current = { left: clampedLeft, right };
+        
+        // Update the store with new width values to persist them
+        if (rows[0]?.id) {
+          updateSectionWidths(rows[0].id, [clampedLeft, right]);
+        }
       }
     });
-  }, [sections]);
+  }, [sections, rows, updateSectionWidths]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -297,9 +302,20 @@ const TabContent = () => {
     };
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  // Update sections when rows change
+  // Update sections when rows change and initialize widthsRef
   useEffect(() => {
-    setSections(rows[0]?.sections || []);
+    if (rows[0]?.sections) {
+      const storeSections = rows[0].sections;
+      setSections(storeSections as Section[]);
+      
+      // Initialize widthsRef with current values from store
+      if (storeSections.length === 2) {
+        widthsRef.current = {
+          left: storeSections[0].width,
+          right: storeSections[1].width
+        };
+      }
+    }
   }, [rows]);
 
   return (
