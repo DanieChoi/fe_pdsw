@@ -111,13 +111,13 @@ const SkillListPopupForNewCampaign = ({
     {
       key: 'skill_name',
       name: '이름',
-      width: 150
+      width: 240
     },
-    {
-      key: 'skill_description',
-      name: '설명',
-      width: 200
-    }
+    // {
+    //   key: 'skill_description',
+    //   name: '설명',
+    //   width: 240
+    // }
   ];
 
   // 로딩 상태
@@ -172,6 +172,7 @@ const SkillListPopupForNewCampaign = ({
           className="h-full"
           rowHeight={40}
           headerRowHeight={40}
+          style={{ width: "100%" }} // ✅ 진짜 이렇게 해야 함!
         />
       </div>
     </div>
@@ -184,9 +185,9 @@ const SkillListPopupForNewCampaign = ({
       message={gridContent}
       onClose={handleConfirm}
       onCancel={onCancel}
-      type={type}
-      // width={420}
-      // height={400}
+      type="1"
+      width={1000}  // px 단위
+      height={500}
     />
   );
 };

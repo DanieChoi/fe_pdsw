@@ -75,7 +75,7 @@ const SkillListPopup = ({
             key: 'skill_name',
             name: '이름',
             frozen: true,
-            width: 157,
+            width: 280,
             minWidth: 100
         }
     ];
@@ -117,6 +117,7 @@ const SkillListPopup = ({
             onClose={handleConfirm}
             onCancel={onCancel}
             type={type}
+            width={'max-w-[500px]'}
         />
     );
 };
