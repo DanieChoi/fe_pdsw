@@ -723,7 +723,14 @@ const ListManager: React.FC = () => {
 
   // 작업시작 버튼 클릭 시
   const handleWorkStart = () => {
-    if (uploadedFiles.length === 0) {
+    if( targetType === 'blacklist' && listFlag === 'L' && _callListInsertData.campaign_id > 0 ){      
+      const callingListInsertData: CallingListInsertRequest = {
+        ..._callListInsertData
+        , campaign_id: _callListInsertData.campaign_id
+        , list_flag: 'L'
+      };
+      fetchBlacklistInsert(callingListInsertData);
+    }else if (uploadedFiles.length === 0) {
       // 작업대상이 선택되지 않은 경우 경고 알림창 표시
       // showAlert('작업 지정 대상을 선택해주세요.');
       setAlertState({
@@ -1012,7 +1019,7 @@ const ListManager: React.FC = () => {
                       <SelectItem value="I">Insert : 기존리스트 삭제 후 등록</SelectItem>
                       <SelectItem value="D">Delete : 특정리스트 삭제</SelectItem>
                       <SelectItem value="A">Append : 발신리스트 추가</SelectItem>
-                      <SelectItem value="T">블랙리스트 전체 삭제</SelectItem>
+                      <SelectItem value="L">블랙리스트 전체 삭제</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
