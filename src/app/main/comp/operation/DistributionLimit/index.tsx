@@ -56,7 +56,7 @@ const errorMessage = {
 }
 
 const DistributionLimit = () => {
-  const { tenant_id, role_id } = useAuthStore();
+  const { tenant_id, role_id, menu_role_id } = useAuthStore();
   const { campaigns } = useMainStore(); // 다른 컴포넌트 영향으로 인하여 setSelectedCampaign 제거
   const [treeData, setTreeData] = useState<Row[]>([]);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set([]));
@@ -75,7 +75,8 @@ const DistributionLimit = () => {
 
   const gridRef = useRef<HTMLDivElement>(null);
 
-  const { operationCampaignId, setOperationCampaignId } = useOperationStore();
+  // 운영설정용 데이터 유지용 store
+  const { operationCampaignId, setOperationCampaignId, operationCampaignName, setOperationCampaignName } = useOperationStore();
 
   // 최대분배호수 일괄 변경 모달 상태
   const [bulkLimitModal, setBulkLimitModal] = useState({
@@ -180,6 +181,12 @@ const DistributionLimit = () => {
     };
     
     window.addEventListener('campaignSkillUpdateStatus', campaignSkillUpdateStatusChange as EventListener);
+
+    if(operationCampaignId !== null && operationCampaignId ){
+      setSelectedCampaignId(operationCampaignId.toString());
+      console.log('editedRows :' , editedRows);
+      
+    }
           
     // 컴포넌트 언마운트 시 리스너 제거
     return () => {
@@ -476,22 +483,21 @@ const DistributionLimit = () => {
     setHasChanges(false); // 변경사항 플래그 초기화
     
     setSelectedCampaignId(value);
-    console.log('proceedWithCampaignChange value : ', value);
     
-
     const campaign = campaigns.find(c => c.campaign_id.toString() === value);
     if (campaign) {
       setSelectedCampaignName(campaign.campaign_name);
+      setOperationCampaignName(campaign.campaign_name);
       setOperationCampaignId(Number(value));
       // setSelectedCampaign(campaign);
     }
   };
 
-  console.log('selectedCampaignId : ',selectedCampaignId);
-  console.log('operationCampaignId : ',operationCampaignId);
 
   // 캠페인 모달에서 선택 시 핸들러
   const handleModalSelect = (campaignId: string, campaignName: string) => {
+    console.log('campaignId :', campaignId);
+    console.log('campaignName: ', campaignName);
     if (hasChanges) {
       showConfirm("저장되지 않은 변경사항이 있습니다. 계속하시겠습니까?", () => {
         setSelectedCampaignId(campaignId);
@@ -508,8 +514,15 @@ const DistributionLimit = () => {
         setHasChanges(false);
       });
     } else {
-      setSelectedCampaignId(campaignId);
-      setSelectedCampaignName(campaignName);
+      
+      
+      if(campaignId !== '' && campaignName !== ''){
+        setSelectedCampaignId(campaignId);
+        setSelectedCampaignName(campaignName);
+        setOperationCampaignId(parseInt(campaignId));
+        setOperationCampaignName(campaignName);
+      }
+        
       
       
       // const campaign = campaigns.find(c => c.campaign_id === Number(campaignId));
@@ -1225,76 +1238,6 @@ const DistributionLimit = () => {
       // 컨텍스트 메뉴 닫기
       handleCloseContextMenu();
       
-
-      /* 
-      // 이전 개별 삭제 처리 방식
-      // 선택된 모든 상담사에 대해 삭제 처리
-      for (const agentId of agentIds) {
-        try {
-          await new Promise<void>((resolve, reject) => {
-            deleteMaxCallMutation({
-              campaign_id: parseInt(selectedCampaignId),
-              agent_id: agentId
-            }, {
-              onSuccess: (response) => {
-                if (response.result_code === 0) {
-                  successCount++;
-                  resolve();
-                } else {
-                  failCount++;
-                  reject(new Error(response.result_msg));
-                }
-              },
-              onError: (error) => {
-                failCount++;
-                reject(error);
-              }
-            });
-          });
-        } catch (error) {
-          console.error('삭제 중 오류 발생:', error);
-        }
-      }
-      
-      setIsLoading(false);
-      
-      // 화면 데이터 업데이트
-      setRawAgentData(prevData => 
-        prevData.map(row => {
-          if (agentIds.includes(row.agent_id)) {
-            return {
-              ...row,
-              max_dist: '0',
-              current_resp: '0',
-              fix_flag: 'N'
-            };
-          }
-          return row;
-        })
-      );
-      
-      // 편집 중인 데이터에서도 제거
-      if (Object.keys(editedRows).length > 0) {
-        const newEditedRows = { ...editedRows };
-        
-        // 해당하는 모든 행 ID에 대해 편집 데이터 제거
-        Object.keys(newEditedRows).forEach(rowId => {
-          const agentId = rowId.replace('agent-', '');
-          if (agentIds.includes(agentId)) {
-            delete newEditedRows[rowId];
-          }
-        });
-        
-        setEditedRows(newEditedRows);
-        setHasChanges(Object.keys(newEditedRows).length > 0);
-      }
-      
-      // showAlert(`삭제 완료`);
-      
-      // 컨텍스트 메뉴 닫기
-      handleCloseContextMenu();
-
-      */
     });
   };
 
@@ -1433,112 +1376,6 @@ const DistributionLimit = () => {
     
     // 로딩 종료
     setIsLoading(false);
-    
-    // 아래는 기존 개별 api 호출
-
-    // 모든 대상 상담사에 대해 API 호출로 바로 저장
-    // for (const agent of targetAgents) {
-    //   const saveData = {
-    //     campaign_id: parseInt(selectedCampaignId),
-    //     agent_id: agent.agent_id,
-    //     max_call: maxLimit,
-    //     fix_flag: bulkLimitModal.fixFlag ? 1 : 0
-    //   };
-      
-    //   // 기존 설정 존재 여부 확인 (max_dist가 0이 아닌 경우)
-    //   const isExisting = parseInt(agent.max_dist) > 0;
-      
-    //   try {
-    //     if (isExisting) {
-    //       // 기존 설정 수정
-    //       await new Promise<void>((resolve, reject) => {
-    //         updateMaxCallMutation(saveData, {
-    //           onSuccess: (response) => {
-    //             if (response.result_code === 0) {
-    //               successCount++;
-    //               resolve();
-    //             } else {
-    //               // 이미 적용된 설정이라면 성공으로 처리
-    //               if (response.result_msg && response.result_msg.includes("No action is needed")) {
-    //                 successCount++;
-    //                 resolve();
-    //               } else {
-    //                 failCount++;
-    //                 reject(new Error(response.result_msg));
-    //               }
-    //             }
-    //           },
-    //           onError: (error) => {
-    //             // "No action is needed" 오류는 무시하고 성공으로 처리
-    //             if (error.message && error.message.includes("No action is needed")) {
-    //               successCount++;
-    //               resolve();
-    //             } else {
-    //               failCount++;
-    //               reject(error);
-    //             }
-    //           }
-    //         });
-    //       });
-    //     } else {
-    //       // 새 설정 생성
-    //       await new Promise<void>((resolve, reject) => {
-    //         createMaxCallMutation(saveData, {
-    //           onSuccess: (response) => {
-    //             if (response.result_code === 0) {
-    //               successCount++;
-    //               resolve();
-    //             } else {
-    //               // 이미 적용된 설정이라면 성공으로 처리
-    //               if (response.result_msg && response.result_msg.includes("No action is needed")) {
-    //                 successCount++;
-    //                 resolve();
-    //               } else {
-    //                 failCount++;
-    //                 reject(new Error(response.result_msg));
-    //               }
-    //             }
-    //           },
-    //           onError: (error) => {
-    //             // "No action is needed" 오류는 무시하고 성공으로 처리
-    //             if (error.message && error.message.includes("No action is needed")) {
-    //               successCount++;
-    //               resolve();
-    //             } else {
-    //               failCount++;
-    //               reject(error);
-    //             }
-    //           }
-    //         });
-    //       });
-    //     }
-    //   } catch (error) {
-    //     console.error('저장 중 오류 발생:', error);
-    //   }
-    // } // end of for
-    
-    // 화면 데이터 직접 업데이트 (API 응답을 기다리지 않고)
-    // setRawAgentData(prevData => 
-    //   prevData.map(row => {
-    //     // 선택된 상담사 ID에 포함된 경우에만 업데이트
-    //     if (agentIds.includes(row.agent_id)) {
-    //       return {
-    //         ...row,
-    //         max_dist: maxLimit.toString(),
-    //         fix_flag: bulkLimitModal.fixFlag ? 'Y' : 'N'
-    //       };
-    //     }
-    //     return row;
-    //   })
-    // );
-    
-    // // 변경 후 목록 다시 조회
-    // await fetchMaxCallList({
-    //   campaign_id: [parseInt(selectedCampaignId)]
-    // });
-    
-    // // 로딩 종료
-    // setIsLoading(false);
 
   }; // end of handleApplyBulkLimit
 
@@ -1835,7 +1672,7 @@ const DistributionLimit = () => {
             캠페인조회
           </CommonButton>
           <CustomInput 
-            value={selectedCampaignName}
+            value={selectedCampaignName !== '' ? selectedCampaignName ?? '' : operationCampaignName ?? ''}
             readOnly 
             className="w-[140px]"
             disabled={true}
@@ -1845,14 +1682,21 @@ const DistributionLimit = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <CommonButton onClick={openTimeSettingModal}>초기화시각 변경</CommonButton>
-          <CommonButton onClick={() => setIsTimeRemoveOpen(true)}>초기화시각 설정해제</CommonButton>
-          {hasChanges && (
-            <>
-              <CommonButton variant="outline" onClick={handleCancelChanges}>변경취소</CommonButton>
-              <CommonButton onClick={handleBulkSave}>저장</CommonButton>
-            </>
-          )}
+          {/* 시스템 권한별 초기화시각 버튼 노출 */}
+          { (menu_role_id === 1 && role_id === 0)&& 
+            ( 
+              <>
+              <CommonButton onClick={openTimeSettingModal}>초기화시각 변경</CommonButton>
+              <CommonButton onClick={() => setIsTimeRemoveOpen(true)}>초기화시각 설정해제</CommonButton>
+              {hasChanges && (
+                <>
+                  <CommonButton variant="outline" onClick={handleCancelChanges}>변경취소</CommonButton>
+                  <CommonButton onClick={handleBulkSave}>저장</CommonButton>
+                </>
+              )}
+              </>
+            )
+          }
         </div>
       </div>
 
@@ -1921,12 +1765,12 @@ const DistributionLimit = () => {
         onClose={() => {
           setIsModalOpen(false);
           console.log('onClose 시 : ', operationCampaignId);
-          if (operationCampaignId) {
+          if (operationCampaignId && !selectedCampaignId) {
             setSelectedCampaignId(operationCampaignId.toString()); // operationCampaignId를 설정
           }
 
         }}
-        onSelect={()=> handleModalSelect(selectedCampaignId, selectedCampaignName)}
+        onSelect={handleModalSelect}
 
       />
 

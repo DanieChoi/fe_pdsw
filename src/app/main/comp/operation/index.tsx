@@ -210,7 +210,7 @@ export default function OperationBoard({ uniqueKey }: OperationBoardProps) {
   const [localOpenSectionId, setLocalOpenSectionId] = useState<string>('');
   
   // 전역 상태 사용
-  const { openSectionId, setOpenSectionId, lastActiveTabId, setActiveTab } = useOperationStore();
+  const { openSectionId, setOpenSectionId, lastActiveTabId, setActiveTab, clearOperationCampaign } = useOperationStore();
   
   const { activeTabId } = useTabStore();
   const { tenant_id } = useAuthStore();
@@ -234,8 +234,10 @@ export default function OperationBoard({ uniqueKey }: OperationBoardProps) {
   // 토글 함수
   const toggleSection = (sectionId: string) => {
     const newSectionId = localOpenSectionId === sectionId ? '' : sectionId;
+    
     setLocalOpenSectionId(newSectionId);
     setOpenSectionId(newSectionId);
+    clearOperationCampaign();
   }
 
   // 섹션 데이터를 배열로 정의
