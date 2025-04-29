@@ -453,6 +453,34 @@ export default function Footer({
             duration: 6000
           });
         }
+        addMessageToFooterList(_time, _type, _message);
+      }
+    }
+    //블랙리스트등록
+    else if (announce === '/pds/campaign/black-list') {
+      if (command === 'INSERT') {
+        _message = '[블랙리스트 등록] 캠페인 아이디 : ' + campaign_id;
+        _message2 = `[EVENT] [${campaign_id}] 블랙리스트 등록`;
+
+        // 토스트 알림 표시
+        if (useAlramPopup === 1) {
+          toast.event(_message2, {
+            duration: 6000
+          });
+        }
+
+        addMessageToFooterList(_time, _type, _message);
+      }else if (command === 'DELETE') {
+        _message = '[블랙리스트 삭제] 캠페인 아이디 : ' + campaign_id;
+        _message2 = `[EVENT] [${campaign_id}] 블랙리스트 삭제`;
+
+        // 토스트 알림 표시
+        if (useAlramPopup === 1) {
+          toast.event(_message2, {
+            duration: 6000
+          });
+        }
+        addMessageToFooterList(_time, _type, _message);
       }
     }
     //예약 재발신
