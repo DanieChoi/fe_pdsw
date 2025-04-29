@@ -305,6 +305,20 @@ export default function Footer({
 
         const _message = '[상담사 스킬' + actionType + '] 스킬아이디: ' + skill_id;
         addMessageToFooterList(_time, _type, _message);
+        
+        // 분배제한 호수 전달을 위한 event 발송
+        const agentSkillUpdateStatus = new CustomEvent('agentSkillUpdateStatus', {
+          detail: {
+            agent_status: 'update'
+          }
+        });
+        window.dispatchEvent(agentSkillUpdateStatus);
+
+        // 캠페인 관리(상세) 전달을 위한 호출
+        fetchMain({
+          session_key: '',
+          tenant_id: tenant_id,
+        });
 
         // 토스트 알림은 한 번만 표시
         if (useAlramPopup === 1) {

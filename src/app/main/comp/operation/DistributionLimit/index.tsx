@@ -78,6 +78,8 @@ const DistributionLimit = () => {
   // 운영설정용 데이터 유지용 store
   const { operationCampaignId, setOperationCampaignId, operationCampaignName, setOperationCampaignName } = useOperationStore();
 
+
+
   // 최대분배호수 일괄 변경 모달 상태
   const [bulkLimitModal, setBulkLimitModal] = useState({
     isOpen: false,
@@ -169,8 +171,11 @@ const DistributionLimit = () => {
   // Footer에서 발생하는 이벤트 수신을 위한 이벤트 리스너 추가
   useEffect( ()=> {
     const campaignSkillUpdateStatusChange = (event: any) => {
-      const { campaign_id, campaign_status } = event.detail; 
+      const { campaign_id, campaign_status } = event.detail;
+      
+      // 캠페인 할당 스킬이 변경되었는지 감지하는 조건문
       if( campaign_status.toString() === 'update' && campaign_id.toString() === selectedCampaignId){
+        
         fetchCampaignAgentList({
           campaign_id: [Number(campaign_id)]
         })
@@ -179,18 +184,34 @@ const DistributionLimit = () => {
         });
       }
     };
+
+    const agentSkillUpdateStatusChange = (event : any) => {
+        const { agent_status } = event.detail;
+        
+        // 상담사 상태가 변경되었는지와 현재 선택된 캠페인이 있는지 감지하는 조건문
+        if( agent_status === 'update' && selectedCampaignId ){
+          
+          fetchCampaignAgentList({
+            campaign_id: [Number(selectedCampaignId)]
+          })
+          fetchMaxCallList({
+            campaign_id: [Number(selectedCampaignId)]
+          });
+        }
+    };
     
     window.addEventListener('campaignSkillUpdateStatus', campaignSkillUpdateStatusChange as EventListener);
+    window.addEventListener('agentSkillUpdateStatus', agentSkillUpdateStatusChange as EventListener);
 
+    // 캠페인 조회 아이디를 유지하는 조건문
     if(operationCampaignId !== null && operationCampaignId ){
       setSelectedCampaignId(operationCampaignId.toString());
-      console.log('editedRows :' , editedRows);
-      
     }
           
     // 컴포넌트 언마운트 시 리스너 제거
     return () => {
         window.removeEventListener('campaignSkillUpdateStatus', campaignSkillUpdateStatusChange as EventListener);
+        window.removeEventListener('agentSkillUpdateStatus', agentSkillUpdateStatusChange as EventListener);
     };
   },[])
 
@@ -496,8 +517,7 @@ const DistributionLimit = () => {
 
   // 캠페인 모달에서 선택 시 핸들러
   const handleModalSelect = (campaignId: string, campaignName: string) => {
-    console.log('campaignId :', campaignId);
-    console.log('campaignName: ', campaignName);
+
     if (hasChanges) {
       showConfirm("저장되지 않은 변경사항이 있습니다. 계속하시겠습니까?", () => {
         setSelectedCampaignId(campaignId);
@@ -1764,11 +1784,9 @@ const DistributionLimit = () => {
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
-          console.log('onClose 시 : ', operationCampaignId);
           if (operationCampaignId && !selectedCampaignId) {
             setSelectedCampaignId(operationCampaignId.toString()); // operationCampaignId를 설정
           }
-
         }}
         onSelect={handleModalSelect}
 
