@@ -103,6 +103,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const { statisticsUpdateCycle } = useEnvironmentStore();
   const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
   const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab} = useTabStore();
+  const [isPopup, setIsPopup] = useState(false);
 
   // 실제 사용할 캠페인 ID 결정
   // const selectedCampaign = externalCampaignId ?? internalSelectedCampaign;
@@ -368,7 +369,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
           fetchCallProgressStatus({ tenantId, campaignId });
         }, statisticsUpdateCycle * 1000);     
       }
-    }else{
+    }else if(!isPopup){
       fetchCallProgressStatus({
         tenantId: tenant_id+'',
         campaignId: '0'
@@ -427,6 +428,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   }, [externalCampaignId,statisticsUpdateCycle]);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsPopup(!!(window.opener && window.opener !== window));
+    }
     let count = 0;
     if( campaignSkills.length === 0){
       fetchCampaignSkills({
