@@ -223,7 +223,7 @@ const ListManager: React.FC = () => {
           const newProgressListData = { ...progressListData
             , id: progressList.length+1
             , datetime: hours + ':' + minutes + ':' + seconds
-            , message: '서버에 리스트 파일 등록 완료 : 총 ' + (listTotalCount+data.request_count) + '건, 성공 ' + (listSuccessCount+data.result_count) + '건'
+            , message: '서버에 리스트 파일 등록 완료 : 총 ' + (listTotalCount+data.request_count||1) + '건, 성공 ' + (listSuccessCount+data.result_count||1) + '건'
           };
           setProgressList(prev => [newProgressListData, ...prev]);
         }else{
@@ -723,6 +723,8 @@ const ListManager: React.FC = () => {
 
   // 작업시작 버튼 클릭 시
   const handleWorkStart = () => {
+    setListTotalCount(0);
+    setListSuccessCount(0);
     if( targetType === 'blacklist' && listFlag === 'L' && _callListInsertData.campaign_id > 0 ){      
       const callingListInsertData: CallingListInsertRequest = {
         ..._callListInsertData
