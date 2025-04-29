@@ -280,8 +280,8 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                   <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-(selectedCall?.nogdeleteGL || 0)}</TableCell>
                   {/* 미발신 = 총 리스트 - 순수발신 - 방지리스트 */}
                   <TableHeader className="!bg-[#FEE9EC] w-[120px]"><Label>대기리스트</Label></TableHeader>
-                  <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.nogblockTime || 0)}</TableCell>
-                  {/* 대기리스트 = 진행대기 - 스케줄대기 */}
+                  <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-(selectedCall?.nogblockTime || 0) + (selectedCall?.nogblockTime || 0)}</TableCell>
+                  {/* 대기리스트 = 진행대기 + 스케줄대기 */}
                   <TableHeader className="!bg-[#FEE9EC] w-[120px]"><Label>방지리스트</Label></TableHeader>
                   <TableCell colSpan={3} className="text-sm text-center">{selectedCall?.nogdeleteGL || 0}</TableCell>
                 </TableRow>

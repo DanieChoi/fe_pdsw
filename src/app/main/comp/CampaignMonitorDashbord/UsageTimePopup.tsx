@@ -52,23 +52,35 @@ const UsageTimePopup: React.FC<UsageTimePopupProps> = ({ campaignIdList,dialKind
   const columns = [
     { 
       key: 'startTime', 
-      name: '시작시간',
+      name: '시작시각',
+      headerCellClass: 'text-center', // 헤더 중앙정렬
+      cellClass: 'text-center px-4',  // 셀 중앙정렬 및 가로 여백
+      width: 170,
     },
     { 
       key: 'endTime', 
-      name: '종료시간',
+      name: '종료시각',
+      headerCellClass: 'text-center', // 헤더 중앙정렬
+      cellClass: 'text-center px-4',  // 셀 중앙정렬 및 가로 여백
+      width: 170,
     },
     { 
       key: 'agents', 
       name: '인원',
+      headerCellClass: 'text-center', // 헤더 중앙정렬
+      cellClass: 'text-center px-4',  // 셀 중앙정렬 및 가로 여백
     },
     { 
       key: 'calls', 
       name: '발신건수',
+      headerCellClass: 'text-center', // 헤더 중앙정렬
+      cellClass: 'text-center px-4',  // 셀 중앙정렬 및 가로 여백
     },
     { 
       key: 'success', 
       name: '성공건수',
+      headerCellClass: 'text-center', // 헤더 중앙정렬
+      cellClass: 'text-center px-4',  // 셀 중앙정렬 및 가로 여백
     }
   ];
 
