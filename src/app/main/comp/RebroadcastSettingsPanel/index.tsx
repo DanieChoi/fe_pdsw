@@ -972,6 +972,8 @@ const RebroadcastSettingsPanel = () => {
                 //     onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
                 //     onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 // });
+                setAlertState(prev => ({ ...prev, isOpen: false }));
+                setAlertState((prev) => ({ ...prev, isOpen: false }));
             } else {
                 setAlertState({
                     ...errorMessage,

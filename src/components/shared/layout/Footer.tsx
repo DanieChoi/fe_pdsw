@@ -394,6 +394,11 @@ export default function Footer({
           });
         }
 
+        fetchMain({
+          session_key: '',
+          tenant_id: tenant_id,
+        });
+  
         // 푸터 데이터 리스트에 추가
         addMessageToFooterList(_time, _type, _message);
       }
