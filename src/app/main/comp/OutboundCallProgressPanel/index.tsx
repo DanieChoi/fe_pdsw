@@ -281,7 +281,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
               barData: [
                 { name: '최초 발신용', value: sumCallProgressStatus[i].firstCall },  //최초 발신용
                 { name: '재시도 발신용', value: sumCallProgressStatus[i].retryCall },  //재시도 발신용
-                { name: '분배 대기', value: sumCallProgressStatus[i].waiting - (sumCallProgressStatus[i].firstCall+sumCallProgressStatus[i].retryCall) }   //분배 대기
+                // { name: '분배 대기', value: sumCallProgressStatus[i].waiting - (sumCallProgressStatus[i].firstCall+sumCallProgressStatus[i].retryCall) }   //분배 대기
+                { name: '분배 대기', value: sumCallProgressStatus[i].distributing }   //분배 대기
               ],
               gridData: [
                 {
