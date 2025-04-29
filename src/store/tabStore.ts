@@ -430,18 +430,122 @@ export const useTabStore = create<TabLayoutStore>()(
             };
           }),
 
-        addOnlyTab: (tab: TabItem, matchFn: (t: TabItem) => boolean) => {
-          const { openedTabs, removeTab, addTab } = get();
+        // addOnlyTab: (tab: TabItem, matchFn: (t: TabItem) => boolean) => {
+        //   const { openedTabs, removeTab, addTab } = get();
 
-          // 조건에 맞는 기존 탭 제거
-          openedTabs
+        //   // 조건에 맞는 기존 탭 제거
+        //   openedTabs
+        //     .filter(matchFn)
+        //     .forEach(t => {
+        //       removeTab(t.id, t.uniqueKey);
+        //     });
+
+        //   // 새로운 탭 추가
+        //   addTab(tab);
+        // },
+
+        addOnlyTab: (tab: TabItem, matchFn: (t: TabItem) => boolean) => {
+          const state = get();
+
+          // 1. Find the active section based on activeTabKey
+          let activeRowId = null;
+          let activeSectionId = null;
+
+          // Find which section contains the active tab
+          for (const row of state.rows) {
+            for (const section of row.sections) {
+              if (section.activeTabKey === state.activeTabKey) {
+                activeRowId = row.id;
+                activeSectionId = section.id;
+                break;
+              }
+
+              // If no section has activeTabKey matching global activeTabKey,
+              // check if any section contains the tab with the active key
+              if (!activeRowId && section.tabs.some(t => t.uniqueKey === state.activeTabKey)) {
+                activeRowId = row.id;
+                activeSectionId = section.id;
+                break;
+              }
+            }
+            if (activeRowId) break;
+          }
+
+          // If no active section found, default to first section
+          if (!activeRowId || !activeSectionId) {
+            if (state.rows.length > 0 && state.rows[0].sections.length > 0) {
+              activeRowId = state.rows[0].id;
+              activeSectionId = state.rows[0].sections[0].id;
+            } else {
+              // No sections available, fall back to standard addTab behavior
+              const { openedTabs, removeTab, addTab } = get();
+              openedTabs.filter(matchFn).forEach(t => removeTab(t.id, t.uniqueKey));
+              addTab(tab);
+              return;
+            }
+          }
+
+          // 2. Remove tabs matching criteria (similar to original addOnlyTab)
+          state.openedTabs
             .filter(matchFn)
             .forEach(t => {
-              removeTab(t.id, t.uniqueKey);
+              state.removeTab(t.id, t.uniqueKey);
             });
 
-          // 새로운 탭 추가
-          addTab(tab);
+          // 3. Add the tab to the active section
+          set((state) => {
+            // Find the active section again after removing tabs
+            const row = state.rows.find(r => r.id === activeRowId);
+            if (!row) return state;
+
+            const section = row.sections.find(s => s.id === activeSectionId);
+            if (!section) return state;
+
+            // Add tab to openedTabs if not already there
+            const tabExists = state.openedTabs.some(t =>
+              t.id === tab.id && t.uniqueKey === tab.uniqueKey
+            );
+
+            const newOpenedTabs = tabExists
+              ? state.openedTabs
+              : [...state.openedTabs, tab];
+
+            // Add tab to the active section
+            const updatedRows = state.rows.map(r => {
+              if (r.id !== activeRowId) return r;
+
+              return {
+                ...r,
+                sections: r.sections.map(s => {
+                  if (s.id !== activeSectionId) return s;
+
+                  // Check if tab already exists in this section
+                  const tabExistsInSection = s.tabs.some(t =>
+                    t.id === tab.id && t.uniqueKey === tab.uniqueKey
+                  );
+
+                  // If not, add it
+                  const newTabs = tabExistsInSection
+                    ? s.tabs
+                    : [...s.tabs, tab];
+
+                  return {
+                    ...s,
+                    tabs: newTabs,
+                    activeTabKey: tab.uniqueKey // Set the tab as active
+                  };
+                })
+              };
+            });
+
+            return {
+              ...state,
+              openedTabs: newOpenedTabs,
+              rows: updatedRows,
+              activeTabId: tab.id,
+              activeTabKey: tab.uniqueKey
+            };
+          });
         },
 
         removeTab: (tabId, uniqueKey) =>
@@ -1346,16 +1450,16 @@ export const useTabStore = create<TabLayoutStore>()(
             // 1. 현재 행 찾기
             const row = state.rows.find(r => r.id === rowId);
             if (!row || row.sections.length >= 2) return state;
-        
+
             // 2. 새 섹션 ID 생성
             const existingIds = row.sections.map(s => s.id);
             const newSectionId = generateUniqueId("section", existingIds);
-        
+
             // 3. 기존 섹션의 너비 저장
             const originalWidth = row.sections[0].width;
             // 두 섹션의 기본 너비 (첫 번째 섹션: 50%, 두 번째 섹션: 50%)
             const newSectionWidths = [50, 50];
-        
+
             // 3. 행 업데이트와 함께 새 섹션 추가 (너비 균등 적용 대신 명시적 너비 설정)
             const updatedRows = state.rows.map(r => {
               if (r.id !== rowId) return r;
@@ -1377,17 +1481,17 @@ export const useTabStore = create<TabLayoutStore>()(
                 ],
               };
             });
-        
+
             // 4. 기존 섹션에서 탭 찾기
             const tab = state.openedTabs.find(
               t => t.id === tabId && t.uniqueKey === tabKey
             );
             if (!tab) return { ...state, rows: updatedRows }; // 탭을 찾지 못하면 섹션만 추가
-        
+
             // 5. 기존 섹션에서 탭 제거하고 새 섹션에 추가하는 로직
             const updatedRowsWithTabMoved = updatedRows.map(r => {
               if (r.id !== rowId) return r;
-        
+
               return {
                 ...r,
                 sections: r.sections.map((sec, index) => {
@@ -1403,7 +1507,7 @@ export const useTabStore = create<TabLayoutStore>()(
                     } else {
                       nextActiveKey = sec.activeTabKey;
                     }
-        
+
                     return {
                       ...sec,
                       tabs: sec.tabs.filter(t => !(t.id === tabId && t.uniqueKey === tabKey)),
@@ -1411,7 +1515,7 @@ export const useTabStore = create<TabLayoutStore>()(
                       width: newSectionWidths[0]
                     };
                   }
-        
+
                   // 새 섹션에 탭 추가
                   if (index === 1) {
                     return {
@@ -1421,12 +1525,12 @@ export const useTabStore = create<TabLayoutStore>()(
                       width: newSectionWidths[1]
                     };
                   }
-        
+
                   return sec;
                 }),
               };
             });
-        
+
             // 6. 전역 활성 탭 업데이트
             return {
               ...state,

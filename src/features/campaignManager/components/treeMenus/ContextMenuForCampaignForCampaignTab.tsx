@@ -191,6 +191,7 @@ export function ContextMenuForCampaignForCampaignTab({
   // tofix-0424 동일한 캠페인 진행 정보 탭이 중복으로 추가 되지 않도록 수정 필요 
   const handleProgressInfoClick = (campaignId: string, campaignName: string) => {
     const uniqueKey = `progress-info-${campaignId}-${Date.now()}`;
+
     useTabStore.getState().addOnlyTab(
       {
         id: 21,
