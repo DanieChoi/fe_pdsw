@@ -123,7 +123,7 @@ const ResizableDivider: React.FC<ResizableDividerProps> = ({
         backgroundColor: isDraggingRef.current ? '#55BEC8' : '#eaeaea',
         cursor: 'col-resize',
         position: 'relative',
-        zIndex: 100,
+        zIndex: 0,
         margin: '0 -3px',
         alignSelf: 'stretch',
         touchAction: 'none',
