@@ -82,7 +82,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const nodeRef = useRef<HTMLDivElement>(null);
   // const { campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const campaignIdForUpdateFromSideMenu = useTabStore(state => state.campaignIdForUpdateFromSideMenu);
-const setCampaignIdForUpdateFromSideMenu = useTabStore(state => state.setCampaignIdForUpdateFromSideMenu);
+  const setCampaignIdForUpdateFromSideMenu = useTabStore(state => state.setCampaignIdForUpdateFromSideMenu);
 
   const [isBrowser, setIsBrowser] = useState(false);
   useEffect(() => {
@@ -143,16 +143,27 @@ const setCampaignIdForUpdateFromSideMenu = useTabStore(state => state.setCampaig
     }
   }, [node, hasChildren, isExpanded]);
 
+  // const handleClick = useCallback(() => {
+  //   onNodeSelect(node.id);
+  //   if (hasChildren) {
+  //     onNodeToggle(node.id);
+  //   }
+  //   setSelectedNodeId(node.id);
+  //   if (node.type === "campaign") {
+  //     setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
+  //   }
+  // }, [node.id, node.type, hasChildren, onNodeSelect, onNodeToggle, setSelectedNodeId]);
+
   const handleClick = useCallback(() => {
-    onNodeSelect(node.id);
+    onNodeSelect(node.id);          // ← store.set(selectedNodeId)
     if (hasChildren) {
-      onNodeToggle(node.id);
+      onNodeToggle(node.id);        // ← store.set(expandedNodes)
     }
-    setSelectedNodeId(node.id);
     if (node.type === "campaign") {
       setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
     }
-  }, [node.id, node.type, hasChildren, onNodeSelect, onNodeToggle, setSelectedNodeId]);
+  }, [onNodeToggle, node]);
+  
 
   const handleContextMenuEvent = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -226,7 +237,7 @@ const setCampaignIdForUpdateFromSideMenu = useTabStore(state => state.setCampaig
       const result = await updateCampaignsStatus(campaignIds, statusMap[bulkActionKey]);
 
       console.log("캠페인 상태 업데이트 결과`, result) : ", result);
-      
+
 
       setBulkResultDialog({
         open: true,

@@ -83,9 +83,12 @@ type Props = {
 
 export default function CampaignManagerList({ campaignId, campaignHeaderSearchParam, onRowClick }: Props) {
   const { campaigns, setSelectedCampaign, selectedCampaignRow, setSelectedCampaignRow } = useMainStore();
-  const { campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
+  // const { campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
+  const campaignIdForUpdateFromSideMenu = useTabStore(state => state.campaignIdForUpdateFromSideMenu);
+  const setCampaignIdForUpdateFromSideMenu = useTabStore(state => state.setCampaignIdForUpdateFromSideMenu);
+
   const { schedules, callingNumbers, campaignSkills } = useCampainManagerStore();
-  const {setSelectedNodeId, selectedNodeId} = useSideMenuCampaignGroupTabStore();
+  const { setSelectedNodeId, selectedNodeId } = useSideMenuCampaignGroupTabStore();
 
   const [filteredCampaigns, setFilteredCampaigns] = useState<CampaignListDataResponse[]>([]);
   const [tempData, setTempData] = useState<Row[]>([]);
@@ -153,7 +156,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
       setSelectedCampaign(clickedCampaign as any);
       setSelectedCampaignRow(row);
       setSelectedNodeId(clickedCampaign.campaign_id.toString());
-      
+
       setCampaignIdForUpdateFromSideMenu(clickedCampaign.campaign_id.toString());
       if (onRowClick) {
         onRowClick(row.campaignId.toString());
