@@ -401,24 +401,25 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   useEffect(() => {
     if( externalCampaignId ){
       setSelectedCampaign( externalCampaignId );
-      const campaignInfo = campaigns.find(data => data.campaign_id === Number(externalCampaignId));
-      const tenantId = campaignInfo?.tenant_id+'' || '1';
-      const campaignId = campaignInfo?.campaign_id+'' || '0';
-      fetchCallProgressStatus({ tenantId, campaignId });
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      if( statisticsUpdateCycle > 0 ){  
-        intervalRef.current = setInterval(() => {
-          fetchCallProgressStatus({ tenantId, campaignId });
-        }, statisticsUpdateCycle * 1000);     
-      }
       setShouldRenderSelect(false);
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-        }
-      };
+      setWaitingCounselorCnt( 0 );
+      _setCampaignData({
+            ' ': {
+              stats: {
+                waiting: 0,
+                firstCall: 0,
+                retryCall: 0,
+                distributing: 0
+              },
+              barData: [
+                { name: '최초 발신용', value: 0 },
+                { name: '재시도 발신용', value: 0 },
+                { name: '분배 대기', value: 0 }
+              ],
+              gridData: [
+              ]
+            }
+      });
     }else{
       setShouldRenderSelect(true);
     }
