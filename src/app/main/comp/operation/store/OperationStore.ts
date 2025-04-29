@@ -22,7 +22,9 @@ interface OperationStore {
 
   operationCampaignId: number | null; // 선택된 캠페인 ID
   setOperationCampaignId: (id: number) => void; // 캠페인 ID 설정
-  clearOperationCampaignId: () => void; // 캠페인 ID 초기화
+  operationCampaignName: string | null; // 선택된 캠페인 이름
+  setOperationCampaignName: (name: string) => void; // 캠페인 ID 이름
+  clearOperationCampaign: () => void; // 캠페인 ID 초기화
 }
 
 export const useOperationStore = create<OperationStore>()(
@@ -48,7 +50,9 @@ export const useOperationStore = create<OperationStore>()(
 
       operationCampaignId: null, // 초기값: null
       setOperationCampaignId: (id) => set({ operationCampaignId: id }),
-      clearOperationCampaignId: () => set({ operationCampaignId: null }),
+      operationCampaignName : null,
+      setOperationCampaignName : (name) => set({ operationCampaignName : name}),
+      clearOperationCampaign: () => set({ operationCampaignId: null, operationCampaignName : null }),
       
       // 특정 탭 ID에 맞는 초기 섹션 ID 반환
       getInitialSectionForTab: (tabId: number) => {
