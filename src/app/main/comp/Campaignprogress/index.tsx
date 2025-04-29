@@ -661,16 +661,14 @@ export default function Campaignprogress() {
         <div className="flex justify-end gap-2">
 
           {/* 새로고침 버튼 */}
-          <div className="flex justify-end mb-3">
-            <CommonButton variant="secondary" onClick={() => {
-              setSelectedCampaignId(campaigns[0].campaign_id);
-              setSelectedCampaignIdIndex(0);
-              setTempCampaignInfoList([]);
-              setCampaignInfoList([]);
-            }}>
-              새로고침
-            </CommonButton>
-          </div>
+          <CommonButton variant="secondary" onClick={() => {
+            setSelectedCampaignId(campaigns[0].campaign_id);
+            setSelectedCampaignIdIndex(0);
+            setTempCampaignInfoList([]);
+            setCampaignInfoList([]);
+          }}>
+            새로고침
+          </CommonButton>
 
           <CommonButton variant="secondary" onClick={handleExcelDownload}>엑셀로 저장</CommonButton>
           <CommonButton variant="secondary" onClick={() => setIsColumnSetOpen(true)}>칼럼 설정</CommonButton>
