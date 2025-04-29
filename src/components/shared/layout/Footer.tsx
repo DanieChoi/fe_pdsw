@@ -656,7 +656,7 @@ export default function Footer({
       });
 
       eventSource.onerror = (err) => {
-        eventSource?.close();
+        // eventSource?.close();
         sessionStorage.removeItem("sse_connected");
 
         // 재접속 시도 (3초 후)
@@ -671,7 +671,7 @@ export default function Footer({
     connectSSE();
 
     return () => {
-      eventSource?.close();
+      // eventSource?.close();
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
       sessionStorage.removeItem("sse_connected");
     };
