@@ -177,7 +177,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
       }
     }
   }, [campaignInfo]);
-
+  
   // 초기 생성시에 기본값으로 1 설정하기
   useEffect(() => {
     if (callCampaignMenu === 'NewCampaignManager' || callCampaignMenu === 'CampaignClone') {
@@ -277,6 +277,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
               type="text"
               value={tempOutgoingMethodTab.auto_dial_interval}
               onChange={(e) => handleNumericInput(e, 'setAutoDial')}
+              maxLength={5}
             />
           </div>
            
@@ -417,7 +418,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
                 type="text"
                 value={limitRate}
                 onChange={(e) => handleNumericInput(e, 'setLimitRate')}
-                disabled={!limitRateRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
+                disabled={!limitRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
               />
               %
             </div>

@@ -117,7 +117,7 @@ const SkillListPopup = ({
             onClose={handleConfirm}
             onCancel={onCancel}
             type={type}
-            width={'max-w-[500px]'}
+            width={'max-w-[510px]'}
         />
     );
 };

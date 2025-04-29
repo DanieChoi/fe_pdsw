@@ -103,6 +103,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const { statisticsUpdateCycle } = useEnvironmentStore();
   const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
   const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab} = useTabStore();
+  const [isPopup, setIsPopup] = useState(false);
 
   // 실제 사용할 캠페인 ID 결정
   // const selectedCampaign = externalCampaignId ?? internalSelectedCampaign;
@@ -241,8 +242,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const { mutate: fetchCallProgressStatus } = useApiForCallProgressStatus({
     onSuccess: (data) => {  
       const tempList = data.sendingProgressStatusList;
-      setWaitingCounselorCnt( data.waitingCounselorCnt );
-      if( tempList.length > 0){
+      const _campaignId = data.campaignId;
+      if( tempList.length > 0 && (_campaignId === selectedCampaign+'' || (selectedCampaign === 'all' && _campaignId === '0')) ){
+        setWaitingCounselorCnt( data.waitingCounselorCnt );
         const sumCallProgressStatus:SummaryCallProgressStatusDataType[] = [];
         for( let i=0;i<tempList.length;i++){
           const index = sumCallProgressStatus.findIndex((data) => data.campaignId === tempList[i].campaignId);
@@ -280,7 +282,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
               barData: [
                 { name: '최초 발신용', value: sumCallProgressStatus[i].firstCall },  //최초 발신용
                 { name: '재시도 발신용', value: sumCallProgressStatus[i].retryCall },  //재시도 발신용
-                { name: '분배 대기', value: sumCallProgressStatus[i].waiting - (sumCallProgressStatus[i].firstCall+sumCallProgressStatus[i].retryCall) }   //분배 대기
+                // { name: '분배 대기', value: sumCallProgressStatus[i].waiting - (sumCallProgressStatus[i].firstCall+sumCallProgressStatus[i].retryCall) }   //분배 대기
+                { name: '분배 대기', value: sumCallProgressStatus[i].distributing }   //분배 대기
               ],
               gridData: [
                 {
@@ -311,7 +314,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
           Object.assign(tempCampaignData, _tempCampaignData);
         }
         _setCampaignData(tempCampaignData);
-      }else{
+      }else if((_campaignId === selectedCampaign+'' || (selectedCampaign === 'all' && _campaignId === '0'))){ 
+        setWaitingCounselorCnt( data.waitingCounselorCnt );
         _setCampaignData({
               ' ': {
                 stats: {
@@ -365,7 +369,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
           fetchCallProgressStatus({ tenantId, campaignId });
         }, statisticsUpdateCycle * 1000);     
       }
-    }else{
+    }else if(!isPopup){
       fetchCallProgressStatus({
         tenantId: tenant_id+'',
         campaignId: '0'
@@ -398,30 +402,35 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 
   useEffect(() => {
     if( externalCampaignId ){
-      const campaignInfo = campaigns.find(data => data.campaign_id === Number(externalCampaignId));
-      const tenantId = campaignInfo?.tenant_id+'' || '1';
-      const campaignId = campaignInfo?.campaign_id+'' || '0';
-      fetchCallProgressStatus({ tenantId, campaignId });
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      if( statisticsUpdateCycle > 0 ){  
-        intervalRef.current = setInterval(() => {
-          fetchCallProgressStatus({ tenantId, campaignId });
-        }, statisticsUpdateCycle * 1000);     
-      }
+      setSelectedCampaign( externalCampaignId );
       setShouldRenderSelect(false);
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-        }
-      };
+      setWaitingCounselorCnt( 0 );
+      _setCampaignData({
+            ' ': {
+              stats: {
+                waiting: 0,
+                firstCall: 0,
+                retryCall: 0,
+                distributing: 0
+              },
+              barData: [
+                { name: '최초 발신용', value: 0 },
+                { name: '재시도 발신용', value: 0 },
+                { name: '분배 대기', value: 0 }
+              ],
+              gridData: [
+              ]
+            }
+      });
     }else{
       setShouldRenderSelect(true);
     }
   }, [externalCampaignId,statisticsUpdateCycle]);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsPopup(!!(window.opener && window.opener !== window));
+    }
     let count = 0;
     if( campaignSkills.length === 0){
       fetchCampaignSkills({

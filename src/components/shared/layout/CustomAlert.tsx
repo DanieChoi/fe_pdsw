@@ -56,7 +56,7 @@ const CustomAlert = ({
       }}
     >
       <AlertDialogContent
-        className={`p-0 rounded-none border shadow-sm`}
+        className={`p-0 rounded-none border shadow-sm ${typeof width === 'string' ? width : ''}`}
         style={{
           width: parsedWidth,
           height: parsedHeight,

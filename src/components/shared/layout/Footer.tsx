@@ -148,6 +148,8 @@ export default function Footer({
     let _type = 'EVENT';
     if (kind === 'event') {
       _type = 'EVENT';
+    } else if (kind === 'agent') {
+      _type = 'AGENT';
     } else if (kind === 'alram') {
       _type = 'ALRAM';
     }
@@ -305,6 +307,20 @@ export default function Footer({
 
         const _message = '[상담사 스킬' + actionType + '] 스킬아이디: ' + skill_id;
         addMessageToFooterList(_time, _type, _message);
+        
+        // 분배제한 호수 전달을 위한 event 발송
+        const agentSkillUpdateStatus = new CustomEvent('agentSkillUpdateStatus', {
+          detail: {
+            agent_status: 'update'
+          }
+        });
+        window.dispatchEvent(agentSkillUpdateStatus);
+
+        // 캠페인 관리(상세) 전달을 위한 호출
+        fetchMain({
+          session_key: '',
+          tenant_id: tenant_id,
+        });
 
         // 토스트 알림은 한 번만 표시
         if (useAlramPopup === 1) {
@@ -439,6 +455,34 @@ export default function Footer({
             duration: 6000
           });
         }
+        addMessageToFooterList(_time, _type, _message);
+      }
+    }
+    //블랙리스트등록
+    else if (announce === '/pds/campaign/black-list') {
+      if (command === 'INSERT') {
+        _message = '[블랙리스트 등록] 캠페인 아이디 : ' + campaign_id;
+        _message2 = `[EVENT] [${campaign_id}] 블랙리스트 등록`;
+
+        // 토스트 알림 표시
+        if (useAlramPopup === 1) {
+          toast.event(_message2, {
+            duration: 6000
+          });
+        }
+
+        addMessageToFooterList(_time, _type, _message);
+      }else if (command === 'DELETE') {
+        _message = '[블랙리스트 삭제] 캠페인 아이디 : ' + campaign_id;
+        _message2 = `[EVENT] [${campaign_id}] 블랙리스트 삭제`;
+
+        // 토스트 알림 표시
+        if (useAlramPopup === 1) {
+          toast.event(_message2, {
+            duration: 6000
+          });
+        }
+        addMessageToFooterList(_time, _type, _message);
       }
     }
     //예약 재발신
@@ -620,6 +664,7 @@ export default function Footer({
       let command = "";
       let kind = "";
       let campaign_id = "";
+      let skill_id = "";
 
       eventSource.addEventListener('message', (event) => {
         console.log("footer sse event = ", event.data);
@@ -630,7 +675,9 @@ export default function Footer({
             if (
               announce !== tempEventData["announce"] ||
               !isEqual(data, tempEventData["data"]) ||
+              command !== tempEventData["command"] ||
               kind !== tempEventData["kind"] ||
+              skill_id !== tempEventData["skill_id"] ||
               campaign_id !== tempEventData["campaign_id"]
             ) {
               announce = tempEventData["announce"];
@@ -638,6 +685,7 @@ export default function Footer({
               data = tempEventData["data"];
               kind = tempEventData["kind"];
               campaign_id = tempEventData["campaign_id"];
+              skill_id = tempEventData["skill_id"];
 
               footerDataSet(
                 announce,
