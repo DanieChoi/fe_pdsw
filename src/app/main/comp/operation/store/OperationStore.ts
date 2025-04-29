@@ -19,6 +19,10 @@ interface OperationStore {
   
   // 특정 탭 ID에 대한 초기 섹션 설정
   getInitialSectionForTab: (tabId: number) => string;
+
+  operationCampaignId: number | null; // 선택된 캠페인 ID
+  setOperationCampaignId: (id: number) => void; // 캠페인 ID 설정
+  clearOperationCampaignId: () => void; // 캠페인 ID 초기화
 }
 
 export const useOperationStore = create<OperationStore>()(
@@ -41,6 +45,10 @@ export const useOperationStore = create<OperationStore>()(
           openSectionId: initialSectionId 
         });
       },
+
+      operationCampaignId: null, // 초기값: null
+      setOperationCampaignId: (id) => set({ operationCampaignId: id }),
+      clearOperationCampaignId: () => set({ operationCampaignId: null }),
       
       // 특정 탭 ID에 맞는 초기 섹션 ID 반환
       getInitialSectionForTab: (tabId: number) => {

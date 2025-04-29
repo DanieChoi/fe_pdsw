@@ -2,7 +2,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CounselorSkillAssignmentResponse, CounselorSkillApiError } from '../types/typeForCounselorSkill';
 import { apiForDeleteCounselorsForSpecificSkill } from '../api/apiForCounselorSkil';
-import { useAgentSkillStatusStore } from '@/store/agenSkillStatus';
+import { useAgentSkillStatusStore } from '@/store/agenSkillStatusStore';
 
 
 interface DeleteCounselorsFromSkillsParams {

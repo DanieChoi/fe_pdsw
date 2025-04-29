@@ -16,7 +16,7 @@ import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiF
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { SkillListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
-import { useAgentSkillStatusStore } from '@/store/agenSkillStatus';
+import { useAgentSkillStatusStore } from '@/store/agenSkillStatusStore';
 
 // 메인 스킬 정보
 interface SkillRow {
