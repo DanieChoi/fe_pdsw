@@ -94,6 +94,16 @@ export function TreeNodeForCampaignTab({
   const isSelected = selectedNodeId === item.id && selectedNodeType === item.type;
   const statusIcon = item.type === "campaign" ? getStatusIcon(currentStatus) : null;
 
+  // const handleClick = useCallback(() => {
+  //   onNodeSelect(item.id);
+  //   setSelectedNodeType(item.type);
+  //   // setCampaignIdForUpdateFromSideMenu(item.id);
+  //   if (item.type === "campaign") {
+  //     setCampaignIdForCopyCampaign(item.id);
+  //   }
+  //   if (hasChildren) onNodeToggle(item.id);
+  // }, [item.id, item.type, hasChildren, onNodeSelect, onNodeToggle, setSelectedNodeType, setCampaignIdForUpdateFromSideMenu]);
+
   const handleClick = useCallback(() => {
     onNodeSelect(item.id);
     setSelectedNodeType(item.type);
@@ -102,7 +112,7 @@ export function TreeNodeForCampaignTab({
       setCampaignIdForCopyCampaign(item.id);
     }
     if (hasChildren) onNodeToggle(item.id);
-  }, [item.id, item.type, hasChildren, onNodeSelect, onNodeToggle, setSelectedNodeType, setCampaignIdForUpdateFromSideMenu]);
+  }, [item.id, item.type, hasChildren, onNodeSelect]);
 
   const handleContextMenu = useCallback(() => {
     onNodeSelect(item.id);
