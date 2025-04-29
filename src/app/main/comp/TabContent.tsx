@@ -421,7 +421,15 @@ interface Section {
 }
 
 // 캐싱된 탭 컴포넌트 - 마운트/언마운트 없이 탭 전환
-const CachedTab = ({ tabId, params, campaignId, campaignName, isVisible }) => {
+interface CachedTabProps {
+  tabId: number;
+  params?: Record<string, any>;
+  campaignId?: string;
+  campaignName?: string;
+  isVisible: boolean;
+}
+
+const CachedTab = ({ tabId, params, campaignId, campaignName, isVisible }: CachedTabProps) => {
   // 컴포넌트 렌더링 시점을 기록하기 위한 ref
   const initialRenderTimeRef = useRef(Date.now());
   
