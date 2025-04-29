@@ -208,14 +208,29 @@ export function ContextMenuForCampaignForCampaignTab({
 
   const handleRebroadcastClick = (campaignId: any) => {
     setCampaignIdForUpdateFromSideMenu(campaignId);
-    addTab({
-      id: 20,
-      uniqueKey: '20',
-      title: '재발신 설정',
-      icon: '',
-      href: '',
-      content: null,
-    });
+    // addTab({
+    //   id: 20,
+    //   uniqueKey: '20',
+    //   title: '재발신 설정',
+    //   icon: '',
+    //   href: '',
+    //   content: null,
+    // });
+    const uniqueKey = `progress-info-${campaignId}-${Date.now()}`;
+
+    useTabStore.getState().addOnlyTab(
+      {
+        id: 20,
+        uniqueKey,
+        title: `재발신 설정 `,
+        icon: '',
+        href: '',
+        content: null,
+        // campaignId,
+      },
+      (tab) => tab.id === 20
+    );
+
   };
 
   const handleMonitorClick = (tenantIdForCampaignTab: any, campaignId: any, campaignName: string) => {
