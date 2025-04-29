@@ -620,6 +620,7 @@ export default function Footer({
       let command = "";
       let kind = "";
       let campaign_id = "";
+      let skill_id = "";
 
       eventSource.addEventListener('message', (event) => {
         console.log("footer sse event = ", event.data);
@@ -630,7 +631,9 @@ export default function Footer({
             if (
               announce !== tempEventData["announce"] ||
               !isEqual(data, tempEventData["data"]) ||
+              command !== tempEventData["command"] ||
               kind !== tempEventData["kind"] ||
+              skill_id !== tempEventData["skill_id"] ||
               campaign_id !== tempEventData["campaign_id"]
             ) {
               announce = tempEventData["announce"];
@@ -638,6 +641,7 @@ export default function Footer({
               data = tempEventData["data"];
               kind = tempEventData["kind"];
               campaign_id = tempEventData["campaign_id"];
+              skill_id = tempEventData["skill_id"];
 
               footerDataSet(
                 announce,
