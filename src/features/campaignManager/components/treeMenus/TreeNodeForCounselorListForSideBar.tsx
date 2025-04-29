@@ -615,7 +615,9 @@ export function TreeNodeForCounselorListForSideBar({
         )}
         {renderIcon()}
         <span className={`text-sm text-555 ${isSelected ? "font-medium" : ""}`}>
-          {type === 'counselor' ? `${getId()} [${getLabel()}]` : getLabel()}
+          {/* {type === 'counselor' ? `${getId()} [${getLabel()}]` : getLabel()} */}
+          {type === 'counselor' ? `[${getId()}] ${getLabel()}` : getLabel()}
+
         </span>
       </div>
     </div>
