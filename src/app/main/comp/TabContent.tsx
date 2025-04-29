@@ -586,6 +586,7 @@ const CachedTab = ({ tabId, params, campaignId, campaignName, isVisible }) => {
 
 // 메모이즈된 탭 컴포넌트
 const MemoizedCachedTab = React.memo(CachedTab);
+MemoizedCachedTab.displayName = 'MemoizedCachedTab';
 
 // Props interface for OptimizedSectionContent
 interface OptimizedSectionContentProps {
@@ -681,6 +682,7 @@ const ResizeDivider = React.memo(({ handleMouseDown }: ResizeDividerProps) => {
     />
   );
 });
+ResizeDivider.displayName = 'ResizeDivider';
 
 // 메인 탭 컨텐츠 컴포넌트
 const TabContent = () => {
