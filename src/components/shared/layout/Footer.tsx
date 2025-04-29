@@ -592,108 +592,14 @@ export default function Footer({
   //   }
   // }, [id, tenant_id]);
 
-  // useEffect(() => {
-  //   let eventSource: EventSource | null = null;
-  //   let reconnectTimeout: NodeJS.Timeout | null = null;
-
-  //   const connectSSE = () => {
-  //     if (typeof window === 'undefined' || !window.EventSource || id === '') return;
-  //     const isConnected = sessionStorage.getItem("sse_connected");
-  //     if (isConnected) return;
-
-  //     const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-  //     console.info(">>>>설정값: ", DOMAIN);
-
-  //     let dominUrl = `/notification/${tenant_id}/subscribe/${id}`;
-  //     if( window.location.hostname === 'localhost'){
-  //       dominUrl = `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`;
-  //     }
-  //     eventSource = new EventSource( dominUrl );
-
-  //     let data: any = {};
-  //     let announce = "";
-  //     let command = "";
-  //     let kind = "";
-  //     let campaign_id = "";
-
-  //     eventSource.addEventListener('message', (event) => {
-  //       console.log("footer sse event = ", event.data);
-
-  //       if (event.data !== "Connected!!") {
-  //         try {
-  //           const tempEventData = JSON.parse(event.data);
-  //           if (
-  //             announce !== tempEventData["announce"] ||
-  //             !isEqual(data, tempEventData["data"]) ||
-  //             kind !== tempEventData["kind"] ||
-  //             campaign_id !== tempEventData["campaign_id"]
-  //           ) {
-  //             announce = tempEventData["announce"];
-  //             command = tempEventData["command"];
-  //             data = tempEventData["data"];
-  //             kind = tempEventData["kind"];
-  //             campaign_id = tempEventData["campaign_id"];
-
-  //             footerDataSet(
-  //               announce,
-  //               command,
-  //               data,
-  //               kind,
-  //               campaign_id,
-  //               tempEventData["skill_id"] || "",
-  //               tempEventData
-  //             );
-  //           }
-  //         } catch (error) {
-  //           console.error("SSE JSON parse error: ", error);
-  //         }
-  //       }
-  //     });
-
-  //     eventSource.onerror = (err) => {
-  //       eventSource?.close();
-  //       sessionStorage.removeItem("sse_connected");
-
-  //       // 재접속 시도 (3초 후)
-  //       reconnectTimeout = setTimeout(() => {
-  //         connectSSE();
-  //       }, 3000);
-  //     };
-
-  //     sessionStorage.setItem("sse_connected", "true");
-  //   };
-
-  //   connectSSE();
-
-  //   return () => {
-  //     eventSource?.close();
-  //     if (reconnectTimeout) clearTimeout(reconnectTimeout);
-  //     sessionStorage.removeItem("sse_connected");
-  //   };
-  // }, [id, tenant_id]);
-  
   useEffect(() => {
-    if (typeof window === 'undefined' || !id) return;
-    
-    // 새로고침 감지
-    const isReload = performance?.navigation?.type === 1 || 
-    (performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming)?.type === "reload";
-
-    const justLoggedIn = sessionStorage.getItem('just_logged_in') === 'true';
-    if (isReload && !justLoggedIn) {
-      console.log("🚫 새로고침, SSE 실행 안 함");
-      return;
-    }
-
     let eventSource: EventSource | null = null;
     let reconnectTimeout: NodeJS.Timeout | null = null;
 
-    sessionStorage.removeItem("just_logged_in"); // ✅ 한 번만 사용
     const connectSSE = () => {
       if (typeof window === 'undefined' || !window.EventSource || id === '') return;
-      const isConnected = sessionStorage.getItem("just_logged_in");
+      const isConnected = sessionStorage.getItem("sse_connected");
       if (isConnected) return;
-      sessionStorage.setItem("sse_connected", "true");
 
       const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
       console.info(">>>>설정값: ", DOMAIN);
@@ -745,29 +651,27 @@ export default function Footer({
       });
 
       eventSource.onerror = (err) => {
-        if (eventSource?.readyState === EventSource.CLOSED) {
-          console.warn("SSE connection closed. Attempting to reconnect...");
-          eventSource?.close();
-          sessionStorage.removeItem("sse_connected");
-      
-          // 3초 후 재연결
-          reconnectTimeout = setTimeout(() => {
-            connectSSE();
-          }, 3000);
-        }
+        eventSource?.close();
+        sessionStorage.removeItem("sse_connected");
+
+        // 재접속 시도 (3초 후)
+        reconnectTimeout = setTimeout(() => {
+          connectSSE();
+        }, 3000);
       };
 
+      sessionStorage.setItem("sse_connected", "true");
     };
 
     connectSSE();
-    
+
     return () => {
       eventSource?.close();
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
       sessionStorage.removeItem("sse_connected");
     };
   }, [id, tenant_id]);
-
+  
   const handleSSEMessage = (tempEventData: any) => {
     try {
       const { announce, command, data, kind, campaign_id, skill_id } = tempEventData;

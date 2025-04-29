@@ -132,17 +132,23 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   ];
 
   const getStatusTime = (time: number) => {
-    let returnValue = "00:00:00";
+    const returnValue = "00:00:00";
     
     if (time !== 0) {
-      const date = new Date(1970, 0, 1);
-      date.setSeconds(time);
+      // const date = new Date(1970, 0, 1);
+      // date.setSeconds(time);
   
-      const hours = String(date.getUTCHours()).padStart(2, '0');
-      const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-      const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+      // const hours = String(date.getUTCHours()).padStart(2, '0');
+      // const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+      // const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+
+      const hrs = Math.floor(time / 3600);
+      const mins = Math.floor((time % 3600) / 60);
+      const secs = time % 60;
+    
+      return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   
-      returnValue = `${hours}:${minutes}:${seconds}`;
+      // returnValue = `${hours}:${minutes}:${seconds}`;
     }
   
     return returnValue;
