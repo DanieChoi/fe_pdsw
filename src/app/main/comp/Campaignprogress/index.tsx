@@ -16,7 +16,7 @@ import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiF
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 import * as XLSX from 'xlsx';
 // 모달
-import ColumnSet, { defaultColumnsData,ColumnSettingItem } from './ColumnSet';
+import ColumnSet, { defaultColumnsData, ColumnSettingItem } from './ColumnSet';
 
 interface TreeRow extends DispatchStatusDataType {
   parentId?: string;
@@ -44,7 +44,7 @@ interface DispatchStatusDataType extends CampaignProgressInformationResponseData
   failSendCount: number;
 }
 
-const initDispatchStatusData:DispatchStatusDataType = {          
+const initDispatchStatusData: DispatchStatusDataType = {
   tenantId: 0 //campaigns[selectedCampaignIdIndex].tenant_id
   , detectMachineRoaming: 0
   , detectMachineEtc: 0
@@ -102,7 +102,7 @@ const initDispatchStatusData:DispatchStatusDataType = {
   , nognotDialAgent: 0
   , nogblockTime: 0
   , nognotDialReady: 0
-  , strFlag : ''
+  , strFlag: ''
   , senderId: 0
   , startFlag: ''// campaigns[selectedCampaignIdIndex].start_flag === 1?'시작':campaigns[selectedCampaignIdIndex].start_flag === 2?'멈충':'중지지'
   , endFlag: '' // campaigns[selectedCampaignIdIndex].end_flag=== 1?'진행중':'완료'
@@ -126,9 +126,9 @@ export default function Campaignprogress() {
   const [selectedStatus, setSelectedStatus] = useState<string>('전체');
   const [isSortAscending, setIsSortAscending] = useState<boolean>(true);
   const { campaigns } = useMainStore();
-  const [selectedCampaignId,setSelectedCampaignId ] = useState<number>(0);
-  const [selectedCampaignIdIndex,setSelectedCampaignIdIndex ] = useState<number>(0);
-  const [maxDispatchCount, setMaxDispatchCount ] = useState<number>(0);
+  const [selectedCampaignId, setSelectedCampaignId] = useState<number>(0);
+  const [selectedCampaignIdIndex, setSelectedCampaignIdIndex] = useState<number>(0);
+  const [maxDispatchCount, setMaxDispatchCount] = useState<number>(0);
   const [campaignInfoList, setCampaignInfoList] = useState<DispatchStatusDataType[]>([]);
   const [tempCampaignInfoList, setTempCampaignInfoList] = useState<DispatchStatusDataType[]>([]);
   const [skills, setSkills] = useState<any[]>([]);
@@ -141,51 +141,55 @@ export default function Campaignprogress() {
     const result: any[] = [];
 
     dataList.forEach((data) => {
-        let center = result.find(center => center.centerId === data.centerId);
-        if (!center) {
-          center = {...initDispatchStatusData,
-                id: `center-${data.centerId}`,
-                level: 0,
-                hasChildren: true,
-                affiliationGroupId: data.centerId,
-                children: []
-            };
-            result.push(center);
-        }
+      let center = result.find(center => center.centerId === data.centerId);
+      if (!center) {
+        center = {
+          ...initDispatchStatusData,
+          id: `center-${data.centerId}`,
+          level: 0,
+          hasChildren: true,
+          affiliationGroupId: data.centerId,
+          children: []
+        };
+        result.push(center);
+      }
 
-        let tenant = center.children.find((tenant: TreeRow) => tenant.tenantId === data.tenantId);
-        if (!tenant) {
-          tenant = {...initDispatchStatusData,
-                id: `tenant-${data.tenantId}`,
-                parentId: center.id,
-                level: 1,
-                hasChildren: true,
-                affiliationTeamId: data.tenantId,
-                children: [],
-                tenantId: data.tenantId
-            };
-            center.children.push(tenant);
-        }
+      let tenant = center.children.find((tenant: TreeRow) => tenant.tenantId === data.tenantId);
+      if (!tenant) {
+        tenant = {
+          ...initDispatchStatusData,
+          id: `tenant-${data.tenantId}`,
+          parentId: center.id,
+          level: 1,
+          hasChildren: true,
+          affiliationTeamId: data.tenantId,
+          children: [],
+          tenantId: data.tenantId
+        };
+        center.children.push(tenant);
+      }
 
-        let campaign = tenant.children.find((campaign: TreeRow) => campaign.campId === data.campId);
-        if (!campaign) {
-          campaign = {...initDispatchStatusData,
-                id: `campaign-${data.campId}`,
-                parentId: tenant.id,
-                level: 2,
-                hasChildren: true,
-                affiliationTeamId: data.campId,
-                children: [],
-                campId: data.campId
-            };
-            tenant.children.push(campaign);
-        }
+      let campaign = tenant.children.find((campaign: TreeRow) => campaign.campId === data.campId);
+      if (!campaign) {
+        campaign = {
+          ...initDispatchStatusData,
+          id: `campaign-${data.campId}`,
+          parentId: tenant.id,
+          level: 2,
+          hasChildren: true,
+          affiliationTeamId: data.campId,
+          children: [],
+          campId: data.campId
+        };
+        tenant.children.push(campaign);
+      }
 
-        campaign.children.push({...data,
-            id: data.campId+'-'+data.senderId,
-            parentId: campaign.id,
-            level: 3
-        });
+      campaign.children.push({
+        ...data,
+        id: data.campId + '-' + data.senderId,
+        parentId: campaign.id,
+        level: 3
+      });
     });
 
     return result;
@@ -239,7 +243,7 @@ export default function Campaignprogress() {
   const getFilteredData = (data: TreeRow[]): TreeRow[] => {
     const filterRow = (row: TreeRow): TreeRow | null => {
       let filteredChildren: TreeRow[] = [];
-      
+
       if (row.children) {
         filteredChildren = row.children
           .map(child => filterRow(child))
@@ -269,7 +273,7 @@ export default function Campaignprogress() {
       }
 
       // if (matchesCampaign && matchesSkill && matchesStatus) {
-        return row;
+      return row;
       // }
 
       // return null;
@@ -290,14 +294,14 @@ export default function Campaignprogress() {
         const idB = parseInt(b.id.split('-')[1]);
         return isSortAscending ? idA - idB : idB - idA;
       });
-      
+
       const sortedCampaignChildRows = [...campaignChildRows].sort((a, b) => {
         const idA = parseInt(a.id.split('-')[1]);
         const idB = parseInt(b.id.split('-')[1]);
         return isSortAscending ? idA - idB : idB - idA;
       });
 
-      const sortedRows = [...nonCampaignRows, ...sortedCampaignRows,...sortedCampaignChildRows].map(row => ({
+      const sortedRows = [...nonCampaignRows, ...sortedCampaignRows, ...sortedCampaignChildRows].map(row => ({
         ...row,
         children: row.children ? sortChildren(row.children) : undefined
       }));
@@ -338,52 +342,52 @@ export default function Campaignprogress() {
   const handleSkillChange = (value: string) => {
     setSelectedSkill(value);
     if (campaignSkills.length > 0) {
-      processDataForGrid(campaignSkills,selectedCampaign, value, selectedStatus);
+      processDataForGrid(campaignSkills, selectedCampaign, value, selectedStatus);
     }
   };
   // 캠페인 아이디 변경 핸들러
   const handleCampaignChange = (value: string) => {
     setSelectedCampaign(value);
     if (campaignSkills.length > 0) {
-      processDataForGrid(campaignSkills,value, selectedSkill, selectedStatus);
+      processDataForGrid(campaignSkills, value, selectedSkill, selectedStatus);
     }
   };
   // 상태 별로 보기 변경 핸들러
   const handleStatusChange = (value: string) => {
     setSelectedStatus(value);
     if (campaignSkills.length > 0) {
-      processDataForGrid(campaignSkills,selectedCampaign, selectedSkill, value);
+      processDataForGrid(campaignSkills, selectedCampaign, selectedSkill, value);
     }
   };
-  const createExcelData = (list:TreeRow[],_columns:Column<TreeRow>[], hasChildren:boolean) => {
-    let rtnList:any[] = [];
-    for( let i=0;i<list.length;i++){
-      let tempData:any[] = [];
-      if( typeof list[i].children !== 'undefined'){
-        if( list[i].id === 'center-center-1' ){
-          tempData = ['센터: NEXUS(1센터)','',''];
-          for(let j=0;j<_columns.length;j++){
+  const createExcelData = (list: TreeRow[], _columns: Column<TreeRow>[], hasChildren: boolean) => {
+    let rtnList: any[] = [];
+    for (let i = 0; i < list.length; i++) {
+      let tempData: any[] = [];
+      if (typeof list[i].children !== 'undefined') {
+        if (list[i].id === 'center-center-1') {
+          tempData = ['센터: NEXUS(1센터)', '', ''];
+          for (let j = 0; j < _columns.length; j++) {
             tempData.push('');
           }
-        }else if( list[i].id.indexOf('tenant') > -1 ){
-          tempData = ['','테넌트: '+ list[i].id.split('-')[1],''];
-          for(let j=0;j<_columns.length;j++){
+        } else if (list[i].id.indexOf('tenant') > -1) {
+          tempData = ['', '테넌트: ' + list[i].id.split('-')[1], ''];
+          for (let j = 0; j < _columns.length; j++) {
             tempData.push('');
           }
-        }else if( list[i].id.indexOf('campaign') > -1 ){
-          tempData = ['','','캠페인 아이디: '+ list[i].id.split('-')[1]];
-          for(let j=0;j<_columns.length;j++){
+        } else if (list[i].id.indexOf('campaign') > -1) {
+          tempData = ['', '', '캠페인 아이디: ' + list[i].id.split('-')[1]];
+          for (let j = 0; j < _columns.length; j++) {
             tempData.push('');
           }
         }
         const childData = createExcelData(list[i].children || [], _columns, true);
         rtnList.push(tempData);
-        rtnList = rtnList.concat(childData); 
-      }else{
+        rtnList = rtnList.concat(childData);
+      } else {
         const rowData = _columns.map(col => {
           return col.key in list[i] ? list[i][col.key] : ''; // Make sure it returns a value for each column
         });
-        rtnList.push(['', '','', ...rowData]);
+        rtnList.push(['', '', '', ...rowData]);
       }
     }
 
@@ -396,7 +400,7 @@ export default function Campaignprogress() {
       // Map the row data to the appropriate columns
       return _columns.map(col => row[col.key]); // assuming each row has keys matching the column's 'key'
     });
-    const tempList = createExcelData(filteredAndSortedData,_columns,true);
+    const tempList = createExcelData(filteredAndSortedData, _columns, true);
 
     // Add the headers
     // const headers = _columns.map(col => col.name);
@@ -413,27 +417,27 @@ export default function Campaignprogress() {
     XLSX.writeFile(wb, 'CampaignProgress.xlsx');
   };
   //컬럼 설정 확인 이벤트.
-  const handleColumnSetConfirm = (data:ColumnSettingItem[]) => {
+  const handleColumnSetConfirm = (data: ColumnSettingItem[]) => {
     setColumns(data);
     setIsColumnSetOpen(false)
   };
-  const handleColumnSetClose = () => setIsColumnSetOpen(false);  
+  const handleColumnSetClose = () => setIsColumnSetOpen(false);
 
   // 차트 데이터 처리 함수
   const processDataForGrid = (
-    campaignSkillsData: any[], 
+    campaignSkillsData: any[],
     currentCampaign: string,
     currentSkill: string,
     currentStatus: string,
   ) => {
-    let filteredCampaigns = campaignSkillsData.sort((a, b) => a.tenant_id-b.tenant_id);
-    
+    let filteredCampaigns = campaignSkillsData.sort((a, b) => a.tenant_id - b.tenant_id);
+
     // 스킬 필터링
     if (currentSkill !== 'total') {
-      filteredCampaigns = campaignSkillsData.filter(campaign => 
+      filteredCampaigns = campaignSkillsData.filter(campaign =>
         campaign.skill_id?.includes(Number(currentSkill))
       );
-    }else{
+    } else {
       filteredCampaigns = campaigns.sort((a, b) => a.campaign_id - b.campaign_id);
     }
 
@@ -446,12 +450,12 @@ export default function Campaignprogress() {
       }
       // 캠페인 아이디 필터링
       if (currentCampaign !== '전체보기') {
-        tempList = tempList.filter(campaignInfo => campaignInfo.campId === Number(currentCampaign) );
+        tempList = tempList.filter(campaignInfo => campaignInfo.campId === Number(currentCampaign));
       }
       return tempList;
     });
     const transformedData = transformToTreeData(processedData.flat().sort((a, b) => {
-      if( a.tenantId !== b.tenantId){
+      if (a.tenantId !== b.tenantId) {
         return a.tenantId - b.tenantId;
       }
       return a.campId - b.campId
@@ -475,55 +479,56 @@ export default function Campaignprogress() {
     onSuccess: (data) => {
       setCampaignSkills(data.result_data);
       // 여기에 나중에 발신 상태 API 연동
-      processDataForGrid(data.result_data,selectedCampaign, selectedSkill,selectedStatus);
+      processDataForGrid(data.result_data, selectedCampaign, selectedSkill, selectedStatus);
     }
   });
 
   // 캠페인 진행 정보 api 호출
   const { mutate: fetchCampaignProgressInformation } = useApiForCampaignProgressInformation({
-    onSuccess: (data) => {  
+    onSuccess: (data) => {
       const tempList = data.progressInfoList.sort((a, b) => a.reuseCnt - b.reuseCnt);
-      if( tempList.length > 0 ){
+      if (tempList.length > 0) {
         const tempDataList: DispatchStatusDataType[] = tempList.map((item, i) => ({
           ...item
-          , strFlag : i === 0 ? '최초발신' : `${i}번째 재발신`
+          , strFlag: i === 0 ? '최초발신' : `${i}번째 재발신`
           , senderId: i
-          , startFlag: campaigns[selectedCampaignIdIndex].start_flag === 1?'시작':campaigns[selectedCampaignIdIndex].start_flag === 2?'멈춤':'중지'
-          , endFlag: campaigns[selectedCampaignIdIndex].end_flag=== 1?'진행중':'완료'
-          , id: 'campaign-'+ item.campId
+          , startFlag: campaigns[selectedCampaignIdIndex].start_flag === 1 ? '시작' : campaigns[selectedCampaignIdIndex].start_flag === 2 ? '멈춤' : '중지'
+          , endFlag: campaigns[selectedCampaignIdIndex].end_flag === 1 ? '진행중' : '완료'
+          , id: 'campaign-' + item.campId
           , centerId: 'center-1'
           , campaignName: campaigns[selectedCampaignIdIndex].campaign_name
           , progressRate: item.totLstCnt === 0 ? 0 : parseFloat(((item.nonTTCT / item.totLstCnt) * 100).toFixed(1))
           , successRateList: item.totLstCnt === 0 ? 0 : parseFloat(((item.scct / item.totLstCnt) * 100).toFixed(1))
-          , nonSendCount: item.totLstCnt-item.scct-item.recallCnt-(item.buct+item.fact+item.tect+item.customerOnHookCnt+item.dialToneSilence+item.nact
-            +item.etct+item.lineStopCnt+item.detectSilenceCnt+item.acct) //미발신 건수.
+          , nonSendCount: item.totLstCnt - item.scct - item.recallCnt - (item.buct + item.fact + item.tect + item.customerOnHookCnt + item.dialToneSilence + item.nact
+            + item.etct + item.lineStopCnt + item.detectSilenceCnt + item.acct) //미발신 건수.
           , successRateSend: item.scct === 0 ? 0 : parseFloat(((item.scct / item.totDialCnt) * 100).toFixed(1))
           , dialAttemptCnt: item.firstCall
-          , failSendCount: item.buct+item.fact+item.tect+item.customerOnHookCnt+item.dialToneSilence+item.nact
-            +item.etct+item.lineStopCnt+item.detectSilenceCnt+item.acct
+          , failSendCount: item.buct + item.fact + item.tect + item.customerOnHookCnt + item.dialToneSilence + item.nact
+            + item.etct + item.lineStopCnt + item.detectSilenceCnt + item.acct
         }));
         setTempCampaignInfoList(prev => [...prev, ...tempDataList]);
-        if( maxDispatchCount < tempList.length ){
+        if (maxDispatchCount < tempList.length) {
           setMaxDispatchCount(tempList.length);
         }
-      }else{
-        const tempData:DispatchStatusDataType = { ...initDispatchStatusData
+      } else {
+        const tempData: DispatchStatusDataType = {
+          ...initDispatchStatusData
           , tenantId: campaigns[selectedCampaignIdIndex].tenant_id
           , campId: campaigns[selectedCampaignIdIndex].campaign_id
-          , startFlag: campaigns[selectedCampaignIdIndex].start_flag === 1?'시작':campaigns[selectedCampaignIdIndex].start_flag === 2?'멈춤':'중지'
-          , endFlag: campaigns[selectedCampaignIdIndex].end_flag=== 1?'진행중':'완료'
-          , id: 'campaign-'+ campaigns[selectedCampaignIdIndex].campaign_id
+          , startFlag: campaigns[selectedCampaignIdIndex].start_flag === 1 ? '시작' : campaigns[selectedCampaignIdIndex].start_flag === 2 ? '멈춤' : '중지'
+          , endFlag: campaigns[selectedCampaignIdIndex].end_flag === 1 ? '진행중' : '완료'
+          , id: 'campaign-' + campaigns[selectedCampaignIdIndex].campaign_id
           , campaignName: campaigns[selectedCampaignIdIndex].campaign_name
         };
         setTempCampaignInfoList(prev => [...prev, tempData]);
       }
-      
-      const index = selectedCampaignIdIndex+1;
 
-      if( index < campaigns.length){
+      const index = selectedCampaignIdIndex + 1;
+
+      if (index < campaigns.length) {
         setSelectedCampaignId(campaigns[index].campaign_id);
         setSelectedCampaignIdIndex(index);
-      }else{
+      } else {
         fetchSkills({
           tenant_id_array: []
         });
@@ -533,7 +538,7 @@ export default function Campaignprogress() {
 
   const filteredAndSortedData = useMemo(() => {
     const filteredData = getFilteredData(initData);
-    
+
     const expandedData = filteredData.map(group => ({
       ...group,
       children: group.children?.map(team => ({
@@ -557,26 +562,26 @@ export default function Campaignprogress() {
     setExpandedRows(expandedRowIds);
 
     return getSortedData(filteredData);
-  }, [selectedCampaign, selectedSkill, selectedStatus, isSortAscending,initData]);
+  }, [selectedCampaign, selectedSkill, selectedStatus, isSortAscending, initData]);
 
   useEffect(() => {
-    if( columns.length > 0 ){
+    if (columns.length > 0) {
       _setColumns([...headercolumns, ...columns]);
     }
   }, [columns]);
 
   useEffect(() => {
-    if( selectedCampaignId > 0 ){      
+    if (selectedCampaignId > 0) {
       fetchCampaignProgressInformation({
         tenantId: campaigns[selectedCampaignIdIndex].tenant_id,
         campaignId: selectedCampaignId
       });
     }
-  }, [selectedCampaignId,selectedCampaignIdIndex]);
+  }, [selectedCampaignId, selectedCampaignIdIndex]);
 
-  
+
   useEffect(() => {
-    if( campaigns.length > 0 ){
+    if (campaigns.length > 0) {
       // 캠페인즈를 가져와서 캠페인 아이디를 설정합니다.
       setSelectedCampaignId(campaigns[0].campaign_id);
       setSelectedCampaignIdIndex(0);
@@ -594,17 +599,6 @@ export default function Campaignprogress() {
         title="상담사 상태"
       />
 
-      {/* 새로고침 버튼 */}
-      <div className="flex justify-end mb-3">
-        <CommonButton variant="secondary" onClick={() => {
-          setSelectedCampaignId(campaigns[0].campaign_id);
-          setSelectedCampaignIdIndex(0);
-          setTempCampaignInfoList([]);
-          setCampaignInfoList([]);
-        }}>
-          새로고침
-        </CommonButton>
-      </div>
 
       <div className="flex items-center justify-between pb-3">
         <div className="flex gap-5">
@@ -615,10 +609,10 @@ export default function Campaignprogress() {
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="전체보기" />
                 </SelectTrigger>
-                <SelectContent style={{ maxHeight: '300px', overflowY: 'auto' }}> 
+                <SelectContent style={{ maxHeight: '300px', overflowY: 'auto' }}>
                   <SelectItem value="전체보기">캠페인 전체</SelectItem>
                   {campaigns.map((campaign) => (
-                    <SelectItem key={campaign.campaign_id} value={campaign.campaign_id+''}>
+                    <SelectItem key={campaign.campaign_id} value={campaign.campaign_id + ''}>
                       {campaign.campaign_id}
                     </SelectItem>
                   ))}
@@ -665,8 +659,22 @@ export default function Campaignprogress() {
           </button>
         </div>
         <div className="flex justify-end gap-2">
+
+          {/* 새로고침 버튼 */}
+          <div className="flex justify-end mb-3">
+            <CommonButton variant="secondary" onClick={() => {
+              setSelectedCampaignId(campaigns[0].campaign_id);
+              setSelectedCampaignIdIndex(0);
+              setTempCampaignInfoList([]);
+              setCampaignInfoList([]);
+            }}>
+              새로고침
+            </CommonButton>
+          </div>
+
           <CommonButton variant="secondary" onClick={handleExcelDownload}>엑셀로 저장</CommonButton>
           <CommonButton variant="secondary" onClick={() => setIsColumnSetOpen(true)}>칼럼 설정</CommonButton>
+
         </div>
       </div>
       <div className="h-[500px] w-full grid-custom-wrap">
@@ -688,11 +696,11 @@ export default function Campaignprogress() {
         />
       </div>
       <ColumnSet
-          isOpen={isColumnSetOpen}
-          onClose={handleColumnSetClose}
-          onConfirm={handleColumnSetConfirm}
-          columns={columns}
-        />
+        isOpen={isColumnSetOpen}
+        onClose={handleColumnSetClose}
+        onConfirm={handleColumnSetConfirm}
+        columns={columns}
+      />
     </div>
   );
 }
