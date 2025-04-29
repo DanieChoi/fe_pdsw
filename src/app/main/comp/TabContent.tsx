@@ -665,6 +665,8 @@ const OptimizedSectionContent = React.memo(({
     </div>
   );
 });
+OptimizedSectionContent.displayName = 'OptimizedSectionContent';
+
 
 // 드래그 가능한 구분선 컴포넌트
 interface ResizeDividerProps {
