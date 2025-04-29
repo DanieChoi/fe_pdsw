@@ -148,6 +148,8 @@ export default function Footer({
     let _type = 'EVENT';
     if (kind === 'event') {
       _type = 'EVENT';
+    } else if (kind === 'agent') {
+      _type = 'AGENT';
     } else if (kind === 'alram') {
       _type = 'ALRAM';
     }
