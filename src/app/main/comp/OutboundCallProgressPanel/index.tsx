@@ -241,8 +241,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const { mutate: fetchCallProgressStatus } = useApiForCallProgressStatus({
     onSuccess: (data) => {  
       const tempList = data.sendingProgressStatusList;
-      setWaitingCounselorCnt( data.waitingCounselorCnt );
-      if( tempList.length > 0){
+      const _campaignId = data.campaignId;
+      if( tempList.length > 0 && (_campaignId === selectedCampaign+'' || (selectedCampaign === 'all' && _campaignId === '0')) ){
+        setWaitingCounselorCnt( data.waitingCounselorCnt );
         const sumCallProgressStatus:SummaryCallProgressStatusDataType[] = [];
         for( let i=0;i<tempList.length;i++){
           const index = sumCallProgressStatus.findIndex((data) => data.campaignId === tempList[i].campaignId);
@@ -311,7 +312,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
           Object.assign(tempCampaignData, _tempCampaignData);
         }
         _setCampaignData(tempCampaignData);
-      }else{
+      }else if((_campaignId === selectedCampaign+'' || (selectedCampaign === 'all' && _campaignId === '0'))){ 
+        setWaitingCounselorCnt( data.waitingCounselorCnt );
         _setCampaignData({
               ' ': {
                 stats: {
@@ -398,6 +400,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 
   useEffect(() => {
     if( externalCampaignId ){
+      setSelectedCampaign( externalCampaignId );
       const campaignInfo = campaigns.find(data => data.campaign_id === Number(externalCampaignId));
       const tenantId = campaignInfo?.tenant_id+'' || '1';
       const campaignId = campaignInfo?.campaign_id+'' || '0';
