@@ -132,7 +132,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   ];
 
   const getStatusTime = (time: number) => {
-    let returnValue = "00:00:00";
+    const returnValue = "00:00:00";
     
     if (time !== 0) {
       // const date = new Date(1970, 0, 1);
