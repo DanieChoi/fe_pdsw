@@ -171,6 +171,7 @@ export interface CallProgressStatusResponse {
   message: string;
   waitingCounselorCnt: number;
   sendingProgressStatusList: CallProgressStatusResponseDataType[];
+  campaignId: string;
 }
 
 // 발신진행상태 응답 데이터 타입
