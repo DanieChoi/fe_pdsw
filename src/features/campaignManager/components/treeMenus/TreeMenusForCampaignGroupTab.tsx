@@ -17,15 +17,23 @@ export function TreeMenusForCampaignGroupTab() {
   const { isLoading, error, data } = useApiForGetTreeDataForCampaignGroupTab(tenant_id);
 
   // Zustand 스토어에서 UI 상태 가져오기 - removeCampaignFromGroup 추가
-  const {
-    treeData,
-    expandedNodes,
-    selectedNodeId,
-    toggleNode,
-    selectNode,
-    expandTenantAndGroup,
-    removeCampaignFromGroup // 이 함수를 추가
-  } = useSideMenuCampaignGroupTabStore();
+  // const {
+  //   treeData,
+  //   expandedNodes,
+  //   selectedNodeId,
+  //   toggleNode,
+  //   selectNode,
+  //   expandTenantAndGroup,
+  //   removeCampaignFromGroup // 이 함수를 추가
+  // } = useSideMenuCampaignGroupTabStore();
+
+  const treeData                = useSideMenuCampaignGroupTabStore(state => state.treeData);
+  const expandedNodes           = useSideMenuCampaignGroupTabStore(state => state.expandedNodes);
+  const selectedNodeId          = useSideMenuCampaignGroupTabStore(state => state.selectedNodeId);
+  const toggleNode              = useSideMenuCampaignGroupTabStore(state => state.toggleNode);
+  const selectNode              = useSideMenuCampaignGroupTabStore(state => state.selectNode);
+  const expandTenantAndGroup    = useSideMenuCampaignGroupTabStore(state => state.expandTenantAndGroup);
+  const removeCampaignFromGroup = useSideMenuCampaignGroupTabStore(state => state.removeCampaignFromGroup);
 
   console.log("TreeMenusForCampaignGroupTab 렌더링", treeData);
 

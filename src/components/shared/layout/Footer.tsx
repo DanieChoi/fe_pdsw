@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { ChevronUp, ChevronDown, Bell, BellOff, Trash } from "lucide-react";
 import { debounce, isEqual } from 'lodash';
 import { useAuthStore, useMainStore } from '@/store';
@@ -54,13 +54,20 @@ export default function Footer({
 
   const lastProcessedMessageRef = useRef<string | null>(null);
 
-  const debouncedInvalidate = useCallback(
-    debounce(() => {
-      invalidateTreeMenuData();
-      invalidateCampaignGroupTreeData();
-    }, 500),
-    [invalidateTreeMenuData, invalidateCampaignGroupTreeData]
+  const debouncedInvalidate = useMemo(
+    () =>
+      debounce(() => {
+        invalidateTreeMenuData();
+        invalidateCampaignGroupTreeData();
+      }, 500),
+    [] // invalidate 함수가 stable 하다면 빈 배열, 아니면 [invalidateTreeMenuData,…]
   );
+
+  useEffect(() => {
+    return () => {
+      debouncedInvalidate.cancel();
+    };
+  }, [debouncedInvalidate]);
 
   useEffect(() => {
     initToasts();

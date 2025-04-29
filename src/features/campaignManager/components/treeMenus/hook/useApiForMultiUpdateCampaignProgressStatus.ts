@@ -1,84 +1,169 @@
-import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { BatchUpdateResult, updateMultipleCampaignStatus } from '../api/apiForMultiUpdateCampaignProgressStatus';
+// import { useState } from 'react';
+// import { useQueryClient } from '@tanstack/react-query';
+// import { BatchUpdateResult, updateMultipleCampaignStatus } from '../api/apiForMultiUpdateCampaignProgressStatus';
 
-type UpdateStatusState = {
-  loading: boolean;
-  error: string | null;
-  result: BatchUpdateResult | null;
-};
+// type UpdateStatusState = {
+//   loading: boolean;
+//   error: string | null;
+//   result: BatchUpdateResult | null;
+// };
 
-/**
- * status 파라미터는 "1" (시작), "2" (멈춤), "3" (중지) 값만 허용
- * 내부적으로 각 캠페인에 대해
- *   PUT /pds/campaigns/{campaign_id}/status
- *   body: { request_data: { campaign_status: status } }
- * 를 호출해야 함
- */
+// /**
+//  * status 파라미터는 "1" (시작), "2" (멈춤), "3" (중지) 값만 허용
+//  * 내부적으로 각 캠페인에 대해
+//  *   PUT /pds/campaigns/{campaign_id}/status
+//  *   body: { request_data: { campaign_status: status } }
+//  * 를 호출해야 함
+//  */
+// export const useApiForMultiUpdateCampaignProgressStatus = () => {
+//   const queryClient = useQueryClient();
+//   const [state, setState] = useState<UpdateStatusState>({
+//     loading: false,
+//     error: null,
+//     result: null
+//   });
+
+//   const updateCampaignsStatus = async (campaignIds: string[], status: string) => {
+//     // 입력 유효성 검사
+//     if (!campaignIds || campaignIds.length === 0) {
+//       setState({
+//         loading: false,
+//         error: '캠페인 ID가 제공되지 않았습니다.',
+//         result: null
+//       });
+//       return;
+//     }
+//     if (!["1", "2", "3"].includes(status)) {
+//       setState({
+//         loading: false,
+//         error: 'status 파라미터는 "1"(시작), "2"(멈춤), "3"(중지)만 허용됩니다.',
+//         result: null
+//       });
+//       return;
+//     }
+
+//     setState({
+//       loading: true,
+//       error: null,
+//       result: null
+//     });
+
+//     try {
+//       // 각 캠페인에 대해 병렬로 상태 변경 요청
+//       const batchResult = await updateMultipleCampaignStatus(campaignIds, status);
+      
+//       // 캠페인 그룹 트리 데이터 갱신 (무효화)
+//       queryClient.invalidateQueries({
+//         queryKey: ['campaignTreeDataForCampaignGroupTab']
+//       });
+
+//       setState({
+//         loading: false,
+//         error: null,
+//         result: batchResult
+//       });
+
+//       return batchResult;
+//     } catch (error: any) {
+//       setState({
+//         loading: false,
+//         error: error.message || '캠페인 상태 업데이트 중 오류가 발생했습니다.',
+//         result: null
+//       });
+
+//       throw error;
+//     }
+//   };
+
+//   return {
+//     updateCampaignsStatus,
+//     isLoading: state.loading,
+//     error: state.error,
+//     result: state.result,
+//   };
+// };
+
+// src/features/campaignManager/hooks/useApiForMultiUpdateCampaignProgressStatus.ts
+"use client";
+
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { updateMultipleCampaignStatus, BatchUpdateResult } from '../api/apiForMultiUpdateCampaignProgressStatus';
+import { TreeNode } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';
+
+// 트리 내 각 노드의 status를 업데이트하는 재귀 함수
+function updateTreeStatus(
+  nodes: TreeNode[],
+  campaignIds: string[],
+  status: string
+): TreeNode[] {
+  return nodes.map((node) => ({
+    ...node,
+    ...(campaignIds.includes(node.id.toString())
+      ? { status }
+      : {}),
+    children: node.children
+      ? updateTreeStatus(node.children, campaignIds, status)
+      : []
+  }));
+}
+
+interface Variables {
+  campaignIds: string[];
+  status: string;
+}
+
+interface Context {
+  previousTree?: TreeNode[];
+}
+
 export const useApiForMultiUpdateCampaignProgressStatus = () => {
   const queryClient = useQueryClient();
-  const [state, setState] = useState<UpdateStatusState>({
-    loading: false,
-    error: null,
-    result: null
-  });
 
-  const updateCampaignsStatus = async (campaignIds: string[], status: string) => {
-    // 입력 유효성 검사
-    if (!campaignIds || campaignIds.length === 0) {
-      setState({
-        loading: false,
-        error: '캠페인 ID가 제공되지 않았습니다.',
-        result: null
-      });
-      return;
+  const mutation = useMutation<BatchUpdateResult, Error, Variables, Context>({
+    mutationFn: ({ campaignIds, status }: Variables) => updateMultipleCampaignStatus(campaignIds, status),
+    // 낙관적 업데이트
+      onMutate: async ({ campaignIds, status }) => {
+        await queryClient.cancelQueries({ queryKey: ['campaignTreeDataForCampaignGroupTab'] });
+        const previousTree = queryClient.getQueryData<TreeNode[]>(['campaignTreeDataForCampaignGroupTab']);
+        if (previousTree) {
+          queryClient.setQueryData(
+            ['campaignTreeDataForCampaignGroupTab'],
+            updateTreeStatus(previousTree, campaignIds, status)
+          );
+        }
+        return { previousTree };
+      },
+      // 오류 시 롤백
+      onError: (_err, _vars, context) => {
+        if (context?.previousTree) {
+          queryClient.setQueryData(
+            ['campaignTreeDataForCampaignGroupTab'],
+            context.previousTree
+          );
+        }
+      },
+      // 완료 후(성공 또는 실패) 실제 서버 데이터로 다시 조회
+      onSettled: () => {
+        queryClient.invalidateQueries({
+          queryKey: ['campaignTreeDataForCampaignGroupTab'],
+          refetchType: 'active'
+        });
+      }
     }
-    if (!["1", "2", "3"].includes(status)) {
-      setState({
-        loading: false,
-        error: 'status 파라미터는 "1"(시작), "2"(멈춤), "3"(중지)만 허용됩니다.',
-        result: null
-      });
-      return;
-    }
+  );
 
-    setState({
-      loading: true,
-      error: null,
-      result: null
-    });
-
-    try {
-      // 각 캠페인에 대해 병렬로 상태 변경 요청
-      const batchResult = await updateMultipleCampaignStatus(campaignIds, status);
-      
-      // 캠페인 그룹 트리 데이터 갱신 (무효화)
-      queryClient.invalidateQueries({
-        queryKey: ['campaignTreeDataForCampaignGroupTab']
-      });
-
-      setState({
-        loading: false,
-        error: null,
-        result: batchResult
-      });
-
-      return batchResult;
-    } catch (error: any) {
-      setState({
-        loading: false,
-        error: error.message || '캠페인 상태 업데이트 중 오류가 발생했습니다.',
-        result: null
-      });
-
-      throw error;
-    }
+  // 호출 인터페이스를 기존과 유사하게 유지
+  const updateCampaignsStatus = (
+    campaignIds: string[],
+    status: string
+  ) => {
+    return mutation.mutateAsync({ campaignIds, status });
   };
 
   return {
     updateCampaignsStatus,
-    isLoading: state.loading,
-    error: state.error,
-    result: state.result,
+    isLoading: mutation.isPending,
+    error: mutation.error?.message ?? null,
+    result: mutation.data ?? null
   };
 };

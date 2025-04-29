@@ -65,14 +65,17 @@ export function TreeMenusForCampaigns() {
 
   // 트리 노드 선택/확장 상태 관리
   const {
-    selectedNodeId,
-    expandedNodes,
+    // selectedNodeId,
+    // expandedNodes,
     setSelectedNodeId,
     toggleNode,
     expandNodes,
     savePreviousState,
     restorePreviousState
   } = useTreeStore();
+
+  const selectedNodeId = useTreeStore(state => state.selectedNodeId);
+  const expandedNodes  = useTreeStore(state => state.expandedNodes);
 
   // 원본 아이템을 useMemo로 감싸서 의존성 배열 변경 방지
   const originalItems = useMemo(() => {

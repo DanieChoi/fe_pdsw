@@ -80,7 +80,9 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const { refetchTreeDataForCampaignGroupTab, setSelectedNodeId } = useSideMenuCampaignGroupTabStore();
   const { setCampaignGroupManagerInit } = useCampainManagerStore();
   const nodeRef = useRef<HTMLDivElement>(null);
-  const { campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
+  // const { campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
+  const campaignIdForUpdateFromSideMenu = useTabStore(state => state.campaignIdForUpdateFromSideMenu);
+const setCampaignIdForUpdateFromSideMenu = useTabStore(state => state.setCampaignIdForUpdateFromSideMenu);
 
   const [isBrowser, setIsBrowser] = useState(false);
   useEffect(() => {
@@ -150,7 +152,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     if (node.type === "campaign") {
       setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
     }
-  }, [node.id, node.type, hasChildren, onNodeSelect, onNodeToggle, setSelectedNodeId, setCampaignIdForUpdateFromSideMenu]);
+  }, [node.id, node.type, hasChildren, onNodeSelect, onNodeToggle, setSelectedNodeId]);
 
   const handleContextMenuEvent = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -222,6 +224,10 @@ export function TreeNodeForSideBarCampaignGroupTab({
       const statusMap = { start: "1", complete: "2", stop: "3" };
       if (bulkActionKey === "") return;
       const result = await updateCampaignsStatus(campaignIds, statusMap[bulkActionKey]);
+
+      console.log("캠페인 상태 업데이트 결과`, result) : ", result);
+      
+
       setBulkResultDialog({
         open: true,
         title: `일괄 ${bulkActionKey === "start" ? "시작" : bulkActionKey === "complete" ? "멈춤" : "중지"} 결과`,
