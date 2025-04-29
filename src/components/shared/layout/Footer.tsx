@@ -394,6 +394,11 @@ export default function Footer({
           });
         }
 
+        fetchMain({
+          session_key: '',
+          tenant_id: tenant_id,
+        });
+  
         // 푸터 데이터 리스트에 추가
         addMessageToFooterList(_time, _type, _message);
       }
@@ -651,7 +656,7 @@ export default function Footer({
       });
 
       eventSource.onerror = (err) => {
-        eventSource?.close();
+        // eventSource?.close();
         sessionStorage.removeItem("sse_connected");
 
         // 재접속 시도 (3초 후)
@@ -666,7 +671,7 @@ export default function Footer({
     connectSSE();
 
     return () => {
-      eventSource?.close();
+      // eventSource?.close();
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
       sessionStorage.removeItem("sse_connected");
     };

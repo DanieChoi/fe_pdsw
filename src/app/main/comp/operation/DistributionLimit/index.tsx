@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import TimePickerComponent from './TimePicker';
 import ContextMenu from './context_menu';
 import OnlyNumberInput from '@/components/shared/OnlyNumberInput';
+import { useOperationStore } from '../store/OperationStore';
 
 interface Row {
   id: string;
@@ -73,6 +74,8 @@ const DistributionLimit = () => {
   const [hasChanges, setHasChanges] = useState(false);
 
   const gridRef = useRef<HTMLDivElement>(null);
+
+  const { operationCampaignId, setOperationCampaignId } = useOperationStore();
 
   // 최대분배호수 일괄 변경 모달 상태
   const [bulkLimitModal, setBulkLimitModal] = useState({
@@ -473,12 +476,19 @@ const DistributionLimit = () => {
     setHasChanges(false); // 변경사항 플래그 초기화
     
     setSelectedCampaignId(value);
+    console.log('proceedWithCampaignChange value : ', value);
+    
+
     const campaign = campaigns.find(c => c.campaign_id.toString() === value);
     if (campaign) {
       setSelectedCampaignName(campaign.campaign_name);
+      setOperationCampaignId(Number(value));
       // setSelectedCampaign(campaign);
     }
   };
+
+  console.log('selectedCampaignId : ',selectedCampaignId);
+  console.log('operationCampaignId : ',operationCampaignId);
 
   // 캠페인 모달에서 선택 시 핸들러
   const handleModalSelect = (campaignId: string, campaignName: string) => {
@@ -486,6 +496,7 @@ const DistributionLimit = () => {
       showConfirm("저장되지 않은 변경사항이 있습니다. 계속하시겠습니까?", () => {
         setSelectedCampaignId(campaignId);
         setSelectedCampaignName(campaignName);
+        
         // const campaign = campaigns.find(c => c.campaign_id === Number(campaignId));
         // if (campaign) {
         //   setSelectedCampaign(campaign);
@@ -499,6 +510,8 @@ const DistributionLimit = () => {
     } else {
       setSelectedCampaignId(campaignId);
       setSelectedCampaignName(campaignName);
+      
+      
       // const campaign = campaigns.find(c => c.campaign_id === Number(campaignId));
       // if (campaign) {
       //   setSelectedCampaign(campaign);
@@ -1804,16 +1817,16 @@ const DistributionLimit = () => {
             onClick={() => {
               if (hasChanges) {
                 showConfirm("저장되지 않은 변경사항이 있습니다. 계속하시겠습니까?", () => {
-                  setSelectedCampaignId('');
-                  setSelectedCampaignName('');
+                  setSelectedCampaignId(operationCampaignId?.toString() || '');
+                  setSelectedCampaignName(selectedCampaignName);
                   // setSelectedCampaign(null);
                   setEditedRows({});
                   setHasChanges(false);
                   setIsModalOpen(true);
                 });
               } else {
-                setSelectedCampaignId('');
-                setSelectedCampaignName('');
+                // setSelectedCampaignId('');
+                // setSelectedCampaignName('');
                 // setSelectedCampaign(null);
                 setIsModalOpen(true);
               }
@@ -1905,8 +1918,16 @@ const DistributionLimit = () => {
 
       <CampaignModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSelect={handleModalSelect}
+        onClose={() => {
+          setIsModalOpen(false);
+          console.log('onClose 시 : ', operationCampaignId);
+          if (operationCampaignId) {
+            setSelectedCampaignId(operationCampaignId.toString()); // operationCampaignId를 설정
+          }
+
+        }}
+        onSelect={()=> handleModalSelect(selectedCampaignId, selectedCampaignName)}
+
       />
 
       <CustomAlert

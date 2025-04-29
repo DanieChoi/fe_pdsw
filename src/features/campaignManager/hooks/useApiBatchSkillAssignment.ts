@@ -3,7 +3,7 @@ import { useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-
 import { CounselorSkillAssignmentResponse, CounselorSkillApiError } from '../types/typeForCounselorSkill';
 import { apiForAddCounselorsForSpecificSkill } from '../api/apiForCounselorSkil';
 import { apiForDeleteCounselorsForSpecificSkill } from '../api/apiForCounselorSkil';
-import { useAgentSkillStatusStore } from '@/store/agenSkillStatus';
+import { useAgentSkillStatusStore } from '@/store/agenSkillStatusStore';
 
 interface BatchSkillAssignmentParams {
   skillIds: number[];

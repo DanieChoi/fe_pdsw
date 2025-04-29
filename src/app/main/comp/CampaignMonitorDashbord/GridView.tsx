@@ -94,9 +94,6 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
       setTempBarChartData(tempBarChartData);
     }
   }, [selectedCall]);
-
-  console.log('totLstCnt : ' , selectedCall?.totLstCnt);
-  console.log('nonTTCT : ' , selectedCall?.nonTTCT);
   
   return (
       <div className="flex flex-col gap-2">
@@ -242,7 +239,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                     <Label>미발신</Label>
                   </TableHeader>
                   <TableCell className="text-center text-sm">
-                    {(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-failCnt-(selectedCall?.recallCnt || 0)}
+                    {(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-(selectedCall?.nogdeleteGL || 0)}
                   </TableCell>
                   <TableHeader className="w-[120px] !bg-[#DDF4F2]">
                     <Label>상담결과 예약</Label>
@@ -280,9 +277,11 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                 {/* 두 번째 행 */}
                 <TableRow>
                   <TableHeader className="!bg-[#DDF4F2] w-[120px]"><Label>미발신</Label></TableHeader>
-                  <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-(selectedCall?.recallCnt || 0)}</TableCell>
+                  <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-(selectedCall?.nogdeleteGL || 0)}</TableCell>
+                  {/* 미발신 = 총 리스트 - 순수발신 - 방지리스트 */}
                   <TableHeader className="!bg-[#FEE9EC] w-[120px]"><Label>대기리스트</Label></TableHeader>
-                  <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)}</TableCell>
+                  <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.nogblockTime || 0)}</TableCell>
+                  {/* 대기리스트 = 진행대기 - 스케줄대기 */}
                   <TableHeader className="!bg-[#FEE9EC] w-[120px]"><Label>방지리스트</Label></TableHeader>
                   <TableCell colSpan={3} className="text-sm text-center">{selectedCall?.nogdeleteGL || 0}</TableCell>
                 </TableRow>
@@ -405,11 +404,16 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                       <tbody>
                         <TableRow>
                           <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>대기리스트</Label></TableHeader>
-                          <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)}</TableCell>
+                          <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-(selectedCall?.nogblockTime || 0) + (selectedCall?.nogblockTime || 0)}</TableCell>
+                          {/* 대기리스트 = 진행대기 + 스케줄대기 */}
                         </TableRow>
                         <TableRow>
                           <TableHeader className="w-[170px]"><Label>진행 대기</Label></TableHeader>
-                          <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-failCnt-(selectedCall?.recallCnt || 0)-(selectedCall?.nogblockTime || 0)-(selectedCall?.nogdeleteGL || 0)}</TableCell>
+                          
+                          <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-(selectedCall?.nogblockTime || 0)}</TableCell>
+                          {/* 진행대기 = 총리스트 - 순수발신 - 스케줄대기 */}
+                          {/* {(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-failCnt-(selectedCall?.recallCnt || 0)-(selectedCall?.nogblockTime || 0)-(selectedCall?.nogdeleteGL || 0)} */ }
+                          
                         </TableRow>
                         <TableRow>
                           <TableHeader className="w-[170px]"><Label>스케줄 대기</Label></TableHeader>
