@@ -95,7 +95,8 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
       ];
       setTempCallStatusData(callStatusData);
       setTempListStatusData([]);
-      const delay = selectedCall.totLstCnt-selectedCall.scct-totalCnt-selectedCall.recallCnt;
+      // const delay = selectedCall.totLstCnt-selectedCall.scct-totalCnt-selectedCall.recallCnt;
+      const delay = selectedCall.totLstCnt - selectedCall.nonTTCT;
       // 리스트 상태 데이터
       const listStatusData: ChartData[] = [
         { name: '대기리스트:'+delay, value: delay, color: '#87CEFA' },
