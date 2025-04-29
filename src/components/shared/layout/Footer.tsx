@@ -177,7 +177,18 @@ export default function Footer({
       }
       addMessageToFooterList(_time, _type, _message);
     }
-    //장비 추가/삭제/상태(사용, 사용중지)    
+    //전화번호설명 템플릿
+    else if (announce === '/pds/phone-description') {
+      if (command === 'INSERT') {
+        _message = '[전화번호설명 템플릿 추가]템플릿ID: ' + data['description_id'];
+      } else if (command === 'UPDATE') {
+        _message = '[전화번호설명 템플릿 수정]템플릿ID: ' + data['description_id'];
+      } else if (command === 'DELETE') {
+        _message = '[전화번호설명 템플릿 삭제]템플릿ID: ' + data['description_id'];
+      }
+      addMessageToFooterList(_time, _type, _message);
+    }
+    //장비 추가/삭제/상태(사용, 사용중지)
     else if (announce === 'dialing-device') {
       if (command === 'INSERT') {
         _message = '[장비추가]장비아이디: ' + data['device_id'];
