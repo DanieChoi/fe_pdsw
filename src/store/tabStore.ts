@@ -444,13 +444,119 @@ export const useTabStore = create<TabLayoutStore>()(
         //   addTab(tab);
         // },
 
+        // addOnlyTab: (tab: TabItem, matchFn: (t: TabItem) => boolean) => {
+        //   const state = get();
+
+        //   // 같은 섹션에 activate tab 있으면 비활성화 해야함
+
+        //   // 1. Find the active section based on activeTabKey
+        //   let activeRowId = null;
+        //   let activeSectionId = null;
+
+        //   // Find which section contains the active tab
+        //   for (const row of state.rows) {
+        //     for (const section of row.sections) {
+        //       if (section.activeTabKey === state.activeTabKey) {
+        //         activeRowId = row.id;
+        //         activeSectionId = section.id;
+        //         break;
+        //       }
+
+        //       // If no section has activeTabKey matching global activeTabKey,
+        //       // check if any section contains the tab with the active key
+        //       if (!activeRowId && section.tabs.some(t => t.uniqueKey === state.activeTabKey)) {
+        //         activeRowId = row.id;
+        //         activeSectionId = section.id;
+        //         break;
+        //       }
+        //     }
+        //     if (activeRowId) break;
+        //   }
+
+        //   // If no active section found, default to first section
+        //   if (!activeRowId || !activeSectionId) {
+        //     if (state.rows.length > 0 && state.rows[0].sections.length > 0) {
+        //       activeRowId = state.rows[0].id;
+        //       activeSectionId = state.rows[0].sections[0].id;
+        //     } else {
+        //       // No sections available, fall back to standard addTab behavior
+        //       const { openedTabs, removeTab, addTab } = get();
+        //       openedTabs.filter(matchFn).forEach(t => removeTab(t.id, t.uniqueKey));
+        //       addTab(tab);
+        //       return;
+        //     }
+        //   }
+
+        //   // 2. Remove tabs matching criteria (similar to original addOnlyTab)
+        //   state.openedTabs
+        //     .filter(matchFn)
+        //     .forEach(t => {
+        //       state.removeTab(t.id, t.uniqueKey);
+        //     });
+
+        //   // 3. Add the tab to the active section
+        //   set((state) => {
+        //     // Find the active section again after removing tabs
+        //     const row = state.rows.find(r => r.id === activeRowId);
+        //     if (!row) return state;
+
+        //     const section = row.sections.find(s => s.id === activeSectionId);
+        //     if (!section) return state;
+
+        //     // Add tab to openedTabs if not already there
+        //     const tabExists = state.openedTabs.some(t =>
+        //       t.id === tab.id && t.uniqueKey === tab.uniqueKey
+        //     );
+
+        //     const newOpenedTabs = tabExists
+        //       ? state.openedTabs
+        //       : [...state.openedTabs, tab];
+
+        //     // Add tab to the active section
+        //     const updatedRows = state.rows.map(r => {
+        //       if (r.id !== activeRowId) return r;
+
+        //       return {
+        //         ...r,
+        //         sections: r.sections.map(s => {
+        //           if (s.id !== activeSectionId) return s;
+
+        //           // Check if tab already exists in this section
+        //           const tabExistsInSection = s.tabs.some(t =>
+        //             t.id === tab.id && t.uniqueKey === tab.uniqueKey
+        //           );
+
+        //           // If not, add it
+        //           const newTabs = tabExistsInSection
+        //             ? s.tabs
+        //             : [...s.tabs, tab];
+
+        //           return {
+        //             ...s,
+        //             tabs: newTabs,
+        //             activeTabKey: tab.uniqueKey // Set the tab as active
+        //           };
+        //         })
+        //       };
+        //     });
+
+        //     return {
+        //       ...state,
+        //       openedTabs: newOpenedTabs,
+        //       rows: updatedRows,
+        //       activeTabId: tab.id,
+        //       activeTabKey: tab.uniqueKey
+        //     };
+        //   });
+        // },
+
         addOnlyTab: (tab: TabItem, matchFn: (t: TabItem) => boolean) => {
           const state = get();
-
+        
           // 1. Find the active section based on activeTabKey
           let activeRowId = null;
           let activeSectionId = null;
-
+        
           // Find which section contains the active tab
           for (const row of state.rows) {
             for (const section of row.sections) {
@@ -459,7 +565,7 @@ export const useTabStore = create<TabLayoutStore>()(
                 activeSectionId = section.id;
                 break;
               }
-
+        
               // If no section has activeTabKey matching global activeTabKey,
               // check if any section contains the tab with the active key
               if (!activeRowId && section.tabs.some(t => t.uniqueKey === state.activeTabKey)) {
@@ -470,7 +576,7 @@ export const useTabStore = create<TabLayoutStore>()(
             }
             if (activeRowId) break;
           }
-
+        
           // If no active section found, default to first section
           if (!activeRowId || !activeSectionId) {
             if (state.rows.length > 0 && state.rows[0].sections.length > 0) {
@@ -478,66 +584,67 @@ export const useTabStore = create<TabLayoutStore>()(
               activeSectionId = state.rows[0].sections[0].id;
             } else {
               // No sections available, fall back to standard addTab behavior
-              const { openedTabs, removeTab, addTab } = get();
-              openedTabs.filter(matchFn).forEach(t => removeTab(t.id, t.uniqueKey));
-              addTab(tab);
+              state.openedTabs.filter(matchFn).forEach(t => state.removeTab(t.id, t.uniqueKey));
+              state.addTab(tab);
               return;
             }
           }
-
+        
           // 2. Remove tabs matching criteria (similar to original addOnlyTab)
           state.openedTabs
             .filter(matchFn)
             .forEach(t => {
               state.removeTab(t.id, t.uniqueKey);
             });
-
-          // 3. Add the tab to the active section
+        
+          // 3. Add the tab to the active section and make it the only active tab
           set((state) => {
             // Find the active section again after removing tabs
             const row = state.rows.find(r => r.id === activeRowId);
             if (!row) return state;
-
-            const section = row.sections.find(s => s.id === activeSectionId);
-            if (!section) return state;
-
+        
+            const activeSection = row.sections.find(s => s.id === activeSectionId);
+            if (!activeSection) return state;
+        
             // Add tab to openedTabs if not already there
             const tabExists = state.openedTabs.some(t =>
               t.id === tab.id && t.uniqueKey === tab.uniqueKey
             );
-
+        
             const newOpenedTabs = tabExists
               ? state.openedTabs
               : [...state.openedTabs, tab];
-
-            // Add tab to the active section
+        
+            // Add tab to the active section and make it the active tab
             const updatedRows = state.rows.map(r => {
               if (r.id !== activeRowId) return r;
-
+        
               return {
                 ...r,
                 sections: r.sections.map(s => {
                   if (s.id !== activeSectionId) return s;
-
+        
                   // Check if tab already exists in this section
                   const tabExistsInSection = s.tabs.some(t =>
                     t.id === tab.id && t.uniqueKey === tab.uniqueKey
                   );
-
+        
                   // If not, add it
                   const newTabs = tabExistsInSection
                     ? s.tabs
                     : [...s.tabs, tab];
-
+        
+                  // Always set this tab as active
                   return {
                     ...s,
                     tabs: newTabs,
-                    activeTabKey: tab.uniqueKey // Set the tab as active
+                    activeTabKey: tab.uniqueKey
                   };
                 })
               };
             });
-
+        
+            // Update global active state to the new tab
             return {
               ...state,
               openedTabs: newOpenedTabs,
@@ -547,7 +654,7 @@ export const useTabStore = create<TabLayoutStore>()(
             };
           });
         },
-
+        
         removeTab: (tabId, uniqueKey) =>
           set((state) => {
             // 1. 먼저 제거된 탭이 활성화된 탭인지 확인
