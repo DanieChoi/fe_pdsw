@@ -363,6 +363,15 @@ const OperationTimeTab: React.FC<Props> = ({
                           });
                           return;
                         }
+                        // 시작시간이 종료시간 같은 경우
+                        if (startTime === endTime) {
+                          setAlertState({
+                            ...alertState,
+                            isOpen: true,
+                            message: "종료시간 설정이 잘못 되었습니다.",
+                          });
+                          return;
+                        }
                         let check = false;
                         const tempStartTime: string[] = [];
                         const tempEndTime: string[] = [];
