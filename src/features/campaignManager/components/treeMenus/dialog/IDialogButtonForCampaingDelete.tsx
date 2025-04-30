@@ -117,11 +117,10 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
         setCampaignIdForUpdateFromSideMenu(null)
         
         // 캠페인 탭 삭제
-        const { rowId, sectionId } = findCurrentTabLocation();
-        if (rowId && activeTabKey) {
-          removeTab(Number(rowId), activeTabKey);
-        }
-
+        // const { rowId, sectionId } = findCurrentTabLocation();
+        // if (rowId && activeTabKey) {
+        //   removeTab(Number(rowId), activeTabKey);
+        // }
 
       }
 

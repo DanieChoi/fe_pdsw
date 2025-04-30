@@ -60,6 +60,10 @@ export default function MainLayout({
                 height: `calc(100% - ${actualFooterHeight}px)`,
                 paddingTop: '0',
                 boxSizing: 'border-box',
+                paddingBottom: '0',
+                paddingLeft: '35px',
+                paddingRight: '25px',
+                marginTop: '20px',
               }}
             >
               {children}
