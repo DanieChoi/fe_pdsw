@@ -114,7 +114,8 @@ export function TreeNodeForCampaignTab({
     if (hasChildren) onNodeToggle(item.id);
   }, [item.id, item.type, hasChildren, onNodeSelect]);
 
-  const handleContextMenu = useCallback(() => {
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
+    // e.preventDefault(); // 기본 브라우저 컨텍스트 메뉴를 막음
     onNodeSelect(item.id);
     setSelectedNodeType(item.type);
   }, [item.id, item.type, onNodeSelect, setSelectedNodeType]);
@@ -215,7 +216,7 @@ export function TreeNodeForCampaignTab({
       return (
         <ContextMenu>
           <ContextMenuTrigger>
-            <div ref={nodeRef} className={nodeStyle} onClick={handleClick} onContextMenu={handleContextMenu} style={{ paddingLeft }}>
+            <div ref={nodeRef} className={nodeStyle} onClick={handleClick} style={{ paddingLeft }}>
               {nodeContent}
             </div>
           </ContextMenuTrigger>
@@ -226,7 +227,7 @@ export function TreeNodeForCampaignTab({
       return (
         <ContextMenu>
           <ContextMenuTrigger>
-            <div ref={nodeRef} className={nodeStyle} onClick={handleClick} onContextMenu={handleContextMenu} style={{ paddingLeft }}>
+            <div ref={nodeRef} className={nodeStyle} onClick={handleClick} style={{ paddingLeft }}>
               {nodeContent}
             </div>
           </ContextMenuTrigger>
@@ -234,19 +235,44 @@ export function TreeNodeForCampaignTab({
         </ContextMenu>
       );
     } else {
-      return (
-        <ContextMenuForCampaignForCampaignTab
-          item={updatedItem}
-          onEdit={() => console.log("Edit:", item)}
-          onMonitor={() => console.log("Monitor:", item)}
-          onHandleCampaignCopy={onHandleCampaignCopy}
-          tenantIdForCampaignTab={item.tenantId}
-        >
-          <div ref={nodeRef} className={nodeStyle} onClick={handleClick} onDoubleClick={handleDoubleClick} onContextMenu={handleContextMenu} style={{ paddingLeft }}>
-            {nodeContent}
-          </div>
-        </ContextMenuForCampaignForCampaignTab>
-      );
+      // 1. ContextMenuForCampaignForCampaignTab가 이미 ContextMenu를 포함하는지 확인
+      if (typeof ContextMenuForCampaignForCampaignTab === 'function' && 
+          ContextMenuForCampaignForCampaignTab.toString().includes('ContextMenu')) {
+        // 2a. 이미 ContextMenu를 포함하는 경우
+        return (
+          <ContextMenuForCampaignForCampaignTab
+            item={updatedItem}
+            onEdit={() => console.log("Edit:", item)}
+            onMonitor={() => console.log("Monitor:", item)}
+            onHandleCampaignCopy={onHandleCampaignCopy}
+            tenantIdForCampaignTab={item.tenantId}
+          >
+            <div ref={nodeRef} className={nodeStyle} onClick={handleClick} onDoubleClick={handleDoubleClick} style={{ paddingLeft }}>
+              {nodeContent}
+            </div>
+          </ContextMenuForCampaignForCampaignTab>
+        );
+      } else {
+        // 2b. ContextMenu를 포함하지 않는 경우
+        return (
+          <ContextMenu>
+            <ContextMenuTrigger>
+              <div ref={nodeRef} className={nodeStyle} onClick={handleClick} onDoubleClick={handleDoubleClick} style={{ paddingLeft }}>
+                {nodeContent}
+              </div>
+            </ContextMenuTrigger>
+            <ContextMenuForCampaignForCampaignTab
+              item={updatedItem}
+              onEdit={() => console.log("Edit:", item)}
+              onMonitor={() => console.log("Monitor:", item)}
+              onHandleCampaignCopy={onHandleCampaignCopy}
+              tenantIdForCampaignTab={item.tenantId}
+            >
+              <></>
+            </ContextMenuForCampaignForCampaignTab>
+          </ContextMenu>
+        );
+      }
     }
   };
 

@@ -463,8 +463,14 @@ const CachedTab = ({ tabId, params, campaignId, campaignName, isVisible }: Cache
     height: '100%'
   };
 
+  console.log("params ????? ", params);
+  
+
   // 각 탭 ID에 맞는 컴포넌트 렌더링
   const renderTabContent = () => {
+
+    console.log("params ??? ", params);
+
     switch (tabId) {
       case 1:
         return <CampaignGroupManager
@@ -494,7 +500,8 @@ const CachedTab = ({ tabId, params, campaignId, campaignName, isVisible }: Cache
       case 12:
         return <PreferencesBoard />;
       case 13:
-        return <NewCampaignManager tenantId={params?.tenantId} />;
+        return <div>hi</div>
+        // return <NewCampaignManager tenantId={params?.tenantId} is_new={params?.is_new}/>;
       case 14:
         return <StatusCampaign />;
       case 20:

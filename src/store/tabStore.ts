@@ -356,6 +356,46 @@ export const useTabStore = create<TabLayoutStore>()(
         // ------------------------
         // 새 탭 열기
         // ------------------------
+        // addTab: (tab) =>
+        //   set((state) => {
+        //     const isAlreadyOpened = state.openedTabs.some(
+        //       (t) => t.id === tab.id && t.uniqueKey === tab.uniqueKey
+        //     );
+        //     if (isAlreadyOpened) {
+        //       return state;
+        //     }
+
+        //     const newOpenedTabs = [...state.openedTabs, tab];
+
+        //     const [firstRow] = state.rows;
+        //     if (!firstRow) return state;
+        //     const [firstSection] = firstRow.sections;
+        //     if (!firstSection) return state;
+
+        //     const updatedSection = {
+        //       ...firstSection,
+        //       tabs: [...firstSection.tabs, tab],
+        //       activeTabKey: tab.uniqueKey,
+        //     };
+
+        //     const updatedSections = adjustSectionWidths(
+        //       firstRow.sections.map((sec) =>
+        //         sec.id === firstSection.id ? updatedSection : sec
+        //       )
+        //     );
+
+        //     const updatedRow = { ...firstRow, sections: updatedSections };
+        //     const newRows = state.rows.map((row) =>
+        //       row.id === firstRow.id ? updatedRow : row
+        //     );
+
+        //     return {
+        //       ...state,
+        //       openedTabs: newOpenedTabs,
+        //       rows: newRows,
+        //     };
+        //   }),
+
         addTab: (tab) =>
           set((state) => {
             const isAlreadyOpened = state.openedTabs.some(
@@ -365,7 +405,13 @@ export const useTabStore = create<TabLayoutStore>()(
               return state;
             }
 
-            const newOpenedTabs = [...state.openedTabs, tab];
+            // 만약 params가 undefined라면 빈 객체로 초기화
+            const tabWithParams = {
+              ...tab,
+              params: tab.params || {}
+            };
+
+            const newOpenedTabs = [...state.openedTabs, tabWithParams];
 
             const [firstRow] = state.rows;
             if (!firstRow) return state;
@@ -374,8 +420,8 @@ export const useTabStore = create<TabLayoutStore>()(
 
             const updatedSection = {
               ...firstSection,
-              tabs: [...firstSection.tabs, tab],
-              activeTabKey: tab.uniqueKey,
+              tabs: [...firstSection.tabs, tabWithParams],
+              activeTabKey: tabWithParams.uniqueKey,
             };
 
             const updatedSections = adjustSectionWidths(
@@ -393,6 +439,8 @@ export const useTabStore = create<TabLayoutStore>()(
               ...state,
               openedTabs: newOpenedTabs,
               rows: newRows,
+              activeTabId: tabWithParams.id,
+              activeTabKey: tabWithParams.uniqueKey,
             };
           }),
 
@@ -552,11 +600,11 @@ export const useTabStore = create<TabLayoutStore>()(
 
         addOnlyTab: (tab: TabItem, matchFn: (t: TabItem) => boolean) => {
           const state = get();
-        
+
           // 1. Find the active section based on activeTabKey
           let activeRowId = null;
           let activeSectionId = null;
-        
+
           // Find which section contains the active tab
           for (const row of state.rows) {
             for (const section of row.sections) {
@@ -565,7 +613,7 @@ export const useTabStore = create<TabLayoutStore>()(
                 activeSectionId = section.id;
                 break;
               }
-        
+
               // If no section has activeTabKey matching global activeTabKey,
               // check if any section contains the tab with the active key
               if (!activeRowId && section.tabs.some(t => t.uniqueKey === state.activeTabKey)) {
@@ -576,7 +624,7 @@ export const useTabStore = create<TabLayoutStore>()(
             }
             if (activeRowId) break;
           }
-        
+
           // If no active section found, default to first section
           if (!activeRowId || !activeSectionId) {
             if (state.rows.length > 0 && state.rows[0].sections.length > 0) {
@@ -589,51 +637,51 @@ export const useTabStore = create<TabLayoutStore>()(
               return;
             }
           }
-        
+
           // 2. Remove tabs matching criteria (similar to original addOnlyTab)
           state.openedTabs
             .filter(matchFn)
             .forEach(t => {
               state.removeTab(t.id, t.uniqueKey);
             });
-        
+
           // 3. Add the tab to the active section and make it the only active tab
           set((state) => {
             // Find the active section again after removing tabs
             const row = state.rows.find(r => r.id === activeRowId);
             if (!row) return state;
-        
+
             const activeSection = row.sections.find(s => s.id === activeSectionId);
             if (!activeSection) return state;
-        
+
             // Add tab to openedTabs if not already there
             const tabExists = state.openedTabs.some(t =>
               t.id === tab.id && t.uniqueKey === tab.uniqueKey
             );
-        
+
             const newOpenedTabs = tabExists
               ? state.openedTabs
               : [...state.openedTabs, tab];
-        
+
             // Add tab to the active section and make it the active tab
             const updatedRows = state.rows.map(r => {
               if (r.id !== activeRowId) return r;
-        
+
               return {
                 ...r,
                 sections: r.sections.map(s => {
                   if (s.id !== activeSectionId) return s;
-        
+
                   // Check if tab already exists in this section
                   const tabExistsInSection = s.tabs.some(t =>
                     t.id === tab.id && t.uniqueKey === tab.uniqueKey
                   );
-        
+
                   // If not, add it
                   const newTabs = tabExistsInSection
                     ? s.tabs
                     : [...s.tabs, tab];
-        
+
                   // Always set this tab as active
                   return {
                     ...s,
@@ -643,7 +691,7 @@ export const useTabStore = create<TabLayoutStore>()(
                 })
               };
             });
-        
+
             // Update global active state to the new tab
             return {
               ...state,
@@ -654,7 +702,7 @@ export const useTabStore = create<TabLayoutStore>()(
             };
           });
         },
-        
+
         removeTab: (tabId, uniqueKey) =>
           set((state) => {
             // 1. 먼저 제거된 탭이 활성화된 탭인지 확인

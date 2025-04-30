@@ -8,7 +8,8 @@ import { useTabStore } from "@/store/tabStore";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
-import { useAuthStore } from "@/store";
+import { useAuthStore, useCampainManagerStore } from "@/store";
+import { toast } from "react-toastify";
 
 export interface FolderContextMenuProps {
   item: {
@@ -18,9 +19,10 @@ export interface FolderContextMenuProps {
 }
 
 export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
-  const { addTab, openedTabs, setActiveTab , removeExistingTabsByTabId} = useTabStore();
-  const { selectedMenus, toggleMenu , } = useTreeMenuStore(); // 통합 스토어 사용
+  const { addTab, openedTabs, setActiveTab, removeExistingTabsByTabId } = useTabStore();
+  const { selectedMenus, toggleMenu, } = useTreeMenuStore(); // 통합 스토어 사용
   const { availableCampaignTenantContextMenuIds } = useAvailableMenuStore(); // 권한 있는 메뉴 ID 가져오기
+  const {setIsAlreadyOpend} = useCampainManagerStore();
 
   const { tenant_id, role_id, session_key } = useAuthStore();
 
@@ -42,10 +44,11 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
       handler: () => {
         const tenantId = item.id;
         const newKey = `13-${Date.now()}`;
-    
+        // toast.success("새 캠페인 탭을 추가합니다.");
         // 💡 새로 추가한 메서드 사용!
         removeExistingTabsByTabId(13);
-    
+        // toast.success("새 캠페인 탭을 추가합니다.");
+
         addTab({
           id: 13,
           uniqueKey: newKey,
@@ -53,13 +56,15 @@ export const FolderContextMenu = ({ item }: FolderContextMenuProps) => {
           icon: "",
           href: "",
           content: null,
-          params: { tenantId },
+          params: {
+            tenantId,
+          },
         });
-    
+        setIsAlreadyOpend(false);
         setActiveTab(13, newKey);
       },
     },
-      
+
     {
       id: 22,
       menuId: 16,

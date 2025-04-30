@@ -14,6 +14,8 @@ import CampaignManager from "@/app/main/comp/CampaignManager";
 import CreateCampaignFormPanel from "./CreateCampaignFormPanel";
 
 export const renderTabContent = (tabId: number | null) => {
+  console.log("renderTabContent tabId : ", tabId);
+
   switch (tabId) {
     case 1:
       return <CampaignGroupManager />;
