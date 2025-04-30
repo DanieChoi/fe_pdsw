@@ -116,9 +116,8 @@ interface ProgressRow {
 
 const ListManager: React.FC = () => {
   const router = useRouter();
-  const { campaigns,listManagerFileFormatRows,setListManagerFileFormatRows } = useMainStore();
+  const { campaigns,listManagerFileFormatRows,setListManagerFileFormatRows,listManagerDelimiter,setListManagerDelimiter } = useMainStore();
   const { activeTabId, openedTabs } = useTabStore();
-  const [delimiter, setDelimiter] = useState<string>('');
   const [_callListInsertData, setCallListInsertData] = useState<CallingListInsertRequest>(callListInsertData);
   const [fileFormat,setFileFormat ] = useState<string>('excel');
   const [deleteData, setDeleteData] = useState(true);  // 기존 캠페인 데이터 삭제.
@@ -332,7 +331,7 @@ const ListManager: React.FC = () => {
   //파일포맷설정 확인 이벤트.
   const handleFileFormatConfirm = (data:FormatRowData) => {
     setIsFileFormatOpen(false);
-    setDelimiter(data.delimiter);
+    setListManagerDelimiter(data.delimiter);
     setOriginaldataYn(data.originDataSaveYn);
     // setHeaderColumnData(data.datalist);
     setListManagerFileFormatRows(data.datalist);
@@ -506,7 +505,7 @@ const ListManager: React.FC = () => {
                     TKDA: '',
                   };
                   //길이체크인 경우 
-                  if( delimiter === '' ){
+                  if( listManagerDelimiter === '' ){
                     for(let k=0;k<headerColumnData.length;k++){
                       const key = headerColumnData[k].field as keyof SendRow;
                       // if (key in tempData) {
@@ -537,7 +536,7 @@ const ListManager: React.FC = () => {
                     
                     //구분자인 경우
                   }else{ 
-                    const row = tempdata[i].split(delimiter) as unknown[];
+                    const row = tempdata[i].split(listManagerDelimiter) as unknown[];
                     if( row.length > 0){
                       let _length = row.length;
                       if( _length > sendColumns.length){
@@ -665,7 +664,7 @@ const ListManager: React.FC = () => {
   const handleFileRowClick = ({ row }: CellClickArgs<FileRow>) => {
     setSelectedFile(row);
     setSelectedFileName(row.fileName);
-    setTargetType(row.campaignId.startsWith('G') ? 'general' : 'blacklist');
+    // setTargetType(row.campaignId.startsWith('G') ? 'general' : 'blacklist');
     setFileSendList(sendList.filter(data=>data.fileId === row.id));
   };
 
@@ -1065,6 +1064,7 @@ const ListManager: React.FC = () => {
        <FileFormat 
         isOpen={isFileFormatOpen}
         _formatRows={listManagerFileFormatRows}
+        _listManagerDelimiter={listManagerDelimiter}
         onConfirm={handleFileFormatConfirm}
         onClose={handleFileFormatClose}
       />

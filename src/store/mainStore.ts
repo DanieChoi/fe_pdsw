@@ -73,6 +73,7 @@ interface MainState {
   sendingStatusCampaignId: string;
   listManagerFileFormatRows: FormatRow[];
   sseInputMessage: string;
+  listManagerDelimiter: string;
 }
 
 interface MainActions {
@@ -86,6 +87,7 @@ interface MainActions {
   setSendingStatusCampaignId: (sendingStatusCampaignId:string) => void;
   setListManagerFileFormatRows: (listManagerFileFormatRows:FormatRow[]) => void;
   setSseInputMessage: (sseInputMessage:string) => void;
+  setListManagerDelimiter: (listManagerDelimiter:string) => void;
 }
 
 type MainStore = MainState & MainActions;
@@ -101,6 +103,7 @@ export const useMainStore = create<MainStore>((set) => ({
   sendingStatusCampaignId: '',
   listManagerFileFormatRows: [],
   sseInputMessage: '',
+  listManagerDelimiter: '',
   
   setCampaigns: (campaigns) => set({ campaigns }),
   setTenants: (tenants) => set({ tenants }),
@@ -114,4 +117,5 @@ export const useMainStore = create<MainStore>((set) => ({
   setSseInputMessage: (sseInputMessage) => {set({ sseInputMessage });  campaignChannel.postMessage({
     type: sseInputMessage,
     });},
+  setListManagerDelimiter: (listManagerDelimiter) => set({ listManagerDelimiter }),
 }));
