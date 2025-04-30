@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { useApiForCallingNumberDelete } from '@/features/campaignManager/hooks/useApiForCallingNumberDelete';
 import OnlyNumberInput from '@/components/shared/OnlyNumberInput';
+import { useOperationStore } from '../store/OperationStore';
 
 type GridRow = MainDataResponse & {
   calling_number: string;
@@ -39,6 +40,7 @@ function CampaignLayout() {
   const [selectedCallingNumber, setSelectedCallingNumber] = useState('');
   const [isNewMode, setIsNewMode] = useState(false); 
 
+  const { operationCampaignId, setOperationCampaignId, operationCampaignName, setOperationCampaignName } = useOperationStore();
   const router = useRouter();
 
   const [alertState, setAlertState] = useState({
@@ -218,6 +220,14 @@ function CampaignLayout() {
 
     window.addEventListener('keydown', handleKeyDown);
 
+    // 캠페인 조회 아이디를 유지하는 조건문
+    if(operationCampaignId !== null && operationCampaignId &&
+      operationCampaignName !== null && operationCampaignName
+     ){
+      setSelectedCampaignId(operationCampaignId.toString());
+      setSelectedCampaignName(operationCampaignName);
+    }
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
@@ -310,6 +320,8 @@ function CampaignLayout() {
     setSelectedCampaignId(args.row.campaign_id.toString());
     setSelectedCampaignName(args.row.campaign_name);
     setSelectedCallingNumber(args.row.calling_number || '');
+    setOperationCampaignName(args.row.campaign_name);
+    setOperationCampaignId(args.row.campaign_id);
     setIsNewMode(false); // 그리드 선택 시 신규 모드 해제
   };
 
@@ -320,21 +332,33 @@ function CampaignLayout() {
   // 모달에서 캠페인 선택 시 호출되는 핸들러
   // 캠페인 아이디와 이름을 받아서 상태 업데이트 및 발신번호 조회
   const handleModalSelect = (campaignId: string, campaignName: string) => {
+    const campaignIdNum = Number(campaignId);
+  
+    // 선택한 캠페인 정보 찾기
+    const campaign = campaigns.find(c => c.campaign_id === campaignIdNum);
+    if (!campaign) {
+      return;
+    }
+  
+    const callingNumber =
+      callingNumbers.find(num => num.campaign_id === campaignIdNum)?.calling_number || '';
+  
+    const campaignWithCallingNumber: GridRow = {
+      ...campaign,
+      calling_number: callingNumber,
+    };
+  
+    // 상태 업데이트
     setSelectedCampaignId(campaignId);
     setSelectedCampaignName(campaignName);
-    const campaignIdNum = Number(campaignId);
-    updateCallingNumber(campaignIdNum);
-    
-    const campaign = campaigns.find(c => c.campaign_id === campaignIdNum);
-    if (campaign) {
-      const campaignWithCallingNumber: GridRow = {
-        ...campaign,
-        calling_number: callingNumbers.find(num => num.campaign_id === campaign.campaign_id)?.calling_number || ''
-      };
-      setSelectedRow(campaignWithCallingNumber);
-      setSelectedCampaign(campaign);
-    }
+    setSelectedCallingNumber(callingNumber);
+    setSelectedRow(campaignWithCallingNumber);
+    setSelectedCampaign(campaign);
+  
+    // 모달 닫기
+    setIsModalOpen(false);
   };
+  
 
   // 발신번호 저장 버튼 핸들러
   const handleSave = () => {
@@ -475,7 +499,7 @@ function CampaignLayout() {
             </CommonButton>
             <CustomInput 
               type="text" 
-              value={selectedCampaignName} 
+              value={selectedCampaignName}
               readOnly 
               disabled={isCampaignFieldDisabled()}
               className=""
@@ -521,7 +545,9 @@ function CampaignLayout() {
       {/* Campaign Modal */}
       <CampaignModal 
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+        }}
         onSelect={handleModalSelect}
       />
       <CustomAlert

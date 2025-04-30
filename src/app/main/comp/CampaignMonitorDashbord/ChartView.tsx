@@ -151,7 +151,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
                 <Label>미발신</Label>
               </TableHeader>
               <TableCell className="text-center text-sm">
-                {(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-failCnt-(selectedCall?.recallCnt || 0)}
+                {(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-(selectedCall?.nogdeleteGL || 0)}
               </TableCell>
               <TableHeader className="w-[120px]">
                 <Label>상담결과 예약</Label>
@@ -206,7 +206,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
             </div>
           </div>
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-center">미발신 : {(selectedCall?.totLstCnt || 0)-(selectedCall?.scct || 0)-failCnt-(selectedCall?.recallCnt || 0)}</p>
+            <p className="text-sm text-center">미발신 : {(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-(selectedCall?.nogdeleteGL || 0)}</p>
             <div className="relative">
               <PieChart width={260} height={250}>
                 <Pie

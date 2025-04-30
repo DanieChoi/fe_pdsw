@@ -147,6 +147,10 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     //     session_key: session_key,
     //     tenant_id: tenant_id,
     //   });
+    }else{
+      setHeaderInit(true);
+      setMasterCampaignId(campaign_id.toString());
+      
     }
   };
 
