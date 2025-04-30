@@ -410,16 +410,22 @@ export default function Footer({
     else if (announce === '/pds/campaign/status') {
       if (command === 'UPDATE') {
         let _start_flag = '';
-        if (data['campaign_status'] === '1') {
+        let _end_flag = '';
+        if (data['campaign_status'] === 1) {
           _start_flag = '시작';
-        } else if (data['campaign_status'] === '2') {
+        } else if (data['campaign_status'] === 2) {
           _start_flag = '멈춤';
-        } else if (data['campaign_status'] === '3') {
+        } else if (data['campaign_status'] === 3) {
           _start_flag = '중지';
+        }
+        if( data['campaign_end_flag'] === 1){
+          _end_flag = '진행중';
+        }else if( data['campaign_end_flag'] === 2){
+          _end_flag = '완료';
         }
 
         // 푸터 로그 메시지
-        _message = '[캠페인 동작상태 변경] 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: 진행중';
+        _message = '[캠페인 동작상태 변경] 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: '+_end_flag;
 
         // 토스트 알림 표시 (한번만 표시)
         if (useAlramPopup === 1) {
