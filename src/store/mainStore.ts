@@ -40,6 +40,7 @@
 // src/features/store/mainStore.ts
 import { create } from 'zustand';
 import { MainDataResponse, TenantListDataResponse } from '../features/auth/types/mainIndex';
+import { campaignChannel } from '@/lib/broadcastChannel';
 
 // Define the DataProps type for selectedCampaignRow
 export interface DataProps {
@@ -110,5 +111,7 @@ export const useMainStore = create<MainStore>((set) => ({
   setReBroadcastType: (reBroadcastType) => set({ reBroadcastType }),
   setSendingStatusCampaignId: (sendingStatusCampaignId) => set({ sendingStatusCampaignId }),
   setListManagerFileFormatRows: (listManagerFileFormatRows) => set({ listManagerFileFormatRows }),
-  setSseInputMessage: (sseInputMessage) => set({ sseInputMessage }),
+  setSseInputMessage: (sseInputMessage) => {set({ sseInputMessage });  campaignChannel.postMessage({
+    type: sseInputMessage,
+    });},
 }));

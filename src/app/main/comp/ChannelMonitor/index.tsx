@@ -54,7 +54,12 @@ const secondModeSender = [
   {key:'5', name: 'system preview'}
 ];
 
-const ChannelMonitor: React.FC = () => {
+interface ChannelMonitorProps {
+  init?: boolean; 
+  onInit?:(init:boolean) => void;
+}
+
+const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
   const [firstSelect, setFirstSelect] = useState<FilterMode>('전체');
   const [secondSelect, setSecondSelect] = useState<string>('');
   const [thirdSelect, setThirdSelect] = useState<string>('상태전체');
@@ -235,17 +240,18 @@ const ChannelMonitor: React.FC = () => {
   }, [sseInputMessage]);
 
   useEffect(() => {   
+    if( init ){
+      fetchDialingDeviceList({
+          tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+      }); 
+      onInit?.(false);
+    }   
+  }, [init]);
+
+  useEffect(() => {   
     fetchDialingDeviceList({
         tenant_id_array: tenants.map(tenant => tenant.tenant_id)
-    });     
-    // if( statisticsUpdateCycle > 0 ){        
-    //   const interval = setInterval(() => {  
-    //     fetchDialingDeviceList({
-    //         tenant_id_array: tenants.map(tenant => tenant.tenant_id)
-    //     });     
-    //   }, statisticsUpdateCycle * 1000);  
-    //   return () => clearInterval(interval);
-    // }
+    });    
   }, []);
 
   return (
