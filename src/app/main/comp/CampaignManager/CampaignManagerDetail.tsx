@@ -1593,7 +1593,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
 
   // 예약콜 제한건수설정 버튼 이벤트
   const handleReservedCall = () => {
-    const existingTabs = openedTabs.filter(tab => tab.id === 8);
+    const existingTabs = openedTabs.filter(tab => tab.id === 8 || tab.id === 9 || tab.id === 11);
+    // 한 탭으로 유지하기
     existingTabs.forEach(tab => {
       removeTab(tab.id, tab.uniqueKey);
     });
@@ -1615,7 +1616,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
 
   // 분배호수 제한설정 버튼 이벤트
   const handleMaxCall = () => {
-    const existingTabs = openedTabs.filter(tab => tab.id === 9);
+    const existingTabs = openedTabs.filter(tab => tab.id === 8 || tab.id === 9 || tab.id === 11);
     existingTabs.forEach(tab => {
       removeTab(tab.id, tab.uniqueKey);
     });

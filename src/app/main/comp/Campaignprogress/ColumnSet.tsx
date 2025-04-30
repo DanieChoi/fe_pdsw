@@ -13,6 +13,7 @@ export interface ColumnSettingItem {
   key: string;
   name: string;
   renderCell?: any;
+  width?: number;
 }
 
 const HeaderColumn : ColumnSettingItem[] = [
@@ -65,7 +66,7 @@ const HeaderColumn : ColumnSettingItem[] = [
 ];
 
 export const defaultColumnsData: ColumnSettingItem[] = [
-  { key: 'strFlag', name: '발신구분',renderCell: ({ row }: { row: { level?: number,strFlag?: string } }) => (row.level === 3 ? row.strFlag : '')},
+  { key: 'strFlag', name: '발신구분', width: 100,renderCell: ({ row }: { row: { level?: number,strFlag?: string } }) => (row.level === 3 ? row.strFlag : '')},
   { key: 'startFlag', name: '시작구분'},
   { key: 'endFlag', name: '완료구분'},
   { key: 'progressRate', name: '진행률(%)',renderCell: ({ row }: { row: { level?: number,progressRate?: number } }) => (row.level === 3 ? `${row.progressRate}%` : '')},
@@ -97,7 +98,7 @@ const ColumnSet: React.FC<ColumnSetProps> = ({ isOpen, onConfirm, onClose, colum
   const [selectedLeftKey, setSelectedLeftKey] = useState<string | null>(null);
   const [selectedRightIndex, setSelectedRightIndex] = useState<number | null>(null);
   
-  console.log("선택 상태:", { selectedLeftKey, selectedRightIndex });
+  // console.log("선택 상태:", { selectedLeftKey, selectedRightIndex });
 
   // 초기 데이터 설정
   useEffect(() => {

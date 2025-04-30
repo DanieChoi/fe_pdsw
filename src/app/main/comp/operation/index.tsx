@@ -217,7 +217,13 @@ export default function OperationBoard({ uniqueKey }: OperationBoardProps) {
 
   // 컴포넌트 마운트 시 초기 섹션 설정
   useEffect(() => {
-    if (activeTabId) {
+
+    if(lastActiveTabId){
+      // 다른 탭 다녀왔을때 유지용
+      
+      setLocalOpenSectionId(lastActiveTabId.toString());
+    }
+    else if (activeTabId) {
       // 탭이 처음 열릴 때 자동으로 해당 아코디언 메뉴 열기
       setActiveTab(activeTabId);
       
@@ -225,6 +231,16 @@ export default function OperationBoard({ uniqueKey }: OperationBoardProps) {
       setLocalOpenSectionId(openSectionId);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  
+  useEffect(() => {
+    if (activeTabId === 8) {
+      setLocalOpenSectionId('section3');
+      setActiveTab(activeTabId);
+    } else if (activeTabId === 9) {
+      setLocalOpenSectionId('section4');
+      setActiveTab(activeTabId);
+    }
+  }, [activeTabId]);
 
   // 전역 상태 변경 감지하여 로컬 상태 동기화
   useEffect(() => {
