@@ -116,6 +116,7 @@ const MonitorPage = () => {
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
   const router = useRouter();
   const [modifiedCampaign, setModifiedCampaign] = useState<string>('');
+  const [channelMonitorInit, setChannelMonitorInit ] = useState<boolean>(false);
 
   // 크기 조정 상태
   const [sizes, setSizes] = useState<Sizes>({
@@ -498,6 +499,10 @@ const MonitorPage = () => {
     };
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
+  const handleChannelMonitorInit = (init: boolean) => {
+    setChannelMonitorInit(init);
+  };
+
 
   // 드래그 위치 바꾸는 함수들
 
@@ -538,7 +543,7 @@ const MonitorPage = () => {
           tenantId={campaigns.find(c => c.campaign_id === Number(selectedCampaign))?.tenant_id + ''}
         />;
       case 'channel-monitor':
-        return <ChannelMonitor />;
+        return <ChannelMonitor init={channelMonitorInit} onInit={handleChannelMonitorInit}/>;
       case 'campaign-progress':
         return <CampaignMonitorDashbord campaignId={selectedCampaign} />;
       default:
@@ -802,8 +807,9 @@ const MonitorPage = () => {
         fetchSkills({
             tenant_id_array: tempTenantIdArray
         });
-      }
-      else{
+      }else if( type === 'channel:' ){
+        setChannelMonitorInit(true);
+      }else if( typeof campaignId != 'undefined'){
         setModifiedCampaign(campaignId);        
       }
       fetchMain({
