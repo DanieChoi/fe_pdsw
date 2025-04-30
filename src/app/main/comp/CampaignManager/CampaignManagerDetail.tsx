@@ -292,7 +292,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const [rtnMessage, setRtnMessage] = useState<string>('');
   const { tenants, setCampaigns, selectedCampaign, setSelectedCampaign, setReBroadcastType } = useMainStore();
   const { id: user_id, tenant_id, menu_role_id, session_key } = useAuthStore();
-  const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab, campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
+  const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab, campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu, moveTabToSection, rows } = useTabStore();
   const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers
     , setNewCampaignManagerInfo, setNewCampaignInfo , setNewTenantId, setNewCampaignSchedule
    } = useCampainManagerStore();
@@ -1599,7 +1599,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       removeTab(tab.id, tab.uniqueKey);
     });
     const newTabKey = `8-${Date.now()}`;
-    addTab({
+
+    const newTab = {
       id: 8,
       campaignId: campaignId + '',
       campaignName: tempCampaignInfo.campaign_name,
@@ -1608,7 +1609,17 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       icon: '/header-menu/예약콜제한설정.svg',
       href: '/reserve',
       content: null,
-    });
+    };
+
+    addTab(newTab);
+
+    const sectionId =
+        rows[0].sections.find(sec =>
+          sec.tabs.some(t => t.id === 8 || t.id === 9 || t.id === 11)
+        )?.id ?? rows[0].sections[0].id;
+
+    moveTabToSection(newTab.id, rows[0].id, sectionId, newTabKey);
+
     setTimeout(function () {
       setActiveTab(8, newTabKey);
     }, 50);
@@ -1621,7 +1632,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       removeTab(tab.id, tab.uniqueKey);
     });
     const newTabKey = `9-${Date.now()}`;
-    addTab({
+
+    const newTab = {
       id: 9,
       campaignId: campaignId + '',
       campaignName: tempCampaignInfo.campaign_name,
@@ -1630,10 +1642,24 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       icon: '/header-menu/분배호수제한설정.svg',
       href: '/distribute',
       content: null,
-    });
+    };
+
+    addTab(newTab);
+
+    // 탭에 운영설정 관련 메뉴가 잇는지 확인 (없다면 default-1 있으면 section-1)
+    const sectionId =
+        rows[0].sections.find(sec =>
+          sec.tabs.some(t => t.id === 8 || t.id === 9 || t.id === 11)
+        )?.id ?? rows[0].sections[0].id;
+
+    // console.log('sectionId : ',sectionId);
+
+    moveTabToSection(newTab.id, rows[0].id, sectionId, newTabKey);
+
     setTimeout(function () {
       setActiveTab(9, newTabKey);
     }, 50);
+
   };
 
   // 재발신 버튼 이벤트

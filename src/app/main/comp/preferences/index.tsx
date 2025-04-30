@@ -364,8 +364,19 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                     <CustomInput
                       type="number"
                       value={refreshCycle}
-                      onChange={(e) => setRefreshCycle(e.target.value)}
+                      onChange={(e) => {
+                          const value = e.target.value;
+                          const numericValue = Number(value);
+                      
+                          if (value === '') {
+                            setRefreshCycle('');
+                          } else if (!isNaN(numericValue)) {
+                            setRefreshCycle(Math.min(numericValue, 100).toString());
+                          }
+                        }
+                      }
                       className="w-20"
+                      max={100}
                     />
                     <span className="text-sm">일(day)</span>
                   </div>
@@ -410,8 +421,19 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                     <CustomInput
                       type="number"
                       value={retryCount}
-                      onChange={(e) => setRetryCount(e.target.value)}
+                      onChange={(e) => {
+                          const value = e.target.value;
+                          const numericValue = Number(value);
+                      
+                          if (value === '') {
+                            setRetryCount('');
+                          } else if (!isNaN(numericValue)) {
+                            setRetryCount(Math.min(numericValue, 60).toString());
+                          }
+                        }
+                      }
                       className="w-20"
+                      max={60}
                     />
                     <span className="text-sm">초(sec)</span>
                   </div>
@@ -429,8 +451,19 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                     <CustomInput
                       type="number"
                       value={timeout}
-                      onChange={(e) => setCustomTimeout(e.target.value)}
+                      onChange={(e) => {
+                          const value = e.target.value;
+                          const numericValue = Number(value);
+                      
+                          if (value === '') {
+                            setCustomTimeout('');
+                          } else if (!isNaN(numericValue)) {
+                            setCustomTimeout(Math.min(numericValue, 100).toString());
+                          }
+                        }
+                      }
                       className="w-20"
+                      max={100}
                     />
                     <span className="text-sm">초(sec)</span>
                   </div>
