@@ -166,32 +166,32 @@ const CampaignAddPopup: React.FC<Props> = ({
   useEffect(() => {
     // 데이터 로그 추가
     console.log("스킬-캠페인 매핑 원본 데이터:", data);
-    
+
     if (data?.result_data) {
       const skillMap: Record<number, SkillWithCampaigns> = {};
-      
+
       // 모든 스킬 ID를 먼저 초기화
       if (skillListData?.result_data) {
         skillListData.result_data.forEach(skill => {
-          skillMap[skill.skill_id] = { 
-            skillId: skill.skill_id, 
-            campaigns: [] 
+          skillMap[skill.skill_id] = {
+            skillId: skill.skill_id,
+            campaigns: []
           };
         });
       }
-      
+
       // 캠페인-스킬 매핑 처리
       data.result_data.forEach(campaign => {
         // skill_id가 배열이거나 단일 값인 경우 모두 처리
-        const skillIds = Array.isArray(campaign.skill_id) 
-          ? campaign.skill_id 
+        const skillIds = Array.isArray(campaign.skill_id)
+          ? campaign.skill_id
           : (campaign.skill_id ? [campaign.skill_id] : []);
-        
+
         skillIds.forEach(skillId => {
           if (!skillMap[skillId]) {
             skillMap[skillId] = { skillId, campaigns: [] };
           }
-          
+
           // 이미 추가된 캠페인은 중복 추가하지 않음
           if (!skillMap[skillId].campaigns.some(c => c.campaignId === campaign.campaign_id)) {
             skillMap[skillId].campaigns.push({
@@ -201,7 +201,7 @@ const CampaignAddPopup: React.FC<Props> = ({
           }
         });
       });
-      
+
       const skillArray = Object.values(skillMap).sort((a, b) => a.skillId - b.skillId);
       console.log("가공된 스킬-캠페인 데이터:", skillArray);
       setSkillsWithCampaigns(skillArray);
@@ -229,6 +229,9 @@ const CampaignAddPopup: React.FC<Props> = ({
   const groupCampaignsData = useMemo(() => {
     return (groupData?.result_data || []).filter(item => item.group_id === groupId);
   }, [groupData, groupId]);
+
+  console.log("groupCampaignsData :::::::::::::::::::::::::::::: ", groupCampaignsData);
+
 
   // 현재 그룹에 이미 존재하는 캠페인 ID들의 Set
   const existingCampaignIds = useMemo(() => {
@@ -592,6 +595,7 @@ const CampaignAddPopup: React.FC<Props> = ({
                       getCampaignName={getCampaignName}
                       getSkillName={getSkillName}
                       setExpandedSkills={setExpandedSkills}
+                      existingCampaignIds={Array.from(existingCampaignIds).map(id => String(id))}
                     />
                   </div>
                 </div>

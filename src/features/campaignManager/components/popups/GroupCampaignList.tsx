@@ -22,6 +22,9 @@ const GroupCampaignList: React.FC<Props> = ({
   toggleAllGroupCampaigns
 }) => {
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
+
+  console.log("groupCampaigns :: ", groupCampaigns);
+  
   
   // 초기에 모든 캠페인 선택 상태 제거 (새로 선택 가능하도록)
   useEffect(() => {
