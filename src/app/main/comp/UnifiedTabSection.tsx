@@ -45,7 +45,7 @@ const UnifiedTabSection = ({
       style={{ width: `${width}%` }}
     >
       {/* 섹션 전체 컨테이너 - 세로 방향으로 탭과 콘텐츠 배치 */}
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full gap-5">
         {/* 탭 헤더 영역 */}
         <TabHeader
           rowId={rowId}
@@ -58,7 +58,7 @@ const UnifiedTabSection = ({
         />
 
         {/* 콘텐츠 영역 - 탭 헤더 아래에 배치 */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden ">
           <SectionContent
             rowId={rowId}
             sectionId={sectionId}
