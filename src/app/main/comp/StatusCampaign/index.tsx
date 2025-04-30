@@ -131,13 +131,13 @@ const StatusCampaign: React.FC = () => {
       });
 
       setCampaignInfoList(flat);
-      setMaxDispatchCount(maxReuse);
-      setDispatchTypeList(
-        Array.from({ length: maxReuse }, (_, i) => ({
-          dispatch_id: i,
-          dispatch_name: i === 0 ? "최초발신" : `${i}차재발신`,
-        }))
-      );
+      // setMaxDispatchCount(maxReuse);
+      // setDispatchTypeList(
+      //   Array.from({ length: maxReuse }, (_, i) => ({
+      //     dispatch_id: i,
+      //     dispatch_name: i === 0 ? "최초발신" : `${i}차재발신`,
+      //   }))
+      // );
     }
   }, [progressData]);
 
@@ -171,6 +171,32 @@ const StatusCampaign: React.FC = () => {
     });
 
     setChartData(processedData);
+
+    let maxReuse = 0;
+    if( filtered.length > 0 ){
+      for( let i=0;i<filtered.length;i++){
+        const reuse = progressData?.find(data=>data.campaign_id === filtered[i].campaign_id)?.progressInfoList.length||0;
+        if( maxReuse < reuse ){
+          maxReuse = reuse;
+        }
+      }
+      setDispatchTypeList(
+        Array.from({ length: maxReuse }, (_, i) => ({
+          dispatch_id: i,
+          dispatch_name: i === 0 ? "최초발신" : `${i}차재발신`,
+        }))
+      );
+    }else{
+      setDispatchTypeList([
+        {
+          dispatch_id: 0,
+          dispatch_name: "최초발신"
+        }
+      ]);
+      setSelectedDispatch('0');
+    }
+    setMaxDispatchCount(maxReuse);
+    
   };
 
   const handleSkillChange = (value: string) => {
