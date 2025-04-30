@@ -163,7 +163,7 @@ export default function Header() {
       // 5) 탭 활성화 및 운영설정 스토어 업데이트
       setActiveTab(item.id, newTabKey);
       useOperationStore.getState().setActiveTab(item.id);
-      setCampaignIdForUpdateFromSideMenu(null);
+      // setCampaignIdForUpdateFromSideMenu(null);
       return;
     }
 
@@ -183,7 +183,7 @@ export default function Header() {
       setActiveTab(item.id, newTabKey);
     }
 
-    setCampaignIdForUpdateFromSideMenu(null);
+    // setCampaignIdForUpdateFromSideMenu(null);
   };
 
 

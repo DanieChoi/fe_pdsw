@@ -222,20 +222,21 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
         const selectedCampaign = campaigns.find(c => c.campaign_id === filteredCampaigns[0].campaign_id);
         setSelectedCampaign(selectedCampaign ?? null);
         setSelectedCampaignRow(tempData.filter(data => data.campaignId === filteredCampaigns[0].campaign_id)[0]);
-        setCampaignIdForUpdateFromSideMenu(filteredCampaigns[0].campaign_id.toString());
+        // setCampaignIdForUpdateFromSideMenu(filteredCampaigns[0].campaign_id.toString());
         if (onRowClick) {
           onRowClick(filteredCampaigns[0].campaign_id.toString());
         }
       }
-    } else if (tempData.length > 0 && filteredCampaigns.length > 0) {
-      const selectedCampaign = campaigns.find(c => c.campaign_id === tempData[0].campaignId);
-      setSelectedCampaign(selectedCampaign ?? null);
-      setSelectedCampaignRow(tempData[0]);
-      setCampaignIdForUpdateFromSideMenu(filteredCampaigns[0].campaign_id.toString());
-      if (onRowClick) {
-        onRowClick(tempData[0].campaignId.toString());
-      }
-    }
+    } 
+    // else if (tempData.length > 0 && filteredCampaigns.length > 0) {
+    //   const selectedCampaign = campaigns.find(c => c.campaign_id === tempData[0].campaignId);
+    //   setSelectedCampaign(selectedCampaign ?? null);
+    //   setSelectedCampaignRow(tempData[0]);
+    //   setCampaignIdForUpdateFromSideMenu(filteredCampaigns[0].campaign_id.toString());
+    //   if (onRowClick) {
+    //     onRowClick(tempData[0].campaignId.toString());
+    //   }
+    // }
 
   }, [tempData, filteredCampaigns, campaignId]);
 
