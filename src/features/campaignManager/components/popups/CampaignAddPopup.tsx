@@ -230,9 +230,6 @@ const CampaignAddPopup: React.FC<Props> = ({
     return (groupData?.result_data || []).filter(item => item.group_id === groupId);
   }, [groupData, groupId]);
 
-  console.log("groupCampaignsData :::::::::::::::::::::::::::::: ", groupCampaignsData);
-
-
   // 현재 그룹에 이미 존재하는 캠페인 ID들의 Set
   const existingCampaignIds = useMemo(() => {
     return new Set(groupCampaignsData.map(item => item.campaign_id));

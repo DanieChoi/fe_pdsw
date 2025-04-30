@@ -53,11 +53,12 @@ const errorMessage: CustomAlertRequest = {
 interface FileFormatProps {
   isOpen: boolean;
   _formatRows: FormatRow[];
+  _listManagerDelimiter: string;
   onConfirm: (data: FormatRowData) => void;
   onClose: () => void;
 }
 
-const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose, _formatRows }) => {
+const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose, _formatRows,_listManagerDelimiter }) => {
   const [delimiter, setDelimiter] = useState<string>(',');
   const [originaldataYn, setOriginaldataYn] = useState<boolean>(true);
   const [tabValue, setTabValue] = useState("format-field");
@@ -414,9 +415,16 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose, _for
   
   useEffect(() => {
     if ( _formatRows.length > 0 ) {
-      setFormatRows(_formatRows);
+      if( _listManagerDelimiter === ''){
+        setFormatRows(_formatRows);
+        setTabValue('format-field');
+      }else{
+        setPositionRows(_formatRows);
+        setTabValue('format-position');
+        setDelimiter(_listManagerDelimiter);
+      }
     }
-  }, [_formatRows]);   
+  }, [_formatRows,_listManagerDelimiter]);   
  
   const modalContent = (
     <div className="w-full">
