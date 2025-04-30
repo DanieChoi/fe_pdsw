@@ -73,6 +73,7 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
   const memoizedRows = useMemo(() => campaignGroupList || [], [campaignGroupList]);
   const memoizedDownDataRows = useMemo(() => groupCampaignListData || [], [groupCampaignListData]);
   const [selectedGroupRow, setSelectedGroupRow] = useState<DataProps | null>(null);
+  const [selectedCampaignRow, setSelectedCampaignRow] = useState<downDataProps | null>(null);
     
   // 캠페인 소속 상담사 리스트 요청
   const { mutate: fetchCampaignAgents } = useApiForCampaignAgent({
@@ -153,6 +154,7 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
   };
   const handleDownCellClick = ({ row }: CellClickArgs<downDataProps>) => {
     onCampaignSelect(row.campaignId.toString());
+    setSelectedCampaignRow(row);
   };
 
   const handleSelectedRowsChange = (newSelection: Set<number>) => {
@@ -166,6 +168,10 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
 
   const getGroupRowClass = (row: DataProps) => {
     return selectedGroupRow?.campaignGroupId === row.campaignGroupId ? 'bg-[#FFFAEE]' : '';
+  };
+
+  const getGroupDownRowClass = (row: downDataProps) => {
+    return selectedCampaignRow?.campaignId === row.campaignId ? 'bg-[#FFFAEE]' : '';
   };
 
   return (
@@ -197,6 +203,7 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
             onSelectedRowsChange={handleSelectedRowsChange}
             rowHeight={30}
             headerRowHeight={30}
+            rowClass={getGroupDownRowClass}
             onCellClick={handleDownCellClick}
             />
         </div>
