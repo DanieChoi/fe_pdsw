@@ -48,6 +48,8 @@ export function AddCampaignGroupDialog({
   const { tenants } = useMainStore();
   const [alertState, setAlertState] = useState(errorMessage);
   const router = useRouter();
+  const [isValidated, setIsValidated] = useState(false);
+  const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
 
   // 다이얼로그가 열릴 때마다 폼 초기화
   useEffect(() => {
@@ -182,6 +184,35 @@ export function AddCampaignGroupDialog({
     }
   };
 
+  const handleCheckDuplicate = () => {
+    if (!groupId.trim()) return false;
+
+    setIsCheckingDuplicate(true);
+    
+    if( campaignGroupList.filter((group) => group.campaignGroupId === Number(groupId)).length > 0 ){
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '이미 존재하는 그룹입니다.',
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+      });
+      setIsValidated(false);
+    } else {
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '사용 가능한 그룹 ID입니다.',
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+      });
+      setIsValidated(true);
+      // toast.success("사용 가능한 그룹 ID입니다.");
+    }
+    setIsCheckingDuplicate(false);
+    return false;
+  };
+
   return (
     <CommonDialogForSideMenu
       isOpen={isOpen}
@@ -213,12 +244,24 @@ export function AddCampaignGroupDialog({
             <CustomInput 
               type="number" 
               value={groupId}
-              onChange={(e) => setGroupId(e.target.value)}      
+              onChange={(e) => {
+                setGroupId(e.target.value);
+                setIsValidated(false);
+              }}      
               placeholder="그룹 아이디를 입력해 주세요."     
               className="" 
               min="0" 
               onBlur={handleBlur}
             />
+            <Button
+              type="button"
+              onClick={handleCheckDuplicate}
+              disabled={!groupId.trim() || isCheckingDuplicate}
+              className="rounded-l-none"
+              onPointerDown={stopPropagation}
+            >
+              {isCheckingDuplicate ? "확인중..." : isValidated ? "✓ 확인됨" : "중복 확인"}
+            </Button>
           </div>
 
           {/* 그룹명 */}
