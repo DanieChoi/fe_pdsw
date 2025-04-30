@@ -646,9 +646,9 @@ const CampaignAddPopup: React.FC<Props> = ({
               </div>
             </div>
             <div className="flex justify-end space-x-2 mt-6">
-              <CommonButton onClick={handleConfirm}>
+              {/* <CommonButton onClick={handleConfirm}>
                 확인
-              </CommonButton>
+              </CommonButton> */}
               <CommonButton variant="outline" onClick={onClose}>
                 닫기
               </CommonButton>

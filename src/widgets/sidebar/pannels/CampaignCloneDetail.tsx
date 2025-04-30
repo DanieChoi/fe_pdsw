@@ -295,6 +295,7 @@ export default function CampaignDetail() {
   const { environmentData } = useEnvironmentStore();
   const [ officeStartTime , setOfficeStartTime ] = useState<string>('0000');
   const [ officeEndTime, setOfficeEndTime ] = useState<string>('0000');
+  const [ inputCampaignId, setInputCampaignId ] = useState<string>('');
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
@@ -458,16 +459,29 @@ export default function CampaignDetail() {
 
   //input data change
   const handleInputData = (value: any, col: string) => {
-    if (col === 'campaign_id' && value !== '' && value.length <= 10) {
-      const numValue = Number(value);
-      setTempCampaignsInfo({
-          ...tempCampaignInfo,
-          campaign_id: numValue
-      });
-      setTempCampaignManagerInfo({
-          ...tempCampaignManagerInfo,
-          campaign_id: numValue
-      });
+    if (col === 'campaign_id' ) {
+      if( value !== '' && value.length <= 10 && Number(value) >= 0 ){
+        const numValue = Number(value);
+        setInputCampaignId(value);
+        setTempCampaignsInfo({
+            ...tempCampaignInfo,
+            campaign_id: numValue
+        });
+        setTempCampaignManagerInfo({
+            ...tempCampaignManagerInfo,
+            campaign_id: numValue
+        });
+      }else if( value === '' ){
+        setInputCampaignId('');
+        setTempCampaignsInfo({
+            ...tempCampaignInfo,
+            campaign_id: 0
+        });
+        setTempCampaignManagerInfo({
+            ...tempCampaignManagerInfo,
+            campaign_id: 0
+        });
+      }
     }
     if (col === 'campaign_name') {
       setTempCampaignsInfo({
@@ -1032,10 +1046,9 @@ export default function CampaignDetail() {
             <Label className="w-[5.6rem] min-w-[5.6rem]">캠페인 아이디</Label>
             <CustomInput 
               type="number" 
-              value={tempCampaignInfo.campaign_id } 
+              value={ inputCampaignId } 
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}            
               className="" 
-              min="0" 
               maxLength={10}
             />
           </div>
