@@ -341,19 +341,33 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
   const { environmentData } = useEnvironmentStore();
   const [ officeStartTime , setOfficeStartTime ] = useState<string>('0000');
   const [ officeEndTime, setOfficeEndTime ] = useState<string>('0000');
+  const [ inputCampaignId, setInputCampaignId ] = useState<string>('');
 
   //input data change
   const handleInputData = (value:any, col:string) => {
-    if( col === 'campaign_id' && value.length <= 10 ){
-      const numValue = Number(value);
-      setNewCampaignInfo({
-          ...newCampaignInfo,
-          campaign_id: numValue
-      });
-      setNewCampaignManagerInfo({
-          ...newCampaignManagerInfo,
-          campaign_id: numValue
-      });
+    if( col === 'campaign_id' ){
+      if( value !== '' && value.length <= 10 && Number(value) >= 0 ){
+        const numValue = Number(value);
+        setInputCampaignId(value);
+        setNewCampaignInfo({
+            ...newCampaignInfo,
+            campaign_id: numValue
+        });
+        setNewCampaignManagerInfo({
+            ...newCampaignManagerInfo,
+            campaign_id: numValue
+        });
+      }else if( value === '' ){
+        setInputCampaignId('');
+        setNewCampaignInfo({
+            ...newCampaignInfo,
+            campaign_id: 0
+        });
+        setNewCampaignManagerInfo({
+            ...newCampaignManagerInfo,
+            campaign_id: 0
+        });
+      }
     }    
     if( col === 'campaign_name' ){
       setNewCampaignInfo({
@@ -981,7 +995,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({tenantId}: Props) => {
           <div className='flex items-center gap-2'>
             <Label className="w-[90px] min-w-[90px]">캠페인 아이디</Label>
             <CustomInput 
-              type="text" 
+              type="number" 
               value={newCampaignInfo.campaign_id || ''} 
               onChange={e => {
                 // 숫자만 반영

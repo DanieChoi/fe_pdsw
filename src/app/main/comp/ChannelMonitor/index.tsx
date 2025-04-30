@@ -61,7 +61,7 @@ const ChannelMonitor: React.FC = () => {
   const [channelData, setChannelData] = useState<ChannelData[]>([]);
   const [filteredData, setFilteredData] = useState<ChannelData[]>([]);
   const { statisticsUpdateCycle } = useEnvironmentStore();
-  const { tenants, campaigns } = useMainStore();
+  const { tenants, campaigns, sseInputMessage, setSseInputMessage } = useMainStore();
   const [ secondModeEquipment, setSecondModeEquipment ] = useState<ItemType[]>([]);
   const [ secondModeCampaign, setSecondModeCampaign ] = useState<ItemType[]>([]);
   const [ secondModeCampaignGroup, setSecondModeCampaignGroup ] = useState<ItemType[]>([]);
@@ -223,23 +223,30 @@ const ChannelMonitor: React.FC = () => {
           }  
         }
       }
-  });
+  });  
+
+  useEffect(() => {  
+    if( sseInputMessage != '' && sseInputMessage.indexOf('channel') > -1){
+      fetchDialingDeviceList({
+          tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+      }); 
+      setSseInputMessage('');
+    } 
+  }, [sseInputMessage]);
 
   useEffect(() => {   
     fetchDialingDeviceList({
         tenant_id_array: tenants.map(tenant => tenant.tenant_id)
     });     
-    // fetchChannelStateMonitoringList({deviceId:0});
-    if( statisticsUpdateCycle > 0 ){        
-      const interval = setInterval(() => {  
-        fetchDialingDeviceList({
-            tenant_id_array: tenants.map(tenant => tenant.tenant_id)
-        });     
-        // fetchChannelStateMonitoringList({deviceId:0});
-      }, statisticsUpdateCycle * 1000);  
-      return () => clearInterval(interval);
-    }
-  }, [statisticsUpdateCycle]);
+    // if( statisticsUpdateCycle > 0 ){        
+    //   const interval = setInterval(() => {  
+    //     fetchDialingDeviceList({
+    //         tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+    //     });     
+    //   }, statisticsUpdateCycle * 1000);  
+    //   return () => clearInterval(interval);
+    // }
+  }, []);
 
   return (
     <div className="h-full">
