@@ -49,6 +49,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { campaignChannel } from '@/lib/broadcastChannel';
 import { useEnvironmentStore } from "@/store/environmentStore";
+import { CampaignInfoInsertRequest } from '@/features/campaignManager/hooks/useApiForCampaignManagerInsert';
 
 export interface TabItem {
   id: number;
@@ -292,7 +293,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const { tenants, setCampaigns, selectedCampaign, setSelectedCampaign, setReBroadcastType } = useMainStore();
   const { id: user_id, tenant_id, menu_role_id, session_key } = useAuthStore();
   const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab, campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
-  const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
+  const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers
+    , setNewCampaignManagerInfo, setNewCampaignInfo , setNewTenantId, setNewCampaignSchedule
+   } = useCampainManagerStore();
   const [inputSkills, setInputSkills] = useState('');
   const [inputCallingNumber, setInputCallingNumber] = useState('');
   const [skillPopupState, setSkillPopupState] = useState({
@@ -1529,6 +1532,10 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
 
   // 새 캠페인 버튼 이벤트
   const handleNewCampaign = () => {
+    setNewCampaignManagerInfo({} as CampaignInfoInsertRequest);
+    setNewCampaignInfo({} as MainDataResponse);
+    setNewTenantId('');
+    setNewCampaignSchedule({} as CampaignScheDuleListDataResponse);
     const existingTabs = openedTabs.filter(tab => tab.id === 13);
     existingTabs.forEach(tab => {
       removeTab(tab.id, tab.uniqueKey);
