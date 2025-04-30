@@ -374,6 +374,7 @@ const EditDescription = () => {
                 onChange={(e) => setInputPhone1(e.target.value)}
                 className="w-full"
                 disabled={isFieldDisabled()}
+                maxLength={20}
             />
             </div>
             
@@ -385,6 +386,7 @@ const EditDescription = () => {
                 onChange={(e) => setInputPhone2(e.target.value)}
                 className="w-full"
                 disabled={isFieldDisabled()}
+                maxLength={20}
             />
             </div>
             
@@ -396,6 +398,7 @@ const EditDescription = () => {
                 onChange={(e) => setInputPhone3(e.target.value)}
                 className="w-full"
                 disabled={isFieldDisabled()}
+                maxLength={20}
             />
             </div>
 
@@ -407,6 +410,7 @@ const EditDescription = () => {
                 onChange={(e) => setInputPhone4(e.target.value)}
                 className="w-full"
                 disabled={isFieldDisabled()}
+                maxLength={20}
             />
             </div>
 
@@ -418,6 +422,7 @@ const EditDescription = () => {
                 onChange={(e) => setInputPhone5(e.target.value)}
                 className="w-full"
                 disabled={isFieldDisabled()}
+                maxLength={20}
             />
             </div>
 

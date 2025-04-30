@@ -344,25 +344,24 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId, is_new }: Props) 
   const [tempCampaignId, setTempCampaignId] = useState<number>(0);
   const { id, menu_role_id, session_key, tenant_id } = useAuthStore();
   const { environmentData } = useEnvironmentStore();
-  const [officeStartTime, setOfficeStartTime] = useState<string>('0000');
-  const [officeEndTime, setOfficeEndTime] = useState<string>('0000');
-  const hasInitialized = useRef(false);
-  // const [isNew, setIsNew] = useState<boolean>(isAlreadyOpend || false);
+  const [ officeStartTime , setOfficeStartTime ] = useState<string>('0000');
+  const [ officeEndTime, setOfficeEndTime ] = useState<string>('0000');
+  const hasInitialized = useRef<boolean>(false);
 
   //input data change
-  const handleInputData = (value: any, col: string) => {
-    if (col === 'campaign_id' && value.length <= 10) {
+  const handleInputData = (value:any, col:string) => {
+    if( col === 'campaign_id' && value.length <= 10 ){
       const numValue = Number(value);
       setNewCampaignInfo({
-        ...newCampaignInfo,
-        campaign_id: numValue
+          ...newCampaignInfo,
+          campaign_id: numValue
       });
       setNewCampaignManagerInfo({
-        ...newCampaignManagerInfo,
-        campaign_id: numValue
+          ...newCampaignManagerInfo,
+          campaign_id: numValue
       });
-    }
-    if (col === 'campaign_name') {
+    }    
+    if( col === 'campaign_name' ){
       setNewCampaignInfo({
         ...newCampaignInfo,
         campaign_name: value
@@ -1059,9 +1058,9 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId, is_new }: Props) 
         <div className="grid grid-cols-3 gap-x-[24px] gap-y-2">
           <div className='flex items-center gap-2'>
             <Label className="w-[90px] min-w-[90px]">캠페인 아이디</Label>
-            <CustomInput
-              type="text"
-              value={newCampaignInfo.campaign_id || ''}
+            <CustomInput 
+              type="text" 
+              value={newCampaignInfo.campaign_id || ''} 
               onChange={e => {
                 // 숫자만 반영
                 const val = e.target.value.replace(/[^0-9]/g, '');

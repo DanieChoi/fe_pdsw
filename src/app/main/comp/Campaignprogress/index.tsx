@@ -499,8 +499,7 @@ export default function Campaignprogress() {
           , campaignName: campaigns[selectedCampaignIdIndex].campaign_name
           , progressRate: item.totLstCnt === 0 ? 0 : parseFloat(((item.nonTTCT / item.totLstCnt) * 100).toFixed(1))
           , successRateList: item.totLstCnt === 0 ? 0 : parseFloat(((item.scct / item.totLstCnt) * 100).toFixed(1))
-          , nonSendCount: item.totLstCnt - item.scct - item.recallCnt - (item.buct + item.fact + item.tect + item.customerOnHookCnt + item.dialToneSilence + item.nact
-            + item.etct + item.lineStopCnt + item.detectSilenceCnt + item.acct) //미발신 건수.
+          , nonSendCount: item.totLstCnt - item.nonTTCT - item.nogdeleteGL //미발신 건수.
           , successRateSend: item.scct === 0 ? 0 : parseFloat(((item.scct / item.totDialCnt) * 100).toFixed(1))
           , dialAttemptCnt: item.firstCall
           , failSendCount: item.buct + item.fact + item.tect + item.customerOnHookCnt + item.dialToneSilence + item.nact
@@ -513,6 +512,7 @@ export default function Campaignprogress() {
       } else {
         const tempData: DispatchStatusDataType = {
           ...initDispatchStatusData
+          , strFlag : '최초발신'
           , tenantId: campaigns[selectedCampaignIdIndex].tenant_id
           , campId: campaigns[selectedCampaignIdIndex].campaign_id
           , startFlag: campaigns[selectedCampaignIdIndex].start_flag === 1 ? '시작' : campaigns[selectedCampaignIdIndex].start_flag === 2 ? '멈춤' : '중지'

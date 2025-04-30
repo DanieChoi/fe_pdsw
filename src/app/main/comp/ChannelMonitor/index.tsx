@@ -54,14 +54,19 @@ const secondModeSender = [
   {key:'5', name: 'system preview'}
 ];
 
-const ChannelMonitor: React.FC = () => {
+interface ChannelMonitorProps {
+  init?: boolean; 
+  onInit?:(init:boolean) => void;
+}
+
+const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
   const [firstSelect, setFirstSelect] = useState<FilterMode>('전체');
   const [secondSelect, setSecondSelect] = useState<string>('');
   const [thirdSelect, setThirdSelect] = useState<string>('상태전체');
   const [channelData, setChannelData] = useState<ChannelData[]>([]);
   const [filteredData, setFilteredData] = useState<ChannelData[]>([]);
   const { statisticsUpdateCycle } = useEnvironmentStore();
-  const { tenants, campaigns } = useMainStore();
+  const { tenants, campaigns, sseInputMessage, setSseInputMessage } = useMainStore();
   const [ secondModeEquipment, setSecondModeEquipment ] = useState<ItemType[]>([]);
   const [ secondModeCampaign, setSecondModeCampaign ] = useState<ItemType[]>([]);
   const [ secondModeCampaignGroup, setSecondModeCampaignGroup ] = useState<ItemType[]>([]);
@@ -223,23 +228,31 @@ const ChannelMonitor: React.FC = () => {
           }  
         }
       }
-  });
+  });  
+
+  useEffect(() => {  
+    if( sseInputMessage != '' && sseInputMessage.indexOf('channel') > -1){
+      fetchDialingDeviceList({
+          tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+      }); 
+      setSseInputMessage('');
+    } 
+  }, [sseInputMessage]);
+
+  useEffect(() => {   
+    if( init ){
+      fetchDialingDeviceList({
+          tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+      }); 
+      onInit?.(false);
+    }   
+  }, [init]);
 
   useEffect(() => {   
     fetchDialingDeviceList({
         tenant_id_array: tenants.map(tenant => tenant.tenant_id)
-    });     
-    // fetchChannelStateMonitoringList({deviceId:0});
-    if( statisticsUpdateCycle > 0 ){        
-      const interval = setInterval(() => {  
-        fetchDialingDeviceList({
-            tenant_id_array: tenants.map(tenant => tenant.tenant_id)
-        });     
-        // fetchChannelStateMonitoringList({deviceId:0});
-      }, statisticsUpdateCycle * 1000);  
-      return () => clearInterval(interval);
-    }
-  }, [statisticsUpdateCycle]);
+    });    
+  }, []);
 
   return (
     <div className="h-full">

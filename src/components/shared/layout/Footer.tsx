@@ -43,7 +43,7 @@ export default function Footer({
   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
   const [currentHeight, setCurrentHeight] = useState(footerHeight);
   const { id, tenant_id, role_id } = useAuthStore();
-  const { campaigns, setCampaigns } = useMainStore();
+  const { campaigns, setCampaigns, setSseInputMessage } = useMainStore();
   const { useAlramPopup } = useEnvironmentStore();
   const [isResizing, setIsResizing] = useState(false);
   const [isHeightToggled, setIsHeightToggled] = useState(false);
@@ -556,7 +556,7 @@ export default function Footer({
       } else if (data['assign_kind'] === 3) {
         _message = _message + '채널그룹으로 할당';
       }
-
+      setSseInputMessage('channel:');
       addMessageToFooterList(_time, _type, _message);
     }
     //에약콜 제한 설정

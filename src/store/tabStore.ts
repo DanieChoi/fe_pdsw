@@ -7,6 +7,7 @@ import React from "react";
 import { menuItems } from "@/widgets/header/model/menuItems";
 import { simulateMenuClick } from "@/widgets/header/utils";
 import { contextMenuItems } from "@/widgets/header/model/contextMenuItems";
+import { useOperationStore } from "@/app/main/comp/operation/store/OperationStore";
 
 export interface TabItem {
   id: number;
@@ -707,6 +708,11 @@ export const useTabStore = create<TabLayoutStore>()(
           set((state) => {
             // 1. 먼저 제거된 탭이 활성화된 탭인지 확인
             const isRemovingActiveTab = state.activeTabKey === uniqueKey;
+
+            // tabIdr가 운영설정인 경우 clearOperationCampaign 호출
+            if (tabId === 8 || tabId === 9 || tabId === 11) { // 
+              useOperationStore.getState().clearOperationCampaign();
+            }
 
             // 2. 탭 제거 후 남아있는 탭 목록 생성
             const newTabs = state.openedTabs.filter(

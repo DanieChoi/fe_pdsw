@@ -40,6 +40,7 @@
 // src/features/store/mainStore.ts
 import { create } from 'zustand';
 import { MainDataResponse, TenantListDataResponse } from '../features/auth/types/mainIndex';
+import { campaignChannel } from '@/lib/broadcastChannel';
 
 // Define the DataProps type for selectedCampaignRow
 export interface DataProps {
@@ -71,6 +72,7 @@ interface MainState {
   reBroadcastType: string;
   sendingStatusCampaignId: string;
   listManagerFileFormatRows: FormatRow[];
+  sseInputMessage: string;
 }
 
 interface MainActions {
@@ -83,6 +85,7 @@ interface MainActions {
   setReBroadcastType: (reBroadcastType:string) => void;
   setSendingStatusCampaignId: (sendingStatusCampaignId:string) => void;
   setListManagerFileFormatRows: (listManagerFileFormatRows:FormatRow[]) => void;
+  setSseInputMessage: (sseInputMessage:string) => void;
 }
 
 type MainStore = MainState & MainActions;
@@ -97,6 +100,7 @@ export const useMainStore = create<MainStore>((set) => ({
   reBroadcastType: '',
   sendingStatusCampaignId: '',
   listManagerFileFormatRows: [],
+  sseInputMessage: '',
   
   setCampaigns: (campaigns) => set({ campaigns }),
   setTenants: (tenants) => set({ tenants }),
@@ -107,4 +111,7 @@ export const useMainStore = create<MainStore>((set) => ({
   setReBroadcastType: (reBroadcastType) => set({ reBroadcastType }),
   setSendingStatusCampaignId: (sendingStatusCampaignId) => set({ sendingStatusCampaignId }),
   setListManagerFileFormatRows: (listManagerFileFormatRows) => set({ listManagerFileFormatRows }),
+  setSseInputMessage: (sseInputMessage) => {set({ sseInputMessage });  campaignChannel.postMessage({
+    type: sseInputMessage,
+    });},
 }));
