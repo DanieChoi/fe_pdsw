@@ -7,7 +7,9 @@ import { Play, Pause, StopCircle, AlertCircle, CheckCircle, Info, FileText, Arro
 interface CampaignInfo {
   name: string;
   status: number;
+  campaign_id?: string;
 }
+
 interface ConfirmProps {
   open: boolean;
   actionKey: "start" | "complete" | "stop" | "";

@@ -1,113 +1,40 @@
 "use client";
 
-import React from "react";
-import CustomAlert from "@/components/shared/layout/CustomAlert";
-import { Play, CheckCircle, Info, FileText, AlertCircle, CheckSquare, XCircle, ArrowRight } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Play, Loader2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
-interface CampaignInfo {
-  name: string;
-  status: number;
+interface Campaign {
+  campaign_id?: string | number;
+  name?: string;
+  status?: number;
+  [key: string]: any;
 }
 
 interface Props {
   open: boolean;
-  items: CampaignInfo[];
-  onConfirm: () => void;
+  items: Campaign[];
+  onConfirm: () => Promise<any>;
   onCancel: () => void;
 }
 
-const statusText = (flag?: number) => {
-  switch (flag) {
-    case 1:
-      return {
-        label: "시작",
-        icon: <Play className="h-4 w-4" />,
-        color: "text-emerald-600",
-        bgColor: "bg-white",
-      };
-    case 2:
-      return {
-        label: "멈춤",
-        icon: <Play className="h-4 w-4" />,
-        color: "text-gray-600",
-        bgColor: "bg-white",
-      };
-    case 3:
-      return {
-        label: "중지",
-        icon: <Play className="h-4 w-4" />,
-        color: "text-rose-600",
-        bgColor: "bg-white",
-      };
-    default:
-      return {
-        label: "알수없음",
-        icon: null,
-        color: "text-gray-400",
-        bgColor: "bg-white"
-      };
-  }
-};
+interface CampaignResult {
+  campaignId: string;
+  success: boolean;
+  response?: {
+    result_code: number;
+    result_msg: string;
+    reason_code: number;
+  };
+}
 
-// 유효성 검사 결과 메시지 (실제 로직에 맞게 수정 필요)
-const getValidationResult = (campaignInfo: CampaignInfo, validationType: number) => {
-  // 이미 실행 중인 캠페인은 모든 유효성 검사를 통과한 것으로 가정
-  if (campaignInfo.status === 1) {
-    return {
-      passed: true,
-      message: "통과",
-      icon: <CheckCircle className="h-4 w-4 text-emerald-500" />,
-      color: "text-emerald-500"
-    };
-  }
-
-  // 유효성 검사 유형별 결과 (예시)
-  switch (validationType) {
-    case 1: // 유효성검사1 - 상담사 배정 여부
-      return Math.random() > 0.2 ? {
-        passed: true,
-        message: "통과",
-        icon: <CheckCircle className="h-4 w-4 text-emerald-500" />,
-        color: "text-emerald-500"
-      } : {
-        passed: false,
-        message: "상담사 미배정",
-        icon: <XCircle className="h-4 w-4 text-amber-500" />,
-        color: "text-amber-500"
-      };
-    case 2: // 유효성검사2 - 스크립트 설정
-      return Math.random() > 0.15 ? {
-        passed: true,
-        message: "통과",
-        icon: <CheckCircle className="h-4 w-4 text-emerald-500" />,
-        color: "text-emerald-500"
-      } : {
-        passed: false,
-        message: "스크립트 누락",
-        icon: <XCircle className="h-4 w-4 text-amber-500" />,
-        color: "text-amber-500"
-      };
-    case 3: // 유효성검사3 - 고객 데이터 설정
-      return Math.random() > 0.1 ? {
-        passed: true,
-        message: "통과",
-        icon: <CheckCircle className="h-4 w-4 text-emerald-500" />,
-        color: "text-emerald-500"
-      } : {
-        passed: false,
-        message: "데이터 누락",
-        icon: <XCircle className="h-4 w-4 text-rose-500" />,
-        color: "text-rose-500"
-      };
-    default:
-      return {
-        passed: true,
-        message: "확인 필요",
-        icon: <Info className="h-4 w-4 text-blue-500" />,
-        color: "text-blue-500"
-      };
-  }
-};
+interface UpdateResult {
+  success: boolean;
+  message?: string;
+  totalCount?: number;
+  successCount?: number;
+  failCount?: number;
+  results?: CampaignResult[];
+}
 
 const IConfirmPopupForMultiUpdateCampaignProgressToStart = ({
   open,
@@ -115,181 +42,336 @@ const IConfirmPopupForMultiUpdateCampaignProgressToStart = ({
   onConfirm,
   onCancel,
 }: Props) => {
-  // 이미 실행 중인 캠페인과 그렇지 않은 캠페인 분류
-  const alreadyRunningCampaigns = items.filter(item => item.status === 1);
-  const notRunningCampaigns = items.filter(item => item.status !== 1);
+  // 상태 관리
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateCompleted, setUpdateCompleted] = useState(false);
+  const [updateResult, setUpdateResult] = useState<UpdateResult | null>(null);
+  const [campaignResults, setCampaignResults] = useState<Map<string, CampaignResult>>(new Map());
   
-  // 최대 10개만 미리보기, 나머지는 ... 처리
-  const previewItems = items.slice(0, 10);
-  const moreCount = items.length - previewItems.length;
+  // 강제 표시 방식: 한번 열리면 내부에서 닫기 버튼 클릭 전까지 절대 닫히지 않음
+  const [internalOpen, setInternalOpen] = useState(false);
+  
+  // 컴포넌트 초기화 시 또는 open prop이 true로 바뀔 때만 모달 열기
+  useEffect(() => {
+    if (open) {
+      setInternalOpen(true);
+      // 결과 초기화
+      setCampaignResults(new Map());
+      setUpdateResult(null);
+      setUpdateCompleted(false);
+    }
+    // open이 false가 되어도 internalOpen은 변경하지 않음
+  }, [open]);
+
+  // 배경 클릭 방지
+  const stopPropagation = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  // 업데이트 함수
+  const handleUpdate = async (e: React.MouseEvent) => {
+    // 이벤트 전파 중단
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (isUpdating) return;
+    setIsUpdating(true);
+    
+    try {
+      console.log("API 호출 시작");
+      const result = await onConfirm();
+      console.log("API 호출 완료, 결과 처리 시작:", result);
+      
+      // 결과 처리 - result_code가 -1인 경우 실패로 간주
+      if (result && result.results && Array.isArray(result.results)) {
+        // 결과 처리를 위한 수정된 데이터
+        let successCount = 0;
+        let failCount = 0;
+        
+        // 결과 배열을 수정하여 result_code를 기반으로 success 상태를 업데이트
+        const updatedResults = result.results.map((item: CampaignResult) => {
+          // result_code가 -1이면 실패로 처리
+          const isSuccess = !(item.response && item.response.result_code === -1);
+          
+          if (isSuccess) {
+            successCount++;
+          } else {
+            failCount++;
+          }
+          
+          return {
+            ...item,
+            success: isSuccess
+          };
+        });
+        
+        // 업데이트된 결과로 상태 업데이트
+        const updatedResult = {
+          ...result,
+          results: updatedResults,
+          successCount: successCount,
+          failCount: failCount,
+          totalCount: updatedResults.length
+        };
+        
+        setUpdateResult(updatedResult);
+        
+        // 결과 맵 생성
+        const resultMap = new Map<string, CampaignResult>();
+        updatedResults.forEach((item: CampaignResult) => {
+          if (item && item.campaignId) {
+            resultMap.set(item.campaignId.toString(), item);
+          }
+        });
+        setCampaignResults(resultMap);
+      } else {
+        // 결과가 형식에 맞지 않는 경우
+        setUpdateResult({
+          success: false,
+          message: "응답 형식이 올바르지 않습니다.",
+          totalCount: 0,
+          successCount: 0,
+          failCount: 0
+        });
+      }
+      
+      setUpdateCompleted(true);
+      console.log("업데이트 완료, 결과 표시됨");
+    } catch (error) {
+      console.error("업데이트 오류:", error);
+      setUpdateResult({
+        success: false,
+        message: error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.",
+        totalCount: 0,
+        successCount: 0,
+        failCount: 0
+      });
+      setUpdateCompleted(true);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // 닫기 함수 (명시적인 닫기 버튼 클릭 시에만 호출)
+  const handleCancel = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    // 업데이트 중이면 무시
+    if (isUpdating) {
+      return;
+    }
+    
+    // 내부 상태를 먼저 변경하여 렌더링 사이클 분리
+    setInternalOpen(false);
+    
+    // 약간의 지연 후 부모 컴포넌트에 닫힘을 알림
+    // 이렇게 하면 모든 상태 변경이 완료된 후 onCancel이 호출됨
+    requestAnimationFrame(() => {
+      onCancel();
+    });
+  };
+
+  // 결과 상태에 따른 스타일 결정
+  const getStatusBadgeStyle = (success: boolean) => {
+    return success
+      ? "bg-green-100 text-green-800 border border-green-200"
+      : "bg-red-100 text-red-800 border border-red-200";
+  };
+
+  // 결과 코드에 따른 메시지
+  const getStatusMessage = (item: CampaignResult | undefined) => {
+    if (!item) return "알 수 없음";
+    
+    if (item.response && item.response.result_msg) {
+      return item.response.result_msg;
+    }
+    
+    return item.success ? "성공" : "실패";
+  };
+
+  // 모달이 닫혀있으면 아무것도 렌더링하지 않음
+  if (!internalOpen) return null;
 
   return (
-    <CustomAlert
-      isOpen={open}
-      title={
-        <div className="flex items-center justify-between w-full py-1 px-1 border-emerald-200">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-full bg-emerald-100">
-              <Play className="h-5 w-5 text-emerald-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold">캠페인 일괄 시작</h3>
-            </div>
+    <div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50" 
+      onClick={stopPropagation}
+      onMouseDown={stopPropagation}
+    >
+      <div 
+        className="bg-white rounded-lg w-full max-w-2xl overflow-hidden shadow-lg" 
+        onClick={stopPropagation}
+        onMouseDown={stopPropagation}
+      >
+        {/* 헤더 */}
+        <div className="bg-[#AAA] px-4 py-2 border-b flex items-center">
+          <div className="p-2 rounded-full bg-emerald-100 mr-3">
+            <Play className="h-5 w-5 text-emerald-600" />
           </div>
+          <h3 className="text-lg font-bold ">캠페인 일괄 시작</h3>
         </div>
-      }
-      type="1"
-      onClose={onConfirm}
-      onCancel={onCancel}
-      width="max-w-2xl"
-      showButtons={true}
-      isShowForCancelButton={true}
-      message={
-        <div className="space-y-5">
-          {/* 유효성 검사 조건 텍스트 설명 */}
+        
+        {/* 본문 */}
+        <div className="p-4 space-y-5">
+          {/* 업데이트 안내 텍스트 */}
           <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-            <h4 className="font-medium text-blue-700 mb-2">유효성 검사 조건</h4>
-            <ul className="space-y-1 text-sm text-gray-700">
-              <li className="flex items-center gap-2">
-                <CheckSquare className="h-4 w-4 text-blue-500" />
-                <span>유효성검사1: 상담사가 1명 이상 배정된 캠페인만 시작할 수 있습니다.</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckSquare className="h-4 w-4 text-blue-500" />
-                <span>유효성검사2: 스크립트가 설정된 캠페인만 시작할 수 있습니다.</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckSquare className="h-4 w-4 text-blue-500" />
-                <span>유효성검사3: 고객 데이터가 업로드된 캠페인만 시작할 수 있습니다.</span>
-              </li>
-            </ul>
-          </div>
-          
-          {/* 캠페인 목록 */}
-          <div className="mx-auto">
-            <div className="mb-2 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-gray-500" />
-                <span className="font-medium text-gray-700">캠페인 목록</span>
-              </div>
-              <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                총 {items.length}개 선택됨
+            <div className="flex items-start">
+              <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
+              <div>
+                <p className="text-sm text-blue-800">
+                  {updateCompleted 
+                    ? "캠페인 일괄 시작 작업이 완료되었습니다."
+                    : "선택하신 캠페인을 일괄적으로 시작 상태로 변경합니다."}
+                </p>
+                {!updateCompleted && (
+                  <p className="mt-1 text-xs text-blue-600">
+                    총 {items.length}개의 캠페인이 선택되었습니다.
+                  </p>
+                )}
+                {updateCompleted && updateResult && (
+                  <div className="mt-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">총 {updateResult.totalCount}개 중</span>
+                      <span className="px-2 py-0.5 rounded bg-green-100 text-green-800 text-xs">
+                        성공: {updateResult.successCount}개
+                      </span>
+                      {updateResult.failCount && updateResult.failCount > 0 && (
+                        <span className="px-2 py-0.5 rounded bg-red-100 text-red-800 text-xs">
+                          실패: {updateResult.failCount}개
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-            <div className="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-              <table className="w-full text-sm divide-y divide-gray-200">
-                <thead>
-                  <tr className="bg-emerald-100 bg-opacity-30">
-                    <th className="px-2 py-3 font-medium text-gray-700 text-center w-8">#</th>
-                    <th className="px-2 py-3 font-medium text-gray-700 text-left">캠페인명</th>
-                    <th className="px-2 py-3 font-medium text-gray-700 text-center">상태 변경</th>
-                    <th className="px-2 py-3 font-medium text-gray-700 text-center">유효성검사1</th>
-                    <th className="px-2 py-3 font-medium text-gray-700 text-center">유효성검사2</th>
-                    <th className="px-2 py-3 font-medium text-gray-700 text-center">유효성검사3</th>
+          </div>
+
+          {/* 상태 요약 정보 */}
+          <div className="mb-4 flex justify-between items-center">
+            <div>
+              <h4 className="text-sm font-medium text-gray-700">
+                {updateCompleted 
+                  ? `작업 결과 (${updateResult?.successCount || 0}/${items.length} 성공)` 
+                  : `선택된 캠페인 (${items.length}개)`}
+              </h4>
+            </div>
+
+            {/* 일괄 시작 진행 버튼 */}
+            {!updateCompleted && (
+              <button
+                onClick={handleUpdate}
+                disabled={isUpdating}
+                className={`px-4 py-2 font-medium rounded-md transition-colors 
+                  ${isUpdating ? 'bg-gray-400' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+              >
+                <div className="flex items-center">
+                  {isUpdating ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Play className="h-4 w-4 mr-2" />
+                  )}
+                  <span>캠페인 일괄 시작 진행</span>
+                </div>
+              </button>
+            )}
+          </div>
+
+          {/* 캠페인 목록 테이블 */}
+          <div className="mx-auto">
+            <div className="border rounded-lg overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      캠페인 정보
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      현재 상태
+                    </th>
+                    {updateCompleted && (
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        결과
+                      </th>
+                    )}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
-                  {previewItems.map((info, idx) => {
-                    const currentStatus = statusText(info.status);
-                    const targetStatus = statusText(1); // 시작 상태로 변경
-                    
-                    // 각 유효성 검사 결과
-                    const validation1 = getValidationResult(info, 1);
-                    const validation2 = getValidationResult(info, 2);
-                    const validation3 = getValidationResult(info, 3);
-                    
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {items.map((item, index) => {
+                    const campaignId = item.campaign_id?.toString() || '';
+                    const result = campaignResults.get(campaignId);
                     return (
-                      <tr key={info.name + idx} className="hover:bg-gray-50 transition-colors duration-150">
-                        <td className="px-2 py-2 text-gray-500 text-center">{idx + 1}</td>
-                        <td className="px-2 py-2 text-gray-700 text-left font-medium">{info.name}</td>
-                        <td className="px-2 py-2">
-                          {info.status !== 1 ? (
-                            <div className="flex items-center justify-center gap-1">
-                              {/* 현재 상태 */}
-                              <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-md ${currentStatus.bgColor} ${currentStatus.color} text-xs font-medium`}>
-                                {currentStatus.icon}
-                                <span>{currentStatus.label}</span>
-                              </div>
-                              
-                              {/* 화살표 */}
-                              <ArrowRight className="h-3 w-3 text-gray-400" />
-                              
-                              {/* 변경될 상태 */}
-                              <div className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white text-emerald-600 text-xs font-medium border border-dashed border-emerald-600">
-                                <Play className="h-3 w-3" />
-                                <span>시작</span>
-                              </div>
+                      <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="px-6 py-2 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="text-sm font-medium text-gray-900">
+                              {item.name}
                             </div>
-                          ) : (
-                            <div className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 text-xs font-medium">
-                              <Info className="h-3 w-3" />
-                              <span>이미 실행 중</span>
+                            <div className="ml-2 text-xs text-gray-500">
+                              ({campaignId})
                             </div>
-                          )}
-                        </td>
-                        <td className="px-2 py-2 text-center">
-                          <div className={`inline-flex items-center gap-1 ${validation1.color}`}>
-                            {validation1.icon}
-                            <span className="text-xs">{validation1.message}</span>
                           </div>
                         </td>
-                        <td className="px-2 py-2 text-center">
-                          <div className={`inline-flex items-center gap-1 ${validation2.color}`}>
-                            {validation2.icon}
-                            <span className="text-xs">{validation2.message}</span>
-                          </div>
+                        <td className="px-6 py-2 whitespace-nowrap">
+                          <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            bg-gray-100 text-gray-800">
+                            {item.status === 1 ? "시작" : item.status === 2 ? "대기" : item.status === 3 ? "중지" : "상태 없음"}
+                          </span>
                         </td>
-                        <td className="px-2 py-2 text-center">
-                          <div className={`inline-flex items-center gap-1 ${validation3.color}`}>
-                            {validation3.icon}
-                            <span className="text-xs">{validation3.message}</span>
-                          </div>
-                        </td>
+                        {updateCompleted && (
+                          <td className="px-6 py-2 whitespace-nowrap">
+                            {result ? (
+                              <div className="flex items-center">
+                                {result.success ? (
+                                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                                ) : (
+                                  <XCircle className="h-4 w-4 text-red-500 mr-2" />
+                                )}
+                                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                  ${getStatusBadgeStyle(result.success)}`}>
+                                  {getStatusMessage(result)}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-gray-400 text-xs">정보 없음</span>
+                            )}
+                          </td>
+                        )}
                       </tr>
                     );
                   })}
-                  {moreCount > 0 && (
-                    <tr className="bg-gray-50">
-                      <td colSpan={6} className="px-4 py-3 text-center text-gray-500 font-medium">
-                        외 {moreCount}개 캠페인이 선택됨
-                      </td>
-                    </tr>
-                  )}
                 </tbody>
               </table>
             </div>
           </div>
-          
+
           {/* 경고 메시지 */}
           <div className="p-3 rounded-lg bg-amber-50 bg-opacity-50 flex items-center gap-3">
             <AlertCircle className="h-5 w-5 text-amber-500" />
-            <p className="text-sm text-gray-700">
-              <span className="font-medium">주의:</span> 캠페인을 시작하면 에이전트에게 즉시 호출이 할당될 수 있습니다.
+            <p className="text-xs text-amber-800">
+              {updateCompleted
+                ? "일괄 처리 작업이 완료되었습니다. 결과를 확인하고 필요한 경우 개별적으로 재시도해 주세요."
+                : "캠페인을 일괄 시작하면 즉시 적용되며, 실행 중인 다른 작업에 영향을 줄 수 있습니다."}
             </p>
           </div>
-          
+
           {/* 버튼 영역 */}
           <div className="flex justify-end items-center space-x-4 pt-2 border-t border-gray-200 mt-4">
             <button
-              onClick={onCancel}
+              onClick={handleCancel}
+              disabled={isUpdating}
               className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
             >
-              취소
-            </button>
-            
-            <button
-              onClick={onConfirm}
-              className="px-5 py-2.5 text-sm font-medium text-white rounded-md transition-colors bg-emerald-600 hover:bg-emerald-700"
-            >
-              <div className="flex items-center">
-                <Play className="h-4 w-4" />
-                <span className="ml-2">일괄 시작 진행</span>
-              </div>
+              {updateCompleted ? "닫기" : "취소"}
             </button>
           </div>
         </div>
-      }
-    />
+      </div>
+    </div>
   );
 };
 

@@ -29,8 +29,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import IConfirmPopupForMultiUpdateCampaignProgress from "../popups/IConfirmPopupForMultiUpdateCampaignProgress";
-import IConfirmPopupForMultiUpdateCampaignProgressToStart from "../popups/IConfirmPopupForMultiUpdateCampaignProgressToStart";
-
+// Portal Provider 사용을 위한 import
+import { usePortal } from "@/features/campaignManager/components/treeMenus/provider/usePortal";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -71,6 +71,9 @@ export function TreeNodeForSideBarCampaignGroupTab({
   onNodeToggle,
   onNodeSelect,
 }: TreeNodeProps) {
+  // Portal Provider 훅 사용
+  const { openStartPopup } = usePortal();
+
   const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
   const [isCampaignAddPopupOpen, setIsCampaignAddPopupOpen] = useState(false);
   const [bulkResultDialog, setBulkResultDialog] = useState<{ open: boolean; title: string; message: React.ReactNode }>({ open: false, title: "", message: "" });
@@ -86,7 +89,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const [isBrowser, setIsBrowser] = useState(false);
 
   const [isBulkUpdatePopupOpen, setIsBulkUpdatePopupOpen] = useState(false);
-  const [isStartPopupOpen, setIsStartPopupOpen] = useState(false);
+  // isStartPopupOpen 상태 제거 - Portal Provider로 관리됨
   const [bulkActionKey, setBulkActionKey] = useState<"start" | "complete" | "stop" | "">("");
 
   useEffect(() => {
@@ -103,14 +106,15 @@ export function TreeNodeForSideBarCampaignGroupTab({
     return [];
   }, [node.type, node.children]);
 
-  // 캠페인 정보 배열 (이름+상태)
+  // 캠페인 정보 배열 (이름+상태+캠페인ID)
   const campaignInfos = useMemo(() => {
     if (node.type === "group" && node.children && Array.isArray(node.children)) {
       return node.children
         .filter(child => child.type === "campaign")
         .map(child => ({
           name: child.name,
-          status: typeof child.start_flag === "number" ? child.start_flag : 0 // undefined 방지
+          status: typeof child.start_flag === "number" ? child.start_flag : 0, // undefined 방지
+          campaign_id: child.campaign_id?.toString()
         }));
     }
     return [];
@@ -147,17 +151,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
     }
   }, [node, hasChildren, isExpanded]);
 
-  // const handleClick = useCallback(() => {
-  //   onNodeSelect(node.id);
-  //   if (hasChildren) {
-  //     onNodeToggle(node.id);
-  //   }
-  //   setSelectedNodeId(node.id);
-  //   if (node.type === "campaign") {
-  //     setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
-  //   }
-  // }, [node.id, node.type, hasChildren, onNodeSelect, onNodeToggle, setSelectedNodeId]);
-
   const handleClick = useCallback(() => {
     onNodeSelect(node.id);          // ← store.set(selectedNodeId)
     if (hasChildren) {
@@ -166,7 +159,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     if (node.type === "campaign") {
       setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
     }
-  }, [onNodeToggle, node]);
+  }, [onNodeToggle, node, onNodeSelect, hasChildren, setCampaignIdForUpdateFromSideMenu]);
 
 
   const handleContextMenuEvent = (e: React.MouseEvent) => {
@@ -227,56 +220,78 @@ export function TreeNodeForSideBarCampaignGroupTab({
     });
   }, [node.tenant_id, node.name]);
 
-  // const handleBulkAction = (actionKey: "start" | "complete" | "stop") => {
-  //   setBulkActionKey(actionKey);
-  //   setIsBulkUpdatePopupOpen(true);
-  // };
-
-  const handleBulkAction = (actionKey: "start" | "complete" | "stop") => {
+  // 수정된 handleBulkAction 함수
+  const handleBulkAction = useCallback((actionKey: "start" | "complete" | "stop") => {
     setBulkActionKey(actionKey);
+    
     if (actionKey === "start") {
-      setIsStartPopupOpen(true);
+      // Portal Provider를 사용하여 팝업 열기
+      openStartPopup(campaignInfos, async () => {
+        try {
+          const statusMap = { start: "1", complete: "2", stop: "3" };
+          
+          // API 호출
+          const result = await updateCampaignsStatus(campaignIds, statusMap[actionKey]);
+          console.log("캠페인 시작 업데이트 결과:", result);
+          
+          // 작업 완료 후 트리 데이터 갱신 - Portal Provider에서 처리됨
+          setTimeout(() => {
+            refetchTreeDataForCampaignGroupTab();
+          }, 100);
+          
+          return result;
+        } catch (error) {
+          console.error("캠페인 시작 오류:", error);
+          throw error;
+        }
+      });
     } else {
       setIsBulkUpdatePopupOpen(true);
     }
-  };
+  }, [openStartPopup, campaignInfos, campaignIds, updateCampaignsStatus, refetchTreeDataForCampaignGroupTab]);
 
-  // 일괄 팝업에서 확인 시
-  // todo 0501
-  // 캠페인 일괄 시작시 에러 표시 
-  const handleConfirmBulk = async () => {
-    setIsBulkUpdatePopupOpen(false);
-    setIsStartPopupOpen(false); // 새로 추가한 팝업도 닫아줍니다
+  // 일괄 팝업에서 확인 시 - 수정된 버전 (start 액션은 Portal Provider에서 처리)
+  const handleConfirmBulk = useCallback(async () => {
     try {
       const statusMap = { start: "1", complete: "2", stop: "3" };
-      if (bulkActionKey === "") return;
+
+      if (bulkActionKey === "") {
+        throw new Error("액션 키가 없습니다");
+      }
+
+      // start 액션은 더 이상 여기서 처리하지 않음 (Portal Provider에서 처리)
+      // 시작이 아닌 경우(complete, stop) 기존 로직 유지
+      setIsBulkUpdatePopupOpen(false);
       const result = await updateCampaignsStatus(campaignIds, statusMap[bulkActionKey]);
-  
-      console.log("캠페인 상태 업데이트 결과`, result) : ", result);
-  
+
+      // 결과 다이얼로그 표시
       setBulkResultDialog({
         open: true,
-        title: `일괄 ${bulkActionKey === "start" ? "시작" : bulkActionKey === "complete" ? "멈춤" : "중지"} 결과`,
+        title: "일괄 처리 결과",
         message: (
-          <>
-            <div>총 {result?.totalCount}개 캠페인 중 {result?.successCount}개 성공, {result?.failCount}개 실패</div>
-            {result?.results && result.results.filter(r => !r.success).length > 0 && (
-              <div className="mt-2 text-red-500">
-                실패 캠페인: {result.results.filter(r => !r.success).map(r => r.campaignId).join(", ")}
-              </div>
-            )}
-          </>
+          <div>
+            <p>총 {result.totalCount}개 중 {result.successCount}개 처리 완료, {result.failCount}개 실패</p>
+          </div>
         )
       });
+
+      // complete, stop 액션에는 트리 데이터 갱신 가능
+      await refetchTreeDataForCampaignGroupTab();
+      return result;
     } catch (e: any) {
+      console.error("캠페인 상태 업데이트 오류:", e);
       setBulkResultDialog({
         open: true,
-        title: `일괄 ${bulkActionKey === "start" ? "시작" : bulkActionKey === "complete" ? "멈춤" : "중지"} 실패`,
-        message: e?.message || "일괄 작업 실패"
+        title: "처리 중 오류",
+        message: (
+          <div className="text-red-500">
+            <p>{e.message || "알 수 없는 오류가 발생했습니다."}</p>
+          </div>
+        )
       });
+      throw e;
     }
-    setBulkActionKey("");
-  };
+  }, [bulkActionKey, campaignIds, updateCampaignsStatus, refetchTreeDataForCampaignGroupTab]);
 
   const getNodeStyle = useCallback(() => {
     let baseStyle = `flex items-center hover:bg-[#FFFAEE] px-2 py-0.5 cursor-pointer transition-colors duration-150`;
@@ -304,7 +319,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     }
   }, [node.type]);
 
-  const renderAllDialogs = () => {
+  const renderAllDialogs = useCallback(() => {
     if (!isBrowser) return null;
 
     return (
@@ -342,16 +357,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
           document.body
         )}
 
-        {isStartPopupOpen && createPortal(
-          <IConfirmPopupForMultiUpdateCampaignProgressToStart
-            open={isStartPopupOpen}
-            items={campaignInfos}
-            onConfirm={handleConfirmBulk}
-            onCancel={() => { setIsStartPopupOpen(false); setBulkActionKey(""); }}
-          />,
-          document.body
-        )}
-
+        {/* isStartPopupOpen 부분 제거 - Portal Provider에서 관리 */}
 
         {bulkResultDialog.open && createPortal(
           <Dialog open={bulkResultDialog.open} onOpenChange={() => setBulkResultDialog(prev => ({ ...prev, open: false }))}>
@@ -392,7 +398,12 @@ export function TreeNodeForSideBarCampaignGroupTab({
         )}
       </>
     );
-  };
+  }, [
+    isBrowser, isAddGroupDialogOpen, isCampaignAddPopupOpen, isBulkUpdatePopupOpen, 
+    bulkResultDialog, isDeleteDialogOpen, isRenameDialogOpen, 
+    node, bulkActionKey, campaignInfos, handleCloseAddGroupDialog, handleCloseDeleteDialog, 
+    handleCloseRenameDialog, handleRenameSuccess, handleConfirmBulk, confirmDelete, handleAddGroup
+  ]);
 
   const handleDoubleClickCampaign = useCallback(() => {
     if (node.type !== "campaign") return;
@@ -414,7 +425,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
   }, [node, setSelectedNodeId]);
 
-  const renderNodeUI = () => (
+  const renderNodeUI = useCallback(() => (
     <div
       ref={nodeRef}
       className={getNodeStyle()}
@@ -442,7 +453,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
         </span>
       </div>
     </div>
-  );
+  ), [getNodeStyle, handleClick, handleDoubleClickCampaign, handleContextMenuEvent, hasChildren, isExpanded, isSelected, level, node, renderIcon]);
 
   const handleEditCampaign = useCallback(() => {
     const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu } = useTabStore.getState();
@@ -469,7 +480,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
     toast.info("캠페인 복사 기능이 준비 중입니다.");
   }, [node.name, node.campaign_id]);
 
-  const renderNodeWithProperContextMenu = () => {
+  const renderNodeWithProperContextMenu = useCallback(() => {
     if (node.type === "campaign") {
       const campaignItem = {
         id: node.campaign_id,
@@ -491,7 +502,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       );
     }
     return renderNodeUI();
-  };
+  }, [node, renderNodeUI, handleEditCampaign, handleMonitorCampaign, handleCopyCampaign]);
 
   useEffect(() => {
     // Only process this effect for campaign nodes

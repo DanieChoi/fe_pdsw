@@ -1,5 +1,5 @@
+// src/components/shared/layout/CustomAlert.tsx 수정본
 
-// src/components/shared/layout/CustomAlert.tsx
 "use client";
 
 import React, { ReactNode } from 'react';
@@ -23,6 +23,7 @@ export interface CustomAlertRequest {
   showButtons?: boolean;
   confirmDisabled?: boolean;
   isShowForCancelButton?: boolean;
+  preventAutoClose?: boolean; // 새로 추가: 자동 닫힘 방지 옵션
 }
 
 const CustomAlert = ({
@@ -37,6 +38,7 @@ const CustomAlert = ({
   showButtons = true,
   confirmDisabled = false,
   isShowForCancelButton = false,
+  preventAutoClose = false, // 기본값은 false로 설정
 }: CustomAlertRequest) => {
   
   const parsedWidth = typeof width === "number" ? `${width}px` : width;
@@ -46,7 +48,8 @@ const CustomAlert = ({
     <AlertDialog
       open={isOpen}
       onOpenChange={(open) => {
-        if (!open) {
+        // 자동 닫힘 방지 옵션이 켜져 있는 경우, 닫기 이벤트 무시
+        if (!open && !preventAutoClose) {
           if (onCancel) {
             onCancel();
           } else {
