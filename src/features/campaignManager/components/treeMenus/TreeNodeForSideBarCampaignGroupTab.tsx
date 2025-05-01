@@ -19,7 +19,6 @@ import IContextMenuForCampaignGroupAtCampaignGroup from "./ContextMenus/IContext
 import IContextMenuForTenantAtCampaignGroup from "./ContextMenus/IContextMenuForTenantAtCampaignGroup";
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
 import IDialogButtonForDeleteCampaignGroup from "@/widgets/sidebar/dialogs/IDialogButtonForDeleteCampaignGroup";
-import IConfirmPopupForMultiUpdateCampaignProgress from "../popups/IConfirmPopupForMultiUpdateCampaignProgress";
 import { useApiForMultiUpdateCampaignProgressStatus } from "../treeMenus/hook/useApiForMultiUpdateCampaignProgressStatus";
 import {
   Dialog,
@@ -29,6 +28,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import IConfirmPopupForMultiUpdateCampaignProgress from "../popups/IConfirmPopupForMultiUpdateCampaignProgress";
+import IConfirmPopupForMultiUpdateCampaignProgressToStart from "../popups/IConfirmPopupForMultiUpdateCampaignProgressToStart";
+
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -71,8 +73,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
 }: TreeNodeProps) {
   const [isAddGroupDialogOpen, setIsAddGroupDialogOpen] = useState(false);
   const [isCampaignAddPopupOpen, setIsCampaignAddPopupOpen] = useState(false);
-  const [isBulkUpdatePopupOpen, setIsBulkUpdatePopupOpen] = useState(false);
-  const [bulkActionKey, setBulkActionKey] = useState<"start" | "complete" | "stop" | "">("");
   const [bulkResultDialog, setBulkResultDialog] = useState<{ open: boolean; title: string; message: React.ReactNode }>({ open: false, title: "", message: "" });
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
@@ -83,8 +83,12 @@ export function TreeNodeForSideBarCampaignGroupTab({
   // const { campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const campaignIdForUpdateFromSideMenu = useTabStore(state => state.campaignIdForUpdateFromSideMenu);
   const setCampaignIdForUpdateFromSideMenu = useTabStore(state => state.setCampaignIdForUpdateFromSideMenu);
-
   const [isBrowser, setIsBrowser] = useState(false);
+
+  const [isBulkUpdatePopupOpen, setIsBulkUpdatePopupOpen] = useState(false);
+  const [isStartPopupOpen, setIsStartPopupOpen] = useState(false);
+  const [bulkActionKey, setBulkActionKey] = useState<"start" | "complete" | "stop" | "">("");
+
   useEffect(() => {
     setIsBrowser(true);
   }, []);
@@ -163,7 +167,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
       setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
     }
   }, [onNodeToggle, node]);
-  
+
 
   const handleContextMenuEvent = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -223,22 +227,33 @@ export function TreeNodeForSideBarCampaignGroupTab({
     });
   }, [node.tenant_id, node.name]);
 
+  // const handleBulkAction = (actionKey: "start" | "complete" | "stop") => {
+  //   setBulkActionKey(actionKey);
+  //   setIsBulkUpdatePopupOpen(true);
+  // };
+
   const handleBulkAction = (actionKey: "start" | "complete" | "stop") => {
     setBulkActionKey(actionKey);
-    setIsBulkUpdatePopupOpen(true);
+    if (actionKey === "start") {
+      setIsStartPopupOpen(true);
+    } else {
+      setIsBulkUpdatePopupOpen(true);
+    }
   };
 
   // 일괄 팝업에서 확인 시
+  // todo 0501
+  // 캠페인 일괄 시작시 에러 표시 
   const handleConfirmBulk = async () => {
     setIsBulkUpdatePopupOpen(false);
+    setIsStartPopupOpen(false); // 새로 추가한 팝업도 닫아줍니다
     try {
       const statusMap = { start: "1", complete: "2", stop: "3" };
       if (bulkActionKey === "") return;
       const result = await updateCampaignsStatus(campaignIds, statusMap[bulkActionKey]);
-
+  
       console.log("캠페인 상태 업데이트 결과`, result) : ", result);
-
-
+  
       setBulkResultDialog({
         open: true,
         title: `일괄 ${bulkActionKey === "start" ? "시작" : bulkActionKey === "complete" ? "멈춤" : "중지"} 결과`,
@@ -326,6 +341,17 @@ export function TreeNodeForSideBarCampaignGroupTab({
           />,
           document.body
         )}
+
+        {isStartPopupOpen && createPortal(
+          <IConfirmPopupForMultiUpdateCampaignProgressToStart
+            open={isStartPopupOpen}
+            items={campaignInfos}
+            onConfirm={handleConfirmBulk}
+            onCancel={() => { setIsStartPopupOpen(false); setBulkActionKey(""); }}
+          />,
+          document.body
+        )}
+
 
         {bulkResultDialog.open && createPortal(
           <Dialog open={bulkResultDialog.open} onOpenChange={() => setBulkResultDialog(prev => ({ ...prev, open: false }))}>
