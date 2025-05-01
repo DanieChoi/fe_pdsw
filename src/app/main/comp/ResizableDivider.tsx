@@ -127,7 +127,7 @@ const ResizableDivider: React.FC<ResizableDividerProps> = ({
         margin: '0 -3px',
         alignSelf: 'stretch',
         touchAction: 'none',
-        transition: 'background-color 0.2s'
+        // transition: 'background-color 0.2s'
       }}
     >
       {/* 드래그 핸들 표시 */}
