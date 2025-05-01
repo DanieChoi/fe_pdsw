@@ -10,6 +10,8 @@ import { getStatusIcon } from "@/components/shared/layout/utils/utils";
 import { useSidebarWidthStore } from "@/store/useSidebarWidthStore";
 import { useAuthStore } from "@/store";
 import { useTreeMenuStore, ViewMode } from "@/store/storeForSsideMenuCampaignTab";
+import { useShallow } from "zustand/react/shallow";
+
 
 // 트리 노드 선택/확장 상태 관리
 interface TreeState {
@@ -60,22 +62,30 @@ export function TreeMenusForCampaigns() {
   // 트리 데이터 API 호출
   const { data: treeData, isLoading, error } = useApiForGetTreeMenuDataForSideMenu();
 
-  console.log("트리 데이터 at 캠페인탭:", treeData);
-  
+  useEffect(() => {
+    console.log("트리 데이터 at 캠페인탭:", treeData);
+  }, []);
 
   // 트리 노드 선택/확장 상태 관리
-  const {
-    // selectedNodeId,
-    // expandedNodes,
+  const [
     setSelectedNodeId,
     toggleNode,
     expandNodes,
     savePreviousState,
-    restorePreviousState
-  } = useTreeStore();
-
-  const selectedNodeId = useTreeStore(state => state.selectedNodeId);
-  const expandedNodes  = useTreeStore(state => state.expandedNodes);
+    restorePreviousState,
+    selectedNodeId,
+    expandedNodes
+  ] = useTreeStore(
+    useShallow(state => [
+      state.setSelectedNodeId,
+      state.toggleNode,
+      state.expandNodes,
+      state.savePreviousState,
+      state.restorePreviousState,
+      state.selectedNodeId,
+      state.expandedNodes
+    ])
+  );
 
   // 원본 아이템을 useMemo로 감싸서 의존성 배열 변경 방지
   const originalItems = useMemo(() => {
@@ -89,7 +99,7 @@ export function TreeMenusForCampaigns() {
     window.treeSavePreviousState = savePreviousState;
     window.treeRestorePreviousState = restorePreviousState;
   }, [expandNodes, originalItems, savePreviousState, restorePreviousState]);
-  
+
 
   // 통합 스토어에서 정렬 및 필터링 상태 가져오기
   const {

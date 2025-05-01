@@ -232,8 +232,8 @@ const CampaignDeletePanel = ({ campaignId, campaignName }: Props) => {
     // 캠페인 삭제 API 훅 사용
     const { mutate: deleteCampaign } = useApiForCampaignManagerDelete({
         onSuccess: (data, variables, context) => {
-            console.log('캠페인 삭제 성공:', data);
-            toast.success('캠페인이 삭제되었습니다.');
+            // console.log('캠페인 삭제 성공:', data);
+            // toast.success('캠페인이 삭제되었습니다.');
 
             fetchCampaignScheduleDelete({
                 ...campaignInfoDelete

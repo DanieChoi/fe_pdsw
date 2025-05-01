@@ -93,7 +93,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
 
   const { mutate: deleteCampaign, isPending } = useApiForCampaignManagerDelete({
     onSuccess: () => {
-      toast.success(`'${campaignName}' 캠페인이 삭제되었습니다.`);
+      // toast.success(`'${campaignName}' 캠페인이 삭제되었습니다.`);
 
       if (campaignId) {
         setDeletedCampaignId(campaignId.toString());
