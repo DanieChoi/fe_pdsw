@@ -212,8 +212,10 @@ export default function Header() {
     if (popupRef.current && !popupRef.current.closed) {
       popupRef.current.close();
     }
-
-    // 홈 또는 로그인 페이지로 리다이렉트
+    // 모든탭 닫기
+    closeAllTabs("row-1", "default");
+    
+    // 홈 또는 로그인 페이지로 리다이렉트 
     router.push('/login');
   }
 
