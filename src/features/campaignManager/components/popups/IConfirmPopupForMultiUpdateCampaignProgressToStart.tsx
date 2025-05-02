@@ -187,7 +187,7 @@ const CampaignStartModal = ({
         
         map.set(campaignId.toString(), campaignSkills.map(skill => ({
           id: skill.skill_id,
-          name: skill.skill_name || `Skill ${skill.skill_id}`
+          name: skill.name || `Skill ${skill.skill_id}`
         })));
       });
     }
