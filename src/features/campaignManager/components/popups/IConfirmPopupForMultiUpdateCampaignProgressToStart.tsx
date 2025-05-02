@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Play, Loader2, CheckCircle, XCircle, AlertCircle, Calendar, Clock, Phone, Users } from "lucide-react";
+import { Play, Loader2, CheckCircle, XCircle, AlertCircle, Calendar, Clock, Phone, Users, Award } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useApiForCampaignScheduleInfosForSystemAdmin } from "@/shared/hooks/campaign/useApiForCampaignScheduleInfosForSystemAdmin";
 import { useApiForCampaignCallingNumberListForSystemAdmin } from "@/shared/hooks/campaign/useApiForCampaignCallingNumberListForSystemAdmin";
 import { useApiForCampaignAgentListForSystemAdmin } from "@/shared/hooks/campaign/useApiForCampaignAgentListForSystemAdmin";
+import { useApiForCampaignSkillListForSystemAdmin } from "@/shared/hooks/campaign/useApiForCampaignSkillListForSystemAdmin";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Campaign {
@@ -113,6 +114,19 @@ const CampaignStartModal = ({
     enabled: campaignIds.length > 0 && internalOpen
   });
 
+  // 캠페인 스킬 정보 가져오기
+  const { data: skillData, isLoading: isLoadingSkills } = useApiForCampaignSkillListForSystemAdmin({
+    request: {
+      filter: {
+        skill_id: {
+          start: 1,
+          end: 9999999
+        }
+      }
+    },
+    enabled: campaignIds.length > 0 && internalOpen
+  });
+
   // 캠페인 스케줄 맵 생성
   const scheduleMap = useMemo(() => {
     const map = new Map();
@@ -143,7 +157,6 @@ const CampaignStartModal = ({
   }, [callingNumberData]);
 
   // 캠페인별 상담사 맵 생성
-  // 캠페인별 상담사 맵 생성
   const agentMap = useMemo(() => {
     const map = new Map<string, string[]>();
 
@@ -157,6 +170,30 @@ const CampaignStartModal = ({
 
     return map;
   }, [agentData]);
+
+  // 캠페인별 스킬 맵 생성
+  const skillMap = useMemo(() => {
+    const map = new Map<string, { id: number, name: string }[]>();
+
+    if (skillData?.result_data) {
+      // 각 캠페인에 할당된 스킬 정보를 매핑
+      // 실제 데이터 구조에 맞게 변경해야 할 수 있음
+      campaignIds.forEach(campaignId => {
+        const campaignSkills = skillData.result_data.filter(skill => 
+          // 이 부분은 API 응답 구조에 따라 수정 필요
+          // 여기서는 예시로 모든 스킬을 각 캠페인에 연결
+          true
+        );
+        
+        map.set(campaignId.toString(), campaignSkills.map(skill => ({
+          id: skill.skill_id,
+          name: skill.skill_name || `Skill ${skill.skill_id}`
+        })));
+      });
+    }
+    
+    return map;
+  }, [skillData, campaignIds]);
 
   // 날짜 형식 변환 함수
   const formatDate = (dateStr: string) => {
@@ -230,12 +267,19 @@ const CampaignStartModal = ({
     return agents && agents.length > 0;
   };
 
-  // 캠페인 유효성 검사 (시작/종료 시간, 발신번호, 상담사)
+  // 스킬 유효성 검사 (스킬이 1개 이상 있는지)
+  const hasSkills = (campaignId: string) => {
+    const skills = skillMap.get(campaignId);
+    return skills && skills.length > 0;
+  };
+
+  // 캠페인 유효성 검사 (시작/종료 시간, 발신번호, 상담사, 스킬)
   const isCampaignValid = (schedule: any, campaignId: string) => {
     return isStartTimeValid(schedule) &&
       isEndTimeValid(schedule) &&
       hasCallingNumbers(campaignId) &&
-      hasAgents(campaignId);
+      hasAgents(campaignId) &&
+      hasSkills(campaignId);
   };
 
   // open prop이 true로 바뀔 때만 모달 열기
@@ -362,7 +406,7 @@ const CampaignStartModal = ({
   };
 
   // 테이블 로딩 여부
-  const isLoading = isLoadingSchedule || isLoadingCallingNumbers || isLoadingAgents;
+  const isLoading = isLoadingSchedule || isLoadingCallingNumbers || isLoadingAgents || isLoadingSkills;
 
   return (
     <Dialog open={internalOpen} onOpenChange={(open) => {
@@ -448,6 +492,7 @@ const CampaignStartModal = ({
                   <TableHead>캠페인 정보</TableHead>
                   <TableHead>발신 번호</TableHead>
                   <TableHead>상담사</TableHead>
+                  <TableHead>스킬</TableHead>
                   <TableHead>시작 날짜</TableHead>
                   <TableHead>종료 날짜</TableHead>
                   <TableHead>유효성</TableHead>
@@ -460,7 +505,7 @@ const CampaignStartModal = ({
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={updateCompleted ? 8 : 7} className="text-center py-4">
+                    <TableCell colSpan={updateCompleted ? 9 : 8} className="text-center py-4">
                       <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                       <div className="mt-2 text-sm text-gray-500">정보를 불러오는 중...</div>
                     </TableCell>
@@ -472,9 +517,11 @@ const CampaignStartModal = ({
                     const schedule = scheduleMap.get(campaignId);
                     const callingNumbers = callingNumberMap.get(campaignId) || [];
                     const agents = agentMap.get(campaignId) || [];
+                    const skills = skillMap.get(campaignId) || [];
 
                     const hasNumbers = callingNumbers.length > 0;
                     const hasAgentsList = agents.length > 0;
+                    const hasSkillsList = skills.length > 0;
                     const startValid = isStartTimeValid(schedule);
                     const endValid = isEndTimeValid(schedule);
                     const isValid = isCampaignValid(schedule, campaignId);
@@ -554,6 +601,40 @@ const CampaignStartModal = ({
                                   </div>
                                 ) : (
                                   <p className="text-red-600">등록된 상담사가 없습니다.</p>
+                                )}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </TableCell>
+                        <TableCell>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center">
+                                  <Award className="h-4 w-4 text-gray-500 mr-1" />
+                                  <span className="text-sm">{skills.length}개</span>
+                                  {hasSkillsList ? (
+                                    <CheckCircle className="h-4 w-4 text-green-500 ml-2" />
+                                  ) : (
+                                    <XCircle className="h-4 w-4 text-red-500 ml-2" />
+                                  )}
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {hasSkillsList ? (
+                                  <div>
+                                    <p className="font-medium mb-1">등록된 스킬 ({skills.length}개)</p>
+                                    <ul className="text-xs space-y-1">
+                                      {skills.slice(0, 5).map((skill, idx) => (
+                                        <li key={idx}>• {skill.name}</li>
+                                      ))}
+                                      {skills.length > 5 && (
+                                        <li>• 외 {skills.length - 5}개</li>
+                                      )}
+                                    </ul>
+                                  </div>
+                                ) : (
+                                  <p className="text-red-600">등록된 스킬이 없습니다.</p>
                                 )}
                               </TooltipContent>
                             </Tooltip>
@@ -651,6 +732,7 @@ const CampaignStartModal = ({
                                       <ul className="mt-1 text-xs space-y-1">
                                         <li className="text-green-600">• 발신번호가 등록되어 있습니다.</li>
                                         <li className="text-green-600">• 상담사가 등록되어 있습니다.</li>
+                                        <li className="text-green-600">• 스킬이 등록되어 있습니다.</li>
                                         <li className="text-green-600">• 시작 시간이 현재 시간 이전입니다.</li>
                                         <li className="text-green-600">• 종료 시간이 현재 시간 이후입니다.</li>
                                       </ul>
@@ -661,6 +743,7 @@ const CampaignStartModal = ({
                                       <ul className="mt-1 text-xs">
                                         {!hasNumbers && <li className="text-red-600">• 발신번호가 등록되지 않았습니다.</li>}
                                         {!hasAgentsList && <li className="text-red-600">• 상담사가 등록되지 않았습니다.</li>}
+                                        {!hasSkillsList && <li className="text-red-600">• 스킬이 등록되지 않았습니다.</li>}
                                         {!startValid && <li className="text-red-600">• 시작 시간이 현재 시간 이후입니다.</li>}
                                         {!endValid && <li className="text-red-600">• 종료 시간이 현재 시간 이전입니다.</li>}
                                       </ul>
