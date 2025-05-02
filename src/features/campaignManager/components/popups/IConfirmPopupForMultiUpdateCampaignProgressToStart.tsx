@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Play, Loader2, CheckCircle, XCircle, AlertCircle, Calendar, Clock } from "lucide-react";
+import { Play, Loader2, CheckCircle, XCircle, AlertCircle, Calendar, Clock, Phone } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useApiForCampaignScheduleInfosForSystemAdmin } from "@/shared/hooks/campaign/useApiForCampaignScheduleInfosForSystemAdmin";
+import { useApiForCampaignCallingNumberListForSystemAdmin } from "@/shared/hooks/campaign/useApiForCampaignCallingNumberListForSystemAdmin";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Campaign {
@@ -88,6 +89,19 @@ const CampaignStartModal = ({
     enabled: campaignIds.length > 0 && internalOpen
   });
 
+  // 캠페인 발신번호 정보 가져오기
+  const { data: callingNumberData, isLoading: isLoadingCallingNumbers } = useApiForCampaignCallingNumberListForSystemAdmin({
+    request: {
+      filter: {
+        campaign_id: {
+          start: Math.min(...campaignIds, 1),
+          end: Math.max(...campaignIds, 9999999)
+        }
+      }
+    },
+    enabled: campaignIds.length > 0 && internalOpen
+  });
+
   // 캠페인 스케줄 맵 생성
   const scheduleMap = useMemo(() => {
     const map = new Map();
@@ -98,6 +112,24 @@ const CampaignStartModal = ({
     }
     return map;
   }, [scheduleData]);
+
+  // 캠페인별 발신번호 맵 생성
+  const callingNumberMap = useMemo(() => {
+    const map = new Map<string, string[]>();
+    
+    if (callingNumberData?.result_data) {
+      // 캠페인 ID별로 발신번호 그룹화
+      callingNumberData.result_data.forEach(item => {
+        const campaignId = item.campaign_id.toString();
+        if (!map.has(campaignId)) {
+          map.set(campaignId, []);
+        }
+        map.get(campaignId)?.push(item.calling_number);
+      });
+    }
+    
+    return map;
+  }, [callingNumberData]);
 
   // 날짜 형식 변환 함수
   const formatDate = (dateStr: string) => {
@@ -159,9 +191,15 @@ const CampaignStartModal = ({
     return endDateTime >= now;
   };
 
-  // 캠페인 유효성 검사 (현재 시간이 시작과 종료 시간 사이에 있음)
-  const isCampaignValid = (schedule: any) => {
-    return isStartTimeValid(schedule) && isEndTimeValid(schedule);
+  // 발신번호 유효성 검사
+  const hasCallingNumbers = (campaignId: string) => {
+    const numbers = callingNumberMap.get(campaignId);
+    return numbers && numbers.length > 0;
+  };
+
+  // 캠페인 유효성 검사 (현재 시간이 시작과 종료 시간 사이에 있고, 발신번호가 있음)
+  const isCampaignValid = (schedule: any, campaignId: string) => {
+    return isStartTimeValid(schedule) && isEndTimeValid(schedule) && hasCallingNumbers(campaignId);
   };
 
   // open prop이 true로 바뀔 때만 모달 열기
@@ -287,12 +325,15 @@ const CampaignStartModal = ({
     return item.success ? "성공" : "실패";
   };
 
+  // 테이블 로딩 여부
+  const isLoading = isLoadingSchedule || isLoadingCallingNumbers;
+
   return (
     <Dialog open={internalOpen} onOpenChange={(open) => {
       if (!open && !isUpdating) handleCancel();
     }}>
       <DialogContent 
-      className="!w-[80%] lg:w-[60%] max-w-[1000px]" 
+      className="!w-[80%] lg:w-[60%] max-w-[1200px]" 
       onInteractOutside={(e) => {
         // 바깥 클릭 시 모달이 닫히지 않도록
         if (isUpdating) e.preventDefault();
@@ -369,6 +410,7 @@ const CampaignStartModal = ({
               <TableHeader>
                 <TableRow>
                   <TableHead>캠페인 정보</TableHead>
+                  <TableHead>발신 번호</TableHead>
                   <TableHead>시작 날짜</TableHead>
                   <TableHead>종료 날짜</TableHead>
                   <TableHead>유효성</TableHead>
@@ -379,11 +421,11 @@ const CampaignStartModal = ({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoadingSchedule ? (
+                {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={updateCompleted ? 6 : 5} className="text-center py-4">
+                    <TableCell colSpan={updateCompleted ? 7 : 6} className="text-center py-4">
                       <Loader2 className="h-5 w-5 animate-spin mx-auto" />
-                      <div className="mt-2 text-sm text-gray-500">스케줄 정보를 불러오는 중...</div>
+                      <div className="mt-2 text-sm text-gray-500">정보를 불러오는 중...</div>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -391,9 +433,11 @@ const CampaignStartModal = ({
                     const campaignId = item.campaign_id?.toString() || '';
                     const result = campaignResults.get(campaignId);
                     const schedule = scheduleMap.get(campaignId);
-                    const isValid = isCampaignValid(schedule);
+                    const callingNumbers = callingNumberMap.get(campaignId) || [];
+                    const hasNumbers = callingNumbers.length > 0;
                     const startValid = isStartTimeValid(schedule);
                     const endValid = isEndTimeValid(schedule);
+                    const isValid = isCampaignValid(schedule, campaignId);
                     
                     return (
                       <TableRow key={index}>
@@ -406,6 +450,40 @@ const CampaignStartModal = ({
                               ({campaignId})
                             </div>
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center">
+                                  <Phone className="h-4 w-4 text-gray-500 mr-1" />
+                                  <span className="text-sm">{callingNumbers.length}개</span>
+                                  {hasNumbers ? (
+                                    <CheckCircle className="h-4 w-4 text-green-500 ml-2" />
+                                  ) : (
+                                    <XCircle className="h-4 w-4 text-red-500 ml-2" />
+                                  )}
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {hasNumbers ? (
+                                  <div>
+                                    <p className="font-medium mb-1">등록된 발신번호 ({callingNumbers.length}개)</p>
+                                    <ul className="text-xs space-y-1">
+                                      {callingNumbers.slice(0, 5).map((number: string, idx) => (
+                                        <li key={idx}>• {number}</li>
+                                      ))}
+                                      {callingNumbers.length > 5 && (
+                                        <li>• 외 {callingNumbers.length - 5}개</li>
+                                      )}
+                                    </ul>
+                                  </div>
+                                ) : (
+                                  <p className="text-red-600">발신번호가 등록되지 않았습니다.</p>
+                                )}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </TableCell>
                         <TableCell>
                           {schedule ? (
@@ -494,18 +572,26 @@ const CampaignStartModal = ({
                               <TooltipContent>
                                 {schedule ? (
                                   isValid ? (
-                                    <p>현재 시간이 캠페인 시작과 종료 시간 사이에 있습니다.</p>
+                                    <div>
+                                      <p className="text-green-600 font-medium">모든 조건 충족</p>
+                                      <ul className="mt-1 text-xs space-y-1">
+                                        <li className="text-green-600">• 발신번호가 등록되어 있습니다.</li>
+                                        <li className="text-green-600">• 시작 시간이 현재 시간 이전입니다.</li>
+                                        <li className="text-green-600">• 종료 시간이 현재 시간 이후입니다.</li>
+                                      </ul>
+                                    </div>
                                   ) : (
                                     <div>
-                                      <p>현재 시간이 캠페인 유효 기간 내에 있지 않습니다.</p>
+                                      <p className="text-red-600 font-medium">일부 조건 미충족</p>
                                       <ul className="mt-1 text-xs">
+                                        {!hasNumbers && <li className="text-red-600">• 발신번호가 등록되지 않았습니다.</li>}
                                         {!startValid && <li className="text-red-600">• 시작 시간이 현재 시간 이후입니다.</li>}
                                         {!endValid && <li className="text-red-600">• 종료 시간이 현재 시간 이전입니다.</li>}
                                       </ul>
                                     </div>
                                   )
                                 ) : (
-                                  <p>캠페인 스케줄 정보를 찾을 수 없습니다.</p>
+                                  <p>캠페인 정보를 찾을 수 없습니다.</p>
                                 )}
                               </TooltipContent>
                             </Tooltip>
