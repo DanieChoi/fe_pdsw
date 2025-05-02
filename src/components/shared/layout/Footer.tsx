@@ -411,18 +411,37 @@ export default function Footer({
       if (command === 'UPDATE') {
         let _start_flag = '';
         let _end_flag = '';
+        
         if (data['campaign_status'] === 1) {
           _start_flag = '시작';
         } else if (data['campaign_status'] === 2) {
           _start_flag = '멈춤';
         } else if (data['campaign_status'] === 3) {
           _start_flag = '중지';
+        } else if (data['campaign_status'] === 4) {
+          _start_flag = '스케줄 PAUSE';
+        } else if (data['campaign_status'] === 5) {
+          _start_flag = '캠페인 멈춤 중';
+        } else if (data['campaign_status'] === 6) {
+          _start_flag = '캠페인 정지 중';
         }
+
         if( data['campaign_end_flag'] === 1){
           _end_flag = '진행중';
         }else if( data['campaign_end_flag'] === 2){
           _end_flag = '완료';
         }
+
+        // 대충 객체 배열로 저장해보겠단 뜻 const arr_status = [{campaign_id : campaign_id, campaign_status: data['campaign_status']}];
+
+        // console.log(`########### campaign_status => ${data['campaign_status']}`);
+        // console.log(`########### campaign_end_flag => ${data['campaign_end_flag']}`);
+        /*
+          정지에서 멈춤으로 변경시 
+          [캠페인 동작상태 변경] 캠페인 아이디 : 49800, 동작상태: 멈춤, 완료구분: 진행중
+          ########### campaign_status => 2
+          ########### campaign_end_flag => 1
+        */
 
         // 푸터 로그 메시지
         _message = '[캠페인 동작상태 변경] 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: '+_end_flag;
