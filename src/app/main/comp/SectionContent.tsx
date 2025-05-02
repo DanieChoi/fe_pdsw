@@ -124,7 +124,10 @@ const SectionContent = ({
       case 14:
         return <StatusCampaign />;
       case 20:
-        return <RebroadcastSettingsPanel />;
+        return <RebroadcastSettingsPanel
+          // campaignId={campaignId}
+          reBroadCastOption ={params?.reBroadCastOption  || 'scheduled'}
+        />;
       case 21:
         return <CampaignMonitorDashbord campaignId={campaignId} />;
       case 22:

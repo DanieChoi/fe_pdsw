@@ -206,31 +206,48 @@ export function ContextMenuForCampaignForCampaignTab({
     );
   };
 
-  const handleRebroadcastClick = (campaignId: any) => {
-    setCampaignIdForUpdateFromSideMenu(campaignId);
-    // addTab({
-    //   id: 20,
-    //   uniqueKey: '20',
-    //   title: '재발신 설정',
-    //   icon: '',
-    //   href: '',
-    //   content: null,
-    // });
-    const uniqueKey = `progress-info-${campaignId}-${Date.now()}`;
+  // const handleRebroadcastClick = (campaignId: any) => {
+  //   setCampaignIdForUpdateFromSideMenu(campaignId);
 
+  //   const uniqueKey = `progress-info-${campaignId}-${Date.now()}`;
+
+  //   useTabStore.getState().addOnlyTab(
+  //     {
+  //       id: 20,
+  //       uniqueKey,
+  //       title: `재발신 설정 `,
+  //       icon: '',
+  //       href: '',
+  //       content: null,
+  //       // campaignId,
+  //     },
+  //     (tab) => tab.id === 20
+  //   );
+
+  // };
+
+  const handleRebroadcastClick = (campaignId: any, reBroadCastOption: 'scheduled' | 'realtime') => {
+    setCampaignIdForUpdateFromSideMenu(campaignId);
+  
+    const uniqueKey = `rebroadcast-${campaignId}-${Date.now()}`;
+    const titlePrefix = reBroadCastOption === 'scheduled' ? '예약' : '실시간';
+  
     useTabStore.getState().addOnlyTab(
       {
         id: 20,
         uniqueKey,
-        title: `재발신 설정 `,
+        title: `${titlePrefix} 재발신 설정`,
         icon: '',
         href: '',
         content: null,
-        // campaignId,
+        campaignId,
+        params: {
+          reBroadCastOption,
+          // campaignId
+        }
       },
       (tab) => tab.id === 20
     );
-
   };
 
   const handleMonitorClick = (tenantIdForCampaignTab: any, campaignId: any, campaignName: string) => {
@@ -394,12 +411,32 @@ export function ContextMenuForCampaignForCampaignTab({
       key: "separator1",
       type: "separator",
     },
+    // {
+    //   key: "rebroadcast",
+    //   title: "예약 재발신",
+    //   onClick: () => handleRebroadcastClick(item.id),
+    //   menuId: 25,
+    // },
+    // {
+    //   key: "rebroadcast",
+    //   title: "실시간 재발신",
+    //   onClick: () => handleRebroadcastClick(item.id),
+    //   menuId: 25,
+    // },
+
     {
-      key: "rebroadcast",
-      title: "재발신",
-      onClick: () => handleRebroadcastClick(item.id),
+      key: "scheduled-rebroadcast",
+      title: "예약 재발신",
+      onClick: () => handleRebroadcastClick(item.id, 'scheduled'),
       menuId: 25,
     },
+    {
+      key: "realtime-rebroadcast",
+      title: "실시간 재발신",
+      onClick: () => handleRebroadcastClick(item.id, 'realtime'),
+      menuId: 25,
+    },
+
     {
       key: "separator2",
       type: "separator",

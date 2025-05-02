@@ -105,7 +105,11 @@ const initOutgoingResult = {
     'outgoing-attempt': true
 };
 
-const RebroadcastSettingsPanel = () => {
+interface PropsType {
+    reBroadCastOption: "scheduled" | "realtime";
+}
+
+const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
     const { campaigns, reBroadcastType, setReBroadcastType, reBroadcastRedialCondition, setReBroadcastRedialCondition } = useMainStore();
     const { activeTabId, openedTabs,campaignIdForUpdateFromSideMenu } = useTabStore();
@@ -1287,6 +1291,7 @@ const RebroadcastSettingsPanel = () => {
                     handleCheckListCount={handleCheckListCount}
                     textType = {textType}
                     selectedRebroadcastId = {selectedRebroadcastId}
+                    reBroadCastOption={reBroadCastOption }
                 />
 
                 <div className="flex gap-5 h-[580px]">

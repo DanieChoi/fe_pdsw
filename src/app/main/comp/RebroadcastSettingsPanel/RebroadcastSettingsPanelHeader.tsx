@@ -47,6 +47,7 @@ type Props = {
     handleCheckListCount: () => void;
     selectedRebroadcastId: any;
     textType: string;
+    reBroadCastOption?: 'scheduled' | 'realtime';
 }
 
 const RebroadcastSettingsPanelHeader = ({
@@ -61,6 +62,7 @@ const RebroadcastSettingsPanelHeader = ({
     , handleRemoveRebroadcast
     , handleApplyRebroadcast
     , handleCheckListCount
+    , reBroadCastOption
 }: Props) => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
     const { campaigns, reBroadcastType } = useMainStore();
@@ -107,6 +109,27 @@ const RebroadcastSettingsPanelHeader = ({
         handleApplyRebroadcast();
     };
 
+    // RebroadcastSettingsPanelHeader 컴포넌트
+    console.log('Header Props:', { reBroadCastOption, reBroadcastType });
+    console.log('Header State:', { broadcastType });
+
+    // useEffect 내부에서
+    useEffect(() => {
+        console.log('Before Update:', { broadcastType });
+        if (reBroadCastOption) {
+            console.log('Updating from props:', reBroadCastOption);
+            const mappedType = reBroadCastOption === 'scheduled' ? 'reservation' : reBroadCastOption;
+            setBroadcastType(mappedType);
+            console.log('After mapping:', mappedType);
+        } else if (reBroadcastType !== '') {
+            console.log('Updating from store:', reBroadcastType);
+            setBroadcastType(reBroadcastType);
+        } else {
+            console.log('Setting default');
+            setBroadcastType('reservation');
+        }
+    }, [reBroadCastOption, reBroadcastType]);
+
     //적용 버튼 
     useEffect(() => {
         setShouldShowApply(reservationShouldShowApply);
@@ -133,6 +156,7 @@ const RebroadcastSettingsPanelHeader = ({
 
     return (
         <div className="flex title-background justify-between">
+            예약 재발신 타입 확인: {reBroadCastOption}
             <div className="flex gap-4 items-center">
                 <div className="flex items-center gap-2">
                     <Label className="w-20 min-w-20">캠페인 아이디</Label>
@@ -156,9 +180,9 @@ const RebroadcastSettingsPanelHeader = ({
                     <CustomInput
                         className="w-[140px]"
                         disabled
-                        value={headerCampaignId === '' ? '' 
-                            : campaigns && campaigns.length > 0 ?campaigns.filter(data => Number(headerCampaignId) === data.campaign_id)[0].campaign_name || ''
-                            : ''
+                        value={headerCampaignId === '' ? ''
+                            : campaigns && campaigns.length > 0 ? campaigns.filter(data => Number(headerCampaignId) === data.campaign_id)[0].campaign_name || ''
+                                : ''
                         }
                     />
                 </div>
@@ -166,7 +190,7 @@ const RebroadcastSettingsPanelHeader = ({
                     defaultValue="reservation"
                     className="flex gap-5"
                     onValueChange={(value) => handleBroadcastType(value)}
-                    value={reBroadcastType}
+                    value={broadcastType} // reBroadcastType에서 broadcastType으로 변경
                     disabled={realtime}
                 >
                     <div className="flex items-center space-x-2">
@@ -185,7 +209,7 @@ const RebroadcastSettingsPanelHeader = ({
                     <div className="px-2 py-1 text-sm font-medium text-gray-700 bg-blue-100 border border-blue-200 rounded-md shadow-sm inline-flex items-center mr-[200px]">
                         {textType}
                     </div>
-                    :null
+                    : null
                 }
 
                 <CommonButton onClick={handleCheckListCountHeader}>
