@@ -41,12 +41,12 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   const [headerInit, setHeaderInit] = useState<boolean>(false);
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions
-    ,schedules,campaignSkills,callingNumbers
     , campaignManagerHeaderTenantId, setCampaignManagerHeaderTenantId
     , campaignManagerHeaderCampaignName, setCampaignManagerHeaderCampaignName
     , campaignManagerHeaderDailMode, setCampaignManagerHeaderDailMode
     , campaignManagerHeaderSkill, setCampaignManagerHeaderSkill
     , campaignManagerHeaderCallNumber, setCampaignManagerHeaderCallNumber
+    , campaignManagerCampaignId
    } = useCampainManagerStore();
 
   const [campaignHeaderSearchParam, setCampaignHeaderSearchParam] = useState<CampaignHeaderSearch>();
@@ -130,17 +130,17 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   useEffect(() => {
     if (typeof campaignId === 'undefined') {
       setMasterCampaignId(campaignIdForUpdateFromSideMenu || '');
-      if( masterCampaignId === '' ){
-        setCampaignManagerHeaderTenantId('all');
-        setCampaignManagerHeaderCampaignName('');
-        setCampaignManagerHeaderDailMode('all');
-        setCampaignManagerHeaderSkill('all');
-        setCampaignManagerHeaderCallNumber('');
-      }
     } else {
       setMasterCampaignId(campaignId);
     }
-  }, [campaignIdForUpdateFromSideMenu, campaignId]);
+    if( campaignManagerCampaignId === '' ){
+      setCampaignManagerHeaderTenantId('all');
+      setCampaignManagerHeaderCampaignName('');
+      setCampaignManagerHeaderDailMode('all');
+      setCampaignManagerHeaderSkill('all');
+      setCampaignManagerHeaderCallNumber('');
+    }
+  }, [campaignIdForUpdateFromSideMenu, campaignId, campaignManagerCampaignId]);
 
   const handleRowClick = (campaignId: string) => {
     setMasterCampaignId(campaignId);

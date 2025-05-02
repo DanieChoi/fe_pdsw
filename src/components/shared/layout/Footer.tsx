@@ -13,6 +13,7 @@ import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useAp
 import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignManager/hooks/useApiForGetTreeDataForCampaignGroupTab";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion"; // 꼭 상단 import 추가!
+import { useCampaignDialStatusStore } from "@/store/campaignDialStatusStore";
 
 
 type FooterDataType = {
@@ -54,6 +55,8 @@ export default function Footer({
 
 
   const lastProcessedMessageRef = useRef<string | null>(null);
+
+  const {addCampaignDialStatus, removeCampaignDialStatus} = useCampaignDialStatusStore();
 
   const debouncedInvalidate = useMemo(
     () =>
@@ -413,6 +416,7 @@ export default function Footer({
         let _start_flag = '';
         let _end_flag = '';
         
+        
         if (data['campaign_status'] === 1) {
           _start_flag = '시작';
         } else if (data['campaign_status'] === 2) {
@@ -432,6 +436,25 @@ export default function Footer({
         }else if( data['campaign_end_flag'] === 2){
           _end_flag = '완료';
         }
+
+
+        if(data['campaign_status'] === 2 && data['campaign_end_flag'] === 1){
+          // 캠페인 상태가 시작이며 발신중일때
+          addCampaignDialStatus({campaign_id : campaign_id, status : data['campaign_status']});
+
+          // 여기에서 직접 setSseInputMessage 호출
+          useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:', campaign_id, '멈춤');
+        }
+
+        if((data['campaign_status'] === 3)&& data['campaign_end_flag'] === 1){
+          // 캠페인 상태가 멈춤이나 정지이며, 완료 되었을때 ==> 차후에 campaign_end_flag 맞춰서 변경해야함!!!
+          removeCampaignDialStatus({campaign_id : campaign_id});
+
+          // 여기에서 직접 setSseInputMessage 호출
+          useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:', campaign_id, '중지');
+        }
+        // 대충 store에다가 객체 배열로 저장해보겠단 뜻 const arr_status = [{campaign_id : campaign_id, campaign_status: data['campaign_status']}];
+
 
         // 대충 객체 배열로 저장해보겠단 뜻 const arr_status = [{campaign_id : campaign_id, campaign_status: data['campaign_status']}];
 
