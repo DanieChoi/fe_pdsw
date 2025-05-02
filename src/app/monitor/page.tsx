@@ -26,6 +26,7 @@ import { campaignChannel } from '@/lib/broadcastChannel';
 import { toast } from 'react-toastify';
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
 import CounsellorGroupActions from '@/components/shared/layout/comp/TabActions/CounsellorGroupActions';
+import { useCampaignDialStatusStore } from '@/store/campaignDialStatusStore';
 
 
 const errorMessage: CustomAlertRequest = {
@@ -149,7 +150,7 @@ const MonitorPage = () => {
   const [campaignList, setCampaignList] = useState<any[]>([]);
   const [campaignSkillList, setCampaignSkillList] = useState<any[]>([]);
 
-
+    
   // 섹션 상태
   const [sections, setSections] = useState<Section[]>([
     {
@@ -368,14 +369,45 @@ const MonitorPage = () => {
     }
   });
 
+  // const {campaignDialStatus} = useCampaignDialStatusStore();
+
   // 캠페인 관련 핸들러
   const handleStatusChange = (newStatus: string) => {
-    setCampaignStatus(newStatus as CampaignStatus);
-    fetchCampaignStatusUpdate({
-      campaign_id: Number(selectedCampaign)
-      , campaign_status: newStatus === '시작' ? 1 : newStatus === '멈춤' ? 2 : 3
-    });
-    // API 호출 로직 추가
+
+    const originStartFlag = campaigns.filter(data => data.campaign_id.toString() === selectedCampaign.toString())[0].start_flag;
+
+    // 현재 캠페인의 상태가 발신중(시작)일때 차후 수정해야함
+    const existDial = false;
+    // (selectedCampaign && originStartFlag === 2);
+
+    const waitConfirm = () => {
+      setCampaignStatus(newStatus as CampaignStatus);
+      fetchCampaignStatusUpdate({
+        campaign_id: Number(selectedCampaign),
+        campaign_status: newStatus === '시작' ? 1 : newStatus === '멈춤' ? 2 : 3,
+      });
+    };
+
+    if (existDial) {
+      setAlertState({
+        ...errorMessage,
+        title: '캠페인 상태 변경',
+        isOpen: true,
+        message:
+          '발신중인 데이터 처리 중 입니다. 기다려 주시길 바랍니다. \n강제로 상태 변경을 하실 경우에는 발신 데이터 처리가 되지 않으며 재시작 시에는 중복 발신이 될 수도 있습니다.\n그래도 진행하시겠습니까?',
+        onClose: () => {
+          setAlertState((prev) => ({ ...prev, isOpen: false }));
+          waitConfirm(); // 여기에 캠페인 상태 변경 로직 실행
+        },
+        onCancel: () => {
+          setAlertState((prev) => ({ ...prev, isOpen: false }));
+          // 취소시 아무 일도 안 함
+        },
+      });
+
+      return;
+    }
+    waitConfirm(); // if문에 걸리지 않는다면 바로 처리*/
   };
 
   const handleCampaignSelect = (campaignId: string) => {
@@ -385,6 +417,7 @@ const MonitorPage = () => {
     setDialMode(tempCampaignInfo?.dial_mode || 0);
     // API 호출 로직 추가
   };
+  
 
   const handleCallPacingChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
@@ -800,7 +833,7 @@ const MonitorPage = () => {
   // src\app\monitor\page.tsx
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      const { type, campaignId } = event.data;
+      const { type, campaignId, status } = event.data;
      
       if( type === 'skills_info_update' ){
         const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
@@ -809,6 +842,9 @@ const MonitorPage = () => {
         });
       }else if( type === 'channel:' ){
         setChannelMonitorInit(true);
+      }else if( type === 'campaign_status:' && typeof campaignId != 'undefined' &&  status !== ''){
+        console.log('전달!!!!!!!!!');
+        setCampaignStatus(status);
       }else if( typeof campaignId != 'undefined'){
         setModifiedCampaign(campaignId);        
       }

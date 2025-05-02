@@ -1103,7 +1103,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   };
 
   
-
+  // 캠페인 삭제시 이전 인덱스나 다음 인덱스의 캠페인 아이디 구하기
   const findPreviousOrNextCampaignId = (campaignId : any) => {
     
     let returnCampaignId = 0;

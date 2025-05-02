@@ -126,8 +126,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   const { mutate: environmentSave } = useApirForEnvironmentSave({
     onSuccess: (data) => {
       setIsSaving(false);
-      showAlert('환경설정이 저장되었습니다');
-
+      
       // 환경설정 스토어도 업데이트하여 UI 반영
       if (environmentData) {
         const updatedData = {
@@ -167,6 +166,8 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
           setDayOfWeek(dayOfWeek);
           setUnusedWorkHoursCalc(false);
         }
+
+        showAlert('환경설정이 저장되었습니다');
       }
     },
     onError: (error) => {
@@ -202,6 +203,10 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   // 캠페인 운용 가능 시간 수정 API 호출
   const { mutate: fetchOperatingTimeUpdate } = useApiForOperatingTimeUpdate({
     onSuccess: (data) => {
+      if(data.result_code !== 0){
+        showAlert('발신업무시간 저장 중 오류가 발생하였습니다.');
+        return;
+      }
       console.log(data);
     },
     onError: (error) => {
@@ -298,6 +303,16 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
         });
         return;
       }
+      // #### 업무시간 제한 미사용이 체크되지 않으며, 시작시각과 종료시각이 입력되었지만 요일 설정이 되지 않은경우
+      if(!unusedWorkHoursCalc && dayOfWeek.findIndex( day => day === "t") === -1){
+        setAlertState({
+          ...alertState,
+          isOpen: true,
+          message: "업무시간 제한 사용시 요일 설정이 필요합니다.",
+        });
+        return;
+      }
+
       let check = false;
       
       if (
