@@ -62,7 +62,7 @@ const CampaignStartModal = ({
   const [updateCompleted, setUpdateCompleted] = useState(false);
   const [updateResult, setUpdateResult] = useState<UpdateResult | null>(null);
   const [campaignResults, setCampaignResults] = useState<Map<string, CampaignResult>>(new Map());
-  
+
   // 내부 상태 관리
   const [internalOpen, setInternalOpen] = useState(false);
   console.log("items :::::::::::::", items);
@@ -127,7 +127,7 @@ const CampaignStartModal = ({
   // 캠페인별 발신번호 맵 생성
   const callingNumberMap = useMemo(() => {
     const map = new Map<string, string[]>();
-    
+
     if (callingNumberData?.result_data) {
       // 캠페인 ID별로 발신번호 그룹화
       callingNumberData.result_data.forEach(item => {
@@ -138,20 +138,23 @@ const CampaignStartModal = ({
         map.get(campaignId)?.push(item.calling_number);
       });
     }
-    
+
     return map;
   }, [callingNumberData]);
 
   // 캠페인별 상담사 맵 생성
+  // 캠페인별 상담사 맵 생성
   const agentMap = useMemo(() => {
     const map = new Map<string, string[]>();
-    
+
     if (agentData?.result_data) {
       agentData.result_data.forEach(item => {
-        map.set(item.campaign_id.toString(), item.agent_id);
+        // agent_id를 string[]으로 변환하여 저장
+        const agentIds = item.agent_id.map(id => id.toString());
+        map.set(item.campaign_id.toString(), agentIds);
       });
     }
-    
+
     return map;
   }, [agentData]);
 
@@ -167,7 +170,7 @@ const CampaignStartModal = ({
   // 시간 형식 변환 함수
   const formatTime = (timeArr: string[]) => {
     if (!timeArr || !timeArr.length) return "-";
-    
+
     return timeArr.map(time => {
       if (!time || time.length !== 4) return time;
       const hour = time.slice(0, 2);
@@ -181,13 +184,13 @@ const CampaignStartModal = ({
     if (!dateStr || dateStr.length !== 8 || !timeStr || timeStr.length !== 4) {
       return null;
     }
-    
+
     const year = parseInt(dateStr.slice(0, 4));
     const month = parseInt(dateStr.slice(4, 6)) - 1; // JavaScript 월은 0부터 시작
     const day = parseInt(dateStr.slice(6, 8));
     const hour = parseInt(timeStr.slice(0, 2));
     const minute = parseInt(timeStr.slice(2, 4));
-    
+
     return new Date(year, month, day, hour, minute);
   };
 
@@ -196,10 +199,10 @@ const CampaignStartModal = ({
     if (!schedule || !schedule.start_date || !schedule.start_time || schedule.start_time.length === 0) {
       return false;
     }
-    
+
     const startDateTime = parseDateTime(schedule.start_date, schedule.start_time[0]);
     if (!startDateTime) return false;
-    
+
     return startDateTime <= now;
   };
 
@@ -208,10 +211,10 @@ const CampaignStartModal = ({
     if (!schedule || !schedule.end_date || !schedule.end_time || schedule.end_time.length === 0) {
       return false;
     }
-    
+
     const endDateTime = parseDateTime(schedule.end_date, schedule.end_time[0]);
     if (!endDateTime) return false;
-    
+
     return endDateTime >= now;
   };
 
@@ -229,10 +232,10 @@ const CampaignStartModal = ({
 
   // 캠페인 유효성 검사 (시작/종료 시간, 발신번호, 상담사)
   const isCampaignValid = (schedule: any, campaignId: string) => {
-    return isStartTimeValid(schedule) && 
-           isEndTimeValid(schedule) && 
-           hasCallingNumbers(campaignId) && 
-           hasAgents(campaignId);
+    return isStartTimeValid(schedule) &&
+      isEndTimeValid(schedule) &&
+      hasCallingNumbers(campaignId) &&
+      hasAgents(campaignId);
   };
 
   // open prop이 true로 바뀔 때만 모달 열기
@@ -250,32 +253,32 @@ const CampaignStartModal = ({
   const handleUpdate = async () => {
     if (isUpdating) return;
     setIsUpdating(true);
-    
+
     try {
       console.log("API 호출 시작");
       const result = await onConfirm();
       console.log("API 호출 완료, 결과 처리 시작:", result);
-      
+
       // 결과 처리
       if (result && result.results && Array.isArray(result.results)) {
         let successCount = 0;
         let failCount = 0;
-        
+
         const updatedResults = result.results.map((item: CampaignResult) => {
           const isSuccess = !(item.response && item.response.result_code === -1);
-          
+
           if (isSuccess) {
             successCount++;
           } else {
             failCount++;
           }
-          
+
           return {
             ...item,
             success: isSuccess
           };
         });
-        
+
         const updatedResult = {
           ...result,
           results: updatedResults,
@@ -283,9 +286,9 @@ const CampaignStartModal = ({
           failCount: failCount,
           totalCount: updatedResults.length
         };
-        
+
         setUpdateResult(updatedResult);
-        
+
         // 결과 맵 생성
         const resultMap = new Map<string, CampaignResult>();
         updatedResults.forEach((item: CampaignResult) => {
@@ -303,7 +306,7 @@ const CampaignStartModal = ({
           failCount: 0
         });
       }
-      
+
       setUpdateCompleted(true);
     } catch (error) {
       console.error("업데이트 오류:", error);
@@ -324,10 +327,10 @@ const CampaignStartModal = ({
   const handleCancel = () => {
     // 업데이트 중이면 무시
     if (isUpdating) return;
-    
+
     // 내부 상태 변경
     setInternalOpen(false);
-    
+
     // 약간의 지연 후 부모 컴포넌트에 닫힘을 알림
     setTimeout(() => {
       onCancel();
@@ -350,11 +353,11 @@ const CampaignStartModal = ({
   // 결과 코드에 따른 메시지
   const getStatusMessage = (item: CampaignResult | undefined) => {
     if (!item) return "알 수 없음";
-    
+
     if (item.response && item.response.result_msg) {
       return item.response.result_msg;
     }
-    
+
     return item.success ? "성공" : "실패";
   };
 
@@ -365,12 +368,12 @@ const CampaignStartModal = ({
     <Dialog open={internalOpen} onOpenChange={(open) => {
       if (!open && !isUpdating) handleCancel();
     }}>
-      <DialogContent 
-      className="!w-[90%] lg:w-[80%] max-w-[1200px]" 
-      onInteractOutside={(e) => {
-        // 바깥 클릭 시 모달이 닫히지 않도록
-        if (isUpdating) e.preventDefault();
-      }}>
+      <DialogContent
+        className="!w-[90%] lg:w-[80%] max-w-[1200px]"
+        onInteractOutside={(e) => {
+          // 바깥 클릭 시 모달이 닫히지 않도록
+          if (isUpdating) e.preventDefault();
+        }}>
         <DialogHeader>
           <div className="flex items-center">
             <div className="p-2 rounded-full bg-emerald-100 mr-3">
@@ -388,16 +391,16 @@ const CampaignStartModal = ({
               <div className="flex items-start">
                 <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
                 <AlertDescription className="text-blue-800">
-                  {updateCompleted 
+                  {updateCompleted
                     ? "캠페인 일괄 시작 작업이 완료되었습니다."
                     : "선택하신 캠페인을 일괄적으로 시작 상태로 변경합니다."}
-                  
+
                   {!updateCompleted && (
                     <p className="mt-1 text-xs text-blue-600">
                       총 {items.length}개의 캠페인이 선택되었습니다.
                     </p>
                   )}
-                  
+
                   {updateCompleted && updateResult && (
                     <div className="mt-2">
                       <div className="flex items-center gap-2">
@@ -415,7 +418,7 @@ const CampaignStartModal = ({
                   )}
                 </AlertDescription>
               </div>
-              
+
               {/* 일괄 시작 진행 버튼 */}
               {!updateCompleted && (
                 <Button
@@ -469,13 +472,13 @@ const CampaignStartModal = ({
                     const schedule = scheduleMap.get(campaignId);
                     const callingNumbers = callingNumberMap.get(campaignId) || [];
                     const agents = agentMap.get(campaignId) || [];
-                    
+
                     const hasNumbers = callingNumbers.length > 0;
                     const hasAgentsList = agents.length > 0;
                     const startValid = isStartTimeValid(schedule);
                     const endValid = isEndTimeValid(schedule);
                     const isValid = isCampaignValid(schedule, campaignId);
-                    
+
                     return (
                       <TableRow key={index}>
                         <TableCell>
