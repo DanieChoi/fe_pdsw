@@ -42,11 +42,21 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions
     ,schedules,campaignSkills,callingNumbers
+    , campaignManagerHeaderTenantId, setCampaignManagerHeaderTenantId
+    , campaignManagerHeaderCampaignName, setCampaignManagerHeaderCampaignName
+    , campaignManagerHeaderDailMode, setCampaignManagerHeaderDailMode
+    , campaignManagerHeaderSkill, setCampaignManagerHeaderSkill
+    , campaignManagerHeaderCallNumber, setCampaignManagerHeaderCallNumber
    } = useCampainManagerStore();
 
   const [campaignHeaderSearchParam, setCampaignHeaderSearchParam] = useState<CampaignHeaderSearch>();
   const handleCampaignHeaderSearch = (param: CampaignHeaderSearch) => {
-    setCampaignHeaderSearchParam(param);
+    // setCampaignHeaderSearchParam(param);
+    setCampaignManagerHeaderTenantId(param.tenantId+'');
+    setCampaignManagerHeaderCampaignName(param.campaignName);
+    setCampaignManagerHeaderDailMode(param.dailMode+'');
+    setCampaignManagerHeaderSkill(param.skill+'');
+    setCampaignManagerHeaderCallNumber(param.callNumber);
   };
 
   // 스케줄 조회
@@ -120,6 +130,13 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   useEffect(() => {
     if (typeof campaignId === 'undefined') {
       setMasterCampaignId(campaignIdForUpdateFromSideMenu || '');
+      if( masterCampaignId === '' ){
+        setCampaignManagerHeaderTenantId('all');
+        setCampaignManagerHeaderCampaignName('');
+        setCampaignManagerHeaderDailMode('all');
+        setCampaignManagerHeaderSkill('all');
+        setCampaignManagerHeaderCallNumber('');
+      }
     } else {
       setMasterCampaignId(campaignId);
     }
@@ -132,6 +149,14 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   const handleHeaderInit = () => {
     setHeaderInit(false);
   };
+  
+  const handleListInit = () => {
+    setCampaignManagerHeaderTenantId('all');
+    setCampaignManagerHeaderCampaignName('');
+    setCampaignManagerHeaderDailMode('all');
+    setCampaignManagerHeaderSkill('all');
+    setCampaignManagerHeaderCallNumber('');
+  };  
 
   //초기화.
   const handleDetailInit = (campaign_id:number) => {
@@ -141,6 +166,11 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
       const tempCampaigns = campaigns.filter(data => data.campaign_id != Number(masterCampaignId));
       setMasterCampaignId(campaigns[0].campaign_id+'');
       setCampaigns(tempCampaigns);
+      setCampaignManagerHeaderTenantId('all');
+      setCampaignManagerHeaderCampaignName('');
+      setCampaignManagerHeaderDailMode('all');
+      setCampaignManagerHeaderSkill('all');
+      setCampaignManagerHeaderCallNumber('');
       // }else{
     //   setMasterCampaignId(campaign_id+'');
     //   fetchMain({
@@ -149,6 +179,25 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     //   });  
     }
   };
+
+  useEffect(() => {
+    if ( campaignManagerHeaderTenantId != ''
+       || campaignManagerHeaderCampaignName != ''
+       || campaignManagerHeaderDailMode != ''
+       || campaignManagerHeaderSkill != ''
+       || campaignManagerHeaderCallNumber != ''
+      ) {
+        setCampaignHeaderSearchParam({          
+          tenantId: campaignManagerHeaderTenantId != ''? Number(campaignManagerHeaderTenantId):-1,
+          campaignName: campaignManagerHeaderCampaignName,
+          dailMode: campaignManagerHeaderDailMode != ''? Number(campaignManagerHeaderDailMode):-1,
+          skill: campaignManagerHeaderSkill != ''? Number(campaignManagerHeaderSkill):-1,
+          callNumber: campaignManagerHeaderCallNumber
+        });
+    }else{
+      setCampaignHeaderSearchParam(undefined);
+    }
+  }, [campaignManagerHeaderTenantId,campaignManagerHeaderCampaignName,campaignManagerHeaderDailMode,campaignManagerHeaderSkill,campaignManagerHeaderCallNumber]);
 
   // 캠페인 정보 조회 API 호출
   // const { mutate: fetchMain } = useApiForMain({
@@ -172,6 +221,7 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
           <CampaignManagerList
             campaignId={campaignIdForUpdateFromSideMenu || masterCampaignId}
             onRowClick={handleRowClick}
+            onHeaderInit={handleListInit}
             campaignHeaderSearchParam={campaignHeaderSearchParam}
           />
           <CampaignManagerDetail
