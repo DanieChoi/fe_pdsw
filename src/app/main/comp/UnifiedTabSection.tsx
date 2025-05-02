@@ -23,7 +23,8 @@ const UnifiedTabSection = ({
   activeTabId,
   activeTabKey,
   canRemove,
-  showDivider
+  showDivider,
+  isSplitView
 }: {
   rowId: string;
   sectionId: string;
@@ -34,6 +35,7 @@ const UnifiedTabSection = ({
   activeTabKey: string | null;
   canRemove: boolean;
   showDivider: boolean;
+  isSplitView: boolean;
 }) => {
   const { setActiveTab } = useTabStore();
 
@@ -58,7 +60,9 @@ const UnifiedTabSection = ({
         />
 
         {/* 콘텐츠 영역 - 탭 헤더 아래에 배치 */}
-        <div className="flex-1 overflow-hidden ">
+        <div className={`flex-1 overflow-hidden ${
+          isSplitView ? "px-5" : ""
+        }`}>
           <SectionContent
             rowId={rowId}
             sectionId={sectionId}

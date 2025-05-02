@@ -82,6 +82,7 @@ const UnifiedTabView: React.FC = () => {
                       activeTabKey={activeTabKey}
                       canRemove={section.id !== "default"}
                       showDivider={idx < row.sections.length - 1}
+                      isSplitView={row.sections.length > 1}
                     />
                     
                     {/* 마지막 섹션이 아니고 섹션이 2개일 때만 리사이즈 분할선 표시 */}
