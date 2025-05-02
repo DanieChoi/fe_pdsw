@@ -156,7 +156,7 @@ const RebroadcastSettingsPanelHeader = ({
 
     return (
         <div className="flex title-background justify-between">
-            예약 재발신 타입 확인: {reBroadCastOption}
+            {/* 예약 재발신 타입 확인: {reBroadCastOption} */}
             <div className="flex gap-4 items-center">
                 <div className="flex items-center gap-2">
                     <Label className="w-20 min-w-20">캠페인 아이디</Label>
