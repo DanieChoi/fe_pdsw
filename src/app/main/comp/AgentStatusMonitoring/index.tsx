@@ -248,7 +248,7 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
   }, [campaignId,tenantId,campaigns,statisticsUpdateCycle]);
 
   return (
-    <div className="w-full h-full flex flex-col gap-4">
+    <div className="w-full h-full flex flex-col gap-4 limit-700">
       <div>
         {campaignId && campaignId > 0?
         <TitleWrap
