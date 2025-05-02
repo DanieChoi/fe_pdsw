@@ -50,6 +50,7 @@ import { toast } from 'react-toastify';
 import { campaignChannel } from '@/lib/broadcastChannel';
 import { useEnvironmentStore } from "@/store/environmentStore";
 import { CampaignInfoInsertRequest } from '@/features/campaignManager/hooks/useApiForCampaignManagerInsert';
+import { Button } from '@/components/ui/button';
 
 export interface TabItem {
   id: number;
@@ -290,7 +291,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const [campaignScheduleChangeYn, setCampaignScheduleChangeYn] = useState<boolean>(false);
   const [campaignDialSpeedChangeYn, setCampaignDialSpeedChangeYn] = useState<boolean>(false);
   const [rtnMessage, setRtnMessage] = useState<string>('');
-  const { tenants, setCampaigns, selectedCampaign, setSelectedCampaign, setReBroadcastType } = useMainStore();
+  const { tenants, setCampaigns, selectedCampaign, setSelectedCampaign, setReBroadcastType, campaigns } = useMainStore();
   const { id: user_id, tenant_id, menu_role_id, session_key } = useAuthStore();
   const { removeTab, activeTabId, activeTabKey, addTab, openedTabs, setActiveTab, campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu, moveTabToSection, rows } = useTabStore();
   const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers
@@ -1101,10 +1102,77 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     });
   };
 
+  
+
+  const findPreviousOrNextCampaignId = (campaignId : any) => {
+    
+    let returnCampaignId = 0;
+
+    // tenant_id가 동일한 캠페인만 필터링
+    const filteredCampaigns = campaigns.filter(data => data.tenant_id === tempCampaignInfo.tenant_id);
+
+    // 현재 campaign_id의 인덱스 찾기
+    const currentCampaignIndex = filteredCampaigns.findIndex(data => data.campaign_id === Number(campaignId));
+
+    const thisCampaign = filteredCampaigns.filter( data => data.campaign_id === campaignId);
+    if(thisCampaign){
+      setSelectedCampaign(thisCampaign[0]);
+    }
+
+    if (currentCampaignIndex === -1) {
+      // console.log('현재 캠페인이 tenant_id가 같은 목록에 없습니다.');
+      return returnCampaignId;
+    }
+
+    // 이전 및 다음 캠페인 ID 가져오기
+    const previousCampaignId = filteredCampaigns[currentCampaignIndex - 1]?.campaign_id;
+    const nextCampaignId = filteredCampaigns[currentCampaignIndex + 1]?.campaign_id;
+
+    if (previousCampaignId || nextCampaignId) {
+
+      // 현재 campaign_id를 제외한 나머지 campaigns로 업데이트
+      const tempCampaigns = campaigns.filter(data => data.campaign_id !== campaignId);
+      setCampaigns(tempCampaigns);
+
+      if(previousCampaignId){
+        // console.log('이전 campaign_id:: ' + previousCampaignId);
+        returnCampaignId = previousCampaignId;
+      }else if (nextCampaignId) {
+        // console.log('다음 campaign_id:: ' + nextCampaignId);
+        returnCampaignId = nextCampaignId; 
+      }
+      
+    }  else {
+      // console.log('###### 이전 및 다음 campaign_id가 없습니다.');
+    }
+
+    // 현재 campaign_id를 제외한 나머지 campaigns로 업데이트
+    // const tempCampaigns = campaigns.filter(data => data.campaign_id !== campaignId);
+    // setCampaigns(tempCampaigns);
+
+    return returnCampaignId;
+  }
+
+  const testFunction = (campaignId : number) =>{
+
+    const filteredCampaigns = campaigns.filter(data => data.tenant_id === tempCampaignInfo.tenant_id);
+    console.log('##### tenant_id가 같은 캠페인 목록:', filteredCampaigns);
+    console.log('###### 캠페인 아이디 : ', campaignId);
+    const thisCampaign = filteredCampaigns.filter( data => data.campaign_id === Number(findPreviousOrNextCampaignId(campaignId)));
+    console.log('######### thisCampaign : ', thisCampaign);
+    if(thisCampaign){
+      setSelectedCampaign(thisCampaign[0]);
+      
+    }
+
+  };
+
+  const [forIndexCurrentCampaignId, setForIndexCurrentCampaignId] = useState<number>(0);
   // 캠페인 삭제 실행
   const handleCampaignDeleteExecute = () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     if (selectedCampaign?.start_flag === 3) {
+      setForIndexCurrentCampaignId(findPreviousOrNextCampaignId(campaignId));
       fetchCampaignManagerDelete({
         ...campaignInfoDelete,
         campaign_id: tempCampaignManagerInfo.campaign_id,
@@ -1362,7 +1430,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
             });
           } else {
             //캠페인관리 화면 닫기.
-            setInit(0);
+            setInit(forIndexCurrentCampaignId);
             setAlertState({
               ...errorMessage,
               isOpen: true,
@@ -1373,7 +1441,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           }
         } else {
           //캠페인관리 화면 닫기.
-          setInit(0);
+          setInit(forIndexCurrentCampaignId);
           setAlertState({
             ...errorMessage,
             isOpen: true,
@@ -1383,7 +1451,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           });
         }
       } else {
-        setInit(0);
+        setInit(forIndexCurrentCampaignId);
         setAlertState({
           ...errorMessage,
           isOpen: true,
@@ -1396,7 +1464,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     onError: (data) => {
       // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
       //캠페인관리 화면 닫기.
-      setInit(0);
+      setInit(forIndexCurrentCampaignId);
       setAlertState({
         ...errorMessage,
         isOpen: true,
@@ -1410,13 +1478,13 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   // 재발신 삭제 API 호출
   const { mutate: fetchAutoRedialDelete } = useApiForAutoRedialDelete({
     onSuccess: (data) => {
-      setInit(0);
+      setInit(forIndexCurrentCampaignId);
     }
   });
 
   // 발신번호 삭제 API 호출
   const { mutate: fetchCallingNumberDelete } = useApiForCallingNumberDelete({
-    onSuccess: (data) => {
+    onSuccess: (data) => {      
       setCallingNumberChangeYn(false);
     }
   });
@@ -1864,6 +1932,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
               className="w-full"
               onChange={(e) => handleInputData(e.target.value, 'campaign_desc')}
             />
+          </div>
+          <div>
+            <Button onClick={()=> testFunction(campaignId)}>test</Button>
           </div>
         </div>
       </div>

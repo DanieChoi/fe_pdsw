@@ -135,7 +135,7 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
 
   //초기화.
   const handleDetailInit = (campaign_id:number) => {
-    console.log('campaign_id:: '+campaign_id);
+    console.log('######## campaign_id:: '+campaign_id);
     if( campaign_id === 0){
       setHeaderInit(true);
       const tempCampaigns = campaigns.filter(data => data.campaign_id != Number(masterCampaignId));
@@ -146,11 +146,7 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     //   fetchMain({
     //     session_key: session_key,
     //     tenant_id: tenant_id,
-    //   });
-    }else{
-      setHeaderInit(true);
-      setMasterCampaignId(campaign_id.toString());
-      
+    //   });  
     }
   };
 
