@@ -7,7 +7,6 @@ import { useTabStore } from "@/store/tabStore";
 import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
 import { Separator } from "react-contexify";
 // import { useApiForMultiUpdateCampaignProgressStatus } from "../hook/useApiForMultiUpdateCampaignProgressStatus";
-// import IConfirmPopupForMultiUpdateCampaignProgress from "@/features/campaignManager/components/popups/IConfirmPopupForMultiUpdateCampaignProgress";
 import {
   Dialog,
   DialogContent,
