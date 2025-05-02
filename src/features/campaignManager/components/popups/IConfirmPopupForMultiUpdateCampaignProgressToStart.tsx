@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Play, Loader2, CheckCircle, XCircle, AlertCircle, Calendar, Clock, Phone } from "lucide-react";
+import { Play, Loader2, CheckCircle, XCircle, AlertCircle, Calendar, Clock, Phone, Users } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useApiForCampaignScheduleInfosForSystemAdmin } from "@/shared/hooks/campaign/useApiForCampaignScheduleInfosForSystemAdmin";
 import { useApiForCampaignCallingNumberListForSystemAdmin } from "@/shared/hooks/campaign/useApiForCampaignCallingNumberListForSystemAdmin";
+import { useApiForCampaignAgentListForSystemAdmin } from "@/shared/hooks/campaign/useApiForCampaignAgentListForSystemAdmin";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Campaign {
@@ -102,6 +103,16 @@ const CampaignStartModal = ({
     enabled: campaignIds.length > 0 && internalOpen
   });
 
+  // 캠페인 상담사 정보 가져오기
+  const { data: agentData, isLoading: isLoadingAgents } = useApiForCampaignAgentListForSystemAdmin({
+    request: {
+      filter: {
+        campaign_id: campaignIds
+      }
+    },
+    enabled: campaignIds.length > 0 && internalOpen
+  });
+
   // 캠페인 스케줄 맵 생성
   const scheduleMap = useMemo(() => {
     const map = new Map();
@@ -130,6 +141,19 @@ const CampaignStartModal = ({
     
     return map;
   }, [callingNumberData]);
+
+  // 캠페인별 상담사 맵 생성
+  const agentMap = useMemo(() => {
+    const map = new Map<string, string[]>();
+    
+    if (agentData?.result_data) {
+      agentData.result_data.forEach(item => {
+        map.set(item.campaign_id.toString(), item.agent_id);
+      });
+    }
+    
+    return map;
+  }, [agentData]);
 
   // 날짜 형식 변환 함수
   const formatDate = (dateStr: string) => {
@@ -197,9 +221,18 @@ const CampaignStartModal = ({
     return numbers && numbers.length > 0;
   };
 
-  // 캠페인 유효성 검사 (현재 시간이 시작과 종료 시간 사이에 있고, 발신번호가 있음)
+  // 상담사 유효성 검사 (상담사가 1명 이상 있는지)
+  const hasAgents = (campaignId: string) => {
+    const agents = agentMap.get(campaignId);
+    return agents && agents.length > 0;
+  };
+
+  // 캠페인 유효성 검사 (시작/종료 시간, 발신번호, 상담사)
   const isCampaignValid = (schedule: any, campaignId: string) => {
-    return isStartTimeValid(schedule) && isEndTimeValid(schedule) && hasCallingNumbers(campaignId);
+    return isStartTimeValid(schedule) && 
+           isEndTimeValid(schedule) && 
+           hasCallingNumbers(campaignId) && 
+           hasAgents(campaignId);
   };
 
   // open prop이 true로 바뀔 때만 모달 열기
@@ -326,14 +359,14 @@ const CampaignStartModal = ({
   };
 
   // 테이블 로딩 여부
-  const isLoading = isLoadingSchedule || isLoadingCallingNumbers;
+  const isLoading = isLoadingSchedule || isLoadingCallingNumbers || isLoadingAgents;
 
   return (
     <Dialog open={internalOpen} onOpenChange={(open) => {
       if (!open && !isUpdating) handleCancel();
     }}>
       <DialogContent 
-      className="!w-[80%] lg:w-[60%] max-w-[1200px]" 
+      className="!w-[90%] lg:w-[80%] max-w-[1200px]" 
       onInteractOutside={(e) => {
         // 바깥 클릭 시 모달이 닫히지 않도록
         if (isUpdating) e.preventDefault();
@@ -411,6 +444,7 @@ const CampaignStartModal = ({
                 <TableRow>
                   <TableHead>캠페인 정보</TableHead>
                   <TableHead>발신 번호</TableHead>
+                  <TableHead>상담사</TableHead>
                   <TableHead>시작 날짜</TableHead>
                   <TableHead>종료 날짜</TableHead>
                   <TableHead>유효성</TableHead>
@@ -423,7 +457,7 @@ const CampaignStartModal = ({
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={updateCompleted ? 7 : 6} className="text-center py-4">
+                    <TableCell colSpan={updateCompleted ? 8 : 7} className="text-center py-4">
                       <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                       <div className="mt-2 text-sm text-gray-500">정보를 불러오는 중...</div>
                     </TableCell>
@@ -434,7 +468,10 @@ const CampaignStartModal = ({
                     const result = campaignResults.get(campaignId);
                     const schedule = scheduleMap.get(campaignId);
                     const callingNumbers = callingNumberMap.get(campaignId) || [];
+                    const agents = agentMap.get(campaignId) || [];
+                    
                     const hasNumbers = callingNumbers.length > 0;
+                    const hasAgentsList = agents.length > 0;
                     const startValid = isStartTimeValid(schedule);
                     const endValid = isEndTimeValid(schedule);
                     const isValid = isCampaignValid(schedule, campaignId);
@@ -480,6 +517,40 @@ const CampaignStartModal = ({
                                   </div>
                                 ) : (
                                   <p className="text-red-600">발신번호가 등록되지 않았습니다.</p>
+                                )}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </TableCell>
+                        <TableCell>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center">
+                                  <Users className="h-4 w-4 text-gray-500 mr-1" />
+                                  <span className="text-sm">{agents.length}명</span>
+                                  {hasAgentsList ? (
+                                    <CheckCircle className="h-4 w-4 text-green-500 ml-2" />
+                                  ) : (
+                                    <XCircle className="h-4 w-4 text-red-500 ml-2" />
+                                  )}
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {hasAgentsList ? (
+                                  <div>
+                                    <p className="font-medium mb-1">등록된 상담사 ({agents.length}명)</p>
+                                    <ul className="text-xs space-y-1">
+                                      {agents.slice(0, 5).map((agent: string, idx) => (
+                                        <li key={idx}>• {agent}</li>
+                                      ))}
+                                      {agents.length > 5 && (
+                                        <li>• 외 {agents.length - 5}명</li>
+                                      )}
+                                    </ul>
+                                  </div>
+                                ) : (
+                                  <p className="text-red-600">등록된 상담사가 없습니다.</p>
                                 )}
                               </TooltipContent>
                             </Tooltip>
@@ -576,6 +647,7 @@ const CampaignStartModal = ({
                                       <p className="text-green-600 font-medium">모든 조건 충족</p>
                                       <ul className="mt-1 text-xs space-y-1">
                                         <li className="text-green-600">• 발신번호가 등록되어 있습니다.</li>
+                                        <li className="text-green-600">• 상담사가 등록되어 있습니다.</li>
                                         <li className="text-green-600">• 시작 시간이 현재 시간 이전입니다.</li>
                                         <li className="text-green-600">• 종료 시간이 현재 시간 이후입니다.</li>
                                       </ul>
@@ -585,6 +657,7 @@ const CampaignStartModal = ({
                                       <p className="text-red-600 font-medium">일부 조건 미충족</p>
                                       <ul className="mt-1 text-xs">
                                         {!hasNumbers && <li className="text-red-600">• 발신번호가 등록되지 않았습니다.</li>}
+                                        {!hasAgentsList && <li className="text-red-600">• 상담사가 등록되지 않았습니다.</li>}
                                         {!startValid && <li className="text-red-600">• 시작 시간이 현재 시간 이후입니다.</li>}
                                         {!endValid && <li className="text-red-600">• 종료 시간이 현재 시간 이전입니다.</li>}
                                       </ul>
