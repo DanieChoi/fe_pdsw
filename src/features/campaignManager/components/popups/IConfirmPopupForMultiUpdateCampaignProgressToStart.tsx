@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
@@ -66,6 +65,9 @@ const CampaignStartModal = ({
   const [internalOpen, setInternalOpen] = useState(false);
   console.log("items :::::::::::::", items);
 
+  // 현재 시간
+  const now = useMemo(() => new Date(), []);
+
   // 캠페인 아이디 배열 추출
   const campaignIds = useMemo(() => {
     return items
@@ -116,6 +118,50 @@ const CampaignStartModal = ({
       const minute = time.slice(2, 4);
       return `${hour}:${minute}`;
     }).join(", ");
+  };
+
+  // 날짜 및 시간 문자열을 Date 객체로 변환
+  const parseDateTime = (dateStr: string, timeStr: string) => {
+    if (!dateStr || dateStr.length !== 8 || !timeStr || timeStr.length !== 4) {
+      return null;
+    }
+    
+    const year = parseInt(dateStr.slice(0, 4));
+    const month = parseInt(dateStr.slice(4, 6)) - 1; // JavaScript 월은 0부터 시작
+    const day = parseInt(dateStr.slice(6, 8));
+    const hour = parseInt(timeStr.slice(0, 2));
+    const minute = parseInt(timeStr.slice(2, 4));
+    
+    return new Date(year, month, day, hour, minute);
+  };
+
+  // 시작 시간 유효성 검사
+  const isStartTimeValid = (schedule: any) => {
+    if (!schedule || !schedule.start_date || !schedule.start_time || schedule.start_time.length === 0) {
+      return false;
+    }
+    
+    const startDateTime = parseDateTime(schedule.start_date, schedule.start_time[0]);
+    if (!startDateTime) return false;
+    
+    return startDateTime <= now;
+  };
+
+  // 종료 시간 유효성 검사
+  const isEndTimeValid = (schedule: any) => {
+    if (!schedule || !schedule.end_date || !schedule.end_time || schedule.end_time.length === 0) {
+      return false;
+    }
+    
+    const endDateTime = parseDateTime(schedule.end_date, schedule.end_time[0]);
+    if (!endDateTime) return false;
+    
+    return endDateTime >= now;
+  };
+
+  // 캠페인 유효성 검사 (현재 시간이 시작과 종료 시간 사이에 있음)
+  const isCampaignValid = (schedule: any) => {
+    return isStartTimeValid(schedule) && isEndTimeValid(schedule);
   };
 
   // open prop이 true로 바뀔 때만 모달 열기
@@ -325,6 +371,7 @@ const CampaignStartModal = ({
                   <TableHead>캠페인 정보</TableHead>
                   <TableHead>시작 날짜</TableHead>
                   <TableHead>종료 날짜</TableHead>
+                  <TableHead>유효성</TableHead>
                   <TableHead>현재 상태</TableHead>
                   {updateCompleted && (
                     <TableHead>결과</TableHead>
@@ -334,7 +381,7 @@ const CampaignStartModal = ({
               <TableBody>
                 {isLoadingSchedule ? (
                   <TableRow>
-                    <TableCell colSpan={updateCompleted ? 5 : 4} className="text-center py-4">
+                    <TableCell colSpan={updateCompleted ? 6 : 5} className="text-center py-4">
                       <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                       <div className="mt-2 text-sm text-gray-500">스케줄 정보를 불러오는 중...</div>
                     </TableCell>
@@ -344,6 +391,9 @@ const CampaignStartModal = ({
                     const campaignId = item.campaign_id?.toString() || '';
                     const result = campaignResults.get(campaignId);
                     const schedule = scheduleMap.get(campaignId);
+                    const isValid = isCampaignValid(schedule);
+                    const startValid = isStartTimeValid(schedule);
+                    const endValid = isEndTimeValid(schedule);
                     
                     return (
                       <TableRow key={index}>
@@ -367,10 +417,20 @@ const CampaignStartModal = ({
                                     <span>{formatDate(schedule.start_date)}</span>
                                     <Clock className="h-4 w-4 text-gray-500 ml-2 mr-1" />
                                     <span className="text-xs">{formatTime(schedule.start_time)}</span>
+                                    {startValid ? (
+                                      <CheckCircle className="h-4 w-4 text-green-500 ml-2" />
+                                    ) : (
+                                      <XCircle className="h-4 w-4 text-red-500 ml-2" />
+                                    )}
                                   </div>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <p>시작 시간: {formatTime(schedule.start_time)}</p>
+                                  {startValid ? (
+                                    <p className="text-green-600 text-xs mt-1">유효: 시작 시간이 현재 시간 이전입니다.</p>
+                                  ) : (
+                                    <p className="text-red-600 text-xs mt-1">유효하지 않음: 시작 시간이 현재 시간 이후입니다.</p>
+                                  )}
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -388,16 +448,68 @@ const CampaignStartModal = ({
                                     <span>{formatDate(schedule.end_date)}</span>
                                     <Clock className="h-4 w-4 text-gray-500 ml-2 mr-1" />
                                     <span className="text-xs">{formatTime(schedule.end_time)}</span>
+                                    {endValid ? (
+                                      <CheckCircle className="h-4 w-4 text-green-500 ml-2" />
+                                    ) : (
+                                      <XCircle className="h-4 w-4 text-red-500 ml-2" />
+                                    )}
                                   </div>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <p>종료 시간: {formatTime(schedule.end_time)}</p>
+                                  {endValid ? (
+                                    <p className="text-green-600 text-xs mt-1">유효: 종료 시간이 현재 시간 이후입니다.</p>
+                                  ) : (
+                                    <p className="text-red-600 text-xs mt-1">유효하지 않음: 종료 시간이 현재 시간 이전입니다.</p>
+                                  )}
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
                           ) : (
                             <span className="text-gray-400 text-xs">정보 없음</span>
                           )}
+                        </TableCell>
+                        <TableCell>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div>
+                                  {schedule ? (
+                                    isValid ? (
+                                      <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
+                                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                                        유효함
+                                      </Badge>
+                                    ) : (
+                                      <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200">
+                                        <XCircle className="h-4 w-4 text-red-500 mr-2" />
+                                        유효하지 않음
+                                      </Badge>
+                                    )
+                                  ) : (
+                                    <span className="text-gray-400 text-xs">정보 없음</span>
+                                  )}
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {schedule ? (
+                                  isValid ? (
+                                    <p>현재 시간이 캠페인 시작과 종료 시간 사이에 있습니다.</p>
+                                  ) : (
+                                    <div>
+                                      <p>현재 시간이 캠페인 유효 기간 내에 있지 않습니다.</p>
+                                      <ul className="mt-1 text-xs">
+                                        {!startValid && <li className="text-red-600">• 시작 시간이 현재 시간 이후입니다.</li>}
+                                        {!endValid && <li className="text-red-600">• 종료 시간이 현재 시간 이전입니다.</li>}
+                                      </ul>
+                                    </div>
+                                  )
+                                ) : (
+                                  <p>캠페인 스케줄 정보를 찾을 수 없습니다.</p>
+                                )}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className="bg-gray-100 text-gray-800">
