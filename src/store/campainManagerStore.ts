@@ -33,6 +33,7 @@ interface CampainManagerState {
   campaignManagerHeaderDailMode: string;
   campaignManagerHeaderSkill: string;
   campaignManagerHeaderCallNumber: string;
+  campaignManagerCampaignId: string;
 }
 
 interface CampainManagerActions {
@@ -54,6 +55,7 @@ interface CampainManagerActions {
   setCampaignManagerHeaderDailMode: (campaignManagerHeaderDailMode: string) => void;
   setCampaignManagerHeaderSkill: (campaignManagerHeaderSkill: string) => void;
   setCampaignManagerHeaderCallNumber: (campaignManagerHeaderCallNumber: string) => void;
+  setCampaignManagerCampaignId: (campaignManagerCampaignId: string) => void;
 }
 
 type CampainManagerStore = CampainManagerState & CampainManagerActions;
@@ -76,6 +78,7 @@ export const useCampainManagerStore = create<CampainManagerStore>((set) => ({
   campaignManagerHeaderDailMode: '',
   campaignManagerHeaderSkill: '',
   campaignManagerHeaderCallNumber: '',
+  campaignManagerCampaignId: '',
   setSkills: (skills) => {
     set({ skills });  
     campaignChannel.postMessage({
@@ -114,5 +117,6 @@ export const useCampainManagerStore = create<CampainManagerStore>((set) => ({
   setCampaignManagerHeaderDailMode: (campaignManagerHeaderDailMode) => set({ campaignManagerHeaderDailMode }),
   setCampaignManagerHeaderSkill: (campaignManagerHeaderSkill) => set({ campaignManagerHeaderSkill }),
   setCampaignManagerHeaderCallNumber: (campaignManagerHeaderCallNumber) => set({ campaignManagerHeaderCallNumber }),
+  setCampaignManagerCampaignId: (campaignManagerCampaignId) => set({ campaignManagerCampaignId }),
   isAlreadyOpend: false
 }));
