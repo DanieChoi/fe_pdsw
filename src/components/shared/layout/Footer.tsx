@@ -855,7 +855,6 @@ export default function Footer({
 
       //캠페인.
       let _message = '';
-      let _message2 = '';
       //캠페인수정>동작시간 추가
       if (announce === '/pds/campaign/schedule') {
         _message = '[캠페인 스케쥴';
