@@ -469,7 +469,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         </div>
       )}
 
-      <div className="flex gap-5 h-[calc(100%-46px)] out-call-responsive-container">
+      <div className="flex gap-5 h-[calc(100%-61px)] out-call-responsive-container">
         <div className="flex-1 out-call-responsive-left gap-5">
           <div className="">
             <Table>

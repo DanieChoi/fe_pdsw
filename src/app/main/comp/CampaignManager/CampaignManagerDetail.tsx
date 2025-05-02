@@ -1933,9 +1933,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
               onChange={(e) => handleInputData(e.target.value, 'campaign_desc')}
             />
           </div>
-          <div>
+          {/* <div>
             <Button onClick={()=> testFunction(campaignId)}>test</Button>
-          </div>
+          </div> */}
         </div>
       </div>
       <div>

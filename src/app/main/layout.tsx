@@ -151,11 +151,11 @@ export default function MainLayout({
                 className="refined-scrollbar overflow-auto flex-1"
                 style={{
                   height: `calc(100% - ${actualFooterHeight}px)`,
-                  padding: '20px 25px 0 35px',
+                  padding: '20px 25px 20px 35px',
                   boxSizing: 'border-box',
                 }}
               >
-                <div className="min-w-[800px]">
+                <div className="h-full min-w-[800px]">
                   {children}
                 </div>
               </div>
