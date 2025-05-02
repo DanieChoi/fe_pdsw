@@ -50,6 +50,7 @@ export default function Footer({
 
   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
+  const [sseData, setSseData] = useState<string>('');
 
 
   const lastProcessedMessageRef = useRef<string | null>(null);
@@ -224,20 +225,20 @@ export default function Footer({
     }
     //캠페인수정>콜페이싱 수정
     else if (announce === '/pds/campaign/dial-speed') {
-      _message = '[콜페이싱] ';
-      if (command === 'UPDATE') {
-        const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === Number(campaign_id));
-        if (tempCampaign && tempCampaign.dial_mode === 2) {
-          _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'] * 2;
-        } else {
-          _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'] * 2;
-        }
-        addMessageToFooterList(_time, _type, _message);
-        fetchMain({
-          session_key: '',
-          tenant_id: tenant_id,
-        });
-      }
+      // _message = '[콜페이싱] ';
+      // if (command === 'UPDATE') {
+      //   const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === Number(campaign_id));
+      //   if (tempCampaign && tempCampaign.dial_mode === 2) {
+      //     _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'] * 2;
+      //   } else {
+      //     _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'] * 2;
+      //   }
+      //   addMessageToFooterList(_time, _type, _message);
+      //   fetchMain({
+      //     session_key: '',
+      //     tenant_id: tenant_id,
+      //   });
+      // }
     }
     //캠페인.
     else if (announce === '/pds/campaign') {
@@ -389,22 +390,22 @@ export default function Footer({
     }
     //캠페인수정>동작시간 추가
     else if (announce === '/pds/campaign/schedule') {
-      _message = '[캠페인 스케쥴';
-      if (command === 'INSERT') {
-        // _message += '수정, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
-        _message += '수정] 캠페인 아이디 : ' + campaign_id;
-        addMessageToFooterList(_time, _type, _message);
-      }
-      else if (command === 'UPDATE') {
-        // _message += '변경, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
-        _message += '변경] 캠페인 아이디 : ' + campaign_id;
-        addMessageToFooterList(_time, _type, _message);
-      }
-      else if (command === 'DELETE') {
-        // _message += '삭제] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
-        _message += '삭제] 캠페인 아이디 : ' + campaign_id;
-        addMessageToFooterList(_time, _type, _message);
-      }
+      // _message = '[캠페인 스케쥴';
+      // if (command === 'INSERT') {
+      //   // _message += '수정, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
+      //   _message += '수정] 캠페인 아이디 : ' + campaign_id;
+      //   addMessageToFooterList(_time, _type, _message);
+      // }
+      // else if (command === 'UPDATE') {
+      //   // _message += '변경, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
+      //   _message += '변경] 캠페인 아이디 : ' + campaign_id;
+      //   addMessageToFooterList(_time, _type, _message);
+      // }
+      // else if (command === 'DELETE') {
+      //   // _message += '삭제] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
+      //   _message += '삭제] 캠페인 아이디 : ' + campaign_id;
+      //   addMessageToFooterList(_time, _type, _message);
+      // }
     }
     //캠페인 동작상태 변경
     else if (announce === '/pds/campaign/status') {
@@ -739,6 +740,7 @@ export default function Footer({
                 tempEventData["skill_id"] || "",
                 tempEventData
               );
+              setSseData(event.data);
             }
           } catch (error) {
             console.error("SSE JSON parse error: ", error);
@@ -795,66 +797,6 @@ export default function Footer({
     }
   };
 
-  // const logConnectionStatus = useCallback(() => {
-  //   const connectionInfo = getConnectionInfo();
-  //   console.log("📊 [SSE 연결 상태]", {
-  //     연결됨: connectionInfo.isConnected,
-  //     URL: connectionInfo.url,
-  //     총연결횟수: connectionInfo.connectionCount,
-  //     메시지수신횟수: connectionInfo.messageCount,
-  //     마지막연결시간: connectionInfo.lastConnectedAt,
-  //   });
-  // }, [getConnectionInfo]);
-
-  // SSE 구독 코드 수정 (기존 useEffect 대체)
-  // src/components/Footer.tsx — 수정 후
-  // useEffect(() => {
-  //   if (
-  //     typeof window !== 'undefined' &&
-  //     window.EventSource &&
-  //     id !== '' &&
-  //     !(window as any).SSE_GLOBAL
-  //   ) {
-  //     const url = `/notification/${tenant_id}/subscribe/${id}`
-  //     if (sessionStorage.getItem('SSE_CONNECTED') === url) {
-  //       console.log(`♻️ [SSE] sessionStorage 중복 연결 방지: ${url}`)
-  //       return
-  //     }
-  //     console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`)
-  //     initSSE(id, tenant_id, handleSSEMessage)
-  //     setTimeout(() => {
-  //       logConnectionStatus()
-  //     }, 1000)
-  //     return () => {
-  //       console.log('🔌 [Footer 언마운트] SSE 연결 종료')
-  //       closeSSE()
-  //     }
-  //   }
-  // }, [id, tenant_id, initSSE, closeSSE, logConnectionStatus])
-
-  // SSE 구독 코드 수정 (기존 useEffect 대체)
-  // useEffect(() => {
-  //   if (
-  //     typeof window !== 'undefined' &&
-  //     window.EventSource &&
-  //     id !== '' &&
-  //     !(window as any).SSE_GLOBAL // ✅ 전역 SSE 없을 때만 실행
-  //   ) {
-  //     console.log(`🔄 [SSE 연결 시도] 사용자 ID: ${id}, 테넌트 ID: ${tenant_id}`);
-
-  //     initSSE(id, tenant_id, handleSSEMessage);
-
-  //     setTimeout(() => {
-  //       logConnectionStatus();
-  //     }, 1000);
-
-  //     return () => {
-  //       console.log("🔌 [Footer 컴포넌트 언마운트] SSE 연결 종료");
-  //       closeSSE();
-  //     };
-  //   }
-  // }, []);
-
   const handleResizeStartInternal = () => {
     setIsResizing(true);
     onResizeStart?.();
@@ -887,6 +829,74 @@ export default function Footer({
     setIsHeightToggled(!isHeightToggled);
   };
 
+  useEffect(() => {
+    if( sseData != '' ){ 
+      console.log('sseData :: '+sseData);
+      const tempEventData = JSON.parse(sseData);
+      const announce = tempEventData["announce"];
+      const data = tempEventData["data"];
+      const command = tempEventData["command"];
+      const kind = tempEventData["kind"];
+      const skill_id = tempEventData["skill_id"];
+      const campaign_id = tempEventData["campaign_id"];
+      //시간.
+      const today = new Date();
+      const _time = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0') + ':' + String(today.getSeconds()).padStart(2, '0');
+
+      //타입.
+      let _type = 'EVENT';
+      if (kind === 'event') {
+        _type = 'EVENT';
+      } else if (kind === 'agent') {
+        _type = 'AGENT';
+      } else if (kind === 'alram') {
+        _type = 'ALRAM';
+      }
+
+      //캠페인.
+      let _message = '';
+      let _message2 = '';
+      //캠페인수정>동작시간 추가
+      if (announce === '/pds/campaign/schedule') {
+        _message = '[캠페인 스케쥴';
+        const _campaign_name = campaigns.find(data=>data.campaign_id === Number(campaign_id))?.campaign_name;
+        if (command === 'INSERT') {
+          // _message += '수정, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
+          _message += '수정] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + _campaign_name;
+          addMessageToFooterList(_time, _type, _message);
+        }
+        else if (command === 'UPDATE') {
+          // _message += '변경, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
+          _message += '변경] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + _campaign_name;
+          addMessageToFooterList(_time, _type, _message);
+        }
+        else if (command === 'DELETE') {
+          // _message += '삭제] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
+          _message += '삭제] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + _campaign_name;
+          addMessageToFooterList(_time, _type, _message);
+        }
+      }      
+      //캠페인수정>콜페이싱 수정
+      else if (announce === '/pds/campaign/dial-speed') {
+        _message = '[콜페이싱] ';
+        if (command === 'UPDATE') {
+          const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === Number(campaign_id));
+          if (tempCampaign && tempCampaign.dial_mode === 2) {
+            _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'] * 2;
+          } else if (tempCampaign && tempCampaign.dial_mode === 3) {
+            _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'];
+          }
+          addMessageToFooterList(_time, _type, _message);
+          fetchMain({
+            session_key: '',
+            tenant_id: tenant_id,
+          });
+        }
+      }
+      
+    }
+  }, [sseData]);
+  
   return (
     <Resizable
       size={{
