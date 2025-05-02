@@ -88,7 +88,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
   const campaignIdForUpdateFromSideMenu = useTabStore(state => state.campaignIdForUpdateFromSideMenu);
   const setCampaignIdForUpdateFromSideMenu = useTabStore(state => state.setCampaignIdForUpdateFromSideMenu);
 
-  const { schedules, callingNumbers, campaignSkills } = useCampainManagerStore();
+  const { schedules, callingNumbers, campaignSkills, setCampaignManagerCampaignId } = useCampainManagerStore();
   const { setSelectedNodeId, selectedNodeId } = useSideMenuCampaignGroupTabStore();
 
   const [filteredCampaigns, setFilteredCampaigns] = useState<CampaignListDataResponse[]>([]);
@@ -164,7 +164,8 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
       }
     }
 
-    setCampaignIdForUpdateFromSideMenu(row.campaignId.toString());
+    setCampaignIdForUpdateFromSideMenu(row.campaignId.toString());    
+    setCampaignManagerCampaignId(row.campaignId.toString()); 
 
   }, [filteredCampaigns, setSelectedCampaign, setSelectedCampaignRow, onRowClick]);
 
@@ -228,6 +229,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
           onRowClick(filteredCampaigns[0].campaign_id.toString());
         }
         // onHeaderInit();
+        setCampaignManagerCampaignId('');
       }
     } 
     // else if (tempData.length > 0 && filteredCampaigns.length > 0) {
