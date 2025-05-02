@@ -107,7 +107,7 @@ const initOutgoingResult = {
 
 const RebroadcastSettingsPanel = () => {
     // TabStore에서 현재 활성화된 탭 정보 가져오기
-    const { campaigns, reBroadcastType, setReBroadcastType } = useMainStore();
+    const { campaigns, reBroadcastType, setReBroadcastType, reBroadcastRedialCondition, setReBroadcastRedialCondition } = useMainStore();
     const { activeTabId, openedTabs,campaignIdForUpdateFromSideMenu } = useTabStore();
     const router = useRouter();
 
@@ -190,6 +190,70 @@ const RebroadcastSettingsPanel = () => {
             ...prev,
             [id]: checked
         }));
+        if (broadcastType === "realtime") {  
+            const temp = {...selectedOutgoingResults, [id]: checked};
+            let returnValue = '00';        
+            if( temp['outgoing-success-ok'] && temp['outgoing-success-no'] ){
+                returnValue += "35210@";
+            }else{
+                //80954, "발신 성공 상담사 연결 성공"
+                if( temp['outgoing-success-ok'] ){
+                    returnValue += "35233@";
+                }
+                //80955, "발신 성공 상담사 연결 실패"
+                if( temp['outgoing-success-no'] ){
+                    returnValue += "35223@35213@";
+                }
+            }
+            //80174, "통화중 실패")
+            if( temp['fail-busy'] ){
+                returnValue += "26232@";
+            }
+            //80175, "무응답 실패")
+            if( temp['fail-no-answer'] ){
+                returnValue += "26233@";
+            }
+            //80176, "팩스/모뎀 실패)
+            if( temp['fail-fax'] ){
+                returnValue += "26234@";
+            }
+            //80177, "기계음 실패"
+            if( temp['fail-machine'] ){
+                returnValue += "26235@";
+            }
+            //80178, "기타실패"
+            if( temp['fail-etc'] ){
+                returnValue += "26236@";
+            }
+            //80179, "전화번호 오류 실패"
+            if( temp['fail-wrong-num'] ){
+                returnValue += "26237@";
+            }
+            //80180, "회선오류 실패"
+            if( temp['fail-line'] ){
+                returnValue += "26239@";
+            }
+            //80181, "고객 바로끊음 실패"
+            if( temp['fail-hangup'] ){
+                returnValue += "262310@";
+            }
+            //80182, "통화음 없음 실패"
+            if( temp['fail-no-tone'] ){
+                returnValue += "262311@";
+            }
+            //80183, "다이얼톤 없음 실패"
+            if( temp['fail-no-dial'] ){
+                returnValue += "262312@";
+            }
+            //80185, "발신 시도 건수"
+            if( temp['outgoing-attempt'] ){
+                returnValue += "26238@";
+            }
+            if( returnValue.lastIndexOf('@') === returnValue.length-1 ){
+                returnValue = returnValue.substring(0,returnValue.length-1);
+            }
+            setReBroadcastRedialCondition(returnValue);
+        }
     };
 
     const MakeRedialPacket = () => {
@@ -485,7 +549,7 @@ const RebroadcastSettingsPanel = () => {
     useEffect(() => {
         if( listRedialQuery !== '' ){
             if( broadcastType === 'realtime'){
-                setSelectedOutgoingResults(initOutgoingResult);
+                // setSelectedOutgoingResults(initOutgoingResult);
             }else{
                 let outgoingSuccessOk = false;  //80954, "발신 성공 상담사 연결 성공"
                 if( listRedialQuery.indexOf('35233') > -1 ){   
@@ -616,10 +680,12 @@ const RebroadcastSettingsPanel = () => {
                     // handleSelectRebroadcast(prevList[0].id);
                     setListRedialQuery(prevList[0].redialCondition);
                     //발신결과 disabled 설정.
-                    setOutgoingResultChecked(false);
-                    setOutgoingTypeChecked(false);
-                    setOutgoingTimeChecked(false);
-                    setOutgoingResultDisabled(true);    
+                    if( reBroadcastType === 'reservation' ){
+                        setOutgoingResultChecked(false);
+                        setOutgoingTypeChecked(false);
+                        setOutgoingTimeChecked(false);
+                        setOutgoingResultDisabled(true);    
+                    }
                     setSequenceNumber(Math.max(...tempList.map(item => item.sequence_number))+1);  
                     
                     // 선택된 항목 찾기
@@ -1096,6 +1162,116 @@ const RebroadcastSettingsPanel = () => {
             setReBroadcastType('reservation');
         }
     }, [reBroadcastType]);
+
+    useEffect(() => {
+        if (reBroadcastRedialCondition == '' ) {
+            setReBroadcastRedialCondition('0035223@35213@26232@26233@26235@262310@26238');
+        }else{            
+            if( broadcastType === 'realtime'){
+                
+                let outgoingSuccessOk = false;  //80954, "발신 성공 상담사 연결 성공"
+                if( reBroadcastRedialCondition.indexOf('35233') > -1 ){   
+                    outgoingSuccessOk = true;
+                }
+                let outgoingSuccessNo = false;  //80955, "발신 성공 상담사 연결 실패"
+                if( reBroadcastRedialCondition.indexOf('35223@35213') > -1 ){   
+                    outgoingSuccessNo = true;
+                }
+                if( reBroadcastRedialCondition.indexOf('35210') > -1 ){   
+                    outgoingSuccessOk = true;
+                    outgoingSuccessNo = true;
+                }
+                let failBusy = false;           //80174, "통화중 실패"
+                if( reBroadcastRedialCondition.indexOf('26232') > -1 ){   
+                    // 2018.07.10 Gideon #24364 삼성화재(중국) 장애현상 수정 - 아래 || str == "0026232" 부분 추가
+                    const tempList = reBroadcastRedialCondition.split('@');
+                    if( tempList.filter(data => data === '26232' || data === '0026232').length > 0 ){
+                        failBusy = true;
+                    }
+                }
+                let failNoAnswer = false;       //80175, "무응답 실패"
+                if( reBroadcastRedialCondition.indexOf('26233') > -1 ){   
+                    failNoAnswer = true;
+                }
+                let failFax = false;            //80176, "팩스/모뎀 실패"
+                if( reBroadcastRedialCondition.indexOf('26234') > -1 ){   
+                    failFax = true;
+                }
+                let failMachine = false;        //80177, "기계음 실패"
+                if( reBroadcastRedialCondition.indexOf('26235') > -1 ){   
+                    failMachine = true;
+                }
+                let failEtc = false;            //80178, "기타실패"
+                if( reBroadcastRedialCondition.indexOf('26236') > -1 ){   
+                    failEtc = true;
+                }
+                let failWrongNum = false;       //80179, "전화번호 오류 실패"
+                if( reBroadcastRedialCondition.indexOf('26237') > -1 ){   
+                    failWrongNum = true;
+                }
+                let failLine = false;           //80180, "회선오류 실패"
+                if( reBroadcastRedialCondition.indexOf('26239') > -1 ){   
+                    failLine = true;
+                }
+                let failHangup = false;         //80181, "고객 바로끊음 실패"
+                if( reBroadcastRedialCondition.indexOf('262310') > -1 ){   
+                    failHangup = true;
+                }
+                let failNoTone = false;         //80182, "통화음 없음 실패"
+                if( reBroadcastRedialCondition.indexOf('262311') > -1 ){   
+                    failNoTone = true;
+                }
+                let failNoDial = false;         //80183, "다이얼톤 없음 실패
+                if( reBroadcastRedialCondition.indexOf('262312') > -1 ){   
+                    failNoDial = true;
+                }
+                let outgoingAttempt = false;//80185, "발신 시도 건수"
+                if( reBroadcastRedialCondition.indexOf('26238') > -1 || reBroadcastRedialCondition.indexOf('0026238') > -1 ){   
+                    outgoingAttempt = true;
+                }
+                //발신결과 체크박스.
+                setSelectedOutgoingResults({...initOutgoingResult
+                    , 'outgoing-success-ok': outgoingSuccessOk
+                    , 'outgoing-success-no': outgoingSuccessNo
+                    , 'fail-busy': failBusy
+                    , 'fail-no-answer': failNoAnswer
+                    , 'fail-fax': failFax
+                    , 'fail-machine': failMachine
+                    , 'fail-etc': failEtc
+                    , 'fail-wrong-num': failWrongNum
+                    , 'fail-line': failLine
+                    , 'fail-hangup': failHangup
+                    , 'fail-no-tone': failNoTone
+                    , 'fail-no-dial': failNoDial
+                    , 'outgoing-attempt': outgoingAttempt
+                });
+                if (reBroadcastRedialCondition.indexOf("(") > 0 || reBroadcastRedialCondition.indexOf("235959") > 0){
+                    if( reBroadcastRedialCondition.indexOf("(") > 0 ){
+                        const strTimes = reBroadcastRedialCondition.split(/[()]/);
+                        if (strTimes[1].indexOf("2714") > 0) // 최종발신날짜 
+                        {
+                            setTimeType("final-call-date");
+                            setStartDate(strTimes[1].substring(4, 8) + "-" + strTimes[1].substring(8, 10) + "-" + strTimes[1].substring(10, 12));
+                            setEndDate(strTimes[1].substring(24, 28) + "-" + strTimes[1].substring(28, 30) + "-" + strTimes[1].substring(30, 32));
+                        } else {// 재콜예약날짜
+                            setTimeType("recall-date");
+                            setStartDate(strTimes[1].substring(4, 8) + "-" + strTimes[1].substring(8, 10) + "-" + strTimes[1].substring(10, 12));
+                            setEndDate(strTimes[1].substring(24, 28) + "-" + strTimes[1].substring(28, 30) + "-" + strTimes[1].substring(30, 32));
+                        }
+                    }
+                    // setOutgoingTimeChecked(true);
+                }
+                //발신되지 않은 예약콜
+                if( reBroadcastRedialCondition.indexOf('402399') > -1 ){   
+                    setCallType("not-sent");
+                }
+                //발신되어진 예약콜
+                if( reBroadcastRedialCondition.indexOf('4023100') > -1 ){   
+                    setCallType('sent');
+                }
+            }
+        }
+    }, [reBroadcastRedialCondition,broadcastType]);    
 
     return (
         <div className="limit-width">
