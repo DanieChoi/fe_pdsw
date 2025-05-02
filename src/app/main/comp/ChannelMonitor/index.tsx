@@ -255,7 +255,7 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
   }, []);
 
   return (
-    <div className="h-full">
+    <div className="h-full limit-700">
       <div className="flex gap-5 h-full">
         {/* 도넛 차트 */}
         <div className="w-full lg:w-1/2 h-full flex flex-col gap-5">

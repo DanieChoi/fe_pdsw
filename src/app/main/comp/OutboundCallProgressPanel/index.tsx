@@ -449,7 +449,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   }, []);
 
   return (
-    <div className="flex flex-col gap-5 h-full out-wrap">
+    <div className="flex flex-col gap-5 h-full out-wrap limit-700">
       {shouldRenderSelect && (
         <div className="flex items-center gap-2">
           <Label className="w-20 min-w-20">캠페인</Label>
