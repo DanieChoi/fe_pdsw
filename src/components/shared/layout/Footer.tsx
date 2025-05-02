@@ -513,20 +513,20 @@ export default function Footer({
     else if (announce === '/pds/campaign/scheduled-redial') {
       _message = '[예약재발신 ';
       if (command === 'INSERT') {
-        _message = _message + '추가] 캠페인 아이디: ' + data['campaign_id']
+        _message = _message + '추가] 캠페인 아이디: ' + campaign_id
         if (data['run_flag'] === 0){
           _message = _message + ' 실행구분: 미실행'
-          _message2 = `[EVENT] [${data['campaign_id']}] 예약 재발신 등록[미실행]`;
+          _message2 = `[EVENT] [${campaign_id}] 예약 재발신 등록[미실행]`;
         } else if (data['run_flag'] === 1) {
           _message = _message + ' 실행구분: 실행'
-          _message2 = `[EVENT] [${data['campaign_id']}] 예약 재발신 등록[실행]`;
+          _message2 = `[EVENT] [${campaign_id}] 예약 재발신 등록[실행]`;
         } else if (data['run_flag'] === 2) {
           _message = _message + ' 실행구분: Timeout'
-          _message2 = `[EVENT] [${data['campaign_id']}] 예약 재발신 등록[Timeout]`;
+          _message2 = `[EVENT] [${campaign_id}] 예약 재발신 등록[Timeout]`;
         }
       } else if (command === 'DELETE') {
-        _message = _message + '삭제] 캠페인 아이디: ' + data['campaign_id']
-        _message2 = `[EVENT] [${data['campaign_id']}] 예약 재발신 삭제`;
+        _message = _message + '삭제] 캠페인 아이디: ' + campaign_id
+        _message2 = `[EVENT] [${campaign_id}] 예약 재발신 삭제`;
       }
 
       // 토스트 알림 표시
