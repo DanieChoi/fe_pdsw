@@ -32,7 +32,7 @@ type Props = {
 
 export default function CampaignManagerHeader({ onSearch,init,setInit }: Props) {
   const { tenants } = useMainStore();
-  const { skills } = useCampainManagerStore();
+  const { skills, campaignManagerHeaderTenantId, campaignManagerHeaderCampaignName, campaignManagerHeaderDailMode, campaignManagerHeaderSkill, campaignManagerHeaderCallNumber } = useCampainManagerStore();
   const [tenantId, setTenantId] = useState('all'); // 테넌트
   const [campaignName, setCampaignName] = useState(''); // 캠페인이름
   const [dailMode, setDailMode] = useState('all'); // 다이얼모드
@@ -59,7 +59,7 @@ export default function CampaignManagerHeader({ onSearch,init,setInit }: Props) 
         setTempSkills(skills.filter((skill) => skill.tenant_id === Number(tenantId)));
       }
     }
-    setSkill('all');
+    // setSkill('all');
   }, [tenantId, skills]);
 
   useEffect(() => {
@@ -79,6 +79,34 @@ export default function CampaignManagerHeader({ onSearch,init,setInit }: Props) 
       });
     }
   }, [init]);
+
+  useEffect(() => {
+    if ( campaignManagerHeaderTenantId != '-1' ) {
+      setTenantId(campaignManagerHeaderTenantId);
+    }else{
+      setTenantId('all');
+    }
+    if ( campaignManagerHeaderCampaignName != '' ) {
+      setCampaignName(campaignManagerHeaderCampaignName);
+    }else{
+      setCampaignName('');
+    }
+    if ( campaignManagerHeaderDailMode != '-1' ) {
+      setDailMode(campaignManagerHeaderDailMode);
+    }else{
+      setDailMode('all');
+    }
+    if ( campaignManagerHeaderSkill != '-1' ) {
+      setSkill(campaignManagerHeaderSkill);
+    }else{
+      setSkill('all');
+    }
+    if ( campaignManagerHeaderCallNumber != '' ) {
+      setCallNumber(campaignManagerHeaderCallNumber);
+    }else{
+      setCallNumber('');
+    }
+  }, [campaignManagerHeaderTenantId,campaignManagerHeaderCampaignName,campaignManagerHeaderDailMode,campaignManagerHeaderSkill,campaignManagerHeaderCallNumber]);
 
   return (
     <div className="flex title-background justify-between">
@@ -146,7 +174,7 @@ export default function CampaignManagerHeader({ onSearch,init,setInit }: Props) 
                   value={option.skill_id + ''}
                   className="truncate"
                 >
-                  {option.skill_name}
+                  [{option.skill_id}]{option.skill_name}
                 </SelectItem>
               ))}
             </SelectContent>

@@ -79,9 +79,10 @@ type Props = {
   campaignId?: string;
   campaignHeaderSearchParam?: CampaignHeaderSearch;
   onRowClick?: (campaignId: string) => void; // 추가된 속성
+  onHeaderInit: () => void;
 };
 
-export default function CampaignManagerList({ campaignId, campaignHeaderSearchParam, onRowClick }: Props) {
+export default function CampaignManagerList({ campaignId, campaignHeaderSearchParam, onRowClick, onHeaderInit }: Props) {
   const { campaigns, setSelectedCampaign, selectedCampaignRow, setSelectedCampaignRow } = useMainStore();
   // const { campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const campaignIdForUpdateFromSideMenu = useTabStore(state => state.campaignIdForUpdateFromSideMenu);
@@ -226,6 +227,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
         if (onRowClick) {
           onRowClick(filteredCampaigns[0].campaign_id.toString());
         }
+        // onHeaderInit();
       }
     } 
     // else if (tempData.length > 0 && filteredCampaigns.length > 0) {
