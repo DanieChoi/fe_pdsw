@@ -177,19 +177,19 @@ const CampaignStartModal = ({
       // 각 캠페인에 할당된 스킬 정보를 매핑
       // 실제 데이터 구조에 맞게 변경해야 할 수 있음
       campaignIds.forEach(campaignId => {
-        const campaignSkills = skillData.result_data.filter(skill => 
+        const campaignSkills = skillData.result_data.filter(skill =>
           // 이 부분은 API 응답 구조에 따라 수정 필요
           // 여기서는 예시로 모든 스킬을 각 캠페인에 연결
           true
         );
-        
+
         map.set(campaignId.toString(), campaignSkills.map(skill => ({
           id: skill.skill_id,
           name: skill.name || `Skill ${skill.skill_id}`
         })));
       });
     }
-    
+
     return map;
   }, [skillData, campaignIds]);
 
@@ -353,14 +353,16 @@ const CampaignStartModal = ({
                 <Button
                   onClick={handleUpdate}
                   disabled={isUpdating}
-                  className="border-2 border-black text-emerald-600 hover:bg-emerald-50"
+                  className="relative overflow-hidden border-2 border-emerald-600 text-emerald-600 px-6 py-2 text-base font-medium
+               hover:text-white transition-colors duration-300 ease-in-out"
                   variant="outline"
                 >
-                  <div className="flex items-center">
+                  <span className="absolute inset-0 bg-emerald-600 transform scale-x-0 origin-left transition-transform duration-300 ease-in-out group-hover:scale-x-100"></span>
+                  <div className="flex items-center relative z-10">
                     {isUpdating ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      <Loader2 className="h-5 w-5 animate-spin mr-2" />
                     ) : (
-                      <Play className="h-4 w-4 mr-2" />
+                      <Play className="h-5 w-5 mr-2" />
                     )}
                     <span>캠페인 시작</span>
                   </div>
