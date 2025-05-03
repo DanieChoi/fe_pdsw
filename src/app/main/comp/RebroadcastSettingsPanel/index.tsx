@@ -106,7 +106,7 @@ const initOutgoingResult = {
 };
 
 interface PropsType {
-    reBroadCastOption: "scheduled" | "realtime";
+    reBroadCastOption?: "scheduled" | "realtime";
 }
 
 const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {

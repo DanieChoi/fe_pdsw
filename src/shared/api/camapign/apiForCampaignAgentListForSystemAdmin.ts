@@ -42,7 +42,7 @@ export const apiForCampaignAgentListForSystemAdmin = async (
   };
 
   const response = await axiosInstance.post<IResponseTypeForCampaignAgentListForSystemAdmin>(
-    "pds/collections/campaign-agent",
+    "collections/campaign-agent",
     finalRequest
   );
 

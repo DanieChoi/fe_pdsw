@@ -71,7 +71,7 @@ export const apiForCampaignCallingNumberListForSystemAdmin = async (
   };
 
   const response = await axiosInstance.post<IResponseForCampaignCallingNumberListForSystemAdmin>(
-    "pds/collections/campaign-calling-number-list",
+    "collections/campaign-calling-number-list",
     finalRequest
   );
 

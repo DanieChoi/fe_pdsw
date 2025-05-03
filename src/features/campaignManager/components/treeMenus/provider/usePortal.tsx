@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import IConfirmPopupForMultiUpdateCampaignProgressToStart from '@/features/campaignManager/components/popups/IConfirmPopupForMultiUpdateCampaignProgressToStart';
+import IConfirmPopupForMultiUpdateCampaignProgressToStart from '@/widgets/sidebar2/dialog/IConfirmPopupForMultiUpdateCampaignProgressToStart';
 
 interface PortalContextType {
   openStartPopup: (items: any[], onConfirm: () => Promise<any>) => void;
