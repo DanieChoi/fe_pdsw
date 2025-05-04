@@ -110,9 +110,22 @@ export default function Header() {
 
 
   //스킬 마스터 조회.
+  // const { mutate: fetchSkills } = useApiForSkills({
+  //   onSuccess: (data) => {
+  //     setSkills(data.result_data || []);
+  //   },
+  //   retry: 0,
+  // });
+
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data || []);
+      console.log("Skills data loaded in header, updated store");
+    },
+    onError: (error) => {
+      // 로딩 상태 해제
+      useCampainManagerStore.getState().setSkillsLoading(false);
+      console.log("Error loading skills data:", error);
     },
     retry: 0,
   });
@@ -458,6 +471,37 @@ export default function Header() {
       setCounselers(counselorListData.result_data);
     }
   }, [counselorListData]);
+
+  useEffect(() => {
+    if (tenants.length > 0  && _sessionKey !== "") {
+      // 스킬 데이터 로딩 상태 확인
+      const store = useCampainManagerStore.getState();
+      
+      // 데이터가 이미 로드되었으면 건너뛰기
+      if (store.skillsLoaded && store.skills.length > 0) {
+        console.log("Skills already loaded, skipping API call");
+        return;
+      }
+      
+      // 로딩 중이면 중복 호출 방지
+      if (store.skillsLoading) {
+        console.log("Skills loading in progress, skipping duplicate call");
+        return;
+      }
+      
+      // 로딩 시작
+      store.setSkillsLoading(true);
+      console.log("Starting skills data fetch from header");
+      
+      // 테넌트 ID 준비
+      const tenant_id_array = tenant_id === 0 
+        ? tenants.map(tenant => tenant.tenant_id)
+        : [tenant_id];
+      
+      // 스킬 데이터 로드
+      fetchSkills({ tenant_id_array });
+    }
+  }, [tenants, _sessionKey]);
 
   return (
     <div className="flex flex-col">
