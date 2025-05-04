@@ -298,7 +298,7 @@ const CampaignStartModal = ({
       if (!open && !isUpdating) handleCancel();
     }}>
       <DialogContent
-        className="!w-[90%] lg:w-[80%] max-w-[1200px]"
+        className="!w-[80%] lg:w-[80%] max-w-[900px]"
         onInteractOutside={(e) => {
           // 바깥 클릭 시 모달이 닫히지 않도록
           if (isUpdating) e.preventDefault();
@@ -308,7 +308,7 @@ const CampaignStartModal = ({
             <div className="p-2 rounded-full bg-emerald-100 mr-3">
               <Play className="h-5 w-5 text-emerald-600" />
             </div>
-            <DialogTitle>캠페인 일괄 시작</DialogTitle>
+            <DialogTitle>캠페인 일괄 시작2</DialogTitle>
           </div>
         </DialogHeader>
 
@@ -316,7 +316,7 @@ const CampaignStartModal = ({
         <div className="space-y-5">
           {/* 업데이트 안내 텍스트 */}
           <Alert className="bg-blue-50 border-blue-100">
-            <div className="flex justify-between items-start w-full">
+            <div className="flex justify-between items-start ">
               <div className="flex items-start">
                 <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5 mr-2 flex-shrink-0" />
                 <AlertDescription className="text-blue-800">
@@ -353,7 +353,7 @@ const CampaignStartModal = ({
                 <Button
                   onClick={handleUpdate}
                   disabled={isUpdating}
-                  className="relative overflow-hidden border-2 border-emerald-600 text-emerald-600 px-6 py-2 text-base font-medium
+                  className="relative overflow-hidden border-2 text-emerald-600 px-6 py-2 text-base font-medium
                hover:text-white transition-colors duration-300 ease-in-out"
                   variant="outline"
                 >
@@ -386,12 +386,14 @@ const CampaignStartModal = ({
 
           {/* 경고 메시지 */}
           <Alert variant="default" className="bg-amber-50 border-amber-100">
-            <AlertCircle className="h-5 w-5 text-amber-500" />
-            <AlertDescription className="text-xs text-amber-800">
-              {updateCompleted
-                ? "일괄 처리 작업이 완료되었습니다. 결과를 확인하고 필요한 경우 개별적으로 재시도해 주세요."
-                : "캠페인을 일괄 시작하면 즉시 적용되며, 실행 중인 다른 작업에 영향을 줄 수 있습니다."}
-            </AlertDescription>
+            <div className="flex items-center">
+              <AlertCircle className="h-5 w-5 text-amber-500 mr-2 flex-shrink-0" />
+              <AlertDescription className="text-xs text-amber-800 pt-0.5">
+                {updateCompleted
+                  ? "일괄 처리 작업이 완료되었습니다. 결과를 확인하고 필요한 경우 개별적으로 재시도해 주세요."
+                  : "캠페인을 일괄 시작하면 즉시 적용되며, 실행 중인 다른 작업에 영향을 줄 수 있습니다."}
+              </AlertDescription>
+            </div>
           </Alert>
         </div>
 

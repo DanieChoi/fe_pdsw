@@ -85,10 +85,10 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<
   // const { updateCampaignsStatus } = useApiForMultiUpdateCampaignProgressStatus();
 
   // 멀티업데이트 팝업 상태
-  const [confirmPopup, setConfirmPopup] = useState<{
-    open: boolean;
-    actionKey: "start" | "complete" | "stop" | "";
-  }>({ open: false, actionKey: "" });
+  // const [confirmPopup, setConfirmPopup] = useState<{
+  //   open: boolean;
+  //   actionKey: "start" | "complete" | "stop" | "";
+  // }>({ open: false, actionKey: "" });
 
   // 결과 dialog 상태 관리
   const [resultDialog, setResultDialog] = useState({
@@ -177,9 +177,10 @@ const IContextMenuForCampaignGroupAtCampaignGroup: React.FC<
     action: () => {
       if (onBulkAction) {
         onBulkAction(key);
-      } else {
-        setConfirmPopup({ open: true, actionKey: key });
-      }
+      } 
+      // else {
+      //   setConfirmPopup({ open: true, actionKey: key });
+      // }
     },
   }));
 
