@@ -72,6 +72,7 @@ export default function Header() {
       popupRef.current = newWindow;
     }
   };
+
   const {
     tenants,
     setCampaigns,
@@ -223,12 +224,48 @@ export default function Header() {
       popupRef.current.close();
     }
 
-    
+
     // 홈 또는 로그인 페이지로 리다이렉트 
     router.push('/login');
   }
 
   // tofix  로그인 안했을때 미리 실행되서 에러 발생
+  // const { mutate: fetchTenants } = useApiForTenants({
+  //   onSuccess: (data) => {
+  //     if (data.result_code === 5) {
+  //       setAlertState({
+  //         ...errorMessage,
+  //         isOpen: true,
+  //         message: '로그인 정보가 없습니다.',
+  //         type: '2',
+  //         onClose: () => goLogin(),
+  //       });
+  //     } else {
+  //       if (tenant_id === 0) {
+  //         setTenants(data.result_data);
+  //       } else {
+  //         setTenants(data.result_data.filter(data => data.tenant_id === tenant_id));
+  //       }
+  //     }
+  //   },
+  //   onError: (error) => {
+  //     // tofix 로그인 에러 발생
+  //     // console.error('Tenants API error:', error);
+  //     // alert("에러 발생 여기!")
+  //     console.log("error 에러 발생 여기 !!!!!! : ", error);
+
+  //     if (error.message.split('||')[0] === '5') {
+  //       setAlertState({
+  //         ...errorMessage,
+  //         isOpen: true,
+  //         message: '로그인 정보가 없습니다.',
+  //         type: '2',
+  //         onClose: () => goLogin(),
+  //       });
+  //     }
+  //   }
+  // });
+
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
       if (data.result_code === 5) {
@@ -239,19 +276,20 @@ export default function Header() {
           type: '2',
           onClose: () => goLogin(),
         });
+        useMainStore.getState().setTenantsLoading(false);
       } else {
         if (tenant_id === 0) {
           setTenants(data.result_data);
         } else {
           setTenants(data.result_data.filter(data => data.tenant_id === tenant_id));
         }
+        console.log("Tenant data loaded in header, updated store");
       }
     },
     onError: (error) => {
       // tofix 로그인 에러 발생
-      // console.error('Tenants API error:', error);
-      // alert("에러 발생 여기!")
       console.log("error 에러 발생 여기 !!!!!! : ", error);
+      useMainStore.getState().setTenantsLoading(false);
 
       if (error.message.split('||')[0] === '5') {
         setAlertState({
@@ -264,6 +302,7 @@ export default function Header() {
       }
     }
   });
+
   const goLogin = () => {
     Cookies.remove('session_key');
     router.push('/login');
@@ -278,14 +317,47 @@ export default function Header() {
     }
   }, [tenants]);
 
+  // useEffect(() => {
+  //   if (_sessionKey !== "") {
+  //     fetchTenants({
+  //       session_key: _sessionKey,
+  //       tenant_id: _tenantId,
+  //     });
+  //   }
+  // }, [fetchTenants, _sessionKey, _tenantId]);
+
   useEffect(() => {
     if (_sessionKey !== "") {
+      // 테넌트 로딩 상태 설정
+      const store = useMainStore.getState();
+
+      // 데이터가 이미 로드되었으면 건너뛰기
+      if (store.tenantsLoaded && store.tenants.length > 0) {
+        console.log("Tenants already loaded, skipping API call");
+        return;
+      }
+
+      // 로딩 중이면 중복 호출 방지
+      if (store.tenantsLoading) {
+        console.log("Tenants loading in progress, skipping duplicate call");
+        return;
+      }
+
+      // 로딩 시작
+      store.setTenantsLoading(true);
+      console.log("Starting tenant data fetch from header");
+
       fetchTenants({
         session_key: _sessionKey,
         tenant_id: _tenantId,
       });
     }
   }, [fetchTenants, _sessionKey, _tenantId]);
+
+  // 테넌트 데이터가 변경될 때마다 로그 추가
+  useEffect(() => {
+    console.log("Tenants updated in header component:", tenants);
+  }, [tenants]);
 
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
