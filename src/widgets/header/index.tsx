@@ -78,6 +78,8 @@ export default function Header() {
     setCampaigns,
     setTenants,
     setCounselers,
+    setCampaignsLoading,
+    setTenantsLoading,
   } = useMainStore();
 
   const {
@@ -355,10 +357,60 @@ export default function Header() {
   }, [fetchTenants, _sessionKey, _tenantId]);
 
   // 테넌트 데이터가 변경될 때마다 로그 추가
-  useEffect(() => {
-    console.log("Tenants updated in header component:", tenants);
-  }, [tenants]);
+  // useEffect(() => {
+  //   console.log("Tenants updated in header component:", tenants);
+  // }, [tenants]);
 
+  // const { mutate: fetchMain } = useApiForMain({
+  //   onSuccess: (data) => {
+  //     if (tenant_id === 0) {
+  //       setCampaigns(data.result_data);
+  //       //스킬 마스터 조회.
+  //       const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
+  //       fetchSkills({ tenant_id_array: tempTenantIdArray });
+  //     } else {
+  //       setCampaigns(data.result_data.filter(data => data.tenant_id === tenant_id));
+  //       //스킬 마스터 조회.
+  //       fetchSkills({ tenant_id_array: [tenant_id] });
+  //     }
+  //     setShouldFetchCounselors(true);  // 이 시점에 상담사 목록 조회 활성화
+  //   }
+  // });
+
+  useEffect(() => {
+    if (tenants.length > 0 && _sessionKey !== "") {
+      // 캠페인 데이터 로딩 상태 확인
+      const store = useMainStore.getState();
+      
+      // 데이터가 이미 로드되었으면 건너뛰기
+      if (store.campaignsLoaded && store.campaigns.length > 0) {
+        console.log("Campaigns already loaded, skipping API call");
+        return;
+      }
+      
+      // 로딩 중이면 중복 호출 방지
+      if (store.campaignsLoading) {
+        console.log("Campaigns loading in progress, skipping duplicate call");
+        return;
+      }
+      
+      // 로딩 시작
+      store.setCampaignsLoading(true);
+      console.log("Starting campaign data fetch from header");
+      
+      fetchMain({
+        session_key: _sessionKey,
+        tenant_id: _tenantId
+      });
+    }
+  }, [tenants]);
+  
+  // 캠페인 데이터가 변경될 때마다 로그 추가
+  useEffect(() => {
+    const { campaigns } = useMainStore.getState();
+    console.log("Campaigns updated in header component:", campaigns);
+  }, [useMainStore.getState().campaigns]);
+  
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       if (tenant_id === 0) {
@@ -371,7 +423,13 @@ export default function Header() {
         //스킬 마스터 조회.
         fetchSkills({ tenant_id_array: [tenant_id] });
       }
+      console.log("Campaign data loaded in header, updated store");
       setShouldFetchCounselors(true);  // 이 시점에 상담사 목록 조회 활성화
+    },
+    onError: (error) => {
+      // 로딩 상태 해제
+      useMainStore.getState().setCampaignsLoading(false);
+      console.log("Error loading campaign data:", error);
     }
   });
 
