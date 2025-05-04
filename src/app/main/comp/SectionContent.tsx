@@ -18,16 +18,18 @@ import RebroadcastSettingsGroupPanel from "./RebroadcastSettingsGroupPanel";
 import CampaignManager from "./CampaignManager";
 import AgentStatusMonitoring from "./AgentStatusMonitoring";
 import SystemMonitoring from "./SystemMonitoring";
-import CampaignClonePanel from "@/widgets/sidebar/pannels/CampaignClonePanel";
+// import CampaignClonePanel from "@/widgets/sidebar/pannels/CampaignClonePanel";
 import IntegratedMonitoringDashboard from "./IntegratedMonitoringDashboard";
 import { SkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/SkillAssignmentTab";
 import BlackListCountPopup from "@/features/campaignManager/components/popups/BlackListCountPopup";
 import { TeamSkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/TeamSkillAssignmentTab";
 import { GroupSkillAssignmentTab } from "@/features/campaignManager/components/treeMenus/GroupSkillAssignmentTab";
 import SkilFilterOptionPannelForCampaignTab from "./SkilFilterOptionPannelForCampaignTab";
-import CampaignDeletePanel from "@/widgets/sidebar/pannels/CampaignDeletePanel";
+// import CampaignDeletePanel from "@/widgets/sidebar/pannels/CampaignDeletePanel";
 import CampaignGroupBulkUpdatePanel from "./CampaignGroupBulkUpdatePanel";
 import SkilAdminPannelForSystemAdmin from "@/widgets/SkilAdminPannelForSystemAdmin";
+import CampaignClonePanel from "@/widgets/sidebar2/pannels/CampaignClonePanel";
+import CampaignDeletePanel from "@/widgets/sidebar2/pannels/CampaignDeletePanel";
 
 // Tab 타입 정의
 interface Tab {

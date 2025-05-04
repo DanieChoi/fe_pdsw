@@ -1,3 +1,4 @@
+// C:\nproject\fe_pdsw3\src\app\main\comp\ResizableDivider.tsx
 import React, { useRef, useCallback, useEffect } from 'react';
 import { useTabStore } from '@/store/tabStore';
 
