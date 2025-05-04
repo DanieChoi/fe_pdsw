@@ -161,12 +161,12 @@ const ITableForUpdateCamapignProgressToStart = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>캠페인 정보</TableHead>
+            <TableHead>캠페인</TableHead>
+            <TableHead>시작 날짜</TableHead>
+            <TableHead>종료 날짜</TableHead>
             <TableHead>발신 번호</TableHead>
             <TableHead>상담사</TableHead>
             <TableHead>스킬</TableHead>
-            <TableHead>시작 날짜</TableHead>
-            <TableHead>종료 날짜</TableHead>
             <TableHead>유효성</TableHead>
             <TableHead>현재 상태</TableHead>
             {updateCompleted && (
@@ -211,7 +211,73 @@ const ITableForUpdateCamapignProgressToStart = ({
                       </div>
                     </div>
                   </TableCell>
-                  
+
+                  {/* 시작 날짜 */}
+                  <TableCell>
+                    {schedule ? (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center">
+                              <Calendar className="h-4 w-4 text-gray-500 mr-1" />
+                              <span>{formatDate(schedule.start_date)}</span>
+                              <Clock className="h-4 w-4 text-gray-500 ml-2 mr-1" />
+                              <span className="text-xs">{formatTime(schedule.start_time)}</span>
+                              {startValid ? (
+                                <CheckCircle className="h-4 w-4 text-green-500 ml-2" />
+                              ) : (
+                                <XCircle className="h-4 w-4 text-red-500 ml-2" />
+                              )}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>시작 시간: {formatTime(schedule.start_time)}</p>
+                            {startValid ? (
+                              <p className="text-green-600 text-xs mt-1">유효: 시작 시간이 현재 시간 이전입니다.</p>
+                            ) : (
+                              <p className="text-red-600 text-xs mt-1">유효하지 않음: 시작 시간이 현재 시간 이후입니다.</p>
+                            )}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ) : (
+                      <span className="text-gray-400 text-xs">정보 없음</span>
+                    )}
+                  </TableCell>
+
+                  {/* 종료 날짜 */}
+                  <TableCell>
+                    {schedule ? (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center">
+                              <Calendar className="h-4 w-4 text-gray-500 mr-1" />
+                              <span>{formatDate(schedule.end_date)}</span>
+                              <Clock className="h-4 w-4 text-gray-500 ml-2 mr-1" />
+                              <span className="text-xs">{formatTime(schedule.end_time)}</span>
+                              {endValid ? (
+                                <CheckCircle className="h-4 w-4 text-green-500 ml-2" />
+                              ) : (
+                                <XCircle className="h-4 w-4 text-red-500 ml-2" />
+                              )}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>종료 시간: {formatTime(schedule.end_time)}</p>
+                            {endValid ? (
+                              <p className="text-green-600 text-xs mt-1">유효: 종료 시간이 현재 시간 이후입니다.</p>
+                            ) : (
+                              <p className="text-red-600 text-xs mt-1">유효하지 않음: 종료 시간이 현재 시간 이전입니다.</p>
+                            )}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ) : (
+                      <span className="text-gray-400 text-xs">정보 없음</span>
+                    )}
+                  </TableCell>
+
                   {/* 발신 번호 */}
                   <TableCell>
                     <TooltipProvider>
@@ -247,7 +313,7 @@ const ITableForUpdateCamapignProgressToStart = ({
                       </Tooltip>
                     </TooltipProvider>
                   </TableCell>
-                  
+
                   {/* 상담사 */}
                   <TableCell>
                     <TooltipProvider>
@@ -283,7 +349,7 @@ const ITableForUpdateCamapignProgressToStart = ({
                       </Tooltip>
                     </TooltipProvider>
                   </TableCell>
-                  
+
                   {/* 스킬 */}
                   <TableCell>
                     <TooltipProvider>
@@ -319,93 +385,23 @@ const ITableForUpdateCamapignProgressToStart = ({
                       </Tooltip>
                     </TooltipProvider>
                   </TableCell>
-                  
-                  {/* 시작 날짜 */}
-                  <TableCell>
-                    {schedule ? (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="flex items-center">
-                              <Calendar className="h-4 w-4 text-gray-500 mr-1" />
-                              <span>{formatDate(schedule.start_date)}</span>
-                              <Clock className="h-4 w-4 text-gray-500 ml-2 mr-1" />
-                              <span className="text-xs">{formatTime(schedule.start_time)}</span>
-                              {startValid ? (
-                                <CheckCircle className="h-4 w-4 text-green-500 ml-2" />
-                              ) : (
-                                <XCircle className="h-4 w-4 text-red-500 ml-2" />
-                              )}
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>시작 시간: {formatTime(schedule.start_time)}</p>
-                            {startValid ? (
-                              <p className="text-green-600 text-xs mt-1">유효: 시작 시간이 현재 시간 이전입니다.</p>
-                            ) : (
-                              <p className="text-red-600 text-xs mt-1">유효하지 않음: 시작 시간이 현재 시간 이후입니다.</p>
-                            )}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    ) : (
-                      <span className="text-gray-400 text-xs">정보 없음</span>
-                    )}
-                  </TableCell>
-                  
-                  {/* 종료 날짜 */}
-                  <TableCell>
-                    {schedule ? (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="flex items-center">
-                              <Calendar className="h-4 w-4 text-gray-500 mr-1" />
-                              <span>{formatDate(schedule.end_date)}</span>
-                              <Clock className="h-4 w-4 text-gray-500 ml-2 mr-1" />
-                              <span className="text-xs">{formatTime(schedule.end_time)}</span>
-                              {endValid ? (
-                                <CheckCircle className="h-4 w-4 text-green-500 ml-2" />
-                              ) : (
-                                <XCircle className="h-4 w-4 text-red-500 ml-2" />
-                              )}
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>종료 시간: {formatTime(schedule.end_time)}</p>
-                            {endValid ? (
-                              <p className="text-green-600 text-xs mt-1">유효: 종료 시간이 현재 시간 이후입니다.</p>
-                            ) : (
-                              <p className="text-red-600 text-xs mt-1">유효하지 않음: 종료 시간이 현재 시간 이전입니다.</p>
-                            )}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    ) : (
-                      <span className="text-gray-400 text-xs">정보 없음</span>
-                    )}
-                  </TableCell>
-                  
+
                   {/* 유효성 */}
                   <TableCell>
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <div>
-                            {schedule ? (
-                              isValid ? (
-                                <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
-                                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                                  유효함
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200">
-                                  <XCircle className="h-4 w-4 text-red-500 mr-2" />
-                                  유효하지 않음
-                                </Badge>
-                              )
+                            {!schedule || !isValid ? (
+                              <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200">
+                                <XCircle className="h-4 w-4 text-red-500 mr-2" />
+                                유효하지 않음
+                              </Badge>
                             ) : (
-                              <span className="text-gray-400 text-xs">정보 없음</span>
+                              <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
+                                <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                                유효함
+                              </Badge>
                             )}
                           </div>
                         </TooltipTrigger>
@@ -441,14 +437,14 @@ const ITableForUpdateCamapignProgressToStart = ({
                       </Tooltip>
                     </TooltipProvider>
                   </TableCell>
-                  
+
                   {/* 현재 상태 */}
                   <TableCell>
                     <Badge variant="outline" className="bg-gray-100 text-gray-800">
                       {item.status === 1 ? "시작" : item.status === 2 ? "대기" : item.status === 3 ? "중지" : "상태 없음"}
                     </Badge>
                   </TableCell>
-                  
+
                   {/* 결과 (조건부 렌더링) */}
                   {updateCompleted && (
                     <TableCell>
