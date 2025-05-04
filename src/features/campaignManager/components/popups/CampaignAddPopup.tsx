@@ -4,7 +4,7 @@ import useApiForGetSkillsWithCampaigns from '@/widgets/sidebar/hooks/useApiForGe
 import { useTotalCampaignListForAddCampaignToCampaignGroup } from '@/widgets/sidebar/hooks/useTotalCampaignListForAddCampaignToCampaignGroup';
 import { useTotalSkillListForAddCampaignToCampaignGroup } from '@/widgets/sidebar/hooks/useTotalSkillListForAddCampaignToCampaignGroup';
 import useApiForGetCampaignListForCampaignGroup from '@/widgets/sidebar/hooks/useApiForGetCampaignListForCampaignGroup';
-import { CampaignInfo, SkillInfo } from '@/widgets/sidebar/api/type/typeForAddCampaignForCampaignGroup';
+import { CampaignInfo, SkillInfo } from '@/widgets/sidebar2/api/type/typeForAddCampaignForCampaignGroup';
 import GroupCampaignList from './GroupCampaignList';
 import ITableForSkillListWithCampaign from './ITableForSkillListWithCampaign';
 import { ChevronRight, ChevronLeft } from 'lucide-react';

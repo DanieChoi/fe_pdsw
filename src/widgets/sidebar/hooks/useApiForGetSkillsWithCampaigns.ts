@@ -4,7 +4,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { 
   CampaignSkillsResponse 
 } from '@/widgets/sidebar/api/type/typeForAddCampaignForCampaignGroup';
-import { getSkilsWithCampaigns } from '@/widgets/sidebar/api/apiForAddCampaginForCampaignGroup';
+import { getSkilsWithCampaigns } from '@/widgets/sidebar2/api/apiForAddCampaginForCampaignGroup';
 
 /**
  * 캠페인에 할당된 스킬 목록을 가져오는 React Query 훅

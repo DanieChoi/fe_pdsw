@@ -1,8 +1,8 @@
 import { useQuery, UseMutationOptions, UseQueryOptions } from '@tanstack/react-query';
 import {
   SkillListResponse,
-} from '@/widgets/sidebar/api/type/typeForAddCampaignForCampaignGroup';
-import { getTotalSkillList } from '../api/apiForAddCampaginForCampaignGroup';
+} from '@/widgets/sidebar2/api/type/typeForAddCampaignForCampaignGroup';
+import { getTotalSkillList } from '../../sidebar2/api/apiForAddCampaginForCampaignGroup';
 
 /**
  * 스킬 목록을 가져오는 React Query 훅
