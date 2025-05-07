@@ -217,15 +217,15 @@ export function useApiForGetTreeMenuDataForSideMenu(): TreeMenuQueryResult {
   // 스토어 구독 설정 (새로 추가)
   useEffect(() => {
     // 스토어 변경 감지를 위한 구독 설정
-    const unsubscribe = useMainStore.subscribe(
-      (state) => [state.campaigns, state.tenants],
-      () => {
-        if (isReady) {
-          console.log("TreeMenu hook: Store data changed, invalidating query cache");
-          invalidateTreeMenuData();
-        }
+    const unsubscribe = useMainStore.subscribe((state) => {
+      if (isReady) {
+        // 변경을 감지하려는 상태 값들을 참조
+        const campaigns = state.campaigns;
+        const tenants = state.tenants;
+        console.log("TreeMenu hook: Store data changed, invalidating query cache");
+        invalidateTreeMenuData();
       }
-    );
+    });
     
     return () => unsubscribe();
   }, [isReady]);
