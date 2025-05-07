@@ -323,14 +323,14 @@ export default function Header() {
     router.push('/login');
   }
 
-  useEffect(() => {
-    if (tenants.length > 0 && _sessionKey !== "") {
-      fetchMain({
-        session_key: _sessionKey,
-        tenant_id: _tenantId
-      });
-    }
-  }, [tenants]);
+  // useEffect(() => {
+  //   if (tenants.length > 0 && _sessionKey !== "") {
+  //     fetchMain({
+  //       session_key: _sessionKey,
+  //       tenant_id: _tenantId
+  //     });
+  //   }
+  // }, [tenants]);
 
   // useEffect(() => {
   //   if (_sessionKey !== "") {
@@ -494,12 +494,12 @@ export default function Header() {
       console.log("Starting skills data fetch from header");
       
       // 테넌트 ID 준비
-      const tenant_id_array = tenant_id === 0 
-        ? tenants.map(tenant => tenant.tenant_id)
-        : [tenant_id];
+      // const tenant_id_array = tenant_id === 0 
+      //   ? tenants.map(tenant => tenant.tenant_id)
+      //   : [tenant_id];
       
-      // 스킬 데이터 로드
-      fetchSkills({ tenant_id_array });
+      // // 스킬 데이터 로드
+      // fetchSkills({ tenant_id_array });
     }
   }, [tenants, _sessionKey]);
 
