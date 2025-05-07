@@ -172,6 +172,8 @@ export interface TabLayoutStore {
   isResizing: boolean;
   setResizing: (isResizing: boolean) => void;
 
+  resetTabStore: () => void; // <-- 이 줄 추가
+
 };
 
 const generateUniqueId = (prefix: string, existingIds: string[]) => {
@@ -586,17 +588,17 @@ export const useTabStore = create<TabLayoutStore>()(
 
         addOnlyTab: (tab: TabItem, matchFn: (t: TabItem) => boolean) => {
           const state = get();
-        
+
           // Make sure params is initialized if undefined
           const tabWithParams = {
             ...tab,
             params: tab.params || {}
           };
-        
+
           // 1. Find the active section based on activeTabKey
           let activeRowId = null;
           let activeSectionId = null;
-        
+
           // Find which section contains the active tab
           for (const row of state.rows) {
             for (const section of row.sections) {
@@ -605,7 +607,7 @@ export const useTabStore = create<TabLayoutStore>()(
                 activeSectionId = section.id;
                 break;
               }
-        
+
               // If no section has activeTabKey matching global activeTabKey,
               // check if any section contains the tab with the active key
               if (!activeRowId && section.tabs.some(t => t.uniqueKey === state.activeTabKey)) {
@@ -616,7 +618,7 @@ export const useTabStore = create<TabLayoutStore>()(
             }
             if (activeRowId) break;
           }
-        
+
           // If no active section found, default to first section
           if (!activeRowId || !activeSectionId) {
             if (state.rows.length > 0 && state.rows[0].sections.length > 0) {
@@ -629,51 +631,51 @@ export const useTabStore = create<TabLayoutStore>()(
               return;
             }
           }
-        
+
           // 2. Remove tabs matching criteria (similar to original addOnlyTab)
           state.openedTabs
             .filter(matchFn)
             .forEach(t => {
               state.removeTab(t.id, t.uniqueKey);
             });
-        
+
           // 3. Add the tab to the active section and make it the only active tab
           set((state) => {
             // Find the active section again after removing tabs
             const row = state.rows.find(r => r.id === activeRowId);
             if (!row) return state;
-        
+
             const activeSection = row.sections.find(s => s.id === activeSectionId);
             if (!activeSection) return state;
-        
+
             // Add tab to openedTabs if not already there
             const tabExists = state.openedTabs.some(t =>
               t.id === tabWithParams.id && t.uniqueKey === tabWithParams.uniqueKey
             );
-        
+
             const newOpenedTabs = tabExists
               ? state.openedTabs
               : [...state.openedTabs, tabWithParams];
-        
+
             // Add tab to the active section and make it the active tab
             const updatedRows = state.rows.map(r => {
               if (r.id !== activeRowId) return r;
-        
+
               return {
                 ...r,
                 sections: r.sections.map(s => {
                   if (s.id !== activeSectionId) return s;
-        
+
                   // Check if tab already exists in this section
                   const tabExistsInSection = s.tabs.some(t =>
                     t.id === tabWithParams.id && t.uniqueKey === tabWithParams.uniqueKey
                   );
-        
+
                   // If not, add it
                   const newTabs = tabExistsInSection
                     ? s.tabs
                     : [...s.tabs, tabWithParams];
-        
+
                   // Always set this tab as active
                   return {
                     ...s,
@@ -683,7 +685,7 @@ export const useTabStore = create<TabLayoutStore>()(
                 })
               };
             });
-        
+
             // Update global active state to the new tab
             return {
               ...state,
@@ -1711,6 +1713,38 @@ export const useTabStore = create<TabLayoutStore>()(
           }),
 
         setResizing: (isResizing) => set((state) => ({ ...state, isResizing })),
+
+        resetTabStore: () =>
+          set(() => ({
+            openedTabs: [],
+            rows: [
+              {
+                id: "row-1",
+                sections: [
+                  {
+                    id: "default",
+                    tabs: [],
+                    width: 100,
+                    activeTabKey: null,
+                  },
+                ],
+              },
+            ],
+            tabGroups: [],
+            activeTabId: null,
+            activeTabKey: null,
+            campaignIdForUpdateFromSideMenu: null,
+            campaignIdForCopyCampaign: null,
+            counselorSkillAssignmentInfo: {
+              tenantId: null,
+              counselorId: null,
+              counselorName: null,
+            },
+            openOperationSectionId: "section1",
+            splitMode: false,
+            splitLayout: "none",
+          })),
+
 
         // 운영설정용 추가
         openOperationSectionId: "section1", // 기본값
