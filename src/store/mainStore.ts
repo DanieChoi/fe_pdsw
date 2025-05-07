@@ -143,33 +143,38 @@ export const useMainStore = create<MainStore>()(
       setChannelMonitorThirdSelect: (channelMonitorThirdSelect) => set({ channelMonitorThirdSelect }, false, 'setChannelMonitorThirdSelect'),
       setCampaignProgressInfoViewType: (campaignProgressInfoViewType) => set({ campaignProgressInfoViewType }, false, 'setCampaignProgressInfoViewType'),
 
-      updateCampaignStatus: (campaignId: number, newStatus: number) => set(state => {
-        // Find the campaign in the array
-        const updatedCampaigns = state.campaigns.map(campaign => {
-          if (campaign.campaign_id === campaignId) {
-            // Return a new object with the updated status
-            return {
-              ...campaign,
-              campaign_status: newStatus
-            };
-          }
-          return campaign;
-        });
-
-        // Update the selectedCampaign if it matches the updated campaignId
-        let updatedSelectedCampaign = state.selectedCampaign;
-        if (state.selectedCampaign && state.selectedCampaign.campaign_id === campaignId) {
-          updatedSelectedCampaign = {
-            ...state.selectedCampaign,
-            campaign_status: newStatus
+      updateCampaignStatus: (campaignId: number, newStatus: number) => {
+        set(state => {
+          const updatedCampaigns = state.campaigns.map(campaign => {
+            if (campaign.campaign_id === campaignId) {
+              return {
+                ...campaign,
+                campaign_status: newStatus,
+                start_flag: newStatus  // ✅ 상태 반영은 그대로
+              };
+            }
+            return campaign;
+          });
+      
+          const updatedSelectedCampaign = state.selectedCampaign?.campaign_id === campaignId
+            ? {
+                ...state.selectedCampaign,
+                campaign_status: newStatus,
+                start_flag: newStatus
+              }
+            : state.selectedCampaign;
+      
+          return {
+            campaigns: updatedCampaigns,
+            selectedCampaign: updatedSelectedCampaign
           };
-        }
+        }, false, 'updateCampaignStatus');
+      
+        // ✅ 상태 반영 후 invalidate는 외부에서 별도로 처리
+        // 예: setTimeout(() => invalidateTreeMenuData(), 300);
+        // 또는 수동 버튼/로직으로 트리 UI 재로딩
+      }      
 
-        return {
-          campaigns: updatedCampaigns,
-          selectedCampaign: updatedSelectedCampaign
-        };
-      }, false, 'updateCampaignStatus'),
 
     }),
     {

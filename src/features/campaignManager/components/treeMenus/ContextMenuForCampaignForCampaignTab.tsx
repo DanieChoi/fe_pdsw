@@ -105,22 +105,6 @@ export function ContextMenuForCampaignForCampaignTab({
   const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
   const [displayStatus, setDisplayStatus] = useState<CampaignStatus>(item.status);
 
-
-  // Update the displayed status whenever the item prop or campaigns state changes
-  useEffect(() => {
-    if (currentCampaign) {
-      const statusMap: Record<number, CampaignStatus> = {
-        1: "started",
-        2: "pending",
-        3: "stopped"
-      };
-      const updatedStatus = statusMap[currentCampaign.campaign_status] || item.status;
-      setDisplayStatus(updatedStatus);
-    } else {
-      setDisplayStatus(item.status);
-    }
-  }, [currentCampaign, item.status, campaigns]);
-
   // ====== API HOOKS ======
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
@@ -133,6 +117,24 @@ export function ContextMenuForCampaignForCampaignTab({
     },
   });
 
+  // const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
+  //   onSuccess: () => {
+  //     preventCloseRef.current = true;
+  //     // Refresh campaigns data after status update
+
+  //     customAlertService.success(
+  //       '캠페인 상태가 성공적으로 변경되었습니다!',
+  //       '캠페인 상태 변경 완료'
+  //     );;
+  //     setCampaigns(data.result_data);
+  //     setSelectedCampaign(
+  //       data.result_data.find(
+  //         (c: any) => c.campaign_id === selectedCampaign?.campaign_id
+  //       ) || null
+  //     );
+  //   },
+  // });
+
   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
     onSuccess: () => {
       preventCloseRef.current = true;
@@ -144,7 +146,7 @@ export function ContextMenuForCampaignForCampaignTab({
       );;
 
 
-      fetchMain({ session_key, tenant_id });
+      // fetchMain({ session_key, tenant_id });
     },
     onError: (error) => {
       toast.error(error.message || "상태 변경 중 오류가 발생했습니다.");
@@ -286,7 +288,7 @@ export function ContextMenuForCampaignForCampaignTab({
     try {
       preventCloseRef.current = true;
       // Set optimistic update for better UX
-      setDisplayStatus(status);
+      // setDisplayStatus(status);
 
       await updateCampaignStatusMutation.mutateAsync({
         campaign_id: Number(item.id),

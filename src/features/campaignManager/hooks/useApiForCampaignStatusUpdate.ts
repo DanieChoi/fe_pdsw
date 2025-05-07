@@ -21,7 +21,7 @@ export function useApiForCampaignStatusUpdate(
     onSuccess: (data, variables, context) => {
       // Immediately update the campaign status in the store
       // This provides an optimistic update even before the invalidateQueries is processed
-      updateCampaignStatus(variables.campaign_id, variables.campaign_status);
+      // updateCampaignStatus(variables.campaign_id, variables.campaign_status);
 
       // Show success message
       customAlertService.success(
@@ -30,9 +30,9 @@ export function useApiForCampaignStatusUpdate(
       );
 
       // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['treeMenuDataForSideMenu'] });
-      queryClient.invalidateQueries({ queryKey: ['mainCampaignProgressInformation'] });
-      queryClient.invalidateQueries({ queryKey: ['mainData'] });
+      // queryClient.invalidateQueries({ queryKey: ['treeMenuDataForSideMenu'] });
+      // queryClient.invalidateQueries({ queryKey: ['mainCampaignProgressInformation'] });
+      // queryClient.invalidateQueries({ queryKey: ['mainData'] });
 
       // Call the original onSuccess if provided
       options?.onSuccess?.(data, variables, context);

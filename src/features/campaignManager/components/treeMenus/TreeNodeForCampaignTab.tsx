@@ -4,7 +4,7 @@ import { TreeNodeProps } from "@/components/shared/layout/SidebarPresenter";
 import { ContextMenuForCampaignForCampaignTab } from "./ContextMenuForCampaignForCampaignTab";
 import { FileText } from "lucide-react";
 import { useTabStore } from "@/store/tabStore";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { ContextMenu, ContextMenuTrigger } from "@/components/ui/context-menu";
 import { FolderContextMenu } from "./FolderContextMenuForTreeNode";
 import Image from "next/image";
@@ -12,6 +12,7 @@ import clsx from "clsx";
 import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useMainStore } from "@/store/mainStore";
 import { IRootNodeContextMenu } from "./ContextMenus/ICampaignTabRootNodeContextMenu";
+import { TreeItem } from "../../types/typeForSidebar2";
 
 export function TreeNodeForCampaignTab({
   item,
@@ -72,6 +73,39 @@ export function TreeNodeForCampaignTab({
     }
   }, [campaignIdForUpdateFromSideMenu, item.id, item.type, onNodeSelect, setSelectedNodeType]);
 
+  // const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
+  // const isTenantFolder = item.type === "folder" && level === 1;
+  // const isRootNode = item.label.toLowerCase() === "nexus";
+
+  // const currentStatus = currentCampaign
+  //   ? (() => {
+  //     switch (currentCampaign.campaign_status) {
+  //       case 1: return "started";
+  //       case 2: return "pending";
+  //       case 3: return "stopped";
+  //       default: return item.status;
+  //     }
+  //   })()
+  //   : item.status;
+
+  // const updatedItem = { ...item, status: currentStatus };
+
+  // 캠페인 ID → 상태 맵 생성
+  const campaignStatusMap = useMemo(() => {
+    const map = new Map<string, "started" | "pending" | "stopped">();
+    campaigns?.forEach(campaign => {
+      let status: "started" | "pending" | "stopped" = 'stopped';
+      switch (campaign.campaign_status) {
+        case 1: status = 'started'; break;
+        case 2: status = 'pending'; break;
+        case 3: status = 'stopped'; break;
+      }
+      map.set(campaign.campaign_id.toString(), status);
+    });
+    return map;
+  }, [campaigns]);
+
+  // 현재 캠페인의 상태 확인
   const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
   const isTenantFolder = item.type === "folder" && level === 1;
   const isRootNode = item.label.toLowerCase() === "nexus";
@@ -88,6 +122,9 @@ export function TreeNodeForCampaignTab({
     : item.status;
 
   const updatedItem = { ...item, status: currentStatus };
+
+
+
   const hasChildren = !!item.children?.length;
   const isExpanded = expandedNodes.has(item.id);
   // ✅ 타입도 같이 체크
@@ -236,8 +273,8 @@ export function TreeNodeForCampaignTab({
       );
     } else {
       // 1. ContextMenuForCampaignForCampaignTab가 이미 ContextMenu를 포함하는지 확인
-      if (typeof ContextMenuForCampaignForCampaignTab === 'function' && 
-          ContextMenuForCampaignForCampaignTab.toString().includes('ContextMenu')) {
+      if (typeof ContextMenuForCampaignForCampaignTab === 'function' &&
+        ContextMenuForCampaignForCampaignTab.toString().includes('ContextMenu')) {
         // 2a. 이미 ContextMenu를 포함하는 경우
         return (
           <ContextMenuForCampaignForCampaignTab
@@ -278,10 +315,57 @@ export function TreeNodeForCampaignTab({
 
   return (
     <div className="select-none">
-      {renderContextMenu()}
+      {(() => {
+        if (isRootNode) {
+          return (
+            <ContextMenu>
+              <ContextMenuTrigger>
+                <div ref={nodeRef} className={nodeStyle} onClick={handleClick} style={{ paddingLeft }}>
+                  {nodeContent}
+                </div>
+              </ContextMenuTrigger>
+              <IRootNodeContextMenu item={updatedItem} />
+            </ContextMenu>
+          );
+        }
+
+        if (item.type === "folder") {
+          return (
+            <ContextMenu>
+              <ContextMenuTrigger>
+                <div ref={nodeRef} className={nodeStyle} onClick={handleClick} style={{ paddingLeft }}>
+                  {nodeContent}
+                </div>
+              </ContextMenuTrigger>
+              <FolderContextMenu item={updatedItem} />
+            </ContextMenu>
+          );
+        }
+
+        return (
+          <ContextMenuForCampaignForCampaignTab
+            item={updatedItem}
+            onEdit={() => console.log("Edit:", item)}
+            onMonitor={() => console.log("Monitor:", item)}
+            onHandleCampaignCopy={onHandleCampaignCopy}
+            tenantIdForCampaignTab={item.tenantId}
+          >
+            <div
+              ref={nodeRef}
+              className={nodeStyle}
+              onClick={handleClick}
+              onDoubleClick={handleDoubleClick}
+              style={{ paddingLeft }}
+            >
+              {nodeContent}
+            </div>
+          </ContextMenuForCampaignForCampaignTab>
+        );
+      })()}
+
       {hasChildren && isExpanded && (
         <div className="space-y-0.5">
-          {item.children?.map((child: typeof item) => (
+          {item.children?.map((child: TreeItem) => (
             <TreeNodeForCampaignTab
               key={child.id}
               item={child}
@@ -298,4 +382,5 @@ export function TreeNodeForCampaignTab({
       )}
     </div>
   );
+
 }

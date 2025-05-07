@@ -93,12 +93,12 @@ export function TreeMenusForCampaigns() {
   }, [treeData]);
 
   // expandNodes 함수와 원본 아이템을 전역으로 사용할 수 있도록 저장
-  useEffect(() => {
-    window.treeExpandNodes = expandNodes;
-    window.originalTreeItems = originalItems;
-    window.treeSavePreviousState = savePreviousState;
-    window.treeRestorePreviousState = restorePreviousState;
-  }, [expandNodes, originalItems, savePreviousState, restorePreviousState]);
+  // useEffect(() => {
+  //   window.treeExpandNodes = expandNodes;
+  //   window.originalTreeItems = originalItems;
+  //   window.treeSavePreviousState = savePreviousState;
+  //   window.treeRestorePreviousState = restorePreviousState;
+  // }, [expandNodes, originalItems, savePreviousState, restorePreviousState]);
 
 
   // 통합 스토어에서 정렬 및 필터링 상태 가져오기
@@ -265,14 +265,30 @@ export function TreeMenusForCampaigns() {
   }
 
   // 정렬 상태가 변경될 때마다 UI 업데이트 강제
+  // useEffect(() => {
+  //   console.log("정렬/필터 상태 변경 감지");
+
+  //   // 디바운스 처리로 연속 업데이트 방지
+  //   const debounceTimer = setTimeout(() => {
+  //     setForceUpdate(prev => prev + 1);
+  //   }, 100); // 100ms 디바운스
+
+  //   return () => clearTimeout(debounceTimer);
+  // }, [campaignSort.type, campaignSort.direction, selectedNodeType]);
+
+  const filteredItems = useMemo(() => filterTreeItems(originalItems), [originalItems, filterMode, selectedSkillIds]);
+  const sortedItems = useMemo(() => sortTreeItems(filteredItems), [filteredItems, campaignSort, selectedNodeType]);
+  
+  // 그 외 measureTreeWidth는 sortedItems.length를 의존성으로 그대로 유지
   useEffect(() => {
-    console.log("정렬 상태 변경 감지:", {
-      type: campaignSort.type,
-      direction: campaignSort.direction,
-      nodeType: selectedNodeType
-    });
-    setForceUpdate(prev => prev + 1);
-  }, [campaignSort.type, campaignSort.direction, selectedNodeType]);
+    if (!isLoading && !error && sortedItems.length > 0) {
+      const timer = setTimeout(() => {
+        measureTreeWidth();
+      }, 500);
+  
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, error, sortedItems.length, campaignSort.type, campaignSort.direction, filterMode, selectedSkillIds.length, viewMode, selectedNodeType]);
 
   // 트리 너비 측정 함수
   const measureTreeWidth = () => {
@@ -332,8 +348,8 @@ export function TreeMenusForCampaigns() {
   };
 
   // 필터링/정렬 적용
-  const filteredItems = filterTreeItems(originalItems);
-  const sortedItems = sortTreeItems(filteredItems);
+  // const filteredItems = filterTreeItems(originalItems);
+  // const sortedItems = sortTreeItems(filteredItems);
 
   // 데이터나 필터, 정렬 변경 시 너비 재측정
   useEffect(() => {
@@ -352,10 +368,10 @@ export function TreeMenusForCampaigns() {
     campaignSort.direction,
     filterMode,
     selectedSkillIds.length,
-    viewMode,
-    selectedNodeType,
-    forceUpdate,
-    measureTreeWidth
+    // viewMode,
+    // selectedNodeType,
+    // forceUpdate,
+    // measureTreeWidth
   ]);
 
   // 컴포넌트 언마운트 시 타이머 정리
@@ -479,7 +495,7 @@ export function TreeMenusForCampaigns() {
     <div className="flex-1 overflow-auto tree-node text-sm" ref={containerRef}>
       {sortedItems.map((item: TreeItem) => (
         <TreeNodeForCampaignTab
-          key={`${item.id}-${forceUpdate}`}
+          key={`${item.id}`}
           item={item}
           level={0}
           expandedNodes={expandedNodes}
