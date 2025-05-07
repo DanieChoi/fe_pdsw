@@ -17,6 +17,7 @@ import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkill
 import * as XLSX from 'xlsx';
 // 모달
 import ColumnSet, { defaultColumnsData, ColumnSettingItem } from './ColumnSet';
+import { useEnvironmentStore } from '@/store/environmentStore';
 
 interface TreeRow extends DispatchStatusDataType {
   parentId?: string;
@@ -136,6 +137,10 @@ export default function Campaignprogress() {
   const [isColumnSetOpen, setIsColumnSetOpen] = useState(false);
   const [initData, setInitData] = useState<TreeRow[]>([]);
   const [columns, setColumns] = useState<Column<TreeRow>[]>(defaultColumnsData);
+
+  const { statisticsUpdateCycle } = useEnvironmentStore();
+  const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const transformToTreeData = (dataList: DispatchStatusDataType[]) => {
     const result: any[] = [];
@@ -512,7 +517,7 @@ export default function Campaignprogress() {
       } else {
         const tempData: DispatchStatusDataType = {
           ...initDispatchStatusData
-          , strFlag : '최초발신'
+          , strFlag: '최초발신'
           , tenantId: campaigns[selectedCampaignIdIndex].tenant_id
           , campId: campaigns[selectedCampaignIdIndex].campaign_id
           , startFlag: campaigns[selectedCampaignIdIndex].start_flag === 1 ? '시작' : campaigns[selectedCampaignIdIndex].start_flag === 2 ? '멈춤' : '중지'
@@ -590,9 +595,28 @@ export default function Campaignprogress() {
     }
   }, [campaigns]);
 
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsRefreshing(true);
+
+      // 기존 갱신 로직 실행
+      setSelectedCampaignId(campaigns[0].campaign_id);
+      setSelectedCampaignIdIndex(0);
+      setTempCampaignInfoList([]);
+      setCampaignInfoList([]);
+
+      setLastRefreshTime(new Date());
+
+      setTimeout(() => setIsRefreshing(false), 1000); // 짧은 갱신 애니메이션 처리
+    }, statisticsUpdateCycle * 1000);
+
+    return () => clearInterval(interval);
+  }, [statisticsUpdateCycle, campaigns]);
+
+
   return (
     <div className="limit-width">
-
 
       <TitleWrap
         className="border-b border-gray-300 pb-3"
@@ -657,8 +681,23 @@ export default function Campaignprogress() {
           <button onClick={() => setIsSortAscending(!isSortAscending)}>
             <Image src="/sort_button.svg" alt="오름,내림차순 버튼" width={12} height={12} />
           </button>
+
         </div>
+
         <div className="flex justify-end gap-2">
+
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span>갱신 주기: <span className="font-medium text-blue-600">{statisticsUpdateCycle}초</span></span>
+            </div>
+            <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md">
+              <span>마지막 갱신:</span>
+              <span className="font-medium text-blue-600">
+                {lastRefreshTime ? lastRefreshTime.toLocaleTimeString() : '갱신 안됨'}
+              </span>
+            </div>
+          </div>
 
           {/* 새로고침 버튼 */}
           <CommonButton variant="secondary" onClick={() => {

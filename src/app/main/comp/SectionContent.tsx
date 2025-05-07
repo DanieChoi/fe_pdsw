@@ -1,3 +1,4 @@
+// C:\nproject\fe_pdsw3\src\app\main\comp\SectionContent.tsx
 import React, { useCallback } from "react";
 import { useDroppable } from "@dnd-kit/core";
 
