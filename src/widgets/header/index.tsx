@@ -403,7 +403,7 @@ export default function Header() {
       
       // 로딩 중이면 중복 호출 방지
       if (store.campaignsLoading) {
-        console.log("Campaigns loading in progress, skipping duplicate call");
+        console.log("Ca mpaigns loading in progress, skipping duplicate call");
         return;
       }
       
