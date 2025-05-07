@@ -198,8 +198,7 @@ export function useApiForGetTreeMenuDataForSideMenu(): TreeMenuQueryResult {
     tenantsLoaded, 
     campaignsLoaded, 
     tenants, 
-    campaigns,
-    storeVersion // 추가: storeVersion을 구독하여 변경 감지
+    campaigns
   } = useMainStore();
   const [isReady, setIsReady] = useState(false);
   
@@ -349,8 +348,7 @@ export function useApiForGetTreeMenuDataForSideMenu(): TreeMenuQueryResult {
       console.log("TreeMenu hook: Invalidating query cache due to data changes");
       invalidateTreeMenuData();
     }
-  }, [isReady, tenant_id, role_id, campaigns.length, storeVersion]); // storeVersion 추가
-
+  }, [isReady, tenant_id, role_id, campaigns.length]); // Watch for relevant changes
   return {
     ...query,
     updateTreeMenuData,
