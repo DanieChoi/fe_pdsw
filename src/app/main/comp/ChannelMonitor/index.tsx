@@ -4,9 +4,8 @@ import DataGrid from 'react-data-grid';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import 'react-data-grid/lib/styles.css';
 import { useApiForChannelStateMonitoringList } from '@/features/monitoring/hooks/useApiForChannelStateMonitoringList';
-import { useEnvironmentStore } from '@/store/environmentStore';
 import { useMainStore } from '@/store';
-import { useApiForDialingDevice, useApiForDialingDeviceCreate, useApiForDialingDeviceDelete, useApiForDialingDeviceUpdate } from '@/features/preferences/hooks/useApiForDialingDevice';
+import { useApiForDialingDevice } from '@/features/preferences/hooks/useApiForDialingDevice';
 
 type ChannelStatus = 'IDLE' | 'BUSY' | 'NONE';
 
@@ -65,8 +64,10 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
   const [thirdSelect, setThirdSelect] = useState<string>('상태전체');
   const [channelData, setChannelData] = useState<ChannelData[]>([]);
   const [filteredData, setFilteredData] = useState<ChannelData[]>([]);
-  const { statisticsUpdateCycle } = useEnvironmentStore();
-  const { tenants, campaigns, sseInputMessage, setSseInputMessage } = useMainStore();
+  const { tenants, campaigns, sseInputMessage, setSseInputMessage 
+    , channelMonitorFirstSelect, channelMonitorSecondSelect, channelMonitorThirdSelect
+    , setChannelMonitorFirstSelect, setChannelMonitorSecondSelect, setChannelMonitorThirdSelect
+  } = useMainStore();
   const [ secondModeEquipment, setSecondModeEquipment ] = useState<ItemType[]>([]);
   const [ secondModeCampaign, setSecondModeCampaign ] = useState<ItemType[]>([]);
   const [ secondModeCampaignGroup, setSecondModeCampaignGroup ] = useState<ItemType[]>([]);
@@ -166,7 +167,21 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
   // 첫 번째 Select 변경 시 두 번째 Select 초기화
   const handleFirstSelectChange = (value: FilterMode) => {
     setFirstSelect(value);
+    setChannelMonitorFirstSelect(value);
     setSecondSelect(' ');
+    setChannelMonitorSecondSelect(' ');
+  };
+
+  // 두 번째 Select 변경 시
+  const handleSecondSelectChange = (value:any) => {
+    setSecondSelect(value);
+    setChannelMonitorSecondSelect(value);
+  };
+
+  // 세세 번째 Select 변경 시
+  const handleThirdSelectChange = (value:any) => {
+    setThirdSelect(value);
+    setChannelMonitorThirdSelect(value);
   };
 
   // 채널 모니터링 api 호출
@@ -249,6 +264,18 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
   }, [init]);
 
   useEffect(() => {   
+    if( channelMonitorFirstSelect != ''){
+      setFirstSelect(channelMonitorFirstSelect as FilterMode);
+      if( channelMonitorSecondSelect != ''){
+        setSecondSelect(channelMonitorSecondSelect);
+        if( channelMonitorThirdSelect != '' ){
+          setThirdSelect(channelMonitorThirdSelect);
+        }
+      }
+    }
+  }, [channelMonitorFirstSelect, channelMonitorSecondSelect, channelMonitorThirdSelect]);
+
+  useEffect(() => {   
     fetchDialingDeviceList({
         tenant_id_array: tenants.map(tenant => tenant.tenant_id)
     });    
@@ -313,7 +340,7 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
 
             <Select 
               disabled={firstSelect === '전체'}
-              onValueChange={setSecondSelect}
+              onValueChange={handleSecondSelectChange}
               value={secondSelect}
             >
               <SelectTrigger className="w-40">
@@ -364,7 +391,7 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
               </SelectContent>
             </Select>
 
-            <Select onValueChange={setThirdSelect}>
+            <Select onValueChange={handleThirdSelectChange}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder={thirdSelect} />
               </SelectTrigger>

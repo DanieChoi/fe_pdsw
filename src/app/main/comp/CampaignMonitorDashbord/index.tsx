@@ -94,7 +94,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   // props로 전달받은 campaignId를 사용
   const numericCampaignId = campaignId ? Number(campaignId) : null;
 
-  const { campaigns } = useMainStore();
+  const { campaigns, campaignProgressInfoViewType, setCampaignProgressInfoViewType } = useMainStore();
   const [campaignInfo, setCampaignInfo] = useState<MainDataResponse | null>(null);
   const [dataList, setDataList] = useState<CampaignProgressInformationResponseDataType[]>([initData]);
   const [campaignIdList, setCampaignIdList] = useState<number[]>([]);
@@ -111,6 +111,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
   // 라디오 버튼 변경 핸들러
   const handleViewTypeChange = (value: string) => {
     setViewType(value as ViewType);
+    setCampaignProgressInfoViewType(value as ViewType);
   };
 
   // 캠페인 진행 정보 API 호출 (useMutation 사용)
@@ -156,6 +157,12 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
       console.warn("캠페인 ID가 없어 API 호출이 비활성화됩니다.");
     }
   }, [fetchProgressData, numericCampaignId]);
+
+  useEffect(() => {   
+    if( campaignProgressInfoViewType != ''){      
+      setViewType(campaignProgressInfoViewType as ViewType);
+    }
+  }, [campaignProgressInfoViewType]);
 
   // 컴포넌트 마운트 시 캠페인 정보 로드 및 데이터 조회
   useEffect(() => {

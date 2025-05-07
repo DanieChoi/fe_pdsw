@@ -156,6 +156,11 @@ interface MainState {
   // 캠페인 상태
   campaignsLoaded: boolean;  // 캠페인 데이터 로딩 여부
   campaignsLoading: boolean; // 캠페인 데이터 로딩 중 여부
+  // 채널 모니터
+  channelMonitorFirstSelect: string;
+  channelMonitorSecondSelect: string;
+  channelMonitorThirdSelect: string;
+  campaignProgressInfoViewType: string;
 }
 
 interface MainActions {
@@ -177,6 +182,10 @@ interface MainActions {
   // 캠페인 액션
   setCampaignsLoaded: (loaded: boolean) => void;
   setCampaignsLoading: (loading: boolean) => void;
+  setChannelMonitorFirstSelect: (channelMonitorFirstSelect:string) => void;
+  setChannelMonitorSecondSelect: (channelMonitorSecondSelect:string) => void;
+  setChannelMonitorThirdSelect: (channelMonitorThirdSelect:string) => void;
+  setCampaignProgressInfoViewType: (campaignProgressInfoViewType:string) => void;
 }
 
 type MainStore = MainState & MainActions;
@@ -203,6 +212,10 @@ export const useMainStore = create<MainStore>()(
       // 캠페인 상태 초기화
       campaignsLoaded: false,
       campaignsLoading: false,
+      channelMonitorFirstSelect: '',
+      channelMonitorSecondSelect: '',
+      channelMonitorThirdSelect: '',
+      campaignProgressInfoViewType: '',
       
       setCampaigns: (campaigns) => set({ 
         campaigns, 
@@ -235,6 +248,10 @@ export const useMainStore = create<MainStore>()(
       // 캠페인 액션
       setCampaignsLoaded: (loaded) => set({ campaignsLoaded: loaded }, false, 'setCampaignsLoaded'),
       setCampaignsLoading: (loading) => set({ campaignsLoading: loading }, false, 'setCampaignsLoading'),
+      setChannelMonitorFirstSelect: (channelMonitorFirstSelect) => set({ channelMonitorFirstSelect }, false, 'setChannelMonitorFirstSelect'),
+      setChannelMonitorSecondSelect: (channelMonitorSecondSelect) => set({ channelMonitorSecondSelect }, false, 'setChannelMonitorSecondSelect'),
+      setChannelMonitorThirdSelect: (channelMonitorThirdSelect) => set({ channelMonitorThirdSelect }, false, 'setChannelMonitorThirdSelect'),
+      setCampaignProgressInfoViewType: (campaignProgressInfoViewType) => set({ campaignProgressInfoViewType }, false, 'setCampaignProgressInfoViewType'),      
     }),
     {
       name: 'main-store', // 개발자 도구에 표시될 스토어 이름
