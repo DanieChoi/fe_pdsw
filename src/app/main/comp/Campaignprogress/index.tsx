@@ -191,7 +191,8 @@ export default function Campaignprogress() {
 
       campaign.children.push({
         ...data,
-        id: data.campId + '-' + data.senderId,
+        // id: data.campId + '-' + data.senderId,
+        id: `${data.centerId}-${data.tenantId}-${data.campId}-${data.senderId}`,
         parentId: campaign.id,
         level: 3
       });

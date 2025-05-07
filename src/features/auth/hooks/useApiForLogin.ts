@@ -12,6 +12,7 @@ export function useApiForLogin(
     mutationFn: loginApi.login,
     onSuccess: (data, variables, context) => {
       options?.onSuccess?.(data, variables, context);
+      
     },
     onError: (error: AuthApiError, variables: LoginCredentials, context: unknown) => {
       options?.onError?.(error, variables, context);
