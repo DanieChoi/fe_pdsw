@@ -308,7 +308,7 @@ const CampaignStartModal = ({
             <div className="p-2 rounded-full bg-emerald-100 mr-3">
               <Play className="h-5 w-5 text-emerald-600" />
             </div>
-            <DialogTitle>캠페인 일괄 시작2</DialogTitle>
+            <DialogTitle>캠페인 일괄 시작</DialogTitle>
           </div>
         </DialogHeader>
 
