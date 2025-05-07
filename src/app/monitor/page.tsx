@@ -916,7 +916,7 @@ const MonitorPage = () => {
       <CustomAlert
         isOpen={isRebroadcastOpen}
         title="재발신 설정"
-        message={<RebroadcastSettingsPanel />}
+        message={<RebroadcastSettingsPanel reBroadCastOption={'realtime'} />}
         type="1"
         onClose={() => setIsRebroadcastOpen(false)}
         onCancel={() => setIsRebroadcastOpen(false)}
