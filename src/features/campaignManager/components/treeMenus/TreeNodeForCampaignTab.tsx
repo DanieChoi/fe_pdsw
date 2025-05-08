@@ -167,6 +167,9 @@ export function TreeNodeForCampaignTab({
       title: `캠페인 관리`,
       content: null,
       params: { campaignId: item.id, campaignName: item.label, campaignType: item.type },
+      menuId: 2, // id와 동일한 값으로 설정하거나 적절한 menuId를 지정
+      icon: "",  // 적절한 아이콘 경로를 지정하거나 빈 문자열을 사용
+      href: ""   // 적절한 href를 지정하거나 빈 문자열을 사용
     };
 
     // 현재 섹션에 단일 탭으로 추가
