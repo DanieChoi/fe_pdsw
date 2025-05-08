@@ -583,10 +583,10 @@ export function IContextMenuForCampaignForCampaignGroup({
                   {item.isSubmenu && isSubmenuActive && (
                     <div
                       ref={subMenuRef}
-                      className="absolute right-0 top-0 min-w-[150px] bg-white rounded-md shadow-md border-2 border-gray-400 z-50 py-1"
+                      className="absolute right-0 top-0 min-w-[150px] bg-white rounded-md shadow-md border-2 border-black z-50 py-1 px-3"
                       style={{
                         marginTop: '-1px',
-                        transform: 'translateX(100%)',  // 오른쪽으로 100% 이동 (부모 요소 너비만큼)
+                        transform: 'translateX(100%)',
                         marginRight: '-2px'
                       }}
                       onMouseLeave={handleSubMenuMouseLeave}
