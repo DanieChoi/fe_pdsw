@@ -1835,9 +1835,9 @@ export const useTabStore = create<TabLayoutStore>()(
               11: '예약콜 제한'
             };
 
-            if (tabNames[tabId]) {
-              toast.info(`${tabNames[tabId]}은(는) 1탭으로 제한합니다.`);
-            }
+            // if (tabNames[tabId]) {
+            //   toast.info(`${tabNames[tabId]}은(는) 1탭으로 제한합니다.`);
+            // }
           }
 
           // 7. 운영 설정 관련 탭이면 운영 스토어도 업데이트
