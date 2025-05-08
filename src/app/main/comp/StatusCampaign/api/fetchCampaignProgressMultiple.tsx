@@ -51,7 +51,7 @@ export const fetchCampaignProgressForMultipleCampaigns = async (
 
   // Log which campaigns are being fetched for debugging
   console.log(
-    `[fetchCampaignProgressForMultipleCampaigns] Fetching progress for ${campaigns.length} campaigns:`,
+    `[fetchCampaignProgressForMultipleCampaigns] Fetching progress for ${campaigns.length} campaigns sequentially:`,
     campaigns.map(c => `${c.campaign_id} (${c.campaign_name})`)
   );
 
@@ -61,30 +61,31 @@ export const fetchCampaignProgressForMultipleCampaigns = async (
     progressInfoList: CampaignProgressInformationResponse["progressInfoList"];
   }[] = [];
 
-  // Use Promise.all for parallel execution but catch individual errors
-  // This gives better performance than the sequential for loop in the original
-  const promises = campaigns.map(c => 
-    fetchCampaignProgressInformation({
-      tenantId: c.tenant_id,
-      campaignId: c.campaign_id,
-    })
-    .then(res => ({
-      campaign_id: c.campaign_id,
-      campaign_name: c.campaign_name,
-      progressInfoList: res.progressInfoList || [],
-    }))
-    .catch(error => {
+  // 순차 실행 - for...of 루프 사용하여 한 번에 하나씩 API 호출
+  for (const c of campaigns) {
+    try {
+      console.log(`[fetchCampaignProgressForMultipleCampaigns] Fetching campaign ${c.campaign_id} (${c.campaign_name})`);
+      
+      const res = await fetchCampaignProgressInformation({
+        tenantId: c.tenant_id,
+        campaignId: c.campaign_id,
+      });
+      
+      results.push({
+        campaign_id: c.campaign_id,
+        campaign_name: c.campaign_name,
+        progressInfoList: res.progressInfoList || [],
+      });
+      
+      console.log(`[fetchCampaignProgressForMultipleCampaigns] Successfully fetched campaign ${c.campaign_id}`);
+    } catch (error) {
       console.error(
         `[fetchCampaignProgressForMultipleCampaigns] 캠페인 ${c.campaign_id} (${c.campaign_name}) 조회 실패:`,
         error
       );
-      // Return null for failed requests
-      return null;
-    })
-  );
+      // 실패한 캠페인은 건너뜁니다 - 결과에 포함되지 않음
+    }
+  }
 
-  const settledResults = await Promise.all(promises);
-  
-  // Filter out null results from failed requests
-  return settledResults.filter(result => result !== null);
+  return results;
 };
