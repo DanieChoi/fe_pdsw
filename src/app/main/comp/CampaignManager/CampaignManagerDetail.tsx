@@ -981,10 +981,26 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     }
   };
 
+  //현재시간 양식 구하기.
+  const getCurrentFormattedTime = () => {
+    const now = new Date();
+  
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // 0부터 시작하므로 +1
+    const day = String(now.getDate()).padStart(2, '0');
+  
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+  
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  };
+  
   // 캠페인 저장 실행
   const handleCampaignSaveExecute = () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     setChangeYn(false);
+    const todayTime = getCurrentFormattedTime();
     if (campaignInfoChangeYn) {
 
       if (tempCampaignManagerInfo.start_flag === 1 && oriCampaignManagerInfo.start_flag != 1) {
@@ -998,12 +1014,14 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
             ...tempCampaignManagerInfo
             , update_user: user_id
             , update_ip: Cookies.get('userHost')+''
+            , update_time: todayTime
           });
         } else {
           fetchCampaignManagerUpdate({
             ...tempCampaignManagerInfo
             , update_user: user_id
             , update_ip: Cookies.get('userHost')+''
+            , update_time: todayTime
             , dial_speed: 0
           });
         }
@@ -1557,11 +1575,13 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     onSuccess: (data) => {
       if (data.result_code === 0 || ( data.result_code === -1 && data.reason_code === -13 )) {
         // fetchCampaignManagerUpdate(tempCampaignManagerInfo);
+        const todayTime = getCurrentFormattedTime();
         fetchCampaignManagerUpdate(
           {
             ...tempCampaignManagerInfo
             , update_user: user_id
             , update_ip: Cookies.get('userHost')+''
+            , update_time: todayTime
           }
         );
         if (campaignSkillChangeYn) {
