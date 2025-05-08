@@ -39,7 +39,7 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { EnvironmentListResponse, EnvironmentSaveRequest } from "@/features/auth/types/environmentIndex";
 
-interface EnvironmentState {
+export interface EnvironmentState {
   // 기존 호환성을 위한 필드
   environmentData: EnvironmentListResponse | null;
 

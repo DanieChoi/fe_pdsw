@@ -14,11 +14,27 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from '@/store/authStore';
 import { useEnvironmentStore } from '@/store/environmentStore';
 import { useApirForEnvironmentList } from '@/features/auth/hooks/useApiForEnvironment';
+import { useApiForOperatingTime } from '@/features/preferences/hooks/useApiForOperatingTime';
+import { EnvironmentListResponse } from "@/features/auth/types/environmentIndex";
 
 interface LoginFormData {
   user_name: string;
   password: string;
   remember: boolean;
+}
+const data:EnvironmentListResponse = {
+  campaignListAlram:0
+  , code:""
+  , dayOfWeekSetting: ""
+  , message: ""
+  , personalCampaignAlertOnly: 0
+  , sendingWorkEndHours: ""
+  , sendingWorkStartHours: ""
+  , serverConnectionTime: 0
+  , showChannelCampaignDayScop: 0
+  , statisticsUpdateCycle: 0
+  , unusedWorkHoursCalc: 0
+  , useAlramPopup: 0
 }
 
 export default function LoginPage() {
@@ -38,14 +54,61 @@ export default function LoginPage() {
   });
 
   const { setAuth } = useAuthStore();
-  const { setEnvironment } = useEnvironmentStore(); // 새로운 환경설정 스토어 사용
-
+  const { setEnvironment, environmentData } = useEnvironmentStore(); // 새로운 환경설정 스토어 사용
+  const [tempEnvironment, setTempEnvironment] = useState<EnvironmentListResponse>(data);
+  // 캠페인 운용 가능 시간 조회 API 호출
+  const { mutate: fetchOperatingTime } = useApiForOperatingTime({
+    onSuccess: (data) => {
+      console.log(data);
+      const startTime = data.result_data.start_time;
+      const endTime = data.result_data.end_time;
+      const work = data.result_data.days_of_week;
+      if( startTime === '0000' && endTime === '0000' && work === '0000000' ){
+        // setStartTime("0000");
+        // setEndTime("0000");          
+        // setDayOfWeek(['f','f','f','f','f','f','f']);
+        // setUnusedWorkHoursCalc(true);
+        // 환경설정 데이터를 별도 스토어에 저장
+        setEnvironment({
+          ...tempEnvironment,
+          sendingWorkEndHours: endTime,
+          sendingWorkStartHours: startTime,
+          dayOfWeekSetting: 'f,f,f,f,f,f,f',
+        });
+      }else{
+        // setStartTime(startTime);
+        // setEndTime(endTime);
+        // setDayOfWeek(convertBinaryString(work).split(','));
+        // setUnusedWorkHoursCalc(false);
+        // 환경설정 데이터를 별도 스토어에 저장
+        setEnvironment({
+          ...tempEnvironment,
+          sendingWorkEndHours: endTime,
+          sendingWorkStartHours: startTime,
+          dayOfWeekSetting: convertBinaryString(work),
+        });
+      }
+    },
+    onError: (error) => {
+      
+    }
+  });
+  const convertBinaryString = (input:string) => {
+    return input
+      .split('')               // 문자열을 문자 배열로 변환
+      .map(char => char === '1' ? 't' : 'f') // 각각 '1'이면 't', 아니면 'f'로
+      .join(',');              // 쉼표로 연결
+  };
+  
   const { mutate: environment } = useApirForEnvironmentList({
     onSuccess: (data) => {
       console.log('환경설정 데이터:', data);
 
+      fetchOperatingTime();
+
       // 환경설정 데이터를 별도 스토어에 저장
-      setEnvironment(data);
+      // setEnvironment(data);
+      setTempEnvironment(data);
     },
     onError: (error) => {
       console.error('환경설정 데이터 로드 실패:', error);
