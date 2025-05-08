@@ -130,6 +130,12 @@ export const getStatusIcon = (status?: string) => {
       return '/sidebar-menu/tree_pause.svg';
     case 'stopped':
       return '/sidebar-menu/tree_stop.svg';
+    case 'stoppedProgress':
+      return '/sidebar-menu/tree_stop_progress.png';
+    case 'pauseProgress':
+      return '/sidebar-menu/tree_pause_progress.png';
+    case 'timeset':
+        return '/sidebar-menu/tree_timeset.png';
     default:
       return null;
   }
