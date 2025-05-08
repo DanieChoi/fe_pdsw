@@ -49,6 +49,7 @@ interface MainState {
   channelMonitorSecondSelect: string;
   channelMonitorThirdSelect: string;
   campaignProgressInfoViewType: string;
+  campaignTotalProgressInfoCampaignId: string;
 }
 
 interface MainActions {
@@ -75,6 +76,7 @@ interface MainActions {
   setChannelMonitorThirdSelect: (channelMonitorThirdSelect: string) => void;
   setCampaignProgressInfoViewType: (campaignProgressInfoViewType: string) => void;
   updateCampaignStatus: (campaignId: number, newStatus: number) => void;
+  setCampaignTotalProgressInfoCampaignId: (campaignTotalProgressInfoCampaignId: string) => void;
 
 }
 
@@ -106,6 +108,7 @@ export const useMainStore = create<MainStore>()(
       channelMonitorSecondSelect: '',
       channelMonitorThirdSelect: '',
       campaignProgressInfoViewType: '',
+      campaignTotalProgressInfoCampaignId: '',
 
       setCampaigns: (campaigns) => set({
         campaigns,
@@ -142,6 +145,7 @@ export const useMainStore = create<MainStore>()(
       setChannelMonitorSecondSelect: (channelMonitorSecondSelect) => set({ channelMonitorSecondSelect }, false, 'setChannelMonitorSecondSelect'),
       setChannelMonitorThirdSelect: (channelMonitorThirdSelect) => set({ channelMonitorThirdSelect }, false, 'setChannelMonitorThirdSelect'),
       setCampaignProgressInfoViewType: (campaignProgressInfoViewType) => set({ campaignProgressInfoViewType }, false, 'setCampaignProgressInfoViewType'),
+      setCampaignTotalProgressInfoCampaignId: (campaignTotalProgressInfoCampaignId) => set({ campaignTotalProgressInfoCampaignId }, false, 'setCampaignTotalProgressInfoCampaignId'),
 
       updateCampaignStatus: (campaignId: number, newStatus: number) => {
         set(state => {
