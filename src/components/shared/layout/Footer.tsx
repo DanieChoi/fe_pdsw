@@ -56,7 +56,7 @@ export default function Footer({
 
   const lastProcessedMessageRef = useRef<string | null>(null);
 
-  const {addCampaignDialStatus, removeCampaignDialStatus} = useCampaignDialStatusStore();
+  const { addCampaignDialStatus, removeCampaignDialStatus } = useCampaignDialStatusStore();
 
   const debouncedInvalidate = useMemo(
     () =>
@@ -105,9 +105,20 @@ export default function Footer({
     }
   };
 
+
+  const speakMessage = (message: string) => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      const msg = new window.SpeechSynthesisUtterance(message);
+      msg.lang = "ko-KR";
+      window.speechSynthesis.speak(msg);
+    }
+  };
+
   // 알림 모두 비우기 기능
   const handleClearNotifications = () => {
     setFooterDataList([]);
+    // 음성 알림 사용
+    speakMessage("푸터 창이 초기화되었습니다.");
   };
 
   //캠페인 정보 조회 api 호출
@@ -219,7 +230,7 @@ export default function Footer({
             }
           });
           window.dispatchEvent(deviceStatusEvent);
-          addMessageToFooterList(_time, _type, _message);  
+          addMessageToFooterList(_time, _type, _message);
         }
       } else if (command === 'DELETE') {
         _message = '[장비제거]장비아이디: ' + data['device_id'];
@@ -329,7 +340,7 @@ export default function Footer({
 
         const _message = '[상담사 스킬' + actionType + '] 스킬아이디: ' + skill_id;
         addMessageToFooterList(_time, _type, _message);
-        
+
         // 분배제한 호수 전달을 위한 event 발송
         const agentSkillUpdateStatus = new CustomEvent('agentSkillUpdateStatus', {
           detail: {
@@ -415,8 +426,8 @@ export default function Footer({
       if (command === 'UPDATE') {
         let _start_flag = '';
         let _end_flag = '';
-        
-        
+
+
         if (data['campaign_status'] === 1) {
           _start_flag = '시작';
         } else if (data['campaign_status'] === 2) {
@@ -431,41 +442,41 @@ export default function Footer({
           _start_flag = '캠페인 정지 중';
         }
 
-        if( data['campaign_end_flag'] === 1){
+        if (data['campaign_end_flag'] === 1) {
           _end_flag = '진행중';
-        }else if( data['campaign_end_flag'] === 2){
+        } else if (data['campaign_end_flag'] === 2) {
           _end_flag = '완료';
         }
 
 
-        if( (data['campaign_status'] === 5 || data['campaign_status'] === 6)&& data['campaign_end_flag'] === 1){
+        if ((data['campaign_status'] === 5 || data['campaign_status'] === 6) && data['campaign_end_flag'] === 1) {
           // 캠페인 상태가 멈춤중 이며 발신중일때
-          
+
           // 여기에서 직접 setSseInputMessage 호출
           useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:', campaign_id, '시작', data['campaign_status']);
         }
 
 
-        if(data['campaign_status'] === 1 && data['campaign_end_flag'] === 1){
+        if (data['campaign_status'] === 1 && data['campaign_end_flag'] === 1) {
           // 캠페인 상태가 시작이며 발신중일때
-          addCampaignDialStatus({campaign_id : campaign_id, status : data['campaign_status']});
+          addCampaignDialStatus({ campaign_id: campaign_id, status: data['campaign_status'] });
         }
-        else if((data['campaign_status'] === 2)&& data['campaign_end_flag'] === 1){
+        else if ((data['campaign_status'] === 2) && data['campaign_end_flag'] === 1) {
           // 캠페인 상태가 멈춤이나 정지이며, 완료 되었을때 ==> 차후에 campaign_end_flag 맞춰서 변경해야함!!!
-          removeCampaignDialStatus({campaign_id : campaign_id});
+          removeCampaignDialStatus({ campaign_id: campaign_id });
 
           // 여기에서 직접 setSseInputMessage 호출
           useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:', campaign_id, '멈춤', data['campaign_status']);
 
-        }else if ((data['campaign_status'] === 3)&& data['campaign_end_flag'] === 1){
-          removeCampaignDialStatus({campaign_id : campaign_id});
+        } else if ((data['campaign_status'] === 3) && data['campaign_end_flag'] === 1) {
+          removeCampaignDialStatus({ campaign_id: campaign_id });
 
           // 여기에서 직접 setSseInputMessage 호출
           useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:', campaign_id, '중지', data['campaign_status']);
         }
 
         // 푸터 로그 메시지
-        _message = '[캠페인 동작상태 변경] 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: '+_end_flag;
+        _message = '[캠페인 동작상태 변경] 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: ' + _end_flag;
 
         // 토스트 알림 표시 (한번만 표시)
         if (useAlramPopup === 1) {
@@ -478,7 +489,7 @@ export default function Footer({
           session_key: '',
           tenant_id: tenant_id,
         });
-  
+
         // 푸터 데이터 리스트에 추가
         addMessageToFooterList(_time, _type, _message);
       }
@@ -509,7 +520,7 @@ export default function Footer({
         }
 
         addMessageToFooterList(_time, _type, _message);
-      }else if (command === 'DELETE') {
+      } else if (command === 'DELETE') {
         _message = '발신리스트 초기화, 캠페인 아이디 : ' + campaign_id;
         _message2 = `[EVENT] [${campaign_id}] 발신리스트 초기화`;
 
@@ -536,7 +547,7 @@ export default function Footer({
         }
 
         addMessageToFooterList(_time, _type, _message);
-      }else if (command === 'DELETE') {
+      } else if (command === 'DELETE') {
         _message = '[블랙리스트 삭제] 캠페인 아이디 : ' + campaign_id;
         _message2 = `[EVENT] [${campaign_id}] 블랙리스트 삭제`;
 
@@ -554,7 +565,7 @@ export default function Footer({
       _message = '[예약재발신 ';
       if (command === 'INSERT') {
         _message = _message + '추가] 캠페인 아이디: ' + campaign_id
-        if (data['run_flag'] === 0){
+        if (data['run_flag'] === 0) {
           _message = _message + ' 실행구분: 미실행'
           _message2 = `[EVENT] [${campaign_id}] 예약 재발신 등록[미실행]`;
         } else if (data['run_flag'] === 1) {
@@ -589,7 +600,7 @@ export default function Footer({
           duration: 6000
         });
       }
-      
+
       addMessageToFooterList(_time, _type, _message);
     }
     //채널할당
@@ -615,7 +626,7 @@ export default function Footer({
       } else if (command === 'DELETE') {
         _message = _message + `삭제] 캠페인 아이디: [${campaign_id}]`;
       }
-      
+
       addMessageToFooterList(_time, _type, _message);
     }
     //콜백 리스트 초기화 시각 설정
@@ -643,13 +654,13 @@ export default function Footer({
       } else if (command === 'DELETE') {
         _message += `삭제] 캠페인 아이디: [${campaign_id}]`;
       }
-      
+
       addMessageToFooterList(_time, _type, _message);
     }
   }, [campaigns, fetchMain, useAlramPopup, debouncedInvalidate, tenant_id]);
 
 
-  
+
   // SSE 구독
   // useEffect(() => {
   //   // 브라우저 환경인지 확인
@@ -718,10 +729,10 @@ export default function Footer({
       console.info(">>>>설정값: ", DOMAIN);
 
       let dominUrl = `/notification/${tenant_id}/subscribe/${id}`;
-      if( window.location.hostname === 'localhost'){
+      if (window.location.hostname === 'localhost') {
         dominUrl = `${DOMAIN}/notification/${tenant_id}/subscribe/${id}`;
       }
-      eventSource = new EventSource( dominUrl );
+      eventSource = new EventSource(dominUrl);
 
       let data: any = {};
       let announce = "";
@@ -789,7 +800,7 @@ export default function Footer({
       sessionStorage.removeItem("sse_connected");
     };
   }, [id, tenant_id]);
-  
+
   const handleSSEMessage = (tempEventData: any) => {
     try {
       const { announce, command, data, kind, campaign_id, skill_id } = tempEventData;
@@ -850,8 +861,8 @@ export default function Footer({
   };
 
   useEffect(() => {
-    if( sseData != '' ){ 
-      console.log('sseData :: '+sseData);
+    if (sseData != '') {
+      console.log('sseData :: ' + sseData);
       const tempEventData = JSON.parse(sseData);
       const announce = tempEventData["announce"];
       const data = tempEventData["data"];
@@ -878,7 +889,7 @@ export default function Footer({
       //캠페인수정>동작시간 추가
       if (announce === '/pds/campaign/schedule') {
         _message = '[캠페인 스케쥴';
-        const _campaign_name = campaigns.find(data=>data.campaign_id === Number(campaign_id))?.campaign_name;
+        const _campaign_name = campaigns.find(data => data.campaign_id === Number(campaign_id))?.campaign_name;
         if (command === 'INSERT') {
           // _message += '수정, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
           _message += '수정] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + _campaign_name;
@@ -894,7 +905,7 @@ export default function Footer({
           _message += '삭제] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + _campaign_name;
           addMessageToFooterList(_time, _type, _message);
         }
-      }      
+      }
       //캠페인수정>콜페이싱 수정
       else if (announce === '/pds/campaign/dial-speed') {
         _message = '[콜페이싱] ';
@@ -911,7 +922,7 @@ export default function Footer({
             tenant_id: tenant_id,
           });
         }
-      } 
+      }
       //잔량 부족 알림 사용
       else if (announce === 'list-not-enough') {
         _message = '[잔량부족알림] ';
@@ -919,9 +930,9 @@ export default function Footer({
         if (command === 'UPDATE') {
           const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === Number(data['campaign_id']));
           if (tempCampaign && (tempCampaign.use_list_alarm === 1 || tempCampaign.use_list_alarm === 4 || tempCampaign.use_list_alarm === 5 || tempCampaign.use_list_alarm === 7)) {
-            _message += data['campaign_id'] + ' 캠페인 잔량알림 : ' +tempCampaign.list_alarm_count;
-          // } else if (tempCampaign && tempCampaign.dial_mode === 3) {
-          //   _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'];
+            _message += data['campaign_id'] + ' 캠페인 잔량알림 : ' + tempCampaign.list_alarm_count;
+            // } else if (tempCampaign && tempCampaign.dial_mode === 3) {
+            //   _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'];
             addMessageToFooterList(_time, _type, _message);
             // 토스트 알림 표시
             if (useAlramPopup === 1) {
@@ -930,18 +941,30 @@ export default function Footer({
               });
             }
           }
+          // if (tempCampaign && (tempCampaign.use_list_alarm === 2 || tempCampaign.use_list_alarm === 4 || tempCampaign.use_list_alarm === 6 || tempCampaign.use_list_alarm === 7)) {
+          //   // tofix ohs 소림 알림 for _message2
+          // }
+          // if (tempCampaign && (tempCampaign.use_list_alarm === 3 || tempCampaign.use_list_alarm === 5 || tempCampaign.use_list_alarm === 6 || tempCampaign.use_list_alarm === 7)) {
+          //   // tofix ohs 관리자에게 전화로 알림 for _message2
+          // }
+
           if (tempCampaign && (tempCampaign.use_list_alarm === 2 || tempCampaign.use_list_alarm === 4 || tempCampaign.use_list_alarm === 6 || tempCampaign.use_list_alarm === 7)) {
             // tofix ohs 소림 알림 for _message2
+            const voiceMessage = `캠페인 ${data['campaign_id']} 잔량 부족 알림: ${tempCampaign.list_alarm_count}건`;
+            speakMessage(voiceMessage);
           }
           if (tempCampaign && (tempCampaign.use_list_alarm === 3 || tempCampaign.use_list_alarm === 5 || tempCampaign.use_list_alarm === 6 || tempCampaign.use_list_alarm === 7)) {
             // tofix ohs 관리자에게 전화로 알림 for _message2
+            const voiceMessage = `캠페인 ${data['campaign_id']} 잔량 부족 알림: 관리자에게 알림 발송`;
+            speakMessage(voiceMessage);
           }
+
         }
       }
-      
+
     }
   }, [sseData]);
-  
+
   return (
     <Resizable
       size={{
