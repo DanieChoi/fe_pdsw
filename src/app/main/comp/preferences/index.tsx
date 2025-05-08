@@ -52,7 +52,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   // 환경설정 스토어에서 데이터 가져오기
   const { environmentData, setEnvironment } = useEnvironmentStore();
   // 사용자 인증 정보 가져오기
-  const { id: userId } = useAuthStore();
+  const { id: userId, tenant_id } = useAuthStore();
 
   // 알림 상태
   const [alertState, setAlertState] = useState({
@@ -539,6 +539,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   id="worktime-enable"
                   checked={unusedWorkHoursCalc}
                   onCheckedChange={(checked) => setUnusedWorkHoursCalc(checked as boolean)}
+                  disabled={tenant_id !== 0}
                 />
                 <Label htmlFor="worktime-enable" className="text-sm">업무시간 제한 미사용</Label>
               </div>
@@ -557,14 +558,14 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                       value={startTime}
                       onChange={(value) => setStartTime(value)}
                       className="w-16"
-                      disabled={unusedWorkHoursCalc}
+                      disabled={tenant_id !== 0 || unusedWorkHoursCalc}
                     />
                     <Label>종료시각</Label>
                     <CustomInputForTime
                       value={endTime}
                       onChange={(value) => setEndTime(value)}
                       className="w-16"
-                      disabled={unusedWorkHoursCalc}
+                      disabled={tenant_id !== 0 || unusedWorkHoursCalc}
                     />
                   </div>
                 </TableCell>
@@ -584,7 +585,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                           id={`day-${day}`}
                           checked={dayOfWeek[index] === 't'}
                           onCheckedChange={(checked) => handleDayChange(index, checked as boolean)}
-                          disabled={unusedWorkHoursCalc}
+                          disabled={tenant_id !== 0 ||unusedWorkHoursCalc}
                         />
                         <Label htmlFor={`day-${day}`}>{day}</Label>
                       </div>

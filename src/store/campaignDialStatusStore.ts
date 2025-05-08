@@ -12,23 +12,29 @@ interface CampaignDialStatusStore {
   addCampaignDialStatus: (status: CampaignDialStatus) => void; // 특정 캠페인 상태 추가
   removeCampaignDialStatus: (status: CampaignDialStatus) => void; // 특정 캠페인 제거 (완료 후 제거)
   resetCampaignDialStatus: () => void; // 상태 초기화
-  setSseInputMessage: (sseInputMessage:string, camaping_id?:string, status?:string) => void;
+  setSseInputMessage: (sseInputMessage:string, camaping_id?:string, status?:string, sseStatus?:number) => void;
   sseInputMessage?: string; // sseInputMessage 속성 추가
+  hasHydrated: boolean; 
+  setHasHydrated: (value: boolean) => void; 
 }
 
 export const useCampaignDialStatusStore = create<CampaignDialStatusStore>()(
   devtools(
     persist(
-      (set) => ({
+      (set, get) => ({
 
         campaignDialStatus: [], // 초기값을 빈 배열로 설정
 
-        setSseInputMessage: (sseInputMessage, camaping_id, status) => {
+        hasHydrated: false,
+        setHasHydrated: (value) => set({ hasHydrated: value }),
+
+        setSseInputMessage: (sseInputMessage, camaping_id, status, sseStatus) => {
             set({ sseInputMessage }); 
             campaignChannel.postMessage({
-            type: sseInputMessage,
-            campaignId : camaping_id,
-            status : status
+              type: sseInputMessage,
+              campaignId : camaping_id,
+              status : status,
+              sseStatus : sseStatus
         })},
 
         addCampaignDialStatus: (status: CampaignDialStatus) =>
@@ -43,9 +49,14 @@ export const useCampaignDialStatusStore = create<CampaignDialStatusStore>()(
 
         resetCampaignDialStatus: () =>
           set({ campaignDialStatus: [] }), // 상태 초기화
-      }),
+         }),
+         
+
       {
         name: "campaign-dial-status-storage", // 고유한 스토리지 키
+        onRehydrateStorage: () => (state) => {
+          state?.setHasHydrated(true);
+        },
       }
     )
   )

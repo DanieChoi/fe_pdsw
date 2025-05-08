@@ -144,7 +144,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
     }
   });
 
-  console.log("progressData 확인 : ", progressData);
+  // console.log("progressData 확인 : ", progressData);
   
   // 데이터 갱신 함수
   const refreshData = useCallback(() => {

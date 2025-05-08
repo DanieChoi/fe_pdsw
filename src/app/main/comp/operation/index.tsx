@@ -193,6 +193,7 @@ import EditDescription from './NumberEditDescription/EditDescription'
 import CallLimitSetting from './CallLimitSetting'
 import DistributionLimit from './DistributionLimit'
 import SkillEdit from './SkillEdit'
+import ChannelGroupSetting from './ChannelGroupSetting'
 // import ConsultResultSetting from './ConsultResultSetting'
 import SuspendView from './SuspendView'
 import Image from 'next/image'
@@ -264,6 +265,7 @@ export default function OperationBoard({ uniqueKey }: OperationBoardProps) {
     { id: 'section8', title: '콜백 리스트 초기화 시각 설정', component: SystemCallBackTimeSetting },
     { id: 'section4', title: '분배호수 제한 설정', component: DistributionLimit },
     { id: 'section5', title: '스킬편집', component: SkillEdit },
+    { id: 'section6', title: '채널그룹 설정', component: ChannelGroupSetting },
     // { id: 'section6', title: '상담 결과코드 설정', component: ConsultResultSetting },
     { id: 'section7', title: '서스팬드', component: SuspendView },
   ]
