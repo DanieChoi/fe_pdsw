@@ -125,6 +125,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { useDroppable } from "@dnd-kit/core";
 import { CommonButton } from "@/components/shared/CommonButton";
 import Image from "next/image";
+import { CSSProperties } from 'react';
 
 interface DraggableTabProps {
   id: number;
@@ -183,11 +184,14 @@ export default function DraggableTab({
   // 드래그 중일 때는 transform 스타일을 적용하고, 아닐 때는 빈 객체 반환
   const style = isDragging && transform
     ? {
+      position: 'absolute', // Add absolute positioning when dragging
       transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
       zIndex: 999,
-      // 잔상 방지를 위한 추가 속성
       willChange: 'transform',
-      transition: 'none', // 드래그 중에는 transition 효과 제거
+      transition: 'none',
+      width: 'auto', // Maintain width
+      height: '100%', // Maintain height
+      margin: 0,      // Reset margins
     }
     : {};
 
@@ -196,12 +200,13 @@ export default function DraggableTab({
       ref={setNodeRef}
       style={style}
       className={`
-        flex-none flex items-center gap-2 px-3 border-r border-t border-[#ebebeb] relative h-full
-        cursor-pointer select-none rounded-t-[3px] rounded-b-none
-        ${isActive ? "bg-[#56CAD6] text-white" : "bg-white text-[#777]"}
-        ${isDragging ? "opacity-70 shadow-md" : "opacity-100"}
-       ${isOver && !isDragging ? "border-2 border-dashed border-blue-500" : ""}
-      `}
+          flex-none flex items-center gap-2 px-3 border-r border-t border-[#ebebeb] 
+          ${!isDragging ? 'relative' : ''} h-full
+          cursor-pointer select-none rounded-t-[3px] rounded-b-none
+          ${isActive ? "bg-[#56CAD6] text-white" : "bg-white text-[#777]"}
+          ${isDragging ? "opacity-70 shadow-md" : "opacity-100"}
+          ${isOver && !isDragging ? "after:absolute after:inset-0 after:border-2 after:border-dashed after:border-blue-500 after:pointer-events-none" : ""}
+        `}
       onClick={onSelect}
       {...listeners}
       {...attributes}
@@ -210,15 +215,10 @@ export default function DraggableTab({
       data-row-id={rowId}
       data-section-id={sectionId}
     >
-      {/* 드롭 가능한 영역임을 표시하는 간단한 시각적 표시 - 더 명확하게 */}
-      {/* {isOver && !isDragging && (
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
-      )} */}
-
-      {/* 탭 제목 */}
+      {/* Tab content */}
       <span className="text-sm whitespace-nowrap">{title}</span>
 
-      {/* 닫기 버튼 */}
+      {/* Close button */}
       <CommonButton
         variant="ghost"
         size="sm"
@@ -227,8 +227,8 @@ export default function DraggableTab({
           onRemove();
         }}
         className={`
-          p-0 min-w-[8px]
-          ${isActive ? "hover:bg-[transparent]" : "hover:bg-[transparent]"}`}
+            p-0 min-w-[8px]
+            ${isActive ? "hover:bg-[transparent]" : "hover:bg-[transparent]"}`}
       >
         <Image
           src={isActive ? "/header-menu/maintap_colse_on.png" : "/header-menu/maintap_colse_off.png"}
