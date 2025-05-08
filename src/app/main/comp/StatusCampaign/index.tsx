@@ -59,9 +59,13 @@ const StatusCampaign: React.FC = () => {
   const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null);
   const { campaigns } = useMainStore();
   const { statisticsUpdateCycle } = useEnvironmentStore();
+  const [filteredCampaigns, setFilteredCampaigns] = useState(campaigns);
 
 
-  const { data: progressData, isLoading, isError, refetch } = useMultiCampaignProgressQuery(campaigns);
+  // const { data: progressData, isLoading, isError, refetch } = useMultiCampaignProgressQuery(campaigns);
+  // 필터링된 캠페인만 사용하도록 쿼리 수정
+  const { data: progressData, isLoading, isError, refetch } =
+    useMultiCampaignProgressQuery(filteredCampaigns);
 
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
@@ -77,40 +81,58 @@ const StatusCampaign: React.FC = () => {
     },
   });
 
+  // const refreshData = useCallback(() => {
+  //   setIsRefreshing(true);
+  //   const startTime = new Date();
+
+  //   // Show toast message when starting refresh
+  //   // const toastId = toast.loading('데이터를 새로고침 중입니다...', {
+  //   //   position: 'top-right',
+  //   // });
+
+  //   refetch()
+  //     .then(() => {
+  //       const endTime = new Date();
+  //       const refreshDuration = (endTime.getTime() - startTime.getTime()) / 1000; // in seconds
+
+  //       // Update success toast with refresh time
+  //       // toast.success(`데이터가 갱신되었습니다!`, {
+  //       //   autoClose: 2000,
+  //       //   position: 'top-center',
+  //       // });
+
+  //       setLastRefreshTime(endTime);
+  //     })
+  //     .catch((error) => {
+  //       // Show error toast if refresh fails
+  //       // toast.error('데이터 갱신에 실패했습니다.', {
+  //       //   id: toastId,
+  //       //   duration: 3000,
+  //       //   position: 'top-right',
+  //       // });
+  //     })
+  //     .finally(() => {
+  //       setTimeout(() => setIsRefreshing(false), 1000);
+  //     });
+  // }, [refetch]);
+
+  // 새로고침 기능도 필터링된 캠페인만 사용하도록 수정
   const refreshData = useCallback(() => {
     setIsRefreshing(true);
     const startTime = new Date();
 
-    // Show toast message when starting refresh
-    // const toastId = toast.loading('데이터를 새로고침 중입니다...', {
-    //   position: 'top-right',
-    // });
-
     refetch()
       .then(() => {
         const endTime = new Date();
-        const refreshDuration = (endTime.getTime() - startTime.getTime()) / 1000; // in seconds
-
-        // Update success toast with refresh time
-        // toast.success(`데이터가 갱신되었습니다!`, {
-        //   autoClose: 2000,
-        //   position: 'top-center',
-        // });
-
         setLastRefreshTime(endTime);
       })
       .catch((error) => {
-        // Show error toast if refresh fails
-        // toast.error('데이터 갱신에 실패했습니다.', {
-        //   id: toastId,
-        //   duration: 3000,
-        //   position: 'top-right',
-        // });
+        // 에러 처리
       })
       .finally(() => {
         setTimeout(() => setIsRefreshing(false), 1000);
       });
-  }, [refetch]);
+  }, [refetch]); // refetch는 filteredCampaigns가 변경될 때마다 변경됨
 
   useEffect(() => {
     if (progressData) {
@@ -199,8 +221,29 @@ const StatusCampaign: React.FC = () => {
 
   };
 
+  // const handleSkillChange = (value: string) => {
+  //   setSelectedSkill(value);
+  //   if (campaignSkills.length > 0) {
+  //     processDataForChart(campaignSkills, value, selectedDispatch);
+  //   }
+  // };
+
+  // 스킬 선택 핸들러 수정
   const handleSkillChange = (value: string) => {
     setSelectedSkill(value);
+
+    // 스킬 기반으로 먼저 캠페인 필터링
+    const newFilteredCampaigns = value === "total"
+      ? campaigns
+      : campaignSkills
+        .filter((c) => c.skill_id?.includes(Number(value)))
+        .map((c) => campaigns.find(camp => camp.campaign_id === c.campaign_id))
+        .filter((camp): camp is typeof campaigns[0] => camp !== undefined); // Type guard to ensure no undefined values
+
+    // 필터링된 캠페인 설정
+    setFilteredCampaigns(newFilteredCampaigns);
+
+    // 이미 가지고 있는 데이터로 차트 처리
     if (campaignSkills.length > 0) {
       processDataForChart(campaignSkills, value, selectedDispatch);
     }
@@ -241,6 +284,9 @@ const StatusCampaign: React.FC = () => {
     `마지막 갱신: ${lastRefreshTime.toLocaleTimeString()}` :
     '아직 갱신되지 않음';
 
+  useEffect(() => {
+    setFilteredCampaigns(campaigns);
+  }, [campaigns]);
 
   return (
     <div className="space-y-6">
@@ -265,7 +311,7 @@ const StatusCampaign: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
-  
+
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-600">발신:</span>
               <Select value={selectedDispatch} onValueChange={handleDispatchChange}>
@@ -282,7 +328,7 @@ const StatusCampaign: React.FC = () => {
               </Select>
             </div>
           </div>
-  
+
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 text-xs text-gray-500">
               <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md">
@@ -291,13 +337,13 @@ const StatusCampaign: React.FC = () => {
                   갱신 주기: <span className="font-medium text-blue-600">{statisticsUpdateCycle}초</span>
                 </span>
               </div>
-  
+
               <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md">
                 <span>마지막 갱신:</span>
                 <span className="font-medium text-blue-600">{formattedLastRefreshTime}</span>
               </div>
             </div>
-  
+
             <CommonButton
               variant="outline"
               size="sm"
@@ -319,7 +365,7 @@ const StatusCampaign: React.FC = () => {
           </div>
         </div>
       </div>
-  
+
       <div
         className={`border rounded-lg overflow-hidden transition-all duration-300`}
         style={{ height: chartHeight }}
