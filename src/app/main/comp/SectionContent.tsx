@@ -31,6 +31,7 @@ import CampaignGroupBulkUpdatePanel from "./CampaignGroupBulkUpdatePanel";
 import SkilAdminPannelForSystemAdmin from "@/widgets/SkilAdminPannelForSystemAdmin";
 import CampaignClonePanel from "@/widgets/sidebar2/pannels/CampaignClonePanel";
 import CampaignDeletePanel from "@/widgets/sidebar2/pannels/CampaignDeletePanel";
+import { useTabStore } from "@/store/tabStore"; // 추가된 임포트
 
 // Tab 타입 정의
 interface Tab {
@@ -129,7 +130,7 @@ const SectionContent = ({
       case 20:
         return <RebroadcastSettingsPanel
           // campaignId={campaignId}
-          reBroadCastOption ={params?.reBroadCastOption  || 'scheduled'}
+          reBroadCastOption={params?.reBroadCastOption || 'scheduled'}
         />;
       case 21:
         return <CampaignMonitorDashbord campaignId={campaignId} />;
@@ -217,13 +218,43 @@ const SectionContent = ({
     }
   }, []);
 
+  // useTabStore를 사용하여 현재 행의 섹션 수 확인
+  const rows = useTabStore(state => state.rows);
+  const currentRow = rows.find(r => r.id === rowId);
+  const sectionCount = currentRow?.sections.length || 0;
+
+  // SectionContent.tsx의 반환 부분 수정
   return (
     <div
       ref={setNodeRef}
-      className={`overflow-auto h-full transition-all duration-75 ease-out ${isOver ? 'bg-blue-100 ring-1 ring-blue-300' : ''}`}
+      className={`
+      overflow-auto h-full transition-all duration-200 ease-out 
+      ${isOver ?
+          sectionCount < 2  // 섹션 개수로 분할 표시 여부 결정하도록 변경
+            ? 'bg-blue-100 border-2 border-dashed border-blue-400 relative'
+            : 'bg-blue-100 border-2 border-dashed border-blue-400'
+          : ''
+        }
+    `}
       onClick={handleContentClick}
     >
-      {renderContent(tabIdToRender, campaignId, campaignName, params)}
+      {/* 섹션 개수 기준으로 분할 표시 */}
+      <div className="relative h-full">
+        {renderContent(tabIdToRender, campaignId, campaignName, params)}
+
+        {isOver && sectionCount < 2 && (
+          <div className="absolute inset-0 pointer-events-none z-10">
+            <div className="flex h-full">
+              <div className="w-1/2 border-r-2 border-blue-500 border-dashed h-full bg-blue-100 bg-opacity-60 flex items-center justify-center">
+                <span className="text-blue-500 opacity-80 font-semibold">현재 영역</span>
+              </div>
+              <div className="w-1/2 h-full bg-blue-200 bg-opacity-60 flex items-center justify-center">
+                <span className="text-blue-500 opacity-80 font-semibold">새 분할 영역</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
