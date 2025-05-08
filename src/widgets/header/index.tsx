@@ -140,9 +140,7 @@ export default function Header() {
     if ([2, 8, 9, 11].includes(item.id)) {
       // 새로운 openSingleTabAtCurrentSection 함수 사용
       // 이 함수는 배타적 탭 그룹을 지원하고 현재 활성화된 섹션에 탭을 추가함
-      useTabStore.getState().openSingleTabAtCurrentSection(item.id, item, {
-        showToast: item.id !== 2  // 캠페인 관리는 토스트 메시지 표시 안 함
-      });
+      useTabStore.getState().openSingleTabAtCurrentSection(item.id, item);
       return;
     }
 
