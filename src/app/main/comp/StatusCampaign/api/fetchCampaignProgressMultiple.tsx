@@ -44,32 +44,47 @@ export const fetchCampaignProgressForMultipleCampaigns = async (
     progressInfoList: CampaignProgressInformationResponse["progressInfoList"];
   }[]
 > => {
+  // Return early if no campaigns to fetch
+  if (campaigns.length === 0) {
+    return [];
+  }
+
+  // Log which campaigns are being fetched for debugging
+  console.log(
+    `[fetchCampaignProgressForMultipleCampaigns] Fetching progress for ${campaigns.length} campaigns:`,
+    campaigns.map(c => `${c.campaign_id} (${c.campaign_name})`)
+  );
+
   const results: {
     campaign_id: number;
     campaign_name: string;
     progressInfoList: CampaignProgressInformationResponse["progressInfoList"];
   }[] = [];
 
-  for (const c of campaigns) {
-    try {
-      const res = await fetchCampaignProgressInformation({
-        tenantId: c.tenant_id,
-        campaignId: c.campaign_id,
-      });
-
-      results.push({
-        campaign_id: c.campaign_id,
-        campaign_name: c.campaign_name,
-        progressInfoList: res.progressInfoList || [],
-      });
-    } catch (error) {
+  // Use Promise.all for parallel execution but catch individual errors
+  // This gives better performance than the sequential for loop in the original
+  const promises = campaigns.map(c => 
+    fetchCampaignProgressInformation({
+      tenantId: c.tenant_id,
+      campaignId: c.campaign_id,
+    })
+    .then(res => ({
+      campaign_id: c.campaign_id,
+      campaign_name: c.campaign_name,
+      progressInfoList: res.progressInfoList || [],
+    }))
+    .catch(error => {
       console.error(
         `[fetchCampaignProgressForMultipleCampaigns] 캠페인 ${c.campaign_id} (${c.campaign_name}) 조회 실패:`,
         error
       );
-      // 실패한 항목은 결과에 포함하지 않음 (필요 시 별도 처리 가능)
-    }
-  }
+      // Return null for failed requests
+      return null;
+    })
+  );
 
-  return results;
+  const settledResults = await Promise.all(promises);
+  
+  // Filter out null results from failed requests
+  return settledResults.filter(result => result !== null);
 };
