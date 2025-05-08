@@ -540,11 +540,8 @@ export function IContextMenuForCampaignForCampaignGroup({
       {menuOpen && visibleMenuItems.length > 0 && (
         <div
           ref={menuRef}
-          className="fixed min-w-[120px] bg-white rounded-md shadow-md border border-gray-200 z-50 py-1"
-          style={{
-            left: `${menuPosition.x}px`,
-            top: `${menuPosition.y}px`
-          }}
+          className="fixed min-w-[160px] bg-white rounded-md shadow-md border-2 border-black z-50 py-2 px-3"
+          style={{ left: `${menuPosition.x}px`, top: `${menuPosition.y}px` }}
         >
           {visibleMenuItems.map((item, index, arr) => {
             // 현재 아이템과 이전 아이템이 다른 그룹인 경우 구분선 추가
@@ -565,7 +562,7 @@ export function IContextMenuForCampaignForCampaignGroup({
                   <button
                     type="button"
                     className={cn(
-                      "w-full flex items-center justify-between text-xs px-2 py-1.5",
+                      "w-full flex items-center justify-between text-xs px-3 py-2",
                       isHovered ? "bg-blue-50" : "",
                       item.className
                     )}
@@ -586,7 +583,7 @@ export function IContextMenuForCampaignForCampaignGroup({
                   {item.isSubmenu && isSubmenuActive && (
                     <div
                       ref={subMenuRef}
-                      className="absolute right-0 top-0 min-w-[100px] bg-white rounded-md shadow-md border border-gray-200 z-50 py-1"
+                      className="absolute right-0 top-0 min-w-[150px] bg-white rounded-md shadow-md border-2 border-gray-400 z-50 py-1"
                       style={{
                         marginTop: '-1px',
                         transform: 'translateX(100%)',  // 오른쪽으로 100% 이동 (부모 요소 너비만큼)
@@ -599,7 +596,7 @@ export function IContextMenuForCampaignForCampaignGroup({
                           key={subItem.key}
                           type="button"
                           className={cn(
-                            "w-full text-left flex items-center justify-between text-xs px-2 py-1.5",
+                            "w-full text-left flex items-center justify-between text-xs px-3 py-2",
                             hoveredItem === subItem.key ? "bg-blue-50" : "",
                             currentStatus === subItem.status ? "bg-gray-50" : "",
                             (updateCampaignStatusMutation.isPending || currentStatus === subItem.status || isProcessing)
