@@ -136,54 +136,17 @@ export default function Header() {
       return;
     }
 
-    // 운영설정 탭들(8, 9, 11) 전용 처리
-    if ([8, 9, 11].includes(item.id)) {
-      // 1) 기존에 열려있던 8,9,11 탭 모두 제거
-      [8, 9, 11].forEach(idToRemove => {
-        openedTabs
-          .filter(tab => tab.id === idToRemove)
-          .forEach(tab => removeTab(tab.id, tab.uniqueKey));
+    // 특별한 탭 처리 (2, 8, 9, 11) - 2번 탭 추가
+    if ([2, 8, 9, 11].includes(item.id)) {
+      // 새로운 openSingleTabAtCurrentSection 함수 사용
+      // 이 함수는 배타적 탭 그룹을 지원하고 현재 활성화된 섹션에 탭을 추가함
+      useTabStore.getState().openSingleTabAtCurrentSection(item.id, item, {
+        showToast: item.id !== 2  // 캠페인 관리는 토스트 메시지 표시 안 함
       });
-
-      // 2) 토스트 메시지 표시
-      const tabNames: { [key: number]: string } = {
-        8: '운영설정',
-        9: '분배 호수',
-        11: '예약콜 제한'
-      };
-
-      // 2-219 요청으로 주석처리
-      // toast.info(`${tabNames[item.id]}은(는) 1탭으로 제한합니다.`, {
-      //   position: "top-right",
-      //   autoClose: 3000,
-      //   hideProgressBar: false,
-      //   closeOnClick: true,
-      //   pauseOnHover: true,
-      //   draggable: true
-      // });
-
-      // 2) 새 탭 생성 및 추가
-      const newTabKey = `${item.id}-${Date.now()}`;
-      const newTab = { ...item, uniqueKey: newTabKey, content: item.content || null };
-      addTab(newTab);
-
-      // 3) 현재 활성 탭이 속한 섹션 찾기 (없으면 첫 섹션)
-      const sectionId =
-        rows[0].sections.find(sec =>
-          sec.tabs.some(t => t.uniqueKey === activeTabKey)
-        )?.id ?? rows[0].sections[0].id;
-
-      // 4) 해당 섹션으로 새 탭 이동
-      moveTabToSection(item.id, rows[0].id, sectionId, newTabKey);
-
-      // 5) 탭 활성화 및 운영설정 스토어 업데이트
-      setActiveTab(item.id, newTabKey);
-      useOperationStore.getState().setActiveTab(item.id);
-      // setCampaignIdForUpdateFromSideMenu(null);
       return;
     }
 
-    // 일반 메뉴 클릭 처리
+    // 일반 메뉴 클릭 처리 - 이 부분은 그대로 유지
     if (event.ctrlKey) {
       duplicateTab(item.id);
     } else {
@@ -198,9 +161,7 @@ export default function Header() {
       addTab(newTab);
       setActiveTab(item.id, newTabKey);
     }
-
-    // setCampaignIdForUpdateFromSideMenu(null);
-  };
+  }
 
 
   const isTabOpened = (itemId: number) => {
@@ -394,36 +355,36 @@ export default function Header() {
     if (tenants.length > 0 && _sessionKey !== "") {
       // 캠페인 데이터 로딩 상태 확인
       const store = useMainStore.getState();
-      
+
       // 데이터가 이미 로드되었으면 건너뛰기
       if (store.campaignsLoaded && store.campaigns.length > 0) {
         console.log("Campaigns already loaded, skipping API call");
         return;
       }
-      
+
       // 로딩 중이면 중복 호출 방지
       if (store.campaignsLoading) {
         console.log("Ca mpaigns loading in progress, skipping duplicate call");
         return;
       }
-      
+
       // 로딩 시작
       store.setCampaignsLoading(true);
       console.log("Starting campaign data fetch from header");
-      
+
       fetchMain({
         session_key: _sessionKey,
         tenant_id: _tenantId
       });
     }
   }, [tenants]);
-  
+
   // 캠페인 데이터가 변경될 때마다 로그 추가
   useEffect(() => {
     const { campaigns } = useMainStore.getState();
     console.log("Campaigns updated in header component:", campaigns);
   }, [useMainStore.getState().campaigns]);
-  
+
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       if (tenant_id === 0) {
@@ -473,31 +434,31 @@ export default function Header() {
   }, [counselorListData]);
 
   useEffect(() => {
-    if (tenants.length > 0  && _sessionKey !== "") {
+    if (tenants.length > 0 && _sessionKey !== "") {
       // 스킬 데이터 로딩 상태 확인
       const store = useCampainManagerStore.getState();
-      
+
       // 데이터가 이미 로드되었으면 건너뛰기
       if (store.skillsLoaded && store.skills.length > 0) {
         console.log("Skills already loaded, skipping API call");
         return;
       }
-      
+
       // 로딩 중이면 중복 호출 방지
       if (store.skillsLoading) {
         console.log("Skills loading in progress, skipping duplicate call");
         return;
       }
-      
+
       // 로딩 시작
       store.setSkillsLoading(true);
       console.log("Starting skills data fetch from header");
-      
+
       // 테넌트 ID 준비
       // const tenant_id_array = tenant_id === 0 
       //   ? tenants.map(tenant => tenant.tenant_id)
       //   : [tenant_id];
-      
+
       // // 스킬 데이터 로드
       // fetchSkills({ tenant_id_array });
     }

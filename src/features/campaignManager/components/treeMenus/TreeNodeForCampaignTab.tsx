@@ -159,16 +159,23 @@ export function TreeNodeForCampaignTab({
 
   const handleDoubleClick = useCallback(() => {
     if (item.type !== "campaign") return;
-    addTabCurrentOnly({
+
+    // openSingleTabAtCurrentSection 함수 사용
+    const tabInfo = {
       id: 2,
-      uniqueKey: "2",
+      uniqueKey: `2-${Date.now()}`,
       title: `캠페인 관리`,
       content: null,
       params: { campaignId: item.id, campaignName: item.label, campaignType: item.type },
-    });
+    };
+
+    // 현재 섹션에 단일 탭으로 추가
+    useTabStore.getState().openSingleTabAtCurrentSection(2, tabInfo);
+
+    // 부가 상태 업데이트 (기존과 동일)
     setCampaignIdForUpdateFromSideMenu(item.id);
     setSelectedNodeType(item.type);
-  }, [item, addTabCurrentOnly, setCampaignIdForUpdateFromSideMenu, setSelectedNodeType]);
+  }, [item, setCampaignIdForUpdateFromSideMenu, setSelectedNodeType]);
 
   const onHandleCampaignCopy = useCallback(() => {
     setCampaignIdForUpdateFromSideMenu(item.id);
