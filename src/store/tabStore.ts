@@ -9,6 +9,13 @@ import { simulateMenuClick } from "@/widgets/header/utils";
 import { contextMenuItems } from "@/widgets/header/model/contextMenuItems";
 import { useOperationStore } from "@/app/main/comp/operation/store/OperationStore";
 
+// MenuItem 인터페이스에 params 속성 추가
+declare module "@/widgets/header/model/menuItems" {
+  interface MenuItem {
+    params?: any;
+  }
+}
+
 export interface TabItem {
   id: number;
   uniqueKey: string;
