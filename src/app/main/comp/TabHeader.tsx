@@ -196,9 +196,9 @@ const TabHeader = ({
                 {/* Tabs container - 높이와 정렬 일치 */}
                 <div
                     ref={scrollRef}
-                    className={`flex-1 flex items-stretch overflow-x-auto scrollbar-none ${isOver ? "bg-blue-50" : ""
-                        }`}
+                    className={`flex-1 flex items-stretch overflow-x-auto scrollbar-none flex-nowrap ${isOver ? "bg-blue-50" : ""}`}
                     data-droppable-tabs-container={true}
+                    style={{ minWidth: 0 }}
                 >
                     {section.tabs.map((tab) => {
                         // openedTabs에서 실제 탭 정보 찾기
