@@ -906,6 +906,19 @@ export default function Footer({
             tenant_id: tenant_id,
           });
         }
+      } 
+      //잔량 부족 알림 사용
+      else if (announce === 'list-not-enough') {
+        _message = '[잔량부족알림] ';
+        if (command === 'UPDATE') {
+          const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === Number(data['campaign_id']));
+          if (tempCampaign && (tempCampaign.use_list_alarm === 1 || tempCampaign.use_list_alarm === 4 || tempCampaign.use_list_alarm === 5 || tempCampaign.use_list_alarm === 7)) {
+            _message += data['campaign_id'] + ' 캠페인 잔량알림 : ' +tempCampaign.list_alarm_count;
+          // } else if (tempCampaign && tempCampaign.dial_mode === 3) {
+          //   _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'];
+            addMessageToFooterList(_time, _type, _message);
+          }
+        }
       }
       
     }
