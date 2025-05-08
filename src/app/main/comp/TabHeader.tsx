@@ -5,7 +5,7 @@ import { useDroppable } from "@dnd-kit/core";
 import Image from "next/image";
 import { CommonButton } from "@/components/shared/CommonButton";
 import DraggableTab from "./DraggableTab";
-import { Trash2  } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 // Tab 타입 정의
 interface Tab {
@@ -170,8 +170,8 @@ const TabHeader = ({
     return (
         <div
             ref={setNodeRef}
-            className={`flex-none border-b border-gray-200 transition-colors duration-200 ${isOver
-                ? "bg-blue-100 shadow-inner ring-2 ring-blue-300" // 강조된 하이라이트 스타일
+            className={`relative flex-none border-b border-gray-200 transition-colors duration-200 ${isOver
+                ? "bg-blue-100 shadow-inner ring-2 ring-blue-300"
                 : "bg-white"
                 }`}
             data-section-id={sectionId}
@@ -288,7 +288,7 @@ const TabHeader = ({
 
             {/* 추가: 드롭 가능한 영역에 대한 시각적 표시 */}
             {isOver && (
-                <div className="absolute inset-0 pointer-events-none border-2 border-blue-400 bg-blue-50 bg-opacity-30 z-10"></div>
+                <div className="absolute inset-0 pointer-events-none ring-2 ring-blue-400 bg-blue-50 bg-opacity-50 z-10" />
             )}
         </div>
     );

@@ -28,7 +28,7 @@
 // }: DraggableTabProps) {
 //   // 드래그 ID와 드롭 ID를 설정
 //   const elementId = uniqueKey;
-  
+
 //   // useDraggable과 useDroppable을 함께 사용
 //   const { attributes, listeners, setNodeRef: setDragNodeRef, transform, isDragging } = useDraggable({
 //     id: elementId,
@@ -40,7 +40,7 @@
 //       sectionId,
 //     },
 //   });
-  
+
 //   // 드롭 영역 설정
 //   const { isOver, setNodeRef: setDropNodeRef } = useDroppable({
 //     id: `droppable-${elementId}`,
@@ -96,7 +96,7 @@
 
 //       {/* 탭 제목 */}
 //       <span className="text-sm whitespace-nowrap">{title}</span>
-      
+
 //       {/* 닫기 버튼 */}
 //       <CommonButton
 //         variant="ghost"
@@ -149,7 +149,7 @@ export default function DraggableTab({
 }: DraggableTabProps) {
   // 드래그 ID와 드롭 ID를 설정
   const elementId = uniqueKey;
-  
+
   // useDraggable과 useDroppable을 함께 사용
   const { attributes, listeners, setNodeRef: setDragNodeRef, transform, isDragging } = useDraggable({
     id: elementId,
@@ -161,7 +161,7 @@ export default function DraggableTab({
       sectionId,
     },
   });
-  
+
   // 드롭 영역 설정
   const { isOver, setNodeRef: setDropNodeRef } = useDroppable({
     id: `droppable-${elementId}`,
@@ -183,13 +183,13 @@ export default function DraggableTab({
   // 드래그 중일 때는 transform 스타일을 적용하고, 아닐 때는 빈 객체 반환
   const style = isDragging && transform
     ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-        zIndex: 999,
-        // 잔상 방지를 위한 추가 속성
-        willChange: 'transform',
-        transition: 'none', // 드래그 중에는 transition 효과 제거
-      }
-    : { };
+      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      zIndex: 999,
+      // 잔상 방지를 위한 추가 속성
+      willChange: 'transform',
+      transition: 'none', // 드래그 중에는 transition 효과 제거
+    }
+    : {};
 
   return (
     <div
@@ -200,7 +200,7 @@ export default function DraggableTab({
         cursor-pointer select-none rounded-t-[3px] rounded-b-none
         ${isActive ? "bg-[#56CAD6] text-white" : "bg-white text-[#777]"}
         ${isDragging ? "opacity-70 shadow-md" : "opacity-100"}
-        ${isOver && !isDragging ? "bg-blue-100 border-b-2 border-blue-500" : ""}
+       ${isOver && !isDragging ? "border-2 border-dashed border-blue-500" : ""}
       `}
       onClick={onSelect}
       {...listeners}
@@ -211,13 +211,13 @@ export default function DraggableTab({
       data-section-id={sectionId}
     >
       {/* 드롭 가능한 영역임을 표시하는 간단한 시각적 표시 - 더 명확하게 */}
-      {isOver && !isDragging && (
+      {/* {isOver && !isDragging && (
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
-      )}
+      )} */}
 
       {/* 탭 제목 */}
       <span className="text-sm whitespace-nowrap">{title}</span>
-      
+
       {/* 닫기 버튼 */}
       <CommonButton
         variant="ghost"
