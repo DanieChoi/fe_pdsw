@@ -28,7 +28,7 @@
 // }: DraggableTabProps) {
 //   // 드래그 ID와 드롭 ID를 설정
 //   const elementId = uniqueKey;
-
+  
 //   // useDraggable과 useDroppable을 함께 사용
 //   const { attributes, listeners, setNodeRef: setDragNodeRef, transform, isDragging } = useDraggable({
 //     id: elementId,
@@ -40,7 +40,7 @@
 //       sectionId,
 //     },
 //   });
-
+  
 //   // 드롭 영역 설정
 //   const { isOver, setNodeRef: setDropNodeRef } = useDroppable({
 //     id: `droppable-${elementId}`,
@@ -96,7 +96,7 @@
 
 //       {/* 탭 제목 */}
 //       <span className="text-sm whitespace-nowrap">{title}</span>
-
+      
 //       {/* 닫기 버튼 */}
 //       <CommonButton
 //         variant="ghost"
@@ -120,12 +120,13 @@
 //   );
 // }
 
-import React from "react";
-import { useDraggable } from "@dnd-kit/core";
-import { useDroppable } from "@dnd-kit/core";
+// src/app/main/comp/DraggableTab.tsx
+"use client";
+
+import React, { CSSProperties } from "react";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { CommonButton } from "@/components/shared/CommonButton";
 import Image from "next/image";
-import { CSSProperties } from 'react';
 
 interface DraggableTabProps {
   id: number;
@@ -152,27 +153,19 @@ export default function DraggableTab({
   const elementId = uniqueKey;
 
   // useDraggable과 useDroppable을 함께 사용
-  const { attributes, listeners, setNodeRef: setDragNodeRef, transform, isDragging } = useDraggable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef: setDragNodeRef,
+    transform,
+    isDragging,
+  } = useDraggable({
     id: elementId,
-    data: {
-      type: "tab",
-      id,
-      uniqueKey,
-      rowId,
-      sectionId,
-    },
+    data: { type: "tab", id, uniqueKey, rowId, sectionId },
   });
-
-  // 드롭 영역 설정
   const { isOver, setNodeRef: setDropNodeRef } = useDroppable({
     id: `droppable-${elementId}`,
-    data: {
-      type: "tab",
-      id,
-      uniqueKey,
-      rowId,
-      sectionId,
-    },
+    data: { type: "tab", id, uniqueKey, rowId, sectionId },
   });
 
   // 두 ref를 결합하는 함수
@@ -181,18 +174,18 @@ export default function DraggableTab({
     setDropNodeRef(node);
   };
 
-  // 드래그 중일 때는 transform 스타일을 적용하고, 아닐 때는 빈 객체 반환
-  const style = isDragging && transform
+  // 드래그 중일 때 스타일
+  const style: CSSProperties = isDragging && transform
     ? {
-      position: 'absolute' as 'absolute', // Add absolute positioning when dragging
-      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      zIndex: 999,
-      willChange: 'transform',
-      transition: 'none',
-      width: 'auto', // Maintain width
-      height: '100%', // Maintain height
-      margin: 0,      // Reset margins
-    }
+        position: 'absolute',
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        zIndex: 999,
+        willChange: 'transform',
+        transition: 'none',
+        width: 'auto',
+        height: '100%',
+        margin: 0,
+      }
     : {};
 
   return (
@@ -200,13 +193,13 @@ export default function DraggableTab({
       ref={setNodeRef}
       style={style}
       className={`
-          flex-none flex items-center gap-2 px-3 border-r border-t border-[#ebebeb] 
-          ${!isDragging ? 'relative' : ''} h-full
-          cursor-pointer select-none rounded-t-[3px] rounded-b-none
-          ${isActive ? "bg-[#56CAD6] text-white" : "bg-white text-[#777]"}
-          ${isDragging ? "opacity-70 shadow-md" : "opacity-100"}
-          ${isOver && !isDragging ? "after:absolute after:inset-0 after:border-2 after:border-dashed after:border-blue-500 after:pointer-events-none" : ""}
-        `}
+        flex-none flex items-center gap-2 px-3 border-r border-t border-[#ebebeb]
+        ${!isDragging ? 'relative' : ''} h-full
+        cursor-pointer select-none rounded-t-[3px] rounded-b-none
+        ${isActive ? "bg-[#56CAD6] text-white" : "bg-white text-[#777]"}
+        ${isDragging ? "opacity-70 shadow-md" : "opacity-100"}
+        ${isOver && !isDragging ? "after:absolute after:inset-0 after:border-[1.5px] after:border-dashed after:border-blue-500 after:pointer-events-none" : ""}
+      `}
       onClick={onSelect}
       {...listeners}
       {...attributes}
@@ -215,10 +208,10 @@ export default function DraggableTab({
       data-row-id={rowId}
       data-section-id={sectionId}
     >
-      {/* Tab content */}
+      {/* 탭 제목 */}
       <span className="text-sm whitespace-nowrap">{title}</span>
 
-      {/* Close button */}
+      {/* 닫기 버튼 */}
       <CommonButton
         variant="ghost"
         size="sm"
@@ -226,9 +219,7 @@ export default function DraggableTab({
           e.stopPropagation();
           onRemove();
         }}
-        className={`
-            p-0 min-w-[8px]
-            ${isActive ? "hover:bg-[transparent]" : "hover:bg-[transparent]"}`}
+        className="p-0 min-w-[8px] hover:bg-transparent"
       >
         <Image
           src={isActive ? "/header-menu/maintap_colse_on.png" : "/header-menu/maintap_colse_off.png"}
