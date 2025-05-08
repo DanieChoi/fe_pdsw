@@ -4,11 +4,13 @@ import { CampaignCredentials, AutoRedialListResponse } from '../types/campaignMa
 
 // 캠페인 재발신 스케줄링 정보 조회 요청
 export const fetchAutoRedials = async (credentials: CampaignCredentials): Promise<AutoRedialListResponse> => {
+  const startCampaignId = credentials.campaign_id || 1;
+  const endCampaignId = credentials.campaign_id || 9999999999;
   const autoRedialListSearchRequestData = {
     filter: {      
       campaign_id: {
-        start: 1,
-        end: 9999999999,
+        start: startCampaignId,
+        end: endCampaignId,
       },    
       sequence_number: {
           start: 0,

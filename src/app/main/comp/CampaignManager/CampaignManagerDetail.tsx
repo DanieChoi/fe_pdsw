@@ -50,7 +50,9 @@ import { toast } from 'react-toastify';
 import { campaignChannel } from '@/lib/broadcastChannel';
 import { useEnvironmentStore } from "@/store/environmentStore";
 import { CampaignInfoInsertRequest } from '@/features/campaignManager/hooks/useApiForCampaignManagerInsert';
-import { Button } from '@/components/ui/button';
+import { useDeleteCampaignHelper } from '@/features/campaignManager/utils/deleteCampaignHelper';
+
+
 
 export interface TabItem {
   id: number;
@@ -1089,7 +1091,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   };
 
   // 캠페인 삭제
-  const handleCampaignDelete = () => {
+  const handleCampaignDelete = () => {  
     setAlertState({
       ...errorMessage,
       isOpen: true,
@@ -1141,43 +1143,56 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         // console.log('다음 campaign_id:: ' + nextCampaignId);
         returnCampaignId = nextCampaignId; 
       }
-      
-    }  else {
-      // console.log('###### 이전 및 다음 campaign_id가 없습니다.');
-    }
-
-    // 현재 campaign_id를 제외한 나머지 campaigns로 업데이트
-    // const tempCampaigns = campaigns.filter(data => data.campaign_id !== campaignId);
-    // setCampaigns(tempCampaigns);
-
+    }  
     return returnCampaignId;
   }
 
-  const testFunction = (campaignId : number) =>{
+  // 캠페인 삭제 공통함수
+  const { commonDeleteCampaign } = useDeleteCampaignHelper();
 
-    const filteredCampaigns = campaigns.filter(data => data.tenant_id === tempCampaignInfo.tenant_id);
-    console.log('##### tenant_id가 같은 캠페인 목록:', filteredCampaigns);
-    console.log('###### 캠페인 아이디 : ', campaignId);
-    const thisCampaign = filteredCampaigns.filter( data => data.campaign_id === Number(findPreviousOrNextCampaignId(campaignId)));
-    console.log('######### thisCampaign : ', thisCampaign);
-    if(thisCampaign){
-      setSelectedCampaign(thisCampaign[0]);
-      
-    }
-
-  };
-
-  const [forIndexCurrentCampaignId, setForIndexCurrentCampaignId] = useState<number>(0);
   // 캠페인 삭제 실행
-  const handleCampaignDeleteExecute = () => {
+  const handleCampaignDeleteExecute = async () => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     if (selectedCampaign?.start_flag === 3) {
-      setForIndexCurrentCampaignId(findPreviousOrNextCampaignId(campaignId));
-      fetchCampaignManagerDelete({
-        ...campaignInfoDelete,
-        campaign_id: tempCampaignManagerInfo.campaign_id,
-        tenant_id: tempCampaignManagerInfo.tenant_id
-      });
+
+      // 캠페인 스케줄 삭제를 1번째 순서로 변경
+      try{
+
+        const callbackCampaignId = await commonDeleteCampaign(tempCampaignInfo.tenant_id, tempCampaignInfo.campaign_id);
+        // 삭제로직 이후에 콜백받는 다음 인덱스 캠페인 아이디
+        // console.log('Test ######## callbackCampaignId : ', callbackCampaignId);
+        setInit(callbackCampaignId);
+
+        if(callbackCampaignId){
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: '작업이 완료되었습니다.',
+            type: '2',
+            onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+          });
+        }        
+        
+      } catch (e: any){
+        if (e.message === 'SESSION_EXPIRED') {
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+            type: '2',
+            onClose: () => goLogin(),
+          });
+        } else {
+          console.error('캠페인 삭제 중 오류 발생:', e);
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: '캠페인 삭제 중 알 수 없는 오류가 발생했습니다.',
+            onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+          });
+        }
+      } 
+      
     } else {
       setAlertState({
         ...errorMessage,
@@ -1273,37 +1288,6 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     }
   });
 
-  // 캠페인 정보 삭제 API 호출
-  const { mutate: fetchCampaignManagerDelete } = useApiForCampaignManagerDelete({
-    onSuccess: (data) => {
-      // 2)캠페인 스케줄 삭제
-      fetchCampaignScheduleDelete({
-        ...campaignInfoDelete,
-        campaign_id: tempCampaignManagerInfo.campaign_id,
-        tenant_id: tempCampaignManagerInfo.tenant_id
-      });
-    },
-    onError: (data) => {
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          type: '2',
-          onClose: () => goLogin(),
-        });
-      }
-    }
-  });
-
-  // 캠페인 스킬 조회 API 호출
-  const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
-    onSuccess: (data) => {
-      setCampaignSkills(data.result_data);
-      setCampaignSkillChangeYn(false);
-    }
-  });
-
   // 캠페인 스킬 수정 API 호출
   const { mutate: fetchCampaignSkillUpdate } = useApiForCampaignSkillUpdate({
     onSuccess: (data) => {
@@ -1336,151 +1320,214 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     }
   });
 
+  // 캠페인 정보 삭제 API 호출
+  // const { mutate: fetchCampaignManagerDelete } = useApiForCampaignManagerDelete({
+  //   onSuccess: (data) => {
+  //     // 2)캠페인 스케줄 삭제
+  //     // fetchCampaignScheduleDelete({
+  //     //   ...campaignInfoDelete,
+  //     //   campaign_id: tempCampaignManagerInfo.campaign_id,
+  //     //   tenant_id: tempCampaignManagerInfo.tenant_id
+  //     // });
+  //   },
+  //   onError: (data) => {
+  //     if (data.message.split('||')[0] === '5') {
+  //       setAlertState({
+  //         ...errorMessage,
+  //         isOpen: true,
+  //         message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+  //         type: '2',
+  //         onClose: () => goLogin(),
+  //       });
+  //     }
+  //   }
+  // });
+
+  // 캠페인 스킬 조회 API 호출
+  // const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
+  //   onSuccess: (data) => {
+  //     setCampaignSkills(data.result_data);
+  //     setCampaignSkillChangeYn(false);
+  //   }
+  // });
+  
   // 캠페인 스케줄 삭제 API 호출
-  const { mutate: fetchCampaignScheduleDelete } = useApiForCampaignScheduleDelete({
-    onSuccess: (data) => {
-      // 3)스킬편집 -> 캠페인 소속 스킬 할당 해제
-      const tempSkill = campaignSkills.filter((skill) => skill.campaign_id === campaignId)
-        .map((data) => data.skill_id)
-        .join(',');
-      if (tempSkill !== '') {
-        fetchCampaignSkillUpdate({
-          ...tempCampaignSkills,
-          skill_id: []
-        });
-      }
-      // 4)캠페인별 발신번호 설정 삭제
-      const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === campaignId)
-        .map((data) => data.calling_number)
-        .join(',');
-      if (tempCallNumber !== '') {
-        fetchCallingNumberDelete(tempCallingNumberInfo);
-      }
-      // 5)캠페인별 문자할당 삭제 : 기능 사용시 API 생성 예정
-      // 6)채널 할당 - 캠페인 모드시, 캠페인이 할당되면 Assign 해제 -> 회선사용 안함으로 변경 : /pds/channel-group - 제외
-      // 7)예약콜제한설정 삭제 
-      fetchReservedCallDelete({
-        ...campaignInfoDelete,
-        campaign_id: tempCampaignManagerInfo.campaign_id,
-        tenant_id: tempCampaignManagerInfo.tenant_id
-      });
-    }
-  });
+  // const { mutate: fetchCampaignScheduleDelete } = useApiForCampaignScheduleDelete({
+  //   onSuccess: (data) => {
+  //     // 3)스킬편집 -> 캠페인 소속 스킬 할당 해제
+  //     const tempSkill = campaignSkills.filter((skill) => skill.campaign_id === campaignId)
+  //       .map((data) => data.skill_id)
+  //       .join(',');
+  //     if (tempSkill !== '') {
+  //       fetchCampaignSkillUpdate({
+  //         ...tempCampaignSkills,
+  //         skill_id: []
+  //       });
+  //     }
+  //     // 4)캠페인별 발신번호 설정 삭제
+  //     const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === campaignId)
+  //       .map((data) => data.calling_number)
+  //       .join(',');
+  //     if (tempCallNumber !== '') {
+  //       fetchCallingNumberDelete(tempCallingNumberInfo);
+  //     }
+  //     // 5)캠페인별 문자할당 삭제 : 기능 사용시 API 생성 예정
+  //     // 6)채널 할당 - 캠페인 모드시, 캠페인이 할당되면 Assign 해제 -> 회선사용 안함으로 변경 : /pds/channel-group - 제외
+  //     // 7)예약콜제한설정 삭제 
+  //     fetchReservedCallDelete({
+  //       ...campaignInfoDelete,
+  //       campaign_id: tempCampaignManagerInfo.campaign_id,
+  //       tenant_id: tempCampaignManagerInfo.tenant_id
+  //     });
+  //   }
+  // });
 
   // 예약콜 삭제 API 호출
-  const { mutate: fetchReservedCallDelete } = useApiForReservedCallDelete({
-    onSuccess: (data) => {
-      // 8)분배호수제한설정에 캠페인 할당된 정보 삭제 - 캠페인 소속 상담사 리스트 정보 조회 후 삭제한다.
-      // 캠페인 소속 상담사 리스트 요청
-      fetchCampaignAgents({ campaign_id: tempCampaignManagerInfo.campaign_id });
-    }
-  });
+  // const { mutate: fetchReservedCallDelete } = useApiForReservedCallDelete({
+  //   onSuccess: (data) => {
+  //     // 8)분배호수제한설정에 캠페인 할당된 정보 삭제 - 캠페인 소속 상담사 리스트 정보 조회 후 삭제한다.
+  //     // 캠페인 소속 상담사 리스트 요청
+  //     fetchCampaignAgents({ campaign_id: tempCampaignManagerInfo.campaign_id });
+  //   }
+  // });
 
   // 캠페인 소속 상담사 리스트 요청
-  const { mutate: fetchCampaignAgents } = useApiForCampaignAgent({
-    onSuccess: (data) => {
-      if (data.result_data.length > 0 && data.result_data[0].agent_id.length > 0) {
-        const agentList = data.result_data[0].agent_id.join(',');
-        // 8)분배호수제한설정에 캠페인 할당된 정보 삭제 - 캠페인 소속 상담사 리스트 정보 조회 후 삭제한다.
-        fetchMaxcallExtDelete({
-          ...agientListDelte,
-          campaign_id: tempCampaignManagerInfo.campaign_id,
-          agent_id_list: agentList.split(',').map(agent => ({ agent_id: agent }))
-        });
-      } else {
-        // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
-        fetchAutoRedials({
-          session_key: session_key,
-          tenant_id: tenant_id,
-        });
-      }
-    },
-    onError: (data) => {
-      // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
-      fetchAutoRedials({
-        session_key: session_key,
-        tenant_id: tenant_id,
-      });
-    }
-  });
+  // const { mutate: fetchCampaignAgents } = useApiForCampaignAgent({
+  //   onSuccess: (data) => {
+  //     if (data.result_data.length > 0 && data.result_data[0].agent_id.length > 0) {
+  //       const agentList = data.result_data[0].agent_id.join(',');
+  //       // 8)분배호수제한설정에 캠페인 할당된 정보 삭제 - 캠페인 소속 상담사 리스트 정보 조회 후 삭제한다.
+  //       fetchMaxcallExtDelete({
+  //         ...agientListDelte,
+  //         campaign_id: tempCampaignManagerInfo.campaign_id,
+  //         agent_id_list: agentList.split(',').map(agent => ({ agent_id: agent }))
+  //       });
+  //     } else {
+  //       // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
+  //       fetchAutoRedials({
+  //         session_key: session_key,
+  //         tenant_id: tenant_id,
+  //       });
+  //     }
+  //   },
+  //   onError: (data) => {
+  //     // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
+  //     fetchAutoRedials({
+  //       session_key: session_key,
+  //       tenant_id: tenant_id,
+  //     });
+  //   }
+  // });
 
   // 분배제한 정보 삭제 API 호출
-  const { mutate: fetchMaxcallExtDelete } = useApiForMaxcallExtDelete({
-    onSuccess: (data) => {
-      // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
-      fetchAutoRedials({
-        session_key: session_key,
-        tenant_id: tenant_id,
-      });
-    }
-  });
+  // const { mutate: fetchMaxcallExtDelete } = useApiForMaxcallExtDelete({
+  //   onSuccess: (data) => {
+  //     // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
+  //     fetchAutoRedials({
+  //       session_key: session_key,
+  //       tenant_id: tenant_id,
+  //       campaign_id : tempCampaignManagerInfo.campaign_id
+  //     });
+  //   }
+  // });
 
   // 캠페인 재발신 조회 API 호출
-  const { mutate: fetchAutoRedials } = useApiForAutoRedial({
-    onSuccess: (data) => {
-      // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
-      if (typeof data.result_data !== 'undefined') {
-        if (data.result_data.length > 0) {
-          const dataList = data.result_data.filter((data) => data.campaign_id === campaignId);
-          if (dataList.length > 0 && dataList[0].sequence_number != null) {
-            // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
-            fetchAutoRedialDelete({
-              campaign_id: campaignId,
-              sequence_number: dataList[0].sequence_number
-            });
-          } else {
-            //캠페인관리 화면 닫기.
-            setInit(forIndexCurrentCampaignId);
-            setAlertState({
-              ...errorMessage,
-              isOpen: true,
-              message: '작업이 완료되었습니다.',
-              type: '2',
-              onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
-            });
-          }
-        } else {
-          //캠페인관리 화면 닫기.
-          setInit(forIndexCurrentCampaignId);
-          setAlertState({
-            ...errorMessage,
-            isOpen: true,
-            message: '작업이 완료되었습니다.',
-            type: '2',
-            onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
-          });
-        }
-      } else {
-        setInit(forIndexCurrentCampaignId);
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: '작업이 완료되었습니다.',
-          type: '2',
-          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
-        });
-      }
-    },
-    onError: (data) => {
-      // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
-      //캠페인관리 화면 닫기.
-      setInit(forIndexCurrentCampaignId);
-      setAlertState({
-        ...errorMessage,
-        isOpen: true,
-        message: '작업이 완료되었습니다.',
-        type: '2',
-        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
-      });
-    }
-  });
+  // const { mutate: fetchAutoRedials } = useApiForAutoRedial({
+  //   onSuccess: (data) => {
+  //     // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
+  //     if (typeof data.result_data !== 'undefined') {
+  //       if (data.result_data.length > 0) {
+  //         const dataList = data.result_data.filter((data) => data.campaign_id === campaignId);
+  //         if (dataList.length > 0 && dataList[0].sequence_number != null) {
+  //           // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
+  //           fetchAutoRedialDelete({
+  //             campaign_id: campaignId,
+  //             sequence_number: dataList[0].sequence_number
+  //           });
+  //         } else {
+  //           //캠페인관리 화면 닫기.
+  //           // setInit(0);
+  //           setInit(findPreviousOrNextCampaignId(campaignId));
+
+  //           // 마지막으로 캠페인 정보 삭제
+  //           fetchCampaignManagerDelete({
+  //             ...campaignInfoDelete,
+  //             campaign_id: tempCampaignManagerInfo.campaign_id,
+  //             tenant_id: tempCampaignManagerInfo.tenant_id
+  //           });
+
+  //           setAlertState({
+  //             ...errorMessage,
+  //             isOpen: true,
+  //             message: '작업이 완료되었습니다.',
+  //             type: '2',
+  //             onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+  //           });
+  //         }
+  //       } else {
+  //         //캠페인관리 화면 닫기.
+  //         // setInit(0);
+  //         setInit(findPreviousOrNextCampaignId(campaignId));
+
+  //         // 마지막으로 캠페인 정보 삭제
+  //         fetchCampaignManagerDelete({
+  //           ...campaignInfoDelete,
+  //           campaign_id: tempCampaignManagerInfo.campaign_id,
+  //           tenant_id: tempCampaignManagerInfo.tenant_id
+  //         });
+  //         setAlertState({
+  //           ...errorMessage,
+  //           isOpen: true,
+  //           message: '작업이 완료되었습니다.',
+  //           type: '2',
+  //           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+  //         });
+  //       }
+  //     } else {
+  //       // setInit(0);
+  //       setInit(findPreviousOrNextCampaignId(campaignId));
+  //       // 마지막으로 캠페인 정보 삭제
+  //       fetchCampaignManagerDelete({
+  //         ...campaignInfoDelete,
+  //         campaign_id: tempCampaignManagerInfo.campaign_id,
+  //         tenant_id: tempCampaignManagerInfo.tenant_id
+  //       });
+  //       setAlertState({
+  //         ...errorMessage,
+  //         isOpen: true,
+  //         message: '작업이 완료되었습니다.',
+  //         type: '2',
+  //         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+  //       });
+  //     }
+  //   },
+  //   onError: (data) => {
+  //     // 9)캠페인 예약 재발신 삭제 - 캠페인 재발신 정보 조회 후 삭제한다.
+  //     //캠페인관리 화면 닫기.
+  //     // setInit(0);
+  //     setInit(findPreviousOrNextCampaignId(campaignId));
+  //     setAlertState({
+  //       ...errorMessage,
+  //       isOpen: true,
+  //       message: '작업이 완료되었습니다.',
+  //       type: '2',
+  //       onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+  //     });
+  //   }
+  // });
 
   // 재발신 삭제 API 호출
-  const { mutate: fetchAutoRedialDelete } = useApiForAutoRedialDelete({
-    onSuccess: (data) => {
-      setInit(forIndexCurrentCampaignId);
-    }
-  });
+  // const { mutate: fetchAutoRedialDelete } = useApiForAutoRedialDelete({
+  //   onSuccess: (data) => {
+  //     // 마지막으로 캠페인 정보 삭제
+  //     fetchCampaignManagerDelete({
+  //       ...campaignInfoDelete,
+  //       campaign_id: tempCampaignManagerInfo.campaign_id,
+  //       tenant_id: tempCampaignManagerInfo.tenant_id
+  //     });
+  //     setInit(findPreviousOrNextCampaignId(campaignId));
+  //   }
+  // });
 
   // 발신번호 삭제 API 호출
   const { mutate: fetchCallingNumberDelete } = useApiForCallingNumberDelete({

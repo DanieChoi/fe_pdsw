@@ -2,17 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import CommonButton from '@/components/shared/CommonButton';
-import CustomAlert from '@/components/shared/layout/CustomAlert';
-import { useApiForCampaignManagerDelete } from '@/features/campaignManager/hooks/useApiForCampaignManagerDelete';
-import { useApiForCampaignScheduleDelete } from '@/features/campaignManager/hooks/useApiForCampaignScheduleDelete';
-import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
+import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import { useAuthStore, useCampainManagerStore } from '@/store';
-import { fetchCallingNumberDelete } from '@/features/campaignManager/api/mainCallingNumberDelete';
-import { fetchReservedCallDelete } from '@/features/campaignManager/api/mainReservedCallDelete';
 import { useSideMenuCampaignGroupTabStore } from '@/store/storeForSideMenuCampaignGroupTab';
 import { toast } from 'react-toastify';
 import { useTabStore } from '@/store/tabStore';
 import { removeNodeByCampaignIdForCampaignTab } from '../utils/treeUtils';
+import { useDeleteCampaignHelper } from '@/features/campaignManager/utils/deleteCampaignHelper';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   campaignId?: string | number;
@@ -23,9 +21,19 @@ interface Props {
   buttonText?: string;
   isDisabled?: boolean;
   isOpen?: boolean;
-  tenant_id?: number;
+  tenant_id: number;
   onOpenChange?: (open: boolean) => void;
+  onFocusID?: (focusId: string | number) => void;
 }
+
+const errorMessage: CustomAlertRequest = {
+  isOpen: false,
+  message: '',
+  title: '캠페인',
+  type: '1',
+  onClose: () => { },
+  onCancel: () => { },
+};
 
 const IDialogButtonForCampaingDelete: React.FC<Props> = ({
   campaignId,
@@ -38,13 +46,13 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
   isOpen: externalIsOpen,
   onOpenChange,
   tenant_id,
+  onFocusID
 }) => {
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const isDialogOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
   const [isDeleting, setIsDeleting] = useState(false);
 
   const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
-  const { callingNumbers, campaignSkills } = useCampainManagerStore();
   const {
     activeTabKey,
     closeAllTabs,
@@ -55,90 +63,99 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
     setDeletedCampaignId,
   } = useTabStore();
 
-  const { mutate: updateCampaignSkill } = useApiForCampaignSkillUpdate({
-    onSuccess: () => console.log('캠페인 스킬 할당 해제 성공'),
-    onError: (error) => console.error('캠페인 스킬 할당 해제 실패:', error),
-  });
+  const router = useRouter();
 
-  const { mutate: deleteCampaignSchedule } = useApiForCampaignScheduleDelete({
-    onSuccess: () => {
-      const relatedSkills = campaignSkills
-        .filter((skill) => skill.campaign_id === Number(campaignId))
-        .map((data) => data.skill_id);
+  const goLogin = () => {
+    Cookies.remove('session_key');
+    router.push('/login');
+  };
 
-      if (relatedSkills.length > 0) {
-        updateCampaignSkill({ campaign_id: Number(campaignId), skill_id: [] });
-      }
+  const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
 
-      const relatedCallingNumbers = callingNumbers
-        .filter((callingNumber) => callingNumber.campaign_id === Number(campaignId))
-        .map((data) => data.calling_number);
+  // const { mutate: updateCampaignSkill } = useApiForCampaignSkillUpdate({
+  //   onSuccess: () => console.log('캠페인 스킬 할당 해제 성공'),
+  //   onError: (error) => console.error('캠페인 스킬 할당 해제 실패:', error),
+  // });
 
-      if (relatedCallingNumbers.length > 0) {
-        fetchCallingNumberDelete({
-          campaign_id: Number(campaignId),
-          calling_number: relatedCallingNumbers.join(','),
-        });
-      }
+  // const { mutate: deleteCampaignSchedule } = useApiForCampaignScheduleDelete({
+  //   onSuccess: () => {
+  //     const relatedSkills = campaignSkills
+  //       .filter((skill) => skill.campaign_id === Number(campaignId))
+  //       .map((data) => data.skill_id);
 
-      fetchReservedCallDelete({
-        campaign_id: Number(campaignId),
-        tenant_id: Number(tenant_id),
-        delete_dial_list: 1,
-      });
+  //     if (relatedSkills.length > 0) {
+  //       updateCampaignSkill({ campaign_id: Number(campaignId), skill_id: [] });
+  //     }
 
-      // refetchTreeDataForCampaignGroupTab();
-    },
-  });
+  //     const relatedCallingNumbers = callingNumbers
+  //       .filter((callingNumber) => callingNumber.campaign_id === Number(campaignId))
+  //       .map((data) => data.calling_number);
 
-  const { mutate: deleteCampaign, isPending } = useApiForCampaignManagerDelete({
-    onSuccess: () => {
-      // toast.success(`'${campaignName}' 캠페인이 삭제되었습니다.`);
+  //     if (relatedCallingNumbers.length > 0) {
+  //       fetchCallingNumberDelete({
+  //         campaign_id: Number(campaignId),
+  //         calling_number: relatedCallingNumbers.join(','),
+  //       });
+  //     }
 
-      if (campaignId) {
-        setDeletedCampaignId(campaignId.toString());
+  //     fetchReservedCallDelete({
+  //       campaign_id: Number(campaignId),
+  //       tenant_id: Number(tenant_id),
+  //       delete_dial_list: 1,
+  //     });
 
-        // 캠페인 탭 트리 메뉴 업데이트
-        if (window.originalTreeItems) {
-          window.originalTreeItems = removeNodeByCampaignIdForCampaignTab(
-            window.originalTreeItems,
-            Number(campaignId)
-          );
-          window.treeForceUpdate?.();
-          window.treeSetSelectedNodeId?.(undefined);
-        }
+  //     // refetchTreeDataForCampaignGroupTab();
+  //   },
+  // });
 
-        // 캠페인 그룹 탭 트리 메뉴 업데이트 (추가된 부분)
-        if (window.removeCampaignFromGroupTree) {
-          window.removeCampaignFromGroupTree(campaignId);
-          console.log(`캠페인 그룹 탭 트리에서 캠페인 ID ${campaignId} 제거 완료`);
-        }
+  // const { mutate: deleteCampaign, isPending } = useApiForCampaignManagerDelete({
+  //   onSuccess: () => {
+  //     // toast.success(`'${campaignName}' 캠페인이 삭제되었습니다.`);
 
-        setCampaignIdForUpdateFromSideMenu(null)
+  //     if (campaignId) {
+  //       setDeletedCampaignId(campaignId.toString());
+
+  //       // 캠페인 탭 트리 메뉴 업데이트
+  //       if (window.originalTreeItems) {
+  //         window.originalTreeItems = removeNodeByCampaignIdForCampaignTab(
+  //           window.originalTreeItems,
+  //           Number(campaignId)
+  //         );
+  //         window.treeForceUpdate?.();
+  //         window.treeSetSelectedNodeId?.(undefined);
+  //       }
+
+  //       // 캠페인 그룹 탭 트리 메뉴 업데이트 (추가된 부분)
+  //       if (window.removeCampaignFromGroupTree) {
+  //         window.removeCampaignFromGroupTree(campaignId);
+  //         console.log(`캠페인 그룹 탭 트리에서 캠페인 ID ${campaignId} 제거 완료`);
+  //       }
+
+  //       setCampaignIdForUpdateFromSideMenu(null)
         
-        // 캠페인 탭 삭제
-        // const { rowId, sectionId } = findCurrentTabLocation();
-        // if (rowId && activeTabKey) {
-        //   removeTab(Number(rowId), activeTabKey);
-        // }
+  //       // 캠페인 탭 삭제
+  //       // const { rowId, sectionId } = findCurrentTabLocation();
+  //       // if (rowId && activeTabKey) {
+  //       //   removeTab(Number(rowId), activeTabKey);
+  //       // }
 
-      }
+  //     }
 
-      deleteCampaignSchedule({
-        campaign_id: Number(campaignId),
-        tenant_id: Number(tenant_id),
-        delete_dial_list: 1,
-      });
+  //     deleteCampaignSchedule({
+  //       campaign_id: Number(campaignId),
+  //       tenant_id: Number(tenant_id),
+  //       delete_dial_list: 1,
+  //     });
 
-      closeDialog();
-      setIsDeleting(false);
-    },
-    onError: (error) => {
-      console.error('캠페인 삭제 실패:', error);
-      toast.error(`캠페인 삭제에 실패했습니다: ${error.message || '알 수 없는 오류'}`);
-      setIsDeleting(false);
-    },
-  });
+  //     closeDialog();
+  //     setIsDeleting(false);
+  //   },
+  //   onError: (error) => {
+  //     console.error('캠페인 삭제 실패:', error);
+  //     toast.error(`캠페인 삭제에 실패했습니다: ${error.message || '알 수 없는 오류'}`);
+  //     setIsDeleting(false);
+  //   },
+  // });
 
   const findCurrentTabLocation = () => {
     for (const row of rows) {
@@ -151,17 +168,54 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
     return { rowId: 'row-1', sectionId: 'default' };
   };
 
-  const handleDelete = () => {
+  const { commonDeleteCampaign } = useDeleteCampaignHelper();
+
+  const handleDelete = async () => {
     if (!campaignId) {
       toast.error('삭제할 캠페인 정보가 없습니다.');
       return;
     }
     setIsDeleting(true);
+
+    try{
+      
+      const callbackCampaignId = await commonDeleteCampaign(Number(tenant_id), Number(campaignId));
+
+      if(onFocusID && callbackCampaignId){
+
+        closeDialog();
+        setIsDeleting(false);
+        onFocusID(callbackCampaignId);
+      }
+
+    } catch (e: any){
+
+      if (e.message === 'SESSION_EXPIRED') {
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          type: '2',
+          onClose: () => goLogin(),
+        });
+      } else {
+        console.error('캠페인 삭제 중 오류 발생:', e);
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: '캠페인 삭제 중 알 수 없는 오류가 발생했습니다.',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+        });
+      }
+    }
+    
+    /*
     deleteCampaign({
       campaign_id: Number(campaignId),
       tenant_id: Number(tenant_id),
       delete_dial_list: 1,
     });
+    */
   };
 
   const openDialog = () => (onOpenChange ? onOpenChange(true) : setInternalIsOpen(true));
@@ -188,7 +242,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
         size={size}
         className={className}
         onClick={openDialog}
-        disabled={isDisabled || isPending}
+        disabled={isDisabled || isDeleting}
       >
         {buttonText}
       </CommonButton>

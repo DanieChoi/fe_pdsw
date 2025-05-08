@@ -463,6 +463,13 @@ export function ContextMenuForCampaignForCampaignTab({
             className="w-full justify-start text-left text-red-500"
             buttonText="캠페인 삭제"
             isDisabled={displayStatus !== 'stopped'}
+            onFocusID={(focusId) => {
+              // context Menu 갇히는거 초기화
+              document.body.style.pointerEvents = 'auto';
+              
+              // onFocusID 삭제 후 이동될 callback 추가, 
+              setCampaignIdForUpdateFromSideMenu(focusId.toString());
+            }}
           />
         </div>
       ),

@@ -438,34 +438,26 @@ export default function Footer({
         }
 
 
-        if(data['campaign_status'] === 2 && data['campaign_end_flag'] === 1){
+        if(data['campaign_status'] === 1 && data['campaign_end_flag'] === 1){
           // 캠페인 상태가 시작이며 발신중일때
           addCampaignDialStatus({campaign_id : campaign_id, status : data['campaign_status']});
 
           // 여기에서 직접 setSseInputMessage 호출
-          useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:', campaign_id, '멈춤');
+          useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:', campaign_id, '시작');
         }
-
-        if((data['campaign_status'] === 3)&& data['campaign_end_flag'] === 1){
+        else if((data['campaign_status'] === 2)&& data['campaign_end_flag'] === 1){
           // 캠페인 상태가 멈춤이나 정지이며, 완료 되었을때 ==> 차후에 campaign_end_flag 맞춰서 변경해야함!!!
+          removeCampaignDialStatus({campaign_id : campaign_id});
+
+          // 여기에서 직접 setSseInputMessage 호출
+          useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:', campaign_id, '멈춤');
+
+        }else if ((data['campaign_status'] === 3)&& data['campaign_end_flag'] === 1){
           removeCampaignDialStatus({campaign_id : campaign_id});
 
           // 여기에서 직접 setSseInputMessage 호출
           useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:', campaign_id, '중지');
         }
-        // 대충 store에다가 객체 배열로 저장해보겠단 뜻 const arr_status = [{campaign_id : campaign_id, campaign_status: data['campaign_status']}];
-
-
-        // 대충 객체 배열로 저장해보겠단 뜻 const arr_status = [{campaign_id : campaign_id, campaign_status: data['campaign_status']}];
-
-        // console.log(`########### campaign_status => ${data['campaign_status']}`);
-        // console.log(`########### campaign_end_flag => ${data['campaign_end_flag']}`);
-        /*
-          정지에서 멈춤으로 변경시 
-          [캠페인 동작상태 변경] 캠페인 아이디 : 49800, 동작상태: 멈춤, 완료구분: 진행중
-          ########### campaign_status => 2
-          ########### campaign_end_flag => 1
-        */
 
         // 푸터 로그 메시지
         _message = '[캠페인 동작상태 변경] 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: '+_end_flag;

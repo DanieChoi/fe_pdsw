@@ -375,10 +375,11 @@ const MonitorPage = () => {
   const handleStatusChange = (newStatus: string) => {
 
     const originStartFlag = campaigns.filter(data => data.campaign_id.toString() === selectedCampaign.toString())[0].start_flag;
+    const originEndFlag = campaigns.filter(data => data.campaign_id.toString() === selectedCampaign.toString())[0].end_flag;
 
-    // 현재 캠페인의 상태가 발신중(시작)일때 차후 수정해야함
-    const existDial = false;
-    // (selectedCampaign && originStartFlag === 2);
+    // 현재 캠페인의 상태가 발신중(시작)일때
+    // 시작 에서 상태 변경시 ==> 정지중 or 멈춤중 이 상태에서 강제 변경시 confirm 을 조건 
+    const existDial = (selectedCampaign && originStartFlag === 5 && originEndFlag === 1) || (selectedCampaign && originStartFlag === 6 && originEndFlag === 1);
 
     const waitConfirm = () => {
       setCampaignStatus(newStatus as CampaignStatus);
@@ -387,14 +388,14 @@ const MonitorPage = () => {
         campaign_status: newStatus === '시작' ? 1 : newStatus === '멈춤' ? 2 : 3,
       });
     };
-
+    
     if (existDial) {
       setAlertState({
         ...errorMessage,
         title: '캠페인 상태 변경',
         isOpen: true,
         message:
-          '발신중인 데이터 처리 중 입니다. 기다려 주시길 바랍니다. \n강제로 상태 변경을 하실 경우에는 발신 데이터 처리가 되지 않으며 재시작 시에는 중복 발신이 될 수도 있습니다.\n그래도 진행하시겠습니까?',
+          '발신중인 데이터 처리 중 입니다. 기다려 주시길 바랍니다. \n강제로 상태 변경을 하실 경우에는 발신 데이터 처리가 되지 않으며 \n재시작 시에는 중복 발신이 될 수도 있습니다.\n그래도 진행하시겠습니까?',
         onClose: () => {
           setAlertState((prev) => ({ ...prev, isOpen: false }));
           waitConfirm(); // 여기에 캠페인 상태 변경 로직 실행

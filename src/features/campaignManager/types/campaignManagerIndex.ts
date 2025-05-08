@@ -42,6 +42,7 @@ export interface SkillListResponse {
 export interface CampaignCredentials {
   session_key: string;
   tenant_id: number;
+  campaign_id? : number;
 }
 
 // 스킬마스터정보조회 요청 시 필요한 credentials 타입

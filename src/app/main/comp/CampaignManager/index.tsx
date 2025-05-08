@@ -33,7 +33,7 @@ type Props = {
 
 const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) => {
   const { tenants, campaigns, selectedCampaign, setSelectedCampaign, setCampaigns } = useMainStore();
-  const { campaignIdForUpdateFromSideMenu } = useTabStore();
+  const { campaignIdForUpdateFromSideMenu, setCampaignIdForUpdateFromSideMenu } = useTabStore();
   const { session_key, tenant_id } = useAuthStore();
   const [masterCampaignId, setMasterCampaignId] = useState<string>('');
   const [alertState, setAlertState] = useState(errorMessage);
@@ -46,7 +46,7 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     , campaignManagerHeaderDailMode, setCampaignManagerHeaderDailMode
     , campaignManagerHeaderSkill, setCampaignManagerHeaderSkill
     , campaignManagerHeaderCallNumber, setCampaignManagerHeaderCallNumber
-    , campaignManagerCampaignId
+    , campaignManagerCampaignId , setCampaignManagerCampaignId
    } = useCampainManagerStore();
 
   const [campaignHeaderSearchParam, setCampaignHeaderSearchParam] = useState<CampaignHeaderSearch>();
@@ -160,24 +160,27 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
 
   //초기화.
   const handleDetailInit = (campaign_id:number) => {
-    console.log('######## campaign_id:: '+campaign_id);
+    // console.log('######## campaign_id:: '+campaign_id);
     if( campaign_id === 0){
       setHeaderInit(true);
       const tempCampaigns = campaigns.filter(data => data.campaign_id != Number(masterCampaignId));
       setMasterCampaignId(campaigns[0].campaign_id+'');
       setCampaigns(tempCampaigns);
-      setCampaignManagerHeaderTenantId('all');
-      setCampaignManagerHeaderCampaignName('');
-      setCampaignManagerHeaderDailMode('all');
-      setCampaignManagerHeaderSkill('all');
-      setCampaignManagerHeaderCallNumber('');
+      // setCampaignManagerHeaderTenantId('all');
+      // setCampaignManagerHeaderCampaignName('');
+      // setCampaignManagerHeaderDailMode('all');
+      // setCampaignManagerHeaderSkill('all');
+      // setCampaignManagerHeaderCallNumber('');
+    }else{
+      setCampaignIdForUpdateFromSideMenu(campaign_id+'');
+    
       // }else{
     //   setMasterCampaignId(campaign_id+'');
     //   fetchMain({
     //     session_key: session_key,
     //     tenant_id: tenant_id,
     //   });  
-    }
+    } 
   };
 
   useEffect(() => {
