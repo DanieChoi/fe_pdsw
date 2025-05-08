@@ -184,7 +184,7 @@ export default function DraggableTab({
   // 드래그 중일 때는 transform 스타일을 적용하고, 아닐 때는 빈 객체 반환
   const style = isDragging && transform
     ? {
-      position: 'absolute', // Add absolute positioning when dragging
+      position: 'absolute' as 'absolute', // Add absolute positioning when dragging
       transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
       zIndex: 999,
       willChange: 'transform',
