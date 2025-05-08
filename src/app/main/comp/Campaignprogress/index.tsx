@@ -18,6 +18,7 @@ import * as XLSX from 'xlsx';
 // 모달
 import ColumnSet, { defaultColumnsData, ColumnSettingItem } from './ColumnSet';
 import { useEnvironmentStore } from '@/store/environmentStore';
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
 
 interface TreeRow extends DispatchStatusDataType {
   parentId?: string;
@@ -126,7 +127,7 @@ export default function Campaignprogress() {
   const [selectedSkill, setSelectedSkill] = useState<string>('total');
   const [selectedStatus, setSelectedStatus] = useState<string>('전체');
   const [isSortAscending, setIsSortAscending] = useState<boolean>(true);
-  const { campaigns } = useMainStore();
+  const { campaigns, campaignTotalProgressInfoCampaignId, setCampaignTotalProgressInfoCampaignId } = useMainStore();
   const [selectedCampaignId, setSelectedCampaignId] = useState<number>(0);
   const [selectedCampaignIdIndex, setSelectedCampaignIdIndex] = useState<number>(0);
   const [maxDispatchCount, setMaxDispatchCount] = useState<number>(0);
@@ -141,6 +142,10 @@ export default function Campaignprogress() {
   const { statisticsUpdateCycle } = useEnvironmentStore();
   const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [tempCampaignList, setTempCampaignList] = useState<MainDataResponse[]>([]);
+  const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  //campaigns: MainDataResponse[];
 
   const transformToTreeData = (dataList: DispatchStatusDataType[]) => {
     const result: any[] = [];
@@ -349,6 +354,7 @@ export default function Campaignprogress() {
     setSelectedSkill(value);
     if (campaignSkills.length > 0) {
       processDataForGrid(campaignSkills, selectedCampaign, value, selectedStatus);
+      processDataForList(selectedCampaign, value, selectedStatus);
     }
   };
   // 캠페인 아이디 변경 핸들러
@@ -356,6 +362,8 @@ export default function Campaignprogress() {
     setSelectedCampaign(value);
     if (campaignSkills.length > 0) {
       processDataForGrid(campaignSkills, value, selectedSkill, selectedStatus);
+      processDataForList(value, selectedSkill, selectedStatus);
+      setCampaignTotalProgressInfoCampaignId(value);
     }
   };
   // 상태 별로 보기 변경 핸들러
@@ -363,6 +371,7 @@ export default function Campaignprogress() {
     setSelectedStatus(value);
     if (campaignSkills.length > 0) {
       processDataForGrid(campaignSkills, selectedCampaign, selectedSkill, value);
+      processDataForList(selectedCampaign, selectedSkill, value);
     }
   };
   const createExcelData = (list: TreeRow[], _columns: Column<TreeRow>[], hasChildren: boolean) => {
@@ -429,6 +438,30 @@ export default function Campaignprogress() {
   };
   const handleColumnSetClose = () => setIsColumnSetOpen(false);
 
+  const processDataForList = (
+    currentCampaign: string,
+    currentSkill: string,
+    currentStatus: string,
+  ) => {
+    let _tempCampaignList = [];
+
+    // 스킬 필터링
+    if (currentSkill !== 'total') {
+      const filteredCampaigns = campaignSkills.filter(campaign =>
+        campaign.skill_id?.includes(Number(currentSkill))
+      );
+      const filteredIds = new Set(filteredCampaigns.map(c => c.campaign_id));
+      _tempCampaignList = campaigns.filter(c => filteredIds.has(c.campaign_id));
+    } else {
+      _tempCampaignList = campaigns;
+    }
+    if (currentCampaign !== '전체보기') {
+      _tempCampaignList = _tempCampaignList.filter(campaign=>campaign.campaign_id === Number(currentCampaign));
+    }
+    setTempCampaignList(_tempCampaignList);
+
+  };
+
   // 차트 데이터 처리 함수
   const processDataForGrid = (
     campaignSkillsData: any[],
@@ -443,6 +476,7 @@ export default function Campaignprogress() {
       filteredCampaigns = campaignSkillsData.filter(campaign =>
         campaign.skill_id?.includes(Number(currentSkill))
       );
+      const filteredIds = new Set(filteredCampaigns.map(c => c.campaign_id));
     } else {
       filteredCampaigns = campaigns.sort((a, b) => a.campaign_id - b.campaign_id);
     }
@@ -468,6 +502,7 @@ export default function Campaignprogress() {
     }));
     setInitData(transformedData);
   };
+  
 
   // 스킬 조회
   const { mutate: fetchSkills } = useApiForSkills({
@@ -498,11 +533,11 @@ export default function Campaignprogress() {
           ...item
           , strFlag: i === 0 ? '최초발신' : `${i}번째 재발신`
           , senderId: i
-          , startFlag: campaigns[selectedCampaignIdIndex].start_flag === 1 ? '시작' : campaigns[selectedCampaignIdIndex].start_flag === 2 ? '멈춤' : '중지'
-          , endFlag: campaigns[selectedCampaignIdIndex].end_flag === 1 ? '진행중' : '완료'
+          , startFlag: tempCampaignList[selectedCampaignIdIndex].start_flag === 1 ? '시작' : tempCampaignList[selectedCampaignIdIndex].start_flag === 2 ? '멈춤' : '중지'
+          , endFlag: tempCampaignList[selectedCampaignIdIndex].end_flag === 1 ? '진행중' : '완료'
           , id: 'campaign-' + item.campId
           , centerId: 'center-1'
-          , campaignName: campaigns[selectedCampaignIdIndex].campaign_name
+          , campaignName: tempCampaignList[selectedCampaignIdIndex].campaign_name
           , progressRate: item.totLstCnt === 0 ? 0 : parseFloat(((item.nonTTCT / item.totLstCnt) * 100).toFixed(1))
           , successRateList: item.totLstCnt === 0 ? 0 : parseFloat(((item.scct / item.totLstCnt) * 100).toFixed(1))
           , nonSendCount: item.totLstCnt - item.nonTTCT - item.nogdeleteGL //미발신 건수.
@@ -519,20 +554,20 @@ export default function Campaignprogress() {
         const tempData: DispatchStatusDataType = {
           ...initDispatchStatusData
           , strFlag: '최초발신'
-          , tenantId: campaigns[selectedCampaignIdIndex].tenant_id
-          , campId: campaigns[selectedCampaignIdIndex].campaign_id
-          , startFlag: campaigns[selectedCampaignIdIndex].start_flag === 1 ? '시작' : campaigns[selectedCampaignIdIndex].start_flag === 2 ? '멈춤' : '중지'
-          , endFlag: campaigns[selectedCampaignIdIndex].end_flag === 1 ? '진행중' : '완료'
-          , id: 'campaign-' + campaigns[selectedCampaignIdIndex].campaign_id
-          , campaignName: campaigns[selectedCampaignIdIndex].campaign_name
+          , tenantId: tempCampaignList[selectedCampaignIdIndex].tenant_id
+          , campId: tempCampaignList[selectedCampaignIdIndex].campaign_id
+          , startFlag: tempCampaignList[selectedCampaignIdIndex].start_flag === 1 ? '시작' : tempCampaignList[selectedCampaignIdIndex].start_flag === 2 ? '멈춤' : '중지'
+          , endFlag: tempCampaignList[selectedCampaignIdIndex].end_flag === 1 ? '진행중' : '완료'
+          , id: 'campaign-' + tempCampaignList[selectedCampaignIdIndex].campaign_id
+          , campaignName: tempCampaignList[selectedCampaignIdIndex].campaign_name
         };
         setTempCampaignInfoList(prev => [...prev, tempData]);
       }
 
       const index = selectedCampaignIdIndex + 1;
 
-      if (index < campaigns.length) {
-        setSelectedCampaignId(campaigns[index].campaign_id);
+      if (index < tempCampaignList.length) {
+        setSelectedCampaignId(tempCampaignList[index].campaign_id);
         setSelectedCampaignIdIndex(index);
       } else {
         fetchSkills({
@@ -577,9 +612,9 @@ export default function Campaignprogress() {
   }, [columns]);
 
   useEffect(() => {
-    if (selectedCampaignId > 0) {
+    if (selectedCampaignId > 0 && tempCampaignList[selectedCampaignIdIndex]) {
       fetchCampaignProgressInformation({
-        tenantId: campaigns[selectedCampaignIdIndex].tenant_id,
+        tenantId: tempCampaignList[selectedCampaignIdIndex].tenant_id,
         campaignId: selectedCampaignId
       });
     }
@@ -587,33 +622,61 @@ export default function Campaignprogress() {
 
 
   useEffect(() => {
-    if (campaigns.length > 0) {
-      // 캠페인즈를 가져와서 캠페인 아이디를 설정합니다.
-      setSelectedCampaignId(campaigns[0].campaign_id);
+    // if (campaigns.length > 0) {
+    //   // 캠페인즈를 가져와서 캠페인 아이디를 설정합니다.
+    //   setSelectedCampaignId(campaigns[0].campaign_id);
+    //   setSelectedCampaignIdIndex(0);
+    //   setTempCampaignInfoList([]);
+    //   setCampaignInfoList([]);
+    // }
+    if(campaigns.length > 0 && tempCampaignList.length === 0){
+      setTempCampaignList(campaigns);
+      // setSelectedCampaignId(campaigns[0].campaign_id);
+      // setSelectedCampaignIdIndex(0);
+      // setTempCampaignInfoList([]);
+      // setCampaignInfoList([]);
+    }
+    if( tempCampaignList.length > 0){
+      setSelectedCampaignId(tempCampaignList[0].campaign_id);
       setSelectedCampaignIdIndex(0);
       setTempCampaignInfoList([]);
       setCampaignInfoList([]);
     }
-  }, [campaigns]);
-
+  }, [campaigns,tempCampaignList]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIsRefreshing(true);
+    if (campaignTotalProgressInfoCampaignId != '') {
+      handleCampaignChange(campaignTotalProgressInfoCampaignId);
+    }
+  }, [campaignTotalProgressInfoCampaignId]);
 
-      // 기존 갱신 로직 실행
-      setSelectedCampaignId(campaigns[0].campaign_id);
-      setSelectedCampaignIdIndex(0);
-      setTempCampaignInfoList([]);
-      setCampaignInfoList([]);
+  useEffect(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    intervalRef.current = setInterval(() => {
+      setIsRefreshing(true);
+      setSelectedCampaignId(0);
+
+      setTimeout(function() {
+        // 기존 갱신 로직 실행
+        setSelectedCampaignId(tempCampaignList[0].campaign_id);
+        setSelectedCampaignIdIndex(0);
+        setTempCampaignInfoList([]);
+        setCampaignInfoList([]);
+      }, 50);
 
       setLastRefreshTime(new Date());
 
       setTimeout(() => setIsRefreshing(false), 1000); // 짧은 갱신 애니메이션 처리
     }, statisticsUpdateCycle * 1000);
 
-    return () => clearInterval(interval);
-  }, [statisticsUpdateCycle, campaigns]);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [statisticsUpdateCycle, tempCampaignList]);
 
 
   return (
@@ -702,7 +765,7 @@ export default function Campaignprogress() {
 
           {/* 새로고침 버튼 */}
           <CommonButton variant="secondary" onClick={() => {
-            setSelectedCampaignId(campaigns[0].campaign_id);
+            setSelectedCampaignId(tempCampaignList[0].campaign_id);
             setSelectedCampaignIdIndex(0);
             setTempCampaignInfoList([]);
             setCampaignInfoList([]);
