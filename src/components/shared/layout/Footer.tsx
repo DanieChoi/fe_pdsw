@@ -915,6 +915,7 @@ export default function Footer({
       //잔량 부족 알림 사용
       else if (announce === 'list-not-enough') {
         _message = '[잔량부족알림] ';
+        const _message2 = '[잔량부족알림]';
         if (command === 'UPDATE') {
           const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === Number(data['campaign_id']));
           if (tempCampaign && (tempCampaign.use_list_alarm === 1 || tempCampaign.use_list_alarm === 4 || tempCampaign.use_list_alarm === 5 || tempCampaign.use_list_alarm === 7)) {
@@ -922,6 +923,18 @@ export default function Footer({
           // } else if (tempCampaign && tempCampaign.dial_mode === 3) {
           //   _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'];
             addMessageToFooterList(_time, _type, _message);
+            // 토스트 알림 표시
+            if (useAlramPopup === 1) {
+              toast.event(_message2, {
+                duration: 6000
+              });
+            }
+          }
+          if (tempCampaign && (tempCampaign.use_list_alarm === 2 || tempCampaign.use_list_alarm === 4 || tempCampaign.use_list_alarm === 6 || tempCampaign.use_list_alarm === 7)) {
+            // tofix ohs 소림 알림 for _message2
+          }
+          if (tempCampaign && (tempCampaign.use_list_alarm === 3 || tempCampaign.use_list_alarm === 5 || tempCampaign.use_list_alarm === 6 || tempCampaign.use_list_alarm === 7)) {
+            // tofix ohs 관리자에게 전화로 알림 for _message2
           }
         }
       }
