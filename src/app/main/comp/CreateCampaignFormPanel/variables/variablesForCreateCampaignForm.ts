@@ -64,7 +64,8 @@ export const CampaignInfo: MainDataResponse = {
     redial_strategy2: "7:2.1.0/3.1.0/4.1.0/5.1.0/6.1.0/10.1.0/99.1.0/2501.1.0/2502.1.0/2503.1.0/2504.1.0/2505.1.0/2506.1.0",
     redial_strategy3: "7:2.1.0/3.1.0/4.1.0/5.1.0/6.1.0/10.1.0/99.1.0/2501.1.0/2502.1.0/2503.1.0/2504.1.0/2505.1.0/2506.1.0",
     redial_strategy4: "7:2.1.0/3.1.0/4.1.0/5.1.0/6.1.0/10.1.0/99.1.0/2501.1.0/2502.1.0/2503.1.0/2504.1.0/2505.1.0/2506.1.0",
-    redial_strategy5: "7:2.1.0/3.1.0/4.1.0/5.1.0/6.1.0/10.1.0/99.1.0/2501.1.0/2502.1.0/2503.1.0/2504.1.0/2505.1.0/2506.1.0"
+    redial_strategy5: "7:2.1.0/3.1.0/4.1.0/5.1.0/6.1.0/10.1.0/99.1.0/2501.1.0/2502.1.0/2503.1.0/2504.1.0/2505.1.0/2506.1.0",
+    channel_group_id: 0,
 }
 
 export const CampaignManagerInfo: CampaignInfoUpdateRequest = {
@@ -124,6 +125,7 @@ export const CampaignManagerInfo: CampaignInfoUpdateRequest = {
     announcement_id: 1,
     campaign_level: 0,
     outbound_sequence: '',
+    channel_group_id: 0,
 }
 
 export const errorMessage: CustomAlertRequest = {

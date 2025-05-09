@@ -86,6 +86,7 @@ const CampaignManagerInfo: CampaignInfoUpdateRequest = {
     announcement_id: 1,
     campaign_level: 0,
     outbound_sequence: '',
+    channel_group_id: 0,
 }
 
 // export const CampaignInfo: MainDataResponse = {
