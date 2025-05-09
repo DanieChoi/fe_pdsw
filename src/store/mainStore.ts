@@ -5,6 +5,7 @@ import { MainDataResponse, TenantListDataResponse } from '../features/auth/types
 import { campaignChannel } from '@/lib/broadcastChannel';
 import { devtools } from 'zustand/middleware';
 import { CampaignSkillItemForSystemAdmin } from '@/shared/api/camapign/apiForCampaignSkilListForSystemAdmin';
+import { CampaignGroupItemForSystemAdmin } from '@/shared/api/camapign/apiForGetCampaignGroupForSystemAdmin';
 
 // Define the DataProps type for selectedCampaignRow
 export interface DataProps {
@@ -57,6 +58,11 @@ interface MainState {
   campaignSkillsLoaded: boolean;
   campaignSkillsLoading: boolean;
 
+  // 캠페인 그룹 관련
+  campaignGroups: CampaignGroupItemForSystemAdmin[];
+  campaignGroupsLoaded: boolean;
+  campaignGroupsLoading: boolean;
+
 }
 
 interface MainActions {
@@ -90,6 +96,13 @@ interface MainActions {
   setCampaignSkillsLoaded: (loaded: boolean) => void;
   setCampaignSkillsLoading: (loading: boolean) => void;
   getCampaignSkillsByCampaignId: (campaignId: number) => CampaignSkillItemForSystemAdmin[];
+
+
+  // 캠페인 그룹 관련 액션 추가
+  // 캠페인 그룹 액션 추가
+  setCampaignGroups: (groups: CampaignGroupItemForSystemAdmin[]) => void;
+  setCampaignGroupsLoaded: (loaded: boolean) => void;
+  setCampaignGroupsLoading: (loading: boolean) => void;
 
 }
 
@@ -127,6 +140,11 @@ export const useMainStore = create<MainStore>()(
       campaignSkills: [],
       campaignSkillsLoaded: false,
       campaignSkillsLoading: false,
+
+      // 캠페인 그룹 관련
+      campaignGroups: [],
+      campaignGroupsLoaded: false,
+      campaignGroupsLoading: false,
 
       setCampaigns: (campaigns) => set({
         campaigns,
@@ -219,6 +237,20 @@ export const useMainStore = create<MainStore>()(
           skill.campaign_id && skill.campaign_id === campaignId
         );
       },
+
+      setCampaignGroups: (groups) => set({
+        campaignGroups: groups,
+        campaignGroupsLoaded: true,
+        campaignGroupsLoading: false
+      }, false, 'setCampaignGroups'),
+      
+      setCampaignGroupsLoaded: (loaded) => set({
+        campaignGroupsLoaded: loaded
+      }, false, 'setCampaignGroupsLoaded'),
+      
+      setCampaignGroupsLoading: (loading) => set({
+        campaignGroupsLoading: loading
+      }, false, 'setCampaignGroupsLoading'),
 
     }),
     {

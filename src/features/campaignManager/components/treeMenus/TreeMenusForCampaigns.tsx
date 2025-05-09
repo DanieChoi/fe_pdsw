@@ -57,20 +57,6 @@ export function TreeMenusForCampaigns() {
   const [forceUpdate, setForceUpdate] = useState(0);
   const [lastViewMode, setLastViewMode] = useState<ViewMode | null>(null);
 
-  // 인증 스토어에서 테넌트 ID 가져오기
-  // const { tenant_id } = useAuthStore();
-
-  // 트리 데이터 API 호출
-  // const { data: treeData, isLoading, error } = useApiForGetTreeMenuDataForSideMenu();
-
-  // useEffect(() => {
-  //   console.log("트리 데이터 at 캠페인탭:", treeData);
-  // }, []);
-
-  // 원본 아이템을 useMemo로 감싸서 의존성 배열 변경 방지
-  // const originalItems = useMemo(() => {
-  //   return treeData?.[0]?.items || [];
-  // }, [treeData]);
 
   // 직접 스토어에서 데이터를 가져와서 useMemo로 트리 데이터 생성
   const { tenant_id, session_key } = useAuthStore();
