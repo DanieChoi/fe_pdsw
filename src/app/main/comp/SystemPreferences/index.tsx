@@ -14,6 +14,7 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { useEnvironmentStore } from '@/store/environmentStore';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
+import { useApiForChannelGroupList } from '@/features/preferences/hooks/useApiForChannelGroup';
 
 interface EquipmentRow {
     device_id: string;
@@ -377,6 +378,35 @@ const SystemPreferences = () => {
         }
     });
 
+    // 채널 그룹 상태 추가
+    const [channelGroupList, setChannelGroupList] = useState<any[]>([]);
+
+    // 채널 그룹 조회
+    const { mutate: fetchChannelGroupList } = useApiForChannelGroupList({
+        onSuccess: (data) => {
+            
+            setChannelGroupList(data.result_data);
+            
+        }, 
+        onError: (error) => {
+            if (error.message.split('||')[0] === '5') {
+                setAlertState({
+                    ...errorMessage,
+                    isOpen: true,
+                    message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+                    onConfirm: closeAlert,
+                    onCancel: () => {}
+                });
+                Cookies.remove('session_key');
+                setTimeout(() => {
+                    router.push('/login');
+                }, 1000);
+            } else {
+                showAlert('오류 발생: ' + error.message);
+            }
+        }
+    });
+
     // 장비 목록 조회 시 테넌트 정보가 변경될 때마다 호출
     useEffect(() => {
         if (tenants && tenants.length > 0) {
@@ -388,6 +418,8 @@ const SystemPreferences = () => {
             fetchSchedules({
                 tenant_id_array: tenants.map(tenant => tenant.tenant_id)
             });
+
+            fetchChannelGroupList();
         } 
     }, [tenants]);
 
@@ -472,6 +504,13 @@ const SystemPreferences = () => {
                 case 2147483647:
                     return "모든 그룹아이디 사용";
                 default:
+                    // 수정: channelGroupList가 비어있지 않은지 확인
+                    if(channelGroupList && Array.isArray(channelGroupList)) {
+                        const group = channelGroupList.find(group => group && group.group_id === assignValue);
+                        if (group) {
+                            return `ID[${group.group_id}] : ${group.group_name}`;
+                        }
+                    }
                     return "미할당";
             }
         }
@@ -872,7 +911,11 @@ const SystemPreferences = () => {
             // 채널그룹으로 할당일 때 옵션 (변경 없음)
             return [
                 { value: "0", label: "회선사용안함" },
-                { value: "2147483647", label: "모든 그룹아이디 사용" }
+                { value: "2147483647", label: "모든 그룹아이디 사용" },
+                ...channelGroupList.map(group => ({
+                    value: group.group_id.toString(),
+                    label: `ID[${group.group_id}] : ${group.group_name}`
+                }))
             ];
         }
         return [];
