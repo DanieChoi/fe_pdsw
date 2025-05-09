@@ -216,7 +216,7 @@ export const useMainStore = create<MainStore>()(
       getCampaignSkillsByCampaignId: (campaignId) => {
         // 캠페인 ID에 해당하는 스킬 필터링
         return get().campaignSkills.filter(skill => 
-          skill.campaign_id && skill.campaign_id.includes(campaignId)
+          skill.campaign_id && skill.campaign_id === campaignId
         );
       },
 

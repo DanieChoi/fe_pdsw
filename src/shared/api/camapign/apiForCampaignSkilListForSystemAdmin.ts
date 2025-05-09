@@ -5,7 +5,7 @@ export interface CampaignSkillItemForSystemAdmin {
   skill_id: number;
   tenant_id: number;
   name?: string;
-  campaign_id?: number | string;
+  campaign_id?: number;
   description?: string;
 }
 
