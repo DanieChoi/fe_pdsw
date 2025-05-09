@@ -63,7 +63,8 @@ export const fetchCampaignManagerUpdate = async (credentials: CampaignInfoUpdate
       counsel_script_id: credentials.counsel_script_id,
       announcement_id: credentials.announcement_id,
       campaign_level: credentials.campaign_level,
-      outbound_sequence: credentials.outbound_sequence
+      outbound_sequence: credentials.outbound_sequence,
+      channel_group_id: credentials.channel_group_id
     }
   };
 

@@ -4,7 +4,7 @@ import { createChannelGroup, deleteChannelGroup, fetchChannelGroupList, UpdateCh
 
 
 // 캠페인 운용 가능 시간 조회 응답 데이터 타입
-export interface ChannelGroupListResponse {
+export interface ChannelGroupListDataResponse {
     group_id: number;
     group_name: string;
   }
@@ -15,7 +15,7 @@ export interface ChannelGroupListResponse {
   result_msg: string;
   result_count: number;
   total_count: number;
-  result_data: ChannelGroupListResponse[];
+  result_data: ChannelGroupListDataResponse[];
 }
 
 // 채널 그룹 리스트 조회하기

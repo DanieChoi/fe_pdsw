@@ -264,6 +264,7 @@ export interface CampaignInfoUpdateRequest {
   announcement_id: number;
   campaign_level: number;
   outbound_sequence: string;
+  channel_group_id: number;
 }
 
 // 캠페인정보 삭제 요청 데이터 타입

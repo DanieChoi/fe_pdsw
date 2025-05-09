@@ -90,6 +90,7 @@ export interface MainDataResponse {
   announcement_id?: number;
   campaign_level?: number;
   outbound_sequence?: string;
+  channel_group_id: number;
 
   phone_dial_try1?: 0,
   phone_dial_try2?: 0,
@@ -205,6 +206,7 @@ export interface CampaignInfoUpdateRequest {
   redial_strategy5: string;  
   dial_mode_option: number;
   user_option: string;  
+  channel_group_id?: number;
 }
 
 // 다이얼링 장비 데이터 타입

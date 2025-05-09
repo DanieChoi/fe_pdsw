@@ -12,7 +12,7 @@ import {
 } from "@/components/shared/CustomSelect";
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { OutgoingMethodTabParam } from './CampaignManagerDetail';
-import { useMainStore } from '@/store';
+import { useMainStore, useCampainManagerStore } from '@/store';
 
 const useCounselResultList = [
   {useCounselResultId:0, useCounselResultName: '미사용'},
@@ -45,6 +45,7 @@ const CampaignOutgoingMethodTab:OutgoingMethodTabParam = {
   use_counsel_result: 0,          //상담결과 등록 여부 - 0 : 미사용, 1 : 사용
   dial_mode_option: 0,            //다이얼 모드 옵션 - 발신 모드별 옵션 설정(system preview 에서만 사용)
   user_option: '',                //제한 호수 비율
+  channel_group_id: 0,
 };
 
 type Props = {
@@ -55,6 +56,7 @@ type Props = {
 
 const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onCampaignOutgoingMethodChange }) => {
   const { campaigns } = useMainStore();
+  const { channelGroupList } = useCampainManagerStore();
   const [maxRings] = useState<string>("10");
   const [dialModeOption, setDialModeOption] = useState<string>("default");
   const [limitRateRateEnabled, setLimitRateRateEnabled] = useState<boolean>(false);
@@ -146,6 +148,13 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
       , detect_mode: Number(value) 
     });
   };
+  const handleLinkedChannelGroupList = (value:string) => {
+    onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+      , changeYn: true
+      , campaignInfoChangeYn: true
+      , channel_group_id: Number(value) 
+    });
+  };
 
   useEffect(() => {
     if (campaignInfo) {  
@@ -168,6 +177,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
         ,use_counsel_result : campaignInfo.use_counsel_result
         ,dial_mode_option : campaignInfo.dial_mode_option
         ,user_option : campaignInfo.user_option
+        ,channel_group_id: campaignInfo.channel_group_id
       }); 
       if( tempCampaignId !== campaignInfo.campaign_id ){
         setTempCampaignId(campaignInfo.campaign_id);
@@ -290,6 +300,27 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="default">default</SelectItem>
+            </SelectContent>
+          </Select>
+          </div>
+
+          {/* 채널그룹 옵션 */}
+          <div className="flex items-center gap-2 justify-between">
+          <Label className="w-[8.3rem] min-w-[8.3rem]">채널그룹 옵션</Label>
+          <Select value={tempOutgoingMethodTab.channel_group_id+''} onValueChange={handleLinkedChannelGroupList}>
+            <SelectTrigger className="w-full">
+            <SelectValue placeholder={''} />
+            </SelectTrigger>
+            <SelectContent>
+                  <SelectItem key={0} value={'0'}>
+                    없음
+                  </SelectItem>
+                  {channelGroupList.map((data) => (
+                  <SelectItem key={data.group_id} value={data.group_id+''}>
+                    [{data.group_id}]{data.group_name}
+                  </SelectItem>
+                ))
+                  }
             </SelectContent>
           </Select>
           </div>

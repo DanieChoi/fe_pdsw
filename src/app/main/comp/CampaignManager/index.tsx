@@ -6,15 +6,14 @@ import CampaignManagerHeader, { CampaignHeaderSearch } from './CampaignManagerHe
 import CampaignManagerDetail from './CampaignManagerDetail';
 import CampaignManagerList from './CampaignManagerList';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
-import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useMainStore, useCampainManagerStore, useTabStore, useAuthStore } from '@/store';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
-import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
-import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
+import CustomAlert from '@/components/shared/layout/CustomAlert';
+import { useApiForChannelGroupList } from "@/features/preferences/hooks/useApiForChannelGroup";
 
 const errorMessage = {
   isOpen: false,
@@ -40,7 +39,7 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   const router = useRouter();
   const [headerInit, setHeaderInit] = useState<boolean>(false);
 
-  const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions
+  const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions, setChannelGroupList
     , campaignManagerHeaderTenantId, setCampaignManagerHeaderTenantId
     , campaignManagerHeaderCampaignName, setCampaignManagerHeaderCampaignName
     , campaignManagerHeaderDailMode, setCampaignManagerHeaderDailMode
@@ -110,8 +109,17 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
     onSuccess: (data) => {
       setPhoneDescriptions(data.result_data || []);
+      fetchChannelGroupList();
     }
   });
+  // 채널 그룹리스트 조회
+  const { mutate: fetchChannelGroupList } = useApiForChannelGroupList({
+    onSuccess: (data) => {
+        console.log('data---------- ', data);
+        setChannelGroupList(data.result_data);
+    }
+  });
+
 
   //초기화실행.
   useEffect(() => {
