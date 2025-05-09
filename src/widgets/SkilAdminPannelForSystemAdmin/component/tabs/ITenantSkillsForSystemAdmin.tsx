@@ -3,7 +3,7 @@
 
 import React, { useMemo, useState } from "react";
 import { useStoreForTenantDataForSystemAdmin } from "@/shared/store/useStoreForTenantDataForSystemAdmin";
-import { SkillItemForSystemAdmin } from "@/shared/api/tenant/skill/apiForGetSkillListForSystemAdmin";
+import { SkillItemForSystemAdmin } from "@/shared/api/skill/apiForGetSkillListForSystemAdmin";
 import { useApiForGetSkillListForSystemAdmin } from "@/shared/hooks/skill/useApiForGetSkillListForSystemAdmin";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useQueryClient } from "@tanstack/react-query";

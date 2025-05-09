@@ -5,7 +5,7 @@ import {
   apiForGetSkillListForSystemAdmin,
   SkillListRequestForSystemAdmin,
   SkillListResponseForSystemAdmin,
-} from "@/shared/api/tenant/skill/apiForGetSkillListForSystemAdmin";
+} from "@/shared/api/skill/apiForGetSkillListForSystemAdmin";
 
 interface UseApiForGetSkillListOptions {
   request?: Partial<SkillListRequestForSystemAdmin>;

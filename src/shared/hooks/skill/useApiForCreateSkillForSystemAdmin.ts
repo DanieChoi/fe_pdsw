@@ -5,7 +5,7 @@ import {
   apiForCreateSkilForSystemAdmin,
   CreateSkillRequestForSystemAdmin,
   CreateSkillResponseForSystemAdmin,
-} from "@/shared/api/tenant/skill/apiForCreateSkilForSystemAdmin";
+} from "@/shared/api/skill/apiForCreateSkilForSystemAdmin";
 
 // 💡 mutation에 사용할 인자 타입
 interface UseApiForCreateSkillArgs {
