@@ -933,7 +933,7 @@ export default function Footer({
             _message += data['campaign_id'] + ' 캠페인 잔량알림 : ' + tempCampaign.list_alarm_count;
             // } else if (tempCampaign && tempCampaign.dial_mode === 3) {
             //   _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'];
-            addMessageToFooterList(_time, _type, _message);
+            // addMessageToFooterList(_time, _type, _message);
             // 토스트 알림 표시
             if (useAlramPopup === 1) {
               toast.event(_message2, {
@@ -941,13 +941,6 @@ export default function Footer({
               });
             }
           }
-          // if (tempCampaign && (tempCampaign.use_list_alarm === 2 || tempCampaign.use_list_alarm === 4 || tempCampaign.use_list_alarm === 6 || tempCampaign.use_list_alarm === 7)) {
-          //   // tofix ohs 소림 알림 for _message2
-          // }
-          // if (tempCampaign && (tempCampaign.use_list_alarm === 3 || tempCampaign.use_list_alarm === 5 || tempCampaign.use_list_alarm === 6 || tempCampaign.use_list_alarm === 7)) {
-          //   // tofix ohs 관리자에게 전화로 알림 for _message2
-          // }
-
           if (tempCampaign && (tempCampaign.use_list_alarm === 2 || tempCampaign.use_list_alarm === 4 || tempCampaign.use_list_alarm === 6 || tempCampaign.use_list_alarm === 7)) {
             // tofix ohs 소림 알림 for _message2
             const voiceMessage = `캠페인 ${data['campaign_id']} 잔량 부족 알림: ${tempCampaign.list_alarm_count}건`;
@@ -955,8 +948,8 @@ export default function Footer({
           }
           if (tempCampaign && (tempCampaign.use_list_alarm === 3 || tempCampaign.use_list_alarm === 5 || tempCampaign.use_list_alarm === 6 || tempCampaign.use_list_alarm === 7)) {
             // tofix ohs 관리자에게 전화로 알림 for _message2
-            const voiceMessage = `캠페인 ${data['campaign_id']} 잔량 부족 알림: 관리자에게 알림 발송`;
-            speakMessage(voiceMessage);
+            // const voiceMessage = `캠페인 ${data['campaign_id']} 잔량 부족 알림: 관리자에게 알림 발송`;
+            // speakMessage(voiceMessage);
           }
 
         }
