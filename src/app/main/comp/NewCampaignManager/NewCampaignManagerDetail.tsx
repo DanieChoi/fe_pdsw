@@ -129,6 +129,7 @@ export const CampaignManagerInfo: CampaignInfoInsertRequest = {
   announcement_id: 1,
   campaign_level: 0,
   outbound_sequence: '',
+  channel_group_id: 0,
 }
 
 export const CampaignInfo: MainDataResponse = {
@@ -181,7 +182,8 @@ export const CampaignInfo: MainDataResponse = {
   ],
   dial_mode_option: 0,
   user_option: '',
-  campaign_status: 0
+  campaign_status: 0,
+  channel_group_id: 0,
 }
 
 export interface OperationTimeParam {

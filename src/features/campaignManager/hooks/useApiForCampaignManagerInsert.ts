@@ -63,6 +63,7 @@ export interface CampaignInfoInsertRequest {
   announcement_id: number;
   campaign_level: number;
   outbound_sequence: string;
+  channel_group_id: number;
 }
 
 export function useApiForCampaignManagerInsert(
