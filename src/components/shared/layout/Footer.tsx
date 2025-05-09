@@ -312,6 +312,8 @@ export default function Footer({
         session_key: '',
         tenant_id: tenant_id,
       });
+      // 여기에서 직접 setSseInputMessage 호출
+      useCampaignDialStatusStore.getState().setSseInputMessage('campaign:', campaign_id, command);
 
       if (data['start_flag'] === 3) {
         const statusMessage = '캠페인 동작상태 변경, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'] + ' , 동작상태 : ' + _start_flag + ', 완료구분 : ' + _end_flag;
