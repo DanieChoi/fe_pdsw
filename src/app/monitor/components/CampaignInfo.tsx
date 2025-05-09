@@ -21,7 +21,7 @@ interface CampaignInfoProps {
   campaigns: Campaign[];
   onCampaignSelect: (id: string) => void;
   onStatusChange: (status: string) => void;
-  onCallPacingChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onCallPacingChange: (value: string) => void;
   onCallPacingApply: () => void;
   onCampaignEdit: () => void;
   onSkillEdit: () => void;
@@ -107,7 +107,7 @@ const CampaignInfo = ({
               type="number"
               className="w-20"
               value={callPacing}
-              onChange={onCallPacingChange}
+              onChange={(e) => onCallPacingChange(e.target.value)}
               min={0}
               disabled={!(dialMode === 2 || dialMode === 3)}
             />
