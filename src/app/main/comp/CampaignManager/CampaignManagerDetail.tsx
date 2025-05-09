@@ -146,6 +146,7 @@ export const CampaignInfo: MainDataResponse = {
   ],
   dial_mode_option: 0,
   user_option: '',
+  channel_group_id: 0,
 }
 
 export interface OperationTimeParam {
@@ -201,6 +202,7 @@ export interface OutgoingMethodTabParam {
   use_counsel_result: number;
   dial_mode_option: number;
   user_option: string;
+  channel_group_id: number;
 }
 
 export interface AdditionalInfoTabParam {
@@ -367,7 +369,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         use_list_alarm: selectedCampaign.use_list_alarm,
         dial_mode_option: selectedCampaign.dial_mode_option,
         user_option: selectedCampaign.user_option,
-        redial_strategy: selectedCampaign.redial_strategy
+        redial_strategy: selectedCampaign.redial_strategy,
+        channel_group_id: selectedCampaign.channel_group_id
       });
 
       const tempSkill = campaignSkills
@@ -467,7 +470,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         counsel_script_id: 1,
         announcement_id: 1,
         campaign_level: 0,
-        outbound_sequence: ''
+        outbound_sequence: '',
+        channel_group_id: selectedCampaign.channel_group_id
       });
       if (schedules.length > 0) {
         const tempCampaignSchedule = schedules.filter((schedule) => schedule.campaign_id === selectedCampaign?.campaign_id);
@@ -775,7 +779,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         token_id: value.token_id,
         use_counsel_result: value.use_counsel_result,
         dial_mode_option: value.dial_mode_option,
-        user_option: value.user_option
+        user_option: value.user_option,
+        channel_group_id: value.channel_group_id
       });
       setTempCampaignManagerInfo({
         ...tempCampaignManagerInfo,
@@ -793,7 +798,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         token_id: value.token_id,
         use_counsel_result: value.use_counsel_result,
         dial_mode_option: value.dial_mode_option,
-        user_option: value.user_option
+        user_option: value.user_option,
+        channel_group_id: value.channel_group_id
       });
     }
     if (value.onSave) {

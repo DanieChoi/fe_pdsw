@@ -134,6 +134,7 @@ import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { campaignChannel } from '@/lib/broadcastChannel';
 import { CampaignInfo, CampaignManagerInfo } from '@/app/main/comp/CreateCampaignFormPanel/variables/variablesForCreateCampaignForm';
 import { CampaignScheduleInfo } from '@/app/main/comp/CreateCampaignFormPanel/variables/interfacesForCreateCampaign';
+import { ChannelGroupListDataResponse } from "@/features/preferences/hooks/useApiForChannelGroup";
 
 // Import default values for reset function
 
@@ -160,6 +161,7 @@ interface CampainManagerState {
   // 스킬 상태 추가
   skillsLoaded: boolean;
   skillsLoading: boolean;
+  channelGroupList: ChannelGroupListDataResponse[];  
 }
 
 interface CampainManagerActions {
@@ -185,6 +187,7 @@ interface CampainManagerActions {
   // 스킬 액션 추가
   setSkillsLoaded: (loaded: boolean) => void;
   setSkillsLoading: (loading: boolean) => void;
+  setChannelGroupList: (channelGroupList: ChannelGroupListDataResponse[]) => void;
 }
 
 type CampainManagerStore = CampainManagerState & CampainManagerActions;
@@ -211,6 +214,7 @@ export const useCampainManagerStore = create<CampainManagerStore>((set) => ({
   // 스킬 상태 초기화
   skillsLoaded: false,
   skillsLoading: false,
+  channelGroupList: [],
   setSkills: (skills) => {
     set({ 
       skills,
@@ -257,5 +261,6 @@ export const useCampainManagerStore = create<CampainManagerStore>((set) => ({
   // 스킬 액션 구현
   setSkillsLoaded: (loaded) => set({ skillsLoaded: loaded }),
   setSkillsLoading: (loading) => set({ skillsLoading: loading }),
+  setChannelGroupList: (channelGroupList) => set({ channelGroupList }),
   isAlreadyOpend: false
 }));
