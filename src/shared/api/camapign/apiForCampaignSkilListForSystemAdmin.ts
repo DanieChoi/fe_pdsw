@@ -1,11 +1,12 @@
 import { axiosInstance } from "@/lib/axios";
 
 // 📌 캠페인 스킬 항목 타입
-// src/shared/api/campaign/apiForCampaignSkillListForSystemAdmin.ts
 export interface CampaignSkillItemForSystemAdmin {
   skill_id: number;
   tenant_id: number;
-  campaign_id: number[]; // 캠페인 ID 배열
+  name?: string;
+  campaign_id?: number;
+  description?: string;
 }
 
 // 📌 요청 타입
@@ -49,7 +50,7 @@ const defaultRequest: IRequestTypeForCampaignSkillListForSystemAdmin = {
   },
   page: {
     index: 1,
-    items: 100 // 충분한 데이터를 가져오기 위해 더 많은 항목으로 설정
+    items: 10
   }
 };
 
@@ -74,16 +75,10 @@ export const apiForCampaignSkillListForSystemAdmin = async (
     },
   };
 
-  try {
-    const response = await axiosInstance.post<IResponseTypeForCampaignSkillListForSystemAdmin>(
-      "collections/skill-campaign", // 엔드포인트 수정
-      finalRequest
-    );
-    return response.data;
-  } catch (error: any) {
-    if (error.response?.status === 401) {
-      throw new Error('세션이 만료되었습니다. 다시 로그인해주세요.');
-    }
-    throw new Error(error.response?.data?.result_code + '||' + error.response?.data?.result_msg || '데이터 가져오기 실패');
-  }
+  const response = await axiosInstance.post<IResponseTypeForCampaignSkillListForSystemAdmin>(
+    "collections/skill",
+    finalRequest
+  );
+
+  return response.data;
 };
