@@ -13,6 +13,7 @@ import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useMainStore } from "@/store/mainStore";
 import { IRootNodeContextMenu } from "./ContextMenus/ICampaignTabRootNodeContextMenu";
 import { TreeItem } from "../../types/typeForSidebar2";
+import { getStatusIconWithStartFlag } from "@/components/shared/layout/utils/utils";
 
 export function TreeNodeForCampaignTab({
   item,
@@ -91,19 +92,19 @@ export function TreeNodeForCampaignTab({
   // const updatedItem = { ...item, status: currentStatus };
 
   // 캠페인 ID → 상태 맵 생성
-  const campaignStatusMap = useMemo(() => {
-    const map = new Map<string, "started" | "pending" | "stopped">();
-    campaigns?.forEach(campaign => {
-      let status: "started" | "pending" | "stopped" = 'stopped';
-      switch (campaign.campaign_status) {
-        case 1: status = 'started'; break;
-        case 2: status = 'pending'; break;
-        case 3: status = 'stopped'; break;
-      }
-      map.set(campaign.campaign_id.toString(), status);
-    });
-    return map;
-  }, [campaigns]);
+  // const campaignStatusMap = useMemo(() => {
+  //   const map = new Map<string, "started" | "pending" | "stopped">();
+  //   campaigns?.forEach(campaign => {
+  //     let status: "started" | "pending" | "stopped" = 'stopped';
+  //     switch (campaign.campaign_status) {
+  //       case 1: status = 'started'; break;
+  //       case 2: status = 'pending'; break;
+  //       case 3: status = 'stopped'; break;
+  //     }
+  //     map.set(campaign.campaign_id.toString(), status);
+  //   });
+  //   return map;
+  // }, [campaigns]);
 
   // 현재 캠페인의 상태 확인
   const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
@@ -129,7 +130,8 @@ export function TreeNodeForCampaignTab({
   const isExpanded = expandedNodes.has(item.id);
   // ✅ 타입도 같이 체크
   const isSelected = selectedNodeId === item.id && selectedNodeType === item.type;
-  const statusIcon = item.type === "campaign" ? getStatusIcon(currentStatus) : null;
+  // const statusIcon = item.type === "campaign" ? getStatusIcon(currentStatus) : null;
+  const statusIcon = item.type === "campaign" ? getStatusIconWithStartFlag(currentCampaign?.start_flag) : null;
 
   // const handleClick = useCallback(() => {
   //   onNodeSelect(item.id);
