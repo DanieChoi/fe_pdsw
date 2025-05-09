@@ -8,9 +8,10 @@ import { TreeNodeForCampaignTab } from "./TreeNodeForCampaignTab";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { getStatusIcon } from "@/components/shared/layout/utils/utils";
 import { useSidebarWidthStore } from "@/store/useSidebarWidthStore";
-import { useAuthStore } from "@/store";
+import { useAuthStore, useMainStore } from "@/store";
 import { useTreeMenuStore, ViewMode } from "@/store/storeForSsideMenuCampaignTab";
 import { useShallow } from "zustand/react/shallow";
+import { getStatusFromFlags } from "../../api/apiForGetTreeMenuDataForSideMenu";
 
 
 // 트리 노드 선택/확장 상태 관리
@@ -57,14 +58,124 @@ export function TreeMenusForCampaigns() {
   const [lastViewMode, setLastViewMode] = useState<ViewMode | null>(null);
 
   // 인증 스토어에서 테넌트 ID 가져오기
-  const { tenant_id } = useAuthStore();
+  // const { tenant_id } = useAuthStore();
 
   // 트리 데이터 API 호출
-  const { data: treeData, isLoading, error } = useApiForGetTreeMenuDataForSideMenu();
+  // const { data: treeData, isLoading, error } = useApiForGetTreeMenuDataForSideMenu();
 
-  useEffect(() => {
-    console.log("트리 데이터 at 캠페인탭:", treeData);
-  }, []);
+  // useEffect(() => {
+  //   console.log("트리 데이터 at 캠페인탭:", treeData);
+  // }, []);
+
+  // 원본 아이템을 useMemo로 감싸서 의존성 배열 변경 방지
+  // const originalItems = useMemo(() => {
+  //   return treeData?.[0]?.items || [];
+  // }, [treeData]);
+
+  // 직접 스토어에서 데이터를 가져와서 useMemo로 트리 데이터 생성
+  const { tenant_id, session_key } = useAuthStore();
+  const {
+    tenantsLoaded,
+    campaignsLoaded,
+    tenants,
+    campaigns,
+    campaignSkills,
+    campaignSkillsLoaded
+  } = useMainStore();
+
+  // 로딩 상태 확인
+  const isLoading = !tenantsLoaded || !campaignsLoaded || !campaignSkillsLoaded ||
+    tenants.length === 0 || campaigns.length === 0;
+
+  // 데이터 준비 완료 상태
+  const isReady = session_key !== "" &&
+    tenantsLoaded &&
+    campaignsLoaded &&
+    campaignSkillsLoaded &&
+    tenants.length > 0 &&
+    campaigns.length > 0;
+
+  // useMemo로 트리 데이터 생성
+  const [treeData, error] = useMemo(() => {
+    if (!isReady) return [[], null];
+
+    try {
+      // 캠페인 스킬 매핑 생성
+      const campaignSkillsMap: Record<string, any[]> = {};
+
+      // 캠페인 스킬 데이터 가공
+      campaignSkills.forEach((skill) => {
+        const campaignIds = Array.isArray(skill.campaign_id) ? skill.campaign_id : [skill.campaign_id];
+
+        campaignIds.forEach((campaignId: number | undefined) => {
+          if (campaignId === undefined || campaignId === null) return;
+
+          const campaignIdStr = campaignId.toString();
+          if (!campaignSkillsMap[campaignIdStr]) campaignSkillsMap[campaignIdStr] = [];
+
+          const exists = campaignSkillsMap[campaignIdStr].some(s => s.skill_id === skill.skill_id);
+          if (!exists) {
+            campaignSkillsMap[campaignIdStr].push({
+              skill_id: skill.skill_id,
+              tenant_id: skill.tenant_id
+            });
+          }
+        });
+      });
+
+      // 테넌트별 캠페인 그룹화
+      const campaignsByTenant: Record<number, any[]> = {};
+      campaigns.forEach(c => {
+        if (!campaignsByTenant[c.tenant_id]) campaignsByTenant[c.tenant_id] = [];
+        campaignsByTenant[c.tenant_id].push(c);
+      });
+
+      // 트리 아이템 생성
+      const items: TreeItem[] = tenants.map(tenant => ({
+        id: tenant.tenant_id.toString(),
+        label: tenant.tenant_name,
+        type: 'folder',
+        children: campaignsByTenant[tenant.tenant_id]?.map(c => ({
+          id: c.campaign_id.toString(),
+          label: c.campaign_name,
+          type: 'campaign',
+          status: getStatusFromFlags(c.start_flag),
+          direction: 'outbound',
+          tenantId: c.tenant_id.toString(),
+          children: (campaignSkillsMap[c.campaign_id.toString()] || []).map(skill => ({
+            id: `skill-${skill.skill_id}-${c.campaign_id}`,
+            label: `Skill ${skill.skill_id}`,
+            type: 'skill',
+            skillId: skill.skill_id,
+            tenantId: skill.tenant_id.toString(),
+            campaignName: c.campaign_name,
+            visible: false
+          }))
+        })) || []
+      }));
+
+      // 최종 트리 데이터 형태 구성
+      return [[{
+        id: 'campaign',
+        label: '캠페인',
+        items: [{
+          id: 'nexus',
+          label: 'NEXUS',
+          type: 'folder',
+          children: items
+        }]
+      }], null];
+    } catch (err) {
+      console.error("트리 메뉴 데이터 생성 오류:", err);
+      return [[], err];
+    }
+  }, [isReady, tenants, campaigns, campaignSkills]);
+
+  // 원본 아이템 추출
+  // 원본 아이템 추출 시 타입 단언(type assertion) 사용
+  const originalItems = useMemo(() => {
+    return (treeData?.[0]?.items || []) as TreeItem[];
+  }, [treeData]);
 
   // 트리 노드 선택/확장 상태 관리
   const [
@@ -87,13 +198,10 @@ export function TreeMenusForCampaigns() {
     ])
   );
 
-  // 원본 아이템을 useMemo로 감싸서 의존성 배열 변경 방지
-  const originalItems = useMemo(() => {
-    return treeData?.[0]?.items || [];
-  }, [treeData]);
+
 
   console.log("노드 출력을 위한 데이터:", originalItems);
-  
+
 
   // expandNodes 함수와 원본 아이템을 전역으로 사용할 수 있도록 저장
   // useEffect(() => {
@@ -281,14 +389,14 @@ export function TreeMenusForCampaigns() {
 
   const filteredItems = useMemo(() => filterTreeItems(originalItems), [originalItems, filterMode, selectedSkillIds]);
   const sortedItems = useMemo(() => sortTreeItems(filteredItems), [filteredItems, campaignSort, selectedNodeType]);
-  
+
   // 그 외 measureTreeWidth는 sortedItems.length를 의존성으로 그대로 유지
   useEffect(() => {
     if (!isLoading && !error && sortedItems.length > 0) {
       const timer = setTimeout(() => {
         measureTreeWidth();
       }, 500);
-  
+
       return () => clearTimeout(timer);
     }
   }, [isLoading, error, sortedItems.length, campaignSort.type, campaignSort.direction, filterMode, selectedSkillIds.length, viewMode, selectedNodeType]);
