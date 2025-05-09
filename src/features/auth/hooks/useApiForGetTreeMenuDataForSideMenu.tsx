@@ -29,7 +29,7 @@ export function useApiForGetTreeMenuDataForSideMenu(): TreeMenuQueryResult {
   const [isReady, setIsReady] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const previousDataRef = useRef<{
     tenants: typeof tenants;
     campaigns: typeof campaigns;
@@ -112,6 +112,15 @@ export function useApiForGetTreeMenuDataForSideMenu(): TreeMenuQueryResult {
         }]
       }];
     } catch (err) {
+
+      if((err as Error).toString() === 'Error: undefined||undefined' ){
+        // 메세지 출력
+        // tofix ohs 0509
+        // PDS 서버 시스템과 연결할 수 없습니다. 서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.
+        console.error("generateTreeMenuData error: undefined||undefined");
+        return [];
+      }
+
       console.error("generateTreeMenuData error:", err);
       return [];
     }

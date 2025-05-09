@@ -18,6 +18,7 @@ import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkill
 import AuthTimeOutCheck from "@/components/providers/AuthTimeOutCheck";
 import { useOperationStore } from "@/app/main/comp/operation/store/OperationStore";
 import { toast } from 'react-toastify';
+import { useApiForGetCampaignSkills } from '@/shared/hooks/skill/useApiForGetCampaignSkills';
 
 
 const errorMessage = {
@@ -99,6 +100,8 @@ export default function Header() {
     moveTabToSection,
 
   } = useTabStore();
+
+  const { data: campaignSkillsData } = useApiForGetCampaignSkills();
 
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {

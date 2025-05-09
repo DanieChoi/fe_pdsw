@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import { MainDataResponse, TenantListDataResponse } from '../features/auth/types/mainIndex';
 import { campaignChannel } from '@/lib/broadcastChannel';
 import { devtools } from 'zustand/middleware';
+import { CampaignSkillItemForSystemAdmin } from '@/shared/api/camapign/apiForCampaignSkilListForSystemAdmin';
 
 // Define the DataProps type for selectedCampaignRow
 export interface DataProps {
@@ -50,6 +51,12 @@ interface MainState {
   channelMonitorThirdSelect: string;
   campaignProgressInfoViewType: string;
   campaignTotalProgressInfoCampaignId: string;
+
+  // 캠페인 스킬 관련
+  campaignSkills: CampaignSkillItemForSystemAdmin[];
+  campaignSkillsLoaded: boolean;
+  campaignSkillsLoading: boolean;
+
 }
 
 interface MainActions {
@@ -78,6 +85,12 @@ interface MainActions {
   updateCampaignStatus: (campaignId: number, newStatus: number) => void;
   setCampaignTotalProgressInfoCampaignId: (campaignTotalProgressInfoCampaignId: string) => void;
 
+  // 캠페인 스킬 액션 추가
+  setCampaignSkills: (skills: CampaignSkillItemForSystemAdmin[]) => void;
+  setCampaignSkillsLoaded: (loaded: boolean) => void;
+  setCampaignSkillsLoading: (loading: boolean) => void;
+  getCampaignSkillsByCampaignId: (campaignId: number) => CampaignSkillItemForSystemAdmin[];
+
 }
 
 type MainStore = MainState & MainActions;
@@ -85,7 +98,7 @@ type MainStore = MainState & MainActions;
 // Redux 개발자 도구 미들웨어 추가
 export const useMainStore = create<MainStore>()(
   devtools(
-    (set) => ({
+    (set, get) => ({
       campaigns: [],
       tenants: [],
       counselers: [],
@@ -109,6 +122,11 @@ export const useMainStore = create<MainStore>()(
       channelMonitorThirdSelect: '',
       campaignProgressInfoViewType: '',
       campaignTotalProgressInfoCampaignId: '',
+
+      // 캠페인 스킬 관련
+      campaignSkills: [],
+      campaignSkillsLoaded: false,
+      campaignSkillsLoading: false,
 
       setCampaigns: (campaigns) => set({
         campaigns,
@@ -177,8 +195,30 @@ export const useMainStore = create<MainStore>()(
         // ✅ 상태 반영 후 invalidate는 외부에서 별도로 처리
         // 예: setTimeout(() => invalidateTreeMenuData(), 300);
         // 또는 수동 버튼/로직으로 트리 UI 재로딩
-      }      
+      },      
 
+      // 캠페인 스킬 액션
+      setCampaignSkills: (skills) => set({
+        campaignSkills: skills,
+        campaignSkillsLoaded: true,
+        campaignSkillsLoading: false
+      }, false, 'setCampaignSkills'),
+      
+      setCampaignSkillsLoaded: (loaded) => set({ 
+        campaignSkillsLoaded: loaded 
+      }, false, 'setCampaignSkillsLoaded'),
+      
+      setCampaignSkillsLoading: (loading) => set({ 
+        campaignSkillsLoading: loading 
+      }, false, 'setCampaignSkillsLoading'),
+      
+      // 특정 캠페인 ID에 연결된 스킬 목록 반환
+      getCampaignSkillsByCampaignId: (campaignId) => {
+        // 캠페인 ID에 해당하는 스킬 필터링
+        return get().campaignSkills.filter(skill => 
+          skill.campaign_id && skill.campaign_id.includes(campaignId)
+        );
+      },
 
     }),
     {
