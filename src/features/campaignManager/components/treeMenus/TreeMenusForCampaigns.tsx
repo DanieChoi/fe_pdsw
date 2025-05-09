@@ -92,6 +92,9 @@ export function TreeMenusForCampaigns() {
     return treeData?.[0]?.items || [];
   }, [treeData]);
 
+  console.log("노드 출력을 위한 데이터:", originalItems);
+  
+
   // expandNodes 함수와 원본 아이템을 전역으로 사용할 수 있도록 저장
   // useEffect(() => {
   //   window.treeExpandNodes = expandNodes;

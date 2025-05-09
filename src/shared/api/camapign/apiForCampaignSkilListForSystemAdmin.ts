@@ -5,7 +5,7 @@ export interface CampaignSkillItemForSystemAdmin {
   skill_id: number;
   tenant_id: number;
   name?: string;
-  campaign_id?: number;
+  campaign_id?: number | number[]; // Allow for both single ID or array of IDs
   description?: string;
 }
 
@@ -76,7 +76,7 @@ export const apiForCampaignSkillListForSystemAdmin = async (
   };
 
   const response = await axiosInstance.post<IResponseTypeForCampaignSkillListForSystemAdmin>(
-    "collections/skill",
+    "collections/skill-campaign",
     finalRequest
   );
 
