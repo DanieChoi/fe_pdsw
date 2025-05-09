@@ -724,6 +724,10 @@ export default function CampaignDetail() {
         ...tempCampaignDialSpeedInfo
         , dial_speed: value.dial_mode === 2 ? Math.floor(value.progressive_dial_speed) : value.predictive_dial_speed
       });
+      setTempCampaignManagerInfo({
+        ...tempCampaignManagerInfo,
+        dial_speed: tempCampaignManagerInfo.dial_mode === 2 ? Math.floor(value.progressive_dial_speed) : value.predictive_dial_speed
+      });
     }
     if (value.onSave) {
       handleCampaignSave();
