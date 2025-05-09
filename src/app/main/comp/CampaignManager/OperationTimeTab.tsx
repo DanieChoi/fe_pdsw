@@ -132,6 +132,10 @@ const OperationTimeTab: React.FC<Props> = ({
           ]);
         });
       }
+      let _start_flag = campaignInfo.start_flag;
+      if( _start_flag > 3){
+        _start_flag = 2;
+      }
       setTempCampaignSchedule({
         ...tempOperationTimeTab,
         campaign_id: campaignInfo.campaign_id,
@@ -139,7 +143,7 @@ const OperationTimeTab: React.FC<Props> = ({
         end_date: tempCampaignScheduleData.end_date,
         start_time: CampaignScheduleStartTime,
         end_time: CampaignScheduleEndTime,
-        start_flag: campaignInfo.start_flag + "",
+        start_flag: _start_flag + "",
         onSave: false,
       });
     }
@@ -216,7 +220,7 @@ const OperationTimeTab: React.FC<Props> = ({
                   callCampaignMenu === "NewCampaignManager" ||
                   callCampaignMenu === "CampaignGroupManager"
                     ? "2"
-                    : campaignInfo.start_flag + ""
+                    : campaignInfo.start_flag > 3?"2":campaignInfo.start_flag+ ""
                 }
                 onValueChange={(value) => handleSelectChange(value, "startFlag")}
                 disabled={

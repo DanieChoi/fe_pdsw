@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { ChevronUp, ChevronDown, Bell, BellOff, Trash } from "lucide-react";
 import { debounce, isEqual } from 'lodash';
-import { useAuthStore, useMainStore } from '@/store';
+import { useAuthStore, useMainStore, useCampainManagerStore } from '@/store';
 import { Resizable } from "re-resizable";
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useEnvironmentStore } from "@/store/environmentStore";
@@ -45,6 +45,7 @@ export default function Footer({
   const [currentHeight, setCurrentHeight] = useState(footerHeight);
   const { id, tenant_id, role_id } = useAuthStore();
   const { campaigns, setCampaigns, setSseInputMessage } = useMainStore();
+  const { channelGroupList, setChannelGroupList } = useCampainManagerStore();
   const { useAlramPopup } = useEnvironmentStore();
   const [isResizing, setIsResizing] = useState(false);
   const [isHeightToggled, setIsHeightToggled] = useState(false);
@@ -657,6 +658,32 @@ export default function Footer({
 
       addMessageToFooterList(_time, _type, _message);
     }
+    //채널그룹 변경
+    else if (announce === '/pds/channel-group') {
+      // _message = '[채널그룹 설정 ';
+      if (command === 'INSERT') {
+        // _message += `추가] 채널그룹 아이디: [${data['group_id']}], 채널그룹명: [${data['group_name']}]`;
+        setChannelGroupList([
+          ...channelGroupList,
+          { group_id: Number(data['group_id']), group_name: data['group_name'] }
+        ]);
+      } else if (command === 'UPDATE') {
+        // _message += `수정] 채널그룹 아이디: [${data['group_id']}], 채널그룹명: [${data['group_name']}]`;
+        setChannelGroupList(
+          channelGroupList.map(item =>
+            item.group_id === Number(data['group_id'])
+              ? { ...item, group_name: data['group_name'] }
+              : item
+          )
+        );
+      } else if (command === 'DELETE') {
+        // _message += `삭제] 채널그룹 아이디: [${data['group_id']}]`;
+        setChannelGroupList(
+          channelGroupList.filter(data=>data.group_id !== Number(data['group_id']))
+        );
+      }
+      // addMessageToFooterList(_time, _type, _message);channelGroupList
+    }
   }, [campaigns, fetchMain, useAlramPopup, debouncedInvalidate, tenant_id]);
 
 
@@ -892,8 +919,13 @@ export default function Footer({
         const _campaign_name = campaigns.find(data => data.campaign_id === Number(campaign_id))?.campaign_name;
         if (command === 'INSERT') {
           // _message += '수정, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
-          _message += '수정] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + _campaign_name;
-          addMessageToFooterList(_time, _type, _message);
+          if( typeof _campaign_name === 'undefined'){
+            _message += '수정] 캠페인 아이디 : ' + campaign_id;
+            addMessageToFooterList(_time, _type, _message);
+          }else{
+            _message += '수정] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + _campaign_name;
+            addMessageToFooterList(_time, _type, _message);
+          }
         }
         else if (command === 'UPDATE') {
           // _message += '변경, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
