@@ -130,6 +130,7 @@ const CampaignManagerInfo: CampaignInfoInsertRequest = {
   announcement_id: 1,
   campaign_level: 0,
   outbound_sequence: '',
+  channel_group_id: 0,
 }
 
 export interface OperationTimeParam {
@@ -185,6 +186,7 @@ export interface OutgoingMethodTabParam {
   use_counsel_result: number;     //상담결과 등록 여부 - 0 : 미사용, 1 : 사용
   dial_mode_option: number;       //다이얼 모드 옵션 - 발신 모드별 옵션 설정(system preview 에서만 사용)
   user_option: string;            //제한 호수 비율
+  channel_group_id: number;
 }
 
 export interface AdditionalInfoTabParam {
@@ -680,6 +682,7 @@ export default function CampaignDetail() {
         , use_counsel_result: value.use_counsel_result
         , dial_mode_option: value.dial_mode_option
         , user_option: value.user_option
+        , channel_group_id: value.channel_group_id
       });
       setTempCampaignManagerInfo({
         ...tempCampaignManagerInfo
@@ -698,6 +701,7 @@ export default function CampaignDetail() {
         , use_counsel_result: value.use_counsel_result
         , dial_mode_option: value.dial_mode_option
         , user_option: value.user_option
+        , channel_group_id: value.channel_group_id
       });
     }
     if (value.onSave) {
