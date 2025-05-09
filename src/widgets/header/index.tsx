@@ -100,23 +100,6 @@ export default function Header() {
 
   } = useTabStore();
 
-  const {
-    campaignListAlram,     // 알람 다이어로그 출력 여부
-    useAlramPopup,         // 알람 팝업 사용 여부
-    personalCampaignAlertOnly, // 개인 캠페인 알림만 표시
-    environmentData,
-    // setEnvironmentData,
-  } = useEnvironmentStore();
-
-
-  //스킬 마스터 조회.
-  // const { mutate: fetchSkills } = useApiForSkills({
-  //   onSuccess: (data) => {
-  //     setSkills(data.result_data || []);
-  //   },
-  //   retry: 0,
-  // });
-
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data || []);
@@ -203,42 +186,6 @@ export default function Header() {
     router.push('/login');
   }
 
-  // tofix  로그인 안했을때 미리 실행되서 에러 발생
-  // const { mutate: fetchTenants } = useApiForTenants({
-  //   onSuccess: (data) => {
-  //     if (data.result_code === 5) {
-  //       setAlertState({
-  //         ...errorMessage,
-  //         isOpen: true,
-  //         message: '로그인 정보가 없습니다.',
-  //         type: '2',
-  //         onClose: () => goLogin(),
-  //       });
-  //     } else {
-  //       if (tenant_id === 0) {
-  //         setTenants(data.result_data);
-  //       } else {
-  //         setTenants(data.result_data.filter(data => data.tenant_id === tenant_id));
-  //       }
-  //     }
-  //   },
-  //   onError: (error) => {
-  //     // tofix 로그인 에러 발생
-  //     // console.error('Tenants API error:', error);
-  //     // alert("에러 발생 여기!")
-  //     console.log("error 에러 발생 여기 !!!!!! : ", error);
-
-  //     if (error.message.split('||')[0] === '5') {
-  //       setAlertState({
-  //         ...errorMessage,
-  //         isOpen: true,
-  //         message: '로그인 정보가 없습니다.',
-  //         type: '2',
-  //         onClose: () => goLogin(),
-  //       });
-  //     }
-  //   }
-  // });
 
   const { mutate: fetchTenants } = useApiForTenants({
     onSuccess: (data) => {
@@ -283,22 +230,6 @@ export default function Header() {
   }
 
   // useEffect(() => {
-  //   if (tenants.length > 0 && _sessionKey !== "") {
-  //     fetchMain({
-  //       session_key: _sessionKey,
-  //       tenant_id: _tenantId
-  //     });
-  //   }
-  // }, [tenants]);
-
-  // useEffect(() => {
-  //   if (_sessionKey !== "") {
-  //     fetchTenants({
-  //       session_key: _sessionKey,
-  //       tenant_id: _tenantId,
-  //     });
-  //   }
-  // }, [fetchTenants, _sessionKey, _tenantId]);
 
   useEffect(() => {
     if (_sessionKey !== "") {
@@ -328,26 +259,6 @@ export default function Header() {
     }
   }, [fetchTenants, _sessionKey, _tenantId]);
 
-  // 테넌트 데이터가 변경될 때마다 로그 추가
-  // useEffect(() => {
-  //   console.log("Tenants updated in header component:", tenants);
-  // }, [tenants]);
-
-  // const { mutate: fetchMain } = useApiForMain({
-  //   onSuccess: (data) => {
-  //     if (tenant_id === 0) {
-  //       setCampaigns(data.result_data);
-  //       //스킬 마스터 조회.
-  //       const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
-  //       fetchSkills({ tenant_id_array: tempTenantIdArray });
-  //     } else {
-  //       setCampaigns(data.result_data.filter(data => data.tenant_id === tenant_id));
-  //       //스킬 마스터 조회.
-  //       fetchSkills({ tenant_id_array: [tenant_id] });
-  //     }
-  //     setShouldFetchCounselors(true);  // 이 시점에 상담사 목록 조회 활성화
-  //   }
-  // });
 
   useEffect(() => {
     if (tenants.length > 0 && _sessionKey !== "") {
