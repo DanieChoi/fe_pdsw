@@ -1629,6 +1629,14 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
             });
           }
         }
+      } else if (data.result_code != 200){
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: '캠페인 상태 변경 요청이 실패하였습니다. PDS 서버 시스템에 확인하여 주십시오.',
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+        });
       } else {
         setAlertState({
           ...errorMessage,
