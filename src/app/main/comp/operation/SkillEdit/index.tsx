@@ -174,10 +174,8 @@ const SkillEdit = () => {
       .filter(id => /^\d+$/.test(id))  // 순수 숫자 형식만 필터링
       .map(id => parseInt(id, 10));
     
-    // 최대값 찾기
-    // const maxSkillId = numericSkillIds.length > 0 ? Math.max(...numericSkillIds) : 0;
 
-    // 최소값 찾아내기 하자###
+    // 최소값 찾아내기
     const minSkillId = numericSkillIds.find((skillId, idx) => {
       if(skillId !== idx + 1){
         return skillId;

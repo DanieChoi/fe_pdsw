@@ -1128,49 +1128,6 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     });
   };
 
-  
-  // 캠페인 삭제시 이전 인덱스나 다음 인덱스의 캠페인 아이디 구하기
-  const findPreviousOrNextCampaignId = (campaignId : any) => {
-    
-    let returnCampaignId = 0;
-
-    // tenant_id가 동일한 캠페인만 필터링
-    const filteredCampaigns = campaigns.filter(data => data.tenant_id === tempCampaignInfo.tenant_id);
-
-    // 현재 campaign_id의 인덱스 찾기
-    const currentCampaignIndex = filteredCampaigns.findIndex(data => data.campaign_id === Number(campaignId));
-
-    const thisCampaign = filteredCampaigns.filter( data => data.campaign_id === campaignId);
-    if(thisCampaign){
-      setSelectedCampaign(thisCampaign[0]);
-    }
-
-    if (currentCampaignIndex === -1) {
-      // console.log('현재 캠페인이 tenant_id가 같은 목록에 없습니다.');
-      return returnCampaignId;
-    }
-
-    // 이전 및 다음 캠페인 ID 가져오기
-    const previousCampaignId = filteredCampaigns[currentCampaignIndex - 1]?.campaign_id;
-    const nextCampaignId = filteredCampaigns[currentCampaignIndex + 1]?.campaign_id;
-
-    if (previousCampaignId || nextCampaignId) {
-
-      // 현재 campaign_id를 제외한 나머지 campaigns로 업데이트
-      const tempCampaigns = campaigns.filter(data => data.campaign_id !== campaignId);
-      setCampaigns(tempCampaigns);
-
-      if(previousCampaignId){
-        // console.log('이전 campaign_id:: ' + previousCampaignId);
-        returnCampaignId = previousCampaignId;
-      }else if (nextCampaignId) {
-        // console.log('다음 campaign_id:: ' + nextCampaignId);
-        returnCampaignId = nextCampaignId; 
-      }
-    }  
-    return returnCampaignId;
-  }
-
   // 캠페인 삭제 공통함수
   const { commonDeleteCampaign } = useDeleteCampaignHelper();
 
