@@ -450,12 +450,20 @@ const MonitorPage = () => {
   };
   
 
-  const handleCallPacingChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value);
-    if (!isNaN(value) && value >= 0) {
-      setCallPacing(value);
+  const handleCallPacingChange = (value: string) => {
+    // const value = parseInt(e.target.value);
+    if(dialMode === 2 && Number(value) > 500){
+      setCallPacing(500);
+    }else if( dialMode === 2 && Number(value) < 25){
+      setCallPacing(25);
+    }else if( dialMode && Number(value) > 100){
+      setCallPacing(100);
+    }else if( dialMode && Number(value) < 50){ 
+      setCallPacing(50);
+    }else if (!isNaN(Number(value)) && Number(value) >= 0) {
+      setCallPacing(Number(value));
     }
-  }, []);
+  };
 
   const handleCallPacingApply = () => {
     console.log('Applying call pacing:', callPacing);

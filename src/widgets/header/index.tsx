@@ -54,6 +54,12 @@ export default function Header() {
   const popupRef = useRef<Window | null>(null);
 
   const openInNewWindow = () => {
+    // 이미 팝업이 열려 있는 경우 새로 열지 않음
+    if (popupRef.current && !popupRef.current.closed) {
+      console.log('팝업이 이미 열려 있습니다.');
+      popupRef.current.focus(); // 기존 창으로 포커스 이동
+      return;
+    }
     // 현재 화면의 크기를 가져옵니다
     const width = window.screen.width;
     const height = window.screen.height;
