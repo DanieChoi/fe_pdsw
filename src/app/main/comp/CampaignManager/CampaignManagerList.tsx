@@ -94,6 +94,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
   const [filteredCampaigns, setFilteredCampaigns] = useState<CampaignListDataResponse[]>([]);
   const [tempData, setTempData] = useState<Row[]>([]);
   const gridRef = useRef<HTMLDivElement>(null);
+  const isUserClick = useRef(false);
 
 
   // campaignListResponse를 처리하여 filteredCampaigns 업데이트
@@ -149,24 +150,26 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
 
   // 셀 클릭 시 호출 - 클릭한 행의 캠페인 데이터를 선택 상태로 업데이트하고, onRowClick이 있다면 호출
   const handleCellClick = useCallback(({ row }: CellClickArgs<Row>) => {
+    // 사용자 클릭임을 표시
+    isUserClick.current = true;
+    
     const clickedCampaign = filteredCampaigns.find(
       campaign => campaign.campaign_id === row.campaignId
     );
-
+  
     if (clickedCampaign) {
       setSelectedCampaign(clickedCampaign as any);
       setSelectedCampaignRow(row);
       setSelectedNodeId(clickedCampaign.campaign_id.toString());
-
+  
       setCampaignIdForUpdateFromSideMenu(clickedCampaign.campaign_id.toString());
       if (onRowClick) {
         onRowClick(row.campaignId.toString());
       }
     }
-
+  
     setCampaignIdForUpdateFromSideMenu(row.campaignId.toString());    
     setCampaignManagerCampaignId(row.campaignId.toString()); 
-
   }, [filteredCampaigns, setSelectedCampaign, setSelectedCampaignRow, onRowClick]);
 
   // filteredCampaigns를 grid 데이터 형식(Row)로 변환
@@ -232,15 +235,6 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
         setCampaignManagerCampaignId('');
       }
     } 
-    // else if (tempData.length > 0 && filteredCampaigns.length > 0) {
-    //   const selectedCampaign = campaigns.find(c => c.campaign_id === tempData[0].campaignId);
-    //   setSelectedCampaign(selectedCampaign ?? null);
-    //   setSelectedCampaignRow(tempData[0]);
-    //   setCampaignIdForUpdateFromSideMenu(filteredCampaigns[0].campaign_id.toString());
-    //   if (onRowClick) {
-    //     onRowClick(tempData[0].campaignId.toString());
-    //   }
-    // }
 
   }, [tempData, filteredCampaigns, campaignId]);
 
@@ -255,41 +249,47 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
       const targetCampaignId = Number(campaignIdForUpdateFromSideMenu);
       const selectedRow = tempData.find(row => row.campaignId === targetCampaignId);
       const selectedCampaign = campaigns.find(c => c.campaign_id === targetCampaignId);
-
+  
       if (selectedRow && selectedCampaign) {
         setSelectedCampaignRow(selectedRow);
         setSelectedCampaign(selectedCampaign);
         setSelectedNodeId(selectedCampaign.campaign_id.toString());
-
-        // 선택된 행이 어디 있는지 찾기
-        const rowIndex = tempData.findIndex(row => row.campaignId === targetCampaignId);
-
-        // 스크롤 조정 (다음 렌더링 사이클에서 실행하기 위해 setTimeout 사용)
-        if (rowIndex !== -1) {
-          setTimeout(() => {
-            // null 체크 한번 더 (setTimeout 내부에서)
-            if (!gridRef.current) return;
-
-            // 행 높이와 헤더 높이를 고려하여 스크롤 위치 계산
-            const rowHeight = 30; // 행 높이
-            const scrollTop = rowIndex * rowHeight;
-
-            // 그리드 컨테이너의 실제 DOM 엘리먼트 찾기
-            const gridContainer = gridRef.current.querySelector('.rdg');
-            if (gridContainer) {
-              // 뷰포트 중앙에 행이 오도록 스크롤 조정
+  
+        // 사용자 클릭이 아닌 경우에만 스크롤 조정 로직 실행 (사이드메뉴에서 선택한 경우)
+        if (!isUserClick.current) {
+          const rowIndex = tempData.findIndex(row => row.campaignId === targetCampaignId);
+          
+          if (rowIndex !== -1) {
+            setTimeout(() => {
+              if (!gridRef.current) return;
+              
+              const gridContainer = gridRef.current.querySelector('.rdg');
+              if (!gridContainer) return;
+              
+              const rowHeight = 30;
+              const scrollTop = rowIndex * rowHeight;
               const containerHeight = gridContainer.clientHeight;
-              const scrollPosition = scrollTop - (containerHeight / 2) + rowHeight;
-
-              // 스크롤 적용
-              gridContainer.scrollTop = Math.max(0, scrollPosition);
-            }
-          }, 0);
+              
+              // 현재 스크롤 위치와 컨테이너 높이를 이용해 해당 행이 보이는지 확인
+              const currentScrollTop = gridContainer.scrollTop;
+              const currentScrollBottom = currentScrollTop + containerHeight;
+              const rowTopPosition = scrollTop;
+              const rowBottomPosition = scrollTop + rowHeight;
+              
+              // 행이 현재 화면에 보이지 않는 경우에만 스크롤 조정
+              if (rowTopPosition < currentScrollTop || rowBottomPosition > currentScrollBottom) {
+                const scrollPosition = scrollTop - (containerHeight / 2) + rowHeight;
+                gridContainer.scrollTop = Math.max(0, scrollPosition);
+              }
+            }, 0);
+          }
         }
+        
+        // 다음 이벤트를 위해 사용자 클릭 플래그 초기화
+        isUserClick.current = false;
       }
     }
   }, [campaignIdForUpdateFromSideMenu, tempData, campaigns, setSelectedCampaignRow, setSelectedCampaign, selectedNodeId]);
-
   const selectedRowKeys = selectedCampaignRow ? new Set<number>([selectedCampaignRow.campaignId]) : new Set<number>();
 
   return (
@@ -297,14 +297,7 @@ export default function CampaignManagerList({ campaignId, campaignHeaderSearchPa
       {/* campaignIdForUpdateFromSideMenu :{campaignIdForUpdateFromSideMenu} */}
       <div className="flex items-center justify-between mb-2">
         <TitleWrap title="캠페인 목록" totalCount={filteredCampaigns?.length || 0} />
-        {/* {viewMode === 'single' && (
-          <Button 
-            onClick={() => setViewMode('full')} 
-            className="ml-2"
-          >
-            ☰ 전체
-          </Button>
-        )} */}
+
       </div>
       <div className="overflow-x-auto">
         <div className="grid-custom-wrap h-[500px]" ref={gridRef}>

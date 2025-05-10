@@ -51,21 +51,17 @@ export const apiForGetCampaignGroupForSystemAdmin = async (
   request: Partial<IRequestTypeForCampaignGroupForSystemAdmin> = {}
 ): Promise<IResponseTypeForCampaignGroupForSystemAdmin> => {
   const finalRequest: IRequestTypeForCampaignGroupForSystemAdmin = {
-    ...defaultRequest,
-    ...request,
-    filter: {
-      ...defaultRequest.filter,
-      ...request.filter,
-    },
-    sort: {
-      ...defaultRequest.sort,
-      ...request.sort,
-    },
+    filter: request.filter
+      ? { ...defaultRequest.filter, ...request.filter }
+      : undefined,
+    sort: request.sort
+      ? { ...defaultRequest.sort, ...request.sort }
+      : undefined,
     page: {
       ...defaultRequest.page,
       ...request.page,
     },
-  };
+  } as IRequestTypeForCampaignGroupForSystemAdmin;
 
   const response = await axiosInstance.post<IResponseTypeForCampaignGroupForSystemAdmin>(
     "collections/campaign-group",

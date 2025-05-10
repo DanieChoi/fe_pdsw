@@ -41,6 +41,7 @@ export interface AuthApiError {
 
 // 메인 응답 데이터 리스트 타입
 export interface MainDataResponse {
+  // group_id: undefined;
   campaign_status?: any;
   campaign_id: number;
   campaign_name: string;

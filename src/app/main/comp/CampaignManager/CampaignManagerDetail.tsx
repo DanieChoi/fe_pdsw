@@ -147,6 +147,7 @@ export const CampaignInfo: MainDataResponse = {
   dial_mode_option: 0,
   user_option: '',
   channel_group_id: 0,
+  // group_id: undefined,
 }
 
 export interface OperationTimeParam {
