@@ -213,23 +213,7 @@ const ChannelGroupSetting = () => {
             fetchChannelGroupList();
         }, 
         onError: (data) => {
-            if (data.message.split('||')[0] === '5') {
-                    setAlertState({
-                    ...errorMessage,
-                    isOpen: true,
-                    message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                    onConfirm: closeAlert,
-                    onCancel: () => { }
-                });
-                Cookies.remove('session_key');
-                setTimeout(() => {
-                router.push('/login');
-                }, 1000);
-            }
-            else if( data.status !== 200 ){
-
-                // ServerErrorCheck('채널 그룹 추가');
-            }
+            ServerErrorCheck('채널 그룹 추가', data.message);
         }
     });
 
@@ -240,23 +224,7 @@ const ChannelGroupSetting = () => {
             fetchChannelGroupList();
         }, 
         onError: (data) => {
-            if (data.message.split('||')[0] === '5') {
-                setAlertState({
-                    ...errorMessage,
-                    isOpen: true,
-                    message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                    onConfirm: closeAlert,
-                    onCancel: () => { }
-                });
-                Cookies.remove('session_key');
-                setTimeout(() => {
-                router.push('/login');
-                }, 1000);
-            }
-            else if( data.status !== 200 ){
-
-                //ServerErrorCheck('채널 그룹 수정');
-            }
+            ServerErrorCheck('채널 그룹 수정', data.message);
         }
     });
 
@@ -269,22 +237,7 @@ const ChannelGroupSetting = () => {
             fetchChannelGroupList();
         }, 
         onError: (data) => {
-            if (data.message.split('||')[0] === '5') {
-                setAlertState({
-                    ...errorMessage,
-                    isOpen: true,
-                    message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                    onConfirm: closeAlert,
-                    onCancel: () => { }
-                });
-                Cookies.remove('session_key');
-                setTimeout(() => {
-                router.push('/login');
-                }, 1000);
-            }else if( data.status !== 200 ){
-
-                //ServerErrorCheck('채널 그룹 삭제');
-            }
+            ServerErrorCheck('채널 그룹 삭제', data.message);
         }
     });
 
@@ -295,22 +248,7 @@ const ChannelGroupSetting = () => {
             
         },
         onError: (data) => {
-            if (data.message.split('||')[0] === '5') {
-            setAlertState({
-                ...errorMessage,
-                isOpen: true,
-                message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                onConfirm: closeAlert,
-                onCancel: () => { }
-                });
-                Cookies.remove('session_key');
-                setTimeout(() => {
-                router.push('/login');
-                }, 1000);
-            }else if( data.status !== 200 ){
-
-                //ServerErrorCheck('캠페인 채널그룹 할당 해제');
-            }
+            ServerErrorCheck('캠페인 채널그룹 할당 해제', data.message);
         }
     });
 
