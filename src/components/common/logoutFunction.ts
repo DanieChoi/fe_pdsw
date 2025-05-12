@@ -25,10 +25,8 @@ const logoutFunction = () => {
       useTabStore.getState().removeSection("row-1", "section-1");
     }
 
-    // 통합모니터창이 열려있다면 popup close
-    // if (popupRef.current && !popupRef.current.closed) {
-    //   popupRef.current.close();
-    // }
+
+    // --- store 초기화 로직 추가하실거 있으시면 추가하시면 됩니다 ---
 
 
     

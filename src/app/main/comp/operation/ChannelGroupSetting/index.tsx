@@ -3,13 +3,14 @@ import DataGrid, { SelectColumn } from "react-data-grid";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useMemo } from 'react';
 import Cookies from 'js-cookie';
-import { useAuthStore, useMainStore } from "@/store";
+import { useAuthStore, useCampainManagerStore, useMainStore } from "@/store";
 import CustomAlert from "@/components/shared/layout/CustomAlert";
 import TitleWrap from "@/components/shared/TitleWrap";
 import { useApiForChannelGroupCreate, useApiForChannelGroupDelete, useApiForChannelGroupList, useApiForChannelGroupUpdate } from "@/features/preferences/hooks/useApiForChannelGroup";
 import { useApiForCampaignManagerUpdate } from "@/features/campaignManager/hooks/useApiForCampaignManagerUpdate";
 import { campaignChannel } from "@/lib/broadcastChannel";
 import { UpdataCampaignInfo } from "@/components/common/common";
+import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 
 
 
@@ -96,6 +97,9 @@ const ChannelGroupSetting = () => {
     // 채널 그룹리스트 선택 행 상태관리
     const [selectedChannelRow, setSelectedChannelRow] = useState<number | null>(null);
 
+    // 캠페인 관리를 위한 store
+    const { setChannelGroupList } = useCampainManagerStore();
+
     
     // 채널 그룹리스트 컬럼
     const channelColumns = [
@@ -148,43 +152,56 @@ const ChannelGroupSetting = () => {
     // 채널 그룹리스트 조회
     const { mutate: fetchChannelGroupList } = useApiForChannelGroupList({
         onSuccess: (data) => {
-            const updatedRows = data.result_data.map((item: any) => ({
-                group_id: item.group_id,
-                group_name: item.group_name,
-                campaign_count: campaigns.filter((campaign) => campaign.channel_group_id === item.group_id).length,
-            }));
-        
-            setChannelGroupRow(updatedRows);
-        
-            // 첫 번째 행 자동 선택
-            if (selectedChannelRow === null && updatedRows.length > 0) {
-                const firstRow = updatedRows[0];
-                setSelectedChannelRow(0); // 첫 번째 행의 인덱스 설정
-                const filteredCampaigns = campaigns
-                    .filter((campaign) => campaign.channel_group_id === firstRow.group_id)
-                    .map((campaign) => ({
-                    campaign_id: campaign.campaign_id,
-                    campaign_name: campaign.campaign_name,
-                    group_name: firstRow.group_name,
-                    }));
-                setChannelCampaignRow(filteredCampaigns);
-                setCampaignCount(filteredCampaigns.length);
+
+            if(data.result_code === 0) {
+
+                const updatedRows = data.result_data.map((item: any) => ({
+                    group_id: item.group_id,
+                    group_name: item.group_name,
+                    campaign_count: campaigns.filter((campaign) => campaign.channel_group_id === item.group_id).length,
+                }));
+            
+                // 변경된 내용 데이터 그리드 반영
+                setChannelGroupRow(updatedRows);
+
+                // 채널 그룹리스트를 캠페인 관리 store에 저장
+                setChannelGroupList(updatedRows);
+
+                // 첫 번째 행 자동 선택
+                if (selectedChannelRow === null && updatedRows.length > 0) {
+                    const firstRow = updatedRows[0];
+                    setSelectedChannelRow(0); // 첫 번째 행의 인덱스 설정
+                    const filteredCampaigns = campaigns
+                        .filter((campaign) => campaign.channel_group_id === firstRow.group_id)
+                        .map((campaign) => ({
+                        campaign_id: campaign.campaign_id,
+                        campaign_name: campaign.campaign_name,
+                        group_name: firstRow.group_name,
+                        }));
+                    setChannelCampaignRow(filteredCampaigns);
+                    setCampaignCount(filteredCampaigns.length);
+                }
+                // 선택된 행이 있을 경우 유지
+                if(selectedChannelRow !== null){
+                    const selectedRow = updatedRows[selectedChannelRow];
+                    const filteredCampaigns = campaigns
+                        .filter((campaign) => campaign.channel_group_id === selectedRow.group_id)
+                        .map((campaign) => ({
+                        campaign_id: campaign.campaign_id,
+                        campaign_name: campaign.campaign_name,
+                        group_name: selectedRow.group_name,
+                        }));
+                    setChannelCampaignRow(filteredCampaigns);
+                    setCampaignCount(filteredCampaigns.length);
+                }
+
+
             }
-            // 선택된 행이 있을 경우 유지
-            if(selectedChannelRow !== null){
-                const selectedRow = updatedRows[selectedChannelRow];
-                const filteredCampaigns = campaigns
-                    .filter((campaign) => campaign.channel_group_id === selectedRow.group_id)
-                    .map((campaign) => ({
-                    campaign_id: campaign.campaign_id,
-                    campaign_name: campaign.campaign_name,
-                    group_name: selectedRow.group_name,
-                    }));
-                setChannelCampaignRow(filteredCampaigns);
-                setCampaignCount(filteredCampaigns.length);
-            }
+            
+            
         }, 
         onError: (data) => {
+
             if (data.message.split('||')[0] === '5') {
                 setAlertState({
                     ...errorMessage,
@@ -197,6 +214,9 @@ const ChannelGroupSetting = () => {
                 setTimeout(() => {
                 router.push('/login');
                 }, 1000);
+            } else if( data.status !== 200 ){
+
+                ServerErrorCheck('채널 그룹 조회');
             }
         }
     });
@@ -220,6 +240,10 @@ const ChannelGroupSetting = () => {
                 router.push('/login');
                 }, 1000);
             }
+            else if( data.status !== 200 ){
+
+                ServerErrorCheck('채널 그룹 추가');
+            }
         }
     });
 
@@ -242,6 +266,10 @@ const ChannelGroupSetting = () => {
                 setTimeout(() => {
                 router.push('/login');
                 }, 1000);
+            }
+            else if( data.status !== 200 ){
+
+                ServerErrorCheck('채널 그룹 수정');
             }
         }
     });
@@ -267,11 +295,15 @@ const ChannelGroupSetting = () => {
                 setTimeout(() => {
                 router.push('/login');
                 }, 1000);
+            }else if( data.status !== 200 ){
+
+                ServerErrorCheck('채널 그룹 삭제');
             }
         }
     });
 
 
+    // 캠페인 채널그룹 할당 해제 (캠페인 마스터 수정)
     const { mutate: fetchCampaignManagerUpdate } = useApiForCampaignManagerUpdate({
         onSuccess: (data,variables) => {
             
@@ -289,6 +321,9 @@ const ChannelGroupSetting = () => {
                 setTimeout(() => {
                 router.push('/login');
                 }, 1000);
+            }else if( data.status !== 200 ){
+
+                ServerErrorCheck('캠페인 채널그룹 할당 해제');
             }
         }
     });
