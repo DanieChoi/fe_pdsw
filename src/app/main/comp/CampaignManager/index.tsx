@@ -123,7 +123,7 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
 
   //초기화실행.
   useEffect(() => {
-    if (tenants && campaigns) {
+    if (tenants && campaigns && tenants.length > 0 && campaigns.length > 0 ) {
       const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       fetchSchedules({ tenant_id_array: tempTenantIdArray });
     }
