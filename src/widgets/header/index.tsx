@@ -12,12 +12,9 @@ import useApiForFetchCounselorList from '@/features/campaignManager/hooks/useApi
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useApiForGetAuthorizedMenusInfoForMenuRoleId } from "./hooks/useApiForGetAuthorizedMenusInfoForMenuRoleId";
 import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
-import { useEnvironmentStore } from "@/store/environmentStore";
 import { Button } from "@/components/ui/button";
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 import AuthTimeOutCheck from "@/components/providers/AuthTimeOutCheck";
-import { useOperationStore } from "@/app/main/comp/operation/store/OperationStore";
-import { toast } from 'react-toastify';
 import { useApiForGetCampaignSkills } from '@/shared/hooks/skill/useApiForGetCampaignSkills';
 import { useApiForGetCampaignGroups } from "@/shared/hooks/campaign/useApiForGetCampaignGroups";
 
@@ -55,9 +52,14 @@ export default function Header() {
 
   const openInNewWindow = () => {
     // 이미 팝업이 열려 있는 경우 새로 열지 않음
-    if (popupRef.current && !popupRef.current.closed) {
-      console.log('팝업이 이미 열려 있습니다.');
-      popupRef.current.focus(); // 기존 창으로 포커스 이동
+    // if (popupRef.current && !popupRef.current.closed) {
+    //   console.log('팝업이 이미 열려 있습니다.');
+    //   popupRef.current.focus(); // 기존 창으로 포커스 이동
+    //   return;
+    // }
+    const isPopupOpen = localStorage.getItem('monitorPopupOpen');
+    if (isPopupOpen === 'true') {
+      // alert('이미 팝업이 열려 있습니다.'); // 또는 무시
       return;
     }
     // 현재 화면의 크기를 가져옵니다
@@ -78,6 +80,16 @@ export default function Header() {
       newWindow.focus();
       // popup 창이 열려있다면 useRef에 연결 (로그아웃시 팝업창 닫히게 하기 위함)
       popupRef.current = newWindow;
+      
+      localStorage.setItem('monitorPopupOpen', 'true'); // 다른 탭도 알 수 있음
+
+      // 팝업이 닫히면 상태 해제
+      const timer = setInterval(() => {
+        if (popupRef.current?.closed) {
+          localStorage.setItem('monitorPopupOpen', 'false');
+          clearInterval(timer);
+        }
+      }, 500);
     }
   };
 
@@ -248,10 +260,10 @@ export default function Header() {
       const store = useMainStore.getState();
 
       // 데이터가 이미 로드되었으면 건너뛰기
-      if (store.tenantsLoaded && store.tenants.length > 0) {
-        console.log("Tenants already loaded, skipping API call");
-        return;
-      }
+      // if (store.tenantsLoaded && store.tenants.length > 0) {
+      //   console.log("Tenants already loaded, skipping API call");
+      //   return;
+      // }
 
       // 로딩 중이면 중복 호출 방지
       if (store.tenantsLoading) {
@@ -277,10 +289,10 @@ export default function Header() {
       const store = useMainStore.getState();
 
       // 데이터가 이미 로드되었으면 건너뛰기
-      if (store.campaignsLoaded && store.campaigns.length > 0) {
-        console.log("Campaigns already loaded, skipping API call");
-        return;
-      }
+      // if (store.campaignsLoaded && store.campaigns.length > 0) {
+      //   console.log("Campaigns already loaded, skipping API call");
+      //   return;
+      // }
 
       // 로딩 중이면 중복 호출 방지
       if (store.campaignsLoading) {
