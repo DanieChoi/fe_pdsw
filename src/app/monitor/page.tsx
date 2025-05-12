@@ -280,6 +280,8 @@ const MonitorPage = () => {
   const { mutate: fetchCampaignStatusUpdate } = useApiForCampaignStatusUpdate({
     onSuccess: (data) => {
       if (!(data.result_code === 0 || data.result_code === -13)) {
+        //
+        // -8000 : '캠페인이 상태 변경 중이므로, 캠페인을 시작할 수 없습니다.'
         setAlertState({
           ...errorMessage,
           isOpen: true,
@@ -368,49 +370,47 @@ const MonitorPage = () => {
     }
   });
 
-  const campaignDialStatus = useCampaignDialStatusStore(state => state.campaignDialStatus);
+  // const campaignDialStatus = useCampaignDialStatusStore(state => state.campaignDialStatus);
 
-  useEffect(() => {
-    console.log('📦 상태가 바뀜:', campaignDialStatus);
-  }, [campaignDialStatus]);
+  // useEffect(() => {
+  //   console.log('📦 상태가 바뀜:', campaignDialStatus);
+  // }, [campaignDialStatus]);
 
 
   // 캠페인 관련 핸들러
   const handleStatusChange = async  (newStatus: string) => {
-    await new Promise((r) => setTimeout(r, 0));
-
-    if (typeof window !== 'undefined') {
-      (window as any).zustandStore = useCampaignDialStatusStore.getState().campaignDialStatus;
-      console.log('$$$$$$$$$$$$$$$ ',(window as any).zustandStore);
-    }
     
     const currentStatus = useCampaignDialStatusStore.getState().campaignDialStatus;
     console.log("Hydrated 이후 강제 확인:", currentStatus);
 
-    console.log("얘는 읽냐? campaignDialStatus : ", campaignDialStatus);
-
+    // console.log("얘는 읽냐? campaignDialStatus : ", campaignDialStatus);
     // fetchMain({
     //   session_key: '',
     //   tenant_id: tenant_id,
     // });
-
-    // console.log('#### newStatus : ', newStatus);
-    // console.log('#### campaigns : ', campaigns.filter(data => data.campaign_id.toString() === selectedCampaign.toString())[0]);
-
-
-    // console.log('originStartFlag : ', originStartFlag);
-    // console.log('originEndFlag : ', originEndFlag);
+    debugger
+    if(newStatus !== '시작'){
+      //시작상태에서 멈춤이나 정지로 바꾸기전 해당 캠페인의 상태
+      const isCurrentCampaignStatus =  campaigns.filter(data => data.campaign_id === Number(selectedCampaign))[0].start_flag;
+    }
 
     
+    console.log( '타입 일치여부 : ',
+      currentStatus.map((item) => ({
+        campaign_id: item.campaign_id,
+        status: item.status,
+        match: item.campaign_id.toString() === selectedCampaign.toString()
+      }))
+    );
+    
+    // 현재 캠페인의 상태가 정지중이거나 멈춤중일때
+    const existDial = currentStatus.some((item) => 
+                      (item.campaign_id.toString() === selectedCampaign.toString()) && 
+                      (item.status?.toString() === '5' || item.status?.toString() === '6') );
+    
+    console.log('existDial : ', existDial);
 
-    console.log('####### dialStatus : ' ,currentStatus);
-
-
-    // 현재 캠페인의 상태가 발신중(시작)일때
-    // 시작 에서 상태 변경시 ==> 정지중 or 멈춤중 이 상태에서 강제 변경시 confirm 을 조건 
-    const existDial = false;
-    // (selectedCampaign && originStartFlag === 5 && originEndFlag === 1) || (selectedCampaign && originStartFlag === 6 && originEndFlag === 1);
-
+    
     const waitConfirm = () => {
       setCampaignStatus(newStatus as CampaignStatus);
       fetchCampaignStatusUpdate({
@@ -438,7 +438,9 @@ const MonitorPage = () => {
 
       return;
     }
+      
     waitConfirm(); // if문에 걸리지 않는다면 바로 처리*/
+    
   };
 
   const handleCampaignSelect = (campaignId: string) => {
@@ -650,8 +652,7 @@ const MonitorPage = () => {
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
       const dataList = data.result_data;
-      console.log('############dataList : ', dataList);
-
+      
       setCampaignSkillList(dataList);
       if (skills.length === 0) {
         const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
@@ -872,7 +873,7 @@ const MonitorPage = () => {
   // src\app\monitor\page.tsx
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      const { type, campaignId, status } = event.data;
+      const { type, campaignId } = event.data;
      
       if( type === 'skills_info_update' ){
         const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
@@ -881,19 +882,17 @@ const MonitorPage = () => {
         });
       }else if( type === 'channel:' ){
         setChannelMonitorInit(true);
-      }else if( type === 'campaign_status:'){
-        const { sseStatus } = event.data;
+      }else if( type.split(':')[0] === 'campaign_status'){
 
-        console.log('%%%%%% campaignId : ', campaignId, '%%%%%% sseStatus : ', sseStatus)
-
-        useCampaignDialStatusStore.getState().addCampaignDialStatus({campaign_id : campaignId, status : sseStatus});
-        
-        console.log('전달!!!#!!!!!!');
-        if(sseStatus === 2 || sseStatus === 3){
+        console.log('####### 캠페인 상태 변경 이벤트 수신:', type);
+        // 'campaign_status:' + '시작(캠페인 상태)' +':' + (1 ~ 6)
+        // type.split(':')[0 ~ 2] ==> 'campaign_status' , '시작(캠페인 상태)', 1 ~ 6 
+        if(type.split(':')[2] === '2' || type.split(':')[2] === '3'){
           useCampaignDialStatusStore.getState().removeCampaignDialStatus({campaign_id : campaignId});
+        } else {
+          useCampaignDialStatusStore.getState().addCampaignDialStatus({campaign_id : campaignId, status : type.split(':')[2]});
         }
-
-        setCampaignStatus(status);
+        setCampaignStatus(type.split(':')[1]);
       }else if( typeof campaignId != 'undefined'){
         setModifiedCampaign(campaignId);        
       }

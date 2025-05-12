@@ -157,7 +157,7 @@ const ChannelGroupSetting = () => {
             setChannelGroupRow(updatedRows);
         
             // 첫 번째 행 자동 선택
-            if (updatedRows.length > 0) {
+            if (selectedChannelRow === null && updatedRows.length > 0) {
                 const firstRow = updatedRows[0];
                 setSelectedChannelRow(0); // 첫 번째 행의 인덱스 설정
                 const filteredCampaigns = campaigns
@@ -166,6 +166,19 @@ const ChannelGroupSetting = () => {
                     campaign_id: campaign.campaign_id,
                     campaign_name: campaign.campaign_name,
                     group_name: firstRow.group_name,
+                    }));
+                setChannelCampaignRow(filteredCampaigns);
+                setCampaignCount(filteredCampaigns.length);
+            }
+            // 선택된 행이 있을 경우 유지
+            if(selectedChannelRow !== null){
+                const selectedRow = updatedRows[selectedChannelRow];
+                const filteredCampaigns = campaigns
+                    .filter((campaign) => campaign.channel_group_id === selectedRow.group_id)
+                    .map((campaign) => ({
+                    campaign_id: campaign.campaign_id,
+                    campaign_name: campaign.campaign_name,
+                    group_name: selectedRow.group_name,
                     }));
                 setChannelCampaignRow(filteredCampaigns);
                 setCampaignCount(filteredCampaigns.length);
@@ -335,7 +348,6 @@ const ChannelGroupSetting = () => {
         // 채널 그룹이 없는 경우 기본값으로 1 반환
         if (channelGroupRow.length === 0) return "1";
 
-        console.log('채널 그룹  row : ', channelGroupRow);
       
         // 모든 채널 그룹 ID를 숫자로 변환 (숫자가 아닌 경우 필터링)
         const numericGroupIds = channelGroupRow

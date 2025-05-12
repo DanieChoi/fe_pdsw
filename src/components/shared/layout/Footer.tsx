@@ -451,31 +451,22 @@ export default function Footer({
           _end_flag = '완료';
         }
 
+        // 통합모니터링창에 보내기
+        useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:' + _start_flag +':' + data['campaign_status'], campaign_id);
 
+        // 멈춤중이나 정지중일때 store에 add
         if ((data['campaign_status'] === 5 || data['campaign_status'] === 6) && data['campaign_end_flag'] === 1) {
-          // 캠페인 상태가 멈춤중 이며 발신중일때
-
-          // 여기에서 직접 setSseInputMessage 호출
-          useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:', campaign_id, '시작', data['campaign_status']);
-        }
-
-
-        if (data['campaign_status'] === 1 && data['campaign_end_flag'] === 1) {
           // 캠페인 상태가 시작이며 발신중일때
           addCampaignDialStatus({ campaign_id: campaign_id, status: data['campaign_status'] });
+          
         }
         else if ((data['campaign_status'] === 2) && data['campaign_end_flag'] === 1) {
           // 캠페인 상태가 멈춤이나 정지이며, 완료 되었을때 ==> 차후에 campaign_end_flag 맞춰서 변경해야함!!!
           removeCampaignDialStatus({ campaign_id: campaign_id });
 
-          // 여기에서 직접 setSseInputMessage 호출
-          useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:', campaign_id, '멈춤', data['campaign_status']);
-
         } else if ((data['campaign_status'] === 3) && data['campaign_end_flag'] === 1) {
           removeCampaignDialStatus({ campaign_id: campaign_id });
 
-          // 여기에서 직접 setSseInputMessage 호출
-          useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:', campaign_id, '중지', data['campaign_status']);
         }
 
         // 푸터 로그 메시지
