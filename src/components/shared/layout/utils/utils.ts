@@ -144,13 +144,22 @@ export const getStatusIcon = (status?: string) => {
 export const getStatusIconWithStartFlag = (status?: number) => {
   switch (status) {
     case 1:
-      return '/sidebar-menu/tree_play.svg';
+      return '/sidebar-menu/tree_play.svg'; // started
     case 2:
-      return '/sidebar-menu/tree_pause.svg';
+      return '/sidebar-menu/tree_pause.svg'; // pending
     case 3:
-      return '/sidebar-menu/tree_stop.svg';
+      return '/sidebar-menu/tree_stop.svg'; // stopped
+    case 4:
+    case 8:
+    case 9:
+      return '/sidebar-menu/tree_stop_progress.png'; // stoppedProgress
+    case 5:
+      return '/sidebar-menu/tree_pause_progress.png'; // pauseProgress
+    case 6:
+      return '/sidebar-menu/tree_timeset.png'; // timeset
     default:
       return null;
   }
 };
+
 

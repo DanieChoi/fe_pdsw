@@ -306,6 +306,7 @@ export function ContextMenuForCampaignForCampaignTab({
           <span className="ml-1 flex items-center">
             <div className="w-4 h-4 mr-1">
               <Image
+                // src={getStatusIcon(displayStatus) || ''}
                 src={getStatusIcon(displayStatus) || ''}
                 alt={displayStatus}
                 width={16}
