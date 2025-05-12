@@ -129,13 +129,15 @@ export const getStatusIcon = (status?: string) => {
     case 'pending':
       return '/sidebar-menu/tree_pause.svg';
     case 'stopped':
-      return '/sidebar-menu/tree_stop.svg';
+      return '/sidebar-menu/tree_timeattp.png';
     case 'stoppedProgress':
       return '/sidebar-menu/tree_stop_progress.png';
     case 'pauseProgress':
       return '/sidebar-menu/tree_pause_progress.png';
     case 'timeset':
         return '/sidebar-menu/tree_timeset.png';
+    case 'timeattp':
+        return '/sidebar-menu/tree_timeattp.png';
     default:
       return null;
   }
