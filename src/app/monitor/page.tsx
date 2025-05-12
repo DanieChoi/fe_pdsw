@@ -381,27 +381,26 @@ const MonitorPage = () => {
   const handleStatusChange = async  (newStatus: string) => {
     
     const currentStatus = useCampaignDialStatusStore.getState().campaignDialStatus;
-    console.log("Hydrated 이후 강제 확인:", currentStatus);
+    
 
     // console.log("얘는 읽냐? campaignDialStatus : ", campaignDialStatus);
     // fetchMain({
     //   session_key: '',
     //   tenant_id: tenant_id,
     // });
-    debugger
-    if(newStatus !== '시작'){
-      //시작상태에서 멈춤이나 정지로 바꾸기전 해당 캠페인의 상태
-      const isCurrentCampaignStatus =  campaigns.filter(data => data.campaign_id === Number(selectedCampaign))[0].start_flag;
-    }
+    
+
+    const isCurrentCampaignStatus =  campaigns.filter(data => data.campaign_id === Number(selectedCampaign))[0].start_flag;
+    // console.log('######## isCurrentCampaignStatus : ', isCurrentCampaignStatus);
 
     
-    console.log( '타입 일치여부 : ',
-      currentStatus.map((item) => ({
-        campaign_id: item.campaign_id,
-        status: item.status,
-        match: item.campaign_id.toString() === selectedCampaign.toString()
-      }))
-    );
+    // console.log( '타입 일치여부 : ',
+    //   currentStatus.map((item) => ({
+    //     campaign_id: item.campaign_id,
+    //     status: item.status,
+    //     match: item.campaign_id.toString() === selectedCampaign.toString()
+    //   }))
+    // );
     
     // 현재 캠페인의 상태가 정지중이거나 멈춤중일때
     const existDial = currentStatus.some((item) => 
