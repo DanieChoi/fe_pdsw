@@ -1801,6 +1801,31 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       setOfficeEndTime( environmentData.sendingWorkEndHours);
     }
   }, [environmentData]);
+
+  const [localIP, setLocalIP] = useState('');
+  useEffect(() => {
+    const getLocalIP = async () => {
+      const pc = new RTCPeerConnection({
+        iceServers: []
+      });
+
+      pc.createDataChannel('');
+
+      pc.onicecandidate = (event) => {
+        if (!event.candidate) return;
+        const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/;
+        const ipMatch = ipRegex.exec(event.candidate.candidate);
+        if (ipMatch) {
+          setLocalIP(ipMatch[1]);
+          pc.close();
+        }
+      };
+
+      await pc.createOffer().then(offer => pc.setLocalDescription(offer));
+    };
+
+    getLocalIP();
+  }, []);
   
   return (
     <div className='flex flex-col gap-5 w-[58%]'>
