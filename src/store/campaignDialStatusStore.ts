@@ -4,7 +4,7 @@ import { devtools, persist } from 'zustand/middleware';
 
 interface CampaignDialStatus {
   campaign_id: string;
-  status?: number;
+  status?: string;
 }
 
 interface CampaignDialStatusStore {
@@ -12,7 +12,7 @@ interface CampaignDialStatusStore {
   addCampaignDialStatus: (status: CampaignDialStatus) => void; // 특정 캠페인 상태 추가
   removeCampaignDialStatus: (status: CampaignDialStatus) => void; // 특정 캠페인 제거 (완료 후 제거)
   resetCampaignDialStatus: () => void; // 상태 초기화
-  setSseInputMessage: (sseInputMessage:string, camaping_id?:string, status?:string, sseStatus?:number) => void;
+  setSseInputMessage: (sseInputMessage:string, camaping_id?:string, status?:string) => void;
   sseInputMessage?: string; // sseInputMessage 속성 추가
   hasHydrated: boolean; 
   setHasHydrated: (value: boolean) => void; 
@@ -28,13 +28,12 @@ export const useCampaignDialStatusStore = create<CampaignDialStatusStore>()(
         hasHydrated: false,
         setHasHydrated: (value) => set({ hasHydrated: value }),
 
-        setSseInputMessage: (sseInputMessage, camaping_id, status, sseStatus) => {
+        setSseInputMessage: (sseInputMessage, camaping_id, status) => {
             set({ sseInputMessage }); 
             campaignChannel.postMessage({
               type: sseInputMessage,
               campaignId : camaping_id,
-              status : status,
-              sseStatus : sseStatus
+              status : status
         })},
 
         addCampaignDialStatus: (status: CampaignDialStatus) =>
