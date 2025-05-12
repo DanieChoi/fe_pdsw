@@ -1813,6 +1813,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
 
       pc.onicecandidate = (event) => {
         if (!event.candidate) return;
+        console.log('event.candidate : ',event.candidate);
         const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/;
         const ipMatch = ipRegex.exec(event.candidate.candidate);
         if (ipMatch) {
