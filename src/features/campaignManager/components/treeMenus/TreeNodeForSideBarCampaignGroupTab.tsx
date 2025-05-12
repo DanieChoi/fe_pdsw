@@ -447,7 +447,8 @@ export function TreeNodeForSideBarCampaignGroupTab({
         )}
         {renderIcon()}
         <span className={`flex text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
-          {getStatusIconWithStartFlag(node.start_flag) && <Image src={getStatusIconWithStartFlag(node.start_flag) || ''} alt="상태" width={12} height={12} className="mr-1" />}
+          {getStatusIconWithStartFlag(node.start_flag) && <Image src={getStatusIconWithStartFlag(node.start_flag) || ''} alt="상태" 
+          width={12} height={8}  className="mr-1 object-contain" />}
           {node.type === "group" && `[${node.group_id}]`}
           {node.type === "campaign" && `[${node.campaign_id}]`}
           {node.name}
