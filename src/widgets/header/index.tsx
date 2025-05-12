@@ -289,10 +289,10 @@ export default function Header() {
       const store = useMainStore.getState();
 
       // 데이터가 이미 로드되었으면 건너뛰기
-      if (store.campaignsLoaded && store.campaigns.length > 0) {
-        console.log("Campaigns already loaded, skipping API call");
-        return;
-      }
+      // if (store.campaignsLoaded && store.campaigns.length > 0) {
+      //   console.log("Campaigns already loaded, skipping API call");
+      //   return;
+      // }
 
       // 로딩 중이면 중복 호출 방지
       if (store.campaignsLoading) {
