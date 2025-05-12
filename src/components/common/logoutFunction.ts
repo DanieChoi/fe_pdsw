@@ -2,6 +2,7 @@ import Cookies from 'js-cookie';
 import { useTabStore } from "@/store/tabStore";
 import { useAuthStore } from "@/store/authStore"; // Ensure this is the correct path to your authStore
 
+
 const logoutFunction = () => {
     
     
@@ -26,10 +27,9 @@ const logoutFunction = () => {
     }
 
 
+
     // --- store 초기화 로직 추가하실거 있으시면 추가하시면 됩니다 ---
 
-
-    
 
 
 }

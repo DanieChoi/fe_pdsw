@@ -17,6 +17,7 @@ import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkill
 import AuthTimeOutCheck from "@/components/providers/AuthTimeOutCheck";
 import { useApiForGetCampaignSkills } from '@/shared/hooks/skill/useApiForGetCampaignSkills';
 import { useApiForGetCampaignGroups } from "@/shared/hooks/campaign/useApiForGetCampaignGroups";
+import GlobalErrorAlert from "@/components/shared/CommonGlobalError/CommonGlobalError";
 
 
 const errorMessage = {
@@ -566,6 +567,7 @@ export default function Header() {
           alertState.onClose()
         }}
         onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
+        <GlobalErrorAlert />
     </div>
   );
 }

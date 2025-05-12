@@ -201,23 +201,8 @@ const ChannelGroupSetting = () => {
             
         }, 
         onError: (data) => {
-
-            if (data.message.split('||')[0] === '5') {
-                setAlertState({
-                    ...errorMessage,
-                    isOpen: true,
-                    message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                    onConfirm: closeAlert,
-                    onCancel: () => { }
-                });
-                Cookies.remove('session_key');
-                setTimeout(() => {
-                router.push('/login');
-                }, 1000);
-            } else if( data.status !== 200 ){
-
-                ServerErrorCheck('채널 그룹 조회');
-            }
+            debugger
+            ServerErrorCheck('채널 그룹 조회', data.message);
         }
     });
 
@@ -242,7 +227,7 @@ const ChannelGroupSetting = () => {
             }
             else if( data.status !== 200 ){
 
-                ServerErrorCheck('채널 그룹 추가');
+                // ServerErrorCheck('채널 그룹 추가');
             }
         }
     });
@@ -269,7 +254,7 @@ const ChannelGroupSetting = () => {
             }
             else if( data.status !== 200 ){
 
-                ServerErrorCheck('채널 그룹 수정');
+                //ServerErrorCheck('채널 그룹 수정');
             }
         }
     });
@@ -297,7 +282,7 @@ const ChannelGroupSetting = () => {
                 }, 1000);
             }else if( data.status !== 200 ){
 
-                ServerErrorCheck('채널 그룹 삭제');
+                //ServerErrorCheck('채널 그룹 삭제');
             }
         }
     });
@@ -323,7 +308,7 @@ const ChannelGroupSetting = () => {
                 }, 1000);
             }else if( data.status !== 200 ){
 
-                ServerErrorCheck('캠페인 채널그룹 할당 해제');
+                //ServerErrorCheck('캠페인 채널그룹 할당 해제');
             }
         }
     });
@@ -371,7 +356,7 @@ const ChannelGroupSetting = () => {
           if (!newRows.has(id)) {
             setIsEditMode(true);
           }
-          console.log("isEditMode :", isEditMode); // 변경된 데이터 출력
+          
         //   console.log("Changed Rows:", Array.from(changedRows)); // 변경된 행 추적
         
           return updatedRows;
@@ -451,8 +436,9 @@ const ChannelGroupSetting = () => {
             showAlert('해당 채널 그룹에 캠페인이 할당되어 있습니다. \n캠페인 해제 후 삭제해 주세요.');
             return;
         }
-        console.log('삭제 성공 ! : ', groupToDelete);
-        deleteChannelGroupList(groupToDelete);
+        
+        showConfirm(`선택한 [${groupToDelete.group_id}]${groupToDelete.group_name} 채널 그룹을 삭제하시겠습니까?`, () => { deleteChannelGroupList(groupToDelete); });
+        
         
     };
 
@@ -538,13 +524,13 @@ const ChannelGroupSetting = () => {
         if(selectedCampaigns.length > 0) {
 
             selectedCampaigns.forEach((campaignId) => {
-                console.log('선택된 캠페인 ID : ', campaignId);
+                // console.log('선택된 캠페인 ID : ', campaignId);
 
                 const updatedCampaignsInfo = campaigns.filter((campaign) => campaign.campaign_id === campaignId)[0];
-                console.log('updatedCampaignsInfo : ', updatedCampaignsInfo);
+                // console.log('updatedCampaignsInfo : ', updatedCampaignsInfo);
                 
                 const currentCampaignInfo = UpdataCampaignInfo(campaigns, campaignId, updatedCampaignsInfo.start_flag);
-                console.log('currentCampaignInfo is this : ', currentCampaignInfo);
+                // console.log('currentCampaignInfo is this : ', currentCampaignInfo);
 
 
                 const todayTime = getCurrentFormattedTime();
