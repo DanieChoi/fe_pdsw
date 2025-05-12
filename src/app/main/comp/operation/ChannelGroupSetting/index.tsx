@@ -11,6 +11,7 @@ import { useApiForCampaignManagerUpdate } from "@/features/campaignManager/hooks
 import { campaignChannel } from "@/lib/broadcastChannel";
 import { UpdataCampaignInfo } from "@/components/common/common";
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
+import { fa } from "@faker-js/faker";
 
 
 
@@ -201,8 +202,8 @@ const ChannelGroupSetting = () => {
             
         }, 
         onError: (data) => {
-            debugger
-            ServerErrorCheck('채널 그룹 조회', data.message);
+        
+            ServerErrorCheck('채널 그룹 조회', data.message, false);
         }
     });
 
