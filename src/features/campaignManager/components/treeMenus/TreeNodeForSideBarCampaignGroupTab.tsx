@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import IConfirmPopupForMultiUpdateCampaignProgress from "../popups/IConfirmPopupForMultiUpdateCampaignProgress";
 // Portal Provider 사용을 위한 import
 import { usePortal } from "@/features/campaignManager/components/treeMenus/provider/usePortal";
+import { getStatusIconWithStartFlag } from "@/components/shared/layout/utils/utils";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -446,7 +447,7 @@ export function TreeNodeForSideBarCampaignGroupTab({
         )}
         {renderIcon()}
         <span className={`flex text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
-          {getStatusIcon(node.start_flag) && <Image src={getStatusIcon(node.start_flag) || ''} alt="상태" width={12} height={12} className="mr-1" />}
+          {getStatusIconWithStartFlag(node.start_flag) && <Image src={getStatusIconWithStartFlag(node.start_flag) || ''} alt="상태" width={12} height={12} className="mr-1" />}
           {node.type === "group" && `[${node.group_id}]`}
           {node.type === "campaign" && `[${node.campaign_id}]`}
           {node.name}
