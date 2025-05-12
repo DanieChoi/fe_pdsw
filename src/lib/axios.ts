@@ -419,6 +419,11 @@ axiosInstance.interceptors.response.use(
   },
   async (error) => {
 
+    if( error.status === 500 ){      
+      customAlertService.error('PDS 서버 시스템과 연결할 수 없습니다. 서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.', '세션 만료', () => {
+        window.location.href = '/login';
+      });
+    }    
     if (error.response.data.result_code === 5) {
       // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
       customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
@@ -882,7 +887,11 @@ axiosRedisInstance.interceptors.response.use(
   async (error) => {
 
     console.log("axios에서 result code 확인 1111111 : ", error.response.data.result_code);
-    
+    if( error.status === 500 ){      
+      customAlertService.error('PDS 서버 시스템과 연결할 수 없습니다. 서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.', '세션 만료', () => {
+        window.location.href = '/login';
+      });
+    }    
 
     // result_code 5 일 경우 axiosInstance 와 동일하게 로그인 페이지로 이동
     if (error.response.data.result_code === 5) {
