@@ -247,7 +247,7 @@ export default function LoginPage() {
             <div className="space-y-4">
               <div className="relative">
                 {/* 작은 아이콘은 공통된 방식 사용 */}
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10">
                   <Image
                     src="/logo/icon_id.svg"
                     alt="id"
@@ -259,13 +259,7 @@ export default function LoginPage() {
                 <Input
                   type="text"
                   placeholder="아이디를 입력하세요"
-                  className="h-12 pl-10 
-                  border-b-1 
-                  border-black shadow-none 
-                  border-t-transparent border-l-transparent border-r-transparent 
-                  focus:border-b-[0px] 
-                  focus:outline-none focus:ring-0 rounded-none
-                  focus:bg-[#F0F0F0] placeholder-[#aaa] font-16"
+                  className="input-field"
                   value={formData.user_name}
                   onChange={(e) => setFormData(prev => ({ ...prev, user_name: e.target.value }))}
                   disabled={isPending}
@@ -287,13 +281,7 @@ export default function LoginPage() {
                   <Input
                     type={showPassword ? "text" : "password"}
                     placeholder="비밀번호를 입력하세요"
-                    className="h-12 pl-10 
-                    border-b-1 
-                    border-black shadow-none 
-                    border-t-transparent border-l-transparent border-r-transparent 
-                    focus:border-b-[0px] 
-                    focus:outline-none focus:ring-0 rounded-none
-                    focus:bg-[#F0F0F0] placeholder-[#aaa] font-16"
+                    className="input-field"
                     value={formData.password}
                     onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                     disabled={isPending}
