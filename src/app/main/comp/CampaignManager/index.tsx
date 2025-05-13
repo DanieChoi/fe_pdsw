@@ -125,9 +125,17 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   useEffect(() => {
     if (tenants && campaigns && tenants.length > 0 && campaigns.length > 0 ) {
       const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
-      fetchSchedules({ tenant_id_array: tempTenantIdArray });
+      fetchSchedules({ tenant_id_array: tempTenantIdArray });      
     }
   }, [tenants, campaigns]);
+
+  useEffect(() => {
+    // 최초 실행시 캠페인 리스트에서 첫번째 캠페인 선택
+    if(campaignId === undefined ){
+      setCampaignIdForUpdateFromSideMenu(campaigns[0].campaign_id+'');
+    }
+  },[]);
+
 
   useEffect(() => {
     if ( selectedCampaign != null) {

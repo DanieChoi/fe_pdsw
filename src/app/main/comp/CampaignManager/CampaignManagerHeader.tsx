@@ -2,7 +2,7 @@
 
 // components/main/CampaignManager.tsx
 import React, { useEffect, useState } from 'react';
-import { useMainStore, useCampainManagerStore } from '@/store';
+import { useMainStore, useCampainManagerStore, useAuthStore } from '@/store';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
@@ -39,6 +39,9 @@ export default function CampaignManagerHeader({ onSearch,init,setInit }: Props) 
   const [skill, setSkill] = useState('all'); // 스킬
   const [callNumber, setCallNumber] = useState(''); // 발신번호
   const [tempSkills, setTempSkills] = useState<SkillListDataResponse[]>([]);
+
+  const { tenant_id } = useAuthStore();
+  const [isTenantManager, setIsTenantManager] = useState(false);
 
   const onHeaderSearch = () => {
     const param: CampaignHeaderSearch = {
@@ -81,6 +84,15 @@ export default function CampaignManagerHeader({ onSearch,init,setInit }: Props) 
   }, [init]);
 
   useEffect(() => {
+    if (tenant_id !== 0) {
+      setTenantId(tenant_id + ''); // 첫 번째 항목 자동 선택
+      setIsTenantManager(true); // 드롭다운 비활성화
+    } else {
+      setIsTenantManager(false); // 드롭다운 활성화
+    }
+  }, [tenants]);
+
+  useEffect(() => {
     if ( campaignManagerHeaderTenantId != '-1' ) {
       setTenantId(campaignManagerHeaderTenantId);
     }else{
@@ -113,13 +125,14 @@ export default function CampaignManagerHeader({ onSearch,init,setInit }: Props) 
       <div className="flex gap-[40px] gap-use-10 items-center flex-wrap">
         <div className="flex items-center">
           <Label className="pr-[15px] whitespace-nowrap">테넌트</Label>
-          <Select defaultValue="all" value={tenantId} onValueChange={setTenantId}>
+          <Select defaultValue="all" value={tenant_id !== 0 ? tenant_id.toString() :tenantId} onValueChange={setTenantId} disabled={isTenantManager}>
             <SelectTrigger className="w-[180px] w-use-140">
               <SelectValue placeholder="테넌트" className="truncate" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all" className="truncate">전체</SelectItem>
-              {tenants.map(option => (
+              {tenants.map(option => ( 
+
                 <SelectItem
                   key={option.tenant_id}
                   value={option.tenant_id + ''}

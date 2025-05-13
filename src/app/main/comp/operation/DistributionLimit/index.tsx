@@ -17,6 +17,7 @@ import TimePickerComponent from './TimePicker';
 import ContextMenu from './context_menu';
 import OnlyNumberInput from '@/components/shared/OnlyNumberInput';
 import { useOperationStore } from '../store/OperationStore';
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 
 interface Row {
   id: string;
@@ -566,22 +567,7 @@ const DistributionLimit = () => {
       }
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert('캠페인 상담사 목록 조회 실패: ' + error.message);
-        setCampaignAgents([]);
-      }
+      ServerErrorCheck('캠페인별 상담사 목록 조회', error.message);
     }
   });
 
@@ -625,22 +611,7 @@ const DistributionLimit = () => {
       }
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert('상담사 목록 조회 실패: ' + error.message);
-        setRawAgentData([]);
-      }
+      ServerErrorCheck('상담사 리스트 정보 조회', error.message);
     }
   });
 
@@ -670,62 +641,20 @@ const DistributionLimit = () => {
       setIsLoading(false); // 로딩 완료
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert('운영설정 분배호수 제한 설정 리스트 조회 실패: ' + error.message);
-      }
+      ServerErrorCheck('분배호수 제한 설정 조회', error.message);
       setIsLoading(false);
     }
   });
 
   const { mutate: createMaxCallMutation } = useApiForCreateMaxCall({
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert('운영설정 분배호수 제한 설정 저장 실패: ' + error.message);
-      }
+      ServerErrorCheck('분배호수 제한 추가', error.message);
     }
   });
   
   const { mutate: updateMaxCallMutation } = useApiForUpdateMaxCall({
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert('운영설정 분배호수 제한 설정 수정 실패: ' + error.message);
-      }
+      ServerErrorCheck('분배호수 제한 수정', error.message);
     }
   });
   
@@ -734,41 +663,14 @@ const DistributionLimit = () => {
       setInitTime(data.result_data.init_time);
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert('초기화 시간 설정 조회 실패: ' + error.message);
-      }
+      ServerErrorCheck('초기화 시간 설정 조회', error.message);
     }
   });
   
   const { mutate: deleteMaxCallMutation } = useApiForDeleteMaxCall({
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert('삭제 실패: ' + error.message);
-      }
+      ServerErrorCheck('초기화 시간 설정 삭제', error.message);
+    
     }
   });
 
@@ -782,21 +684,7 @@ const DistributionLimit = () => {
       }
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert(`초기화 시간 변경 중 오류가 발생했습니다: ${error.message}`);
-      }
+      ServerErrorCheck('초기화 시간 변경', error.message);
     }
   });
 

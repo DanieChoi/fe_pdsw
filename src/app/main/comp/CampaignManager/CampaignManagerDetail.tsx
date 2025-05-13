@@ -1810,7 +1810,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           title="상세내역"
           buttons={
             menu_role_id === 1 ?
-              selectedCampaign?.start_flag === 3 ?
+              // selectedCampaign?.start_flag === 3 ?
                 [
                   { label: "새 캠페인", onClick: () => handleNewCampaign() },
                   { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
@@ -1820,18 +1820,18 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
                   { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
                   { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
                 ]
-                :
-                [
-                  { label: "새 캠페인", onClick: () => handleNewCampaign() },
-                  { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
-                  { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
-                  { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
-                  { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
-                  { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
-                ]
+                // :
+                // [
+                //   { label: "새 캠페인", onClick: () => handleNewCampaign() },
+                //   { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+                //   { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+                //   { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+                //   { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
+                //   { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
+                // ]
               :
               menu_role_id === 2 ?
-                selectedCampaign?.start_flag === 3 ?
+                // selectedCampaign?.start_flag === 3 ?
                   [
                     { label: "새 캠페인", onClick: () => handleNewCampaign() },
                     { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
@@ -1839,13 +1839,13 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
                     { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
                     { label: "리스트 삭제", onClick: () => handleListManagerDelete(), variant: "customblue" },
                   ]
-                  :
-                  [
-                    { label: "새 캠페인", onClick: () => handleNewCampaign() },
-                    { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
-                    { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
-                    { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
-                  ]
+                  // :
+                  // [
+                  //   { label: "새 캠페인", onClick: () => handleNewCampaign() },
+                  //   { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+                  //   { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+                  //   { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+                  // ]
                 :
                 menu_role_id === 3 ?
                   [
@@ -1854,7 +1854,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
                     { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
                   ]
                   :
-                  selectedCampaign?.start_flag === 3 ?
+                  // selectedCampaign?.start_flag === 3 ?
                     [
                       { label: "새 캠페인", onClick: () => handleNewCampaign() },
                       { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
@@ -1864,15 +1864,15 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
                       { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
                       { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
                     ]
-                    :
-                    [
-                      { label: "새 캠페인", onClick: () => handleNewCampaign() },
-                      { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
-                      { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
-                      { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
-                      { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
-                      { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
-                    ]
+                    // :
+                    // [
+                    //   { label: "새 캠페인", onClick: () => handleNewCampaign() },
+                    //   { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
+                    //   { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
+                    //   { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
+                    //   { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
+                    //   { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
+                    // ]
           }
         />
         <div className="grid grid-cols-3 gap-x-[26px] gap-y-2">

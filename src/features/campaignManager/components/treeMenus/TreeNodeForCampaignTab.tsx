@@ -214,7 +214,8 @@ export function TreeNodeForCampaignTab({
 
   const nodeStyle = clsx(
     "flex items-center hover:bg-[#FFFAEE] cursor-pointer transition-colors duration-150",
-    { "bg-[#FFFAEE]": isSelected, "px-2 py-0.5": !compact, "px-1 py-0.5": compact },
+    // "bg-[#FFFAEE]" ==> 로그아웃시 (tabStroe가 초기화될시 선택 효과 css 제거)
+    { "bg-[#FFFAEE]": campaignIdForUpdateFromSideMenu !== null && isSelected, "px-2 py-0.5": !compact, "px-1 py-0.5": compact },
     item.type === "folder" ? "folder-node" : "campaign-node",
     "tree-item"
   );

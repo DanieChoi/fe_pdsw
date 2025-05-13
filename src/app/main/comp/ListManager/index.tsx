@@ -130,6 +130,7 @@ const ListManager: React.FC = () => {
   const [workFileIndex, setWorkFileIndex ] = useState<number>(-1);
   const [listTotalCount, setListTotalCount] = useState<number>(0);
   const [listSuccessCount,setListSuccessCount] = useState<number>(0);
+  const [deleteDisableYn, setDeleteDisableYn] = useState<boolean>(false);
   // 아이디 생성용 카운터
   const [nextId, setNextId] = useState(1);
   
@@ -176,6 +177,7 @@ const ListManager: React.FC = () => {
         }
         setUploadedFiles([]);
         setSendList([]);
+        setWorkFileIndex(-1);
       }
     }
     , onError: (data) => {  
@@ -235,6 +237,7 @@ const ListManager: React.FC = () => {
         }
         setUploadedFiles([]);
         setSendList([]);
+        setWorkFileIndex(-1);
       }
     }
     , onError: (data) => {
@@ -288,6 +291,7 @@ const ListManager: React.FC = () => {
         }
         setUploadedFiles([]);
         setSendList([]);
+        setWorkFileIndex(-1);
       }
     }
     , onError: (data) => {    
@@ -345,11 +349,21 @@ const ListManager: React.FC = () => {
   // 파일 관련 핸들러
   const handleTargetTypeChange = (value: string) => {
     setTargetType(value as "general" | "blacklist");
-    setListFlag('I');
-    setCallListInsertData({
-      ..._callListInsertData,
-      list_flag: 'I'
-    });
+    const checkYn = campaigns.find(data=>data.campaign_id === _callListInsertData.campaign_id)?.start_flag === 4 
+    || campaigns.find(data=>data.campaign_id === _callListInsertData.campaign_id)?.start_flag === 2;
+    if( checkYn ){
+      setListFlag('A');
+      setCallListInsertData({
+        ..._callListInsertData,
+        list_flag: 'A'
+      });
+    }else{
+      setListFlag('I');
+      setCallListInsertData({
+        ..._callListInsertData,
+        list_flag: 'I'
+      });
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {   
@@ -772,6 +786,14 @@ const ListManager: React.FC = () => {
   const handleSelectChange = (value: string, type: string) => {
     if( type === 'campaignId' ){
       setCampaignId(Number(value));
+      const checkYn = campaigns.find(data=>data.campaign_id === Number(value))?.start_flag === 4 
+      || campaigns.find(data=>data.campaign_id === Number(value))?.start_flag === 2;
+      if( checkYn ){
+        setListFlag('A');
+      }else{
+        setListFlag('I');
+      }
+      setDeleteDisableYn(checkYn);
       setCallListInsertData({
         ..._callListInsertData,
         campaign_id: Number(value)
@@ -819,11 +841,19 @@ const ListManager: React.FC = () => {
   }, [sendList]);
    
   useEffect(() => {
-    if (activeTabId === 7) {
+    if (activeTabId === 7 && campaigns.length > 0) {
       const tempData = openedTabs.filter(tab => tab.id === 7);
       if( tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
         const _campaignId = Number(tempData[0].campaignId);
         setCampaignId(_campaignId);
+        const checkYn = campaigns.find(data=>data.campaign_id === _campaignId)?.start_flag === 4 
+        || campaigns.find(data=>data.campaign_id === _campaignId)?.start_flag === 2;
+        if( checkYn ){
+          setListFlag('A');
+        }else{
+          setListFlag('I');
+        }
+        setDeleteDisableYn(checkYn);
         setCallListInsertData({
           ..._callListInsertData,
           campaign_id: _campaignId
@@ -831,7 +861,7 @@ const ListManager: React.FC = () => {
         setCampaignIdDisabled(true);
       }
     }
-  }, [activeTabId, openedTabs]);
+  }, [activeTabId, openedTabs, campaigns]);
    
   useEffect(() => {
     if (workFileIndex > -1) {
@@ -1003,7 +1033,8 @@ const ListManager: React.FC = () => {
                 {targetType === "general" ? (
                   <div className="flex gap-2">
                     <CustomCheckbox id="deleteData" checked={deleteData}
-                      onCheckedChange={(checked) => handleCheckbox(checked === true, 'deleteData')} />
+                      onCheckedChange={(checked) => handleCheckbox(checked === true, 'deleteData')} 
+                      disabled={deleteDisableYn}/>
                     <Label htmlFor="deleteData" className="text-sm">
                       기존 캠페인 데이터 삭제
                     </Label>
