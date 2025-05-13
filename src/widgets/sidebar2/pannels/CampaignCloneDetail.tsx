@@ -1101,7 +1101,9 @@ export default function CampaignDetail() {
       if( copyCampaignSkills && copyCampaignSkills.skill_id.length > 0){
         setInputSkills(copyCampaignSkills.skill_id.join(','));
       }
-      setInputCampaignId(copyCampaignManagerInfo.campaign_id+'');
+      if( copyCampaignManagerInfo.campaign_id > 0 ){
+        setInputCampaignId(copyCampaignManagerInfo.campaign_id+'');
+      }
     } else {
       setCopyCampaignManagerInfo(CampaignManagerInfo);
       setCopyCampaignInfo(CampaignInfo);
