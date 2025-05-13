@@ -131,6 +131,7 @@ const ListManager: React.FC = () => {
   const [listTotalCount, setListTotalCount] = useState<number>(0);
   const [listSuccessCount,setListSuccessCount] = useState<number>(0);
   const [deleteDisableYn, setDeleteDisableYn] = useState<boolean>(false);
+  const [workTargetDisableYn, setWorkTargetDisableYn ] = useState<boolean>(false);
   // 아이디 생성용 카운터
   const [nextId, setNextId] = useState(1);
   
@@ -368,6 +369,8 @@ const ListManager: React.FC = () => {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {   
     setCampaignIdDisabled(true);
+    setWorkTargetDisableYn(true);
+    setDeleteDisableYn(true);
     const files = e.target.files;
     if (files && files.length > 0) {
       try{
@@ -793,7 +796,9 @@ const ListManager: React.FC = () => {
       }else{
         setListFlag('I');
       }
-      setDeleteDisableYn(checkYn);
+      if( !workTargetDisableYn ){
+        setDeleteDisableYn(checkYn);
+      }
       setCallListInsertData({
         ..._callListInsertData,
         campaign_id: Number(value)
@@ -853,7 +858,9 @@ const ListManager: React.FC = () => {
         }else{
           setListFlag('I');
         }
-        setDeleteDisableYn(checkYn);
+        if( !workTargetDisableYn ){
+          setDeleteDisableYn(checkYn);
+        }
         setCallListInsertData({
           ..._callListInsertData,
           campaign_id: _campaignId
@@ -1019,6 +1026,7 @@ const ListManager: React.FC = () => {
                   defaultValue="general"
                   className="flex gap-8 w-[200px] min-w-[200px]"
                   onValueChange={handleTargetTypeChange}
+                  disabled={workTargetDisableYn}
                 >
                   <div className="flex items-center space-x-2">
                     <CommonRadioItem value="general" id="general" />
@@ -1043,6 +1051,7 @@ const ListManager: React.FC = () => {
                   <Select value={_callListInsertData.list_flag} 
                   onValueChange={(value) => handleSelectChange(value, 'listFlag')}
                   defaultValue="I"
+                  disabled={workTargetDisableYn}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Insert: 기존리스트 삭제 후 등록" />
