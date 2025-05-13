@@ -8,6 +8,7 @@ import Cookies from 'js-cookie';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useApiForSkillList } from '@/features/preferences/hooks/useApiForSkill';
 import { useMainStore } from '@/store';
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 
 type ViewMode = 'campaign' | 'skill';
 
@@ -91,22 +92,8 @@ const SuspendView = () => {
       setSuspendedCampaigns(data.result_data || []);
       setSelectedRows(new Set());
     },
-    onError: (data) => {      
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert(`캠페인 리스트 조회 실패: ${data.message}`);
-      }
+    onError: (error) => {      
+      ServerErrorCheck('서스팬드 캠페인 조회', error.message);
     }
   });
 
@@ -116,22 +103,8 @@ const SuspendView = () => {
       showAlert('삭제가 완료되었습니다.');
       fetchSuspendedCampaignList();
     },
-    onError: (data) => {      
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert(`삭제 실패: ${data.message}`);
-      }
+    onError: (error) => {      
+      ServerErrorCheck('서스팬드 캠페인 삭제', error.message);
     }
   });
 
@@ -141,22 +114,8 @@ const SuspendView = () => {
       setSuspendedSkills(data.result_data || []);
       setSelectedRows(new Set());
     },
-    onError: (data) => {      
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert(`스킬 리스트 조회 실패: ${data.message}`);
-      }
+    onError: (error) => {      
+      ServerErrorCheck('서스팬드 스킬 조회', error.message);
     }
   });
 
@@ -166,22 +125,8 @@ const SuspendView = () => {
       showAlert('삭제가 완료되었습니다.');
       fetchSuspendedSkillList();
     },
-    onError: (data) => {      
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert(`삭제 실패: ${data.message}`);
-      }
+    onError: (error) => {      
+      ServerErrorCheck('서스팬드 스킬 삭제', error.message);
     }
   });
 
@@ -192,23 +137,10 @@ const SuspendView = () => {
       setIsSkillDataLoaded(true);
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert(`스킬 리스트 조회 실패: ${error.message}`);
-      }
+      ServerErrorCheck('스킬 마스터 리스트 조회', error.message);
     }
   });
+  
 
   // 초기 렌더링 시 캠페인 모드에 필요한 API만 호출
   useEffect(() => {

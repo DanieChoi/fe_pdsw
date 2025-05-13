@@ -9,6 +9,7 @@ import { SystemCallBackTimeUpdateRequest } from "@/features/preferences/types/Sy
 import { useApiForCallLimitSettingList } from "@/features/preferences/hooks/useApiForCallLimitSetting";
 import { useMainStore } from "@/store";
 import CustomAlert from "@/components/shared/layout/CustomAlert";
+import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 
 interface SystemCallBackTimeData {
     use_flag : number; // 0: 미사용, 1: 사용
@@ -107,20 +108,8 @@ const SystemCallBackTimeSetting = () => {
                 .map((element) => element.daily_init_time ?? "") // null 값을 빈 문자열로 변환
             );
             
-        }, onError: (data) => {
-          if (data.message.split('||')[0] === '5') {
-            setAlertState({
-              ...errorMessage,
-              isOpen: true,
-              message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-              onConfirm: closeAlert,
-              onCancel: () => { }
-            });
-            Cookies.remove('session_key');
-            setTimeout(() => {
-              router.push('/login');
-            }, 1000);
-          }
+        }, onError: (error) => {
+          ServerErrorCheck('예약콜 제한건수 조회', error.message);
         }
       });
 
@@ -140,23 +129,8 @@ const SystemCallBackTimeSetting = () => {
             // setSystemCallBackTimeData(data.result_data); // 시스템 콜백 리스트 초기화 시간 설정
             // setSelectSystemCallBackTime(data.result_data?.use_flag === 0 ? '미사용' : data.result_data.init_hour || ''); // 시스템 콜백 리스트 초기화 시간 설정
         },
-        onError: (data) => {     
-            if (data.message.split('||')[0] === '5') {
-
-                setAlertState({
-                    ...errorMessage,
-                    isOpen: true,
-                    message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                    onConfirm: closeAlert,
-                    onCancel: () => {}
-                });
-                Cookies.remove('session_key');
-                setTimeout(() => {
-                    router.push('/login');
-                }, 1000);
-            } else {
-                showAlert(`조회 실패: ${data.message}`);
-            }
+        onError: (error) => {     
+            ServerErrorCheck('콜백 리스트 초기화 시간 조회', error.message);
         }
     }); // end of useApiForSystemCallBackTimeSetting
 
@@ -174,22 +148,8 @@ const SystemCallBackTimeSetting = () => {
                 showAlert(`수정 실패: ${data.result_msg}`);
             }
         },
-        onError: (data) => {      
-            if (data.message.split('||')[0] === '5') {
-                setAlertState({
-                    ...errorMessage,
-                    isOpen: true,
-                    message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                    onConfirm: closeAlert,
-                    onCancel: () => {}
-                });
-                Cookies.remove('session_key');
-                setTimeout(() => {
-                    router.push('/login');
-                }, 1000);
-            } else {
-                showAlert(`수정 실패: ${data.message}`);
-            }
+        onError: (error) => {      
+            ServerErrorCheck('콜백 리스트 초기화 시간 수정', error.message);
         }
     }); // end of useApiForSystemCallBackTimeUpdate
 

@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { useEnvironmentStore } from '@/store/environmentStore';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import { useApiForChannelGroupList } from '@/features/preferences/hooks/useApiForChannelGroup';
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 
 interface EquipmentRow {
     device_id: string;
@@ -206,21 +207,7 @@ const SystemPreferences = () => {
             }
         },
         onError: (error) => {      
-            if (error.message && error.message.split('||')[0] === '5') {
-                setAlertState({
-                    ...errorMessage,
-                    isOpen: true,
-                    message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                    onConfirm: closeAlert,
-                    onCancel: () => {}
-                });
-                Cookies.remove('session_key');
-                setTimeout(() => {
-                    router.push('/login');
-                }, 1000);
-            } else {
-                showAlert(`시스템 모니터링 조회 실패: ${error.message || '알 수 없는 오류'}`);
-            }
+            ServerErrorCheck('장비 목록 조회', error.message);
         }
     });
 
@@ -228,21 +215,9 @@ const SystemPreferences = () => {
     const { mutate: fetchChannelList } = useApiForChannelList({
         onSuccess: (data) => {
             setChannelList(data.result_data);
-        },onError: (data) => {      
-            if (data.message.split('||')[0] === '5') {
-              setAlertState({
-                ...errorMessage,
-                isOpen: true,
-                message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                onConfirm: closeAlert,
-                onCancel: () => {}
-              });
-              Cookies.remove('session_key');
-              setTimeout(() => {
-                router.push('/login');
-              }, 1000);
-            }
-          }
+        },onError: (error) => {      
+            ServerErrorCheck('채널 목록 조회', error.message);
+        }
     });
 
     // 채널 정보 수정 api 호출
@@ -253,21 +228,7 @@ const SystemPreferences = () => {
                 tenant_id_array: tenant_id === 0 ?  tenants.map(tenant => tenant.tenant_id) : [tenant_id]
             });
         },onError: (error) => {
-            if (error.message.split('||')[0] === '5') {
-                setAlertState({
-                  ...errorMessage,
-                  isOpen: true,
-                  message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                  onConfirm: closeAlert,
-                  onCancel: () => {}
-                });
-                Cookies.remove('session_key');
-                setTimeout(() => {
-                  router.push('/login');
-                }, 1000);
-            } else {
-                showAlert('채널 정보 저장 중 오류가 발생했습니다: ' + error.message);
-            }
+            ServerErrorCheck('채널 정보 수정', error.message);
         }
     });
     
@@ -279,21 +240,7 @@ const SystemPreferences = () => {
                 tenant_id_array: tenant_id === 0 ?  tenants.map(tenant => tenant.tenant_id) : [tenant_id]
             });
         },onError: (error) => {
-            if (error.message.split('||')[0] === '5') {
-                setAlertState({
-                  ...errorMessage,
-                  isOpen: true,
-                  message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                  onConfirm: closeAlert,
-                  onCancel: () => {}
-                });
-                Cookies.remove('session_key');
-                setTimeout(() => {
-                  router.push('/login');
-                }, 1000);
-            } else {
-                showAlert('장비 정보 저장 중 오류가 발생했습니다: ' + error.message);
-            }
+            ServerErrorCheck('장비 신규 등록', error.message);
         }
     });
 
@@ -306,21 +253,7 @@ const SystemPreferences = () => {
             });
         },
         onError: (error) => {
-            if (error.message.split('||')[0] === '5') {
-                setAlertState({
-                  ...errorMessage,
-                  isOpen: true,
-                  message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                  onConfirm: closeAlert,
-                  onCancel: () => {}
-                });
-                Cookies.remove('session_key');
-                setTimeout(() => {
-                  router.push('/login');
-                }, 1000);
-            } else {
-                showAlert('장비 정보 저장 중 오류가 발생했습니다: ' + error.message);
-            }
+            ServerErrorCheck('장비 수정', error.message);
         }
     });
 
@@ -333,21 +266,7 @@ const SystemPreferences = () => {
             });
         },
         onError: (error) => {
-            if (error.message.split('||')[0] === '5') {
-                setAlertState({
-                  ...errorMessage,
-                  isOpen: true,
-                  message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                  onConfirm: closeAlert,
-                  onCancel: () => {}
-                });
-                Cookies.remove('session_key');
-                setTimeout(() => {
-                  router.push('/login');
-                }, 1000);
-            } else {
-                showAlert('장비 정보 삭제 중 오류가 발생했습니다: ' + error.message);
-            }
+            ServerErrorCheck('장비 삭제', error.message);
         }
     });
 
@@ -360,21 +279,7 @@ const SystemPreferences = () => {
             }
         },
         onError: (error) => {
-            if (error.message.split('||')[0] === '5') {
-                setAlertState({
-                    ...errorMessage,
-                    isOpen: true,
-                    message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                    onConfirm: closeAlert,
-                    onCancel: () => {}
-                });
-                Cookies.remove('session_key');
-                setTimeout(() => {
-                    router.push('/login');
-                }, 1000);
-            } else {
-                showAlert('오류 발생: ' + error.message);
-            }
+            ServerErrorCheck('스케줄 조회', error.message);
         }
     });
 
@@ -389,21 +294,7 @@ const SystemPreferences = () => {
             
         }, 
         onError: (error) => {
-            if (error.message.split('||')[0] === '5') {
-                setAlertState({
-                    ...errorMessage,
-                    isOpen: true,
-                    message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                    onConfirm: closeAlert,
-                    onCancel: () => {}
-                });
-                Cookies.remove('session_key');
-                setTimeout(() => {
-                    router.push('/login');
-                }, 1000);
-            } else {
-                showAlert('오류 발생: ' + error.message);
-            }
+            ServerErrorCheck('채널 그룹 조회', error.message);
         }
     });
 

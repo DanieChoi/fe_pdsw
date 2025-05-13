@@ -17,6 +17,7 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import CustomInputForTime from '@/components/shared/CustomInputForTime';
 import { useApiForSystemCallBackTimeSetting } from '@/features/preferences/hooks/useApiForSystemCallBackTimeSetting';
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 
 interface Row {
   campaign_id: string;
@@ -117,20 +118,8 @@ const CampaignSettings = () => {
     onSuccess: (data) => {
       setLimitSettings(data.result_data);
       setIsNewMode(false); // 데이터 로드 시 신규 모드 해제
-    }, onError: (data) => {
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => { }
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      }
+    }, onError: (error) => {
+      ServerErrorCheck('예약콜 제한건수 조회', error.message);
     }
   });
 
@@ -155,21 +144,7 @@ const CampaignSettings = () => {
       }
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => { }
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert('저장에 실패했습니다: ' + error.message);
-      }
+      ServerErrorCheck('예약콜 제한건수 추가', error.message);
     }
   });
 
@@ -188,21 +163,7 @@ const CampaignSettings = () => {
       }
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => { }
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert('수정에 실패했습니다: ' + error.message);
-      }
+      ServerErrorCheck('예약콜 제한건수 수정', error.message);
     }
   });
 
@@ -215,21 +176,7 @@ const CampaignSettings = () => {
       setIsNewMode(false); // 삭제 후 신규 모드 해제
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => { }
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert('삭제에 실패했습니다: ' + error.message);
-      }
+      ServerErrorCheck('예약콜 제한건수 삭제', error.message);
     }
   });
 
@@ -283,23 +230,8 @@ const CampaignSettings = () => {
         // setSystemCallBackTimeData(data.result_data); // 시스템 콜백 리스트 초기화 시간 설정
         // setSelectSystemCallBackTime(data.result_data?.use_flag === 0 ? '미사용' : data.result_data.init_hour || ''); // 시스템 콜백 리스트 초기화 시간 설정
     },
-    onError: (data) => {     
-        if (data.message.split('||')[0] === '5') {
-
-            setAlertState({
-                ...errorMessage,
-                isOpen: true,
-                message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-                onConfirm: closeAlert,
-                onCancel: () => {}
-            });
-            Cookies.remove('session_key');
-            setTimeout(() => {
-                router.push('/login');
-            }, 1000);
-        } else {
-            showAlert(`조회 실패: ${data.message}`);
-        }
+    onError: (error) => {     
+        ServerErrorCheck('콜백 리스트 초기화 시각 조회', error.message);
     }
   }); // end of useApiForSystemCallBackTimeSetting
 

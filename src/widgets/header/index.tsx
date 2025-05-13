@@ -18,6 +18,8 @@ import AuthTimeOutCheck from "@/components/providers/AuthTimeOutCheck";
 import { useApiForGetCampaignSkills } from '@/shared/hooks/skill/useApiForGetCampaignSkills';
 import { useApiForGetCampaignGroups } from "@/shared/hooks/campaign/useApiForGetCampaignGroups";
 import GlobalErrorAlert from "@/components/shared/CommonGlobalError/CommonGlobalError";
+import logoutFunction from "@/components/common/logoutFunction";
+import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 
 
 const errorMessage = {
@@ -181,24 +183,28 @@ export default function Header() {
   };
 
   const handleLoginOut = () => {
-    // 쿠키 제거
-    Cookies.remove('session_key');
 
-    // AuthStore의 상태를 초기화
-    useAuthStore.getState().clearAuth();
+    // 로그아웃 공통함수로 처리
+    logoutFunction();
 
-    // tabStore의 초기화, 모든 탭 제거
-    useTabStore.getState().closeAllTabs("row-1", "default");
+    // // 쿠키 제거
+    // Cookies.remove('session_key');
 
-    // 만들어진 탭그룹이 있는지 찾기
-    const sectionExists = rows.some(row =>
-      row.sections.find(section => section.id === "section-1")
-    );
-    // 만들어진 탭그룹이 있다면 해당 탭그룹을 전부 초기화하고 section도 초기화
-    if (sectionExists) {
-      useTabStore.getState().closeAllTabs("row-1", "section-1");
-      useTabStore.getState().removeSection("row-1", "section-1");
-    }
+    // // AuthStore의 상태를 초기화
+    // useAuthStore.getState().clearAuth();
+
+    // // tabStore의 초기화, 모든 탭 제거
+    // useTabStore.getState().closeAllTabs("row-1", "default");
+
+    // // 만들어진 탭그룹이 있는지 찾기
+    // const sectionExists = rows.some(row =>
+    //   row.sections.find(section => section.id === "section-1")
+    // );
+    // // 만들어진 탭그룹이 있다면 해당 탭그룹을 전부 초기화하고 section도 초기화
+    // if (sectionExists) {
+    //   useTabStore.getState().closeAllTabs("row-1", "section-1");
+    //   useTabStore.getState().removeSection("row-1", "section-1");
+    // }
 
     // 통합모니터창이 열려있다면 popup close
     if (popupRef.current && !popupRef.current.closed) {
@@ -236,15 +242,7 @@ export default function Header() {
       console.log("error 에러 발생 여기 !!!!!! : ", error);
       useMainStore.getState().setTenantsLoading(false);
 
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: '로그인 정보가 없습니다.',
-          type: '2',
-          onClose: () => goLogin(),
-        });
-      }
+      ServerErrorCheck('테넌트 리스트 조회', error.message);
     }
   });
 
