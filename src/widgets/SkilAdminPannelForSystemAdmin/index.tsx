@@ -11,7 +11,17 @@ import CounselorSkillsForSystemAdmin from "./component/tabs/CounselorSkillsForSy
 import CampaignSkillsForSystemAdmin from "./component/tabs/CampaignSkillsForSystemAdmin";
 
 export default function SkilAdminPannelForSystemAdmin() {
-  const { data, isLoading, error } = useApiForGetTenants();
+  // const { data, isLoading, error } = useApiForGetTenants();
+  const { data, isLoading, error } =
+    useApiForGetTenants({
+      request: {
+        sort: {
+          tenant_id: 1, // 내림차순
+        },
+      },
+    });
+
+
   const { setTenants, setLoading, setError } = useStoreForTenantDataForSystemAdmin();
 
   useEffect(() => {
