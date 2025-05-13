@@ -5,20 +5,14 @@ import { CampaignListResponse, CampaignSkillListResponse, CampaignSkillUpdateReq
 export const fetchSkillList = async (credentials: SkillListCredentials): Promise<SkillListResponse> => {
     const SkillListRequestData = {
         filter: {
-            skill_id: {
-                start: 1,
-                end: 9999999
-            },
+            
             tenant_id: credentials.tenant_id_array
         },
         sort: {
             skill_id: 0,
             tenant_id: 0
         },
-        page: {
-            index: 1,
-            items: 99999
-        }
+
     };
 
     try {
@@ -108,19 +102,11 @@ export const DeleteSkill = async (credentials: DeleteSkillCredentials): Promise<
 // 스킬 할당 캠페인 조회
 export const fetchskillCampaignList = async() : Promise<SkillCampaignListResponse> => {
     const skillCampaignListRequestData = {
-        filter: {
-            skill_id: {
-                "start": 1,
-                "end": 999999
-            }
-        },
+
         sort: {
             skill_id: 0
         },
-        page: {
-            index: 1,
-            items: 10
-        }
+        
     };
 
     try {
@@ -141,19 +127,11 @@ export const fetchskillCampaignList = async() : Promise<SkillCampaignListRespons
 // 스킬 할당 상담사 조회
 export const fetchSkillAgentList = async(): Promise<SkillAgentListResponse> => {
     const skillAgentListRequestData = {
-        filter: {
-            skill_id: {
-                "start": 1,
-                "end": 99999
-            }
-        },
+
         sort: {
             skill_id: 0
         },
-        // page: {
-        //     index: 1,
-        //     items: 10
-        // }
+
     };
 
     try {
@@ -173,19 +151,11 @@ export const fetchSkillAgentList = async(): Promise<SkillAgentListResponse> => {
 // 캠페인 정보 조회 API
 export const fetchCampaignList = async (): Promise<CampaignListResponse> => {
     const campaignListRequestData = {
-        filter: {
-            campaign_id: {
-                start: 1,
-                end: 9999999999,
-            },
-        },
+
         sort: {
             campaign_id: 0,
         },
-        page: {
-            index: 1,
-            items: 9999999999,
-        },
+
     };
 
     try {
@@ -249,19 +219,11 @@ export const fetchCampaignSkillUpdate = async (credentials: CampaignSkillUpdateR
 // 캠페인별스킬 리스트 요청
 export const fetchCampaignSkills = async (): Promise<CampaignSkillListResponse> => {
   const campaignSkillListSearchRequestData = {
-    filter: {      
-      campaign_id: {
-        start: 1,
-        end: 9999999999,
-      },    
-    },
+
     sort: {
       campaign_id: 0,
     },
-    page: {
-      index: 1,
-      items: 9999999999,
-    },
+
   };
 
   try {

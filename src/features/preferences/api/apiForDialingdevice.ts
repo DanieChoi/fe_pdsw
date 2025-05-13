@@ -5,20 +5,14 @@ import { DialingDeviceCreateRequest, SuccesResponse, TenantIdCredentials, Dialin
 export const fetchDialingDeviceList = async (credentials: TenantIdCredentials): Promise<DialingDeviceListResponse> => {
     const dialingDeviceListRequestData = {
         filter: {
-            device_id: {
-                "start": 1,
-                "end": 99,
-            },
+            
             tenant_id: credentials.tenant_id_array
         },
         sort: {
             device_id: 0,
             tenant_id: 0
         },
-        page: {
-            index: 1,
-            items: 10,
-        },
+
     };
 
     try {

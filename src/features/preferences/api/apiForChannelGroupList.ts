@@ -7,19 +7,11 @@ export const fetchChannelGroupList = async (): Promise<ChannelGroupListResponse>
 
     try {
         const channelGroupListRequestData = {
-            filter: {
-                group_id: {
-                    "start": 1,
-                    "end": 99,
-                }
-            },
+
             sort: {
                 group_id: 0
             },
-            // page: {
-            //     index: 1,
-            //     items: 10,
-            // },
+
         };
 
         const { data } = await axiosInstance.post<ChannelGroupListResponse>(
