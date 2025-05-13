@@ -252,7 +252,7 @@ export function TreeNodeForCampaignTab({
       {getNodeIcon()}
       <span className={textStyle}>
         {(isTenantFolder || item.type === "campaign") && ` [${item.id}]`}
-        {item.label} {currentCampaign?.start_flag}
+        {item.label} 
       </span>
     </div>
   );
