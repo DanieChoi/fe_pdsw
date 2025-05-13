@@ -24,10 +24,12 @@ export function useApiForCampaignStatusUpdate(
       // updateCampaignStatus(variables.campaign_id, variables.campaign_status);
 
       // Show success message
-      customAlertService.success(
-        '캠페인 상태가 성공적으로 변경되었습니다!',
-        '캠페인 상태 변경 완료'
-      );
+
+      // 0513 result_code에 따라서 상태변경이 실패할수있기 때문에 주석처리함 
+      // customAlertService.success(
+      //   '캠페인 상태가 성공적으로 변경되었습니다!',
+      //   '캠페인 상태 변경 완료'
+      // );
 
       // Invalidate queries to refresh data
       // queryClient.invalidateQueries({ queryKey: ['treeMenuDataForSideMenu'] });

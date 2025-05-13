@@ -137,22 +137,54 @@ export function ContextMenuForCampaignForCampaignTab({
 
   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
     onSuccess: (data, variables) => {
-      preventCloseRef.current = true;
       
-      customAlertService.success(
-        '캠페인 상태가 성공적으로 변경되었습니다!',
-        '캠페인 상태 변경 완료'
-      );
+      // 등록된 발신리스트가 없을 경우
+      if(data.result_code === -1 && data.reason_code === -7771) {
 
-      // API 성공 후 2가지 방법으로 상태 업데이트:
-      // 1. 스토어의 updateCampaignStatus 직접 호출 (즉시 UI 반영)
-      useMainStore.getState().updateCampaignStatus(
-        Number(variables.campaign_id), 
-        variables.campaign_status
-      );
+        setAlertState({
+          ...alertState,
+          isOpen: true,
+          message: '발신리스트가 존재하지 않습니다. 발신리스트를 등록해주세요.',
+          title: '알림',
+          type: '2',
+          onClose: () => {
+            setAlertState({ ...alertState, isOpen: false });
+            preventCloseRef.current = false;
+          },
+        });
+        return;
+      } else if(data.result_code !== 0) {
+        setAlertState({
+          ...alertState,
+          isOpen: true,
+          message: '캠페인 상태 변경 중 오류가 발생했습니다.',
+          title: '알림',
+          type: '2',
+          onClose: () => {
+            setAlertState({ ...alertState, isOpen: false });
+            preventCloseRef.current = false;
+          },
+        });
+        return;
+      } 
+
+        preventCloseRef.current = true;
       
-      // 2. fetchMain으로 전체 데이터 새로고침 (백엔드와 완전히 동기화)
-      fetchMain({ session_key, tenant_id });
+        customAlertService.success(
+          '캠페인 상태가 성공적으로 변경되었습니다!',
+          '캠페인 상태 변경 완료'
+        );
+
+        // API 성공 후 2가지 방법으로 상태 업데이트:
+        // 1. 스토어의 updateCampaignStatus 직접 호출 (즉시 UI 반영)
+        useMainStore.getState().updateCampaignStatus(
+          Number(variables.campaign_id), 
+          variables.campaign_status
+        );
+        
+        // 2. fetchMain으로 전체 데이터 새로고침 (백엔드와 완전히 동기화)
+        fetchMain({ session_key, tenant_id });
+      
     },
     onError: (error) => {
       toast.error(error.message || "상태 변경 중 오류가 발생했습니다.");
@@ -256,6 +288,11 @@ export function ContextMenuForCampaignForCampaignTab({
     });
   };
 
+  // 
+  useEffect(() => {
+
+  },[]);
+
   const handleCampaignListDelete = (campaignId: any) => {
     if (displayStatus !== "stopped") {
       toast.error("캠페인이 중지 상태일 때만 리스트를 삭제할 수 있습니다.");
@@ -264,7 +301,11 @@ export function ContextMenuForCampaignForCampaignTab({
     deleteCampaignList(campaignId);
   };
 
+  // 여기 수정 해야함 표시
   const handleCampaingProgressUpdate = async (status: CampaignStatus) => {
+    // "started" | "pending" | "stopped"
+    
+
     if (displayStatus === status || updateCampaignStatusMutation.isPending) {
       return;
     }
@@ -287,6 +328,8 @@ export function ContextMenuForCampaignForCampaignTab({
       });
     }
   };
+
+
 
   const handleBlacklistCountCheckClick = () => {
     fetchCampaignBlacklistCount(Number(item.id));

@@ -133,6 +133,9 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     if(campaignId === undefined ){
       if(campaigns.length > 0){
         setCampaignIdForUpdateFromSideMenu(campaigns[0].campaign_id+'');
+      }else{
+        // 새로고침시 campaigns가 비어있는 경우
+        setCampaignIdForUpdateFromSideMenu(0+'');
       }
     }
   },[]);

@@ -22,6 +22,9 @@ const logoutFunction = () => {
     // 세션 체크 store 초기화
     useSessionCheckStore.getState().clearSessionError();
 
+    // 팝업 창 닫는 로직 추가해야함
+    // localStorage.setItem('monitorPopupOpen', 'false');
+    
     // --- store 초기화 로직 추가하실거 있으시면 추가하시면 됩니다 ---
 
 
