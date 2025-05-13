@@ -1,7 +1,7 @@
 "use client";
 // components/main/CampaignManager.tsx
 import React, { useEffect, useState } from 'react';
-import { useMainStore, useCampainManagerStore } from '@/store';
+import { useMainStore, useAuthStore } from '@/store';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { Label } from "@/components/ui/label";
 import { CustomInput } from "@/components/shared/CustomInput";
@@ -30,6 +30,8 @@ export default function CampaignGroupManagerHeader({groupId,onSearch}:Props) {
   const [tenantId, setTenantId] = useState('all'); // 테넌트
   const [campaignGroupName, setCampaignGroupName] = useState(''); // 캠페인이름
   const [readonly, setReadonly] = useState(false);
+  const { tenant_id } = useAuthStore();
+  const [isTenantManager, setIsTenantManager] = useState(false);
 
   const onHeaderSearch = () => {
     const param:CampaignGroupHeaderSearch = {
@@ -39,12 +41,21 @@ export default function CampaignGroupManagerHeader({groupId,onSearch}:Props) {
     onSearch(param);
   }
 
+  useEffect(() => {
+    if (tenant_id !== 0) {
+      setTenantId(tenant_id + ''); // 첫 번째 항목 자동 선택
+      setIsTenantManager(true); // 드롭다운 비활성화
+    } else {
+      setIsTenantManager(false); // 드롭다운 활성화
+    }
+  }, [tenants]);
+
   return (
     <div className="flex title-background justify-between">
       <div className="flex gap-[40px] items-center">
         <div className="flex items-center gap-1r">
             <Label className="pr-[15px]">테넌트</Label>
-            <Select defaultValue='all' value={tenantId} onValueChange={setTenantId}>
+            <Select defaultValue="all" value={tenant_id !== 0 ? tenant_id.toString() :tenantId} onValueChange={setTenantId} disabled={isTenantManager}>
                 <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="테넌트" />
                 </SelectTrigger>
