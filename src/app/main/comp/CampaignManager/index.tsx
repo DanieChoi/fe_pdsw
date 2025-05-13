@@ -115,7 +115,6 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   // 채널 그룹리스트 조회
   const { mutate: fetchChannelGroupList } = useApiForChannelGroupList({
     onSuccess: (data) => {
-        console.log('data---------- ', data);
         setChannelGroupList(data.result_data);
     }
   });
@@ -132,7 +131,9 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   useEffect(() => {
     // 최초 실행시 캠페인 리스트에서 첫번째 캠페인 선택
     if(campaignId === undefined ){
-      setCampaignIdForUpdateFromSideMenu(campaigns[0].campaign_id+'');
+      if(campaigns.length > 0){
+        setCampaignIdForUpdateFromSideMenu(campaigns[0].campaign_id+'');
+      }
     }
   },[]);
 

@@ -12,6 +12,7 @@ import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
 import { CampaignProgressInformationResponseDataType } from '@/features/monitoring/types/monitoringIndex';
 import { useEnvironmentStore } from '@/store/environmentStore';
+import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 
 interface CallItem {
   id: number;
@@ -122,7 +123,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
     isError,
   } = useApiForCampaignProgressInformation({
     onSuccess: (data) => {
-      console.log("캠페인 진행 정보 API 성공:", data);
+      // console.log("캠페인 진행 정보 API 성공:", data);
       
       if (data && data.progressInfoList.length > 0) {
         const tempList = [...data.progressInfoList].sort((a, b) => a.reuseCnt - b.reuseCnt);
@@ -141,6 +142,8 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         setDataList([initData]);
         setSelectedCall(initData);
       }
+    },onError: (error) => {
+      ServerErrorCheck('캠페인 진행 정보 조회', error.message);
     }
   });
 
@@ -154,7 +157,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         campaignId: numericCampaignId
       });
     } else {
-      console.warn("캠페인 ID가 없어 API 호출이 비활성화됩니다.");
+      // console.warn("캠페인 ID가 없어 API 호출이 비활성화됩니다.");
     }
   }, [fetchProgressData, numericCampaignId]);
 
@@ -166,7 +169,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
 
   // 컴포넌트 마운트 시 캠페인 정보 로드 및 데이터 조회
   useEffect(() => {
-    console.log("컴포넌트 마운트, 캠페인 ID:", numericCampaignId);
+    // console.log("컴포넌트 마운트, 캠페인 ID:", numericCampaignId);
     
     if (numericCampaignId) {
       // 캠페인 정보 찾기
@@ -186,7 +189,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         campaignId: numericCampaignId
       });
     } else {
-      console.warn("캠페인 ID가 없어 API 호출이 비활성화됩니다.");
+      // console.warn("캠페인 ID가 없어 API 호출이 비활성화됩니다.");
     }
     if( statisticsUpdateCycle > 0 ){        
       const interval = setInterval(() => {  
