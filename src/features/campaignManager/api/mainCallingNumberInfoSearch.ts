@@ -5,18 +5,8 @@ import { CampaignCredentials, CallingNumberListResponse } from '../types/campaig
 // 캠페인발신번호 리스트 요청
 export const fetchCallingNumbers = async (credentials: CampaignCredentials): Promise<CallingNumberListResponse> => {
   const callingNumberListSearchRequestData = {
-    filter: {      
-      campaign_id: {
-        start: 1,
-        end: 9999999999,
-      },    
-    },
     sort: {
       campaign_id: 0,
-    },
-    page: {
-      index: 1,
-      items: 9999999999,
     },
   };
 

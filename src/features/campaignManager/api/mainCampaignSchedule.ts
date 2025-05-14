@@ -6,19 +6,11 @@ import { SkillListCredentials, CampaignScheDuleListResponse } from '../types/cam
 export const fetchSchedules = async (credentials: SkillListCredentials): Promise<CampaignScheDuleListResponse> => {
   const campaignScheduleInfoSearchRequestData = {
     filter: {      
-      campaign_id: {
-        start: 1,
-        end: 9999999999,
-      },    
       tenant_id: credentials.tenant_id_array
     },
     sort: {
       tenant_id: 0,
       campaign_id: 0,
-    },
-    page: {
-      index: 1,
-      items: 9999999999,
     },
   };
 

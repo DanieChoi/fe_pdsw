@@ -12,10 +12,6 @@ export const fetchCampaignHistory = async (credentials: CampaignHistoryRequest):
     sort: {
       campaign_sequence: 0,
     },
-    page: {
-      index: 1,
-      items: 9999999,
-    },
   };
 
   try {

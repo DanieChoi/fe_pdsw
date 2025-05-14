@@ -14,6 +14,7 @@ import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignMana
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion"; // 꼭 상단 import 추가!
 import { useCampaignDialStatusStore } from "@/store/campaignDialStatusStore";
+import { sseMessageChannel } from '@/lib/broadcastChannel';
 
 
 type FooterDataType = {
@@ -788,6 +789,11 @@ export default function Footer({
                 tempEventData
               );
               setSseData(event.data);
+              
+              sseMessageChannel.postMessage({
+                type: "sseMessage",
+                message: event.data,
+              });
             }
           } catch (error) {
             console.error("SSE JSON parse error: ", error);
@@ -816,6 +822,40 @@ export default function Footer({
       sessionStorage.removeItem("sse_connected");
     };
   }, [id, tenant_id]);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      const { type, message } = event.data;
+     
+      if( type === 'sseMessage' ){
+          console.log( 'sseMessageChannel :: ' + message);
+          const tempEventData = JSON.parse(message);
+          const announce = tempEventData["announce"];
+          const command = tempEventData["command"];
+          const data = tempEventData["data"];
+          const kind = tempEventData["kind"];
+          const campaign_id = tempEventData["campaign_id"];
+          const skill_id = tempEventData["skill_id"];
+          footerDataSet(
+            announce,
+            command,
+            data,
+            kind,
+            campaign_id,
+            tempEventData["skill_id"] || "",
+            tempEventData
+          );
+          setSseData(message);
+      }
+    };
+
+    // todo:
+    sseMessageChannel.addEventListener("message", handleMessage);
+
+    return () => {
+      sseMessageChannel.removeEventListener("message", handleMessage);
+    };
+  }, []);
 
   const handleSSEMessage = (tempEventData: any) => {
     try {

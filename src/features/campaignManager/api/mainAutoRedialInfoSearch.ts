@@ -11,19 +11,11 @@ export const fetchAutoRedials = async (credentials: CampaignCredentials): Promis
       campaign_id: {
         start: startCampaignId,
         end: endCampaignId,
-      },    
-      sequence_number: {
-          start: 0,
-          end: 999
       }
     },
     sort: {
       campaign_id: 0,
       sequence_number: 0
-    },
-    page: {
-      index: 1,
-      items: 9999999999,
     },
   };
 

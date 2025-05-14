@@ -5,19 +5,9 @@ import { MainCredentials, MainResponse } from '../types/mainIndex';
 // 캠페인 리스트 요청
 export const fetchCampaigns = async (credentials: MainCredentials): Promise<MainResponse> => {
   const mainData = {
-    filter: {
-      campaign_id: {
-        start: 1,
-        end: 9999999999,
-      },
-    },
     sort: {
       campaign_id: 0,
-    },
-    page: {
-      index: 1,
-      items: 9999999999,
-    },
+    }
   };
 
   try {
