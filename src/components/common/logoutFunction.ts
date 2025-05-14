@@ -3,6 +3,7 @@ import { useTabStore } from "@/store/tabStore";
 import { useAuthStore } from "@/store/authStore"; // Ensure this is the correct path to your authStore
 import { useOperationStore } from '@/app/main/comp/operation/store/OperationStore';
 import { useSessionCheckStore } from '@/store/sessionCheckStore';
+import { logoutChannel } from '@/lib/broadcastChannel';
 
 
 const logoutFunction = () => {
@@ -27,6 +28,10 @@ const logoutFunction = () => {
     
     // --- store 초기화 로직 추가하실거 있으시면 추가하시면 됩니다 ---
 
+    logoutChannel.postMessage({
+        type: "logout",
+        message: '',
+    });
 
 
 }
