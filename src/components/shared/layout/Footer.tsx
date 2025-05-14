@@ -14,7 +14,9 @@ import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignMana
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion"; // 꼭 상단 import 추가!
 import { useCampaignDialStatusStore } from "@/store/campaignDialStatusStore";
-import { sseMessageChannel } from '@/lib/broadcastChannel';
+import { sseMessageChannel, logoutChannel } from '@/lib/broadcastChannel';
+import logoutFunction from "@/components/common/logoutFunction";
+import { useRouter } from 'next/navigation';
 
 
 type FooterDataType = {
@@ -54,6 +56,7 @@ export default function Footer({
   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
   const [sseData, setSseData] = useState<string>('');
+  const router = useRouter();
 
 
   const lastProcessedMessageRef = useRef<string | null>(null);
@@ -849,11 +852,28 @@ export default function Footer({
       }
     };
 
-    // todo:
     sseMessageChannel.addEventListener("message", handleMessage);
-
     return () => {
       sseMessageChannel.removeEventListener("message", handleMessage);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleLogoutMessage = (event: MessageEvent) => {
+      const { type, message } = event.data;
+     
+      if( type === 'logout' ){
+        
+        // 일반 페이지에서 라우터 사용
+        setTimeout(() => {
+          logoutFunction();
+          router.push('/login');
+        }, 300);
+      }
+    };
+    logoutChannel.addEventListener("message", handleLogoutMessage);
+    return () => {
+      logoutChannel.removeEventListener("message", handleLogoutMessage);
     };
   }, []);
 
