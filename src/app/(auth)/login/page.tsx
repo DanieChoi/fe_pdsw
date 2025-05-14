@@ -153,14 +153,14 @@ export default function LoginPage() {
       router.push('/main');
     },
     onError: (e) => {
-      if (e.message === 'Request failed with status code 500') {
+      if (e.message === 'Request failed with status code 500' && (e as any).config?.url?.indexOf('/agent/loginCubeC') > -1) {
         // interceptor와 중복되는 부분이라 주석처리
-        // setAlertState({
-        //   isOpen: true,
-        //   message: '아이디 또는 암호가 잘못 입력되었습니다.',
-        //   title: '로그인',
-        //   type: '2',
-        // });
+        setAlertState({
+          isOpen: true,
+          message: '아이디 또는 암호가 잘못 입력되었습니다.',
+          title: '로그인',
+          type: '2',
+        });
       } else if (e.message === 'User does not exist.') {
         setAlertState({
           isOpen: true,
