@@ -5,15 +5,8 @@ import { CampaignGroupSearchResponse } from '../types/campaignGroupManagerIndex'
 // 캠페인 그룹 조회 요청
 export const fetchCampaignGroupSearch = async (): Promise<CampaignGroupSearchResponse> => {
     const campaignGroupRequestData = {
-        filter: {
-          group_id: [],
-        },
         sort: {
           group_id: 0,
-        },
-        page: {
-            index: 1,
-            items: 9999999,
         },
     };
 

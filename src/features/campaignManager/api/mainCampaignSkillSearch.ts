@@ -5,18 +5,8 @@ import { CampaignCredentials, CampaignSkillListResponse } from '../types/campaig
 // 캠페인발스킬 리스트 요청
 export const fetchCampaignSkills = async (credentials: CampaignCredentials): Promise<CampaignSkillListResponse> => {
   const campaignSkillListSearchRequestData = {
-    filter: {      
-      campaign_id: {
-        start: 1,
-        end: 9999999999,
-      },    
-    },
     sort: {
       campaign_id: 0,
-    },
-    page: {
-      index: 1,
-      items: 9999999999,
     },
   };
 

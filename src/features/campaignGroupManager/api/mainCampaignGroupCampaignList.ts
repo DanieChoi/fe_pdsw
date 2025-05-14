@@ -5,15 +5,8 @@ import { CampaignGroupCampaignListResponse } from '../types/campaignGroupManager
 // 캠페인 그룹 소속 캠페인 조회 요청
 export const fetchCampaignGroupCampaignList = async (): Promise<CampaignGroupCampaignListResponse> => {
     const campaignGroupCampaignListRequestData = {
-        filter: {
-          group_id: [],
-        },
         sort: {
           campaign_id: 0,
-        },
-        page: {
-            index: 1,
-            items: 9999999,
         },
     };
 

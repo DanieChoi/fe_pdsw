@@ -3,24 +3,14 @@
 
 // src/features/campaignManager/api/apiForCampaignList.ts
 import { axiosInstance } from "@/lib/axios";
-import { CampaignApiError, CampaignListResponse, CampaignRequestData } from "../types/typeForCampaignForSideBar";
+import { CampaignApiError, CampaignListResponse } from "../types/typeForCampaignForSideBar";
 import { customAlertService } from "@/components/shared/layout/utils/CustomAlertService";
 
 
 export const apiForGetCampaignList = async (): Promise<CampaignListResponse> => {
-    const campaignRequestData: CampaignRequestData = {
-        filter: {
-            campaign_id: {
-                start: 1,
-                end: 9999999999,
-            },
-        },
+    const campaignRequestData = {
         sort: {
             campaign_id: 0,
-        },
-        page: {
-            index: 1,
-            items: 9999999999,
         },
     };
 
