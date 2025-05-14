@@ -460,14 +460,10 @@ export default function Footer({
           addCampaignDialStatus({ campaign_id: campaign_id, status: data['campaign_status'] });
           
         }
-        else if ((data['campaign_status'] === 2) && data['campaign_end_flag'] === 1) {
+        else if ((data['campaign_status'] === 2 || data['campaign_status'] === 3) && data['campaign_end_flag'] === 1) {
           // 캠페인 상태가 멈춤이나 정지이며, 완료 되었을때 ==> 차후에 campaign_end_flag 맞춰서 변경해야함!!!
           removeCampaignDialStatus({ campaign_id: campaign_id });
-
-        } else if ((data['campaign_status'] === 3) && data['campaign_end_flag'] === 1) {
-          removeCampaignDialStatus({ campaign_id: campaign_id });
-
-        }
+        } 
 
         // 푸터 로그 메시지
         _message = '[캠페인 동작상태 변경] 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: ' + _end_flag;

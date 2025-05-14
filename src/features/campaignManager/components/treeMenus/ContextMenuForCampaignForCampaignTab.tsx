@@ -29,6 +29,10 @@ import BlackListCountPopup from "@/features/campaignManager/components/popups/Bl
 import CustomAlert, { CustomAlertRequest } from "@/components/shared/layout/CustomAlert";
 import IDialogButtonForCampaingDelete from "./dialog/IDialogButtonForCampaingDelete";
 import { customAlertService } from "@/components/shared/layout/utils/CustomAlertService";
+import { useCampaignDialStatusStore } from "@/store/campaignDialStatusStore";
+import { UpdataCampaignInfo } from "@/components/common/common";
+import { useApiForCampaignManagerUpdate } from "../../hooks/useApiForCampaignManagerUpdate";
+import Cookies from "js-cookie";
 
 
 export type CampaignStatus = "started" | "pending" | "stopped";
@@ -99,7 +103,7 @@ export function ContextMenuForCampaignForCampaignTab({
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
   const { availableCampaignTabCampaignContextMenuIds } = useAvailableMenuStore();
 
-  const { tenant_id, role_id, session_key } = useAuthStore();
+  const { tenant_id, role_id, session_key, id : user_id } = useAuthStore();
   
   // 스토어에서 campaigns 데이터 직접 구독하여 항상 최신 상태 사용
   const campaigns = useMainStore(state => state.campaigns);
@@ -124,7 +128,7 @@ export function ContextMenuForCampaignForCampaignTab({
 
   // 디버깅용 - 상태 변경 시 콘솔 출력
   useEffect(() => {
-    console.log(`Campaign ${item.id} status: ${displayStatus} (from store: ${currentCampaign?.campaign_status})`);
+    // console.log(`Campaign ${item.id} status: ${displayStatus} (from store: ${currentCampaign?.campaign_status})`);
   }, [displayStatus, currentCampaign?.campaign_status, item.id]);
 
   // ====== API HOOKS ======
@@ -168,12 +172,7 @@ export function ContextMenuForCampaignForCampaignTab({
         return;
       } 
 
-        preventCloseRef.current = true;
-      
-        customAlertService.success(
-          '캠페인 상태가 성공적으로 변경되었습니다!',
-          '캠페인 상태 변경 완료'
-        );
+        
 
         // API 성공 후 2가지 방법으로 상태 업데이트:
         // 1. 스토어의 updateCampaignStatus 직접 호출 (즉시 UI 반영)
@@ -301,7 +300,17 @@ export function ContextMenuForCampaignForCampaignTab({
     deleteCampaignList(campaignId);
   };
 
-  // 여기 수정 해야함 표시
+  // 캠페인 마스터 정보 수정하기
+  const { mutate: fetchCampaignManagerUpdate } = useApiForCampaignManagerUpdate({
+      onSuccess: (data,variables) => {
+          
+      },
+      onError: (data) => {
+          //ServerErrorCheck('캠페인 채널그룹 할당 해제', data.message);
+      }
+  });
+
+  // 여기 수정 해야함 표시 #### 
   const handleCampaingProgressUpdate = async (status: CampaignStatus) => {
     // "started" | "pending" | "stopped"
     
@@ -310,23 +319,120 @@ export function ContextMenuForCampaignForCampaignTab({
       return;
     }
 
-    try {
-      preventCloseRef.current = true;
-      // 실제 API 호출
-      await updateCampaignStatusMutation.mutateAsync({
-        campaign_id: Number(item.id),
-        campaign_status: getStatusNumber(status),
-      });
+    const currentDialStatus = useCampaignDialStatusStore.getState().campaignDialStatus;
+
+    // 현재 캠페인의 상태가 정지중이거나 멈춤중일때
+    const existDial = currentDialStatus.some(( dialStatus) => 
+                      (dialStatus.campaign_id.toString() === item.id.toString()) && 
+                      (dialStatus.status?.toString() === '5' || dialStatus.status?.toString() === '6') );
+
+    const waitConfirm = async () => {
+
+      // 상태변경할 캠페인 정보 가져오기
+      const updatedCampaignsInfo = campaigns.filter((campaign) => campaign.campaign_id === parseInt(item.id))[0];
       
-      // API 응답 처리는 onSuccess 콜백에서 처리
-    } catch (error) {
-      console.error('Error changing campaign status:', {
-        campaignId: item.id,
-        campaignName: item.label,
-        attemptedStatus: status,
-        error: error,
+      // 캠페인 마스터 변경시 보낼 데이터정보 가져오기
+      const currentCampaignInfo = UpdataCampaignInfo(campaigns, parseInt(item.id), updatedCampaignsInfo.start_flag);
+
+      // 현재시간 양식 구하기.
+      const getCurrentFormattedTime = () => {
+          const now = new Date();
+      
+          const year = now.getFullYear();
+          const month = String(now.getMonth() + 1).padStart(2, '0'); // 0부터 시작하므로 +1
+          const day = String(now.getDate()).padStart(2, '0');
+      
+          const hours = String(now.getHours()).padStart(2, '0');
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+          const seconds = String(now.getSeconds()).padStart(2, '0');
+      
+          return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+      };
+
+      const todayTime = getCurrentFormattedTime();
+      
+      // 현재 캠페인 발신중이며 멈춤 중이거나 정지 중일때 === existDial
+      if(!existDial){
+
+        // 캠페인 status API 호출
+        await updateCampaignStatusMutation.mutateAsync({
+          campaign_id: Number(item.id),
+          campaign_status: getStatusNumber(status),
+        }).then(() => {
+            console.log('#### then 으로 떨어짐 사이드바 캠페인 상태 변경');
+            preventCloseRef.current = true;
+
+            const reCheckCampaigns = useCampaignDialStatusStore.getState().campaignDialStatus.some(( dialStatus) => 
+                      (dialStatus.campaign_id.toString() === item.id.toString()) && 
+                      (dialStatus.status?.toString() === '5' || item.status?.toString() === '6') );
+            if(!reCheckCampaigns) {
+              customAlertService.success(
+                '캠페인 상태가 성공적으로 변경되었습니다!',
+                '캠페인 상태 변경 완료'
+              );
+            }
+
+        }).catch(error => {
+            console.log('#### 사이드바 캠페인 상태 변경 에러:', error);  
+        });
+      }
+      else {
+        console.log('#### 마스터 수정 으로 떨어짐 사이드바 캠페인 상태 변경');
+        // 캠페인 마스터 API 호출
+        fetchCampaignManagerUpdate(
+            {
+                ...currentCampaignInfo
+                , start_flag : status === 'started' ? 1 : status === 'pending' ? 2 : 3
+                , update_user: user_id
+                , update_ip: Cookies.get('userHost')+''
+                , update_time: todayTime
+            }
+        );
+      }
+
+      
+    };
+
+    if(existDial) {
+      preventCloseRef.current = true;
+
+      setAlertState({
+        ...errorMessage,
+        title: '캠페인 상태 변경',
+        isOpen: true,
+        message:
+          '발신중인 데이터 처리 중 입니다. 기다려 주시길 바랍니다. \n강제로 상태 변경을 하실 경우에는 발신 데이터 처리가 되지 않으며 \n재시작 시에는 중복 발신이 될 수도 있습니다.\n그래도 진행하시겠습니까?',
+        onClose: () => {
+          setAlertState((prev) => ({ ...prev, isOpen: false }));
+          waitConfirm(); // 여기에 캠페인 상태 변경 로직 실행
+        },
+        onCancel: () => {
+          setAlertState((prev) => ({ ...prev, isOpen: false }));
+          // 취소시 아무 일도 안 함
+        },
       });
-    }
+      return;
+    }    
+    
+    await waitConfirm();
+    
+    // try {
+    //   preventCloseRef.current = true;
+    //   // 실제 API 호출
+    //   await updateCampaignStatusMutation.mutateAsync({
+    //     campaign_id: Number(item.id),
+    //     campaign_status: getStatusNumber(status),
+    //   });
+      
+    //   // API 응답 처리는 onSuccess 콜백에서 처리
+    // } catch (error) {
+    //   console.error('Error changing campaign status:', {
+    //     campaignId: item.id,
+    //     campaignName: item.label,
+    //     attemptedStatus: status,
+    //     error: error,
+    //   });
+    // }
   };
 
 

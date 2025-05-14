@@ -21,7 +21,7 @@ import {
 } from "recharts";
 import { useApiForCampaignSkill } from "@/features/campaignManager/hooks/useApiForCampaignSkill";
 import { useApiForSkills } from "@/features/campaignManager/hooks/useApiForSkills";
-import { useCampainManagerStore, useMainStore } from "@/store";
+import { useAuthStore, useCampainManagerStore, useMainStore } from "@/store";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { useEnvironmentStore } from "@/store/environmentStore";
 import { useMultiCampaignProgressQuery } from "./hook/useMultiCampaignProgressQuery";
@@ -60,6 +60,7 @@ const StatusCampaign: React.FC = () => {
   const { campaigns } = useMainStore();
   const { statisticsUpdateCycle } = useEnvironmentStore();
   const [filteredCampaigns, setFilteredCampaigns] = useState(campaigns);
+  const {tenant_id} = useAuthStore();
 
 
   // const { data: progressData, isLoading, isError, refetch } = useMultiCampaignProgressQuery(campaigns);
@@ -70,7 +71,7 @@ const StatusCampaign: React.FC = () => {
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data);
-      fetchCampaignSkills({ session_key: "", tenant_id: 0 });
+      fetchCampaignSkills({ session_key: "", tenant_id: tenant_id === 0 ? 0 : tenant_id });
     },
   });
 
@@ -281,7 +282,7 @@ const StatusCampaign: React.FC = () => {
 
   // Format the last refresh time
   const formattedLastRefreshTime = lastRefreshTime ?
-    `마지막 갱신: ${lastRefreshTime.toLocaleTimeString()}` :
+    `${lastRefreshTime.toLocaleTimeString()}` :
     '아직 갱신되지 않음';
 
   useEffect(() => {
@@ -360,7 +361,8 @@ const StatusCampaign: React.FC = () => {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              {isRefreshing ? "갱신중" : "새로고침"}
+              {/* {isRefreshing ? "갱신중" : "새로고침"} */}
+              새로고침
             </CommonButton>
           </div>
         </div>
