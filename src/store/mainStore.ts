@@ -39,6 +39,8 @@ interface MainState {
   listManagerFileFormatRows: FormatRow[];
   sseInputMessage: string;
   listManagerDelimiter: string;
+  listManagerCampaignId: string;
+  listManagerFileFormat: string;
   reBroadcastRedialCondition: string;
   // 테넌트 상태
   tenantsLoaded: boolean;  // 테넌트 데이터 로딩 여부
@@ -77,6 +79,8 @@ interface MainActions {
   setListManagerFileFormatRows: (listManagerFileFormatRows: FormatRow[]) => void;
   setSseInputMessage: (sseInputMessage: string) => void;
   setListManagerDelimiter: (listManagerDelimiter: string) => void;
+  setListManagerCampaignId: (listManagerCampaignId: string) => void;
+  setListManagerFileFormat: (listManagerFileFormat: string) => void;
   setReBroadcastRedialCondition: (reBroadcastRedialCondition: string) => void;
   // 테넌트 액션
   setTenantsLoaded: (loaded: boolean) => void;
@@ -123,6 +127,8 @@ export const useMainStore = create<MainStore>()(
       listManagerFileFormatRows: [],
       sseInputMessage: '',
       listManagerDelimiter: '',
+      listManagerCampaignId: '',
+      listManagerFileFormat: '',
       reBroadcastRedialCondition: '',
       // 테넌트 상태 초기화
       tenantsLoaded: false,
@@ -170,6 +176,8 @@ export const useMainStore = create<MainStore>()(
         });
       },
       setListManagerDelimiter: (listManagerDelimiter) => set({ listManagerDelimiter }, false, 'setListManagerDelimiter'),
+      setListManagerCampaignId: (listManagerCampaignId) => set({ listManagerCampaignId }, false, 'setListManagerCampaignId'),
+      setListManagerFileFormat: (listManagerFileFormat) => set({ listManagerFileFormat }, false, 'setListManagerFileFormat'),
       setReBroadcastRedialCondition: (reBroadcastRedialCondition) => set({ reBroadcastRedialCondition }, false, 'setReBroadcastRedialCondition'),
       // 테넌트 액션
       setTenantsLoaded: (loaded) => set({ tenantsLoaded: loaded }, false, 'setTenantsLoaded'),
