@@ -117,18 +117,18 @@ const RebroadcastSettingsPanelHeader = ({
     useEffect(() => {
         console.log('Before Update:', { broadcastType });
         if (reBroadCastOption) {
-            console.log('Updating from props:', reBroadCastOption);
+            // console.log('Updating from props:', reBroadCastOption);
             const mappedType = reBroadCastOption === 'scheduled' ? 'reservation' : reBroadCastOption;
             setBroadcastType(mappedType);
-            console.log('After mapping:', mappedType);
-        } else if (reBroadcastType !== '') {
-            console.log('Updating from store:', reBroadcastType);
-            setBroadcastType(reBroadcastType);
-        } else {
-            console.log('Setting default');
-            setBroadcastType('reservation');
+            // console.log('After mapping:', mappedType);
+        // } else if (reBroadcastType !== '') {
+        //     console.log('Updating from store:', reBroadcastType);
+        //     setBroadcastType(reBroadcastType);
+        // } else {
+        //     console.log('Setting default');
+        //     setBroadcastType('reservation');
         }
-    }, [reBroadCastOption, reBroadcastType]);
+    }, [reBroadCastOption]);
 
     //적용 버튼 
     useEffect(() => {
