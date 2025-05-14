@@ -47,7 +47,7 @@ type Props = {
     handleCheckListCount: () => void;
     selectedRebroadcastId: any;
     textType: string;
-    reBroadCastOption?: 'scheduled' | 'realtime';
+    reBroadCastOption?: 'scheduled' | 'realtime' | 'campaign';
 }
 
 const RebroadcastSettingsPanelHeader = ({
@@ -69,7 +69,7 @@ const RebroadcastSettingsPanelHeader = ({
     const { removeTab } = useTabStore();
 
     const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
-    const [broadcastType, setBroadcastType] = useState("reservation");
+    // const [broadcastType, setBroadcastType] = useState("reservation");
     const [listCount, setListCount] = useState<number>(0);
     const [shouldShowApply, setShouldShowApply] = useState<boolean>(false);    //적용 버튼.
     const [shouldShowAdd, setShouldShowAdd] = useState<boolean>(false);        //추가 버튼.
@@ -95,7 +95,7 @@ const RebroadcastSettingsPanelHeader = ({
 
     //예약, 실시간 변경 이벤트.
     const handleBroadcastType = (value: string) => {
-        setBroadcastType(value);
+        // setBroadcastType(value);
         handleBroadcastTypeChange(value);
         if (value === 'realtime') {
             setShouldShowApply(true);
@@ -110,25 +110,25 @@ const RebroadcastSettingsPanelHeader = ({
     };
 
     // RebroadcastSettingsPanelHeader 컴포넌트
-    console.log('Header Props:', { reBroadCastOption, reBroadcastType });
-    console.log('Header State:', { broadcastType });
+    // console.log('Header Props:', { reBroadCastOption, reBroadcastType });
+    // console.log('Header State:', { broadcastType });
 
     // useEffect 내부에서
-    useEffect(() => {
-        console.log('Before Update:', { broadcastType });
-        if (reBroadCastOption) {
-            // console.log('Updating from props:', reBroadCastOption);
-            const mappedType = reBroadCastOption === 'scheduled' ? 'reservation' : reBroadCastOption;
-            setBroadcastType(mappedType);
-            // console.log('After mapping:', mappedType);
-        // } else if (reBroadcastType !== '') {
-        //     console.log('Updating from store:', reBroadcastType);
-        //     setBroadcastType(reBroadcastType);
-        // } else {
-        //     console.log('Setting default');
-        //     setBroadcastType('reservation');
-        }
-    }, [reBroadCastOption]);
+    // useEffect(() => {
+    //     // console.log('Before Update:', { broadcastType });
+    //     if (reBroadCastOption) {
+    //         // console.log('Updating from props:', reBroadCastOption);
+    //         const mappedType = reBroadCastOption === 'scheduled' ? 'reservation' : reBroadCastOption;
+    //         setBroadcastType(mappedType);
+    //         // console.log('After mapping:', mappedType);
+    //     // } else if (reBroadcastType !== '') {
+    //     //     console.log('Updating from store:', reBroadcastType);
+    //     //     setBroadcastType(reBroadcastType);
+    //     // } else {
+    //     //     console.log('Setting default');
+    //     //     setBroadcastType('reservation');
+    //     }
+    // }, [reBroadCastOption]);
 
     //적용 버튼 
     useEffect(() => {
@@ -190,7 +190,7 @@ const RebroadcastSettingsPanelHeader = ({
                     defaultValue="reservation"
                     className="flex gap-5"
                     onValueChange={(value) => handleBroadcastType(value)}
-                    value={broadcastType} // reBroadcastType에서 broadcastType으로 변경
+                    value={reBroadcastType} // reBroadcastType에서 broadcastType으로 변경
                     disabled={realtime}
                 >
                     <div className="flex items-center space-x-2">

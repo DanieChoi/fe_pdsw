@@ -106,7 +106,7 @@ const initOutgoingResult = {
 };
 
 interface PropsType {
-    reBroadCastOption?: "scheduled" | "realtime";
+    reBroadCastOption?: 'scheduled' | 'realtime' | 'campaign';
 }
 
 const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
@@ -1287,7 +1287,7 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
     }, [reBroadcastRedialCondition,broadcastType]);    
 
     useEffect(() => {
-        if (reBroadCastOption) {     
+        if (reBroadCastOption && reBroadCastOption !== 'campaign' ) {     
             const mappedType = reBroadCastOption === 'scheduled' ? 'reservation' : reBroadCastOption;       
             setReBroadcastType(mappedType);
         }

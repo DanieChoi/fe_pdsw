@@ -1789,6 +1789,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       icon: '',
       href: '',
       content: null,
+      params: {
+        reBroadCastOption: 'campaign',
+      }
     });
     setTimeout(function () {
       setActiveTab(20, newTabKey);
