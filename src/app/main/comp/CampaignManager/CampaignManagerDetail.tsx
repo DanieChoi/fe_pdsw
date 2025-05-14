@@ -22,26 +22,18 @@ import { useEffect, useState } from 'react';
 import SkillListPopup from '@/components/shared/layout/SkillListPopup';
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
 import { useApiForCampaignManagerUpdate } from '@/features/campaignManager/hooks/useApiForCampaignManagerUpdate';
-import { useApiForCampaignManagerDelete } from '@/features/campaignManager/hooks/useApiForCampaignManagerDelete';
 import { useApiForCampaignScheduleUpdate } from '@/features/campaignManager/hooks/useApiForCampaignScheduleUpdate';
 import { useApiForCampaignScheduleInsert } from '@/features/campaignManager/hooks/useApiForCampaignScheduleInsert';
-import { useApiForCampaignScheduleDelete } from '@/features/campaignManager/hooks/useApiForCampaignScheduleDelete';
 import { useApiForCallingNumberUpdate } from '@/features/campaignManager/hooks/useApiForCallingNumberUpdate';
 import { useApiForCampaignStatusUpdate } from '@/features/campaignManager/hooks/useApiForCampaignStatusUpdate';
 import { useApiForCallingNumberInsert } from '@/features/campaignManager/hooks/useApiForCallingNumberInsert';
 import { useApiForCallingNumberDelete } from '@/features/campaignManager/hooks/useApiForCallingNumberDelete';
-import { useApiForAutoRedialDelete } from '@/features/campaignManager/hooks/useApiForAutoRedialDelete';
-import { useApiForReservedCallDelete } from '@/features/campaignManager/hooks/useApiForReservedCallDelete';
-import { useApiForMaxcallExtDelete } from '@/features/campaignManager/hooks/useApiForMaxcallExtDelete';
 import { useApiForDialSpeedUpdate } from '@/features/campaignManager/hooks/useApiForDialSpeedUpdate';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
-import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
-import { useApiForAutoRedial } from '@/features/campaignManager/hooks/useApiForAutoRedial';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
-import { useApiForCampaignAgent } from '@/features/campaignManager/hooks/useApiForCampaignAgent';
 import { useApiForCallingListDelete } from '@/features/listManager/hooks/useApiForCallingListDelete';
 import { CheckCampaignSaveReturnCode, CampaignManagerInfo } from '@/components/common/common';
 import Cookies from 'js-cookie';
@@ -51,6 +43,7 @@ import { campaignChannel } from '@/lib/broadcastChannel';
 import { useEnvironmentStore } from "@/store/environmentStore";
 import { CampaignInfoInsertRequest } from '@/features/campaignManager/hooks/useApiForCampaignManagerInsert';
 import { useDeleteCampaignHelper } from '@/features/campaignManager/utils/deleteCampaignHelper';
+import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 
 
 
@@ -1222,16 +1215,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       });
 
     },
-    onError: (data) => {
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          type: '2',
-          onClose: () => goLogin(),
-        });
-      }
+    onError: (error) => {
+      ServerErrorCheck('캠페인 정보 수정', error.message);
     }
   });
 
@@ -1257,16 +1242,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const { mutate: fetchCallingListDelete } = useApiForCallingListDelete({
     onSuccess: (data) => {
       setAlertState((prev) => ({ ...prev, isOpen: false }));
-    }, onError: (data) => {
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          type: '2',
-          onClose: () => goLogin(),
-        });
-      }
+    },
+    onError: (error) => {
+      ServerErrorCheck('발신리스트 업로드 취소', error.message);
     }
   });
 
@@ -1605,16 +1583,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         });
       }
     },
-    onError: (data) => {
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          type: '2',
-          onClose: () => goLogin(),
-        });
-      }
+    onError: (error) => {
+      ServerErrorCheck('캠페인 상태 변경', error.message);
     }
   });
   const goLogin = () => {

@@ -29,6 +29,7 @@ import { useRouter } from 'next/navigation';
 import { CommonButton } from "@/components/shared/CommonButton";
 import { useEnvironmentStore } from "@/store/environmentStore";
 import { toast } from 'react-toastify';
+import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 
 export interface TabItem {
   id: number;
@@ -917,22 +918,11 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId, is_new }: Props) 
       //캠페인 스케줄 수정 api 호출
       fetchCampaignScheduleInsert(_tempCampaignSchedule);
 
-    }, onError: (data) => {
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          type: '2',
-          onClose: () => goLogin(),
-        });
-      }
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 정보 수정', error.message);
     }
   });
-  const goLogin = () => {
-    Cookies.remove('session_key');
-    router.push('/login');
-  }
 
   //캠페인 스킬 수정 api 호출
   const { mutate: fetchCampaignSkillUpdate } = useApiForCampaignSkillUpdate({
