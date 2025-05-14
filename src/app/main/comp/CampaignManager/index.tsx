@@ -14,6 +14,7 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useApiForChannelGroupList } from "@/features/preferences/hooks/useApiForChannelGroup";
+import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 
 const errorMessage = {
   isOpen: false,
@@ -66,23 +67,11 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
       // fetchSkills({ tenant_id_array: tempTenantIdArray });
       fetchCallingNumbers({ session_key: session_key, tenant_id: 0 });
     },
-    onError: (data) => {
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          type: '2',
-          onClose: () => goLogin(),
-        });
-        Cookies.remove('session_key');
-      }
+    onError: (error) => {
+      ServerErrorCheck('캠페인 스케줄 정보 조회', error.message);
     }
   });
 
-  const goLogin = () => {
-    router.push('/login');
-  };
   // 스킬 조회
   // const { mutate: fetchSkills } = useApiForSkills({
   //   onSuccess: (data) => {

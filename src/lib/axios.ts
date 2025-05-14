@@ -17,10 +17,18 @@ export const axiosRedisInstance = axios.create({
 export const externalAxiosInstance = axios.create({
   withCredentials: true
 });
+let sessionCheckYn = true;
 
 // 요청 인터셉터 추가
 axiosInstance.interceptors.request.use(
   (config) => {
+    // sessionCheckYn이 false이면 요청을 막음
+    if (!sessionCheckYn) {
+      return Promise.reject({
+        message: '세션 체크가 비활성화되어 API 요청이 차단되었습니다.',
+        config,
+      });
+    }
     
     const sessionKey = getCookie('session_key');
 
@@ -49,7 +57,13 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   async (response) => {
     // console.log("here 8888888888888 response", response);
-    
+    if (response.data.result_code === 5) {
+      sessionCheckYn = false;
+      // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
+      customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
+        window.location.href = '/login';
+      });
+    }
     const url = response.config.url || '';
     const userId = getCookie('id');
     if( url !== '/login' && userId != null && userId != '' ) {
@@ -426,9 +440,9 @@ axiosInstance.interceptors.response.use(
     }    
     if (error.response.data.result_code === 5) {
       // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
-      customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
-        window.location.href = '/login';
-      });
+      // customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
+      //   window.location.href = '/login';
+      // });
     }
 
     const url = error.config.url || '';

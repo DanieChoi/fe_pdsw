@@ -36,6 +36,7 @@ import CampaignAddPopup from '@/features/campaignManager/components/popups/Campa
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { CampaignInfo } from '../CreateCampaignFormPanel/variables/variablesForCreateCampaignForm';
+import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 
 const dialModeList = [
   { dial_id: 1, dial_name: 'Power' },
@@ -1057,16 +1058,9 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
   const { mutate: fetchCampaignManagerUpdate } = useApiForCampaignManagerUpdate({
     onSuccess: (data) => {
       setCampaignInfoChangeYn(false);
-    },onError: (data) => {      
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          type: '2',
-          onClose: () => goLogin(),
-        });
-      }
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 정보 수정', error.message);
     }
   });
   

@@ -23,6 +23,7 @@ import {
   , CampaignScheDuleListDataResponse
   , CampaignDialSpeedUpdateRequest
 } from '@/features/campaignManager/types/campaignManagerIndex';
+import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 
 
 const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ tenantId }: IPropsForCreateCampaignForm) => {
@@ -535,17 +536,8 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
       }
       fetchCampaignScheduleInsert(_tempCampaignSchedule);
     },
-
-    onError: (data) => {
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          type: '2',
-          onClose: () => goLogin(),
-        });
-      }
+    onError: (error) => {
+      ServerErrorCheck('캠페인 정보 입력', error.message);
     }
   });
 
