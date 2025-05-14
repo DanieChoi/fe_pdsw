@@ -5,18 +5,8 @@ import { CampaignCredentials, PhoneDescriptionListResponse } from '../types/camp
 // 전화번호설명 템플릿 조회 리스트 요청
 export const fetchPhoneDescriptions = async (credentials: CampaignCredentials): Promise<PhoneDescriptionListResponse> => {
   const phoneDescriptionListSearchRequestData = {
-    filter: {      
-      description_id: {
-        start: 1,
-        end: 9999999,
-      },    
-    },
     sort: {
       description_id: 0,
-    },
-    page: {
-      index: 1,
-      items: 9999999,
     },
   };
 

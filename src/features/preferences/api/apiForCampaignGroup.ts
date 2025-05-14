@@ -40,19 +40,8 @@ export const apiForCombinedTenantAndCampaignGroup = async (
             apiForGetTenantList(tenant_id), // tenant_id 전달
             apiForCampaignGroupList(tenant_id),
             apiForCampaignListForCampaignGroup({
-                filter: {
-                    group_id: [],
-                    campaign_id: {
-                        start: 1,
-                        end: 9999999999
-                    }
-                },
                 sort: {
                     campaign_id: 1
-                },
-                page: {
-                    index: 1,
-                    items: 9999999999
                 }
             })
         ]);
@@ -115,7 +104,7 @@ export const apiForCombinedTenantAndCampaignGroup = async (
  * @returns 캠페인 그룹별 캠페인 목록
  */
 export const apiForCampaignListForCampaignGroup = async (
-    request: GetCampaignListForCampaignGroupRequest
+    request: any
 ): Promise<CampaignGroupGampaignListApiResponse> => {
     try {
         const { data } = await axiosInstance.post<CampaignGroupGampaignListApiResponse>(
@@ -320,10 +309,6 @@ export const apiForCampaignGroupCampaignList = async (
         },
         sort: {
             campaign_id: 0
-        },
-        page: {
-            index: 1,
-            items: 99999
         }
     };
 
@@ -348,10 +333,9 @@ export const apiForCampaignGroupDataForCampaignGroupAdmin = async (
 ): Promise<CampaignGroupResponse> => {
 
     // Create request body that matches the expected API format
-    const requestBody: ApiRequest = {
+    const requestBody = {
         filter: group_id ? { group_id: [group_id] } : {},
         sort: { group_id: 1 },
-        page: { index: 1, items: 100 }
     };
 
     try {

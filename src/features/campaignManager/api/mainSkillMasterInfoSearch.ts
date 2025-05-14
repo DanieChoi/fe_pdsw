@@ -9,20 +9,12 @@ export const fetchSkills = async (credentials: SkillListCredentials): Promise<Sk
   
   
   const skillMasterInfoSearchRequestData = {
-    filter: {      
-      skill_id: {
-        start: 1,
-        end: 9999999,
-      },    
+    filter: {        
       tenant_id: credentials.tenant_id_array[0]
     },
     sort: {
       skill_id: 0,
       tenant_id: credentials.tenant_id_array[0],
-    },
-    page: {
-      index: 1,
-      items: 9999999,
     },
   };
   
