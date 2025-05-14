@@ -1075,10 +1075,17 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
                 condition: MakeRedialPacket()
             });
         }else{
-            fetchCampaignRedialPreviewSearch({
-                campaign_id: Number(campaignId),
-                condition: selectedRebroadcastDetails?.redialCondition+''||'00'
-            });
+            if( selectedRebroadcastDetails != null ){
+                fetchCampaignRedialPreviewSearch({
+                    campaign_id: Number(campaignId),
+                    condition: selectedRebroadcastDetails?.redialCondition+''||'00'
+                });
+            }else{
+                fetchCampaignRedialPreviewSearch({
+                    campaign_id: Number(campaignId),
+                    condition: MakeRedialPacket()
+                });
+            }
         }
     };
     
@@ -1273,9 +1280,18 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
                 if( reBroadcastRedialCondition.indexOf('4023100') > -1 ){   
                     setCallType('sent');
                 }
+            }else{                
+                // setReBroadcastRedialCondition('0035223@35213@26232@26233@26235@262310@26238');
             }
         }
     }, [reBroadcastRedialCondition,broadcastType]);    
+
+    useEffect(() => {
+        if (reBroadCastOption) {     
+            const mappedType = reBroadCastOption === 'scheduled' ? 'reservation' : reBroadCastOption;       
+            setReBroadcastType(mappedType);
+        }
+    }, [reBroadCastOption]);
 
     return (
         <div className="limit-width">
