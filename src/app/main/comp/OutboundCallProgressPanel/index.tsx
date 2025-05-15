@@ -215,21 +215,23 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     }
 
     
-    const existingTabs = openedTabs.filter(tab => tab.id === 5);
-    existingTabs.forEach(tab => {
-      removeTab(tab.id, tab.uniqueKey);
-    });
+    // const existingTabs = openedTabs.filter(tab => tab.id === 5);
+    // existingTabs.forEach(tab => {
+    //   removeTab(tab.id, tab.uniqueKey);
+    // });
+    // const newTabKey = `5-${Date.now()}`;
+    // addTab({
+    //   id: 5,
+    //   campaignId: value,
+    //   campaignName: campaigns.find(data=>data.campaign_id === Number(value))?.campaign_name,
+    //   uniqueKey: '5',
+    //   title: '발신진행상태',
+    //   icon: '',
+    //   href: '',
+    //   content: null,
+    // });
+
     const newTabKey = `5-${Date.now()}`;
-    addTab({
-      id: 5,
-      campaignId: value,
-      campaignName: campaigns.find(data=>data.campaign_id === Number(value))?.campaign_name,
-      uniqueKey: '5',
-      title: '발신진행상태',
-      icon: '',
-      href: '',
-      content: null,
-    });
     setTimeout(function () {
       setActiveTab(5, newTabKey);
     }, 50);
