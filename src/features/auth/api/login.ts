@@ -7,7 +7,6 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { getRuntimeEnv } from '@/lib/getRuntimeEnv';
-import { internalIpV4 } from 'internal-ip';
 
 export const loginApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
@@ -50,14 +49,12 @@ export const loginApi = {
       }
 
       // 🌐 클라이언트 IP 조회
-      // const { data: dataSecond } = await axios.get<{ ip: string }>(
-      //   `https://api.ipify.org?format=json`
-      // );
-      const clientIp = await internalIpV4();
-      console.log("🌐 클라이언트 IP:", clientIp);
+      const { data: dataSecond } = await axios.get<{ ip: string }>(
+        `https://api.ipify.org?format=json`
+      );
 
       // 🍪 쿠키 저장
-      Cookies.set('userHost', clientIp || 'unknown', {
+      Cookies.set('userHost', dataSecond.ip, {
         expires: 1,
         secure: false,
         sameSite: 'Lax',
