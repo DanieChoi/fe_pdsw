@@ -231,6 +231,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     //   content: null,
     // });
 
+    const newTabKey = `5-${Date.now()}`;
     setTimeout(function () {
       setActiveTab(5, newTabKey);
     }, 50);
