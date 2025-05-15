@@ -57,10 +57,6 @@ export const apiForGetCampaignGroupForSystemAdmin = async (
     sort: request.sort
       ? { ...defaultRequest.sort, ...request.sort }
       : undefined,
-    page: {
-      ...defaultRequest.page,
-      ...request.page,
-    },
   } as IRequestTypeForCampaignGroupForSystemAdmin;
 
   const response = await axiosInstance.post<IResponseTypeForCampaignGroupForSystemAdmin>(

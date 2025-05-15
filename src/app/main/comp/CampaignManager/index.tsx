@@ -14,6 +14,7 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useApiForChannelGroupList } from "@/features/preferences/hooks/useApiForChannelGroup";
+import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 
 const errorMessage = {
   isOpen: false,
@@ -66,23 +67,11 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
       // fetchSkills({ tenant_id_array: tempTenantIdArray });
       fetchCallingNumbers({ session_key: session_key, tenant_id: 0 });
     },
-    onError: (data) => {
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          type: '2',
-          onClose: () => goLogin(),
-        });
-        Cookies.remove('session_key');
-      }
+    onError: (error) => {
+      ServerErrorCheck('캠페인 스케줄 정보 조회', error.message);
     }
   });
 
-  const goLogin = () => {
-    router.push('/login');
-  };
   // 스킬 조회
   // const { mutate: fetchSkills } = useApiForSkills({
   //   onSuccess: (data) => {
@@ -115,7 +104,6 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   // 채널 그룹리스트 조회
   const { mutate: fetchChannelGroupList } = useApiForChannelGroupList({
     onSuccess: (data) => {
-        console.log('data---------- ', data);
         setChannelGroupList(data.result_data);
     }
   });
@@ -132,7 +120,12 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   useEffect(() => {
     // 최초 실행시 캠페인 리스트에서 첫번째 캠페인 선택
     if(campaignId === undefined ){
-      setCampaignIdForUpdateFromSideMenu(campaigns[0].campaign_id+'');
+      if(campaigns.length > 0){
+        setCampaignIdForUpdateFromSideMenu(campaigns[0].campaign_id+'');
+      }else{
+        // 새로고침시 campaigns가 비어있는 경우
+        setCampaignIdForUpdateFromSideMenu(0+'');
+      }
     }
   },[]);
 

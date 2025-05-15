@@ -6,10 +6,6 @@ import { ca } from "date-fns/locale";
 export const fetchCallLimitSettingList = async (credentials: TenantIdCredentials): Promise<CallLimitSettingListResponse> => {
     const callLimitSettingListRequestData = {
         filter: {
-            campaign_id: {
-                "start": 1,
-                "end": 9999999999,
-            },
             tenant_id: credentials.tenant_id_array
         },
         sort: {
@@ -17,10 +13,7 @@ export const fetchCallLimitSettingList = async (credentials: TenantIdCredentials
             campaign_id: 0,
             tenant_id: 0
         },
-        page: {
-            index: 1,
-            items: 10
-        }
+
     };
 
     try {
@@ -53,7 +46,7 @@ export const createCallLimitSetting = async (credentials: CallLimitSettingCreate
         }
     };
 
-    console.log("credentials check !!!!!!!!!!!!!!!!!: ", credentials);
+    
     
 
     try {

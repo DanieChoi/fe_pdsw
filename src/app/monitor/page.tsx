@@ -18,7 +18,7 @@ import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiF
 import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 import { useApiForCampaignStatusUpdate } from '@/features/campaignManager/hooks/useApiForCampaignStatusUpdate';
-import { CheckCampaignSaveReturnCode } from '@/components/common/common';
+import { CheckCampaignSaveReturnCode, UpdataCampaignInfo } from '@/components/common/common';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { useApiForDialSpeedUpdate } from '@/features/campaignManager/hooks/useApiForDialSpeedUpdate';
@@ -27,6 +27,7 @@ import { toast } from 'react-toastify';
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
 import CounsellorGroupActions from '@/components/shared/layout/comp/TabActions/CounsellorGroupActions';
 import { useCampaignDialStatusStore } from '@/store/campaignDialStatusStore';
+import { useApiForCampaignManagerUpdate } from '@/features/campaignManager/hooks/useApiForCampaignManagerUpdate';
 
 
 const errorMessage: CustomAlertRequest = {
@@ -101,7 +102,7 @@ const MonitorPage = () => {
   const { skills, setSkills } = useCampainManagerStore();
 
   // 인증 관련 상태
-  const { tenant_id, session_key } = useAuthStore();
+  const { tenant_id, session_key, id : user_id } = useAuthStore();
 
   // 드래그 관련 상태
   const containerRef = useRef<HTMLDivElement>(null);
@@ -276,7 +277,7 @@ const MonitorPage = () => {
     });
   }, [isDragging, activeDragger]);
 
-  //캠페인 상태 변경 api 호출
+  //캠페인 상태 변경 api 호출 ==> 0513 캠페인 마스터 변경으로 수정
   const { mutate: fetchCampaignStatusUpdate } = useApiForCampaignStatusUpdate({
     onSuccess: (data) => {
       if (!(data.result_code === 0 || data.result_code === -13)) {
@@ -370,11 +371,15 @@ const MonitorPage = () => {
     }
   });
 
-  // const campaignDialStatus = useCampaignDialStatusStore(state => state.campaignDialStatus);
+  const { mutate: fetchCampaignManagerUpdate } = useApiForCampaignManagerUpdate({
+      onSuccess: (data,variables) => {
+          
+      },
+      onError: (data) => {
+          //ServerErrorCheck('캠페인 채널그룹 할당 해제', data.message);
+      }
+  });
 
-  // useEffect(() => {
-  //   console.log('📦 상태가 바뀜:', campaignDialStatus);
-  // }, [campaignDialStatus]);
 
 
   // 캠페인 관련 핸들러
@@ -382,40 +387,62 @@ const MonitorPage = () => {
     
     const currentStatus = useCampaignDialStatusStore.getState().campaignDialStatus;
     
-
-    // console.log("얘는 읽냐? campaignDialStatus : ", campaignDialStatus);
-    // fetchMain({
-    //   session_key: '',
-    //   tenant_id: tenant_id,
-    // });
-    
-
-    const isCurrentCampaignStatus =  campaigns.filter(data => data.campaign_id === Number(selectedCampaign))[0].start_flag;
-    // console.log('######## isCurrentCampaignStatus : ', isCurrentCampaignStatus);
-
-    
-    // console.log( '타입 일치여부 : ',
-    //   currentStatus.map((item) => ({
-    //     campaign_id: item.campaign_id,
-    //     status: item.status,
-    //     match: item.campaign_id.toString() === selectedCampaign.toString()
-    //   }))
-    // );
-    
     // 현재 캠페인의 상태가 정지중이거나 멈춤중일때
     const existDial = currentStatus.some((item) => 
                       (item.campaign_id.toString() === selectedCampaign.toString()) && 
                       (item.status?.toString() === '5' || item.status?.toString() === '6') );
     
-    console.log('existDial : ', existDial);
+    // console.log('existDial : ', existDial);
 
-    
     const waitConfirm = () => {
+      
+      // 상태변경할 캠페인 정보 가져오기
+      const updatedCampaignsInfo = campaigns.filter((campaign) => campaign.campaign_id === parseInt(selectedCampaign))[0];
+      
+      // 캠페인 마스터 변경시 보낼 데이터정보 가져오기
+      const currentCampaignInfo = UpdataCampaignInfo(campaigns, parseInt(selectedCampaign), updatedCampaignsInfo.start_flag);
+
+      // 현재시간 양식 구하기.
+      const getCurrentFormattedTime = () => {
+          const now = new Date();
+      
+          const year = now.getFullYear();
+          const month = String(now.getMonth() + 1).padStart(2, '0'); // 0부터 시작하므로 +1
+          const day = String(now.getDate()).padStart(2, '0');
+      
+          const hours = String(now.getHours()).padStart(2, '0');
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+          const seconds = String(now.getSeconds()).padStart(2, '0');
+      
+          return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+      };
+
+      const todayTime = getCurrentFormattedTime();
+
+      // 현재 캠페인 발신중이며 멈춤 중이거나 정지 중일때 === existDial
+      if(!existDial){
+
+        // 캠페인 status API 호출
+        fetchCampaignStatusUpdate({
+          campaign_id: Number(selectedCampaign),
+          campaign_status: newStatus === '시작' ? 1 : newStatus === '멈춤' ? 2 : 3,
+        });
+      }
+      else {
+        // 캠페인 마스터 API 호출
+        fetchCampaignManagerUpdate(
+            {
+                ...currentCampaignInfo
+                , start_flag : newStatus === '시작' ? 1 : newStatus === '멈춤' ? 2 : 3
+                , update_user: user_id
+                , update_ip: Cookies.get('userHost')+''
+                , update_time: todayTime
+            }
+        );
+      }
+
       setCampaignStatus(newStatus as CampaignStatus);
-      fetchCampaignStatusUpdate({
-        campaign_id: Number(selectedCampaign),
-        campaign_status: newStatus === '시작' ? 1 : newStatus === '멈춤' ? 2 : 3,
-      });
+      
     };
     
     if (existDial) {
@@ -891,7 +918,10 @@ const MonitorPage = () => {
         } else {
           useCampaignDialStatusStore.getState().addCampaignDialStatus({campaign_id : campaignId, status : type.split(':')[2]});
         }
-        setCampaignStatus(type.split(':')[1]);
+        if( campaignId === selectedCampaign ){
+          setCampaignStatus(type.split(':')[1]);
+        }
+        
       }else if( typeof campaignId != 'undefined'){
         setModifiedCampaign(campaignId);        
       }

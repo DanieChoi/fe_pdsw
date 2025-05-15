@@ -11,9 +11,13 @@ import Image from "next/image";
 import clsx from "clsx";
 import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 import { useMainStore } from "@/store/mainStore";
+import { useCampainManagerStore } from "@/store/campainManagerStore";
 import { IRootNodeContextMenu } from "./ContextMenus/ICampaignTabRootNodeContextMenu";
 import { TreeItem } from "../../types/typeForSidebar2";
 import { getStatusIconWithStartFlag } from "@/components/shared/layout/utils/utils";
+import { CampaignScheDuleListDataResponse, CampaignSkillUpdateRequest } from '@/features/campaignManager/types/campaignManagerIndex';
+import { CampaignInfoInsertRequest } from '@/features/campaignManager/hooks/useApiForCampaignManagerInsert';
+import { MainDataResponse } from '@/features/auth/types/mainIndex';
 
 export function TreeNodeForCampaignTab({
   item,
@@ -50,6 +54,7 @@ export function TreeNodeForCampaignTab({
     addTab,
     addTabCurrentOnly
   } = useTabStore.getState();
+  const { setCopyCampaignManagerInfo, setCopyCampaignInfo, setCopyTenantId, setCopyCampaignSchedule, setCopyCampaignSkills } = useCampainManagerStore();
 
   const { campaigns } = useMainStore();
   const nodeRef = useRef<HTMLDivElement>(null);
@@ -183,6 +188,11 @@ export function TreeNodeForCampaignTab({
   }, [item, setCampaignIdForUpdateFromSideMenu, setSelectedNodeType]);
 
   const onHandleCampaignCopy = useCallback(() => {
+    setCopyCampaignManagerInfo({} as CampaignInfoInsertRequest);
+    setCopyCampaignInfo({} as MainDataResponse);
+    setCopyTenantId('');
+    setCopyCampaignSchedule({} as CampaignScheDuleListDataResponse);
+    setCopyCampaignSkills({} as CampaignSkillUpdateRequest);
     setCampaignIdForUpdateFromSideMenu(item.id);
     setCampaignIdForCopyCampaign(item.id);
     setSelectedNodeType(item.type);

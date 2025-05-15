@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, use } from "react";
 import {
   Select,
   SelectContent,
@@ -21,11 +21,15 @@ import {
 } from "recharts";
 import { useApiForCampaignSkill } from "@/features/campaignManager/hooks/useApiForCampaignSkill";
 import { useApiForSkills } from "@/features/campaignManager/hooks/useApiForSkills";
-import { useCampainManagerStore, useMainStore } from "@/store";
+import { useAuthStore, useCampainManagerStore, useMainStore } from "@/store";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { useEnvironmentStore } from "@/store/environmentStore";
 import { useMultiCampaignProgressQuery } from "./hook/useMultiCampaignProgressQuery";
 import { toast } from "react-toastify";
+import { CampaignProgressInformationResponse, CampaignProgressInformationResponseDataType } from "@/features/monitoring/types/monitoringIndex";
+import { useCampaignProgressMutation } from "./hook/useMultiCampaignProgressMutaion";
+
+
 
 interface ChartDataItem {
   name: string;
@@ -46,6 +50,12 @@ interface DispatchDataType {
   dispatch_name: string;
 }
 
+type ProgressDataItem = {
+  campaign_id: number;
+  campaign_name: string;
+  progressInfoList: CampaignProgressInformationResponseDataType[];
+};
+
 const StatusCampaign: React.FC = () => {
   const [selectedSkill, setSelectedSkill] = useState("total");
   const [selectedDispatch, setSelectedDispatch] = useState("0");
@@ -60,17 +70,24 @@ const StatusCampaign: React.FC = () => {
   const { campaigns } = useMainStore();
   const { statisticsUpdateCycle } = useEnvironmentStore();
   const [filteredCampaigns, setFilteredCampaigns] = useState(campaigns);
+  const {tenant_id} = useAuthStore();
 
 
   // const { data: progressData, isLoading, isError, refetch } = useMultiCampaignProgressQuery(campaigns);
   // 필터링된 캠페인만 사용하도록 쿼리 수정
-  const { data: progressData, isLoading, isError, refetch } =
-    useMultiCampaignProgressQuery(filteredCampaigns);
+  // const { data: progressData, isLoading, isError, refetch } =
+  //   useMultiCampaignProgressQuery(filteredCampaigns);
+    // filteredCampaigns
+
+  const [progressData, setProgressData] = useState<ProgressDataItem[]| null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  
 
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data);
-      fetchCampaignSkills({ session_key: "", tenant_id: 0 });
+      fetchCampaignSkills({ session_key: "", tenant_id: tenant_id === 0 ? 0 : tenant_id });
     },
   });
 
@@ -116,26 +133,69 @@ const StatusCampaign: React.FC = () => {
   //     });
   // }, [refetch]);
 
+    // 캠페인 진행 정보 api 호출
+  const { mutate: fetchCampaignProgressInformation } = useCampaignProgressMutation({
+    onSuccess: (data, variables) => {  
+      // console.log("fetchCampaignProgressInformation data: ", data);
+      if(data.length > 0){
+        setProgressData(
+          data.map((item) => ({
+            campaign_id: item.campaign_id,
+            campaign_name: item.campaign_name,
+            progressInfoList: item.progressInfoList, // Assuming you want the first item in the array
+          }))
+        );
+        setIsLoading(false);
+        setIsError(false);
+        const endTime = new Date();
+        setLastRefreshTime(endTime);
+
+      }
+      else if(variables.length === 0 && data.length === 0){
+        setProgressData([]);
+        setIsLoading(false); 
+      }   
+    }
+  });
+
   // 새로고침 기능도 필터링된 캠페인만 사용하도록 수정
   const refreshData = useCallback(() => {
     setIsRefreshing(true);
-    const startTime = new Date();
-
-    refetch()
-      .then(() => {
-        const endTime = new Date();
-        setLastRefreshTime(endTime);
-      })
-      .catch((error) => {
-        // 에러 처리
-      })
-      .finally(() => {
+    
+    fetchCampaignProgressInformation( campaigns, {
+      onSuccess: (data, variables) => {
+        // console.log('variables: ', variables);
+        if(data.length > 0){
+          setProgressData(
+            data.map((item) => ({
+              campaign_id: item.campaign_id,
+              campaign_name: item.campaign_name,
+              progressInfoList: item.progressInfoList, // Assuming you want the first item in the array
+            }))
+          );
+          setIsLoading(false);
+          setIsError(false);
+          const endTime = new Date();
+          setLastRefreshTime(endTime);
+        }
+        else if(variables.length > 0 && data.length === 0){
+          setProgressData([]);
+          setIsLoading(false); 
+        }
+      },
+      onError: () => {
+        setIsError(true);
+        setIsLoading(false);
+      },
+      onSettled: () => {
         setTimeout(() => setIsRefreshing(false), 1000);
-      });
-  }, [refetch]); // refetch는 filteredCampaigns가 변경될 때마다 변경됨
+      }
+    });
+  }, [campaigns, filteredCampaigns]); // refetch는 filteredCampaigns가 변경될 때마다 변경됨
 
   useEffect(() => {
     if (progressData) {
+      // console.log("%%%%%%%%%% useEffect progressData: ", progressData);
       const flat: DispatchStatusData[] = [];
       let maxReuse = 0;
 
@@ -153,15 +213,17 @@ const StatusCampaign: React.FC = () => {
       });
 
       setCampaignInfoList(flat);
-      // setMaxDispatchCount(maxReuse);
-      // setDispatchTypeList(
-      //   Array.from({ length: maxReuse }, (_, i) => ({
-      //     dispatch_id: i,
-      //     dispatch_name: i === 0 ? "최초발신" : `${i}차재발신`,
-      //   }))
-      // );
+
     }
+
+    
   }, [progressData]);
+
+  useEffect(() => {
+    if(campaignInfoList.length > 0){
+      processDataForChart(campaignSkills, selectedSkill, selectedDispatch);
+    }
+  },[campaignInfoList, filteredCampaigns]);
 
   const generateDispatchStatusData = (campaignId: number) => {
     const tempDataList = campaignInfoList.filter((data) => data.campaign_id === campaignId);
@@ -174,6 +236,7 @@ const StatusCampaign: React.FC = () => {
   };
 
   const processDataForChart = (campaignSkillsData: any[], currentSkill: string, dispatchType: string) => {
+    
     let filtered = currentSkill === "total"
       ? campaigns
       : campaignSkillsData.filter((c) => c.skill_id?.includes(Number(currentSkill)));
@@ -259,12 +322,6 @@ const StatusCampaign: React.FC = () => {
   useEffect(() => {
     if (statisticsUpdateCycle > 0) {
       const interval = setInterval(() => {
-        // Show toast notification before auto-refresh
-        // toast.loading(`자동 새로고침 시작 (${statisticsUpdateCycle}초 주기)`, {
-        //   duration: 2000,
-        //   position: 'top-right'
-        // });
-
         refreshData();
       }, statisticsUpdateCycle * 1000);
       return () => clearInterval(interval);
@@ -272,8 +329,11 @@ const StatusCampaign: React.FC = () => {
   }, [statisticsUpdateCycle, refreshData]);
 
   useEffect(() => {
+    fetchCampaignProgressInformation(campaigns);
     if (campaigns.length > 0) {
+      refreshData();
       fetchSkills({ tenant_id_array: [] });
+      setFilteredCampaigns(campaigns);
     }
   }, [campaigns]);
 
@@ -281,12 +341,10 @@ const StatusCampaign: React.FC = () => {
 
   // Format the last refresh time
   const formattedLastRefreshTime = lastRefreshTime ?
-    `마지막 갱신: ${lastRefreshTime.toLocaleTimeString()}` :
+    `${lastRefreshTime.toLocaleTimeString()}` :
     '아직 갱신되지 않음';
 
-  useEffect(() => {
-    setFilteredCampaigns(campaigns);
-  }, [campaigns]);
+
 
   return (
     <div className="space-y-6">
@@ -330,15 +388,15 @@ const StatusCampaign: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 text-xs text-gray-500">
+            <div className="flex items-center gap-2 text-xs text-gray-500 min-w-[260px]">
               <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-green-500" />
                 <span>
                   갱신 주기: <span className="font-medium text-blue-600">{statisticsUpdateCycle}초</span>
                 </span>
               </div>
 
-              <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md">
+              <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md max-w[150px] min-w-[150px]">
                 <span>마지막 갱신:</span>
                 <span className="font-medium text-blue-600">{formattedLastRefreshTime}</span>
               </div>
@@ -360,7 +418,8 @@ const StatusCampaign: React.FC = () => {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              {isRefreshing ? "갱신중" : "새로고침"}
+              {/* {isRefreshing ? "갱신중" : "새로고침"} */}
+              새로고침
             </CommonButton>
           </div>
         </div>
@@ -370,7 +429,7 @@ const StatusCampaign: React.FC = () => {
         className={`border rounded-lg overflow-hidden transition-all duration-300`}
         style={{ height: chartHeight }}
       >
-        {isLoading && !isRefreshing ? (
+        { (isLoading && !isRefreshing) || progressData === null ? (
           <div className="h-full flex flex-col items-center justify-center bg-slate-50">
             <div className="w-12 h-12 border-4 border-t-blue-500 rounded-full animate-spin mb-4"></div>
             <p className="text-gray-600">데이터를 로드 중입니다...</p>
@@ -392,7 +451,7 @@ const StatusCampaign: React.FC = () => {
           </div>
         ) : (
           <div className="p-4 h-full">
-            {chartData.length > 0 ? (
+            { chartData.length > 0  ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   layout="vertical"
@@ -421,7 +480,7 @@ const StatusCampaign: React.FC = () => {
                   <Bar dataKey="progress" fill="#4AD3C8" name="진행률" radius={[0, 2, 2, 0]} />
                 </BarChart>
               </ResponsiveContainer>
-            ) : (
+            ) :  (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
                   <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

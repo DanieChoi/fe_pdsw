@@ -14,6 +14,9 @@ import { useApiForGetTreeDataForCampaignGroupTab } from "@/features/campaignMana
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion"; // 꼭 상단 import 추가!
 import { useCampaignDialStatusStore } from "@/store/campaignDialStatusStore";
+import { sseMessageChannel, logoutChannel } from '@/lib/broadcastChannel';
+import logoutFunction from "@/components/common/logoutFunction";
+import { useRouter } from 'next/navigation';
 
 
 type FooterDataType = {
@@ -53,6 +56,7 @@ export default function Footer({
   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
   const [sseData, setSseData] = useState<string>('');
+  const router = useRouter();
 
 
   const lastProcessedMessageRef = useRef<string | null>(null);
@@ -460,14 +464,10 @@ export default function Footer({
           addCampaignDialStatus({ campaign_id: campaign_id, status: data['campaign_status'] });
           
         }
-        else if ((data['campaign_status'] === 2) && data['campaign_end_flag'] === 1) {
+        else if ((data['campaign_status'] === 2 || data['campaign_status'] === 3) && data['campaign_end_flag'] === 1) {
           // 캠페인 상태가 멈춤이나 정지이며, 완료 되었을때 ==> 차후에 campaign_end_flag 맞춰서 변경해야함!!!
           removeCampaignDialStatus({ campaign_id: campaign_id });
-
-        } else if ((data['campaign_status'] === 3) && data['campaign_end_flag'] === 1) {
-          removeCampaignDialStatus({ campaign_id: campaign_id });
-
-        }
+        } 
 
         // 푸터 로그 메시지
         _message = '[캠페인 동작상태 변경] 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: ' + _end_flag;
@@ -792,6 +792,11 @@ export default function Footer({
                 tempEventData
               );
               setSseData(event.data);
+              
+              sseMessageChannel.postMessage({
+                type: "sseMessage",
+                message: event.data,
+              });
             }
           } catch (error) {
             console.error("SSE JSON parse error: ", error);
@@ -820,6 +825,57 @@ export default function Footer({
       sessionStorage.removeItem("sse_connected");
     };
   }, [id, tenant_id]);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      const { type, message } = event.data;
+     
+      if( type === 'sseMessage' ){
+          console.log( 'sseMessageChannel :: ' + message);
+          const tempEventData = JSON.parse(message);
+          const announce = tempEventData["announce"];
+          const command = tempEventData["command"];
+          const data = tempEventData["data"];
+          const kind = tempEventData["kind"];
+          const campaign_id = tempEventData["campaign_id"];
+          const skill_id = tempEventData["skill_id"];
+          footerDataSet(
+            announce,
+            command,
+            data,
+            kind,
+            campaign_id,
+            tempEventData["skill_id"] || "",
+            tempEventData
+          );
+          setSseData(message);
+      }
+    };
+
+    sseMessageChannel.addEventListener("message", handleMessage);
+    return () => {
+      sseMessageChannel.removeEventListener("message", handleMessage);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleLogoutMessage = (event: MessageEvent) => {
+      const { type, message } = event.data;
+     
+      if( type === 'logout' ){
+        
+        // 일반 페이지에서 라우터 사용
+        setTimeout(() => {
+          logoutFunction();
+          router.push('/login');
+        }, 300);
+      }
+    };
+    logoutChannel.addEventListener("message", handleLogoutMessage);
+    return () => {
+      logoutChannel.removeEventListener("message", handleLogoutMessage);
+    };
+  }, []);
 
   const handleSSEMessage = (tempEventData: any) => {
     try {

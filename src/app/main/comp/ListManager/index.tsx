@@ -116,21 +116,24 @@ interface ProgressRow {
 
 const ListManager: React.FC = () => {
   const router = useRouter();
-  const { campaigns,listManagerFileFormatRows,setListManagerFileFormatRows,listManagerDelimiter,setListManagerDelimiter } = useMainStore();
+  const { campaigns
+    ,listManagerFileFormatRows,setListManagerFileFormatRows
+    ,listManagerDelimiter,setListManagerDelimiter
+    , listManagerCampaignId, setListManagerCampaignId
+    , listManagerFileFormat, setListManagerFileFormat } = useMainStore();
   const { activeTabId, openedTabs } = useTabStore();
   const [_callListInsertData, setCallListInsertData] = useState<CallingListInsertRequest>(callListInsertData);
-  const [fileFormat,setFileFormat ] = useState<string>('excel');
   const [deleteData, setDeleteData] = useState(true);  // 기존 캠페인 데이터 삭제.
   const [campaignIdDisabled,setCampaignIdDisabled] = useState<boolean>(false);
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
   const [headerColumnData,setHeaderColumnData] = useState<FormatRow[]>([]);
   const [originaldataYn, setOriginaldataYn] = useState<boolean>(false);
-  const [campaignId, setCampaignId] = useState<number>(0);
   const [listFlag, setListFlag] = useState<string>('I');
   const [workFileIndex, setWorkFileIndex ] = useState<number>(-1);
   const [listTotalCount, setListTotalCount] = useState<number>(0);
   const [listSuccessCount,setListSuccessCount] = useState<number>(0);
   const [deleteDisableYn, setDeleteDisableYn] = useState<boolean>(false);
+  const [workTargetDisableYn, setWorkTargetDisableYn ] = useState<boolean>(false);
   // 아이디 생성용 카운터
   const [nextId, setNextId] = useState(1);
   
@@ -368,12 +371,14 @@ const ListManager: React.FC = () => {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {   
     setCampaignIdDisabled(true);
+    setWorkTargetDisableYn(true);
+    setDeleteDisableYn(true);
     const files = e.target.files;
     if (files && files.length > 0) {
       try{
         setIsLoading(true);
         const file = files[0];
-        if( fileFormat === 'excel' && file.name.indexOf('.xls') === -1 ){              
+        if( listManagerFileFormat === 'excel' && file.name.indexOf('.xls') === -1 ){              
           setAlertState({
             ...errorMessage,
             isOpen: true,
@@ -381,7 +386,7 @@ const ListManager: React.FC = () => {
             type: '2',
             onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
           });
-        }else if( fileFormat === 'txt' && file.name.indexOf('.xls') > -1 ){    
+        }else if( listManagerFileFormat === 'txt' && file.name.indexOf('.xls') > -1 ){    
           setAlertState({
             ...errorMessage,
             isOpen: true,
@@ -393,7 +398,7 @@ const ListManager: React.FC = () => {
           const newFileData: FileRow = {
             id: nextId,
             fileName: file.name,
-            campaignId: campaignId+'',
+            campaignId: listManagerCampaignId,
             fileSize: (file.size / 1024).toFixed(2) + " KB",
             deletable: false,
             listFlag: listFlag,
@@ -414,7 +419,7 @@ const ListManager: React.FC = () => {
           setProgressList(prev => [newProgressListData, ...prev]);
           
           const reader = new FileReader();
-          if( fileFormat === 'excel' && file.name.indexOf('.xls') > -1 ){
+          if( listManagerFileFormat === 'excel' && file.name.indexOf('.xls') > -1 ){
             reader.onload = (event) => {
               const fileContent = event.target?.result;
               
@@ -480,7 +485,7 @@ const ListManager: React.FC = () => {
 
             };
             reader.readAsArrayBuffer(file);
-          }else if( fileFormat === 'txt' && file.name.indexOf('.xls') == -1 ){
+          }else if( listManagerFileFormat === 'txt' && file.name.indexOf('.xls') == -1 ){
             reader.onload = (event) => {
               const fileContent = event.target?.result;       
               console.log("File content:", fileContent);
@@ -627,7 +632,7 @@ const ListManager: React.FC = () => {
         type: '2',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
-    }else if( campaignId === 0){
+    }else if( listManagerCampaignId === '0' ||  listManagerCampaignId === ''){
       setAlertState({
         ...errorMessage,
         isOpen: true,
@@ -638,7 +643,7 @@ const ListManager: React.FC = () => {
     }else{
       const fileInput = document.getElementById("fileInput") as HTMLInputElement;
       if (fileInput){
-        if( fileFormat === 'excel'){
+        if( listManagerFileFormat === 'excel'){
           fileInput.accept = ".xlsx, .xls";
         }else{
           fileInput.accept = ".txt";
@@ -785,7 +790,7 @@ const ListManager: React.FC = () => {
   //select data change
   const handleSelectChange = (value: string, type: string) => {
     if( type === 'campaignId' ){
-      setCampaignId(Number(value));
+      setListManagerCampaignId(value);
       const checkYn = campaigns.find(data=>data.campaign_id === Number(value))?.start_flag === 4 
       || campaigns.find(data=>data.campaign_id === Number(value))?.start_flag === 2;
       if( checkYn ){
@@ -793,7 +798,9 @@ const ListManager: React.FC = () => {
       }else{
         setListFlag('I');
       }
-      setDeleteDisableYn(checkYn);
+      if( !workTargetDisableYn ){
+        setDeleteDisableYn(checkYn);
+      }
       setCallListInsertData({
         ..._callListInsertData,
         campaign_id: Number(value)
@@ -845,7 +852,7 @@ const ListManager: React.FC = () => {
       const tempData = openedTabs.filter(tab => tab.id === 7);
       if( tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
         const _campaignId = Number(tempData[0].campaignId);
-        setCampaignId(_campaignId);
+        setListManagerCampaignId(_campaignId+'');
         const checkYn = campaigns.find(data=>data.campaign_id === _campaignId)?.start_flag === 4 
         || campaigns.find(data=>data.campaign_id === _campaignId)?.start_flag === 2;
         if( checkYn ){
@@ -853,7 +860,9 @@ const ListManager: React.FC = () => {
         }else{
           setListFlag('I');
         }
-        setDeleteDisableYn(checkYn);
+        if( !workTargetDisableYn ){
+          setDeleteDisableYn(checkYn);
+        }
         setCallListInsertData({
           ..._callListInsertData,
           campaign_id: _campaignId
@@ -912,6 +921,12 @@ const ListManager: React.FC = () => {
     }
   }, [workFileIndex]);
 
+  useEffect(() => {
+    if( listManagerFileFormat === ''){
+      setListManagerFileFormat('excel');
+    }
+  }, [listManagerFileFormat]);
+   
   useEffect(() => {
     if ( listManagerFileFormatRows.length === 0 ) {
       setListManagerFileFormatRows(initData);
@@ -973,7 +988,7 @@ const ListManager: React.FC = () => {
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label className="w-[100px] min-w-[100px]">대상캠페인</Label>
-                <Select value={_callListInsertData.campaign_id+''} 
+                <Select value={listManagerCampaignId} 
                 onValueChange={(value) => handleSelectChange(value, 'campaignId')}
                 defaultValue="0" disabled={campaignIdDisabled}
                 >
@@ -1000,8 +1015,8 @@ const ListManager: React.FC = () => {
                 <CommonRadio
                   defaultValue="auto"
                   className="flex gap-8"
-                  value={fileFormat}
-                  onValueChange={(value) => setFileFormat(value)}
+                  value={listManagerFileFormat}
+                  onValueChange={(value) => setListManagerFileFormat(value)}
                 >
                   <div className="flex items-center space-x-2">
                     <CommonRadioItem value="excel" id="excel" />
@@ -1019,6 +1034,7 @@ const ListManager: React.FC = () => {
                   defaultValue="general"
                   className="flex gap-8 w-[200px] min-w-[200px]"
                   onValueChange={handleTargetTypeChange}
+                  disabled={workTargetDisableYn}
                 >
                   <div className="flex items-center space-x-2">
                     <CommonRadioItem value="general" id="general" />
@@ -1043,6 +1059,7 @@ const ListManager: React.FC = () => {
                   <Select value={_callListInsertData.list_flag} 
                   onValueChange={(value) => handleSelectChange(value, 'listFlag')}
                   defaultValue="I"
+                  disabled={workTargetDisableYn}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Insert: 기존리스트 삭제 후 등록" />

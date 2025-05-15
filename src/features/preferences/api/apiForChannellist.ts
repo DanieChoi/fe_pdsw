@@ -3,19 +3,11 @@ import { ChannelListResponse } from "../types/SystemPreferences";
 
 export const fetchChannelList = async (): Promise<ChannelListResponse> => {
     const channelListRequestData = {
-        filter: {
-            device_id: {
-                "start": 1,
-                "end": 99,
-            }
-        },
+
         sort: {
             device_id: 0
         },
-        page: {
-            index: 1,
-            items: 10,
-        },
+
     };
 
     try {

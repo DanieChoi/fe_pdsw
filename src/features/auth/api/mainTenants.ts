@@ -21,12 +21,10 @@ export const fetchTenants = async (credentials:MainCredentials): Promise<TenantL
   // };
 
   const tenantRequestData = {
-    ...(credentials.tenant_id !== -1 ? {
+    ...(credentials.tenant_id !== -1 && credentials.tenant_id != 0 ? {
       filter:
       {
-        tenant_id: credentials.tenant_id === 0
-          ? { start: 0, end: 999999 }
-          : { start: credentials.tenant_id, end: credentials.tenant_id },
+        tenant_id: { start: credentials.tenant_id, end: credentials.tenant_id },
       },
     } : {}),
   };

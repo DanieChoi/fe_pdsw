@@ -7,21 +7,15 @@ import { toast } from "react-toastify";
 
 
 export const apiForGetTenantList = async (tenant_id?: number): Promise<TenantListResponse> => {
-  const tenantRequestData: TenantRequestData = {
-    ...(tenant_id !== -1 ? {
+  const tenantRequestData = {
+    ...(tenant_id !== -1 && tenant_id != 0 ? {
       filter: 
       {
-        tenant_id: tenant_id === 0
-          ? { start: 0, end: 999999 }
-          : { start: tenant_id!, end: tenant_id! },
+        tenant_id: { start: tenant_id!, end: tenant_id! },
       },
     } : {}),
     sort: {
       tenant_id: 0,
-    },
-    page: {
-      index: 1,
-      items: 9999999,
     },
   };
 

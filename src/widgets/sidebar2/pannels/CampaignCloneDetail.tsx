@@ -257,9 +257,9 @@ export interface NotificationTabParam {
 }
 
 export default function CampaignDetail() {
-  const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoInsertRequest>(CampaignManagerInfo);
-  const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
-  const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
+  // const [tempCampaignManagerInfo, setTempCampaignManagerInfo] = useState<CampaignInfoInsertRequest>(CampaignManagerInfo);
+  // const [tempCampaignInfo, setTempCampaignsInfo] = useState<MainDataResponse>(CampaignInfo);
+  // const [tempCampaignSkills, setTempCampaignSkills] = useState<CampaignSkillUpdateRequest>(CampaignSkillInfo);
   const [tempCallingNumberInfo, setTempCallingNumberInfo] = useState<CallingNumberListDataResponse>(CallingNumberInfo);
   const [tempCampaignSchedule, setTempCampaignSchedule] = useState<CampaignScheDuleListDataResponse>(CampaignScheduleInfo);
   const [tempCampaignDialSpeedInfo, setTempCampaignDialSpeedInfo] = useState<CampaignDialSpeedUpdateRequest>(CampaignDialSpeedInfo);
@@ -275,7 +275,12 @@ export default function CampaignDetail() {
     , campaigns
   } = useMainStore();
   const { removeTab, activeTabId, activeTabKey, campaignIdForCopyCampaign } = useTabStore();
-  const { callingNumbers, campaignSkills, schedules, setCampaignSkills, setSchedules, setCallingNumbers } = useCampainManagerStore();
+  const { callingNumbers, campaignSkills, schedules
+    , copyCampaignManagerInfo, setCopyCampaignManagerInfo
+    , copyCampaignInfo, setCopyCampaignInfo
+    , copyTenantId, setCopyTenantId
+    , copyCampaignSchedule, setCopyCampaignSchedule
+    , copyCampaignSkills, setCopyCampaignSkills } = useCampainManagerStore();
   const [inputSkills, setInputSkills] = useState('');
   const [inputCallingNumber, setInputCallingNumber] = useState('');
   const [selectedCampaign, setSelectedCampaign] = useState<MainDataResponse>(CampaignInfo);
@@ -301,9 +306,9 @@ export default function CampaignDetail() {
 
   //캠페인 정보 최초 세팅 
   useEffect(() => {
-    if (selectedCampaign && selectedCampaign !== null) {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo,
+    if (selectedCampaign && selectedCampaign !== null && typeof copyCampaignInfo.campaign_name !== 'undefined' && copyCampaignInfo.campaign_name === '') {
+      setCopyCampaignInfo({
+        ...copyCampaignInfo,
         campaign_id: 0,
         campaign_name: selectedCampaign.campaign_name,
         campaign_desc: selectedCampaign.campaign_desc,
@@ -353,8 +358,8 @@ export default function CampaignDetail() {
         .map((data) => data.skill_id)
         .join(',');
       setInputSkills(tempSkill);
-      setTempCampaignSkills({
-        ...tempCampaignSkills
+      setCopyCampaignSkills({
+        ...copyCampaignSkills
         , skill_id: tempSkill.split(',').map((data) => Number(data))
       });
       const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === selectedCampaign.campaign_id)
@@ -377,8 +382,8 @@ export default function CampaignDetail() {
         , predictive_dial_speed: selectedCampaign.dial_mode === 2 ? 0 : selectedCampaign.dial_speed
         , progressive_dial_speed: selectedCampaign.dial_mode === 3 ? 0 : selectedCampaign.dial_speed
       })
-      setTempCampaignManagerInfo({
-        ...CampaignManagerInfo,
+      setCopyCampaignManagerInfo({
+        ...copyCampaignManagerInfo,
         campaign_id: 0,
         campaign_name: selectedCampaign.campaign_name,
         campaign_desc: selectedCampaign.campaign_desc,
@@ -448,9 +453,23 @@ export default function CampaignDetail() {
             start_time: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].start_time,
             end_time: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].end_time
           });
+          setCopyCampaignSchedule({
+            ...tempCampaignSchedule[0],
+            campaign_id: 0,
+            tenant_id: selectedCampaign.tenant_id,
+            start_date: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].start_date,
+            end_date: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].end_date,
+            start_time: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].start_time,
+            end_time: schedules.filter((schedule) => schedule.campaign_id === selectedCampaign.campaign_id)[0].end_time
+          });
         }
       } else {
         setTempCampaignSchedule({
+          ...tempCampaignSchedule,
+          campaign_id: 0,
+          tenant_id: selectedCampaign.tenant_id
+        });
+        setCopyCampaignSchedule({
           ...tempCampaignSchedule,
           campaign_id: 0,
           tenant_id: selectedCampaign.tenant_id
@@ -465,43 +484,43 @@ export default function CampaignDetail() {
       if( value !== '' && value.length <= 10 && Number(value) >= 0 ){
         const numValue = Number(value);
         setInputCampaignId(value);
-        setTempCampaignsInfo({
-            ...tempCampaignInfo,
+        setCopyCampaignInfo({
+            ...copyCampaignInfo,
             campaign_id: numValue
         });
-        setTempCampaignManagerInfo({
-            ...tempCampaignManagerInfo,
+        setCopyCampaignManagerInfo({
+            ...copyCampaignManagerInfo,
             campaign_id: numValue
         });
       }else if( value === '' ){
         setInputCampaignId('');
-        setTempCampaignsInfo({
-            ...tempCampaignInfo,
+        setCopyCampaignInfo({
+            ...copyCampaignInfo,
             campaign_id: 0
         });
-        setTempCampaignManagerInfo({
-            ...tempCampaignManagerInfo,
+        setCopyCampaignManagerInfo({
+            ...copyCampaignManagerInfo,
             campaign_id: 0
         });
       }
     }
     if (col === 'campaign_name') {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo,
+      setCopyCampaignInfo({
+        ...copyCampaignInfo,
         campaign_name: value
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
+      setCopyCampaignManagerInfo({
+        ...copyCampaignManagerInfo,
         campaign_name: value
       });
     }
     if (col === 'campaign_desc') {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo,
+      setCopyCampaignInfo({
+        ...copyCampaignInfo,
         campaign_desc: value
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
+      setCopyCampaignManagerInfo({
+        ...copyCampaignManagerInfo,
         campaign_desc: value
       });
     }
@@ -510,23 +529,23 @@ export default function CampaignDetail() {
   //select data change
   const handleSelectChange = (value: string, type: 'tenant' | 'dialMode') => {
     if (type === 'tenant' && value !== '') {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo,
+      setCopyCampaignInfo({
+        ...copyCampaignInfo,
         tenant_id: Number(value)
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
+      setCopyCampaignManagerInfo({
+        ...copyCampaignManagerInfo,
         tenant_id: Number(value)
       });
     }
     if (type === 'dialMode' && value !== '') {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo,
+      setCopyCampaignInfo({
+        ...copyCampaignInfo,
         dial_mode: Number(value),
         dial_speed: 0,
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
+      setCopyCampaignManagerInfo({
+        ...copyCampaignManagerInfo,
         dial_mode: Number(value),
         dial_speed: 0,
       });
@@ -537,14 +556,34 @@ export default function CampaignDetail() {
     }
   }
 
+  //스킬 선택 팝업 버튼이벤트
+  const handleOpenSkillPopup = () => {
+    console.log(copyTenantId);
+    if (copyTenantId === ' ') {
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: '테넌트를 선택해 주세요.',
+        type: '2',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+      });
+    } else {
+      setSkillPopupState({
+        ...skillPopupState
+        , isOpen: true
+        , tenantId: Number(copyTenantId)
+      });
+    }
+  }
+
   //스킬 선택 팝업
   const handleSelectSkills = (param: string) => {
-    if (tempCampaignSkills.skill_id.join(',') !== param) {
+    if (copyCampaignSkills.skill_id.join(',') !== param) {
       setCampaignSkillChangeYn(true);
       setInputSkills(param);
-      setTempCampaignSkills({
-        ...tempCampaignSkills
-        , campaign_id: tempCampaignInfo.campaign_id
+      setCopyCampaignSkills({
+        ...copyCampaignSkills
+        , campaign_id: copyCampaignInfo.campaign_id
         , skill_id: param.split(',').map((data) => Number(data))
       });
     }
@@ -558,7 +597,7 @@ export default function CampaignDetail() {
       setInputCallingNumber(param);
       setTempCallingNumberInfo({
         ...tempCallingNumberInfo
-        , campaign_id: tempCampaignInfo.campaign_id
+        , campaign_id: copyCampaignInfo.campaign_id
         , calling_number: param
       });
     }
@@ -568,17 +607,25 @@ export default function CampaignDetail() {
   //캠페인 동작시간 탭 변경
   const handleCampaignScheduleChange = (value: OperationTimeParam) => {
     if (value.campaignInfoChangeYn) {
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
+      setCopyCampaignManagerInfo({
+        ...copyCampaignManagerInfo
         , start_flag: Number(value.start_flag)
       });
-      setTempCampaignsInfo({
-        ...tempCampaignInfo
+      setCopyCampaignInfo({
+        ...copyCampaignInfo
         , start_flag: Number(value.start_flag)
       });
     }
     if (value.campaignScheduleChangeYn) {
       setTempCampaignSchedule({
+        ...tempCampaignSchedule
+        , campaign_id: value.campaign_id
+        , start_date: value.start_date
+        , end_date: value.end_date
+        , start_time: value.start_time
+        , end_time: value.end_time
+      });
+      setCopyCampaignSchedule({
         ...tempCampaignSchedule
         , campaign_id: value.campaign_id
         , start_date: value.start_date
@@ -598,14 +645,14 @@ export default function CampaignDetail() {
   //캠페인 발신순서 탭 변경
   const handleCampaignOutgoingOrderChange = (value: OutgoingOrderTabParam) => {
     if (value.campaignInfoChangeYn) {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo
+      setCopyCampaignInfo({
+        ...copyCampaignInfo
         , dial_phone_id: Number(value.dial_phone_id)
         , phone_dial_try: value.phone_dial_try
         , phone_order: value.phone_order
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
+      setCopyCampaignManagerInfo({
+        ...copyCampaignManagerInfo
         , dial_phone_id: Number(value.dial_phone_id)
         , phone_dial_try1: value.phone_dial_try[0]
         , phone_dial_try2: value.phone_dial_try[1]
@@ -626,12 +673,12 @@ export default function CampaignDetail() {
   //캠페인 발신전략 탭 변경
   const handleOutgoingStrategyTabChange = (value: OutgoingStrategyTabParam) => {
     if (value.campaignInfoChangeYn) {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo
+      setCopyCampaignInfo({
+        ...copyCampaignInfo
         , redial_strategy: value.redial_strategy
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
+      setCopyCampaignManagerInfo({
+        ...copyCampaignManagerInfo
         , redial_strategy1: value.redial_strategy[0]
         , redial_strategy2: value.redial_strategy[1]
         , redial_strategy3: value.redial_strategy[2]
@@ -641,12 +688,12 @@ export default function CampaignDetail() {
     }
     //초기화버튼 클릭시
     if (value.onInit) {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo
+      setCopyCampaignInfo({
+        ...copyCampaignInfo
         , redial_strategy: CampaignInfo.redial_strategy
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
+      setCopyCampaignManagerInfo({
+        ...copyCampaignManagerInfo
         , redial_strategy1: CampaignManagerInfo.redial_strategy1
         , redial_strategy2: CampaignManagerInfo.redial_strategy2
         , redial_strategy3: CampaignManagerInfo.redial_strategy3
@@ -665,8 +712,8 @@ export default function CampaignDetail() {
   //캠페인 발신방법 탭 변경
   const handleOutgoingMethodTabChange = (value: OutgoingMethodTabParam) => {
     if (value.campaignInfoChangeYn) {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo
+      setCopyCampaignInfo({
+        ...copyCampaignInfo
         , trunk_access_code: value.trunk_access_code
         , dial_try_interval: value.dial_try_interval
         , alarm_answer_count: value.alarm_answer_count
@@ -684,8 +731,8 @@ export default function CampaignDetail() {
         , user_option: value.user_option
         , channel_group_id: value.channel_group_id
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
+      setCopyCampaignManagerInfo({
+        ...copyCampaignManagerInfo
         , trunk_access_code: value.trunk_access_code
         , dial_try_interval: value.dial_try_interval
         , alarm_answer_count: value.alarm_answer_count
@@ -724,9 +771,9 @@ export default function CampaignDetail() {
         ...tempCampaignDialSpeedInfo
         , dial_speed: value.dial_mode === 2 ? Math.floor(value.progressive_dial_speed) : value.predictive_dial_speed
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo,
-        dial_speed: tempCampaignManagerInfo.dial_mode === 2 ? Math.floor(value.progressive_dial_speed) : value.predictive_dial_speed
+      setCopyCampaignManagerInfo({
+        ...copyCampaignManagerInfo,
+        dial_speed: copyCampaignManagerInfo.dial_mode === 2 ? Math.floor(value.progressive_dial_speed) : value.predictive_dial_speed
       });
     }
     if (value.onSave) {
@@ -740,13 +787,13 @@ export default function CampaignDetail() {
   //캠페인 콜백 탭 변경
   const handleCallbackTabChange = (value: CallbackTabParam) => {
     if (value.campaignInfoChangeYn) {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo
+      setCopyCampaignInfo({
+        ...copyCampaignInfo
         , callback_kind: Number(value.callback_kind)
         , service_code: value.service_code
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
+      setCopyCampaignManagerInfo({
+        ...copyCampaignManagerInfo
         , callback_kind: Number(value.callback_kind)
         , service_code: value.service_code
       });
@@ -762,14 +809,14 @@ export default function CampaignDetail() {
   //캠페인 알림 탭 변경
   const handleNotificationTabChange = (value: NotificationTabParam) => {
     if (value.campaignInfoChangeYn) {
-      setTempCampaignsInfo({
-        ...tempCampaignInfo
+      setCopyCampaignInfo({
+        ...copyCampaignInfo
         , list_alarm_count: Number(value.list_alarm_count)
         , supervisor_phone: value.supervisor_phone
         , use_list_alarm: value.use_list_alarm
       });
-      setTempCampaignManagerInfo({
-        ...tempCampaignManagerInfo
+      setCopyCampaignManagerInfo({
+        ...copyCampaignManagerInfo
         , list_alarm_count: Number(value.list_alarm_count)
         , supervisor_phone: value.supervisor_phone
         , use_list_alarm: value.use_list_alarm
@@ -814,8 +861,8 @@ export default function CampaignDetail() {
   const handleCampaignSave = () => {
     let saveErrorCheck = false;
     //2018.11.27 Gideon #23127 캠페인 수정창 연결 IVR 입력 예외 처리
-    if( tempCampaignManagerInfo.dial_mode === 1 && (tempCampaignManagerInfo.token_id === 0 || tempCampaignManagerInfo.token_id === 3) ){
-      if( tempCampaignManagerInfo.power_divert_queue === '0' || tempCampaignManagerInfo.power_divert_queue === ''){
+    if( copyCampaignManagerInfo.dial_mode === 1 && (copyCampaignManagerInfo.token_id === 0 || copyCampaignManagerInfo.token_id === 3) ){
+      if( copyCampaignManagerInfo.power_divert_queue === '0' || copyCampaignManagerInfo.power_divert_queue === ''){
         saveErrorCheck = true;
         setAlertState({
           ...errorMessage,
@@ -826,7 +873,7 @@ export default function CampaignDetail() {
         });
       }
     }
-    if(!saveErrorCheck && tempCampaignManagerInfo.campaign_name === '' ){
+    if(!saveErrorCheck && copyCampaignManagerInfo.campaign_name === '' ){
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -836,7 +883,7 @@ export default function CampaignDetail() {
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
-    if(!saveErrorCheck && tempCampaignManagerInfo.tenant_id < 0 ){
+    if(!saveErrorCheck && copyCampaignManagerInfo.tenant_id < 0 ){
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -846,8 +893,8 @@ export default function CampaignDetail() {
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
-    if( !saveErrorCheck && tempCampaignManagerInfo.campaign_id > 0 ){
-      const checkCampaign = campaigns.filter(data => data.campaign_id === tempCampaignManagerInfo.campaign_id);
+    if( !saveErrorCheck && copyCampaignManagerInfo.campaign_id > 0 ){
+      const checkCampaign = campaigns.filter(data => data.campaign_id === copyCampaignManagerInfo.campaign_id);
       if( checkCampaign.length > 0 ){
         saveErrorCheck = true;
         setAlertState({
@@ -913,7 +960,7 @@ export default function CampaignDetail() {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     setChangeYn(true);
     const todayTime = getCurrentFormattedTime();
-    fetchCampaignManagerInsert({...tempCampaignManagerInfo
+    fetchCampaignManagerInsert({...copyCampaignManagerInfo
       , update_user: id
       , creation_user: id
       , update_ip: Cookies.get('userHost')+''
@@ -930,7 +977,7 @@ export default function CampaignDetail() {
     onSuccess: (data) => {
       setTempCampaignId(data.result_data.campaign_id);
       const _tempCampaignSchedule = {...tempCampaignSchedule
-        , tenant_id: tempCampaignManagerInfo.tenant_id
+        , tenant_id: copyCampaignManagerInfo.tenant_id
         , campaign_id: data.result_data.campaign_id
       }
       //캠페인 스케줄 수정 api 호출
@@ -963,8 +1010,8 @@ export default function CampaignDetail() {
   //캠페인 스케줄 등록 api 호출
   const { mutate: fetchCampaignScheduleInsert } = useApiForCampaignScheduleInsert({
     onSuccess: (data) => {
-      if( tempCampaignSkills.skill_id[0] !== 0 ){
-        const _tempCampaignSkills = {...tempCampaignSkills,
+      if( copyCampaignSkills.skill_id[0] !== 0 ){
+        const _tempCampaignSkills = {...copyCampaignSkills,
           campaign_id: tempCampaignId
         }
         fetchCampaignSkillUpdate(_tempCampaignSkills);
@@ -1008,7 +1055,7 @@ export default function CampaignDetail() {
     onSuccess: (data) => {
       setCampaigns(data.result_data);
       setSelectedCampaign( data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0] );
-      setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0]);
+      setCopyCampaignInfo(data.result_data.filter((campaign) => campaign.campaign_id === tempCampaignId)[0]);
       // setChangeYn(false);
       setAlertState({
         ...errorMessage,
@@ -1038,6 +1085,33 @@ export default function CampaignDetail() {
     }
   }, [campaigns, campaignIdForCopyCampaign]);
 
+  useEffect(() => {
+    if (copyCampaignSchedule && typeof copyCampaignSchedule.campaign_id !== 'undefined') {
+      setTempCampaignSchedule({ ...copyCampaignSchedule });
+    } else {
+      setCopyCampaignSchedule(CampaignScheduleInfo);
+    }
+  }, [copyCampaignSchedule]);
+
+  useEffect(() => {
+    if (CampaignManagerInfo && typeof copyCampaignManagerInfo.campaign_id !== 'undefined') {
+      if (!isNaN(copyCampaignInfo.tenant_id) && copyCampaignInfo.tenant_id > -1) {
+        setCopyTenantId(copyCampaignInfo.tenant_id + '');
+      }
+      if( copyCampaignSkills && copyCampaignSkills.skill_id.length > 0){
+        setInputSkills(copyCampaignSkills.skill_id.join(','));
+      }
+      if( copyCampaignManagerInfo.campaign_id > 0 ){
+        setInputCampaignId(copyCampaignManagerInfo.campaign_id+'');
+      }
+    } else {
+      setCopyCampaignManagerInfo(CampaignManagerInfo);
+      setCopyCampaignInfo(CampaignInfo);
+      setCopyTenantId((tenants.length > 0 ? tenants[0].tenant_id : '') + '' || ' ');
+      setCopyCampaignSkills(CampaignSkillInfo);
+    }
+  }, [copyCampaignManagerInfo]);
+
   return (
     <div className='flex flex-col gap-5 w-full overflow-auto'>
       <div>
@@ -1065,7 +1139,7 @@ export default function CampaignDetail() {
             <Label className="w-[5.6rem] min-w-[5.6rem]">테넌트</Label>
             <Select
               onValueChange={(value) => handleSelectChange(value, 'tenant')}
-              value={tempCampaignInfo.tenant_id + '' || ''}
+              value={copyCampaignInfo.tenant_id + '' || ''}
               disabled={true}
             >
               <SelectTrigger className="w-full">
@@ -1084,7 +1158,7 @@ export default function CampaignDetail() {
           <div className='flex items-center gap-2'>
             <Label className="w-[5.6rem] min-w-[5.6rem]">캠페인명</Label>
             <CustomInput
-              value={tempCampaignInfo.campaign_name || ''}
+              value={copyCampaignInfo.campaign_name || ''}
               onChange={(e) => handleInputData(e.target.value, 'campaign_name')}
               className=""
             />
@@ -1094,7 +1168,7 @@ export default function CampaignDetail() {
             <Label className="w-[5.6rem] min-w-[5.6rem]">다이얼 모드</Label>
             <Select
               onValueChange={(value) => handleSelectChange(value, 'dialMode')}
-              value={tempCampaignInfo.dial_mode + '' || ''}
+              value={copyCampaignInfo.dial_mode + '' || ''}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="다이얼 모드를 선택하세요" />
@@ -1119,12 +1193,7 @@ export default function CampaignDetail() {
                 width={12}
                 height={12}
                 priority
-                onClick={() =>
-                  setSkillPopupState({
-                    ...skillPopupState,
-                    isOpen: true,
-                  })
-                }
+                onClick={() => handleOpenSkillPopup()}
               />
             </button>
           </div>
@@ -1146,7 +1215,7 @@ export default function CampaignDetail() {
           </div>
           <div className="flex items-center gap-2 col-span-3">
             <Label className="w-[5.6rem] min-w-[5.6rem]">설명</Label>
-            <CustomInput value={tempCampaignInfo.campaign_desc || ''} className="w-full"
+            <CustomInput value={copyCampaignInfo.campaign_desc || ''} className="w-full"
               onChange={(e) => handleInputData(e.target.value, 'campaign_desc')}
             />
           </div>
@@ -1156,7 +1225,7 @@ export default function CampaignDetail() {
         <CampaignTab
           campaignSchedule={tempCampaignSchedule}
           callCampaignMenu={'CampaignClone'}
-          campaignInfo={tempCampaignInfo}
+          campaignInfo={copyCampaignInfo}
           campaignDialSpeedInfo={tempCampaignDialSpeedInfoParam}
           onCampaignOutgoingOrderChange={(value) => handleCampaignOutgoingOrderChange(value)}
           onCampaignScheduleChange={(value) => handleCampaignScheduleChange(value)}
@@ -1169,8 +1238,8 @@ export default function CampaignDetail() {
         />
       </div>
       <SkillListPopup
-        param={tempCampaignSkills.skill_id || []}
-        tenantId={tempCampaignInfo.tenant_id}
+        param={copyCampaignSkills.skill_id || []}
+        tenantId={copyCampaignInfo.tenant_id}
         type={skillPopupState.type}
         isOpen={skillPopupState.isOpen}
         onConfirm={(param) => handleSelectSkills(param)}
