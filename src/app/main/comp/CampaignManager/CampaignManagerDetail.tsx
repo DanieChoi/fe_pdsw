@@ -44,6 +44,10 @@ import { useEnvironmentStore } from "@/store/environmentStore";
 import { CampaignInfoInsertRequest } from '@/features/campaignManager/hooks/useApiForCampaignManagerInsert';
 import { useDeleteCampaignHelper } from '@/features/campaignManager/utils/deleteCampaignHelper';
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
+import { useCampaignDialStatusStore } from '@/store/campaignDialStatusStore';
+import { ca } from 'date-fns/locale';
+import { set } from 'lodash';
+import { on } from 'events';
 
 
 
@@ -155,6 +159,7 @@ export interface OperationTimeParam {
   start_time: string[];
   end_time: string[];
   start_flag: string;
+  only_status_change: boolean;  // 캠페인 상태만 변경되었는지 체크
 }
 
 export interface OutgoingOrderTabParam {
@@ -366,6 +371,82 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         redial_strategy: selectedCampaign.redial_strategy,
         channel_group_id: selectedCampaign.channel_group_id
       });
+
+      // 캠페인 초기정보 세팅
+      setOriCampaignManagerInfo(
+        {
+          ...oriCampaignManagerInfo,
+          campaign_id: selectedCampaign.campaign_id,
+          campaign_name: selectedCampaign.campaign_name,
+          campaign_desc: selectedCampaign.campaign_desc,
+          site_code: selectedCampaign.site_code,
+          service_code: selectedCampaign.service_code,
+          start_flag: selectedCampaign.start_flag,
+          end_flag: selectedCampaign.end_flag,
+          dial_mode: selectedCampaign.dial_mode,
+          callback_kind: selectedCampaign.callback_kind,
+          delete_flag: selectedCampaign.delete_flag,
+          list_count: selectedCampaign.list_count,
+          list_redial_query: selectedCampaign.list_redial_query,
+          next_campaign: selectedCampaign.next_campaign,
+          token_id: selectedCampaign.token_id,
+          phone_order: selectedCampaign.phone_order,
+          phone_dial_try1: (selectedCampaign.phone_dial_try !== undefined)
+            ? Number(selectedCampaign.phone_dial_try.slice(0, 1)[0])
+            : 0,
+          phone_dial_try2: (selectedCampaign.phone_dial_try !== undefined)
+            ? Number(selectedCampaign.phone_dial_try.slice(1, 2)[0])
+            : 0,
+          phone_dial_try3: (selectedCampaign.phone_dial_try !== undefined)
+            ? Number(selectedCampaign.phone_dial_try.slice(2, 3)[0])
+            : 0,
+          phone_dial_try4: (selectedCampaign.phone_dial_try !== undefined)
+            ? Number(selectedCampaign.phone_dial_try.slice(3, 4)[0])
+            : 0,
+          phone_dial_try5: (selectedCampaign.phone_dial_try !== undefined)
+            ? Number(selectedCampaign.phone_dial_try.slice(4, 5)[0])
+            : 0,
+          dial_try_interval: selectedCampaign.dial_try_interval,
+          trunk_access_code: selectedCampaign.trunk_access_code,
+          DDD_code: selectedCampaign.DDD_code,
+          power_divert_queue: selectedCampaign.power_divert_queue + '',
+          max_ring: selectedCampaign.max_ring,
+          detect_mode: selectedCampaign.detect_mode,
+          auto_dial_interval: selectedCampaign.auto_dial_interval,
+          creation_user: selectedCampaign.creation_user + '',
+          creation_time: selectedCampaign.creation_time,
+          creation_ip: selectedCampaign.creation_ip,
+          update_user: selectedCampaign.update_user + '',
+          update_time: selectedCampaign.update_time,
+          update_ip: selectedCampaign.update_ip,
+          dial_phone_id: selectedCampaign.dial_phone_id,
+          tenant_id: selectedCampaign.tenant_id,
+          alarm_answer_count: selectedCampaign.alarm_answer_count,
+          dial_speed: selectedCampaign.dial_speed,
+          parent_campaign: selectedCampaign.parent_campaign,
+          overdial_abandon_time: selectedCampaign.overdial_abandon_time,
+          list_alarm_count: selectedCampaign.list_alarm_count,
+          supervisor_phone: selectedCampaign.supervisor_phone,
+          reuse_count: selectedCampaign.reuse_count,
+          use_counsel_result: selectedCampaign.use_counsel_result,
+          use_list_alarm: selectedCampaign.use_list_alarm,
+          redial_strategy1: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(0, 1)[0] + '' : '',
+          redial_strategy2: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(1, 2)[0] + '' : '',
+          redial_strategy3: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(2, 3)[0] + '' : '',
+          redial_strategy4: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(3, 4)[0] + '' : '',
+          redial_strategy5: (selectedCampaign.redial_strategy !== undefined) ? selectedCampaign.redial_strategy.slice(4, 5)[0] + '' : '',
+          dial_mode_option: selectedCampaign.dial_mode_option,
+          user_option: selectedCampaign.user_option,
+          customer_char_id: 1,
+          counsel_script_id: 1,
+          announcement_id: 1,
+          campaign_level: 0,
+          outbound_sequence: '',
+          channel_group_id: selectedCampaign.channel_group_id
+        }
+      );
+
+
 
       const tempSkill = campaignSkills
         .filter((skill) => skill.campaign_id === selectedCampaign.campaign_id)
@@ -642,10 +723,12 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
 
   // 캠페인 동작시간 탭 변경
   const handleCampaignScheduleChange = (value: OperationTimeParam) => {
-    if (value.campaignInfoChangeYn) {
-      if (!campaignInfoChangeYn) {
-        setCampaignInfoChangeYn(true);
-      }
+    
+    // 캠페인 정보만 변경 여부 확인
+    if (value.only_status_change) {
+
+      setOnlyCampaignStatusChange(true); // 캠페인 상태 api만 날리기 위한 표시
+
       setTempCampaignManagerInfo({
         ...tempCampaignManagerInfo,
         start_flag: Number(value.start_flag)
@@ -654,26 +737,43 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         ...tempCampaignInfo,
         start_flag: Number(value.start_flag)
       });
-    }
-    if (value.campaignScheduleChangeYn) {
-      if (!campaignScheduleChangeYn) {
-        setCampaignScheduleChangeYn(true);
+
+    }else {
+      if (value.campaignInfoChangeYn) {
+        if (!campaignInfoChangeYn) {
+          setCampaignInfoChangeYn(true); // ###
+        }
+        setTempCampaignManagerInfo({
+          ...tempCampaignManagerInfo,
+          start_flag: Number(value.start_flag)
+        });
+        setTempCampaignsInfo({
+          ...tempCampaignInfo,
+          start_flag: Number(value.start_flag)
+        });
       }
-      setTempCampaignSchedule({
-        ...tempCampaignSchedule,
-        campaign_id: value.campaign_id,
-        start_date: value.start_date,
-        end_date: value.end_date,
-        start_time: value.start_time,
-        end_time: value.end_time
-      });
+      if (value.campaignScheduleChangeYn) {
+        if (!campaignScheduleChangeYn) {
+          setCampaignScheduleChangeYn(true);
+        }
+        setTempCampaignSchedule({
+          ...tempCampaignSchedule,
+          campaign_id: value.campaign_id,
+          start_date: value.start_date,
+          end_date: value.end_date,
+          start_time: value.start_time,
+          end_time: value.end_time
+        });
+      }
+      if (value.onSave) {
+        handleCampaignSave();
+      }
+      if (value.onClosed) {
+        handleCampaignClosed();
+      }
     }
-    if (value.onSave) {
-      handleCampaignSave();
-    }
-    if (value.onClosed) {
-      handleCampaignClosed();
-    }
+
+    
   };
 
   // 캠페인 발신순서 탭 변경
@@ -918,64 +1018,201 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     removeTab(Number(activeTabId), activeTabKey + '');
   };
 
+  // 캠페인 상태 변경 API 조건 체크
+  const [campaignStatusUpdateCheck, setCampaignStatusUpdateCheck] = useState<boolean>(true);
+  // 캠페인 상태만 변경되었는지 체크
+  const [onlyCampaignStatusChange, setOnlyCampaignStatusChange] = useState<boolean>(false);
+  
+
   // 캠페인 저장 체크
-  const saveCampaignCheck = () => {
-    let saveCheck = true;
-    const today = new Date();
-    const tempDate = today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2);
-    if (tempCampaignSchedule.start_time.length === 0) {
-      saveCheck = false;
-      setAlertState({
-        ...errorMessage,
-        isOpen: true,
-        message: "시작시간 또는 종료시간을 지정해 주세요.",
-        type: '2',
-        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
-      });
-    } else if (tempCampaignSchedule.end_date < tempDate) {
-      saveCheck = false;
-      setAlertState({
-        ...errorMessage,
-        isOpen: true,
-        message: "종료일이 금일 이전으로 설정되어 있습니다.",
-        type: '2',
-        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
-      });
-    }
+  // const saveCampaignCheck = () => {
+  //   let saveCheck = true;
+  //   const today = new Date();
+  //   const tempDate = today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2);
+  //   if (tempCampaignSchedule.start_time.length === 0) {
+  //     saveCheck = false;
+  //     setAlertState({
+  //       ...errorMessage,
+  //       isOpen: true,
+  //       message: "시작시간 또는 종료시간을 지정해 주세요.",
+  //       type: '2',
+  //       onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+  //     });
+      
+  //   } else if (tempCampaignSchedule.end_date < tempDate) {
+  //     saveCheck = false;
+  //     setAlertState({
+  //       ...errorMessage,
+  //       isOpen: true,
+  //       message: "종료일이 금일 이전으로 설정되어 있습니다.",
+  //       type: '2',
+  //       onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+  //     });
+  //   }
     
-    if( environmentData ){
-      if( !(officeStartTime === '0000' && officeEndTime === '0000')){
-        let timeCheck = false;
-        for( let i=0;i< tempCampaignSchedule.start_time.length ;i++ ){
-          if( officeStartTime > tempCampaignSchedule.start_time[i] || officeEndTime < tempCampaignSchedule.end_time[i] ){
-            timeCheck = true;
+  //   if( environmentData ){
+  //     if( !(officeStartTime === '0000' && officeEndTime === '0000')){
+  //       let timeCheck = false;
+  //       for( let i=0;i< tempCampaignSchedule.start_time.length ;i++ ){
+  //         if( officeStartTime > tempCampaignSchedule.start_time[i] || officeEndTime < tempCampaignSchedule.end_time[i] ){
+  //           timeCheck = true;
+  //         }
+  //       }
+  //       if( timeCheck ){
+  //         saveCheck = false;
+  //         setAlertState({
+  //           ...errorMessage,
+  //           isOpen: true,
+  //           message: "설정된 발신 업무 시간에 맞지 않은 스케줄이 존재 합니다. 동작시간 탭의 시작 시간 또는 종료 시간을 변경해 주세요.",
+  //           type: '2',
+  //           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+  //         });
+  //       }
+  //     }
+  //   }
+
+  //   const currentDialStatus = useCampaignDialStatusStore.getState().campaignDialStatus;
+    
+  //   // 현재 캠페인의 상태가 정지중이거나 멈춤중일때
+  //   const existDial = currentDialStatus.some(( dialStatus) => 
+  //                     (dialStatus.campaign_id.toString() === selectedCampaign?.campaign_id.toString()) && 
+  //                     (dialStatus.status?.toString() === '5' || dialStatus.status?.toString() === '6') );
+  
+  //   if( existDial ) {
+  //     saveCheck = false;
+  //     setAlertState({
+  //       ...errorMessage,
+  //       title: '캠페인 상태 변경',
+  //       isOpen: true,
+  //       message:
+  //         '발신중인 데이터 처리 중 입니다. 기다려 주시길 바랍니다. \n강제로 상태 변경을 하실 경우에는 발신 데이터 처리가 되지 않으며 \n재시작 시에는 중복 발신이 될 수도 있습니다.\n그래도 진행하시겠습니까?',
+  //       onClose: () => {
+  //         setAlertState((prev) => ({ ...prev, isOpen: false }));
+  //         saveCheck = true;
+  //         setCampaignStatusUpdateCheck(false);
+  //       },
+  //       onCancel: () => {
+  //         setAlertState((prev) => ({ ...prev, isOpen: false }));
+  //         // 취소시 아무 일도 안 함
+  //       },
+  //     });
+  //   }
+  //   return saveCheck;
+  // };
+
+
+  interface CampaignCheckResult {
+    isSaveOk: boolean;
+    isDialExist?: boolean;
+  };
+  
+  // 캠페인 저장 체크
+  const saveCampaignCheck = (): Promise<CampaignCheckResult> => {
+    return new Promise((resolve) => {
+      let saveCheck = true;
+
+      const today = new Date();
+      const tempDate = today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2);
+
+      if (tempCampaignSchedule.start_time.length === 0) {
+        saveCheck = false;
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "시작시간 또는 종료시간을 지정해 주세요.",
+          type: '2',
+          onClose: () => {
+            setAlertState((prev) => ({ ...prev, isOpen: false }));
+            resolve({ isSaveOk: false }); // 즉시 종료
+          }
+        });
+        return;
+      }
+
+      if (tempCampaignSchedule.end_date < tempDate) {
+        saveCheck = false;
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: "종료일이 금일 이전으로 설정되어 있습니다.",
+          type: '2',
+          onClose: () => {
+            setAlertState((prev) => ({ ...prev, isOpen: false }));
+            resolve({ isSaveOk: false });
+          }
+        });
+        return;
+      }
+
+      // 시간 범위 체크
+      if (environmentData) {
+        if (!(officeStartTime === '0000' && officeEndTime === '0000')) {
+          const timeCheck = tempCampaignSchedule.start_time.some((start, i) => {
+            return officeStartTime > start || officeEndTime < tempCampaignSchedule.end_time[i];
+          });
+
+          if (timeCheck) {
+            saveCheck = false;
+            setAlertState({
+              ...errorMessage,
+              isOpen: true,
+              message: "설정된 발신 업무 시간에 맞지 않은 스케줄이 존재 합니다. 동작시간 탭의 시작 시간 또는 종료 시간을 변경해 주세요.",
+              type: '2',
+              onClose: () => {
+                setAlertState((prev) => ({ ...prev, isOpen: false }));
+                resolve({ isSaveOk: false });
+              }
+            });
+            return;
           }
         }
-        if( timeCheck ){
-          saveCheck = false;
-          setAlertState({
-            ...errorMessage,
-            isOpen: true,
-            message: "설정된 발신 업무 시간에 맞지 않은 스케줄이 존재 합니다. 동작시간 탭의 시작 시간 또는 종료 시간을 변경해 주세요.",
-            type: '2',
-            onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
-          });
-        }
       }
-    }
-    return saveCheck;
+
+      const currentDialStatus = useCampaignDialStatusStore.getState().campaignDialStatus;
+      const existDial = currentDialStatus.some(
+        (dialStatus) =>
+          dialStatus.campaign_id.toString() === selectedCampaign?.campaign_id.toString() &&
+          (dialStatus.status?.toString() === '5' || dialStatus.status?.toString() === '6')
+      );
+
+      if (existDial) {
+        saveCheck = false;
+        setAlertState({
+          ...errorMessage,
+          title: '캠페인 상태 변경',
+          isOpen: true,
+          message:
+            '발신중인 데이터 처리 중 입니다. 기다려 주시길 바랍니다. \n강제로 상태 변경을 하실 경우에는 발신 데이터 처리가 되지 않으며 \n재시작 시에는 중복 발신이 될 수도 있습니다.\n그래도 진행하시겠습니까?',
+          onClose: () => {
+            setCampaignStatusUpdateCheck(false);
+            setAlertState((prev) => ({ ...prev, isOpen: false }));
+            resolve({ isSaveOk: true, isDialExist : true }); // 사용자 확인 시 true로 반환
+          },
+          onCancel: () => {
+            setAlertState((prev) => ({ ...prev, isOpen: false }));
+            resolve({ isSaveOk: false }); // 사용자 취소
+          }
+        });
+        return;
+      }
+
+      // 모든 검사를 통과했으면
+      resolve({ isSaveOk: true });
+    });
   };
 
+  // 0515 비동기 처리로 변경해서 파라미터를 넘겨주는 구조로 변경
   // 캠페인 저장
-  const handleCampaignSave = () => {
-    if (saveCampaignCheck()) {
+  const handleCampaignSave = async () => {
+    const {isSaveOk , isDialExist} = await saveCampaignCheck();
+    if (isSaveOk) {
       setAlertState({
         ...errorMessage,
         isOpen: true,
         message: '캠페인 아이디 : ' + tempCampaignManagerInfo.campaign_id
           + '\n 캠페인 이름 : ' + tempCampaignManagerInfo.campaign_name
           + '\n 캠페인을 수정하시겠습니까?',
-        onClose: handleCampaignSaveExecute,
+        onClose: () => handleCampaignSaveExecute(isDialExist ?? false),
         onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
@@ -997,34 +1234,103 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   };
   
   // 캠페인 저장 실행
-  const handleCampaignSaveExecute = () => {
+  const handleCampaignSaveExecute = (isDialExist: boolean) => {
     setAlertState((prev) => ({ ...prev, isOpen: false }));
     setChangeYn(false);
+    
     const todayTime = getCurrentFormattedTime();
-    if (campaignInfoChangeYn) {
+    // 캠페인 상태만 변경하는 거라면
+    if(onlyCampaignStatusChange){
 
-      if (tempCampaignManagerInfo.start_flag === 1 && oriCampaignManagerInfo.start_flag != 1) {
+      // 이전 캠페인 상태와 현재 바꾸려는 캠페인의 상태가 같다면
+      if(oriCampaignManagerInfo.start_flag === tempCampaignManagerInfo.start_flag){
+        return;
+      }
+      
+      // 캠페인 상태만 변경하는거지만 발신중인경우 
+      if(isDialExist || !campaignStatusUpdateCheck){
+        // console.log('발신중인 캠페인 상태 변경');
+        fetchCampaignManagerUpdate({
+          ...tempCampaignManagerInfo
+          , update_user: user_id
+          , update_ip: Cookies.get('userHost')+''
+          , update_time: todayTime
+        });
+      }
+      else{
         fetchCampaignStatusUpdate({
           campaign_id: tempCampaignManagerInfo.campaign_id,
           campaign_status: tempCampaignManagerInfo.start_flag
         });
-      } else {
-        if (tempCampaignManagerInfo.dial_mode === 2 || tempCampaignManagerInfo.dial_mode === 3) {
-          fetchCampaignManagerUpdate({
-            ...tempCampaignManagerInfo
-            , update_user: user_id
-            , update_ip: Cookies.get('userHost')+''
-            , update_time: todayTime
+      }
+
+    }else{
+      // 캠페인 상태가 아닌 수정이거나 캠페인 상태도 포함인 경우
+      if (campaignInfoChangeYn) {
+        if (tempCampaignManagerInfo.start_flag === 1 && oriCampaignManagerInfo.start_flag != 1) {
+          fetchCampaignStatusUpdate({
+            campaign_id: tempCampaignManagerInfo.campaign_id,
+            campaign_status: tempCampaignManagerInfo.start_flag
           });
-        } else {
-          fetchCampaignManagerUpdate({
-            ...tempCampaignManagerInfo
-            , update_user: user_id
-            , update_ip: Cookies.get('userHost')+''
-            , update_time: todayTime
-            , dial_speed: 0
-          });
+        } 
+        else {
+          if (tempCampaignManagerInfo.dial_mode === 2 || tempCampaignManagerInfo.dial_mode === 3) {
+            fetchCampaignManagerUpdate({
+              ...tempCampaignManagerInfo
+              , update_user: user_id
+              , update_ip: Cookies.get('userHost')+''
+              , update_time: todayTime
+            });
+          } else {
+            fetchCampaignManagerUpdate({
+              ...tempCampaignManagerInfo
+              , update_user: user_id
+              , update_ip: Cookies.get('userHost')+''
+              , update_time: todayTime
+              , dial_speed: 0
+            });
+          }
+          if (campaignSkillChangeYn) {
+            if (tempCampaignSkills.skill_id[0] === 0) {
+              fetchCampaignSkillUpdate({
+                ...tempCampaignSkills,
+                skill_id: []
+              });
+            } else {
+              fetchCampaignSkillUpdate(tempCampaignSkills);
+            }
+          }
+          if (campaignScheduleChangeYn) {
+            if (tempCampaignSchedule.tenant_id === 0) {
+              fetchCampaignScheduleInsert({ ...tempCampaignSchedule, tenant_id: tempCampaignManagerInfo.tenant_id });
+            } else {
+              fetchCampaignScheduleUpdate(tempCampaignSchedule);
+            }
+          }
+          if (callingNumberChangeYn) {
+            const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignManagerInfo.campaign_id)
+              .map((data) => data.calling_number)
+              .join(',');
+            if (tempCallingNumberInfo.calling_number !== '' && tempCallNumber === '') {
+              fetchCallingNumberInsert(tempCallingNumberInfo);
+            } else if (tempCallingNumberInfo.calling_number === '' && tempCallNumber !== '') {
+              fetchCallingNumberDelete(tempCallingNumberInfo);
+            } else {
+              fetchCallingNumberUpdate(tempCallingNumberInfo);
+            }
+          }
+          if (campaignDialSpeedChangeYn) {
+            if (tempCampaignManagerInfo.dial_mode === 2 || tempCampaignManagerInfo.dial_mode === 3) {
+              fetchDialSpeedUpdate(tempCampaignDialSpeedInfo);
+            } else {
+              fetchDialSpeedUpdate({
+                ...tempCampaignDialSpeedInfo,
+                dial_speed: 0
+              });
+            }
+          }
         }
+      } else {
         if (campaignSkillChangeYn) {
           if (tempCampaignSkills.skill_id[0] === 0) {
             fetchCampaignSkillUpdate({
@@ -1063,46 +1369,6 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
               dial_speed: 0
             });
           }
-        }
-      }
-    } else {
-      if (campaignSkillChangeYn) {
-        if (tempCampaignSkills.skill_id[0] === 0) {
-          fetchCampaignSkillUpdate({
-            ...tempCampaignSkills,
-            skill_id: []
-          });
-        } else {
-          fetchCampaignSkillUpdate(tempCampaignSkills);
-        }
-      }
-      if (campaignScheduleChangeYn) {
-        if (tempCampaignSchedule.tenant_id === 0) {
-          fetchCampaignScheduleInsert({ ...tempCampaignSchedule, tenant_id: tempCampaignManagerInfo.tenant_id });
-        } else {
-          fetchCampaignScheduleUpdate(tempCampaignSchedule);
-        }
-      }
-      if (callingNumberChangeYn) {
-        const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignManagerInfo.campaign_id)
-          .map((data) => data.calling_number)
-          .join(',');
-        if (tempCallingNumberInfo.calling_number !== '' && tempCallNumber === '') {
-          fetchCallingNumberInsert(tempCallingNumberInfo);
-        } else if (tempCallingNumberInfo.calling_number === '' && tempCallNumber !== '') {
-          fetchCallingNumberDelete(tempCallingNumberInfo);
-        } else {
-          fetchCallingNumberUpdate(tempCallingNumberInfo);
-        }
-      }
-      if (campaignDialSpeedChangeYn) {
-        if (tempCampaignManagerInfo.dial_mode === 2 || tempCampaignManagerInfo.dial_mode === 3) {
-          fetchDialSpeedUpdate(tempCampaignDialSpeedInfo);
-        } else {
-          fetchDialSpeedUpdate({
-            ...tempCampaignDialSpeedInfo,
-            dial_speed: 0
-          });
         }
       }
     }
@@ -1180,12 +1446,12 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   };
 
   useEffect(() => {
-    if (!changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !callingNumberChangeYn && !campaignDialSpeedChangeYn) {
+    if (!changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !callingNumberChangeYn && !campaignDialSpeedChangeYn && !onlyCampaignStatusChange) {
       setChangeYn(true);
-      fetchMain({
-        session_key: '',
-        tenant_id: 0,
-      });
+      // fetchMain({
+      //   session_key: '',
+      //   tenant_id: 0,
+      // });
       setRtnMessage('');
       setAlertState({
         ...errorMessage,
@@ -1195,7 +1461,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
       });
     }
-  }, [campaignInfoChangeYn, campaignSkillChangeYn, callingNumberChangeYn, campaignDialSpeedChangeYn]);
+  }, [campaignInfoChangeYn, campaignSkillChangeYn, callingNumberChangeYn, campaignDialSpeedChangeYn, onlyCampaignStatusChange]);
 
   // 캠페인 정보 수정 API 호출
   // tofix 0417 a3 브라우져 api 로 campaign 정보 변경 후에 
@@ -1213,6 +1479,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         type: "campaign_basic_info_update",
         campaignId: tempCampaignManagerInfo.campaign_id,
       });
+      setOnlyCampaignStatusChange(false);
+      setCampaignStatusUpdateCheck(true);
 
     },
     onError: (error) => {
@@ -1228,13 +1496,13 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
       setCampaignInfoChangeYn(false);
       setRtnMessage('');
-      setAlertState({
-        ...errorMessage,
-        isOpen: true,
-        message: '작업이 완료되었습니다.',
-        type: '2',
-        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
-      });
+      // setAlertState({
+      //   ...errorMessage,
+      //   isOpen: true,
+      //   message: '작업이 완료되었습니다.',
+      //   type: '2',
+      //   onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+      // });
     }
   });
 
@@ -1515,17 +1783,30 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   // 캠페인 상태 변경 API 호출
   const { mutate: fetchCampaignStatusUpdate } = useApiForCampaignStatusUpdate({
     onSuccess: (data) => {
-      if (data.result_code === 0 || ( data.result_code === -1 && data.reason_code === -13 )) {
+      if(data.result_code === -1 && data.reason_code === -7771){
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: '발신리스트가 존재하지 않습니다. 발신리스트를 등록해주세요.',
+          type: '2',
+          onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+        });
+      }
+      else if (data.result_code === 0 || ( data.result_code === -1 && data.reason_code === -13 )) {
         // fetchCampaignManagerUpdate(tempCampaignManagerInfo);
         const todayTime = getCurrentFormattedTime();
-        fetchCampaignManagerUpdate(
-          {
-            ...tempCampaignManagerInfo
-            , update_user: user_id
-            , update_ip: Cookies.get('userHost')+''
-            , update_time: todayTime
-          }
-        );
+        
+        // 캠페인 상태 변경시 마스터도 수정해야 하는경우
+        if(!campaignStatusUpdateCheck && !onlyCampaignStatusChange){
+          fetchCampaignManagerUpdate(
+            {
+              ...tempCampaignManagerInfo
+              , update_user: user_id
+              , update_ip: Cookies.get('userHost')+''
+              , update_time: todayTime
+            }
+          );
+        }
         if (campaignSkillChangeYn) {
           if (tempCampaignSkills.skill_id[0] === 0) {
             fetchCampaignSkillUpdate({
@@ -1565,6 +1846,13 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
             });
           }
         }
+
+        setOnlyCampaignStatusChange(false);
+        setCampaignStatusUpdateCheck(true);
+
+        // 캠페인 상태만 변경했을 경우
+        
+
       } else if (data.result_code != 200){
         setAlertState({
           ...errorMessage,

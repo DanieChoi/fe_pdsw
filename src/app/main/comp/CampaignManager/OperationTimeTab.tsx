@@ -59,6 +59,7 @@ const tempOperationTimeTab: OperationTimeParam = {
   start_time: [],
   end_time: [],
   start_flag: "",
+  only_status_change: false,
 };
 
 const OperationTimeTab: React.FC<Props> = ({
@@ -106,6 +107,7 @@ const OperationTimeTab: React.FC<Props> = ({
       changeYn: true,
       campaignInfoChangeYn: true,
       start_flag: value,
+      only_status_change: true,
     });
   };
 

@@ -913,13 +913,24 @@ const MonitorPage = () => {
         console.log('####### 캠페인 상태 변경 이벤트 수신:', type);
         // 'campaign_status:' + '시작(캠페인 상태)' +':' + (1 ~ 6)
         // type.split(':')[0 ~ 2] ==> 'campaign_status' , '시작(캠페인 상태)', 1 ~ 6 
+
+        // 캠페인 상태 변경시 캠페인 정보 업데이트
+        console.log('####### 현재 캠페인 currentCampaign :', currentCampaign);
+        console.log('####### 캠페인 ID :', campaignId);
+        
+        
         if(type.split(':')[2] === '2' || type.split(':')[2] === '3'){
           useCampaignDialStatusStore.getState().removeCampaignDialStatus({campaign_id : campaignId});
         } else {
           useCampaignDialStatusStore.getState().addCampaignDialStatus({campaign_id : campaignId, status : type.split(':')[2]});
         }
-        if( campaignId === selectedCampaign ){
-          setCampaignStatus(type.split(':')[1]);
+        if( currentCampaign.id.toString() === campaignId.toString() && selectedCampaign.toString() === campaignId.toString()){
+          console.log('####### 캠페인 상태 변경 이벤트 수신: 현재 캠페인과 동일');
+          setCurrentCampaign((prev) => ({
+            ...prev,
+            startFlag: Number(type.split(':')[2])
+          }));
+          setCampaignStatus(type.split(':')[2] === 1 ? '시작' : type.split(':')[2] === 2 ? '멈춤' : type.split(':')[2] === '3' ? '중지' : type.split(':')[1]);
         }
         
       }else if( typeof campaignId != 'undefined'){

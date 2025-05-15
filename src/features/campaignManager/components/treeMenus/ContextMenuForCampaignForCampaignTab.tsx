@@ -45,6 +45,14 @@ export const getStatusIcon = (status?: string) => {
       return "/sidebar-menu/tree_pause.svg";
     case "stopped":
       return "/sidebar-menu/tree_stop.svg";
+    case "stoppedProgress":
+      return "/sidebar-menu/tree_stop_progress.png";
+    case "pauseProgress":
+      return "/sidebar-menu/tree_pause_progress.png";
+    case "timeset":
+      return "/sidebar-menu/tree_timeset.png";  
+    case "timeattp":
+      return "/sidebar-menu/tree_timeattp.png";  
     default:
       return null;
   }
@@ -107,11 +115,31 @@ export function ContextMenuForCampaignForCampaignTab({
   
   // 스토어에서 campaigns 데이터 직접 구독하여 항상 최신 상태 사용
   const campaigns = useMainStore(state => state.campaigns);
+
+  const currentCampaignDialStatus = useCampaignDialStatusStore(state => state.campaignDialStatus);
   
   // 현재 캠페인 정보를 useMemo로 캐싱
   const currentCampaign = useMemo(() => {
+    // DialStatus에 해당 캠페인이 있으면 그 값을 사용
+    const dialStatus = currentCampaignDialStatus?.find(
+      (d) => d.campaign_id === item.id
+    );
+    if (dialStatus) {
+      // campaigns에서 해당 캠페인 정보 찾기
+      const base = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
+      // base가 있으면 base의 모든 정보를 복사하고, campaign_status만 dialStatus.status로 덮어씀
+      if (base) {
+        return { ...base, campaign_status: dialStatus.status };
+      }
+      // base가 없으면 dialStatus만 반환 (필요한 필드만)
+      return { campaign_id: dialStatus.campaign_id, campaign_status: dialStatus.status };
+    }
+    // DialStatus에 없으면 기존 campaigns에서 찾음
     return campaigns?.find((c: any) => c.campaign_id === Number(item.id));
-  }, [campaigns, item.id]);
+
+  }, [campaigns, item.id, currentCampaignDialStatus]);
+
+  type ExtendedCampaignStatus = CampaignStatus | "stoppedProgress" | "pauseProgress" | "timeset";
 
   // 항상 최신 캠페인 상태 반영하기 위해 displayStatus를 로컬 상태가 아닌 계산된 값으로 사용
   const displayStatus = useMemo<CampaignStatus>(() => {
@@ -119,12 +147,30 @@ export function ContextMenuForCampaignForCampaignTab({
       switch (currentCampaign.campaign_status) {
         case 1: return "started";
         case 2: return "pending";
-        case 3: return "stopped";
+        case 3: return "stopped";   
+
         default: return item.status;
       }
     }
     return item.status;
   }, [currentCampaign, item.status]);
+
+  // const statusIconSrc = useMemo(() => {
+  //   // currentCampaign.campaign_status가 숫자(1~9 등)일 때만 분기
+  //   switch (currentCampaign?.campaign_status) {
+  //     case 1: return "/sidebar-menu/tree_play.svg";
+  //     case 2: return "/sidebar-menu/tree_pause.svg";
+  //     case 3: return "/sidebar-menu/tree_stop.svg";
+  //     case 4:
+  //     case 8:
+  //     case 9: return "/sidebar-menu/tree_stop_progress.png";
+  //     case 5: return "/sidebar-menu/tree_pause_progress.png";
+  //     case 6: return "/sidebar-menu/tree_timeset.png";
+  //     default: return null;
+  //   }
+  // }, [currentCampaign?.campaign_status]);
+
+  // console.log("statusIconSrc: ", statusIconSrc);
 
   // 디버깅용 - 상태 변경 시 콘솔 출력
   useEffect(() => {
@@ -353,14 +399,13 @@ export function ContextMenuForCampaignForCampaignTab({
       
       // 현재 캠페인 발신중이며 멈춤 중이거나 정지 중일때 === existDial
       if(!existDial){
-
+        
         // 캠페인 status API 호출
         await updateCampaignStatusMutation.mutateAsync({
           campaign_id: Number(item.id),
           campaign_status: getStatusNumber(status),
         }).then(() => {
             console.log('#### then 으로 떨어짐 사이드바 캠페인 상태 변경');
-            preventCloseRef.current = true;
 
             const reCheckCampaigns = useCampaignDialStatusStore.getState().campaignDialStatus.some(( dialStatus) => 
                       (dialStatus.campaign_id.toString() === item.id.toString()) && 
@@ -389,13 +434,11 @@ export function ContextMenuForCampaignForCampaignTab({
             }
         );
       }
-
-      
     };
 
     if(existDial) {
-      preventCloseRef.current = true;
-
+      // 시점 초기화
+      document.body.style.pointerEvents = 'auto';
       setAlertState({
         ...errorMessage,
         title: '캠페인 상태 변경',
