@@ -183,6 +183,14 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
       
       closeDialog();
 
+      setAlertState({
+        ...errorMessage,
+        isOpen: true,
+        message: `'${campaignName}' 캠페인이 삭제되었습니다.`,
+        type: '1',
+        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
+      });
+
       if(onFocusID && callbackCampaignId){
 
         closeDialog();

@@ -18,6 +18,7 @@ import { useAuthStore } from "@/store/authStore";
 
 import IDialogButtonForCampaingDelete from "../dialog/IDialogButtonForCampaingDelete";
 import BlackListCountPopup from '@/features/campaignManager/components/popups/BlackListCountPopup';
+import CustomAlert from "@/components/shared/layout/CustomAlert";
 
 export type CampaignStatus = 'started' | 'pending' | 'stopped';
 
@@ -96,6 +97,21 @@ export function IContextMenuForCampaignForCampaignGroup({
   const [isProcessing, setIsProcessing] = useState(false);
   const [menuWidth, setMenuWidth] = useState(120); // 메뉴 너비 상태 추가
 
+  const [isStatusAlertOpen, setIsStatusAlertOpen] = useState(false);
+  const [statusAlertProps, setStatusAlertProps] = useState({
+    message: '',
+    title: '',
+    type: ''
+  });
+
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+  const [deleteAlertProps, setDeleteAlertProps] = useState({
+    message: '',
+    title: '',
+    type: ''
+  });
+
+
   const { tenant_id, session_key } = useAuthStore();
 
   const {
@@ -141,11 +157,16 @@ export function IContextMenuForCampaignForCampaignGroup({
 
   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
     onSuccess: () => {
-      console.log("캠페인 상태 업데이트");
-      fetchMain({
-        session_key: session_key,
-        tenant_id: tenant_id
+      console.log("캠페인 상태 업데이트 !!!!!!!!!!!!!!!!!!!!!");
+
+      // CustomAlert 대신 상태 업데이트
+      setStatusAlertProps({
+        message: "캠페인 상태가 변경되었습니다.",
+        title: "상태 변경",
+        type: "success"
       });
+      setIsStatusAlertOpen(true);
+
       setIsProcessing(false);
     },
     onError: (error) => {
@@ -165,6 +186,17 @@ export function IContextMenuForCampaignForCampaignGroup({
       setIsProcessing(false);
     }
   });
+
+  // 상태 변경 알림 닫기 핸들러
+  const handleStatusAlertClose = useCallback(() => {
+    setIsStatusAlertOpen(false);
+
+    // 데이터 새로고침
+    fetchMain({
+      session_key: session_key,
+      tenant_id: tenant_id
+    });
+  }, [fetchMain, session_key, tenant_id]);
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -273,9 +305,28 @@ export function IContextMenuForCampaignForCampaignGroup({
       return;
     }
 
-    // 다이얼로그 열기
-    setIsDeleteDialogOpen(true);
+    // 다이얼로그 열기 - 기존 방식 대신 상태 사용
+    setDeleteAlertProps({
+      message: `"${item.label}" 캠페인을 삭제하시겠습니까?`,
+      title: "캠페인 삭제",
+      type: "0" // 확인/취소 버튼이 있는 타입
+    });
+    setIsDeleteAlertOpen(true);
     setMenuOpen(false);
+  }, [item.label]);
+
+
+  // 캠페인 삭제 알림 처리 핸들러
+  const handleDeleteAlertConfirm = useCallback(() => {
+    setIsDeleteAlertOpen(false);
+
+    // 여기에 실제 삭제 API 호출 코드 추가
+    // API 호출이 성공하면 데이터 리프레시
+    setIsDeleteDialogOpen(true); // 기존 삭제 다이얼로그 열기
+  }, []);
+
+  const handleDeleteAlertCancel = useCallback(() => {
+    setIsDeleteAlertOpen(false);
   }, []);
 
   const getStatusNumber = (status: CampaignStatus): number => {
@@ -653,6 +704,20 @@ export function IContextMenuForCampaignForCampaignGroup({
           tenant_id={tenantIdForCampaignTab}
         />
       )}
+
+      {/* 상태 변경 알림 다이얼로그 */}
+      {isStatusAlertOpen && (
+        <CustomAlert
+          isOpen={isStatusAlertOpen}
+          message={statusAlertProps.message}
+          title={statusAlertProps.title}
+          type={statusAlertProps.type}
+          onClose={handleStatusAlertClose}
+          onCancel={handleStatusAlertClose}
+        />
+      )}
+
     </>
   );
 }
+
