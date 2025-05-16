@@ -883,25 +883,42 @@ export default function Footer({
     const handleMessage = (event: MessageEvent) => {
       const { type, message } = event.data;
      
+      let data: any = {};
+      let announce = "";
+      let command = "";
+      let kind = "";
+      let campaign_id = "";
+      let skill_id = "";
       if( type === 'sseMessage' ){
           console.log( 'sseMessageChannel :: ' + message);
+          
           const tempEventData = JSON.parse(message);
-          const announce = tempEventData["announce"];
-          const command = tempEventData["command"];
-          const data = tempEventData["data"];
-          const kind = tempEventData["kind"];
-          const campaign_id = tempEventData["campaign_id"];
-          const skill_id = tempEventData["skill_id"];
-          footerDataSet(
-            announce,
-            command,
-            data,
-            kind,
-            campaign_id,
-            tempEventData["skill_id"] || "",
-            tempEventData
-          );
-          setSseData(message);
+          if (
+            announce !== tempEventData["announce"] ||
+            !isEqual(data, tempEventData["data"]) ||
+            command !== tempEventData["command"] ||
+            kind !== tempEventData["kind"] ||
+            skill_id !== tempEventData["skill_id"] ||
+            campaign_id !== tempEventData["campaign_id"]
+          ) {
+            announce = tempEventData["announce"];
+            command = tempEventData["command"];
+            data = tempEventData["data"];
+            kind = tempEventData["kind"];
+            campaign_id = tempEventData["campaign_id"];
+            skill_id = tempEventData["skill_id"];
+
+            footerDataSet(
+              announce,
+              command,
+              data,
+              kind,
+              campaign_id,
+              tempEventData["skill_id"] || "",
+              tempEventData
+            );
+            setSseData(message);          
+          }
       }
     };
 
