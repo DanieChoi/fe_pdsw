@@ -71,7 +71,7 @@ export function useApiForGetTreeMenuDataForSideMenu(): TreeMenuQueryResult {
     campaignSkills.length
   ]);
 
-  console.log("campaignSkills at hook : ", campaignSkills);
+  // console.log("campaignSkills at hook : ", campaignSkills);
   
 
   const invalidateTreeMenuData = () => {
@@ -175,7 +175,7 @@ export function useApiForGetTreeMenuDataForSideMenu(): TreeMenuQueryResult {
     queryClient.setQueryData(getQueryKey(), updater);
   };
 
-  console.log("updateTreeMenuData : ", updateTreeMenuData);
+  // console.log("updateTreeMenuData : ", updateTreeMenuData);
   
 
   return {

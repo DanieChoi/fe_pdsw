@@ -186,7 +186,7 @@ export function TreeMenusForCampaigns() {
 
 
 
-  console.log("노드 출력을 위한 데이터:", originalItems);
+  // console.log("노드 출력을 위한 데이터:", originalItems);
 
 
   // expandNodes 함수와 원본 아이템을 전역으로 사용할 수 있도록 저장
@@ -561,7 +561,7 @@ export function TreeMenusForCampaigns() {
 
         expandAll(items);
         expandNodes(newExpanded);
-        console.log("캠페인 뷰: 자식이 있는 노드만 확장됨", newExpanded.size);
+        // console.log("캠페인 뷰: 자식이 있는 노드만 확장됨", newExpanded.size);
       };
 
       // 초기 확장 상태 설정

@@ -216,21 +216,24 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
           return () => clearInterval(campaignInterval);
         }
       }
-    }else if( tenantId && campaigns.length > 0) {
-      fetchAgentStateMonitoringList({
-        tenantId: tenantId,
-        campaignId: 0
-      });
-      if( statisticsUpdateCycle > 0 ){        
-        const tenantInterval = setInterval(() => {  
-          fetchAgentStateMonitoringList({
-            tenantId: tenantId,
-            campaignId: 0
-          });
-        }, statisticsUpdateCycle * 1000);  
-        return () => clearInterval(tenantInterval);
-      }
-    }else if( campaignId === 0 && Number(tenantId) === 0 && campaigns.length > 0) {
+    }
+    // 최초 로딩이나 새로고침시 BadRequest 방지를 위한 주석처리
+    // else if( tenantId && campaigns.length > 0) {
+    //   fetchAgentStateMonitoringList({
+    //     tenantId: tenantId,
+    //     campaignId: 0
+    //   });
+    //   if( statisticsUpdateCycle > 0 ){        
+    //     const tenantInterval = setInterval(() => {  
+    //       fetchAgentStateMonitoringList({
+    //         tenantId: tenantId,
+    //         campaignId: 0
+    //       });
+    //     }, statisticsUpdateCycle * 1000);  
+    //     return () => clearInterval(tenantInterval);
+    //   }
+    // }
+    else if( campaignId === 0 && Number(tenantId) === 0 && campaigns.length > 0) {
       fetchAgentStateMonitoringList({
         tenantId: '0',
         campaignId: 0

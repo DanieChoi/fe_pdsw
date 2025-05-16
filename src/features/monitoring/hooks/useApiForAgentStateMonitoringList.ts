@@ -12,11 +12,11 @@ export function useApiForAgentStateMonitoringList(
     mutationKey: ['mainAgentStateMonitoringList'],
     mutationFn: fetchAgentStateMonitoringList,
     onSuccess: (data, variables, context) => {
-      console.log('API Response:', {
-        code: data.code,
-        message: data.message,
-        data: data.counselorStatusList
-      });
+      // console.log('API Response:', {
+      //   code: data.code,
+      //   message: data.message,
+      //   data: data.counselorStatusList
+      // });
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: MonitoringApiError, variables: AgentStatusMonitoringRequest, context: unknown) => {

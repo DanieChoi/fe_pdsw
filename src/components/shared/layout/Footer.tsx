@@ -18,6 +18,7 @@ import { sseMessageChannel, logoutChannel } from '@/lib/broadcastChannel';
 import logoutFunction from "@/components/common/logoutFunction";
 import { useRouter } from 'next/navigation';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
+import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
 
 
@@ -50,7 +51,7 @@ export default function Footer({
   const [currentHeight, setCurrentHeight] = useState(footerHeight);
   const { id, tenant_id, role_id } = useAuthStore();
   const { tenants, campaigns, setCampaigns, setSseInputMessage } = useMainStore();
-  const { channelGroupList, setChannelGroupList, schedules, setSchedules } = useCampainManagerStore();
+  const { channelGroupList, setChannelGroupList, schedules, setSchedules, setCallingNumbers } = useCampainManagerStore();
   const { useAlramPopup } = useEnvironmentStore();
   const [isResizing, setIsResizing] = useState(false);
   const [isHeightToggled, setIsHeightToggled] = useState(false);
@@ -142,6 +143,13 @@ export default function Footer({
     }
   });
 
+  // 캠페인 발신번호 조회
+  const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
+    onSuccess: (data) => {
+      setCallingNumbers(data.result_data || []);
+    }
+  });
+
   // Helper function to add a message to footerDataList
   const addMessageToFooterList = (time: string, type: string, message: string) => {
     if (message !== '') {
@@ -196,15 +204,15 @@ export default function Footer({
 
     //운영설정>캠페인별 발신번호설정
     if (announce === '/pds/campaign/calling-number') {
-      _message = '캠페인 : ';
-      if (command === 'INSERT') {
-        _message += '[' + campaign_id + '], 사용자 발신번호 설정 추가 성공';
-      } else if (command === 'DELETE') {
-        _message += '[' + campaign_id + '], 사용자 발신번호 설정 삭제 성공';
-      } else if (command === 'UPDATE') {
-        _message += '[' + campaign_id + '], 사용자 발신번호 설정 변경 성공';
-      }
-      addMessageToFooterList(_time, _type, _message);
+      // _message = '캠페인 : ';
+      // if (command === 'INSERT') {
+      //   _message += '[' + campaign_id + '], 사용자 발신번호 설정 추가 성공';
+      // } else if (command === 'DELETE') {
+      //   _message += '[' + campaign_id + '], 사용자 발신번호 설정 삭제 성공';
+      // } else if (command === 'UPDATE') {
+      //   _message += '[' + campaign_id + '], 사용자 발신번호 설정 변경 성공';
+      // }
+      // addMessageToFooterList(_time, _type, _message);
     }
     //전화번호설명 템플릿
     else if (announce === '/pds/phone-description') {
@@ -1126,6 +1134,19 @@ export default function Footer({
           );
 
         }
+      }
+      //운영설정>캠페인별 발신번호설정
+      else if (announce === '/pds/campaign/calling-number') {
+        _message = '캠페인 : ';
+        if (command === 'INSERT') {
+          _message += '[' + campaign_id + '], 사용자 발신번호 설정 추가 성공';
+        } else if (command === 'DELETE') {
+          _message += '[' + campaign_id + '], 사용자 발신번호 설정 삭제 성공';
+        } else if (command === 'UPDATE') {
+          _message += '[' + campaign_id + '], 사용자 발신번호 설정 변경 성공';
+        }
+        addMessageToFooterList(_time, _type, _message); 
+        fetchCallingNumbers({ session_key: '', tenant_id: 0 }); 
       }
 
     }

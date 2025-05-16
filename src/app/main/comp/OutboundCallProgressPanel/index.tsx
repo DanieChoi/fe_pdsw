@@ -338,7 +338,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       }
       // setDataList(tempList);
       // setSelectedCall(tempList[0]);
-      console.log("API 응답 데이터:", tempList); 
+      // console.log("API 응답 데이터:", tempList); 
     } 
   });
   
