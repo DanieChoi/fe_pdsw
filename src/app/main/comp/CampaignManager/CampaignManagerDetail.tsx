@@ -1772,7 +1772,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const { mutate: fetchCallingNumberInsert } = useApiForCallingNumberInsert({
     onSuccess: (data) => {
       setCallingNumberChangeYn(false);
-      fetchCallingNumbers({ session_key: '', tenant_id: 0 });
+      // fetchCallingNumbers({ session_key: '', tenant_id: 0 });
     }
   });
 
@@ -1780,7 +1780,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const { mutate: fetchCallingNumberUpdate } = useApiForCallingNumberUpdate({
     onSuccess: (data) => {
       setCallingNumberChangeYn(false);
-      fetchCallingNumbers({ session_key: '', tenant_id: 0 });
+      // fetchCallingNumbers({ session_key: '', tenant_id: 0 });
     }
   });
 
@@ -1892,12 +1892,12 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   });
 
   // 발신번호 조회 API 호출
-  const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
-    onSuccess: (data) => {
-      setCallingNumbers(data.result_data || []);
-      setCallingNumberChangeYn(false);
-    }
-  });
+  // const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
+  //   onSuccess: (data) => {
+  //     setCallingNumbers(data.result_data || []);
+  //     setCallingNumberChangeYn(false);
+  //   }
+  // });
 
   // 새 캠페인 버튼 이벤트
   const handleNewCampaign = () => {
