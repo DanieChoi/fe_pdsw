@@ -111,6 +111,12 @@ export function IContextMenuForCampaignForCampaignGroup({
     type: ''
   });
 
+  const [isDeleteCompleteAlertOpen, setIsDeleteCompleteAlertOpen] = useState(false);
+  const [deleteCompleteAlertProps, setDeleteCompleteAlertProps] = useState({
+    message: '',
+    title: '',
+    type: ''
+  });
 
   const { tenant_id, session_key } = useAuthStore();
 
@@ -189,7 +195,7 @@ export function IContextMenuForCampaignForCampaignGroup({
 
   // 상태 변경 알림 닫기 핸들러
   const handleStatusAlertClose = useCallback(() => {
-    setIsStatusAlertOpen(false);
+    // setIsStatusAlertOpen(false);
 
     // 데이터 새로고침
     fetchMain({
@@ -197,6 +203,7 @@ export function IContextMenuForCampaignForCampaignGroup({
       tenant_id: tenant_id
     });
   }, [fetchMain, session_key, tenant_id]);
+
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -305,16 +312,10 @@ export function IContextMenuForCampaignForCampaignGroup({
       return;
     }
 
-    // 다이얼로그 열기 - 기존 방식 대신 상태 사용
-    setDeleteAlertProps({
-      message: `"${item.label}" 캠페인을 삭제하시겠습니까?`,
-      title: "캠페인 삭제",
-      type: "0" // 확인/취소 버튼이 있는 타입
-    });
-    setIsDeleteAlertOpen(true);
+    // 바로 IDialogButtonForCampaingDelete를 표시하는 대신 직접 열기
+    setIsDeleteDialogOpen(true);
     setMenuOpen(false);
-  }, [item.label]);
-
+  }, []);
 
   // 캠페인 삭제 알림 처리 핸들러
   const handleDeleteAlertConfirm = useCallback(() => {
@@ -497,12 +498,19 @@ export function IContextMenuForCampaignForCampaignGroup({
   const handleDialogClose = useCallback((open: boolean) => {
     if (!open) {
       setIsDeleteDialogOpen(false);
-      // 데이터 리프레시
-      setTimeout(() => {
-        refetchTreeDataForCampaignGroupTab();
-      }, 100);
     }
-  }, [refetchTreeDataForCampaignGroupTab]);
+  }, []);
+
+  // 삭제 완료 알림 닫기 핸들러
+  const handleDeleteCompleteAlertClose = useCallback(() => {
+    setIsDeleteCompleteAlertOpen(false);
+
+    // 데이터 리프레시
+    fetchMain({
+      session_key: session_key,
+      tenant_id: tenant_id
+    });
+  }, [fetchMain, session_key, tenant_id]);
 
   // 메뉴 항목 hover 이벤트 처리
   const handleMenuItemMouseEnter = useCallback((key: string) => {
@@ -694,14 +702,15 @@ export function IContextMenuForCampaignForCampaignGroup({
         />
       )}
 
-      {/* 캠페인 삭제 다이얼로그 */}
-      {isDeleteDialogOpen && (
-        <IDialogButtonForCampaingDelete
-          isOpen={isDeleteDialogOpen}
-          onOpenChange={handleDialogClose}
-          campaignId={item.id}
-          campaignName={item.label}
-          tenant_id={tenantIdForCampaignTab}
+      {/* 삭제 완료 알림 다이얼로그 */}
+      {isDeleteCompleteAlertOpen && (
+        <CustomAlert
+          isOpen={isDeleteCompleteAlertOpen}
+          message={deleteCompleteAlertProps.message}
+          title={deleteCompleteAlertProps.title}
+          type={deleteCompleteAlertProps.type}
+          onClose={handleDeleteCompleteAlertClose}
+          onCancel={handleDeleteCompleteAlertClose}
         />
       )}
 
@@ -714,6 +723,32 @@ export function IContextMenuForCampaignForCampaignGroup({
           type={statusAlertProps.type}
           onClose={handleStatusAlertClose}
           onCancel={handleStatusAlertClose}
+        />
+      )}
+
+      {/* 캠페인 삭제 알림 다이얼로그 */}
+      {isDeleteDialogOpen && (
+        <IDialogButtonForCampaingDelete
+          isOpen={isDeleteDialogOpen}
+          onOpenChange={handleDialogClose}
+          campaignId={item.id}
+          campaignName={item.label}
+          tenant_id={tenantIdForCampaignTab}
+          onDeleteSuccess={() => {
+            // 삭제 완료 알림 표시
+            setDeleteCompleteAlertProps({
+              message: `"${item.label}" 캠페인이 삭제되었습니다.`,
+              title: "삭제 완료",
+              type: "success"
+            });
+            setIsDeleteCompleteAlertOpen(true);
+
+            // 데이터 리프레시
+            // setTimeout(() => {
+            //   refetchTreeDataForCampaignGroupTab();
+            // }, 100);
+          }}
+          preventAutoClose={false} // 삭제 확인 창이 자동으로 닫히는 것을 방지
         />
       )}
 
