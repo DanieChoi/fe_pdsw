@@ -13,6 +13,7 @@ import { campaignChannel } from '@/lib/broadcastChannel';
 import { CampaignInfo, CampaignManagerInfo } from '@/app/main/comp/CreateCampaignFormPanel/variables/variablesForCreateCampaignForm';
 import { CampaignScheduleInfo } from '@/app/main/comp/CreateCampaignFormPanel/variables/interfacesForCreateCampaign';
 import { ChannelGroupListDataResponse } from "@/features/preferences/hooks/useApiForChannelGroup";
+import { devtools, persist } from 'zustand/middleware';
 
 // Import default values for reset function
 
@@ -80,85 +81,99 @@ interface CampainManagerActions {
 
 type CampainManagerStore = CampainManagerState & CampainManagerActions;
 
-export const useCampainManagerStore = create<CampainManagerStore>((set) => ({
-  skills: [],
-  callingNumbers: [],
-  schedules: [],
-  campaignSkills: [],
-  phoneDescriptions: [],
-  selectedCampaign: null,
-  totalCount: 0,
-  campaignGroupManagerInit: false,
-  newCampaignManagerInfo: {} as CampaignInfoInsertRequest,
-  newCampaignInfo: {} as MainDataResponse,
-  newTenantId: ' ',
-  newCampaignSchedule: {} as CampaignScheDuleListDataResponse,
-  campaignManagerHeaderTenantId: '',
-  campaignManagerHeaderCampaignName: '',
-  campaignManagerHeaderDailMode: '',
-  campaignManagerHeaderSkill: '',
-  campaignManagerHeaderCallNumber: '',
-  campaignManagerCampaignId: '',
-  copyCampaignManagerInfo: {} as CampaignInfoInsertRequest,
-  copyCampaignInfo: {} as MainDataResponse,
-  copyTenantId: ' ',
-  copyCampaignSchedule: {} as CampaignScheDuleListDataResponse,
-  copyCampaignSkills: {} as CampaignSkillUpdateRequest,
-  // 스킬 상태 초기화
-  skillsLoaded: false,
-  skillsLoading: false,
-  channelGroupList: [],
-  setSkills: (skills) => {
-    set({ 
-      skills,
-      skillsLoaded: true,
-      skillsLoading: false
-    });  
-    campaignChannel.postMessage({
-      type: "skills_info_update",
-      skillsId: skills.map((skill) => skill.skill_id),
-    });
-  },
-  setCallingNumbers: (callingNumbers) => set({ callingNumbers }),
-  setSchedules: (schedules) => set({ schedules }),
-  setCampaignSkills: (campaignSkills) => set({ campaignSkills }),
-  setPhoneDescriptions: (phoneDescriptions) => set({ phoneDescriptions }),
-  setTotalCount: (totalCount) => set({ totalCount }),
-  setCampaignGroupManagerInit: (campaignGroupManagerInit) => set({ campaignGroupManagerInit }),
-  setNewCampaignManagerInfo: (newCampaignManagerInfo) => set({ newCampaignManagerInfo }),
-  setNewCampaignInfo: (newCampaignInfo) => set({ newCampaignInfo }),
-  setNewTenantId: (newTenantId) => set({ newTenantId }),
-  setNewCampaignSchedule: (newCampaignSchedule) => set({ newCampaignSchedule }),
-  
-  // Add new resetCampaignState function
-  resetCampaignState: (tenantId) => {
-    // Get default values from the imports or define them inline
-    const defaultCampaignManagerInfo = {...CampaignManagerInfo};
-    const defaultCampaignInfo = {...CampaignInfo};
-    const defaultCampaignSchedule = {...CampaignScheduleInfo};
-    
-    set({
-      newCampaignManagerInfo: defaultCampaignManagerInfo,
-      newCampaignInfo: defaultCampaignInfo,
-      newTenantId: tenantId || ' ',
-      newCampaignSchedule: defaultCampaignSchedule,
-    });
-  },
-  setIsAlreadyOpend: (isAlreadyOpend) => set({ isAlreadyOpend }),
-  setCampaignManagerHeaderTenantId: (campaignManagerHeaderTenantId) => set({ campaignManagerHeaderTenantId }),
-  setCampaignManagerHeaderCampaignName: (campaignManagerHeaderCampaignName) => set({ campaignManagerHeaderCampaignName }),
-  setCampaignManagerHeaderDailMode: (campaignManagerHeaderDailMode) => set({ campaignManagerHeaderDailMode }),
-  setCampaignManagerHeaderSkill: (campaignManagerHeaderSkill) => set({ campaignManagerHeaderSkill }),
-  setCampaignManagerHeaderCallNumber: (campaignManagerHeaderCallNumber) => set({ campaignManagerHeaderCallNumber }),
-  setCampaignManagerCampaignId: (campaignManagerCampaignId) => set({ campaignManagerCampaignId }),
-  setCopyCampaignManagerInfo: (copyCampaignManagerInfo) => set({ copyCampaignManagerInfo }),
-  setCopyCampaignInfo: (copyCampaignInfo) => set({ copyCampaignInfo }),
-  setCopyTenantId: (copyTenantId) => set({ copyTenantId }),
-  setCopyCampaignSchedule: (copyCampaignSchedule) => set({ copyCampaignSchedule }),
-  setCopyCampaignSkills: (copyCampaignSkills) => set({ copyCampaignSkills }),
-  // 스킬 액션 구현
-  setSkillsLoaded: (loaded) => set({ skillsLoaded: loaded }),
-  setSkillsLoading: (loading) => set({ skillsLoading: loading }),
-  setChannelGroupList: (channelGroupList) => set({ channelGroupList }),
-  isAlreadyOpend: false
-}));
+export const useCampainManagerStore = create<CampainManagerStore>()(
+  devtools(
+    persist(
+      (set,get) => ({
+        skills: [],
+        callingNumbers: [],
+        schedules: [],
+        campaignSkills: [],
+        phoneDescriptions: [],
+        selectedCampaign: null,
+        totalCount: 0,
+        campaignGroupManagerInit: false,
+        newCampaignManagerInfo: {} as CampaignInfoInsertRequest,
+        newCampaignInfo: {} as MainDataResponse,
+        newTenantId: ' ',
+        newCampaignSchedule: {} as CampaignScheDuleListDataResponse,
+        campaignManagerHeaderTenantId: '',
+        campaignManagerHeaderCampaignName: '',
+        campaignManagerHeaderDailMode: '',
+        campaignManagerHeaderSkill: '',
+        campaignManagerHeaderCallNumber: '',
+        campaignManagerCampaignId: '',
+        copyCampaignManagerInfo: {} as CampaignInfoInsertRequest,
+        copyCampaignInfo: {} as MainDataResponse,
+        copyTenantId: ' ',
+        copyCampaignSchedule: {} as CampaignScheDuleListDataResponse,
+        copyCampaignSkills: {} as CampaignSkillUpdateRequest,
+        // 스킬 상태 초기화
+        skillsLoaded: false,
+        skillsLoading: false,
+        channelGroupList: [],
+        setSkills: (skills) => {
+          set({ 
+            skills,
+            skillsLoaded: true,
+            skillsLoading: false
+          });  
+          campaignChannel.postMessage({
+            type: "skills_info_update",
+            skillsId: skills.map((skill) => skill.skill_id),
+          });
+        },
+        setCallingNumbers: (callingNumbers) => set({ callingNumbers }),
+        setSchedules: (schedules) => set({ schedules }),
+        setCampaignSkills: (campaignSkills) => set({ campaignSkills }),
+        setPhoneDescriptions: (phoneDescriptions) => set({ phoneDescriptions }),
+        setTotalCount: (totalCount) => set({ totalCount }),
+        setCampaignGroupManagerInit: (campaignGroupManagerInit) => set({ campaignGroupManagerInit }),
+        setNewCampaignManagerInfo: (newCampaignManagerInfo) => set({ newCampaignManagerInfo }),
+        setNewCampaignInfo: (newCampaignInfo) => set({ newCampaignInfo }),
+        setNewTenantId: (newTenantId) => set({ newTenantId }),
+        setNewCampaignSchedule: (newCampaignSchedule) => set({ newCampaignSchedule }),
+        
+        // Add new resetCampaignState function
+        resetCampaignState: (tenantId) => {
+          // Get default values from the imports or define them inline
+          const defaultCampaignManagerInfo = {...CampaignManagerInfo};
+          const defaultCampaignInfo = {...CampaignInfo};
+          const defaultCampaignSchedule = {...CampaignScheduleInfo};
+          
+          set({
+            newCampaignManagerInfo: defaultCampaignManagerInfo,
+            newCampaignInfo: defaultCampaignInfo,
+            newTenantId: tenantId || ' ',
+            newCampaignSchedule: defaultCampaignSchedule,
+          });
+        },
+        setIsAlreadyOpend: (isAlreadyOpend) => set({ isAlreadyOpend }),
+        setCampaignManagerHeaderTenantId: (campaignManagerHeaderTenantId) => set({ campaignManagerHeaderTenantId }),
+        setCampaignManagerHeaderCampaignName: (campaignManagerHeaderCampaignName) => set({ campaignManagerHeaderCampaignName }),
+        setCampaignManagerHeaderDailMode: (campaignManagerHeaderDailMode) => set({ campaignManagerHeaderDailMode }),
+        setCampaignManagerHeaderSkill: (campaignManagerHeaderSkill) => set({ campaignManagerHeaderSkill }),
+        setCampaignManagerHeaderCallNumber: (campaignManagerHeaderCallNumber) => set({ campaignManagerHeaderCallNumber }),
+        setCampaignManagerCampaignId: (campaignManagerCampaignId) => set({ campaignManagerCampaignId }),
+        setCopyCampaignManagerInfo: (copyCampaignManagerInfo) => set({ copyCampaignManagerInfo }),
+        setCopyCampaignInfo: (copyCampaignInfo) => set({ copyCampaignInfo }),
+        setCopyTenantId: (copyTenantId) => set({ copyTenantId }),
+        setCopyCampaignSchedule: (copyCampaignSchedule) => set({ copyCampaignSchedule }),
+        setCopyCampaignSkills: (copyCampaignSkills) => set({ copyCampaignSkills }),
+        // 스킬 액션 구현
+        setSkillsLoaded: (loaded) => set({ skillsLoaded: loaded }),
+        setSkillsLoading: (loading) => set({ skillsLoading: loading }),
+        setChannelGroupList: (channelGroupList) => set({ channelGroupList }),
+        isAlreadyOpend: false
+      }),
+      {
+        name: 'campaign-manager-store', // localStorage에 저장될 키 이름
+        // storage: createJSONStorage(() => sessionStorage) // 이 줄을 사용하면 sessionStorage에 저장됨
+      }
+    ),
+    {
+      name: 'campaign-manager-store-devtools',
+      enabled: process.env.NODE_ENV === 'development',
+    }
+  )
+);
