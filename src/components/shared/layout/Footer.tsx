@@ -18,7 +18,6 @@ import { sseMessageChannel, logoutChannel } from '@/lib/broadcastChannel';
 import logoutFunction from "@/components/common/logoutFunction";
 import { useRouter } from 'next/navigation';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
-import { ca } from "date-fns/locale";
 
 
 type FooterDataType = {
@@ -883,42 +882,26 @@ export default function Footer({
     const handleMessage = (event: MessageEvent) => {
       const { type, message } = event.data;
      
-      let data: any = {};
-      let announce = "";
-      let command = "";
-      let kind = "";
-      let campaign_id = "";
-      let skill_id = "";
       if( type === 'sseMessage' ){
           console.log( 'sseMessageChannel :: ' + message);
           
           const tempEventData = JSON.parse(message);
-          if (
-            announce !== tempEventData["announce"] ||
-            !isEqual(data, tempEventData["data"]) ||
-            command !== tempEventData["command"] ||
-            kind !== tempEventData["kind"] ||
-            skill_id !== tempEventData["skill_id"] ||
-            campaign_id !== tempEventData["campaign_id"]
-          ) {
-            announce = tempEventData["announce"];
-            command = tempEventData["command"];
-            data = tempEventData["data"];
-            kind = tempEventData["kind"];
-            campaign_id = tempEventData["campaign_id"];
-            skill_id = tempEventData["skill_id"];
-
-            footerDataSet(
-              announce,
-              command,
-              data,
-              kind,
-              campaign_id,
-              tempEventData["skill_id"] || "",
-              tempEventData
-            );
-            setSseData(message);          
-          }
+          const announce = tempEventData["announce"];
+          const command = tempEventData["command"];
+          const data = tempEventData["data"];
+          const kind = tempEventData["kind"];
+          const campaign_id = tempEventData["campaign_id"];
+          const skill_id = tempEventData["skill_id"];
+          footerDataSet(
+            announce,
+            command,
+            data,
+            kind,
+            campaign_id,
+            tempEventData["skill_id"] || "",
+            tempEventData
+          );
+          setSseData(message);
       }
     };
 
@@ -1112,17 +1095,13 @@ export default function Footer({
       else if (announce === '/pds/campaign/status') {
         // sseData :: {"kind":"event","command":"UPDATE","announce":"/pds/campaign/status","data":{"campaign_status":3,"campaign_end_flag":1},"campaign_id":"38890","skill_id":null}
 
-        let campaignStatus = data['campaign_status'];
+        const campaignStatus = data['campaign_status'];
         // campaign_id
         
         const isCorrectCampaign = campaigns.find((campaign) => campaign.campaign_id === Number(campaign_id));
         // MainDataResponse
         
         if( isCorrectCampaign) {
-
-          if(campaignStatus > 3){
-            campaignStatus = 2;
-          }
           const updatedCampaigns = campaigns.map((campaign) =>
             campaign.campaign_id === Number(campaign_id)
               ? { ...campaign, start_flag: campaignStatus }
