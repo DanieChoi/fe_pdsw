@@ -29,7 +29,7 @@ import BlackListCountPopup from "@/features/campaignManager/components/popups/Bl
 import CustomAlert, { CustomAlertRequest } from "@/components/shared/layout/CustomAlert";
 import IDialogButtonForCampaingDelete from "./dialog/IDialogButtonForCampaingDelete";
 import { customAlertService } from "@/components/shared/layout/utils/CustomAlertService";
-import { useCampaignDialStatusStore } from "@/store/campaignDialStatusStore";
+import { CampaignDialStatus, useCampaignDialStatusStore } from "@/store/campaignDialStatusStore";
 import { UpdataCampaignInfo } from "@/components/common/common";
 import { useApiForCampaignManagerUpdate } from "../../hooks/useApiForCampaignManagerUpdate";
 import Cookies from "js-cookie";
@@ -116,30 +116,25 @@ export function ContextMenuForCampaignForCampaignTab({
   // 스토어에서 campaigns 데이터 직접 구독하여 항상 최신 상태 사용
   const campaigns = useMainStore(state => state.campaigns);
 
-  const currentCampaignDialStatus = useCampaignDialStatusStore(state => state.campaignDialStatus);
+  const campaignDialStatus = useCampaignDialStatusStore(state => state.campaignDialStatus);
+
+  // 변수에 저장하는 방식
+  // const currentCampaignDialStatus = campaignDialStatus.find((dialStatus) => dialStatus.campaign_id === item.id);
+
+  // state에 저장하는 방식
+  const [currentCampaignDialStatus, setCurrentCampaignDialStatus] = useState<CampaignDialStatus | undefined>(undefined);
+  useEffect(() => {
+    // 캠페인 다이얼 상태를 업데이트
+    const currentCampaignDialStatus = campaignDialStatus.find((dialStatus) => dialStatus.campaign_id === item.id);
+    setCurrentCampaignDialStatus(currentCampaignDialStatus);
+  }, [campaignDialStatus, item.id]);
+  
   
   // 현재 캠페인 정보를 useMemo로 캐싱
   const currentCampaign = useMemo(() => {
-    // DialStatus에 해당 캠페인이 있으면 그 값을 사용
-    const dialStatus = currentCampaignDialStatus?.find(
-      (d) => d.campaign_id === item.id
-    );
-    if (dialStatus) {
-      // campaigns에서 해당 캠페인 정보 찾기
-      const base = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
-      // base가 있으면 base의 모든 정보를 복사하고, campaign_status만 dialStatus.status로 덮어씀
-      if (base) {
-        return { ...base, campaign_status: dialStatus.status };
-      }
-      // base가 없으면 dialStatus만 반환 (필요한 필드만)
-      return { campaign_id: dialStatus.campaign_id, campaign_status: dialStatus.status };
-    }
-    // DialStatus에 없으면 기존 campaigns에서 찾음
-    return campaigns?.find((c: any) => c.campaign_id === Number(item.id));
+  return campaigns?.find((c: any) => c.campaign_id === Number(item.id));
+  }, [campaigns, item.id]);
 
-  }, [campaigns, item.id, currentCampaignDialStatus]);
-
-  type ExtendedCampaignStatus = CampaignStatus | "stoppedProgress" | "pauseProgress" | "timeset";
 
   // 항상 최신 캠페인 상태 반영하기 위해 displayStatus를 로컬 상태가 아닌 계산된 값으로 사용
   const displayStatus = useMemo<CampaignStatus>(() => {
@@ -155,20 +150,22 @@ export function ContextMenuForCampaignForCampaignTab({
     return item.status;
   }, [currentCampaign, item.status]);
 
-  // const statusIconSrc = useMemo(() => {
-  //   // currentCampaign.campaign_status가 숫자(1~9 등)일 때만 분기
-  //   switch (currentCampaign?.campaign_status) {
-  //     case 1: return "/sidebar-menu/tree_play.svg";
-  //     case 2: return "/sidebar-menu/tree_pause.svg";
-  //     case 3: return "/sidebar-menu/tree_stop.svg";
-  //     case 4:
-  //     case 8:
-  //     case 9: return "/sidebar-menu/tree_stop_progress.png";
-  //     case 5: return "/sidebar-menu/tree_pause_progress.png";
-  //     case 6: return "/sidebar-menu/tree_timeset.png";
-  //     default: return null;
-  //   }
-  // }, [currentCampaign?.campaign_status]);
+
+  // 아이콘작업 
+  const statusIconSrc = (campaignDialStatus?: CampaignDialStatus) => {
+    // currentCampaign.campaign_status가 숫자(1~9 등)일 때만 분기
+    switch (Number(campaignDialStatus?.status)) {
+      case 1: return "/sidebar-menu/tree_play.svg";
+      case 2: return "/sidebar-menu/tree_pause.svg";
+      case 3: return "/sidebar-menu/tree_stop.svg";
+      case 4:
+      case 8:
+      case 9: return "/sidebar-menu/tree_stop_progress.png";
+      case 5: return "/sidebar-menu/tree_pause_progress.png";
+      case 6: return "/sidebar-menu/tree_timeset.png";
+      default: return null;
+    }
+  };
 
   // console.log("statusIconSrc: ", statusIconSrc);
 
@@ -217,8 +214,6 @@ export function ContextMenuForCampaignForCampaignTab({
         });
         return;
       } 
-
-        
 
         // API 성공 후 2가지 방법으로 상태 업데이트:
         // 1. 스토어의 updateCampaignStatus 직접 호출 (즉시 UI 반영)
@@ -333,11 +328,7 @@ export function ContextMenuForCampaignForCampaignTab({
     });
   };
 
-  // 
-  useEffect(() => {
-
-  },[]);
-
+  
   const handleCampaignListDelete = (campaignId: any) => {
     if (displayStatus !== "stopped") {
       toast.error("캠페인이 중지 상태일 때만 리스트를 삭제할 수 있습니다.");
@@ -499,7 +490,7 @@ export function ContextMenuForCampaignForCampaignTab({
             <div className="w-4 h-4 mr-1">
               <Image
                 // src={getStatusIcon(displayStatus) || ''}
-                src={getStatusIcon(displayStatus) || ''}
+                src={statusIconSrc(currentCampaignDialStatus) || getStatusIcon(displayStatus) || ''}
                 alt={displayStatus}
                 width={16}
                 height={16}

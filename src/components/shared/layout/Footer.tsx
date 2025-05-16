@@ -457,19 +457,59 @@ export default function Footer({
           _end_flag = '완료';
         }
 
+        const camapaignDialStatus = useCampaignDialStatusStore.getState().campaignDialStatus.find((status) => status.campaign_id === campaign_id);
+
         // 통합모니터링창에 보내기
         useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:' + _start_flag +':' + data['campaign_status'], campaign_id);
 
         // 멈춤중이나 정지중일때 store에 add
-        if ((data['campaign_status'] === 4 || data['campaign_status'] === 5 || data['campaign_status'] === 6) && data['campaign_end_flag'] === 1) {
+        if ((data['campaign_status'] === 5 || data['campaign_status'] === 6) && data['campaign_end_flag'] === 1) {
+
+          // 로직 결정전 add 하기전에 항상 이미 존재하면 지워주기
+          if(camapaignDialStatus){
+            removeCampaignDialStatus({ campaign_id: campaign_id });
+          }
+
           // 캠페인 상태가 시작이며 발신중일때
           addCampaignDialStatus({ campaign_id: campaign_id, status: data['campaign_status'] });
-          
         }
         else if ((data['campaign_status'] === 2 || data['campaign_status'] === 3) && data['campaign_end_flag'] === 1) {
           // 캠페인 상태가 멈춤이나 정지이며, 완료 되었을때 ==> 차후에 campaign_end_flag 맞춰서 변경해야함!!!
           removeCampaignDialStatus({ campaign_id: campaign_id });
         } 
+
+        /* 캠페인 동작시간에 벗어났을때 캠페인 시작을 누르면
+          전화를 받아서 발신이 종료된경우
+          [11:01:48]	[EVENT]	[캠페인 동작상태 변경] 캠페인 아이디 : 38890, 동작상태: 중지, 완료구분: 완료
+
+          스케줄에 해당하는 시간이 되었을경우
+          [10:59:59]	[EVENT]	[캠페인 동작상태 변경] 캠페인 아이디 : 38890, 동작상태: 시작, 완료구분: 진행중
+
+          스케줄에 해당하지않는 시간에 시작을 누를경우
+          [10:54:39]	[EVENT]	[캠페인 동작상태 변경] 캠페인 아이디 : 38890, 동작상태: 스케줄 PAUSE, 완료구분: 진행중
+          [10:54:39]	[EVENT]	[캠페인 동작상태 변경] 캠페인 아이디 : 38890, 동작상태: 캠페인 멈춤 중, 완료구분: 진행중
+          [10:54:39]	[EVENT]	[캠페인 동작상태 변경] 캠페인 아이디 : 38890, 동작상태: 시작, 완료구분: 진행중
+        */
+        
+
+        // 스케줄 PAUSE와 스케줄 시작 구분???
+        if ((data['campaign_status'] === 4 || data['campaign_status'] === 9) && data['campaign_end_flag'] === 1) {
+
+          // 로직 결정전 add 하기전에 항상 이미 존재하면 지워주기
+          if(camapaignDialStatus){
+            removeCampaignDialStatus({ campaign_id: campaign_id });
+          }
+
+          // 만약 같은 캠페인이 전달된다면?
+          if( (camapaignDialStatus && data['campaign_status'] === 4 && Number(camapaignDialStatus.status) === 9) ||
+              (camapaignDialStatus && data['campaign_status'] === 9 && Number(camapaignDialStatus.status) === 4)) {
+            removeCampaignDialStatus({ campaign_id: campaign_id });
+          }
+          // 캠페인 상태가 스케줄 PAUSE와 스케줄 시작일때,
+          addCampaignDialStatus({ campaign_id: campaign_id, status: data['campaign_status'] });
+        }
+        
+
 
         // 푸터 로그 메시지
         _message = '[캠페인 동작상태 변경] 캠페인 아이디 : ' + campaign_id + ', 동작상태: ' + _start_flag + ', 완료구분: ' + _end_flag;
@@ -481,10 +521,12 @@ export default function Footer({
           });
         }
 
-        fetchMain({
-          session_key: '',
-          tenant_id: tenant_id,
-        });
+      
+
+        // fetchMain({
+        //   session_key: '',
+        //   tenant_id: tenant_id,
+        // });
 
         // 푸터 데이터 리스트에 추가
         addMessageToFooterList(_time, _type, _message);
@@ -1035,6 +1077,26 @@ export default function Footer({
             // speakMessage(voiceMessage);
           }
 
+        }
+      }
+      // setCampaigns를 통한(fetchMain 을 안하고) 캠페인 상태 변경
+      else if (announce === '/pds/campaign/status') {
+        // sseData :: {"kind":"event","command":"UPDATE","announce":"/pds/campaign/status","data":{"campaign_status":3,"campaign_end_flag":1},"campaign_id":"38890","skill_id":null}
+
+        const campaignStatus = data['campaign_status'];
+        // campaign_id
+        
+        const isCorrectCampaign = campaigns.find((campaign) => campaign.campaign_id === Number(campaign_id));
+        // MainDataResponse
+        
+        if( isCorrectCampaign) {
+          const updatedCampaigns = campaigns.map((campaign) =>
+            campaign.campaign_id === Number(campaign_id)
+              ? { ...campaign, start_flag: campaignStatus }
+              : campaign
+          );
+
+          setCampaigns(updatedCampaigns);
         }
       }
 

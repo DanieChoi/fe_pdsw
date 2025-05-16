@@ -514,6 +514,7 @@ const ChannelGroupSetting = () => {
 
     useEffect( ()=> {
         fetchChannelGroupList();
+        console.log('after campaigns :: ', campaigns);
     }, [campaigns]);
 
 

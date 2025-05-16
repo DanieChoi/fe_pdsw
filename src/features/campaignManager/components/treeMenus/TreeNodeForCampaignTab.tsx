@@ -18,6 +18,7 @@ import { getStatusIconWithStartFlag } from "@/components/shared/layout/utils/uti
 import { CampaignScheDuleListDataResponse, CampaignSkillUpdateRequest } from '@/features/campaignManager/types/campaignManagerIndex';
 import { CampaignInfoInsertRequest } from '@/features/campaignManager/hooks/useApiForCampaignManagerInsert';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import { useCampaignDialStatusStore } from "@/store/campaignDialStatusStore";
 
 export function TreeNodeForCampaignTab({
   item,
@@ -129,24 +130,21 @@ export function TreeNodeForCampaignTab({
 
   const updatedItem = { ...item, status: currentStatus };
 
-
+  const campaignDialStatus = useCampaignDialStatusStore(state => state.campaignDialStatus);
+  
+  const currentCampaignDialStatus = campaignDialStatus.find((dialStatus) => dialStatus.campaign_id === item.id);
 
   const hasChildren = !!item.children?.length;
   const isExpanded = expandedNodes.has(item.id);
   // ✅ 타입도 같이 체크
   const isSelected = selectedNodeId === item.id && selectedNodeType === item.type;
   // const statusIcon = item.type === "campaign" ? getStatusIcon(currentStatus) : null;
-  const statusIcon = item.type === "campaign" ? getStatusIconWithStartFlag(currentCampaign?.start_flag) : null;
 
-  // const handleClick = useCallback(() => {
-  //   onNodeSelect(item.id);
-  //   setSelectedNodeType(item.type);
-  //   // setCampaignIdForUpdateFromSideMenu(item.id);
-  //   if (item.type === "campaign") {
-  //     setCampaignIdForCopyCampaign(item.id);
-  //   }
-  //   if (hasChildren) onNodeToggle(item.id);
-  // }, [item.id, item.type, hasChildren, onNodeSelect, onNodeToggle, setSelectedNodeType, setCampaignIdForUpdateFromSideMenu]);
+  // const statusIcon = item.type === "campaign" ? getStatusIconWithStartFlag(currentCampaign?.start_flag) : null;
+
+  // store에 저장된게 있으면 그걸넣고 없어서 null이면 기존 currentCampaign?.start_flag를 넣음
+  const statusIcon = item.type === "campaign" ? getStatusIconWithStartFlag(currentCampaignDialStatus ? Number(currentCampaignDialStatus.status) : currentCampaign?.start_flag) : null;
+
 
   const handleClick = useCallback(() => {
     onNodeSelect(item.id);

@@ -28,6 +28,7 @@ import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/u
 import CounsellorGroupActions from '@/components/shared/layout/comp/TabActions/CounsellorGroupActions';
 import { useCampaignDialStatusStore } from '@/store/campaignDialStatusStore';
 import { useApiForCampaignManagerUpdate } from '@/features/campaignManager/hooks/useApiForCampaignManagerUpdate';
+import { ca } from 'date-fns/locale';
 
 
 const errorMessage: CustomAlertRequest = {
@@ -150,6 +151,9 @@ const MonitorPage = () => {
   const [_campaigns, _setCampaigns] = useState<Campaign[]>([]);
   const [campaignList, setCampaignList] = useState<any[]>([]);
   const [campaignSkillList, setCampaignSkillList] = useState<any[]>([]);
+
+  // footer 이벤트 감지용 (다른 유저 다른컴퓨터에서 변경시 감지 목적)
+  const [channelCampaign, setChannelCampaign] = useState({campaignId: '', type: ':::'});
 
     
   // 섹션 상태
@@ -892,7 +896,7 @@ const MonitorPage = () => {
       );
     });
   };
-
+  
   // tofix a2 0417
   // 새창 열기로 모니터 페이지가 열리기 때문에 캠페인 매니저에서 수정된 캠페인 정보가 반영되지 않음
   // 캠페인 관리 페이지에서 broadcast api 를 통해 수정 업데이트 후에 campaignId 를 전달받아 캠페인 정보 업데이트 해야 함
@@ -900,7 +904,7 @@ const MonitorPage = () => {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       const { type, campaignId } = event.data;
-     
+      
       if( type === 'skills_info_update' ){
         const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
         fetchSkills({
@@ -910,27 +914,36 @@ const MonitorPage = () => {
         setChannelMonitorInit(true);
       }else if( type.split(':')[0] === 'campaign_status'){
 
-        console.log('####### 캠페인 상태 변경 이벤트 수신:', type);
+        // console.log('####### 캠페인 상태 변경 이벤트 수신:', type);
         // 'campaign_status:' + '시작(캠페인 상태)' +':' + (1 ~ 6)
         // type.split(':')[0 ~ 2] ==> 'campaign_status' , '시작(캠페인 상태)', 1 ~ 6 
 
         // 캠페인 상태 변경시 캠페인 정보 업데이트
-        console.log('####### 현재 캠페인 currentCampaign :', currentCampaign);
-        console.log('####### 캠페인 ID :', campaignId);
+        // console.log('####### 현재 캠페인 currentCampaign :', currentCampaign);
+        // console.log('####### 캠페인 ID :', campaignId);
         
+        setChannelCampaign({campaignId, type});
+
+        const camapaignDialStatus = useCampaignDialStatusStore.getState().campaignDialStatus.find((item) => item.campaign_id.toString() === campaignId.toString());
         
         if(type.split(':')[2] === '2' || type.split(':')[2] === '3'){
           useCampaignDialStatusStore.getState().removeCampaignDialStatus({campaign_id : campaignId});
         } else {
+
+          if(camapaignDialStatus){
+            useCampaignDialStatusStore.getState().removeCampaignDialStatus({ campaign_id: campaignId });
+          }
+
           useCampaignDialStatusStore.getState().addCampaignDialStatus({campaign_id : campaignId, status : type.split(':')[2]});
         }
         if( currentCampaign.id.toString() === campaignId.toString() && selectedCampaign.toString() === campaignId.toString()){
-          console.log('####### 캠페인 상태 변경 이벤트 수신: 현재 캠페인과 동일');
+          // console.log('####### 캠페인 상태 변경 이벤트 수신: 현재 캠페인과 동일');
           setCurrentCampaign((prev) => ({
             ...prev,
             startFlag: Number(type.split(':')[2])
           }));
-          setCampaignStatus(type.split(':')[2] === 1 ? '시작' : type.split(':')[2] === 2 ? '멈춤' : type.split(':')[2] === '3' ? '중지' : type.split(':')[1]);
+          
+          setCampaignStatus(type.split(':')[2] === '1' ? '시작' : type.split(':')[2] === '2' ? '멈춤' : type.split(':')[2] === '3' ? '중지' : type.split(':')[1]);
         }
         
       }else if( typeof campaignId != 'undefined'){
@@ -951,6 +964,25 @@ const MonitorPage = () => {
       campaignChannel.removeEventListener("message", handleMessage);
     };
   }, []);
+
+  useEffect(() => {
+
+    if( channelCampaign.campaignId !== '' && selectedCampaign !== channelCampaign.campaignId){
+      
+      setCurrentCampaign((prev) => ({
+        ...prev,
+        startFlag: Number(channelCampaign.type.split(':')[2])
+      }));
+      // console.log('####### 캠페인 상태 변경 이벤트 수신: 현재 캠페인과 동일');
+     setCampaignStatus(
+      channelCampaign.type.split(':')[2] === '1' ? '시작' : 
+      channelCampaign.type.split(':')[2] === '2' ? '멈춤' : 
+      '중지' 
+      );
+
+    }
+
+  },[channelCampaign]);
 
   // 모니터 페이지 렌더링
   return (
