@@ -889,26 +889,27 @@ export default function Footer({
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       const { type, message } = event.data;
-
-      if (type === 'sseMessage') {
-        console.log('sseMessageChannel :: ' + message);
-        const tempEventData = JSON.parse(message);
-        const announce = tempEventData["announce"];
-        const command = tempEventData["command"];
-        const data = tempEventData["data"];
-        const kind = tempEventData["kind"];
-        const campaign_id = tempEventData["campaign_id"];
-        const skill_id = tempEventData["skill_id"];
-        footerDataSet(
-          announce,
-          command,
-          data,
-          kind,
-          campaign_id,
-          tempEventData["skill_id"] || "",
-          tempEventData
-        );
-        setSseData(message);
+     
+      if( type === 'sseMessage' ){
+          console.log( 'sseMessageChannel :: ' + message);
+          
+          const tempEventData = JSON.parse(message);
+          const announce = tempEventData["announce"];
+          const command = tempEventData["command"];
+          const data = tempEventData["data"];
+          const kind = tempEventData["kind"];
+          const campaign_id = tempEventData["campaign_id"];
+          const skill_id = tempEventData["skill_id"];
+          footerDataSet(
+            announce,
+            command,
+            data,
+            kind,
+            campaign_id,
+            tempEventData["skill_id"] || "",
+            tempEventData
+          );
+          setSseData(message);
       }
     };
 

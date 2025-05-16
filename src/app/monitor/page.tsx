@@ -697,7 +697,7 @@ const MonitorPage = () => {
         setCurrentCampaign({...tempCampaign
           , skills: dataList.find(data=> data.campaign_id === Number(selectedCampaign))?.skill_id.join(',').split(',').map((data) => Number(data))
         });
-        setCampaignStatus(tempCampaign.startFlag === 1 ? '시작' : tempCampaign.startFlag === 2 ? '멈춤' : '중지');
+        setCampaignStatus(tempCampaign.startFlag === 1 ? '시작' : tempCampaign.startFlag === 2 ? '멈춤' : tempCampaign.startFlag === 3 ? '중지' : '멈춤');
         const tempCampaignInfo = campaigns.find(c => c.campaign_id === Number(tempCampaign.id));
         setCallPacing(tempCampaignInfo?.dial_mode === 2 ? tempCampaignInfo.dial_speed * 2 : tempCampaignInfo?.dial_mode === 3 ? tempCampaignInfo.dial_speed : 0);
         setDialMode(tempCampaignInfo?.dial_mode || 0);
@@ -751,7 +751,7 @@ const MonitorPage = () => {
     if (selectedCampaign !== '') {
       const tempCampaign = _campaigns.find(c => c.id === selectedCampaign) || initData;
       setCurrentCampaign(tempCampaign);
-      setCampaignStatus(tempCampaign.startFlag === 1 ? '시작' : tempCampaign.startFlag === 2 ? '멈춤' : '중지');
+      setCampaignStatus(tempCampaign.startFlag === 1 ? '시작' : tempCampaign.startFlag === 2 ? '멈춤' : tempCampaign.startFlag === 3 ? '중지' : '멈춤');
       const tempCampaignInfo = campaigns.find(c => c.campaign_id === Number(tempCampaign.id));
       setCallPacing(tempCampaignInfo?.dial_mode === 2 ? tempCampaignInfo.dial_speed * 2 : tempCampaignInfo?.dial_mode === 3 ? tempCampaignInfo.dial_speed : 0);
       setDialMode(tempCampaignInfo?.dial_mode || 0);
@@ -943,7 +943,8 @@ const MonitorPage = () => {
             startFlag: Number(type.split(':')[2])
           }));
           
-          setCampaignStatus(type.split(':')[2] === '1' ? '시작' : type.split(':')[2] === '2' ? '멈춤' : type.split(':')[2] === '3' ? '중지' : type.split(':')[1]);
+          // setCampaignStatus(type.split(':')[2] === '1' ? '시작' : type.split(':')[2] === '2' ? '멈춤' : type.split(':')[2] === '3' ? '중지' : type.split(':')[1]);
+          setCampaignStatus(type.split(':')[2] === '1' ? '시작' : type.split(':')[2] === '2' ? '멈춤' : type.split(':')[2] === '3' ? '중지' : '멈춤');
         }
         
       }else if( typeof campaignId != 'undefined'){
@@ -977,7 +978,8 @@ const MonitorPage = () => {
      setCampaignStatus(
       channelCampaign.type.split(':')[2] === '1' ? '시작' : 
       channelCampaign.type.split(':')[2] === '2' ? '멈춤' : 
-      '중지' 
+      channelCampaign.type.split(':')[2] === '3' ? '중지' : 
+      '멈춤' 
       );
 
     }
