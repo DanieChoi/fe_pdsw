@@ -44,7 +44,7 @@ axiosInstance.interceptors.request.use(
 
     if (error.response.data.result_code === 5) {
       // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
-      customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
+      customAlertService.error('API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.', '세션 만료', () => {
         window.location.href = '/login';
       });
     }
@@ -60,7 +60,7 @@ axiosInstance.interceptors.response.use(
     if (response.data.result_code === 5) {
       sessionCheckYn = false;
       // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
-      customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
+      customAlertService.error('API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.', '세션 만료', () => {
         window.location.href = '/login';
       });
     }
@@ -440,9 +440,9 @@ axiosInstance.interceptors.response.use(
     }    
     if (error.response.data.result_code === 5) {
       // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
-      // customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
-      //   window.location.href = '/login';
-      // });
+      customAlertService.error('API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.', '세션 만료', () => {
+        window.location.href = '/login';
+      });
     }
 
     const url = error.config.url || '';
