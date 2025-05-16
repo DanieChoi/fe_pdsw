@@ -180,6 +180,8 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
     try{
       
       const callbackCampaignId = await commonDeleteCampaign(Number(tenant_id), Number(campaignId));
+      
+      closeDialog();
 
       if(onFocusID && callbackCampaignId){
 

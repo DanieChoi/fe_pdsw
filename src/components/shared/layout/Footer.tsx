@@ -18,6 +18,7 @@ import { sseMessageChannel, logoutChannel } from '@/lib/broadcastChannel';
 import logoutFunction from "@/components/common/logoutFunction";
 import { useRouter } from 'next/navigation';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
+import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
 
 
 type FooterDataType = {
@@ -68,7 +69,7 @@ export default function Footer({
     () =>
       debounce(() => {
         invalidateTreeMenuData();
-        invalidateCampaignGroupTreeData();
+        // invalidateCampaignGroupTreeData();
       }, 500),
     [] // invalidate 함수가 stable 하다면 빈 배열, 아니면 [invalidateTreeMenuData,…]
   );
@@ -468,23 +469,30 @@ export default function Footer({
         const camapaignDialStatus = useCampaignDialStatusStore.getState().campaignDialStatus.find((status) => status.campaign_id === campaign_id);
 
         // 통합모니터링창에 보내기
-        useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:' + _start_flag +':' + data['campaign_status'], campaign_id);
+        useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:' + _start_flag + ':' + data['campaign_status'], campaign_id);
 
         // 멈춤중이나 정지중일때 store에 add
         if ((data['campaign_status'] === 5 || data['campaign_status'] === 6) && data['campaign_end_flag'] === 1) {
 
           // 로직 결정전 add 하기전에 항상 이미 존재하면 지워주기
-          if(camapaignDialStatus){
+          if (camapaignDialStatus) {
             removeCampaignDialStatus({ campaign_id: campaign_id });
           }
 
           // 캠페인 상태가 시작이며 발신중일때
           addCampaignDialStatus({ campaign_id: campaign_id, status: data['campaign_status'] });
+
+          // fixed 0516
+          useSideMenuCampaignGroupTabStore.getState().updateCampaignStatus(
+            campaign_id,
+            data['campaign_status']
+          );
+
         }
         else if ((data['campaign_status'] === 2 || data['campaign_status'] === 3) && data['campaign_end_flag'] === 1) {
           // 캠페인 상태가 멈춤이나 정지이며, 완료 되었을때 ==> 차후에 campaign_end_flag 맞춰서 변경해야함!!!
           removeCampaignDialStatus({ campaign_id: campaign_id });
-        } 
+        }
 
         /* 캠페인 동작시간에 벗어났을때 캠페인 시작을 누르면
           전화를 받아서 발신이 종료된경우
@@ -498,25 +506,25 @@ export default function Footer({
           [10:54:39]	[EVENT]	[캠페인 동작상태 변경] 캠페인 아이디 : 38890, 동작상태: 캠페인 멈춤 중, 완료구분: 진행중
           [10:54:39]	[EVENT]	[캠페인 동작상태 변경] 캠페인 아이디 : 38890, 동작상태: 시작, 완료구분: 진행중
         */
-        
+
 
         // 스케줄 PAUSE와 스케줄 시작 구분???
         if ((data['campaign_status'] === 4 || data['campaign_status'] === 9) && data['campaign_end_flag'] === 1) {
 
           // 로직 결정전 add 하기전에 항상 이미 존재하면 지워주기
-          if(camapaignDialStatus){
+          if (camapaignDialStatus) {
             removeCampaignDialStatus({ campaign_id: campaign_id });
           }
 
           // 만약 같은 캠페인이 전달된다면?
-          if( (camapaignDialStatus && data['campaign_status'] === 4 && Number(camapaignDialStatus.status) === 9) ||
-              (camapaignDialStatus && data['campaign_status'] === 9 && Number(camapaignDialStatus.status) === 4)) {
+          if ((camapaignDialStatus && data['campaign_status'] === 4 && Number(camapaignDialStatus.status) === 9) ||
+            (camapaignDialStatus && data['campaign_status'] === 9 && Number(camapaignDialStatus.status) === 4)) {
             removeCampaignDialStatus({ campaign_id: campaign_id });
           }
           // 캠페인 상태가 스케줄 PAUSE와 스케줄 시작일때,
           addCampaignDialStatus({ campaign_id: campaign_id, status: data['campaign_status'] });
         }
-        
+
 
 
         // 푸터 로그 메시지
@@ -529,7 +537,7 @@ export default function Footer({
           });
         }
 
-      
+
 
         // fetchMain({
         //   session_key: '',
@@ -724,7 +732,7 @@ export default function Footer({
       } else if (command === 'DELETE') {
         // _message += `삭제] 채널그룹 아이디: [${data['group_id']}]`;
         setChannelGroupList(
-          channelGroupList.filter(data=>data.group_id !== Number(data['group_id']))
+          channelGroupList.filter(data => data.group_id !== Number(data['group_id']))
         );
       }
       // addMessageToFooterList(_time, _type, _message);channelGroupList
@@ -844,7 +852,7 @@ export default function Footer({
                 tempEventData
               );
               setSseData(event.data);
-              
+
               sseMessageChannel.postMessage({
                 type: "sseMessage",
                 message: event.data,
@@ -881,26 +889,26 @@ export default function Footer({
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       const { type, message } = event.data;
-     
-      if( type === 'sseMessage' ){
-          console.log( 'sseMessageChannel :: ' + message);
-          const tempEventData = JSON.parse(message);
-          const announce = tempEventData["announce"];
-          const command = tempEventData["command"];
-          const data = tempEventData["data"];
-          const kind = tempEventData["kind"];
-          const campaign_id = tempEventData["campaign_id"];
-          const skill_id = tempEventData["skill_id"];
-          footerDataSet(
-            announce,
-            command,
-            data,
-            kind,
-            campaign_id,
-            tempEventData["skill_id"] || "",
-            tempEventData
-          );
-          setSseData(message);
+
+      if (type === 'sseMessage') {
+        console.log('sseMessageChannel :: ' + message);
+        const tempEventData = JSON.parse(message);
+        const announce = tempEventData["announce"];
+        const command = tempEventData["command"];
+        const data = tempEventData["data"];
+        const kind = tempEventData["kind"];
+        const campaign_id = tempEventData["campaign_id"];
+        const skill_id = tempEventData["skill_id"];
+        footerDataSet(
+          announce,
+          command,
+          data,
+          kind,
+          campaign_id,
+          tempEventData["skill_id"] || "",
+          tempEventData
+        );
+        setSseData(message);
       }
     };
 
@@ -913,9 +921,9 @@ export default function Footer({
   useEffect(() => {
     const handleLogoutMessage = (event: MessageEvent) => {
       const { type, message } = event.data;
-     
-      if( type === 'logout' ){
-        
+
+      if (type === 'logout') {
+
         // 일반 페이지에서 라우터 사용
         setTimeout(() => {
           logoutFunction();
@@ -1020,10 +1028,10 @@ export default function Footer({
         const _campaign_name = campaigns.find(data => data.campaign_id === Number(campaign_id))?.campaign_name;
         if (command === 'INSERT') {
           // _message += '수정, 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + data['campaign_name'];
-          if( typeof _campaign_name === 'undefined'){
+          if (typeof _campaign_name === 'undefined') {
             _message += '수정] 캠페인 아이디 : ' + campaign_id;
             addMessageToFooterList(_time, _type, _message);
-          }else{
+          } else {
             _message += '수정] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + _campaign_name;
             addMessageToFooterList(_time, _type, _message);
           }
@@ -1038,9 +1046,9 @@ export default function Footer({
           _message += '삭제] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + _campaign_name;
           addMessageToFooterList(_time, _type, _message);
         }
-        
+
         const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
-        fetchSchedules({ tenant_id_array: tempTenantIdArray }); 
+        fetchSchedules({ tenant_id_array: tempTenantIdArray });
       }
       //캠페인수정>콜페이싱 수정
       else if (announce === '/pds/campaign/dial-speed') {
@@ -1096,18 +1104,26 @@ export default function Footer({
 
         const campaignStatus = data['campaign_status'];
         // campaign_id
-        
+
         const isCorrectCampaign = campaigns.find((campaign) => campaign.campaign_id === Number(campaign_id));
         // MainDataResponse
-        
-        if( isCorrectCampaign) {
+
+        if (isCorrectCampaign) {
           const updatedCampaigns = campaigns.map((campaign) =>
             campaign.campaign_id === Number(campaign_id)
               ? { ...campaign, start_flag: campaignStatus }
               : campaign
           );
 
+          // fixed 0516
           setCampaigns(updatedCampaigns);
+
+
+          useSideMenuCampaignGroupTabStore.getState().updateCampaignStatus(
+            campaign_id,
+            campaignStatus
+          );
+
         }
       }
 

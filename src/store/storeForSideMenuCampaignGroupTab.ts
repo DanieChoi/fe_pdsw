@@ -440,45 +440,6 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
     });
   },
 
-  // removeCampaignFromGroup: (campaignId: string) => {
-  //   set(state => {
-  //     const newTreeData = [...state.treeData];
-  //     const newOriginalData = [...state.originalTreeData];
-
-  //     // Helper function to find and remove the campaign
-  //     const removeFromTree = (nodes: TreeNode[]): boolean => {
-  //       for (let i = 0; i < nodes.length; i++) {
-  //         const node = nodes[i];
-
-  //         // Check if any children match the campaign ID
-  //         if (node.children) {
-  //           const index = node.children.findIndex(child => child.id === campaignId);
-  //           if (index !== -1) {
-  //             // Remove the campaign
-  //             node.children.splice(index, 1);
-  //             return true;
-  //           }
-
-  //           // Recursively search in children
-  //           if (removeFromTree(node.children)) {
-  //             return true;
-  //           }
-  //         }
-  //       }
-  //       return false;
-  //     };
-
-  //     // Remove from both tree data and original data
-  //     removeFromTree(newTreeData);
-  //     removeFromTree(newOriginalData);
-
-  //     return {
-  //       treeData: newTreeData,
-  //       originalTreeData: newOriginalData
-  //     };
-  //   });
-  // },
-
   removeCampaignFromGroup: (campaignId: string) => {
     set(state => {
       console.log(`캠페인 ID ${campaignId} 제거 시작`);
@@ -630,6 +591,7 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
 
   // 캠페인 상태 업데이트 함수
   updateCampaignStatus: (campaignId: string, status: number) => {
+    
     set(state => {
       const newTreeData = JSON.parse(JSON.stringify(state.treeData));
       const newOriginalData = JSON.parse(JSON.stringify(state.originalTreeData));
@@ -661,6 +623,7 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
         originalTreeData: newOriginalData
       };
     });
+
   },
 }));
 
