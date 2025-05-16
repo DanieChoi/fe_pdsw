@@ -44,9 +44,7 @@ import { CampaignInfoInsertRequest } from '@/features/campaignManager/hooks/useA
 import { useDeleteCampaignHelper } from '@/features/campaignManager/utils/deleteCampaignHelper';
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 import { useCampaignDialStatusStore } from '@/store/campaignDialStatusStore';
-import { ca } from 'date-fns/locale';
-import { set } from 'lodash';
-import { on } from 'events';
+
 
 
 
