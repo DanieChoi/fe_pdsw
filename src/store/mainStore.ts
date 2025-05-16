@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import { MainDataResponse, TenantListDataResponse } from '../features/auth/types/mainIndex';
 import { campaignChannel } from '@/lib/broadcastChannel';
-import { devtools } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 import { CampaignSkillItemForSystemAdmin } from '@/shared/api/camapign/apiForCampaignSkilListForSystemAdmin';
 import { CampaignGroupItemForSystemAdmin } from '@/shared/api/camapign/apiForGetCampaignGroupForSystemAdmin';
 
@@ -115,155 +115,161 @@ type MainStore = MainState & MainActions;
 // Redux 개발자 도구 미들웨어 추가
 export const useMainStore = create<MainStore>()(
   devtools(
-    (set, get) => ({
-      campaigns: [],
-      tenants: [],
-      counselers: [],
-      selectedCampaign: null,
-      selectedCampaignRow: null, // Initialize selectedCampaignRow as null
-      totalCount: 0,
-      reBroadcastType: '',
-      sendingStatusCampaignId: '',
-      listManagerFileFormatRows: [],
-      sseInputMessage: '',
-      listManagerDelimiter: '',
-      listManagerCampaignId: '',
-      listManagerFileFormat: '',
-      reBroadcastRedialCondition: '',
-      // 테넌트 상태 초기화
-      tenantsLoaded: false,
-      tenantsLoading: false,
-      // 캠페인 상태 초기화
-      campaignsLoaded: false,
-      campaignsLoading: false,
-      channelMonitorFirstSelect: '',
-      channelMonitorSecondSelect: '',
-      channelMonitorThirdSelect: '',
-      campaignProgressInfoViewType: '',
-      campaignTotalProgressInfoCampaignId: '',
+    persist(
+      (set, get) => ({
+        campaigns: [],
+        tenants: [],
+        counselers: [],
+        selectedCampaign: null,
+        selectedCampaignRow: null, // Initialize selectedCampaignRow as null
+        totalCount: 0,
+        reBroadcastType: '',
+        sendingStatusCampaignId: '',
+        listManagerFileFormatRows: [],
+        sseInputMessage: '',
+        listManagerDelimiter: '',
+        listManagerCampaignId: '',
+        listManagerFileFormat: '',
+        reBroadcastRedialCondition: '',
+        // 테넌트 상태 초기화
+        tenantsLoaded: false,
+        tenantsLoading: false,
+        // 캠페인 상태 초기화
+        campaignsLoaded: false,
+        campaignsLoading: false,
+        channelMonitorFirstSelect: '',
+        channelMonitorSecondSelect: '',
+        channelMonitorThirdSelect: '',
+        campaignProgressInfoViewType: '',
+        campaignTotalProgressInfoCampaignId: '',
 
-      // 캠페인 스킬 관련
-      campaignSkills: [],
-      campaignSkillsLoaded: false,
-      campaignSkillsLoading: false,
+        // 캠페인 스킬 관련
+        campaignSkills: [],
+        campaignSkillsLoaded: false,
+        campaignSkillsLoading: false,
 
-      // 캠페인 그룹 관련
-      campaignGroups: [],
-      campaignGroupsLoaded: false,
-      campaignGroupsLoading: false,
+        // 캠페인 그룹 관련
+        campaignGroups: [],
+        campaignGroupsLoaded: false,
+        campaignGroupsLoading: false,
 
-      setCampaigns: (campaigns) => set({
-        campaigns,
-        campaignsLoaded: true,
-        campaignsLoading: false
-      }, false, 'setCampaigns'),
-      setTenants: (tenants) => set({
-        tenants,
-        tenantsLoaded: true,
-        tenantsLoading: false
-      }, false, 'setTenants'),
-      setCounselers: (counselers) => set({ counselers }, false, 'setCounselers'),
-      setSelectedCampaign: (campaign) => set({ selectedCampaign: campaign }, false, 'setSelectedCampaign'),
-      setSelectedCampaignRow: (row) => set({ selectedCampaignRow: row }, false, 'setSelectedCampaignRow'), // Set selectedCampaignRow
-      setTotalCount: (totalCount) => set({ totalCount }, false, 'setTotalCount'),
-      setReBroadcastType: (reBroadcastType) => set({ reBroadcastType }, false, 'setReBroadcastType'),
-      setSendingStatusCampaignId: (sendingStatusCampaignId) => set({ sendingStatusCampaignId }, false, 'setSendingStatusCampaignId'),
-      setListManagerFileFormatRows: (listManagerFileFormatRows) => set({ listManagerFileFormatRows }, false, 'setListManagerFileFormatRows'),
-      setSseInputMessage: (sseInputMessage) => {
-        set({ sseInputMessage }, false, 'setSseInputMessage');
-        campaignChannel.postMessage({
-          type: sseInputMessage,
-        });
-      },
-      setListManagerDelimiter: (listManagerDelimiter) => set({ listManagerDelimiter }, false, 'setListManagerDelimiter'),
-      setListManagerCampaignId: (listManagerCampaignId) => set({ listManagerCampaignId }, false, 'setListManagerCampaignId'),
-      setListManagerFileFormat: (listManagerFileFormat) => set({ listManagerFileFormat }, false, 'setListManagerFileFormat'),
-      setReBroadcastRedialCondition: (reBroadcastRedialCondition) => set({ reBroadcastRedialCondition }, false, 'setReBroadcastRedialCondition'),
-      // 테넌트 액션
-      setTenantsLoaded: (loaded) => set({ tenantsLoaded: loaded }, false, 'setTenantsLoaded'),
-      setTenantsLoading: (loading) => set({ tenantsLoading: loading }, false, 'setTenantsLoading'),
-      // 캠페인 액션
-      setCampaignsLoaded: (loaded) => set({ campaignsLoaded: loaded }, false, 'setCampaignsLoaded'),
-      setCampaignsLoading: (loading) => set({ campaignsLoading: loading }, false, 'setCampaignsLoading'),
-      setChannelMonitorFirstSelect: (channelMonitorFirstSelect) => set({ channelMonitorFirstSelect }, false, 'setChannelMonitorFirstSelect'),
-      setChannelMonitorSecondSelect: (channelMonitorSecondSelect) => set({ channelMonitorSecondSelect }, false, 'setChannelMonitorSecondSelect'),
-      setChannelMonitorThirdSelect: (channelMonitorThirdSelect) => set({ channelMonitorThirdSelect }, false, 'setChannelMonitorThirdSelect'),
-      setCampaignProgressInfoViewType: (campaignProgressInfoViewType) => set({ campaignProgressInfoViewType }, false, 'setCampaignProgressInfoViewType'),
-      setCampaignTotalProgressInfoCampaignId: (campaignTotalProgressInfoCampaignId) => set({ campaignTotalProgressInfoCampaignId }, false, 'setCampaignTotalProgressInfoCampaignId'),
-
-      updateCampaignStatus: (campaignId: number, newStatus: number) => {
-        set(state => {
-          const updatedCampaigns = state.campaigns.map(campaign => {
-            if (campaign.campaign_id === campaignId) {
-              return {
-                ...campaign,
-                campaign_status: newStatus,
-                start_flag: newStatus  // ✅ 상태 반영은 그대로
-              };
-            }
-            return campaign;
+        setCampaigns: (campaigns) => set({
+          campaigns,
+          campaignsLoaded: true,
+          campaignsLoading: false
+        }, false, 'setCampaigns'),
+        setTenants: (tenants) => set({
+          tenants,
+          tenantsLoaded: true,
+          tenantsLoading: false
+        }, false, 'setTenants'),
+        setCounselers: (counselers) => set({ counselers }, false, 'setCounselers'),
+        setSelectedCampaign: (campaign) => set({ selectedCampaign: campaign }, false, 'setSelectedCampaign'),
+        setSelectedCampaignRow: (row) => set({ selectedCampaignRow: row }, false, 'setSelectedCampaignRow'), // Set selectedCampaignRow
+        setTotalCount: (totalCount) => set({ totalCount }, false, 'setTotalCount'),
+        setReBroadcastType: (reBroadcastType) => set({ reBroadcastType }, false, 'setReBroadcastType'),
+        setSendingStatusCampaignId: (sendingStatusCampaignId) => set({ sendingStatusCampaignId }, false, 'setSendingStatusCampaignId'),
+        setListManagerFileFormatRows: (listManagerFileFormatRows) => set({ listManagerFileFormatRows }, false, 'setListManagerFileFormatRows'),
+        setSseInputMessage: (sseInputMessage) => {
+          set({ sseInputMessage }, false, 'setSseInputMessage');
+          campaignChannel.postMessage({
+            type: sseInputMessage,
           });
-      
-          const updatedSelectedCampaign = state.selectedCampaign?.campaign_id === campaignId
-            ? {
-                ...state.selectedCampaign,
-                campaign_status: newStatus,
-                start_flag: newStatus
+        },
+        setListManagerDelimiter: (listManagerDelimiter) => set({ listManagerDelimiter }, false, 'setListManagerDelimiter'),
+        setListManagerCampaignId: (listManagerCampaignId) => set({ listManagerCampaignId }, false, 'setListManagerCampaignId'),
+        setListManagerFileFormat: (listManagerFileFormat) => set({ listManagerFileFormat }, false, 'setListManagerFileFormat'),
+        setReBroadcastRedialCondition: (reBroadcastRedialCondition) => set({ reBroadcastRedialCondition }, false, 'setReBroadcastRedialCondition'),
+        // 테넌트 액션
+        setTenantsLoaded: (loaded) => set({ tenantsLoaded: loaded }, false, 'setTenantsLoaded'),
+        setTenantsLoading: (loading) => set({ tenantsLoading: loading }, false, 'setTenantsLoading'),
+        // 캠페인 액션
+        setCampaignsLoaded: (loaded) => set({ campaignsLoaded: loaded }, false, 'setCampaignsLoaded'),
+        setCampaignsLoading: (loading) => set({ campaignsLoading: loading }, false, 'setCampaignsLoading'),
+        setChannelMonitorFirstSelect: (channelMonitorFirstSelect) => set({ channelMonitorFirstSelect }, false, 'setChannelMonitorFirstSelect'),
+        setChannelMonitorSecondSelect: (channelMonitorSecondSelect) => set({ channelMonitorSecondSelect }, false, 'setChannelMonitorSecondSelect'),
+        setChannelMonitorThirdSelect: (channelMonitorThirdSelect) => set({ channelMonitorThirdSelect }, false, 'setChannelMonitorThirdSelect'),
+        setCampaignProgressInfoViewType: (campaignProgressInfoViewType) => set({ campaignProgressInfoViewType }, false, 'setCampaignProgressInfoViewType'),
+        setCampaignTotalProgressInfoCampaignId: (campaignTotalProgressInfoCampaignId) => set({ campaignTotalProgressInfoCampaignId }, false, 'setCampaignTotalProgressInfoCampaignId'),
+
+        updateCampaignStatus: (campaignId: number, newStatus: number) => {
+          set(state => {
+            const updatedCampaigns = state.campaigns.map(campaign => {
+              if (campaign.campaign_id === campaignId) {
+                return {
+                  ...campaign,
+                  campaign_status: newStatus,
+                  start_flag: newStatus  // ✅ 상태 반영은 그대로
+                };
               }
-            : state.selectedCampaign;
-      
-          return {
-            campaigns: updatedCampaigns,
-            selectedCampaign: updatedSelectedCampaign
-          };
-        }, false, 'updateCampaignStatus');
-      
-        // ✅ 상태 반영 후 invalidate는 외부에서 별도로 처리
-        // 예: setTimeout(() => invalidateTreeMenuData(), 300);
-        // 또는 수동 버튼/로직으로 트리 UI 재로딩
-      },      
+              return campaign;
+            });
+        
+            const updatedSelectedCampaign = state.selectedCampaign?.campaign_id === campaignId
+              ? {
+                  ...state.selectedCampaign,
+                  campaign_status: newStatus,
+                  start_flag: newStatus
+                }
+              : state.selectedCampaign;
+        
+            return {
+              campaigns: updatedCampaigns,
+              selectedCampaign: updatedSelectedCampaign
+            };
+          }, false, 'updateCampaignStatus');
+        
+          // ✅ 상태 반영 후 invalidate는 외부에서 별도로 처리
+          // 예: setTimeout(() => invalidateTreeMenuData(), 300);
+          // 또는 수동 버튼/로직으로 트리 UI 재로딩
+        },      
 
-      // 캠페인 스킬 액션
-      setCampaignSkills: (skills) => set({
-        campaignSkills: skills,
-        campaignSkillsLoaded: true,
-        campaignSkillsLoading: false
-      }, false, 'setCampaignSkills'),
-      
-      setCampaignSkillsLoaded: (loaded) => set({ 
-        campaignSkillsLoaded: loaded 
-      }, false, 'setCampaignSkillsLoaded'),
-      
-      setCampaignSkillsLoading: (loading) => set({ 
-        campaignSkillsLoading: loading 
-      }, false, 'setCampaignSkillsLoading'),
-      
-      // 특정 캠페인 ID에 연결된 스킬 목록 반환
-      getCampaignSkillsByCampaignId: (campaignId) => {
-        // 캠페인 ID에 해당하는 스킬 필터링
-        return get().campaignSkills.filter(skill => 
-          skill.campaign_id && skill.campaign_id === campaignId
-        );
-      },
+        // 캠페인 스킬 액션
+        setCampaignSkills: (skills) => set({
+          campaignSkills: skills,
+          campaignSkillsLoaded: true,
+          campaignSkillsLoading: false
+        }, false, 'setCampaignSkills'),
+        
+        setCampaignSkillsLoaded: (loaded) => set({ 
+          campaignSkillsLoaded: loaded 
+        }, false, 'setCampaignSkillsLoaded'),
+        
+        setCampaignSkillsLoading: (loading) => set({ 
+          campaignSkillsLoading: loading 
+        }, false, 'setCampaignSkillsLoading'),
+        
+        // 특정 캠페인 ID에 연결된 스킬 목록 반환
+        getCampaignSkillsByCampaignId: (campaignId) => {
+          // 캠페인 ID에 해당하는 스킬 필터링
+          return get().campaignSkills.filter(skill => 
+            skill.campaign_id && skill.campaign_id === campaignId
+          );
+        },
 
-      setCampaignGroups: (groups) => set({
-        campaignGroups: groups,
-        campaignGroupsLoaded: true,
-        campaignGroupsLoading: false
-      }, false, 'setCampaignGroups'),
-      
-      setCampaignGroupsLoaded: (loaded) => set({
-        campaignGroupsLoaded: loaded
-      }, false, 'setCampaignGroupsLoaded'),
-      
-      setCampaignGroupsLoading: (loading) => set({
-        campaignGroupsLoading: loading
-      }, false, 'setCampaignGroupsLoading'),
+        setCampaignGroups: (groups) => set({
+          campaignGroups: groups,
+          campaignGroupsLoaded: true,
+          campaignGroupsLoading: false
+        }, false, 'setCampaignGroups'),
+        
+        setCampaignGroupsLoaded: (loaded) => set({
+          campaignGroupsLoaded: loaded
+        }, false, 'setCampaignGroupsLoaded'),
+        
+        setCampaignGroupsLoading: (loading) => set({
+          campaignGroupsLoading: loading
+        }, false, 'setCampaignGroupsLoading'),
 
-    }),
+      }),
+      {
+        name: 'main-store', // localStorage에 저장될 키 이름
+        // storage: createJSONStorage(() => sessionStorage) // 이 줄을 사용하면 sessionStorage에 저장됨
+      }
+    ),
     {
-      name: 'main-store', // 개발자 도구에 표시될 스토어 이름
-      enabled: process.env.NODE_ENV === 'development', // 개발 환경에서만 활성화
+      name: 'main-store-devtools',
+      enabled: process.env.NODE_ENV === 'development',
     }
   )
 );
