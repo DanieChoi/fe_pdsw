@@ -84,7 +84,7 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
       setCallingNumbers(data.result_data || []);
-      fetchCampaignSkills({ session_key: session_key, tenant_id: 0 });
+      // fetchCampaignSkills({ session_key: session_key, tenant_id: 0 });
     },
     onError: (error) => {
       ServerErrorCheck('캠페인 발신번호 조회', error.message);
@@ -123,7 +123,8 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     if (tenants && campaigns && tenants.length > 0 && campaigns.length > 0 ) {
       // const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       // fetchSchedules({ tenant_id_array: tempTenantIdArray });        
-      fetchCallingNumbers({ session_key: session_key, tenant_id: 0 });    
+      // fetchCallingNumbers({ session_key: session_key, tenant_id: 0 });    
+      fetchCampaignSkills({ session_key: session_key, tenant_id: 0 });
     }
   }, [tenants, campaigns]);
 
@@ -133,7 +134,8 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
       if(campaigns.length > 0){
         setCampaignIdForUpdateFromSideMenu(campaigns[0].campaign_id+'');
         const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
-        fetchSchedules({ tenant_id_array: tempTenantIdArray });   
+        fetchSchedules({ tenant_id_array: tempTenantIdArray });  
+        fetchCallingNumbers({ session_key: session_key, tenant_id: 0 });     
       }else{
         // 새로고침시 campaigns가 비어있는 경우
         setCampaignIdForUpdateFromSideMenu(0+'');
