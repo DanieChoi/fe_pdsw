@@ -1072,21 +1072,6 @@ export default function Footer({
       <div className="flex-none pt-[5px] pb-[4px] px-[20px] border-b bg-white flex justify-between items-center">
         <div className="flex items-center gap-1">
           <span className="text-[13px] text-[#333]">현재 진행 상태 </span>
-          <span className="text-[12px] text-[#666] bg-gray-100 px-1 rounded">
-            {footerDataList.length > 0 ? (
-              <button
-                onClick={handleToggleHeight}
-                className="text-[12px] text-[#666] bg-gray-100 px-1 rounded cursor-pointer hover:bg-gray-200 transition"
-              >
-                {footerDataList.length}건
-              </button>
-            ) : (
-              <span className="text-[12px] text-[#666] bg-gray-100 px-1 rounded">
-                0건
-              </span>
-            )}
-
-          </span>
         </div>
 
         <div className="flex items-center gap-2">
