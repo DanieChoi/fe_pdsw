@@ -447,6 +447,8 @@ export default function Footer({
           _start_flag = '캠페인 멈춤 중';
         } else if (data['campaign_status'] === 6) {
           _start_flag = '캠페인 정지 중';
+        } else if (data['campaign_status'] === 9) {
+          _start_flag = '스케줄 시작';
         }
 
         if (data['campaign_end_flag'] === 1) {
@@ -459,7 +461,7 @@ export default function Footer({
         useCampaignDialStatusStore.getState().setSseInputMessage('campaign_status:' + _start_flag +':' + data['campaign_status'], campaign_id);
 
         // 멈춤중이나 정지중일때 store에 add
-        if ((data['campaign_status'] === 5 || data['campaign_status'] === 6) && data['campaign_end_flag'] === 1) {
+        if ((data['campaign_status'] === 4 || data['campaign_status'] === 5 || data['campaign_status'] === 6) && data['campaign_end_flag'] === 1) {
           // 캠페인 상태가 시작이며 발신중일때
           addCampaignDialStatus({ campaign_id: campaign_id, status: data['campaign_status'] });
           

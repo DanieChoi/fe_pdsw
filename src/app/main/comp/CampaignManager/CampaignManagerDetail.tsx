@@ -1212,7 +1212,12 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         message: '캠페인 아이디 : ' + tempCampaignManagerInfo.campaign_id
           + '\n 캠페인 이름 : ' + tempCampaignManagerInfo.campaign_name
           + '\n 캠페인을 수정하시겠습니까?',
-        onClose: () => handleCampaignSaveExecute(isDialExist ?? false),
+        onClose: () => {
+          // 화면 깜빡임 방지를 위한 비동기처리
+          setTimeout(() => {
+            handleCampaignSaveExecute(isDialExist ?? false);
+          }, 300);
+        },
         onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }

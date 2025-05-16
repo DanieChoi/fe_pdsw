@@ -2,7 +2,7 @@ import { campaignChannel } from '@/lib/broadcastChannel';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
-interface CampaignDialStatus {
+export interface CampaignDialStatus {
   campaign_id: string;
   status?: string;
 }
