@@ -65,7 +65,7 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
       setSchedules(data.result_data);
       // const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       // fetchSkills({ tenant_id_array: tempTenantIdArray });
-      fetchCallingNumbers({ session_key: session_key, tenant_id: 0 });
+      // fetchCallingNumbers({ session_key: session_key, tenant_id: 0 });
     },
     onError: (error) => {
       ServerErrorCheck('캠페인 스케줄 정보 조회', error.message);
@@ -121,8 +121,9 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   //초기화실행.
   useEffect(() => {
     if (tenants && campaigns && tenants.length > 0 && campaigns.length > 0 ) {
-      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
-      fetchSchedules({ tenant_id_array: tempTenantIdArray });      
+      // const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
+      // fetchSchedules({ tenant_id_array: tempTenantIdArray });        
+      fetchCallingNumbers({ session_key: session_key, tenant_id: 0 });    
     }
   }, [tenants, campaigns]);
 
@@ -131,6 +132,8 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     if(campaignId === undefined ){
       if(campaigns.length > 0){
         setCampaignIdForUpdateFromSideMenu(campaigns[0].campaign_id+'');
+        const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
+        fetchSchedules({ tenant_id_array: tempTenantIdArray });   
       }else{
         // 새로고침시 campaigns가 비어있는 경우
         setCampaignIdForUpdateFromSideMenu(0+'');
