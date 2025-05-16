@@ -20,6 +20,7 @@ const ServerErrorCheck = (requestContent: string, dataMessage: string, routerChe
   else if (dataMessage.split('||')[0] === '5') {
     
     errorMessage = 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.';
+    return null;
   }else if (dataMessage.split('||')[0] === '200') {
 
     return null;
