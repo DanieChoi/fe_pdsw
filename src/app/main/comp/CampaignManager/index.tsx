@@ -80,11 +80,14 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   //   },
   //   retry: 0,
   // });
-  // 전화번호 조회
+  // 캠페인 발신번호 조회
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
       setCallingNumbers(data.result_data || []);
       fetchCampaignSkills({ session_key: session_key, tenant_id: 0 });
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 발신번호 조회', error.message);
     }
   });
   // 캠페인스킬 조회
@@ -92,6 +95,9 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     onSuccess: (data) => {
       setCampaignSkills(data.result_data || []);
       fetchPhoneDescriptions({ session_key: session_key, tenant_id: 0 });
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인스킬 조회', error.message);
     }
   });
   // 전화번호설명 템플릿 조회
@@ -105,6 +111,9 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   const { mutate: fetchChannelGroupList } = useApiForChannelGroupList({
     onSuccess: (data) => {
         setChannelGroupList(data.result_data);
+    },
+    onError: (error) => {
+      ServerErrorCheck('채널 그룹리스트 조회', error.message);
     }
   });
 
