@@ -17,6 +17,7 @@ import { useCampaignDialStatusStore } from "@/store/campaignDialStatusStore";
 import { sseMessageChannel, logoutChannel } from '@/lib/broadcastChannel';
 import logoutFunction from "@/components/common/logoutFunction";
 import { useRouter } from 'next/navigation';
+import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 
 
 type FooterDataType = {
@@ -47,8 +48,8 @@ export default function Footer({
   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
   const [currentHeight, setCurrentHeight] = useState(footerHeight);
   const { id, tenant_id, role_id } = useAuthStore();
-  const { campaigns, setCampaigns, setSseInputMessage } = useMainStore();
-  const { channelGroupList, setChannelGroupList } = useCampainManagerStore();
+  const { tenants, campaigns, setCampaigns, setSseInputMessage } = useMainStore();
+  const { channelGroupList, setChannelGroupList, schedules, setSchedules } = useCampainManagerStore();
   const { useAlramPopup } = useEnvironmentStore();
   const [isResizing, setIsResizing] = useState(false);
   const [isHeightToggled, setIsHeightToggled] = useState(false);
@@ -130,6 +131,13 @@ export default function Footer({
   const { mutate: fetchMain } = useApiForMain({
     onSuccess: (data) => {
       setCampaigns(data.result_data);
+    }
+  });
+
+  // 캠페인 스케줄 조회 API 호출
+  const { mutate: fetchSchedules } = useApiForSchedules({
+    onSuccess: (data) => {
+      setSchedules(data.result_data);
     }
   });
 
@@ -1030,6 +1038,9 @@ export default function Footer({
           _message += '삭제] 캠페인 아이디 : ' + campaign_id + ' , 캠페인 이름 : ' + _campaign_name;
           addMessageToFooterList(_time, _type, _message);
         }
+        
+        const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
+        fetchSchedules({ tenant_id_array: tempTenantIdArray }); 
       }
       //캠페인수정>콜페이싱 수정
       else if (announce === '/pds/campaign/dial-speed') {

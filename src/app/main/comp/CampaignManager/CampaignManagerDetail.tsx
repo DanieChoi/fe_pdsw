@@ -31,7 +31,6 @@ import { useApiForCallingNumberDelete } from '@/features/campaignManager/hooks/u
 import { useApiForDialSpeedUpdate } from '@/features/campaignManager/hooks/useApiForDialSpeedUpdate';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
-import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import CallingNumberPopup from '@/components/shared/layout/CallingNumberPopup';
 import { useApiForCallingListDelete } from '@/features/listManager/hooks/useApiForCallingListDelete';
@@ -1451,7 +1450,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   };
 
   useEffect(() => {
-    if (!changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !callingNumberChangeYn && !campaignDialSpeedChangeYn && !onlyCampaignStatusChange) {
+    if (!changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !callingNumberChangeYn && !campaignDialSpeedChangeYn && !onlyCampaignStatusChange && !campaignScheduleChangeYn) {
       setChangeYn(true);
       // fetchMain({
       //   session_key: '',
@@ -1466,7 +1465,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
       });
     }
-  }, [campaignInfoChangeYn, campaignSkillChangeYn, callingNumberChangeYn, campaignDialSpeedChangeYn, onlyCampaignStatusChange]);
+  }, [campaignInfoChangeYn, campaignSkillChangeYn, callingNumberChangeYn, campaignDialSpeedChangeYn, onlyCampaignStatusChange, campaignScheduleChangeYn]);
 
   // 캠페인 정보 수정 API 호출
   // tofix 0417 a3 브라우져 api 로 campaign 정보 변경 후에 
@@ -1529,27 +1528,29 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   });
 
   // 캠페인 스케줄 조회 API 호출
-  const { mutate: fetchSchedules } = useApiForSchedules({
-    onSuccess: (data) => {
-      setSchedules(data.result_data);
-      setCampaignScheduleChangeYn(false);
-    }
-  });
+  // const { mutate: fetchSchedules } = useApiForSchedules({
+  //   onSuccess: (data) => {
+  //     setSchedules(data.result_data);
+  //     setCampaignScheduleChangeYn(false);
+  //   }
+  // });
 
   // 캠페인 스케줄 등록 API 호출
   const { mutate: fetchCampaignScheduleInsert } = useApiForCampaignScheduleInsert({
     onSuccess: (data) => {
-      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
-      fetchSchedules({ tenant_id_array: tempTenantIdArray });
+      // const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
+      // fetchSchedules({ tenant_id_array: tempTenantIdArray });
+      setCampaignScheduleChangeYn(false);
     }
   });
 
   // 캠페인 스케줄 수정 API 호출
   const { mutate: fetchCampaignScheduleUpdate } = useApiForCampaignScheduleUpdate({
     onSuccess: (data) => {
-      toast.success('캠페인 스케줄 수정이 완료되었습니다.');
-      const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
-      fetchSchedules({ tenant_id_array: tempTenantIdArray });
+      // toast.success('캠페인 스케줄 수정이 완료되었습니다.');
+      // const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
+      // fetchSchedules({ tenant_id_array: tempTenantIdArray });
+      setCampaignScheduleChangeYn(false);
     }
   });
 
