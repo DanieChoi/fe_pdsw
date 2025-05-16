@@ -287,7 +287,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const [changeYn, setChangeYn] = useState<boolean>(true);
   const [campaignInfoChangeYn, setCampaignInfoChangeYn] = useState<boolean>(false);
   const [campaignSkillChangeYn, setCampaignSkillChangeYn] = useState<boolean>(false);
-  const [callingNumberChangeYn, setCallingNumberChangeYn] = useState<boolean>(false);
+  // const [callingNumberChangeYn, setCallingNumberChangeYn] = useState<boolean>(false);
   const [campaignScheduleChangeYn, setCampaignScheduleChangeYn] = useState<boolean>(false);
   const [campaignDialSpeedChangeYn, setCampaignDialSpeedChangeYn] = useState<boolean>(false);
   const [rtnMessage, setRtnMessage] = useState<string>('');
@@ -572,7 +572,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       setTempCampaignSchedule(CampaignScheduleInfo);
     }
     // campaignId 추가하여 masterCampaignId 변경 시에도 재설정되도록 함
-  }, [campaignId, selectedCampaign, campaignSkills, callingNumbers, schedules, callingNumberChangeYn]);
+  }, [campaignId, selectedCampaign, campaignSkills, callingNumbers, schedules]);
 
   // input 데이터 변경
   const handleInputData = (value: any, col: string) => {
@@ -672,7 +672,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const handleCallingNumlber = (param: string) => {
     
     if (inputCallingNumber !== param) {
-      setCallingNumberChangeYn(true);
+      // setCallingNumberChangeYn(true);
       setInputCallingNumber(param);
       setTempCallingNumberInfo({
         ...tempCallingNumberInfo,
@@ -683,18 +683,13 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     // 0424 발신번호 변경 api 추가
 
     // 발신번호가 비어있는 경우
-    if (!param || param.trim().length === 0) {
-      showAlert('발신번호를 입력해주세요.');
-      return; // 여기서 바로 종료
-    }
+    // if (!param || param.trim().length === 0) {
+    //   showAlert('발신번호를 입력해주세요.');
+    //   return; // 여기서 바로 종료
+    // }
 
     // 발신번호가 숫자가 아닌 경우
     const isNumber = /^[0-9]+$/.test(param);
-
-    if (!isNumber) {
-      showAlert('발신번호는 숫자로만 입력해주세요.');
-      return; // 여기서 바로 종료
-    }
 
     // 발신번호가 이미 존재하는지 확인
     const existingCallingNumber = callingNumbers.find(num => num.campaign_id === Number(campaignId));
@@ -703,6 +698,12 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       calling_number: param,
     };
     
+    if (!param || param.trim().length === 0) {
+      // showAlert('발신번호는 숫자로만 입력해주세요.');
+      // return; // 여기서 바로 종료
+      fetchCallingNumberDelete(saveRequest);
+    }else
+
     // 발신번호 처리 후, api 요청이 성공하면 팝업을 닫는다
     
     if (existingCallingNumber) {
@@ -1309,18 +1310,18 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
               fetchCampaignScheduleUpdate(tempCampaignSchedule);
             }
           }
-          if (callingNumberChangeYn) {
-            const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignManagerInfo.campaign_id)
-              .map((data) => data.calling_number)
-              .join(',');
-            if (tempCallingNumberInfo.calling_number !== '' && tempCallNumber === '') {
-              fetchCallingNumberInsert(tempCallingNumberInfo);
-            } else if (tempCallingNumberInfo.calling_number === '' && tempCallNumber !== '') {
-              fetchCallingNumberDelete(tempCallingNumberInfo);
-            } else {
-              fetchCallingNumberUpdate(tempCallingNumberInfo);
-            }
-          }
+          // if (callingNumberChangeYn) {
+          //   const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignManagerInfo.campaign_id)
+          //     .map((data) => data.calling_number)
+          //     .join(',');
+          //   if (tempCallingNumberInfo.calling_number !== '' && tempCallNumber === '') {
+          //     fetchCallingNumberInsert(tempCallingNumberInfo);
+          //   } else if (tempCallingNumberInfo.calling_number === '' && tempCallNumber !== '') {
+          //     fetchCallingNumberDelete(tempCallingNumberInfo);
+          //   } else {
+          //     fetchCallingNumberUpdate(tempCallingNumberInfo);
+          //   }
+          // }
           if (campaignDialSpeedChangeYn) {
             if (tempCampaignManagerInfo.dial_mode === 2 || tempCampaignManagerInfo.dial_mode === 3) {
               fetchDialSpeedUpdate(tempCampaignDialSpeedInfo);
@@ -1350,18 +1351,18 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
             fetchCampaignScheduleUpdate(tempCampaignSchedule);
           }
         }
-        if (callingNumberChangeYn) {
-          const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignManagerInfo.campaign_id)
-            .map((data) => data.calling_number)
-            .join(',');
-          if (tempCallingNumberInfo.calling_number !== '' && tempCallNumber === '') {
-            fetchCallingNumberInsert(tempCallingNumberInfo);
-          } else if (tempCallingNumberInfo.calling_number === '' && tempCallNumber !== '') {
-            fetchCallingNumberDelete(tempCallingNumberInfo);
-          } else {
-            fetchCallingNumberUpdate(tempCallingNumberInfo);
-          }
-        }
+        // if (callingNumberChangeYn) {
+        //   const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === tempCampaignManagerInfo.campaign_id)
+        //     .map((data) => data.calling_number)
+        //     .join(',');
+        //   if (tempCallingNumberInfo.calling_number !== '' && tempCallNumber === '') {
+        //     fetchCallingNumberInsert(tempCallingNumberInfo);
+        //   } else if (tempCallingNumberInfo.calling_number === '' && tempCallNumber !== '') {
+        //     fetchCallingNumberDelete(tempCallingNumberInfo);
+        //   } else {
+        //     fetchCallingNumberUpdate(tempCallingNumberInfo);
+        //   }
+        // }
         if (campaignDialSpeedChangeYn) {
           if (tempCampaignManagerInfo.dial_mode === 2 || tempCampaignManagerInfo.dial_mode === 3) {
             fetchDialSpeedUpdate(tempCampaignDialSpeedInfo);
@@ -1448,7 +1449,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   };
 
   useEffect(() => {
-    if (!changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !callingNumberChangeYn && !campaignDialSpeedChangeYn && !onlyCampaignStatusChange && !campaignScheduleChangeYn) {
+    if (!changeYn && !campaignInfoChangeYn && !campaignSkillChangeYn && !campaignDialSpeedChangeYn && !onlyCampaignStatusChange && !campaignScheduleChangeYn) {
       setChangeYn(true);
       // fetchMain({
       //   session_key: '',
@@ -1463,7 +1464,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
       });
     }
-  }, [campaignInfoChangeYn, campaignSkillChangeYn, callingNumberChangeYn, campaignDialSpeedChangeYn, onlyCampaignStatusChange, campaignScheduleChangeYn]);
+  }, [campaignInfoChangeYn, campaignSkillChangeYn, campaignDialSpeedChangeYn, onlyCampaignStatusChange, campaignScheduleChangeYn]);
 
   // 캠페인 정보 수정 API 호출
   // tofix 0417 a3 브라우져 api 로 campaign 정보 변경 후에 
@@ -1764,14 +1765,14 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   // 발신번호 삭제 API 호출
   const { mutate: fetchCallingNumberDelete } = useApiForCallingNumberDelete({
     onSuccess: (data) => {      
-      setCallingNumberChangeYn(false);
+      // setCallingNumberChangeYn(false);
     }
   });
 
   // 발신번호 추가 API 호출
   const { mutate: fetchCallingNumberInsert } = useApiForCallingNumberInsert({
     onSuccess: (data) => {
-      setCallingNumberChangeYn(false);
+      // setCallingNumberChangeYn(false);
       // fetchCallingNumbers({ session_key: '', tenant_id: 0 });
     }
   });
@@ -1779,7 +1780,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   // 발신번호 수정 API 호출
   const { mutate: fetchCallingNumberUpdate } = useApiForCallingNumberUpdate({
     onSuccess: (data) => {
-      setCallingNumberChangeYn(false);
+      // setCallingNumberChangeYn(false);
       // fetchCallingNumbers({ session_key: '', tenant_id: 0 });
     }
   });
@@ -1828,18 +1829,18 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
             fetchCampaignScheduleUpdate(tempCampaignSchedule);
           }
         }
-        if (callingNumberChangeYn) {
-          const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === campaignId)
-            .map((data) => data.calling_number)
-            .join(',');
-          if (tempCallingNumberInfo.calling_number !== '' && tempCallNumber === '') {
-            fetchCallingNumberInsert(tempCallingNumberInfo);
-          } else if (tempCallingNumberInfo.calling_number === '' && tempCallNumber !== '') {
-            fetchCallingNumberDelete(tempCallingNumberInfo);
-          } else {
-            fetchCallingNumberUpdate(tempCallingNumberInfo);
-          }
-        }
+        // if (callingNumberChangeYn) {
+        //   const tempCallNumber = callingNumbers.filter((callingNumber) => callingNumber.campaign_id === campaignId)
+        //     .map((data) => data.calling_number)
+        //     .join(',');
+        //   if (tempCallingNumberInfo.calling_number !== '' && tempCallNumber === '') {
+        //     fetchCallingNumberInsert(tempCallingNumberInfo);
+        //   } else if (tempCallingNumberInfo.calling_number === '' && tempCallNumber !== '') {
+        //     fetchCallingNumberDelete(tempCallingNumberInfo);
+        //   } else {
+        //     fetchCallingNumberUpdate(tempCallingNumberInfo);
+        //   }
+        // }
         if (campaignDialSpeedChangeYn) {
           if (tempCampaignManagerInfo.dial_mode === 2 || tempCampaignManagerInfo.dial_mode === 3) {
             fetchDialSpeedUpdate(tempCampaignDialSpeedInfo);
