@@ -18,6 +18,7 @@ import { sseMessageChannel, logoutChannel } from '@/lib/broadcastChannel';
 import logoutFunction from "@/components/common/logoutFunction";
 import { useRouter } from 'next/navigation';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
+import { ca } from "date-fns/locale";
 
 
 type FooterDataType = {
@@ -1094,13 +1095,17 @@ export default function Footer({
       else if (announce === '/pds/campaign/status') {
         // sseData :: {"kind":"event","command":"UPDATE","announce":"/pds/campaign/status","data":{"campaign_status":3,"campaign_end_flag":1},"campaign_id":"38890","skill_id":null}
 
-        const campaignStatus = data['campaign_status'];
+        let campaignStatus = data['campaign_status'];
         // campaign_id
         
         const isCorrectCampaign = campaigns.find((campaign) => campaign.campaign_id === Number(campaign_id));
         // MainDataResponse
         
         if( isCorrectCampaign) {
+
+          if(campaignStatus > 3){
+            campaignStatus = 2;
+          }
           const updatedCampaigns = campaigns.map((campaign) =>
             campaign.campaign_id === Number(campaign_id)
               ? { ...campaign, start_flag: campaignStatus }
