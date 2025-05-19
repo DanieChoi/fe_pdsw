@@ -123,6 +123,26 @@ export default function LoginPage() {
 
   const { mutate: login } = useApiForLogin({
     onSuccess: (data) => {
+
+      if(data.result_code === 1 || data.result_msg === 'User does not exist.'){
+        setAlertState({
+          isOpen: true,
+          message: '존재하지 않는 아이디입니다.',
+          title: '로그인',
+          type: '2',
+        });
+        setIsPending(false);
+        return;
+      } else if(data.result_code === 2 || data.result_msg === 'Password is wrong.'){
+        setAlertState({
+          isOpen: true,
+          message: '암호가 잘못 입력되었습니다.',
+          title: '로그인',
+          type: '2',
+        });
+        setIsPending(false);
+        return;
+      } 
       setIsPending(false);
 
       // console.log('data (로그인 응답)', data);
@@ -153,25 +173,17 @@ export default function LoginPage() {
       router.push('/main');
     },
     onError: (e) => {
-      if (e.message === 'Request failed with status code 500' && (e as any).config?.url?.indexOf('/agent/loginCubeC') > -1) {
-        // interceptor와 중복되는 부분이라 주석처리
+      if (e.message === 'User does not exist.') {
         setAlertState({
           isOpen: true,
-          message: '아이디 또는 암호가 잘못 입력되었습니다.',
-          title: '로그인',
-          type: '2',
-        });
-      } else if (e.message === 'User does not exist.') {
-        setAlertState({
-          isOpen: true,
-          message: 'API인증이 정상적으로 이루어 지지 않았습니다.',
+          message: '존재하지 않는 아이디입니다.',
           title: '로그인',
           type: '2',
         });
       } else if (e.message === 'Password is wrong.') {
         setAlertState({
           isOpen: true,
-          message: '접근권한이 없습니다.',
+          message: '암호가 잘못 입력되었습니다.',
           title: '로그인',
           type: '2',
         });
@@ -182,7 +194,15 @@ export default function LoginPage() {
           title: '로그인',
           type: '2',
         });
-      } else {
+      } else if (e.message === 'Request failed with status code 500' && (e as any).config?.url?.indexOf('/agent/loginCubeC') > -1) {
+        // interceptor와 중복되는 부분이라 주석처리
+        setAlertState({
+          isOpen: true,
+          message: 'API인증이 정상적으로 이루어 지지 않았습니다.',
+          title: '로그인',
+          type: '2',
+        });
+      } else  {
         setAlertState({
           isOpen: true,
           message: e.message,
