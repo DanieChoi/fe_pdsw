@@ -589,7 +589,6 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
     return foundNodeId;
   },
 
-  // 캠페인 상태 업데이트 함수
   // updateCampaignStatus: (campaignId: string, status: number) => {
 
   //   set(state => {
