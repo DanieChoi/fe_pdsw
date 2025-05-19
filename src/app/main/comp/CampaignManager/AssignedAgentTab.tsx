@@ -69,10 +69,10 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
             };
             group.children.push(team);
         }
-
+        // 상담사 그룹과 팀 아이디 표현을 위한 수정 0519
         team.children.push({
-            id: counselor.counselorEmplNum,
-            parentId: team.id,
+            id: team.parentId.split('group-')[1],
+            parentId: (team.id).split('team-')[1],
             level: 2,
             counselorEmplNum: counselor.counselorEmplNum,
             counselorId: counselor.counselorId,
@@ -146,6 +146,7 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
       rows.forEach((row) => {
         const isExpanded = expandedRows.has(row.id);
         flat.push({ ...row, isExpanded });
+        
         if (row.children && isExpanded) {
           flat = flat.concat(flattenRows(row.children));
         }
@@ -154,7 +155,17 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
     return flat;
   }
 
-  const rowKeyGetter = (row: TreeRow) => row.id;
+  // row level에 따라 다른 key를 반환해야 고유함
+  const rowKeyGetter = (row: TreeRow): string => {
+    switch (row.level) {
+      case 0:
+        return row.affiliationGroupId ?? '';
+      case 1:
+        return row.affiliationTeamId ?? '';
+      default:
+        return row.counselorId ?? '';
+    }
+  };
 
   const columns: Column<TreeRow>[] = [
     {
@@ -169,13 +180,20 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
         if (row.level === 0) {
           displayName = `상담그룹 : ${row.affiliationGroupId}`;
         } else if (row.level === 1) {
-          displayName = `상담파트 : ${row.affiliationTeamId}`;
+          displayName = `상담팀 : ${row.affiliationTeamId}`;
         } else {
           displayName = row.id;
         }
 
+        // row.level 0과 1을 제외하고 css 적용을 위한 boolean
+        const isCentered = row.level > 1;
+
         return (
-          <div style={{ marginLeft: `${indent}px` }} className="flex items-center">
+          <div style={{
+          marginLeft: isCentered ? `0px`: `${indent}px`,
+          justifyContent: isCentered ? 'center' : 'flex-start',
+        }}
+        className={`flex items-center w-full ${isCentered ? 'text-center' : ''}`}>
             {showToggle && (
               <span
                 onClick={(e) => {
@@ -197,16 +215,24 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
       }
     },
     {
+      key: 'parentId',
+      name: '상담 팀',
+      width: 100,
+       renderCell: ({ row }) => {
+        return row.level === 1  || row.level === 0 ? '' : row.parentId;
+      }
+    },
+    {
       key: 'counselorEmplNum',
-      name: '상담사'
+      name: '상담사 아이디'
     },
     {
       key: 'counselorId',
-      name: '사번'
+      name: '상담사 사번'
     },
     {
       key: 'counselorname',
-      name: '상담사 아이디'
+      name: '상담사 이름'
     }
   ];
 
