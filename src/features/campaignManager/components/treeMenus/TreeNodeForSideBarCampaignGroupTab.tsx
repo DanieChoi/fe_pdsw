@@ -32,6 +32,7 @@ import IConfirmPopupForMultiUpdateCampaignProgress from "../popups/IConfirmPopup
 // Portal Provider 사용을 위한 import
 import { usePortal } from "@/features/campaignManager/components/treeMenus/provider/usePortal";
 import { getStatusIconWithStartFlag } from "@/components/shared/layout/utils/utils";
+import { useCampaignDialStatusStore } from "@/store/campaignDialStatusStore";
 
 interface TreeNodeProps {
   node: TreeNode;
@@ -92,6 +93,13 @@ export function TreeNodeForSideBarCampaignGroupTab({
   const [isBulkUpdatePopupOpen, setIsBulkUpdatePopupOpen] = useState(false);
   // isStartPopupOpen 상태 제거 - Portal Provider로 관리됨
   const [bulkActionKey, setBulkActionKey] = useState<"start" | "complete" | "stop" | "">("");
+
+  const campaignDialStatus = useCampaignDialStatusStore(state => state.campaignDialStatus);
+
+  // step1 
+  // campaignDialStatus에서 캠페인 ID에 해당하는 상태를 찾음 (멈춤중, 중지중, 시작중에 대한 일시적 상태)
+  // 그 외의 상태는 기존 currentCampaign?.start_flag를 사용
+  const currentCampaignDialStatus = campaignDialStatus.find((dialStatus) => dialStatus.campaign_id === node.id);
 
   useEffect(() => {
     setIsBrowser(true);
@@ -224,22 +232,22 @@ export function TreeNodeForSideBarCampaignGroupTab({
   // 수정된 handleBulkAction 함수
   const handleBulkAction = useCallback((actionKey: "start" | "complete" | "stop") => {
     setBulkActionKey(actionKey);
-    
+
     if (actionKey === "start") {
       // Portal Provider를 사용하여 팝업 열기
       openStartPopup(campaignInfos, async () => {
         try {
           const statusMap = { start: "1", complete: "2", stop: "3" };
-          
+
           // API 호출
           const result = await updateCampaignsStatus(campaignIds, statusMap[actionKey]);
           console.log("캠페인 시작 업데이트 결과:", result);
-          
+
           // 작업 완료 후 트리 데이터 갱신 - Portal Provider에서 처리됨
           setTimeout(() => {
             refetchTreeDataForCampaignGroupTab();
           }, 100);
-          
+
           return result;
         } catch (error) {
           console.error("캠페인 시작 오류:", error);
@@ -400,9 +408,9 @@ export function TreeNodeForSideBarCampaignGroupTab({
       </>
     );
   }, [
-    isBrowser, isAddGroupDialogOpen, isCampaignAddPopupOpen, isBulkUpdatePopupOpen, 
-    bulkResultDialog, isDeleteDialogOpen, isRenameDialogOpen, 
-    node, bulkActionKey, campaignInfos, handleCloseAddGroupDialog, handleCloseDeleteDialog, 
+    isBrowser, isAddGroupDialogOpen, isCampaignAddPopupOpen, isBulkUpdatePopupOpen,
+    bulkResultDialog, isDeleteDialogOpen, isRenameDialogOpen,
+    node, bulkActionKey, campaignInfos, handleCloseAddGroupDialog, handleCloseDeleteDialog,
     handleCloseRenameDialog, handleRenameSuccess, handleConfirmBulk, confirmDelete, handleAddGroup
   ]);
 
@@ -447,8 +455,31 @@ export function TreeNodeForSideBarCampaignGroupTab({
         )}
         {renderIcon()}
         <span className={`flex text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
-          {getStatusIconWithStartFlag(node.start_flag) && <Image src={getStatusIconWithStartFlag(node.start_flag) || ''} alt="상태" 
-          width={12} height={8}  className="mr-1 object-contain" />}
+
+          {/* // 캠페인 노드일 경우 상태 아이콘 표시 */}
+          {/* 일시적인 멈춤중 중지중 시작중에 대해 currentCampaignDialStatus 사용 null 일 경우 현재처럼 node.start_flag 참조 삼항 연산자 분기 처리 필요*/}
+          {node.type === "campaign" && typeof currentCampaignDialStatus?.status === "number" ? (
+            getStatusIconWithStartFlag(currentCampaignDialStatus.status) ? (
+              <Image
+                src={getStatusIconWithStartFlag(currentCampaignDialStatus.status) as string}
+                alt="상태"
+                width={12}
+                height={8}
+                className="mr-1 object-contain"
+              />
+            ) : null
+          ) : (
+            getStatusIconWithStartFlag(typeof node.start_flag === "number" ? node.start_flag : undefined) ? (
+              <Image
+                src={getStatusIconWithStartFlag(typeof node.start_flag === "number" ? node.start_flag : undefined) as string}
+                alt="상태"
+                width={12}
+                height={8}
+                className="mr-1 object-contain"
+              />
+            ) : null
+          )}
+
           {node.type === "group" && `[${node.group_id}]`}
           {node.type === "campaign" && `[${node.campaign_id}]`}
           {node.name}

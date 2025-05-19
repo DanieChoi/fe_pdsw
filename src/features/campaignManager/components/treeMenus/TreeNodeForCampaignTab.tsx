@@ -49,12 +49,14 @@ export function TreeNodeForCampaignTab({
 
   // useTabStore: selector 로 읽기 전용 값만, 액션은 getState()로
   const campaignIdForUpdateFromSideMenu = useTabStore(state => state.campaignIdForUpdateFromSideMenu);
+
   const {
     setCampaignIdForUpdateFromSideMenu,
     setCampaignIdForCopyCampaign,
     addTab,
     addTabCurrentOnly
   } = useTabStore.getState();
+
   const { setCopyCampaignManagerInfo, setCopyCampaignInfo, setCopyTenantId, setCopyCampaignSchedule, setCopyCampaignSkills } = useCampainManagerStore();
 
   const { campaigns } = useMainStore();
@@ -132,6 +134,8 @@ export function TreeNodeForCampaignTab({
 
   const campaignDialStatus = useCampaignDialStatusStore(state => state.campaignDialStatus);
   
+  // campaignDialStatus에서 캠페인 ID에 해당하는 상태를 찾음 (멈춤중, 중지중, 시작중에 대한 일시적 상태)
+  // 그 외의 상태는 기존 currentCampaign?.start_flag를 사용
   const currentCampaignDialStatus = campaignDialStatus.find((dialStatus) => dialStatus.campaign_id === item.id);
 
   const hasChildren = !!item.children?.length;
@@ -144,7 +148,6 @@ export function TreeNodeForCampaignTab({
 
   // store에 저장된게 있으면 그걸넣고 없어서 null이면 기존 currentCampaign?.start_flag를 넣음
   const statusIcon = item.type === "campaign" ? getStatusIconWithStartFlag(currentCampaignDialStatus ? Number(currentCampaignDialStatus.status) : currentCampaign?.start_flag) : null;
-
 
   const handleClick = useCallback(() => {
     onNodeSelect(item.id);

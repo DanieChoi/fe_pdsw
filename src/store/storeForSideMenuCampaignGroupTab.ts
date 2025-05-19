@@ -99,27 +99,27 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
       originalTreeData: JSON.parse(JSON.stringify(treeData)) // Deep copy
     });
   },
-  
+
   setOriginalTreeData: (originalTreeData: TreeNode[]) => {
     set({ originalTreeData });
   },
-  
+
   setLoading: (isLoading: boolean) => {
     set({ isLoading });
   },
-  
+
   setError: (error: Error | null) => {
     set({ error });
   },
-  
+
   setTenantId: (tenant_id: number) => {
     set({ tenant_id });
   },
-  
+
   setExpandedNodes: (expandedNodes: Set<string>) => {
     set({ expandedNodes });
   },
-  
+
   setSelectedNodeId: (selectedNodeId: string | undefined) => {
     set({ selectedNodeId });
   },
@@ -128,7 +128,7 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
   refetchTreeDataForCampaignGroupTab: async (tenant_id?: number) => {
     const state = get();
     const targetTenantId = tenant_id !== undefined ? tenant_id : state.tenant_id;
-    
+
     // Validate tenant ID
     if (targetTenantId === undefined || targetTenantId === null) {
       console.error("테넌트 ID가 없습니다.");
@@ -139,25 +139,25 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
     // Store current UI state before invalidation
     const currentExpandedNodes = state.expandedNodes;
     const currentSelectedNodeId = state.selectedNodeId;
-    
+
     set({ isLoading: true });
-    
+
     try {
       // Check if we have the QueryClient instance
       if (queryClientInstance) {
         // Modern approach: Use React Query cache invalidation
         console.log("Using React Query invalidation for refetch");
-        await queryClientInstance.invalidateQueries({ 
+        await queryClientInstance.invalidateQueries({
           queryKey: ['campaignTreeDataForCampaignGroupTab', targetTenantId]
         });
       } else {
         // Fallback approach: Use direct API call for backward compatibility
         console.log("Fallback: Using direct API call for refetch");
-        
+
         try {
           const combinedData = await apiForCombinedTenantAndCampaignGroup(targetTenantId);
           const transformedData = transformToTreeData(combinedData);
-          
+
           set({
             treeData: transformedData,
             originalTreeData: JSON.parse(JSON.stringify(transformedData)),
@@ -172,18 +172,18 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
           return;
         }
       }
-      
+
       // Ensure we preserve the UI state after refetch
-      set({ 
+      set({
         expandedNodes: currentExpandedNodes,
         selectedNodeId: currentSelectedNodeId,
-        isLoading: false 
+        isLoading: false
       });
     } catch (error) {
       console.error("캠페인 그룹 트리 데이터 캐시 무효화 오류:", error);
-      set({ 
+      set({
         error: error instanceof Error ? error : new Error('알 수 없는 오류가 발생했습니다'),
-        isLoading: false 
+        isLoading: false
       });
     }
   },
@@ -443,11 +443,11 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
   removeCampaignFromGroup: (campaignId: string) => {
     set(state => {
       console.log(`캠페인 ID ${campaignId} 제거 시작`);
-      
+
       // 트리 데이터 복제
       const newTreeData = JSON.parse(JSON.stringify(state.treeData));
       const newOriginalData = JSON.parse(JSON.stringify(state.originalTreeData));
-      
+
       // 재귀적으로 트리 순회하며 캠페인 노드 제거
       const removeFromTree = (nodes: TreeNode[]): TreeNode[] => {
         return nodes.reduce<TreeNode[]>((result, node) => {
@@ -456,30 +456,30 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
             console.log(`캠페인 노드 찾음(제거): ID=${node.campaign_id}, name=${node.name}`);
             return result; // 이 노드는 제외
           }
-          
+
           // 자식 노드가 있으면 재귀적으로 처리
           if (node.children && node.children.length > 0) {
             const childrenBefore = node.children.length;
             const filteredChildren = removeFromTree(node.children);
             const childrenAfter = filteredChildren.length;
-            
+
             if (childrenBefore !== childrenAfter) {
               console.log(`노드 ${node.name}에서 자식이 제거됨`);
             }
-            
+
             result.push({ ...node, children: filteredChildren });
           } else {
             result.push(node);
           }
-          
+
           return result;
         }, []);
       };
-      
+
       // 새 트리 데이터 생성
       const updatedTreeData = removeFromTree(newTreeData);
       const updatedOriginalData = removeFromTree(newOriginalData);
-      
+
       return {
         treeData: updatedTreeData,
         originalTreeData: updatedOriginalData
@@ -590,29 +590,70 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
   },
 
   // 캠페인 상태 업데이트 함수
+  // updateCampaignStatus: (campaignId: string, status: number) => {
+
+  //   set(state => {
+  //     const newTreeData = JSON.parse(JSON.stringify(state.treeData));
+  //     const newOriginalData = JSON.parse(JSON.stringify(state.originalTreeData));
+
+  //     const updateStatusInTree = (nodes: TreeNode[]): boolean => {
+  //       for (let i = 0; i < nodes.length; i++) {
+  //         const node = nodes[i];
+
+  //         // campaign_id로 비교하도록 수정
+  //         if (node.type === 'campaign' && (node.id === campaignId || node.campaign_id?.toString() === campaignId)) {
+  //           node.start_flag = status;
+  //           return true;
+  //         }
+
+  //         if (node.children && node.children.length > 0) {
+  //           if (updateStatusInTree(node.children)) {
+  //             return true;
+  //           }
+  //         }
+  //       }
+  //       return false;
+  //     };
+
+  //     updateStatusInTree(newTreeData);
+  //     updateStatusInTree(newOriginalData);
+
+  //     return {
+  //       treeData: newTreeData,
+  //       originalTreeData: newOriginalData
+  //     };
+  //   });
+
+  // },
+
   updateCampaignStatus: (campaignId: string, status: number) => {
-    
+
     set(state => {
       const newTreeData = JSON.parse(JSON.stringify(state.treeData));
       const newOriginalData = JSON.parse(JSON.stringify(state.originalTreeData));
 
       const updateStatusInTree = (nodes: TreeNode[]): boolean => {
+        let found = false;
+
         for (let i = 0; i < nodes.length; i++) {
           const node = nodes[i];
 
-          // campaign_id로 비교하도록 수정
+          // 캠페인 ID가 일치하면 상태 업데이트
           if (node.type === 'campaign' && (node.id === campaignId || node.campaign_id?.toString() === campaignId)) {
             node.start_flag = status;
-            return true;
+            found = true;
+            // 여기서 return하지 않고 계속 검색
           }
 
+          // 자식 노드가 있으면 재귀적으로 검색
           if (node.children && node.children.length > 0) {
-            if (updateStatusInTree(node.children)) {
-              return true;
-            }
+            // 자식 노드에서 찾은 결과를 OR 연산으로 누적
+            const foundInChildren = updateStatusInTree(node.children);
+            found = found || foundInChildren;
           }
         }
-        return false;
+
+        return found;
       };
 
       updateStatusInTree(newTreeData);
@@ -623,8 +664,8 @@ export const useSideMenuCampaignGroupTabStore = create<SideMenuCampaignGroupTabS
         originalTreeData: newOriginalData
       };
     });
-
   },
+
 }));
 
 // Helper function for sorting tree data

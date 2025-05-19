@@ -166,12 +166,12 @@ export function IContextMenuForCampaignForCampaignGroup({
       console.log("캠페인 상태 업데이트 !!!!!!!!!!!!!!!!!!!!!");
 
       // CustomAlert 대신 상태 업데이트
-      setStatusAlertProps({
-        message: "캠페인 상태가 변경되었습니다.",
-        title: "상태 변경",
-        type: "success"
-      });
-      setIsStatusAlertOpen(true);
+      // setStatusAlertProps({
+      //   message: "캠페인 상태가 변경되었습니다.",
+      //   title: "상태 변경",
+      //   type: "success"
+      // });
+      // setIsStatusAlertOpen(true);
 
       setIsProcessing(false);
     },
@@ -715,7 +715,7 @@ export function IContextMenuForCampaignForCampaignGroup({
       )}
 
       {/* 상태 변경 알림 다이얼로그 */}
-      {isStatusAlertOpen && (
+      {/* {isStatusAlertOpen && (
         <CustomAlert
           isOpen={isStatusAlertOpen}
           message={statusAlertProps.message}
@@ -724,7 +724,7 @@ export function IContextMenuForCampaignForCampaignGroup({
           onClose={handleStatusAlertClose}
           onCancel={handleStatusAlertClose}
         />
-      )}
+      )} */}
 
       {/* 캠페인 삭제 알림 다이얼로그 */}
       {isDeleteDialogOpen && (
