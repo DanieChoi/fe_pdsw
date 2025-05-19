@@ -11,35 +11,40 @@ import { getRuntimeEnv } from '@/lib/getRuntimeEnv';
 export const loginApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
+
+      // ######## 0519 로그인 과정 한번으로 통합 수정 ########
+
       // ✅ 반드시 함수 안에서 호출해야 env.js 로딩 이후 window 객체에 접근 가능
-      const LOGIN_URL = getRuntimeEnv('LOGIN_API_URL');
+      // const LOGIN_URL = getRuntimeEnv('LOGIN_API_URL');
 
-      if (!LOGIN_URL) {
-        console.log("🚨 LOGIN_URL이 정의되지 않았습니다.");
-        throw new Error('LOGIN_URL이 정의되지 않았습니다.');
-      }
+      // if (!LOGIN_URL) {
+      //   console.log("🚨 LOGIN_URL이 정의되지 않았습니다.");
+      //   throw new Error('LOGIN_URL이 정의되지 않았습니다.');
+      // }
 
+      
       // 🔐 첫 번째 로그인 (외부 인증)
-      const { data: dataFirst } = await externalAxiosInstance.get<LoginResponseFirst>(
-        LOGIN_URL,
-        {
-          params: {
-            id: credentials.user_name,
-            passwd: credentials.password
-          }
-        }
-      );
+      // const { data: dataFirst } = await externalAxiosInstance.get<LoginResponseFirst>(
+      //   LOGIN_URL,
+      //   {
+      //     params: {
+      //       id: credentials.user_name,
+      //       passwd: credentials.password
+      //     }
+      //   }
+      // );
+      // if (!dataFirst.id) {
+      //   throw new Error('서버 에러입니다.');
+      // }
 
-      if (!dataFirst.id) {
-        throw new Error('서버 에러입니다.');
-      }
+      // 0519 로그인 과정 한번으로 통합 수정
 
-      // 🔐 두 번째 로그인 (내부 인증)
+      // 🔐로그인 (내부 인증)
       const loginData: LoginRequest = {
-        grant_type: 'password',
+        grant_type: 'nexus_admin',
         device_id: 'WEB',
-        user_name: dataFirst.id,
-        password: dataFirst.passwd,
+        user_name: credentials.user_name,
+        password: credentials.password,
       };
 
       const { data } = await axiosInstance.post<LoginResponse>('/login', loginData);
@@ -61,7 +66,7 @@ export const loginApi = {
         path: '/',
       });
 
-      Cookies.set('id', dataFirst.id, {
+      Cookies.set('id', credentials.user_name, {
         expires: 1,
         secure: false,
         sameSite: 'Lax',
@@ -96,7 +101,7 @@ export const loginApi = {
 
       // 🧠 사용자 정보 저장 (Zustand)
       const userInfo: UserInfoData = {
-        id: dataFirst.id,
+        id: credentials.user_name,
         tenant_id: data.tenant_id,
         session_key: data.session_key,
         role_id: data.role_id,

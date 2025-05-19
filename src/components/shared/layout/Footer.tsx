@@ -19,6 +19,7 @@ import logoutFunction from "@/components/common/logoutFunction";
 import { useRouter } from 'next/navigation';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
+import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
 
 
@@ -51,7 +52,7 @@ export default function Footer({
   const [currentHeight, setCurrentHeight] = useState(footerHeight);
   const { id, tenant_id, role_id } = useAuthStore();
   const { tenants, campaigns, setCampaigns, setSseInputMessage } = useMainStore();
-  const { channelGroupList, setChannelGroupList, schedules, setSchedules, setCallingNumbers } = useCampainManagerStore();
+  const { channelGroupList, setChannelGroupList, schedules, setSchedules, setCallingNumbers, setCampaignSkills } = useCampainManagerStore();
   const { useAlramPopup } = useEnvironmentStore();
   const [isResizing, setIsResizing] = useState(false);
   const [isHeightToggled, setIsHeightToggled] = useState(false);
@@ -147,6 +148,13 @@ export default function Footer({
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
       setCallingNumbers(data.result_data || []);
+    }
+  });
+
+  // 캠페인스킬 조회
+  const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
+    onSuccess: (data) => {
+      setCampaignSkills(data.result_data || []);
     }
   });
 
@@ -403,7 +411,8 @@ export default function Footer({
     else if (announce === '/pds/campaign/skill') {
       if (command === 'UPDATE') {
         _message = '[캠페인 요구스킬 수정] 캠페인 아이디 : ' + campaign_id;
-        addMessageToFooterList(_time, _type, _message);
+        addMessageToFooterList(_time, _type, _message);   
+        fetchCampaignSkills({ session_key: '', tenant_id: 0 });
         // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
         const campaignSkillUpdateStatus = new CustomEvent('campaignSkillUpdateStatus', {
           detail: {
