@@ -11,15 +11,16 @@ interface DeleteRequest {
 // 발신리스트 업로드 취소 요청 (DELETE -> POST, body 추가)
 // 0507 발신리스트 업로드 취소 요청 변경 (POST => DELETE body 삭제)
 export const fetchCallingListDelete = async (campaignId: number): Promise<DeleteResponse> => {
-  // const requestData: DeleteRequest = {
-  //   request_data: {
-  //     list_flag: "L",
-  //   },
-  // };
+  const requestData: DeleteRequest = {
+    request_data: {
+      list_flag: "L",
+    },
+  };
 
   try {
-    const { data } = await axiosInstance.delete<DeleteResponse>(
+    const { data } = await axiosInstance.post<DeleteResponse>(
       `campaigns/${campaignId}/calling-list`
+      , requestData
     );
     return data;
   } catch (error: any) {
