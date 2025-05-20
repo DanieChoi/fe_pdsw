@@ -566,6 +566,17 @@ const ListManager: React.FC = () => {
                         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
                       });
                       tempSendList = [];
+                      const now = new Date();
+                      const hours = now.getHours().toString().padStart(2, '0');
+                      const minutes = now.getMinutes().toString().padStart(2, '0');
+                      const seconds = now.getSeconds().toString().padStart(2, '0');
+                      const newProgressListData = { ...progressListData
+                        , id: progressList.length+1
+                        , datetime: hours + ':' + minutes + ':' + seconds
+                        , message: '파일 전송 도중 에러 : 리스트 파일을 확인 하세요.'
+                      };
+                      setProgressList(prev => [newProgressListData, ...prev]);
+                      
                       break;
                     }else if( tempdata[i].split(listManagerDelimiter).length != sendColumns.length ){
                       setAlertState({
@@ -576,6 +587,16 @@ const ListManager: React.FC = () => {
                         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
                       });
                       tempSendList = [];
+                      const now = new Date();
+                      const hours = now.getHours().toString().padStart(2, '0');
+                      const minutes = now.getMinutes().toString().padStart(2, '0');
+                      const seconds = now.getSeconds().toString().padStart(2, '0');
+                      const newProgressListData = { ...progressListData
+                        , id: progressList.length+1
+                        , datetime: hours + ':' + minutes + ':' + seconds
+                        , message: '파일 전송 도중 에러 : 리스트 파일을 확인 하세요.'
+                      };
+                      setProgressList(prev => [newProgressListData, ...prev]);
                       break;
                     }else if( row.length > 0){
                       let _length = row.length;
