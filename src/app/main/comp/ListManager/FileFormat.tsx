@@ -21,9 +21,9 @@ export interface FormatRow {
 
 export const initData: FormatRow[] = [{
   id: '1',
-  name: '고객키(1)',
+  name: '고객키[1]',
   start: 1,
-  length: 10,
+  length: 1,
   field: 'CSKE'
 }]
 
@@ -215,15 +215,15 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose, _for
 
 
   const leftItems = useMemo(() => [
-    { id: '1', name: '고객키(1)', field: 'CSKE' },
-    { id: '2', name: '고객키(2)', field: 'CSK2' },
-    { id: '3', name: '고객키(3)', field: 'CSK3' },
+    { id: '1', name: '고객키[1]', field: 'CSKE' },
+    { id: '2', name: '고객키[2]', field: 'CSK2' },
+    { id: '3', name: '고객키[3]', field: 'CSK3' },
     { id: '4', name: '고객이름', field: 'CSNA' },
-    { id: '5', name: '고객 전화번호(1)', field: 'TNO1' },
-    { id: '6', name: '고객 전화번호(2)', field: 'TNO2' },
-    { id: '7', name: '고객 전화번호(3)', field: 'TNO3' },
-    { id: '8', name: '고객 전화번호(4)', field: 'TNO4' },
-    { id: '9', name: '고객 전화번호(5)', field: 'TNO5' },
+    { id: '5', name: '고객 전화번호[1]', field: 'TNO1' },
+    { id: '6', name: '고객 전화번호[2]', field: 'TNO2' },
+    { id: '7', name: '고객 전화번호[3]', field: 'TNO3' },
+    { id: '8', name: '고객 전화번호[4]', field: 'TNO4' },
+    { id: '9', name: '고객 전화번호[5]', field: 'TNO5' },
   ], []);
 
   const rightItems = useMemo(() => [
@@ -249,7 +249,7 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose, _for
         start: formatRows.length > 0 
           ? formatRows[formatRows.length - 1].start + formatRows[formatRows.length - 1].length 
           : 1,
-        length: 10, // 기본 길이, 필요에 따라 조정 가능
+        length: 1, // 기본 길이, 필요에 따라 조정 가능
         field: item.field, // 필드 값은 비워둠
       };
 
@@ -266,15 +266,15 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose, _for
 
 
   const positionLeftItems = useMemo(() => [
-    { id: '1', name: '고객키(1)', field: 'CSKE' },
-    { id: '2', name: '고객키(2)', field: 'CSK2' },
-    { id: '3', name: '고객키(3)', field: 'CSK3' },
+    { id: '1', name: '고객키[1]', field: 'CSKE' },
+    { id: '2', name: '고객키[2]', field: 'CSK2' },
+    { id: '3', name: '고객키[3]', field: 'CSK3' },
     { id: '4', name: '고객이름', field: 'CSNA' },
-    { id: '5', name: '고객 전화번호(1)', field: 'TNO1' },
-    { id: '6', name: '고객 전화번호(2)', field: 'TNO2' },
-    { id: '7', name: '고객 전화번호(3)', field: 'TNO3' },
-    { id: '8', name: '고객 전화번호(4)', field: 'TNO4' },
-    { id: '9', name: '고객 전화번호(5)', field: 'TNO5' },
+    { id: '5', name: '고객 전화번호[1]', field: 'TNO1' },
+    { id: '6', name: '고객 전화번호[2]', field: 'TNO2' },
+    { id: '7', name: '고객 전화번호[3]', field: 'TNO3' },
+    { id: '8', name: '고객 전화번호[4]', field: 'TNO4' },
+    { id: '9', name: '고객 전화번호[5]', field: 'TNO5' },
   ], []);
 
   const positionRightItems = useMemo(() => [
