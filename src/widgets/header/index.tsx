@@ -55,13 +55,15 @@ export default function Header() {
 
   const openInNewWindow = () => {
     // 이미 팝업이 열려 있는 경우 새로 열지 않음
-    // if (popupRef.current && !popupRef.current.closed) {
-    //   console.log('팝업이 이미 열려 있습니다.');
-    //   popupRef.current.focus(); // 기존 창으로 포커스 이동
-    //   return;
-    // }
+    if (popupRef.current && !popupRef.current.closed) {
+      console.log('팝업이 이미 열려 있습니다.');
+      popupRef.current.moveTo(100, 100);    // 화면 좌표로 이동
+      popupRef.current.resizeTo(600, 400);  // 크기 조절
+      popupRef.current.focus(); // 기존 창으로 포커스 이동
+      return;
+    }
     const isPopupOpen = localStorage.getItem('monitorPopupOpen');
-    if (isPopupOpen === 'true') {
+    if (isPopupOpen === 'true' && (popupRef.current && !popupRef.current.closed)) {
       // alert('이미 팝업이 열려 있습니다.'); // 또는 무시
       return;
     }
