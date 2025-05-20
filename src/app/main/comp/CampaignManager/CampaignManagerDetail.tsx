@@ -1876,6 +1876,10 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           type: '2',
           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
         });
+        setTempCampaignsInfo({
+          ...tempCampaignInfo,
+          start_flag: oriCampaignManagerInfo.start_flag
+        });
       }
     },
     onError: (error) => {
