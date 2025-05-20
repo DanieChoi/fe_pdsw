@@ -16,6 +16,7 @@ import { useEnvironmentStore } from '@/store/environmentStore';
 import { useApirForEnvironmentList } from '@/features/auth/hooks/useApiForEnvironment';
 import { useApiForOperatingTime } from '@/features/preferences/hooks/useApiForOperatingTime';
 import { EnvironmentListResponse } from "@/features/auth/types/environmentIndex";
+import Cookies from 'js-cookie';
 
 interface LoginFormData {
   user_name: string;
@@ -152,6 +153,8 @@ export default function LoginPage() {
         employeeId: formData.user_name  // 로그인 시 입력한 user_name
       });
 
+      // 로그인시 통합모니터링창 초기화
+      localStorage.setItem('monitorPopupOpen', 'false');
       router.push('/main');
     },
     onError: (e) => {
@@ -232,11 +235,12 @@ export default function LoginPage() {
     }
   }, []);
 
-  // 로그인 되어있는 상태로 login 페이지 접근시 replace
+  // // 로그인 되어있는 상태로 login 페이지 접근시 replace
   const isLoggedIn = useAuthStore((state) => state.session_key !== '');
+  const cookiesSessionKey = Cookies.get('session_key'); 
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn || cookiesSessionKey !== '' || cookiesSessionKey !== undefined) {
       router.replace('/main');
     }
   }, [isLoggedIn]);

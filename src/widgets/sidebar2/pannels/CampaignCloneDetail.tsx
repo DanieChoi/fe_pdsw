@@ -1004,6 +1004,7 @@ export default function CampaignDetail() {
   });
   const goLogin = () => {
     Cookies.remove('session_key');
+    useAuthStore.getState().clearAuth();
     router.push('/login');
   };
 

@@ -264,6 +264,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
 
   const goLogin = () => {
     Cookies.remove('session_key');
+    useAuthStore.getState().clearAuth();
     router.push('/login');
   };
 
