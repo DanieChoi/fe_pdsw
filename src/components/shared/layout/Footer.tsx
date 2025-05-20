@@ -823,7 +823,7 @@ export default function Footer({
       if (isConnected) return;
 
       const DOMAIN = process.env.NEXT_PUBLIC_API_URL;
-      console.info(">>>>설정값: ", DOMAIN);
+      // console.info(">>>>설정값: ", DOMAIN);
 
       let dominUrl = `/notification/${tenant_id}/subscribe/${id}`;
       if (window.location.hostname === 'localhost') {
