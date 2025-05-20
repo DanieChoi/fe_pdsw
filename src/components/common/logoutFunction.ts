@@ -5,8 +5,14 @@ import { useOperationStore } from '@/app/main/comp/operation/store/OperationStor
 import { useSessionCheckStore } from '@/store/sessionCheckStore';
 import { logoutChannel } from '@/lib/broadcastChannel';
 
+type PortCheck = {
+    portcheck?: boolean;
+}
 
-const logoutFunction = () => {
+
+const logoutFunction = ({ portcheck = true }: PortCheck = {}) => {
+    // footer 이벤트수신으로 alert가 2번 발생하는 경우를 제외시키기 위하여 선택적 파라미터로 설정
+    
     
     // 로그아웃 시 쿠키 삭제
     Cookies.remove('session_key');
@@ -27,11 +33,14 @@ const logoutFunction = () => {
     // localStorage.setItem('monitorPopupOpen', 'false');
     
     // --- store 초기화 로직 추가하실거 있으시면 추가하시면 됩니다 ---
-
-    logoutChannel.postMessage({
-        type: "logout",
-        message: '',
-    });
+    if(portcheck){
+        logoutChannel.postMessage({
+            type: "logout",
+            message: '',
+        });
+    }
+        
+    
 
 
 }

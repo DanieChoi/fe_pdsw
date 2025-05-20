@@ -236,16 +236,23 @@ export default function LoginPage() {
   }, []);
 
   // // 로그인 되어있는 상태로 login 페이지 접근시 replace
-  // const isLoggedIn = useAuthStore((state) => state.session_key !== '');
-  // const cookiesSessionKey = Cookies.get('session_key'); 
+  const isLoggedIn = useAuthStore((state) => state.session_key !== '');
+  const cookiesSessionKey = Cookies.get('session_key');
+  const isSessionTimeCheck = useAuthStore((state) => state.expires_check);
+  
+  // AuthStore 의 session_key가 있거나, 쿠키에 session_key가 존재하는지 확인
+  const sessionExists = isLoggedIn || (!!cookiesSessionKey && cookiesSessionKey !== '');
 
-  // useEffect(() => {
-  //   if (isLoggedIn || cookiesSessionKey !== '' || cookiesSessionKey !== undefined) {
-  //     router.replace('/main');
-  //   }
-  // }, [isLoggedIn]);
+  useEffect(() => {
+    
+    if (sessionExists && !isSessionTimeCheck) {
+      // store나 쿠키에 session_key가 존재하면서 세션 만료가 아닌 경우 login 페이지 접근시 main 페이지로 이동
+      router.replace('/main');
+    }
+  }, [isLoggedIn]);
 
-  // if (isLoggedIn) return (null);
+  // AuthStore 의 session_key가 있거나, 쿠키에 session_key가 존재하면 main 페이지로 이동하기전에 보여지는 빈 페이지
+  if (sessionExists) return (null);
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center">
