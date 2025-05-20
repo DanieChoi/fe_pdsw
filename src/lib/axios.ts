@@ -44,7 +44,6 @@ axiosInstance.interceptors.request.use(
 
     // console.log("error ???????????????", error);
 
-<<<<<<< HEAD
     if (error.response.data.result_code === 5) {
       // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
       customAlertService.error('API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.', '세션 만료', () => {
@@ -52,9 +51,6 @@ axiosInstance.interceptors.request.use(
         window.location.href = '/login';
       });
     }
-=======
-
->>>>>>> backup/playwright-test
 
     return Promise.reject(error);
   }
@@ -441,7 +437,6 @@ axiosInstance.interceptors.response.use(
   },
   async (error) => {
 
-<<<<<<< HEAD
     if( error.status === 500 ){      
       customAlertService.error('PDS 서버 시스템과 연결할 수 없습니다. 서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.', '세션 만료', () => {
         logoutFunction({ portcheck: false });
@@ -455,14 +450,6 @@ axiosInstance.interceptors.response.use(
         window.location.href = '/login';
       });
     }
-=======
-    // if (error.response.data.result_code === 5) {
-    //   // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
-    //   customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
-    //     window.location.href = '/login';
-    //   });
-    // }
->>>>>>> backup/playwright-test
 
     const url = error.config.url || '';
     const userId = getCookie('id');
@@ -929,20 +916,12 @@ axiosRedisInstance.interceptors.response.use(
     }    
 
     // result_code 5 일 경우 axiosInstance 와 동일하게 로그인 페이지로 이동
-<<<<<<< HEAD
     if (error.response.data.result_code === 5) {
       customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
         logoutFunction({ portcheck: false });
         window.location.href = '/login';
       });
     }
-=======
-    // if (error.response.data.result_code === 5) {
-    //   customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
-    //     window.location.href = '/login';
-    //   });
-    // }
->>>>>>> backup/playwright-test
 
     if (error.response?.status === 401) {
       logoutFunction({ portcheck: false });
