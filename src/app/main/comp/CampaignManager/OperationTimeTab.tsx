@@ -182,7 +182,7 @@ const OperationTimeTab: React.FC<Props> = ({
 
   // 그리드 컬럼 정의 (삭제 버튼 컬럼 추가, delete 열에 width 추가)
   const gridColumns = [
-    { key: "no", name: "NO" },
+    // { key: "no", name: "NO" },
     { key: "division", name: "구분" },
     { key: "startTime", name: "시작시간" },
     { key: "endTime", name: "종료시간" },

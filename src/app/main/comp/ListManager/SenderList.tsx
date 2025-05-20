@@ -80,8 +80,10 @@ const SenderList: React.FC<SenderListProps> = ({ headerData, _sendList, totalCou
   };
   
   useEffect(() => {
-    if( headerData.length > 0 ) {     
-      // setSendColumns(headerData);   
+    if( headerData.length > 1 ) {     
+      setSendColumns(headerData);   
+    }else{
+      setSendColumns(HeaderColumn);
     }
     setSendList(_sendList);
   }, [headerData, _sendList]);

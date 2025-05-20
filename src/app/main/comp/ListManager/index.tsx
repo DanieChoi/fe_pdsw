@@ -43,7 +43,7 @@ interface FileRow {
   fileName: string;
   campaignId: string;
   fileSize: string;
-  deletable: boolean;
+  deletable: string;
   listFlag: string;
   targetType: string;
 }
@@ -134,6 +134,7 @@ const ListManager: React.FC = () => {
   const [listSuccessCount,setListSuccessCount] = useState<number>(0);
   const [deleteDisableYn, setDeleteDisableYn] = useState<boolean>(false);
   const [workTargetDisableYn, setWorkTargetDisableYn ] = useState<boolean>(false);
+  const [processMessage, setProcessMessage] = useState<string>(''); // 프로세스 메시지
   // 아이디 생성용 카운터
   const [nextId, setNextId] = useState(1);
   
@@ -391,7 +392,7 @@ const ListManager: React.FC = () => {
           setAlertState({
             ...errorMessage,
             isOpen: true,
-            message: "파일 포맷 형식과 다른 형식의 파일입니다. 파일 또는 포맷 형식을 확인해 주세요.",
+              message: "파일 또는 포맷 형식이 올바르지 않습니다. 작업대상 지정을 다시 해 주십시오.",
             type: '2',
             onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
           });
@@ -401,7 +402,7 @@ const ListManager: React.FC = () => {
             fileName: file.name,
             campaignId: listManagerCampaignId,
             fileSize: (file.size / 1024).toFixed(2) + " KB",
-            deletable: false,
+            deletable: 'Yes',
             listFlag: listFlag,
             targetType: targetType
           };
@@ -498,7 +499,7 @@ const ListManager: React.FC = () => {
                   tempdata = (fileContent+'').split('\n');
                 }
                 let index = 0;
-                const tempSendList: SendRow[] = [];
+                let tempSendList: SendRow[] = [];
                 for( let i=0;i<tempdata.length;i++){
                   // const row = tempdata[i].split(delimiter) as unknown[];
                   index = index+1;
@@ -557,7 +558,31 @@ const ListManager: React.FC = () => {
                     //구분자인 경우
                   }else{ 
                     const row = tempdata[i].split(listManagerDelimiter) as unknown[];
-                    if( row.length > 0){
+                    if( tempdata[i].indexOf(listManagerDelimiter) === -1 ){    
+                      setProcessMessage('파일 전송 도중 에러 : 리스트 파일을 확인 하세요.');
+                      setAlertState({
+                        ...errorMessage,
+                        isOpen: true,
+                        message: "파일 또는 포맷 형식이 올바르지 않습니다. 작업대상 지정을 다시 해 주십시오.",
+                        type: '2',
+                        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+                      });
+                      tempSendList = [];
+                      setUploadedFiles((prev) => prev.slice(0, -1));   
+                      break;
+                    }else if( tempdata[i].split(listManagerDelimiter).length != sendColumns.length ){
+                      setProcessMessage('파일 전송 도중 에러 : 리스트 파일을 확인 하세요.');
+                      setAlertState({
+                        ...errorMessage,
+                        isOpen: true,
+                        message: "파일 또는 포맷 형식이 올바르지 않습니다. 작업대상 지정을 다시 해 주십시오.",
+                        type: '2',
+                        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+                      });
+                      tempSendList = [];
+                      setUploadedFiles((prev) => prev.slice(0, -1));
+                      break;
+                    }else if( row.length > 0){
                       let _length = row.length;
                       if( _length > sendColumns.length){
                         _length = sendColumns.length;
@@ -706,17 +731,9 @@ const ListManager: React.FC = () => {
       key: "deletable",
       name: "삭제 여부",
       formatter: ({ row }: { row: FileRow }) => (
-        <CustomCheckbox
-          checked={row.deletable}
-          onChange={() =>
-            setUploadedFiles((prev) =>
-              prev.map((file) =>
-                file.id === row.id
-                  ? { ...file, deletable: !file.deletable }
-                  : file
-              )
-            )
-          }
+        <CustomInput
+          type="text"
+          value={'Yes'}
         />
       ),
     },
@@ -870,6 +887,13 @@ const ListManager: React.FC = () => {
           campaign_id: _campaignId
         });
         setCampaignIdDisabled(true);
+      }else{
+        setListManagerCampaignId('0');
+        setCallListInsertData({
+          ..._callListInsertData,
+          campaign_id: 0
+        });
+        setCampaignIdDisabled(false);
       }
     }
   }, [activeTabId, openedTabs, campaigns]);
@@ -930,8 +954,9 @@ const ListManager: React.FC = () => {
   }, [listManagerFileFormat]);
    
   useEffect(() => {
-    if ( listManagerFileFormatRows.length === 0 ) {
+    if ( listManagerFileFormatRows.length === 0 || listManagerFileFormatRows.length === 1  ) {
       setListManagerFileFormatRows(initData);
+      setSendColumns([]);
     }else if ( listManagerFileFormatRows.length > 1 ) {
       setHeaderColumnData(listManagerFileFormatRows);
       const tempList: Column<SendRow>[] = listManagerFileFormatRows.map((tempData) => ({
@@ -941,6 +966,22 @@ const ListManager: React.FC = () => {
       setSendColumns(tempList);
     }
   }, [listManagerFileFormatRows]);
+   
+  useEffect(() => {
+    if( processMessage !== ''){
+      setProcessMessage('');
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      const newProgressListData = { ...progressListData
+        , id: progressList.length+1
+        , datetime: hours + ':' + minutes + ':' + seconds
+        , message: processMessage
+      };       
+      setProgressList(prev => [newProgressListData, ...prev]);
+    }
+  }, [processMessage]);
    
   return (
     <div className="flex flex-col gap-5 limit-width">
