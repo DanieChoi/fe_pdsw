@@ -43,7 +43,7 @@ interface FileRow {
   fileName: string;
   campaignId: string;
   fileSize: string;
-  deletable: boolean;
+  deletable: string;
   listFlag: string;
   targetType: string;
 }
@@ -401,7 +401,7 @@ const ListManager: React.FC = () => {
             fileName: file.name,
             campaignId: listManagerCampaignId,
             fileSize: (file.size / 1024).toFixed(2) + " KB",
-            deletable: false,
+            deletable: 'Yes',
             listFlag: listFlag,
             targetType: targetType
           };
@@ -498,7 +498,7 @@ const ListManager: React.FC = () => {
                   tempdata = (fileContent+'').split('\n');
                 }
                 let index = 0;
-                const tempSendList: SendRow[] = [];
+                let tempSendList: SendRow[] = [];
                 for( let i=0;i<tempdata.length;i++){
                   // const row = tempdata[i].split(delimiter) as unknown[];
                   index = index+1;
@@ -557,7 +557,27 @@ const ListManager: React.FC = () => {
                     //구분자인 경우
                   }else{ 
                     const row = tempdata[i].split(listManagerDelimiter) as unknown[];
-                    if( row.length > 0){
+                    if( tempdata[i].indexOf(listManagerDelimiter) === -1 ){              
+                      setAlertState({
+                        ...errorMessage,
+                        isOpen: true,
+                        message: "리스트 파일을 확인 하세요.",
+                        type: '2',
+                        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+                      });
+                      tempSendList = [];
+                      break;
+                    }else if( tempdata[i].split(listManagerDelimiter).length != sendColumns.length ){
+                      setAlertState({
+                        ...errorMessage,
+                        isOpen: true,
+                        message: "리스트 파일을 확인 하세요.",
+                        type: '2',
+                        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+                      });
+                      tempSendList = [];
+                      break;
+                    }else if( row.length > 0){
                       let _length = row.length;
                       if( _length > sendColumns.length){
                         _length = sendColumns.length;
@@ -706,17 +726,9 @@ const ListManager: React.FC = () => {
       key: "deletable",
       name: "삭제 여부",
       formatter: ({ row }: { row: FileRow }) => (
-        <CustomCheckbox
-          checked={row.deletable}
-          onChange={() =>
-            setUploadedFiles((prev) =>
-              prev.map((file) =>
-                file.id === row.id
-                  ? { ...file, deletable: !file.deletable }
-                  : file
-              )
-            )
-          }
+        <CustomInput
+          type="text"
+          value={'Yes'}
         />
       ),
     },
@@ -870,6 +882,13 @@ const ListManager: React.FC = () => {
           campaign_id: _campaignId
         });
         setCampaignIdDisabled(true);
+      }else{
+        setListManagerCampaignId('0');
+        setCallListInsertData({
+          ..._callListInsertData,
+          campaign_id: 0
+        });
+        setCampaignIdDisabled(false);
       }
     }
   }, [activeTabId, openedTabs, campaigns]);
@@ -930,8 +949,9 @@ const ListManager: React.FC = () => {
   }, [listManagerFileFormat]);
    
   useEffect(() => {
-    if ( listManagerFileFormatRows.length === 0 ) {
+    if ( listManagerFileFormatRows.length === 0 || listManagerFileFormatRows.length === 1  ) {
       setListManagerFileFormatRows(initData);
+      setSendColumns([]);
     }else if ( listManagerFileFormatRows.length > 1 ) {
       setHeaderColumnData(listManagerFileFormatRows);
       const tempList: Column<SendRow>[] = listManagerFileFormatRows.map((tempData) => ({
