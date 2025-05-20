@@ -24,12 +24,12 @@ export const useApiForGetCampaignGroups = (options?: UseApiForGetCampaignGroupsO
       try {
         const response = await apiForGetCampaignGroupForSystemAdmin(options?.request || {});
 
-        console.log("Campaign groups data response at hook:", response);
+        // console.log("Campaign groups data response at hook:", response);
         
         if (response.result_code === 0) {
           setCampaignGroups(response.result_data || []);
           setCampaignGroupsLoaded(true);
-          console.log("Campaign groups data loaded, updated store");
+          // console.log("Campaign groups data loaded, updated store");
         }
         
         return response;

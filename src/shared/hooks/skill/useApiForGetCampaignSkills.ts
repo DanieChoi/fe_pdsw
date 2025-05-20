@@ -26,7 +26,7 @@ export const useApiForGetCampaignSkills = (options?: UseApiForCampaignSkillsOpti
         if (response.result_code === 0) {
           setCampaignSkills(response.result_data || []);
           setCampaignSkillsLoaded(true);
-          console.log("Campaign skills data loaded, updated store");
+          // console.log("Campaign skills data loaded, updated store");
         }
         
         return response;
