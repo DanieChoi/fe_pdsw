@@ -236,16 +236,16 @@ export default function LoginPage() {
   }, []);
 
   // // 로그인 되어있는 상태로 login 페이지 접근시 replace
-  const isLoggedIn = useAuthStore((state) => state.session_key !== '');
-  const cookiesSessionKey = Cookies.get('session_key'); 
+  // const isLoggedIn = useAuthStore((state) => state.session_key !== '');
+  // const cookiesSessionKey = Cookies.get('session_key'); 
 
-  useEffect(() => {
-    if (isLoggedIn || cookiesSessionKey !== '' || cookiesSessionKey !== undefined) {
-      router.replace('/main');
-    }
-  }, [isLoggedIn]);
+  // useEffect(() => {
+  //   if (isLoggedIn || cookiesSessionKey !== '' || cookiesSessionKey !== undefined) {
+  //     router.replace('/main');
+  //   }
+  // }, [isLoggedIn]);
 
-  if (isLoggedIn) return (null);
+  // if (isLoggedIn) return (null);
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center">
