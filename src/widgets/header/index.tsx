@@ -297,7 +297,7 @@ export default function Header() {
 
       // 로딩 중이면 중복 호출 방지
       if (store.campaignsLoading) {
-        console.log("Ca mpaigns loading in progress, skipping duplicate call");
+        // console.log("Ca mpaigns loading in progress, skipping duplicate call");
         return;
       }
 
@@ -315,7 +315,7 @@ export default function Header() {
   // 캠페인 데이터가 변경될 때마다 로그 추가
   useEffect(() => {
     const { campaigns } = useMainStore.getState();
-    console.log("Campaigns updated in header component:", campaigns);
+    // console.log("Campaigns updated in header component:", campaigns);
   }, [useMainStore.getState().campaigns]);
 
   const { mutate: fetchMain } = useApiForMain({
@@ -330,7 +330,7 @@ export default function Header() {
         //스킬 마스터 조회.
         fetchSkills({ tenant_id_array: [tenant_id] });
       }
-      console.log("Campaign data loaded in header, updated store");
+      // console.log("Campaign data loaded in header, updated store");
       setShouldFetchCounselors(true);  // 이 시점에 상담사 목록 조회 활성화
     },
     onError: (error) => {
@@ -373,7 +373,7 @@ export default function Header() {
 
       // 데이터가 이미 로드되었으면 건너뛰기
       if (store.skillsLoaded && store.skills.length > 0) {
-        console.log("Skills already loaded, skipping API call");
+        // console.log("Skills already loaded, skipping API call");
         return;
       }
 
