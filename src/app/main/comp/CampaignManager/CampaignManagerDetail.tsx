@@ -1419,6 +1419,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         
       } catch (e: any){
         if (e.message === 'SESSION_EXPIRED') {
+
+          ServerErrorCheck('API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.', e.message);
           setAlertState({
             ...errorMessage,
             isOpen: true,
@@ -1882,6 +1884,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   });
   const goLogin = () => {
     Cookies.remove('session_key');
+    useAuthStore.getState().clearAuth();
     router.push('/login');
   };
 

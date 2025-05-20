@@ -19,7 +19,7 @@ import {
   CommonRadioItem,
 } from "@/components/shared/CommonRadio";
 import SenderList from './SenderList';
-import { useMainStore, useTabStore } from '@/store';
+import { useAuthStore, useMainStore, useTabStore } from '@/store';
 import { CallingListInsertDataType
   , CallingListInsertRequest
 } from '@/features/listManager/types/listManagerIndex';
@@ -208,6 +208,7 @@ const ListManager: React.FC = () => {
   });
   const goLogin = () => {
     Cookies.remove('session_key');
+    useAuthStore.getState().clearAuth();
     router.push('/login');
   }
   

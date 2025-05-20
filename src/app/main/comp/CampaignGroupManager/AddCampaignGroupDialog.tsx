@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import CommonDialogForSideMenu from "@/components/shared/CommonDialog/CommonDialogForSideMenu";
 import { useApiForCampaignGroupCreate } from '@/features/campaignGroupManager/hooks/useApiForCampaignGroupCreate';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
-import { useMainStore } from '@/store';
+import { useAuthStore, useMainStore } from '@/store';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
@@ -98,6 +98,7 @@ export function AddCampaignGroupDialog({
 
   const goLogin = () => {
     Cookies.remove('session_key');
+    useAuthStore.getState().clearAuth();
     router.push('/login');
   };
   // 캠페인 그룹 생성 API 호출 훅 사용

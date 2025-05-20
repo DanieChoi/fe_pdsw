@@ -11,6 +11,7 @@ import { useApiForPhoneDescriptionInsert } from '@/features/campaignManager/hook
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { useApiForPhoneDescriptionDelete } from '@/features/campaignManager/hooks/useApiForPhoneDescriptionDelete';
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 
 interface PhoneRow {
   id: string;
@@ -64,20 +65,8 @@ const EditDescription = () => {
   const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
     onSuccess: (data) => {
       setPhoneDescriptions(data.result_data || []);
-    },onError: (data) => {      
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      }
+    },onError: (error) => {      
+      ServerErrorCheck('전화번호설명 조회', error.message);
     }
   })
 
@@ -90,21 +79,7 @@ const EditDescription = () => {
       })
       showAlert('저장되었습니다');
     },onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-          setAlertState({
-            ...errorMessage,
-            isOpen: true,
-            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-            onConfirm: closeAlert,
-            onCancel: () => {}
-          });
-          Cookies.remove('session_key');
-          setTimeout(() => {
-            router.push('/login');
-          }, 1000);
-      } else {
-          showAlert('전화번호설명 저장 중 오류가 발생했습니다: ' + error.message);
-      }
+      ServerErrorCheck('전화번호설명 추가', error.message);
     }
   })
 
@@ -117,21 +92,7 @@ const EditDescription = () => {
       });
       showConfirm('수정되었습니다', () => {});
     },onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-          setAlertState({
-            ...errorMessage,
-            isOpen: true,
-            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-            onConfirm: closeAlert,
-            onCancel: () => {}
-          });
-          Cookies.remove('session_key');
-          setTimeout(() => {
-            router.push('/login');
-          }, 1000);
-      } else {
-          showAlert('전화번호설명 저장 중 오류가 발생했습니다: ' + error.message);
-      }
+      ServerErrorCheck('전화번호설명 수정', error.message);
     }
   })
 
@@ -144,21 +105,7 @@ const EditDescription = () => {
       });
       showAlert('삭제되었습니다');
     },onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-          setAlertState({
-            ...errorMessage,
-            isOpen: true,
-            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-            onConfirm: closeAlert,
-            onCancel: () => {}
-          });
-          Cookies.remove('session_key');
-          setTimeout(() => {
-            router.push('/login');
-          }, 1000);
-      } else {
-          showAlert('전화번호설명 저장 중 오류가 발생했습니다: ' + error.message);
-      }
+      ServerErrorCheck('전화번호설명 삭제', error.message);
     }
   })
 

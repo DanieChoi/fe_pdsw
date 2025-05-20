@@ -13,7 +13,7 @@ import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { Calendar as CalendarIcon } from "lucide-react";
 import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
-import { useTabStore, useMainStore } from '@/store';
+import { useTabStore, useMainStore, useAuthStore } from '@/store';
 import RebroadcastSettingsGroupPanelHeader from './RebroadcastSettingsGroupPanelHeader';
 import { useApiForAutoRedial } from '@/features/campaignManager/hooks/useApiForAutoRedial';
 import { useApiForCampaignAutoRedialInsert } from '@/features/rebroadcastSettingsPanel/hooks/useApiForCampaignAutoRedialInsert';
@@ -675,6 +675,7 @@ const RebroadcastSettingsGroupPanel = () => {
     });
     const goLogin = () => {
       Cookies.remove('session_key');
+      useAuthStore.getState().clearAuth();
       router.push('/login');
     }
     
