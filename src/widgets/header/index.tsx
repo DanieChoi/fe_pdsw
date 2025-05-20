@@ -131,7 +131,7 @@ export default function Header() {
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data || []);
-      console.log("Skills data loaded in header, updated store");
+      // console.log("Skills data loaded in header, updated store");
     },
     onError: (error) => {
       // 로딩 상태 해제
@@ -236,7 +236,7 @@ export default function Header() {
         } else {
           setTenants(data.result_data.filter(data => data.tenant_id === tenant_id));
         }
-        console.log("Tenant data loaded in header, updated store");
+        // console.log("Tenant data loaded in header, updated store");
       }
     },
     onError: (error) => {
@@ -274,7 +274,7 @@ export default function Header() {
 
       // 로딩 시작
       store.setTenantsLoading(true);
-      console.log("Starting tenant data fetch from header");
+      // console.log("Starting tenant data fetch from header");
 
       fetchTenants({
         session_key: _sessionKey,
@@ -303,7 +303,7 @@ export default function Header() {
 
       // 로딩 시작
       store.setCampaignsLoading(true);
-      console.log("Starting campaign data fetch from header");
+      // console.log("Starting campaign data fetch from header");
 
       fetchMain({
         session_key: _sessionKey,
