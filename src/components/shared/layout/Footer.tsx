@@ -688,22 +688,6 @@ export default function Footer({
             </table>
           </div>
 
-          {/* 2단(W) 모드일 때만 오른쪽 테이블 표시 */}
-          {/* {isExpanded && (
-            <div className="w-1/2 overflow-auto py-[7px] px-[20px]">
-              <table className="w-full text-sm">
-                <tbody>
-                  {footerDataList.map((log, index) => (
-                    <tr key={index}>
-                      <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
-                      <td className="whitespace-nowrap text-[13px] px-1 hidden">[{log.type}]</td>
-                      <td className="text-[13px]">{log.message}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )} */}
         </div>
       )}
     </Resizable>
