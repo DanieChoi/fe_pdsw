@@ -1249,7 +1249,10 @@ export default function Footer({
             </table>
           </div>
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> backup/playwright-test
         </div>
       )}
     </Resizable>
