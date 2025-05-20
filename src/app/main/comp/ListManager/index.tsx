@@ -850,6 +850,7 @@ const ListManager: React.FC = () => {
    
   useEffect(() => {
     if (activeTabId === 7 && campaigns.length > 0) {
+      // setListManagerFileFormatRows([]);
       const tempData = openedTabs.filter(tab => tab.id === 7);
       if( tempData.length > 0 && tempData[0].campaignId && tempData[0].campaignName) {
         const _campaignId = Number(tempData[0].campaignId);
