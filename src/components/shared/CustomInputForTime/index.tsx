@@ -165,7 +165,7 @@ const CustomInputForTime = React.forwardRef<HTMLInputElement, CustomInputForTime
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         maxLength={5} // 5 characters for format HH:MM
-        placeholder="HH:MM"
+        placeholder="hh:mm"
         {...props}
       />
     );
