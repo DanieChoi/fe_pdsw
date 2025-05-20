@@ -124,25 +124,7 @@ export default function LoginPage() {
   const { mutate: login } = useApiForLogin({
     onSuccess: (data) => {
 
-      if(data.result_code === 1 || data.result_msg === 'User does not exist.'){
-        setAlertState({
-          isOpen: true,
-          message: '존재하지 않는 아이디입니다.',
-          title: '로그인',
-          type: '2',
-        });
-        setIsPending(false);
-        return;
-      } else if(data.result_code === 2 || data.result_msg === 'Password is wrong.'){
-        setAlertState({
-          isOpen: true,
-          message: '암호가 잘못 입력되었습니다.',
-          title: '로그인',
-          type: '2',
-        });
-        setIsPending(false);
-        return;
-      } 
+      // login.ts에서 throw error를 하기때문에 다른 오류 응답은 올수 없음
       setIsPending(false);
 
       // console.log('data (로그인 응답)', data);
@@ -249,6 +231,17 @@ export default function LoginPage() {
       }));
     }
   }, []);
+
+  // 로그인 되어있는 상태로 login 페이지 접근시 replace
+  const isLoggedIn = useAuthStore((state) => state.session_key !== '');
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.replace('/main');
+    }
+  }, [isLoggedIn]);
+
+  if (isLoggedIn) return (null);
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center">
