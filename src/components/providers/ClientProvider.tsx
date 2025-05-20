@@ -65,7 +65,7 @@ export default function ClientProvider({ children }: { children: React.ReactNode
         draggable
         pauseOnHover
       />
-      <NotificationSetup />
+      {/* <NotificationSetup /> */}
       {/* <NotificationListener /> */}
       {/* <AppNotificationSetup /> */}
       {/* <ReactQueryDevtools initialIsOpen={false} /> */}

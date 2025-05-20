@@ -38,12 +38,12 @@ export const apiForGetCampaignList = async (): Promise<CampaignListResponse> => 
         }
     } catch (error:any) {
 
-        if (error.response.data.result_code === 5) {
-            // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
-            customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
-              window.location.href = '/login';
-            });
-          }
+        // if (error.response.data.result_code === 5) {
+        //     // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
+        //     customAlertService.error('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.', '세션 만료', () => {
+        //       window.location.href = '/login';
+        //     });
+        //   }
 
         const typedError = error as CampaignApiError;
         throw new Error(
