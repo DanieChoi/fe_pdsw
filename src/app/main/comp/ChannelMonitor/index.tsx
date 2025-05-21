@@ -61,7 +61,7 @@ interface ChannelMonitorProps {
 const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
   const [firstSelect, setFirstSelect] = useState<FilterMode>('전체');
   const [secondSelect, setSecondSelect] = useState<string>('');
-  const [thirdSelect, setThirdSelect] = useState<string>('상태전체');
+  const [thirdSelect, setThirdSelect] = useState<string>('상태 전체');
   const [channelData, setChannelData] = useState<ChannelData[]>([]);
   const [filteredData, setFilteredData] = useState<ChannelData[]>([]);
   const { tenants, campaigns, sseInputMessage, setSseInputMessage 
@@ -90,7 +90,7 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
   };
 
   // 세 번째 Select의 옵션
-  const thirdSelectOptions = ['상태전체', 'NONE', 'IDLE', 'BUSY'];
+  const thirdSelectOptions = ['상태 전체', 'NONE', 'IDLE', 'BUSY'];
 
   // 필터링 로직
   useEffect(() => {
@@ -123,7 +123,7 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
 
       }
 
-      if (thirdSelect !== '상태전체') {
+      if (thirdSelect !== '상태 전체') {
         newData = newData.filter(item => item.status === thirdSelect);
       }
 
