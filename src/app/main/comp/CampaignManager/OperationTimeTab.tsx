@@ -388,7 +388,12 @@ const OperationTimeTab: React.FC<Props> = ({
                         }
                         // === 겹치는 시간 구간 검사 추가 ===
                         if (isTimeOverlap(startTime, endTime, tempData)) {
-                          toast.error("기존에 등록된 시간과 겹칩니다.");
+                          // toast.error("기존에 등록된 시간과 겹칩니다.");
+                          setAlertState({
+                            ...alertState,
+                            isOpen: true,
+                            message: "기존에 등록된 시간과 중복됩니다.",
+                          });
                           return;
                         }
                         // === 기존 동일 시간 검사 ===
