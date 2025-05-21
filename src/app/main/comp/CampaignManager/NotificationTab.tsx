@@ -198,7 +198,7 @@ const NotificationTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onHa
               onChange={(e) => handleNumericInput(e)}
               disabled={!isChecked} // 체크박스 상태에 따라 비활성화
             />
-            <Label className="w-[8.3rem] min-w-[8.3rem]">잔량 부족 알람 개수</Label>
+            <Label className="w-[8.3rem] min-w-[8.3rem]">잔량 부족 알람 갯수</Label>
           </div>
           <div className="flex gap-1 items-center">
             <CustomCheckbox id="alertMessage" disabled={!isChecked} checked={alertMessage}
