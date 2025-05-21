@@ -1,33 +1,3 @@
-// import * as React from "react";
-// import { cn } from "@/lib/utils";
-
-// const CustomInput = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-//   ({ className, type, value, onChange, ...props }, ref) => {
-//     const stringValue =
-//       typeof value === "number" || typeof value === "string"
-//         ? String(value)
-//         : "";
-
-//     return (
-//       <input
-//         type={type}
-//         value={stringValue}
-//         onChange={onChange}
-//         className={cn(
-//           "flex h-[26px] w-full rounded-[3px] border border-input bg-white px-[8px] transition-colors file:border-0 file:bg-white file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:text-[#aaa] disabled:bg-[#F4F4F4] border-[#ebebeb] text-[#333] text-sm",
-//           className
-//         )}
-//         ref={ref}
-//         {...props}
-//       />
-//     );
-//   }
-// );
-
-// CustomInput.displayName = "Input";
-
-// export { CustomInput };
-
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
@@ -36,21 +6,26 @@ interface CustomInputProps extends React.ComponentProps<"input"> {
   isPhoneNumber?: boolean;
   onValidPhoneNumber?: (isValid: boolean) => void;
   error?: string; // Error message to display
+  resetKey?: any; // 이 값이 변경되면 에러가 초기화됨
 }
 
 const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
-  ({ className, type = "text", value, onChange, isPercent, isPhoneNumber, onValidPhoneNumber, error, ...props }, ref) => {
+  ({ className, type = "text", value, onChange, isPercent, isPhoneNumber, onValidPhoneNumber, error, resetKey, ...props }, ref) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
     const combinedRef = useCombinedRefs(ref, inputRef);
     const [localError, setLocalError] = React.useState<string | undefined>(error);
-    
-    // 리로딩 또는 컴포넌트 마운트 시 에러 메시지 초기화
+
+    const stringValue =
+      typeof value === "number" || typeof value === "string"
+        ? String(value)
+        : "";
+
+    // resetKey가 변경될 때마다 에러 초기화
     React.useEffect(() => {
       setLocalError(undefined);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    // 외부에서 전달된 error prop이 변경될 때 localError 업데이트
+    }, [resetKey]);
+    
+    // Update local error when prop changes
     React.useEffect(() => {
       if (error !== undefined) {
         setLocalError(error);
@@ -136,12 +111,6 @@ const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
 
       props.onBlur?.(e);
     };
-
-    // Ensure value is always a string for the input
-    const stringValue =
-      typeof value === "number" || typeof value === "string"
-        ? String(value)
-        : "";
 
     return (
       <div className="relative w-full">

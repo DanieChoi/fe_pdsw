@@ -15,17 +15,17 @@ import { OutgoingMethodTabParam } from './CampaignManagerDetail';
 import { useMainStore, useCampainManagerStore } from '@/store';
 
 const useCounselResultList = [
-  {useCounselResultId:0, useCounselResultName: '미사용'},
-  {useCounselResultId:1, useCounselResultName: '사용'}
+  { useCounselResultId: 0, useCounselResultName: '미사용' },
+  { useCounselResultId: 1, useCounselResultName: '사용' }
 ];
 
 const useMachineHandling = [
-  {id:1, name: '컬러링 판별 후 사람만 연결'},
-  {id:2, name: '컬러링 판별 후 사람 / 기계음 연결'},
-  {id:3, name: '기계음 / 사람 무조건 연결'},
+  { id: 1, name: '컬러링 판별 후 사람만 연결' },
+  { id: 2, name: '컬러링 판별 후 사람 / 기계음 연결' },
+  { id: 3, name: '기계음 / 사람 무조건 연결' },
 ];
 
-const CampaignOutgoingMethodTab:OutgoingMethodTabParam = {
+const CampaignOutgoingMethodTab: OutgoingMethodTabParam = {
   changeYn: false,
   campaignInfoChangeYn: false,
   onSave: false,
@@ -51,10 +51,10 @@ const CampaignOutgoingMethodTab:OutgoingMethodTabParam = {
 type Props = {
   callCampaignMenu: string;
   campaignInfo: MainDataResponse;
-  onCampaignOutgoingMethodChange: (param:OutgoingMethodTabParam) => void;
+  onCampaignOutgoingMethodChange: (param: OutgoingMethodTabParam) => void;
 };
 
-const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onCampaignOutgoingMethodChange }) => {
+const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onCampaignOutgoingMethodChange }) => {
   const { campaigns } = useMainStore();
   const { channelGroupList } = useCampainManagerStore();
   const [maxRings] = useState<string>("10");
@@ -63,9 +63,9 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
   const [limitRateEnabled, setLimitRateEnabled] = useState<boolean>(false);
   const [limitExitInit, setLimitExitInit] = useState<boolean>(false);
   const [limitInit, setLimitInit] = useState<boolean>(false);
-  const [limitRate, setLimitRate] = useState<string>("");  
+  const [limitRate, setLimitRate] = useState<string>("");
   const [tempOutgoingMethodTab, setTempOutgoingMethodTab] = useState<OutgoingMethodTabParam>(CampaignOutgoingMethodTab);
-  const [tempCampaignId, setTempCampaignId ] = useState<number>(0);
+  const [tempCampaignId, setTempCampaignId] = useState<number>(0);
 
   // 숫자만 입력되도록 제어하는 함수
   const handleNumericInput = (
@@ -74,120 +74,133 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
   ) => {
     const value = e.target.value;
     if (/^\d*$/.test(value)) {
-      if( type === 'setTrunkAccessCode'){
-        onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+      if (type === 'setTrunkAccessCode') {
+        onCampaignOutgoingMethodChange({
+          ...tempOutgoingMethodTab
           , changeYn: true
           , campaignInfoChangeYn: true
           , trunk_access_code: value
         });
-      }else if( type === 'setCallGoal'){
-        onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+      } else if (type === 'setCallGoal') {
+        onCampaignOutgoingMethodChange({
+          ...tempOutgoingMethodTab
           , changeYn: true
           , campaignInfoChangeYn: true
           , alarm_answer_count: Number(value)
         });
-      }else if( type === 'setAutoDial'){
-        onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+      } else if (type === 'setAutoDial') {
+        onCampaignOutgoingMethodChange({
+          ...tempOutgoingMethodTab
           , changeYn: true
           , campaignInfoChangeYn: true
           , auto_dial_interval: Number(value)
         });
-      }else if( type === 'setDddNumber'){
-        onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+      } else if (type === 'setDddNumber') {
+        onCampaignOutgoingMethodChange({
+          ...tempOutgoingMethodTab
           , changeYn: true
           , campaignInfoChangeYn: true
           , DDD_code: value
         });
-      }else if( type === 'setTokenId'){
-        onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+      } else if (type === 'setTokenId') {
+        onCampaignOutgoingMethodChange({
+          ...tempOutgoingMethodTab
           , changeYn: true
           , campaignInfoChangeYn: true
           , token_id: Number(value)
         });
-      }else if( type === 'setIvrNo'){
-        onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+      } else if (type === 'setIvrNo') {
+        onCampaignOutgoingMethodChange({
+          ...tempOutgoingMethodTab
           , changeYn: true
           , campaignInfoChangeYn: true
           , power_divert_queue: Number(value)
         });
-      }else if( type === 'setLimitRate'){
-        onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+      } else if (type === 'setLimitRate') {
+        onCampaignOutgoingMethodChange({
+          ...tempOutgoingMethodTab
           , changeYn: true
           , campaignInfoChangeYn: true
-          , user_option: value === ''?'': 'limit='+value
+          , user_option: value === '' ? '' : 'limit=' + value
         });
         setLimitRate(value);
       }
     }
   };
-  const handleAbandonmentTime = (value:string) => {
-    onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+  const handleAbandonmentTime = (value: string) => {
+    onCampaignOutgoingMethodChange({
+      ...tempOutgoingMethodTab
       , changeYn: true
       , campaignInfoChangeYn: true
-      , overdial_abandon_time: Number(value) 
+      , overdial_abandon_time: Number(value)
     });
   };
-  const handleLinkedCampaign = (value:string) => {
-    onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+  const handleLinkedCampaign = (value: string) => {
+    onCampaignOutgoingMethodChange({
+      ...tempOutgoingMethodTab
       , changeYn: true
       , campaignInfoChangeYn: true
-      , next_campaign: Number(value) 
+      , next_campaign: Number(value)
     });
   };
-  const handleUseCounselResult = (value:string) => {
-    onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+  const handleUseCounselResult = (value: string) => {
+    onCampaignOutgoingMethodChange({
+      ...tempOutgoingMethodTab
       , changeYn: true
       , campaignInfoChangeYn: true
-      , use_counsel_result: Number(value) 
+      , use_counsel_result: Number(value)
     });
   };
-  const handleMachineHandling = (value:string) => {
-    onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+  const handleMachineHandling = (value: string) => {
+    onCampaignOutgoingMethodChange({
+      ...tempOutgoingMethodTab
       , changeYn: true
       , campaignInfoChangeYn: true
-      , detect_mode: Number(value) 
+      , detect_mode: Number(value)
     });
   };
-  const handleLinkedChannelGroupList = (value:string) => {
-    onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+  const handleLinkedChannelGroupList = (value: string) => {
+    onCampaignOutgoingMethodChange({
+      ...tempOutgoingMethodTab
       , changeYn: true
       , campaignInfoChangeYn: true
-      , channel_group_id: Number(value) 
+      , channel_group_id: Number(value)
     });
   };
 
   useEffect(() => {
-    if (campaignInfo) {  
+    if (campaignInfo) {
       // 서버에서 값이 0이거나 없는 경우, 기본값 1로 설정
       const detectMode = campaignInfo.detect_mode === 0 ? 1 : campaignInfo.detect_mode;
-      
-      setTempOutgoingMethodTab({...tempOutgoingMethodTab
-        ,trunk_access_code : campaignInfo.trunk_access_code
-        ,dial_try_interval : campaignInfo.dial_try_interval
-        ,alarm_answer_count : campaignInfo.alarm_answer_count
-        ,overdial_abandon_time : campaignInfo.overdial_abandon_time
-        ,detect_mode : detectMode  // 기본값 1로 설정
-        ,auto_dial_interval : campaignInfo.auto_dial_interval
-        ,power_divert_queue : Number(campaignInfo.power_divert_queue)
-        ,next_campaign : campaignInfo.next_campaign
-        ,DDD_code : campaignInfo.DDD_code
-        ,callback_kind : campaignInfo.callback_kind
-        ,max_ring : campaignInfo.max_ring
-        ,token_id : campaignInfo.token_id
-        ,use_counsel_result : campaignInfo.use_counsel_result
-        ,dial_mode_option : campaignInfo.dial_mode_option
-        ,user_option : campaignInfo.user_option
-        ,channel_group_id: campaignInfo.channel_group_id
-      }); 
-      if( tempCampaignId !== campaignInfo.campaign_id ){
+
+      setTempOutgoingMethodTab({
+        ...tempOutgoingMethodTab
+        , trunk_access_code: campaignInfo.trunk_access_code
+        , dial_try_interval: campaignInfo.dial_try_interval
+        , alarm_answer_count: campaignInfo.alarm_answer_count
+        , overdial_abandon_time: campaignInfo.overdial_abandon_time
+        , detect_mode: detectMode  // 기본값 1로 설정
+        , auto_dial_interval: campaignInfo.auto_dial_interval
+        , power_divert_queue: Number(campaignInfo.power_divert_queue)
+        , next_campaign: campaignInfo.next_campaign
+        , DDD_code: campaignInfo.DDD_code
+        , callback_kind: campaignInfo.callback_kind
+        , max_ring: campaignInfo.max_ring
+        , token_id: campaignInfo.token_id
+        , use_counsel_result: campaignInfo.use_counsel_result
+        , dial_mode_option: campaignInfo.dial_mode_option
+        , user_option: campaignInfo.user_option
+        , channel_group_id: campaignInfo.channel_group_id
+      });
+      if (tempCampaignId !== campaignInfo.campaign_id) {
         setTempCampaignId(campaignInfo.campaign_id);
-        setLimitRate(campaignInfo.user_option === ''?'':campaignInfo.user_option.split(',')[0].indexOf('limit') > -1?campaignInfo.user_option.split(',')[0].split('=')[1]:'');
-        setLimitInit(campaignInfo.user_option === ''?false:campaignInfo.user_option.split(',')[0].indexOf('limit') > -1 && campaignInfo.user_option.split(',')[1] === '0'?true:false);
-        setLimitRateEnabled(campaignInfo.user_option === ''?false:campaignInfo.user_option.split(',')[0].indexOf('limit') > -1?true:false);
+        setLimitRate(campaignInfo.user_option === '' ? '' : campaignInfo.user_option.split(',')[0].indexOf('limit') > -1 ? campaignInfo.user_option.split(',')[0].split('=')[1] : '');
+        setLimitInit(campaignInfo.user_option === '' ? false : campaignInfo.user_option.split(',')[0].indexOf('limit') > -1 && campaignInfo.user_option.split(',')[1] === '0' ? true : false);
+        setLimitRateEnabled(campaignInfo.user_option === '' ? false : campaignInfo.user_option.split(',')[0].indexOf('limit') > -1 ? true : false);
       }
     }
   }, [campaignInfo]);
-  
+
   // 초기 생성시에 기본값으로 1 설정하기
   useEffect(() => {
     if (callCampaignMenu === 'NewCampaignManager' || callCampaignMenu === 'CampaignClone') {
@@ -218,7 +231,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
           {/* 재시도 간격(초) */}
           <div className="flex items-center gap-2 justify-between">
             <Label className="w-[8.3rem] min-w-[8.3rem]">재시도 간격(초)</Label>
-            <Select value={tempOutgoingMethodTab.dial_try_interval+''} disabled>
+            <Select value={tempOutgoingMethodTab.dial_try_interval + ''} disabled>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={tempOutgoingMethodTab.dial_try_interval} />
               </SelectTrigger>
@@ -244,12 +257,12 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
             <Label className="w-[8.3rem] min-w-[8.3rem]">
               포기호 처리 시간(초)
             </Label>
-            <Select value={tempOutgoingMethodTab.overdial_abandon_time+''} onValueChange={handleAbandonmentTime}>
+            <Select value={tempOutgoingMethodTab.overdial_abandon_time + ''} onValueChange={handleAbandonmentTime}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={tempOutgoingMethodTab.overdial_abandon_time} />
               </SelectTrigger>
               <SelectContent>
-                {["0","2", "3", "4", "5", "6", "7", "10", "15", "20", "30", "60"].map(
+                {["0", "2", "3", "4", "5", "6", "7", "10", "15", "20", "30", "60"].map(
                   (time) => (
                     <SelectItem key={time} value={time}>
                       {time}
@@ -264,7 +277,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
           <div className="flex items-center gap-2 justify-between">
             <Label className="w-[8.3rem] min-w-[8.3rem]">기계음 처리</Label>
             <Select
-              value={tempOutgoingMethodTab.detect_mode+''}
+              value={tempOutgoingMethodTab.detect_mode + ''}
               onValueChange={handleMachineHandling}
             >
               <SelectTrigger className="w-full">
@@ -272,7 +285,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
               </SelectTrigger>
               <SelectContent>
                 {useMachineHandling.map((option) => (
-                  <SelectItem key={option.id} value={option.id+''}>
+                  <SelectItem key={option.id} value={option.id + ''}>
                     {option.name}
                   </SelectItem>
                 ))}
@@ -290,39 +303,39 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
               maxLength={5}
             />
           </div>
-           
+
           {/* 다이얼 모드 옵션 */}
           <div className="flex items-center gap-2 justify-between">
-          <Label className="w-[8.3rem] min-w-[8.3rem]">다이얼 모드 옵션</Label>
-          <Select value={dialModeOption} disabled>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder={dialModeOption} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="default">default</SelectItem>
-            </SelectContent>
-          </Select>
+            <Label className="w-[8.3rem] min-w-[8.3rem]">다이얼 모드 옵션</Label>
+            <Select value={dialModeOption} disabled>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={dialModeOption} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">default</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* 채널그룹 옵션 */}
           <div className="flex items-center gap-2 justify-between">
-          <Label className="w-[8.3rem] min-w-[8.3rem]">채널 그룹 옵션</Label>
-          <Select value={tempOutgoingMethodTab.channel_group_id+''} onValueChange={handleLinkedChannelGroupList}>
-            <SelectTrigger className="w-full">
-            <SelectValue placeholder={''} />
-            </SelectTrigger>
-            <SelectContent>
-                  <SelectItem key={0} value={'0'}>
-                    없음
-                  </SelectItem>
-                  {channelGroupList.map((data) => (
-                  <SelectItem key={data.group_id} value={data.group_id+''}>
+            <Label className="w-[8.3rem] min-w-[8.3rem]">채널 그룹 옵션</Label>
+            <Select value={tempOutgoingMethodTab.channel_group_id + ''} onValueChange={handleLinkedChannelGroupList}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={''} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem key={0} value={'0'}>
+                  없음
+                </SelectItem>
+                {channelGroupList.map((data) => (
+                  <SelectItem key={data.group_id} value={data.group_id + ''}>
                     [{data.group_id}]{data.group_name}
                   </SelectItem>
                 ))
-                  }
-            </SelectContent>
-          </Select>
+                }
+              </SelectContent>
+            </Select>
           </div>
 
         </div>
@@ -331,31 +344,31 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
           {/* 연결 캠페인 */}
           <div className="flex items-center gap-2 justify-between">
             <Label className="w-[8.3rem] min-w-[8.3rem]">연결 캠페인</Label>
-            <Select value={tempOutgoingMethodTab.next_campaign+''} onValueChange={handleLinkedCampaign}>
+            <Select value={tempOutgoingMethodTab.next_campaign + ''} onValueChange={handleLinkedCampaign}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={''} />
               </SelectTrigger>
               <SelectContent>
-                  <SelectItem key={0} value={'0'}>
-                    없음
-                  </SelectItem>
-                  {isNaN(campaignInfo.tenant_id ) ? 
+                <SelectItem key={0} value={'0'}>
+                  없음
+                </SelectItem>
+                {isNaN(campaignInfo.tenant_id) ?
                   campaigns.filter((data) => data.campaign_id !== Number(campaignInfo.campaign_id))
-                  .map((campaign) => (
-                  <SelectItem key={campaign.campaign_id} value={campaign.campaign_id+''}>
-                    [{campaign.campaign_id}]{campaign.campaign_name}
-                  </SelectItem>
-                ))
-                  :campaigns.filter(({ campaign_id, tenant_id }) =>
+                    .map((campaign) => (
+                      <SelectItem key={campaign.campaign_id} value={campaign.campaign_id + ''}>
+                        [{campaign.campaign_id}]{campaign.campaign_name}
+                      </SelectItem>
+                    ))
+                  : campaigns.filter(({ campaign_id, tenant_id }) =>
                     campaign_id !== +campaignInfo.campaign_id &&
                     tenant_id === +campaignInfo.tenant_id
                   )
-                  .map((campaign) => (
-                  <SelectItem key={campaign.campaign_id} value={campaign.campaign_id+''}>
-                    [{campaign.campaign_id}]{campaign.campaign_name}
-                  </SelectItem>
-                ))
-                  }
+                    .map((campaign) => (
+                      <SelectItem key={campaign.campaign_id} value={campaign.campaign_id + ''}>
+                        [{campaign.campaign_id}]{campaign.campaign_name}
+                      </SelectItem>
+                    ))
+                }
               </SelectContent>
             </Select>
           </div>
@@ -399,7 +412,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
           <div className="flex items-center gap-2 justify-between">
             <Label className="w-[8.3rem] min-w-[8.3rem]">상담 결과 등록</Label>
             <Select
-              value={tempOutgoingMethodTab.use_counsel_result+''}
+              value={tempOutgoingMethodTab.use_counsel_result + ''}
               onValueChange={handleUseCounselResult}
             >
               <SelectTrigger className="w-full">
@@ -407,7 +420,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
               </SelectTrigger>
               <SelectContent>
                 {useCounselResultList.map((status) => (
-                  <SelectItem key={status.useCounselResultId} value={status.useCounselResultId+''}>
+                  <SelectItem key={status.useCounselResultId} value={status.useCounselResultId + ''}>
                     {status.useCounselResultName}
                   </SelectItem>
                 ))}
@@ -416,7 +429,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
           </div>
 
           {/* 연결 IVR NO  */}
-            <div className="flex items-center gap-2 justify-between">
+          <div className="flex items-center gap-2 justify-between">
             <Label className="w-[8.3rem] min-w-[8.3rem]">연결 IVR NO</Label>
             <CustomInput
               type="text"
@@ -426,8 +439,8 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
             />
           </div>
 
-                 
-        <div className="flex flex-col items-start gap-4">
+
+          <div className="flex flex-col items-start gap-4">
             <div className="flex items-center gap-2 justify-between">
               <CustomCheckbox
                 id="limit-rate"
@@ -449,8 +462,9 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
                 type="text"
                 value={limitRate}
                 onChange={(e) => handleNumericInput(e, 'setLimitRate')}
-                disabled={!limitRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
-                isPercent={true} // 퍼센트 입력 가능
+                disabled={!limitRateEnabled}
+                isPercent={true}
+                resetKey={campaignInfo.campaign_id} // key 대신 resetKey 사용
               />
             </div>
             <div className="flex items-center gap-2 justify-between">
@@ -462,7 +476,8 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
                   setLimitRateRateEnabled(!checked as boolean);
                   if (checked) {
                     setLimitRate("0"); // 비활성화 시 입력 값 초기화
-                    onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+                    onCampaignOutgoingMethodChange({
+                      ...tempOutgoingMethodTab
                       , changeYn: true
                       , campaignInfoChangeYn: true
                       , user_option: 'limit=0'
@@ -485,10 +500,11 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
                   setLimitRateRateEnabled(!checked as boolean);
                   if (checked) {
                     setLimitRate(""); // 비활성화 시 입력 값 초기화
-                    onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
+                    onCampaignOutgoingMethodChange({
+                      ...tempOutgoingMethodTab
                       , changeYn: true
                       , campaignInfoChangeYn: true
-                      , user_option: '' 
+                      , user_option: ''
                     });
                     setLimitInit(!checked as boolean);
                   }
@@ -504,19 +520,21 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
         </div>
       </div>
 
-      {!(callCampaignMenu == 'NewCampaignManager' || callCampaignMenu == 'CampaignGroupManager' || callCampaignMenu == 'CampaignClone')  &&
-      <div className="flex justify-end gap-2 mt-5">
-        <CommonButton variant="secondary" onClick={()=> 
-          onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
-            , onSave: true
-          })
-        }>확인</CommonButton>
-        <CommonButton variant="secondary" onClick={()=> 
-          onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
-            , onClosed: true
-          })
-        }>취소</CommonButton>
-      </div>
+      {!(callCampaignMenu == 'NewCampaignManager' || callCampaignMenu == 'CampaignGroupManager' || callCampaignMenu == 'CampaignClone') &&
+        <div className="flex justify-end gap-2 mt-5">
+          <CommonButton variant="secondary" onClick={() =>
+            onCampaignOutgoingMethodChange({
+              ...tempOutgoingMethodTab
+              , onSave: true
+            })
+          }>확인</CommonButton>
+          <CommonButton variant="secondary" onClick={() =>
+            onCampaignOutgoingMethodChange({
+              ...tempOutgoingMethodTab
+              , onClosed: true
+            })
+          }>취소</CommonButton>
+        </div>
       }
     </div>
   );
