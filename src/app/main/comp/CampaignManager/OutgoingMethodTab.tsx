@@ -488,7 +488,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
                     onCampaignOutgoingMethodChange({...tempOutgoingMethodTab
                       , changeYn: true
                       , campaignInfoChangeYn: true
-                      , user_option: ''
+                      , user_option: '' 
                     });
                     setLimitInit(!checked as boolean);
                   }

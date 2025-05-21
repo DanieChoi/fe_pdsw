@@ -16,6 +16,7 @@ import CustomAlert, { CustomAlertRequest } from "@/components/shared/layout/Cust
 import { MainDataResponse } from "@/features/auth/types/mainIndex";
 import CustomInputForTime from "@/components/shared/CustomInputForTime";
 import { CalendarHeadless } from "@/components/shared/CalendarRadix";
+import { toast } from "react-toastify";
 
 interface DataProps {
   no: number;
@@ -206,6 +207,18 @@ const OperationTimeTab: React.FC<Props> = ({
     }
   ];
 
+  // 시간 구간 겹침 검사 함수
+  function isTimeOverlap(start: string, end: string, data: DataProps[]) {
+    const newStart = parseInt(start, 10);
+    const newEnd = parseInt(end, 10);
+    return data.some(item => {
+      const existStart = parseInt(item.startTime.replace(":", ""), 10);
+      const existEnd = parseInt(item.endTime.replace(":", ""), 10);
+      // 구간이 겹치는지 검사
+      return !(newEnd <= existStart || newStart >= existEnd);
+    });
+  }
+
   return (
     <div className="pt-[20px]">
       <div className="flex gap-[30px]">
@@ -340,9 +353,7 @@ const OperationTimeTab: React.FC<Props> = ({
                     variant="secondary"
                     disabled={!isValidForStartAndEndTime}
                     onClick={() => {
-                      // 필수 입력 및 기본 유효성 검사
                       if (startTime.length === 4 && endTime.length === 4) {
-                        // 24시간 범위를 벗어난 경우
                         if (!isTimeFormatValid(startTime) || !isTimeFormatValid(endTime)) {
                           setAlertState({
                             ...alertState,
@@ -351,7 +362,6 @@ const OperationTimeTab: React.FC<Props> = ({
                           });
                           return;
                         }
-                        // 시작시간/종료시간 추가 유효성 검사 (예: "1112" 무효 처리)
                         if (!validateTime(startTime) || !validateTime(endTime)) {
                           setAlertState({
                             ...alertState,
@@ -360,7 +370,6 @@ const OperationTimeTab: React.FC<Props> = ({
                           });
                           return;
                         }
-                        // 시작시간이 종료시간보다 늦은 경우
                         if (startTime > endTime) {
                           setAlertState({
                             ...alertState,
@@ -369,7 +378,6 @@ const OperationTimeTab: React.FC<Props> = ({
                           });
                           return;
                         }
-                        // 시작시간이 종료시간 같은 경우
                         if (startTime === endTime) {
                           setAlertState({
                             ...alertState,
@@ -378,6 +386,12 @@ const OperationTimeTab: React.FC<Props> = ({
                           });
                           return;
                         }
+                        // === 겹치는 시간 구간 검사 추가 ===
+                        if (isTimeOverlap(startTime, endTime, tempData)) {
+                          toast.error("기존에 등록된 시간과 겹칩니다.");
+                          return;
+                        }
+                        // === 기존 동일 시간 검사 ===
                         let check = false;
                         const tempStartTime: string[] = [];
                         const tempEndTime: string[] = [];
@@ -411,14 +425,8 @@ const OperationTimeTab: React.FC<Props> = ({
                             {
                               no: prev.length + 1,
                               division: prev.length + 1,
-                              startTime:
-                                startTime.substring(0, 2) +
-                                ":" +
-                                startTime.substring(2, 4),
-                              endTime:
-                                endTime.substring(0, 2) +
-                                ":" +
-                                endTime.substring(2, 4),
+                              startTime: startTime.substring(0, 2) + ":" + startTime.substring(2, 4),
+                              endTime: endTime.substring(0, 2) + ":" + endTime.substring(2, 4),
                             },
                           ]);
                           setStartTime("");
