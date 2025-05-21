@@ -228,7 +228,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         </div>
 
         <div>
-          <TitleWrap title="표시방법" />
+          <TitleWrap title="표시 방법" />
           <CommonRadio 
             className="flex gap-8 pl-4" 
             value={viewType} 
@@ -246,7 +246,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
         </div>
 
         <div className="flex-1 h-full">
-          <TitleWrap title="발신구분" />
+          <TitleWrap title="발신 구분" />
           <div className="border rounded overflow-y-auto h-[calc(100%-20px)]">
             <table className="w-full text-sm border-collapse">
               <tbody>
@@ -267,7 +267,7 @@ const CampaignMonitorDashboard: React.FC<CampaignMonitorDashboardProps> = ({ cam
                     }`}
                   >
                     <td className="border-b border-r px-3 py-1">
-                      {index === 0 ? '최초발신' : index + '번째 재발신'}
+                      {index === 0 ? '최초 발신' : index + '번째 재발신'}
                     </td>
                   </tr>
                 )) : (

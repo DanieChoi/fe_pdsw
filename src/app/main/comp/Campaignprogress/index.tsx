@@ -221,7 +221,7 @@ export default function Campaignprogress() {
         } else if (row.level === 1) {
           displayName = `테넌트: ${row.id.split('-')[1]}`;
         } else if (row.level === 2) {
-          displayName = `캠페인 아이디: ${row.id.split('-')[1]}`;
+          displayName = `캠페인 ID: ${row.id.split('-')[1]}`;
         } else {
           displayName = row.campaignName;
         }
@@ -419,7 +419,7 @@ export default function Campaignprogress() {
 
     // Add the headers
     // const headers = _columns.map(col => col.name);
-    const headers = ['센터', '테넌트', '캠페인 아이디', ..._columns.map(col => col.name)];
+    const headers = ['센터', '테넌트', '캠페인 ID', ..._columns.map(col => col.name)];
 
     // Create the worksheet
     const ws = XLSX.utils.aoa_to_sheet([headers, ...tempList]);
@@ -531,7 +531,7 @@ export default function Campaignprogress() {
       if (tempList.length > 0) {
         const tempDataList: DispatchStatusDataType[] = tempList.map((item, i) => ({
           ...item
-          , strFlag: i === 0 ? '최초발신' : `${i}번째 재발신`
+          , strFlag: i === 0 ? '최초 발신' : `${i}번째 재발신`
           , senderId: i
           , startFlag: tempCampaignList[selectedCampaignIdIndex].start_flag === 1 ? '시작' : tempCampaignList[selectedCampaignIdIndex].start_flag === 2 ? '멈춤' : '중지'
           , endFlag: tempCampaignList[selectedCampaignIdIndex].end_flag === 1 ? '진행중' : '완료'
@@ -553,7 +553,7 @@ export default function Campaignprogress() {
       } else {
         const tempData: DispatchStatusDataType = {
           ...initDispatchStatusData
-          , strFlag: '최초발신'
+          , strFlag: '최초 발신'
           , tenantId: tempCampaignList[selectedCampaignIdIndex].tenant_id
           , campId: tempCampaignList[selectedCampaignIdIndex].campaign_id
           , startFlag: tempCampaignList[selectedCampaignIdIndex].start_flag === 1 ? '시작' : tempCampaignList[selectedCampaignIdIndex].start_flag === 2 ? '멈춤' : '중지'
@@ -695,7 +695,7 @@ export default function Campaignprogress() {
             <div className="w-[120px]">
               <Select value={selectedCampaign} onValueChange={handleCampaignChange}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="전체보기" />
+                  <SelectValue placeholder="전체 보기" />
                 </SelectTrigger>
                 <SelectContent style={{ maxHeight: '300px', overflowY: 'auto' }}>
                   <SelectItem value="전체보기">캠페인 전체</SelectItem>
@@ -716,7 +716,7 @@ export default function Campaignprogress() {
                   <SelectValue placeholder="total" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="total">스킬전체보기</SelectItem>
+                  <SelectItem value="total">스킬 전체 보기</SelectItem>
                   {skills.map(skill => (
                     <SelectItem key={skill.skill_id} value={skill.skill_id.toString()}>
                       {skill.skill_name}
@@ -774,7 +774,9 @@ export default function Campaignprogress() {
           </CommonButton>
 
           <CommonButton variant="secondary" onClick={handleExcelDownload}>엑셀로 저장</CommonButton>
-          <CommonButton variant="secondary" onClick={() => setIsColumnSetOpen(true)}>칼럼 설정</CommonButton>
+          <CommonButton variant="secondary" onClick={() => setIsColumnSetOpen(true)}>
+            컬럼 설정
+          </CommonButton>
 
         </div>
       </div>

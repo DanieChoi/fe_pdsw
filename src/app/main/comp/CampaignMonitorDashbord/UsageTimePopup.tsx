@@ -52,14 +52,14 @@ const UsageTimePopup: React.FC<UsageTimePopupProps> = ({ campaignIdList,dialKind
   const columns = [
     { 
       key: 'startTime', 
-      name: '시작시각',
+      name: '시작 시각',
       headerCellClass: 'text-center', // 헤더 중앙정렬
       cellClass: 'text-center px-4',  // 셀 중앙정렬 및 가로 여백
       width: 170,
     },
     { 
       key: 'endTime', 
-      name: '종료시각',
+      name: '종료 시각',
       headerCellClass: 'text-center', // 헤더 중앙정렬
       cellClass: 'text-center px-4',  // 셀 중앙정렬 및 가로 여백
       width: 170,
@@ -72,13 +72,13 @@ const UsageTimePopup: React.FC<UsageTimePopupProps> = ({ campaignIdList,dialKind
     },
     { 
       key: 'calls', 
-      name: '발신건수',
+      name: '발신 건수',
       headerCellClass: 'text-center', // 헤더 중앙정렬
       cellClass: 'text-center px-4',  // 셀 중앙정렬 및 가로 여백
     },
     { 
       key: 'success', 
-      name: '성공건수',
+      name: '성공 건수',
       headerCellClass: 'text-center', // 헤더 중앙정렬
       cellClass: 'text-center px-4',  // 셀 중앙정렬 및 가로 여백
     }
@@ -131,7 +131,7 @@ const UsageTimePopup: React.FC<UsageTimePopupProps> = ({ campaignIdList,dialKind
   return (
     <CustomAlert
       isOpen={isOpen}
-      title="캠페인 사용시간"
+      title="캠페인 사용 시간"
       message={modalContent}
       type="2"
       onClose={onClose}
