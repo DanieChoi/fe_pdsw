@@ -36,7 +36,7 @@ const ISelectorForTeanantForCreateNewCampaign = ({ tenantId, onChange }: Props) 
         value={selectedTenantId}
       >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="테넌트를 선택하세요" />
+          <SelectValue placeholder="테넌트를 선택해 주세요" />
         </SelectTrigger>
         <SelectContent>
           {tenants.map(option => (

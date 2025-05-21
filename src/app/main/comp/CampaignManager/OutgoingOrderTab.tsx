@@ -10,11 +10,11 @@ import { OutgoingOrderTabParam } from './CampaignManagerDetail';
 import { CampaignInfo } from "../CreateCampaignFormPanel/variables/variablesForCreateCampaignForm";
 
 const columns = [
-  { key: "phone1", name: "고객전화번호(1)" },
-  { key: "phone2", name: "고객전화번호(2)" },
-  { key: "phone3", name: "고객전화번호(3)" },
-  { key: "phone4", name: "고객전화번호(4)" },
-  { key: "phone5", name: "고객전화번호(5)" },
+  { key: "phone1", name: "고객 전화번호(1)" },
+  { key: "phone2", name: "고객 전화번호(2)" },
+  { key: "phone3", name: "고객 전화번호(3)" },
+  { key: "phone4", name: "고객 전화번호(4)" },
+  { key: "phone5", name: "고객 전화번호(5)" },
 ];
 
 interface DataProps {

@@ -195,8 +195,8 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
         , phone_order: value.phone_order
       });
       // setTempCampaignManagerInfo({
-      //   ...tempCampaignManagerInfo
-      //   , dial_phone_id: Number(value.dial_phone_id)
+      //   ...tempCampaignManagerInfo,
+      //   dial_phone_id: Number(value.dial_phone_id)
       //   , phone_dial_try1: value.phone_dial_try[0]
       //   , phone_dial_try2: value.phone_dial_try[1]
       //   , phone_dial_try3: value.phone_dial_try[2]
@@ -440,19 +440,18 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
       setAlertState({
         ...errorMessage,
         isOpen: true,
-        message: "시작시간 또는 종료시간을 지정해 주세요.",
+        message: "시작 시간 또는 종료 시간을 지정해 주세요.",
         type: '2',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
 
-    //2018.11.27 Gideon #23127 캠페인 수정창 연결 IVR 입력 예외 처리
     if (!saveErrorCheck && tempCampaignInfo.power_divert_queue === '0' || tempCampaignInfo.power_divert_queue === '') {
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
         isOpen: true,
-        message: "'발신 방법' 탭의 '연결 IVR NO' 값을 입력해 주시기 바랍니다.",
+        message: "'발신 방법' 탭의 '연결 IVR 번호' 값을 입력해 주세요.",
         type: '2',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
@@ -564,7 +563,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
       <div>
         <TitleWrap
           className='border-b border-gray-300 pb-1'
-          title="캠페인정보"
+          title="캠페인 정보"
           buttons={[
             { label: "캠페인 생성", onClick: () => handleCampaignSave() },
             { label: "생성 취소", onClick: () => handleCampaignClosed() },

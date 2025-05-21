@@ -43,18 +43,21 @@ const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
     const inputRef = React.useRef<HTMLInputElement>(null);
     const combinedRef = useCombinedRefs(ref, inputRef);
     const [localError, setLocalError] = React.useState<string | undefined>(error);
-
-    const stringValue =
-      typeof value === "number" || typeof value === "string"
-        ? String(value)
-        : "";
-
-    // Update local error when prop changes
+    
+    // 리로딩 또는 컴포넌트 마운트 시 에러 메시지 초기화
     React.useEffect(() => {
-      setLocalError(error);
-      // Focus the input when an error is set
-      if (error && inputRef.current) {
-        inputRef.current.focus();
+      setLocalError(undefined);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // 외부에서 전달된 error prop이 변경될 때 localError 업데이트
+    React.useEffect(() => {
+      if (error !== undefined) {
+        setLocalError(error);
+        // Focus the input when an error is set
+        if (error && inputRef.current) {
+          inputRef.current.focus();
+        }
       }
     }, [error]);
 
@@ -133,6 +136,12 @@ const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
 
       props.onBlur?.(e);
     };
+
+    // Ensure value is always a string for the input
+    const stringValue =
+      typeof value === "number" || typeof value === "string"
+        ? String(value)
+        : "";
 
     return (
       <div className="relative w-full">
