@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { ApiError, SuccesResponse, SuspendedCampaignListResponse, SuspendedSkillListResponse } from "../types/SystemPreferences";
 import { fetchDeleteSuspendedCampaign, fetchDeleteSuspendedSkill, fetchSuspendedCampaignList, fetchSuspendedSkillList } from "../api/apiForsuspendView";
 
-// 서스팬드 캠페인 조회
+// 서스펜드 캠페인 조회
 export function useApiForSuspendedCampaignList (
     options?: UseMutationOptions<SuspendedCampaignListResponse, ApiError>
 ) {
@@ -18,7 +18,7 @@ export function useApiForSuspendedCampaignList (
     });
 }
 
-// 서스팬드 캠페인 삭제
+// 서스펜드 캠페인 삭제
 export function useApiForDeleteSuspendedCampaign (
     options?: UseMutationOptions<SuccesResponse, ApiError, unknown>
 ) {
@@ -34,7 +34,7 @@ export function useApiForDeleteSuspendedCampaign (
     });
 }
 
-// 서스팬드 스킬 조회
+// 서스펜드 스킬 조회
 export function useApiForSuspendedSkillList (
     options?: UseMutationOptions<SuspendedSkillListResponse, ApiError, unknown>
 ) {
@@ -50,7 +50,7 @@ export function useApiForSuspendedSkillList (
     });
 }
 
-// 서스팬드 스킬킬 삭제
+// 서스펜드 스킬킬 삭제
 export function useApiForDeleteSuspendedSkill (
     options?: UseMutationOptions<SuccesResponse, ApiError, unknown>
 ) {

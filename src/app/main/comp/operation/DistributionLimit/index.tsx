@@ -1030,7 +1030,7 @@ const DistributionLimit = () => {
         agentIds = [contextMenu.agentId];
       }
     } else if (contextMenu.level === 2) {
-      // 상담파트 전체 삭제 - 분배호수가 설정된 상담사만 삭제
+      // 상담 파트 전체 삭제 - 분배호수가 설정된 상담사만 삭제
       confirmMessage = `파트 ${contextMenu.part} 의 할당된 콜수를 삭제하시겠습니까?`;
       
       // 파트에 속한 상담사 중 최대분배호수가 0보다 큰 상담사만 ID 수집
@@ -1043,7 +1043,7 @@ const DistributionLimit = () => {
         .map(agent => agent.agent_id);
         
     } else if (contextMenu.level === 1) {
-      // 상담그룹 전체 삭제 - 분배호수가 설정된 상담사만 삭제
+      // 상담 그룹 전체 삭제 - 분배호수가 설정된 상담사만 삭제
       confirmMessage = `그룹 ${contextMenu.group} 의 할당된 콜수를 삭제하시겠습니까?`;
       
       // 그룹에 속한 상담사 중 최대분배호수가 0보다 큰 상담사만 ID 수집
@@ -1171,13 +1171,13 @@ const DistributionLimit = () => {
     let targetAgents: Row[] = [];
     
     if (bulkLimitModal.targetLevel === 1) {
-      // 상담그룹에 속한 모든 상담사만 정확히 필터링
+      // 상담 그룹에 속한 모든 상담사만 정확히 필터링
       targetAgents = rawAgentData.filter(agent => 
         agent.group === bulkLimitModal.targetGroup
       );
       // console.log(`그룹 ${bulkLimitModal.targetGroup}에 속한 상담사 ${targetAgents.length}명 선택됨`);
     } else if (bulkLimitModal.targetLevel === 2) {
-      // 상담파트에 속한 모든 상담사만 정확히 필터링
+      // 상담 파트에 속한 모든 상담사만 정확히 필터링
       targetAgents = rawAgentData.filter(agent => 
         agent.part === bulkLimitModal.targetPart
       );
@@ -1355,9 +1355,9 @@ const DistributionLimit = () => {
         if (row.level === 0) {
           hierarchyContent = `센터: ${row.center}`;
         } else if (row.level === 1) {
-          hierarchyContent = `상담그룹: ${row.group}`;
+          hierarchyContent = `상담 그룹: ${row.group}`;
         } else if (row.level === 2) {
-          hierarchyContent = `상담파트: ${row.part}`;
+          hierarchyContent = `상담 파트: ${row.part}`;
         } else if (row.level === 3) {
           // 상담사 레벨에서는 계층 표시 없이 센터 값만 보여줌
           return <div style={{ marginLeft: `${indent}px` }}>{centerContent}</div>;
@@ -1397,7 +1397,7 @@ const DistributionLimit = () => {
     },
     { 
       key: 'group', 
-      name: '상담그룹',
+      name: '상담 그룹',
       renderCell: ({ row }: { row: Row }) => {
         // 상담사 행에만 데이터 표시
         return row.level === 3 ? row.group : '';
@@ -1405,7 +1405,7 @@ const DistributionLimit = () => {
     },
     { 
       key: 'part', 
-      name: '상담파트',
+      name: '상담 파트',
       renderCell: ({ row }: { row: Row }) => {
         // 상담사 행에만 데이터 표시
         return row.level === 3 ? row.part : '';
@@ -1542,7 +1542,7 @@ const DistributionLimit = () => {
               onValueChange={handleCampaignIdChange}
             >
               <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="캠페인선택" />
+                <SelectValue placeholder="캠페인 선택" />
               </SelectTrigger>
               <SelectContent style={{ maxHeight: '300px', overflowY: 'auto' }}> 
                 {campaigns.map(campaign => (

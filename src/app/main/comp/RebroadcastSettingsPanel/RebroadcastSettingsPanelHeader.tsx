@@ -162,7 +162,7 @@ const RebroadcastSettingsPanelHeader = ({
                     <Label className="w-20 min-w-20">캠페인 아이디</Label>
                     <Select defaultValue='0' value={headerCampaignId} onValueChange={setHeaderCampaignId} disabled>
                         <SelectTrigger className="w-[140px]">
-                            <SelectValue placeholder="캠페인선택" />
+                            <SelectValue placeholder="캠페인 선택" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem key='0' value='0'>-선택-</SelectItem>

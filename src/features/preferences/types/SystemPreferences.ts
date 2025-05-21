@@ -399,7 +399,7 @@ export interface CampaignSkillListResponse {
   result_data: CampaignSkillDataResponse[];
 }
 
-// 서스팬드 캠페인 조회
+// 서스펜드 캠페인 조회
 export interface SuspendedCampaignListResponse {
   result_code: number;
   result_msg: string;
@@ -411,7 +411,7 @@ export interface SuspendedCampaignListResponse {
   ]
 }
 
-// 서스팬드 스킬 조회
+// 서스펜드 스킬 조회
 export interface SuspendedSkillListResponse {
   result_code: number;
   result_msg: string;

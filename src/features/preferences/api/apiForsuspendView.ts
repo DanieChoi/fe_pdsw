@@ -1,7 +1,7 @@
 import { SuccesResponse, SuspendedCampaignListResponse, SuspendedSkillListResponse } from "../types/SystemPreferences";
 import { axiosInstance } from "@/lib/axios";
 
-// 서스팬드 캠페인 조회
+// 서스펜드 캠페인 조회
 export const fetchSuspendedCampaignList = async (): Promise<SuspendedCampaignListResponse> => {
     const suspendedCampaignRequestData = {
         filter: {
@@ -23,7 +23,7 @@ export const fetchSuspendedCampaignList = async (): Promise<SuspendedCampaignLis
     }
 }
 
-// 서스팬드 캠페인 삭제
+// 서스펜드 캠페인 삭제
 export const fetchDeleteSuspendedCampaign = async (campaign_id: number): Promise<SuccesResponse> => {
     try {
         const { data } = await axiosInstance.delete<SuccesResponse>(
@@ -45,7 +45,7 @@ export const fetchDeleteSuspendedCampaign = async (campaign_id: number): Promise
     }
 }
 
-// 서스팬드 스킬 조회
+// 서스펜드 스킬 조회
 export const fetchSuspendedSkillList = async (): Promise<SuspendedSkillListResponse> => {
     const suspendedSkillRequestData = {
         filter: {
@@ -67,7 +67,7 @@ export const fetchSuspendedSkillList = async (): Promise<SuspendedSkillListRespo
     }
 }
 
-// 서스팬드 스킬 삭제
+// 서스펜드 스킬 삭제
 export const fetchDeleteSuspendedSkill = async (skill_id: number): Promise<SuccesResponse> => {
     try {
         const { data } = await axiosInstance.delete<SuccesResponse>(

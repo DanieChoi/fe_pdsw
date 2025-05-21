@@ -13,7 +13,7 @@ export const menuItems: MenuItem[] = [
   { 
     id: 1,
     menuId: 1,
-    title: '캠페인 그룹관리', 
+    title: '캠페인 그룹 관리', 
     icon: '/header-menu/캠페인그룹관리.svg', 
     href: '/main',
     content: null
@@ -29,7 +29,7 @@ export const menuItems: MenuItem[] = [
   { 
     id: 3,
     menuId: 3,
-    title: '통합모니터', 
+    title: '통합 모니터', 
     icon: '/header-menu/통합모니터.svg', 
     href: '/monitor',
     content: null
@@ -37,7 +37,7 @@ export const menuItems: MenuItem[] = [
   { 
     id: 4,
     menuId: 4,
-    title: '총진행상황', 
+    title: '총 진행 상황', 
     icon: '/header-menu/총진행상황.svg', 
     href: '/status',
     content: null
@@ -45,7 +45,7 @@ export const menuItems: MenuItem[] = [
   { 
     id: 5,
     menuId: 5,
-    title: '발신진행상태', 
+    title: '발신 진행 상태', 
     icon: '/header-menu/발신진행상태.svg', 
     href: '/call',
     content: null
@@ -53,7 +53,7 @@ export const menuItems: MenuItem[] = [
   { 
     id: 14,
     menuId: 6,
-    title: '캠페인별상태', 
+    title: '캠페인별 상태', 
     icon: '/header-menu/캠페인별상태.svg', 
     href: '/chartCampaign',
     content: null
@@ -85,7 +85,7 @@ export const menuItems: MenuItem[] = [
   { 
     id: 8,
     menuId: 10,
-    title: '예약콜 제한 설정', 
+    title: '예약 콜 제한 설정', 
     icon: '/header-menu/예약콜제한설정.svg', 
     href: '/reserve',
     content: null
@@ -93,7 +93,7 @@ export const menuItems: MenuItem[] = [
   { 
     id: 9,
     menuId: 11,
-    title: '분배호수 제한 설정', 
+    title: '분배 호수 제한 설정', 
     icon: '/header-menu/분배호수제한설정.svg', 
     href: '/distribute',
     content: null

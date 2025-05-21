@@ -56,10 +56,10 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, onDelete, onChangeBulkL
   
   // 각 레벨에 따라 다른 텍스트 표시
   if (level === 1) {
-    // menuText = "상담그룹 분배제한 정보 삭제";
+    // menuText = "상담 그룹 분배제한 정보 삭제";
     menuText = "분배제한 정보 삭제";
   } else if (level === 2) {
-    // menuText = "상담파트 분배제한 정보 삭제";
+    // menuText = "상담 파트 분배제한 정보 삭제";
     menuText = "분배제한 정보 삭제";
   } else if (level === 3) {
     menuText = "분배제한 정보 삭제";
@@ -78,7 +78,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, onDelete, onChangeBulkL
         width: 'auto'
       }}
     >
-      {/* 레벨 1(상담그룹)과 레벨 2(상담파트)인 경우만 최대분배호수 일괄 변경 메뉴 표시 */}
+      {/* 레벨 1(상담 그룹)과 레벨 2(상담 파트)인 경우만 최대분배호수 일괄 변경 메뉴 표시 */}
       {(level === 1 || level === 2) && (
         <div
           className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center text-blue-600"

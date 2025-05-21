@@ -86,47 +86,47 @@ const SuspendView = () => {
     setAlertState(prev => ({ ...prev, isOpen: false }));
   };
 
-  // 서스팬드 캠페인 조회
+  // 서스펜드 캠페인 조회
   const { mutate: fetchSuspendedCampaignList } = useApiForSuspendedCampaignList({
     onSuccess: (data) => {
       setSuspendedCampaigns(data.result_data || []);
       setSelectedRows(new Set());
     },
     onError: (error) => {      
-      ServerErrorCheck('서스팬드 캠페인 조회', error.message);
+      ServerErrorCheck('서스펜드 캠페인 조회', error.message);
     }
   });
 
-  // 서스팬드 캠페인 삭제
+  // 서스펜드 캠페인 삭제
   const { mutate: deleteSuspendedCampaign } = useApiForDeleteSuspendedCampaign({
     onSuccess: (data) => {
       showAlert('삭제가 완료되었습니다.');
       fetchSuspendedCampaignList();
     },
     onError: (error) => {      
-      ServerErrorCheck('서스팬드 캠페인 삭제', error.message);
+      ServerErrorCheck('서스펜드 캠페인 삭제', error.message);
     }
   });
 
-  // 서스팬드 스킬 조회
+  // 서스펜드 스킬 조회
   const { mutate: fetchSuspendedSkillList } = useApiForSuspendedSkillList({
     onSuccess: (data) => {
       setSuspendedSkills(data.result_data || []);
       setSelectedRows(new Set());
     },
     onError: (error) => {      
-      ServerErrorCheck('서스팬드 스킬 조회', error.message);
+      ServerErrorCheck('서스펜드 스킬 조회', error.message);
     }
   });
 
-  // 서스팬드 스킬 삭제
+  // 서스펜드 스킬 삭제
   const { mutate: deleteSuspendedSkill } = useApiForDeleteSuspendedSkill({
     onSuccess: (data) => {
       showAlert('삭제가 완료되었습니다.');
       fetchSuspendedSkillList();
     },
     onError: (error) => {      
-      ServerErrorCheck('서스팬드 스킬 삭제', error.message);
+      ServerErrorCheck('서스펜드 스킬 삭제', error.message);
     }
   });
 

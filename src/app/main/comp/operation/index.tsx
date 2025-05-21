@@ -38,7 +38,7 @@
 //     { id: 'section4', title: '분배호수 제한 설정', component: DistributionLimit },
 //     { id: 'section5', title: '스킬편집', component: SkillEdit },
 //     // { id: 'section6', title: '상담 결과코드 설정', component: ConsultResultSetting },
-//     { id: 'section7', title: '서스팬드', component: SuspendView },
+//     { id: 'section7', title: '서스펜드', component: SuspendView },
 //   ]
 
 //   return (
@@ -137,7 +137,7 @@
 //     { id: 'section4', title: '분배호수 제한 설정', component: DistributionLimit },
 //     { id: 'section5', title: '스킬편집', component: SkillEdit },
 //     // { id: 'section6', title: '상담 결과코드 설정', component: ConsultResultSetting },
-//     { id: 'section7', title: '서스팬드', component: SuspendView },
+//     { id: 'section7', title: '서스펜드', component: SuspendView },
 //   ]
 
 //   return (
@@ -267,7 +267,7 @@ export default function OperationBoard({ uniqueKey }: OperationBoardProps) {
     { id: 'section5', title: '스킬편집', component: SkillEdit },
     { id: 'section6', title: '채널그룹 설정', component: ChannelGroupSetting },
     // { id: 'section6', title: '상담 결과코드 설정', component: ConsultResultSetting },
-    { id: 'section7', title: '서스팬드', component: SuspendView },
+    { id: 'section7', title: '서스펜드', component: SuspendView },
   ]
 
   return (
