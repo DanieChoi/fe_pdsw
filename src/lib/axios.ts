@@ -794,27 +794,32 @@ axiosInstance.interceptors.response.use(
           queryType = 'D';
         }
       }
-      const logData = {
-          "tenantId": Number(getCookie('tenant_id')),
-          "employeeId": userId,
-          "userHost": getCookie('userHost'),
-          "queryId": error.config.url,
-          "queryType": queryType,
-          "activation": activation,
-          "description": error.message,
-          "successFlag": 0,
-          "eventName": eventName,
-          "queryRows": 0,
-          "targetId": error.config.url||0,
-          "userSessionType": 0,
-          "exportFlag": 1,
-          "memo": "",
-          "updateEmployeeId": userId
-      };
-      const { data } = await axiosRedisInstance.post<{code:string;message:string;}>(
-        `/log/save`,
-        logData 
-      );
+      
+      if( error.status === 400 ){      
+        customAlertService.error(activation + ' 요청이 실패하였습니다. PDS 서버 시스템에 확인하여 주십시오.', 'PDS 서버오류', () => {});
+      }else{
+        const logData = {
+            "tenantId": Number(getCookie('tenant_id')),
+            "employeeId": userId,
+            "userHost": getCookie('userHost'),
+            "queryId": error.config.url,
+            "queryType": queryType,
+            "activation": activation,
+            "description": error.message,
+            "successFlag": 0,
+            "eventName": eventName,
+            "queryRows": 0,
+            "targetId": error.config.url||0,
+            "userSessionType": 0,
+            "exportFlag": 1,
+            "memo": "",
+            "updateEmployeeId": userId
+        };
+        const { data } = await axiosRedisInstance.post<{code:string;message:string;}>(
+          `/log/save`,
+          logData 
+        );
+      }
     }
     if (error.response?.status === 401) {
       logoutFunction({ portcheck: false });
