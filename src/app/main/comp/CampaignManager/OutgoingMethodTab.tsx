@@ -452,7 +452,6 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
                 disabled={!limitRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
                 isPercent={true} // 퍼센트 입력 가능
               />
-              %
             </div>
             <div className="flex items-center gap-2 justify-between">
               <CustomCheckbox
