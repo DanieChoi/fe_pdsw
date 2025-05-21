@@ -256,7 +256,7 @@ const OperationTimeTab: React.FC<Props> = ({
             </div>
 
             <div className="flex items-center gap-[10px] justify-between">
-              <Label className="w-[70px] min-w-[70px]">시작날짜</Label>
+              <Label className="w-[70px] min-w-[70px]">시작 날짜</Label>
               <CalendarHeadless
                 date={new Date(
                   `${tempCampaignSchedule.start_date.substring(0, 4)}-${tempCampaignSchedule.start_date.substring(4, 6)}-${tempCampaignSchedule.start_date.substring(6, 8)}`
@@ -284,7 +284,7 @@ const OperationTimeTab: React.FC<Props> = ({
             </div>
 
             <div className="flex items-center gap-[10px] justify-between">
-              <Label className="w-[70px] min-w-[70px]">종료날짜</Label>
+              <Label className="w-[70px] min-w-[70px]">종료 날짜</Label>
               <CalendarHeadless
                 date={new Date(
                   `${tempCampaignSchedule.end_date.substring(0, 4)}-${tempCampaignSchedule.end_date.substring(4, 6)}-${tempCampaignSchedule.end_date.substring(6, 8)}`
@@ -374,7 +374,7 @@ const OperationTimeTab: React.FC<Props> = ({
                           setAlertState({
                             ...alertState,
                             isOpen: true,
-                            message: "종료시간 설정이 잘못 되었습니다.",
+                            message: "종료시간 설정이 잘못되었습니다.",
                           });
                           return;
                         }
