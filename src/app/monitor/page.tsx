@@ -22,7 +22,7 @@ import { CheckCampaignSaveReturnCode, UpdataCampaignInfo } from '@/components/co
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { useApiForDialSpeedUpdate } from '@/features/campaignManager/hooks/useApiForDialSpeedUpdate';
-import { campaignChannel } from '@/lib/broadcastChannel';
+import { campaignChannel, logoutChannel } from '@/lib/broadcastChannel';
 import { toast } from 'react-toastify';
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
 import CounsellorGroupActions from '@/components/shared/layout/comp/TabActions/CounsellorGroupActions';
@@ -315,16 +315,25 @@ const MonitorPage = () => {
         session_key: '',
         tenant_id: tenant_id,
       });
-    }, onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        if (window.opener) {
-          window.opener.postMessage({ type: "sessionFailed" }, "*");
-          // 자기 자신 닫기
+    }, 
+    onError: (error) => {
+      if(window.opener){
+        if(error.message.split('||')[0] === '5'){
+          logoutChannel.postMessage({
+            type: 'logout',
+            message: error.message,
+          });
           window.close();
-        }  
-      } else if (error.message.split('||')[0] !== '200') {
-        console.log('캠페인 상태 변경 실패 :', error);
-      }
+        }else{
+          setAlertState({
+            ...alertState,
+            isOpen: true,
+            message: "캠페인 상태 변경 요청이 실패하였습니다. \nPDS 서버 시스템에 확인하여 주십시오.",
+            title: "알림",
+          });
+          // console.log('캠페인 상태 변경 실패',error.message);
+        }
+      } 
     }
   });
 
@@ -350,20 +359,23 @@ const MonitorPage = () => {
       
 
     }, onError: (error) => {
-      // ### error 수정하자 
-      if (error.message.split('||')[0] === '5') {
-        if (window.opener) {
-          window.opener.postMessage({ type: "sessionFailed" }, "*");
-          // 자기 자신 닫기
+      if(window.opener){
+        if(error.message.split('||')[0] === '5'){
+          logoutChannel.postMessage({
+            type: 'logout',
+            message: error.message,
+          });
           window.close();
-          
-        }  
-      } else if(error.message.split('||')[0] !== '200') {
-        
-        window.close();
-        window.opener.ServerCheckError('캠페인 발신 속도 수정', error.message);
-
-      }
+        }else{
+          setAlertState({
+            ...alertState,
+            isOpen: true,
+            message: "캠페인 발신 속도 수정 요청이 실패하였습니다. \nPDS 서버 시스템에 확인하여 주십시오.",
+            title: "알림",
+          });
+          // console.log('캠페인 발신 속도 수정 실패',error.message);
+        }
+      } 
     }
   });
 
@@ -383,25 +395,60 @@ const MonitorPage = () => {
           tenant_id: tenant_id,
         });
       } // end of if result_code
+      else {
+        console.log('통합 모니터링 캠페인 스킬 수정 실패 :', data);
+
+      }
     },
-    onError: (data) => {
+    onError: (error) => {
       // 세션이 만료되었을때 팝업창을 닫는 로직처리를 위한 것
-      if (data.message.split('||')[0] === '5') {
-        if (window.opener) {
-          window.opener.postMessage({ type: "sessionFailed" }, "*");
-          // 자기 자신 닫기
+      if(window.opener){
+        if(error.message.split('||')[0] === '5'){
+          logoutChannel.postMessage({
+            type: 'logout',
+            message: error.message,
+          });
           window.close();
-        }  
+        }else{
+          setAlertState({
+            ...alertState,
+            isOpen: true,
+            message: "캠페인 스킬 수정 요청이 실패하였습니다. \nPDS 서버 시스템에 확인하여 주십시오.",
+            title: "알림",
+          });
+          // console.log('캠페인 스킬 수정 실패',error.message);
+        }
       }
     }
   });
 
+  // 캠페인 마스터 수정 API 호출(캠페인 상태변경시 강제로 변경 할 경우 마스터수정)
   const { mutate: fetchCampaignManagerUpdate } = useApiForCampaignManagerUpdate({
       onSuccess: (data,variables) => {
-          
+          if(data.result_code === 0){
+            
+          } else{
+            console.log('통합 모니터링 캠페인 마스터 수정 실패 :', data);
+          }
       },
-      onError: (data) => {
-          //ServerErrorCheck('캠페인 채널그룹 할당 해제', data.message);
+      onError: (error) => {
+        if(window.opener){
+          if(error.message.split('||')[0] === '5'){
+            logoutChannel.postMessage({
+              type: 'logout',
+              message: error.message,
+            });
+            window.close();
+          }else{
+            setAlertState({
+              ...alertState,
+              isOpen: true,
+              message: "캠페인 마스터 수정 요청이 실패하였습니다. \nPDS 서버 시스템에 확인하여 주십시오.",
+              title: "알림",
+            });
+            // console.log('캠페인 마스터 수정 실패',error.message);
+          }
+        }
       }
   });
 
@@ -723,6 +770,25 @@ const MonitorPage = () => {
         setCallPacing(tempCampaignInfo?.dial_mode === 2 ? tempCampaignInfo.dial_speed * 2 : tempCampaignInfo?.dial_mode === 3 ? tempCampaignInfo.dial_speed : 0);
         setDialMode(tempCampaignInfo?.dial_mode || 0);
       }
+    },
+    onError: (error) => {
+      if(window.opener){
+        if(error.message.split('||')[0] === '5'){
+          logoutChannel.postMessage({
+            type: 'logout',
+            message: error.message,
+          });
+          window.close();
+        }else{
+          setAlertState({
+            ...alertState,
+            isOpen: true,
+            message: "캠페인 스킬 조회 요청이 실패하였습니다. \nPDS 서버 시스템에 확인하여 주십시오.",
+            title: "알림",
+          });
+          // console.log('캠페인 스킬 조회 실패',error.message);
+        }
+      }
     }
   });
   // 캠페인 목록 조회
@@ -740,6 +806,25 @@ const MonitorPage = () => {
         setCampaigns(data.result_data.filter(data => data.tenant_id === tenant_id));
       }
       
+    },
+    onError: (error) => {
+      if(window.opener){
+        if(error.message.split('||')[0] === '5'){
+          logoutChannel.postMessage({
+            type: 'logout',
+            message: error.message,
+          });
+          window.close();
+        }else{
+          setAlertState({
+            ...alertState,
+            isOpen: true,
+            message: "캠페인 목록 조회 요청이 실패하였습니다. \nPDS 서버 시스템에 확인하여 주십시오.",
+            title: "알림",
+          });
+          // console.log('캠페인 목록 조회 실패',error.message);
+        }
+      }
     }
   });
 
@@ -750,6 +835,25 @@ const MonitorPage = () => {
       } else {
         setTenants(data.result_data.filter(data => data.tenant_id === tenant_id));
       }
+    },
+    onError: (error) => {
+      if(window.opener){
+        if(error.message.split('||')[0] === '5'){
+          logoutChannel.postMessage({
+            type: 'logout',
+            message: error.message,
+          });
+          window.close();
+        }else{
+          setAlertState({
+            ...alertState,
+            isOpen: true,
+            message: "테넌트 목록 조회 요청이 실패하였습니다. \nPDS 서버 시스템에 확인하여 주십시오.",
+            title: "알림",
+          });
+          // console.log('테넌트 목록 조회 실패',error.message);
+        }
+      }
     }
   });
 
@@ -757,6 +861,25 @@ const MonitorPage = () => {
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data);
+    },
+    onError: (error) => {
+      if(window.opener){
+        if(error.message.split('||')[0] === '5'){
+          logoutChannel.postMessage({
+            type: 'logout',
+            message: error.message,
+          });
+          window.close();
+        }else{
+          setAlertState({
+            ...alertState,
+            isOpen: true,
+            message: "스킬 목록 조회 요청이 실패하였습니다. \nPDS 서버 시스템에 확인하여 주십시오.",
+            title: "알림",
+          });
+          // console.log('스킬 목록 조회 실패',error.message);
+        }
+      }
     }
   });
 

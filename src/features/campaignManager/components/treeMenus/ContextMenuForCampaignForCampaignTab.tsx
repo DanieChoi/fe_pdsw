@@ -33,6 +33,7 @@ import { CheckCampaignSaveReturnCode, UpdataCampaignInfo } from "@/components/co
 import { useApiForCampaignManagerUpdate } from "../../hooks/useApiForCampaignManagerUpdate";
 import Cookies from "js-cookie";
 import { th } from "date-fns/locale";
+import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 
 
 export type CampaignStatus = "started" | "pending" | "stopped";
@@ -239,7 +240,7 @@ export function ContextMenuForCampaignForCampaignTab({
       
     },
     onError: (error) => {
-      
+      ServerErrorCheck('캠페인 상태 변경', error.message);
     },
   });
 

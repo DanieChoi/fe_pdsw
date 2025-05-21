@@ -20,7 +20,16 @@ import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSc
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
+import CustomAlert from "./CustomAlert";
 
+const errorMessage = {
+  isOpen: false,
+  message: '',
+  title: '알림',
+  type: '1',
+  onClose: () => { },
+  onCancel: () => { },
+};
 
 type FooterDataType = {
   time: string;
@@ -935,6 +944,8 @@ export default function Footer({
     };
   }, []);
 
+  const [alertState, setAlertState] = useState(errorMessage);
+
   useEffect(() => {
     const handleLogoutMessage = (event: MessageEvent) => {
       const { type, message } = event.data;
@@ -943,8 +954,17 @@ export default function Footer({
 
         // 일반 페이지에서 라우터 사용
         setTimeout(() => {
-          logoutFunction();
-          router.push('/login');
+          setAlertState({
+            ...errorMessage,
+            isOpen: true,
+            message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+            type: '2',
+            onClose: () => {
+              setAlertState({ ...errorMessage, isOpen: false });
+              logoutFunction();
+              router.push('/login');
+            },
+          });
         }, 300);
       }
     };
@@ -1223,6 +1243,15 @@ export default function Footer({
           </button>
         </div>
       </div>
+      <CustomAlert
+        message={alertState.message}
+        title={alertState.title}
+        type={alertState.type}
+        isOpen={alertState.isOpen}
+        onClose={() => {
+          alertState.onClose()
+        }}
+        onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
 
       {/* 푸터 내부 콘텐츠: isDrawerOpen이 true일 때만 렌더링 */}
       {isDrawerOpen && (
