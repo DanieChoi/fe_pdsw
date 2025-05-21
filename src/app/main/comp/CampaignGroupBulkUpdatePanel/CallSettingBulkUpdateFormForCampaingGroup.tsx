@@ -164,7 +164,7 @@ export function CallSettingBulkUpdateFormForCampaingGroup({
 
                 {/* 전화번호별 발신 순서 편집 */}
                 <div className="border border-gray-300 p-2 flex-1 flex flex-col">
-                  <div className="text-sm font-medium mb-2">전화번호별 발신 순서 편집</div>
+                  <div className="text-sm font-medium mb-2">전화 번호별 발신 순서 편집</div>
 
                   <div className="flex flex-1">
                     {/* 왼쪽 전화번호 목록 */}
