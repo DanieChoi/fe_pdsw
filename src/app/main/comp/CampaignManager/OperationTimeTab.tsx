@@ -28,7 +28,7 @@ interface DataProps {
 const errorMessage: CustomAlertRequest = {
   isOpen: false,
   message: "",
-  title: "캠페인 동작시간",
+  title: "캠페인 동작 시간",
   type: "0",
   onClose: () => {},
   onCancel: () => {},
@@ -185,8 +185,8 @@ const OperationTimeTab: React.FC<Props> = ({
   const gridColumns = [
     // { key: "no", name: "NO" },
     { key: "division", name: "구분" },
-    { key: "startTime", name: "시작시간" },
-    { key: "endTime", name: "종료시간" },
+    { key: "startTime", name: "시작 시간" },
+    { key: "endTime", name: "종료 시간" },
     {
       key: "delete",
       name: "",
@@ -335,14 +335,14 @@ const OperationTimeTab: React.FC<Props> = ({
             <div className="w-[40%]">
               <div className="flex flex-col gap-y-2">
                 <div className="flex items-center gap-[10px] justify-between">
-                  <Label className="w-[70px] min-w-[70px]">시작시간</Label>
+                  <Label className="w-[70px] min-w-[70px]">시작 시간</Label>
                   <CustomInputForTime
                     value={startTime}
                     onChange={(value) => setStartTime(value)}
                   />
                 </div>
                 <div className="flex items-center gap-[10px] justify-between">
-                  <Label className="w-[70px] min-w-[70px]">종료시간</Label>
+                  <Label className="w-[70px] min-w-[70px]">종료 시간</Label>
                   <CustomInputForTime
                     value={endTime}
                     onChange={(value) => setEndTime(value)}
@@ -374,7 +374,7 @@ const OperationTimeTab: React.FC<Props> = ({
                           setAlertState({
                             ...alertState,
                             isOpen: true,
-                            message: "시작시간이 종료시간보다 늦을 수 없습니다.",
+                            message: "시작 시간이 종료 시간보다 늦을 수 없습니다.",
                           });
                           return;
                         }
@@ -382,7 +382,7 @@ const OperationTimeTab: React.FC<Props> = ({
                           setAlertState({
                             ...alertState,
                             isOpen: true,
-                            message: "종료시간 설정이 잘못되었습니다.",
+                            message: "종료 시간 설정이 잘못되었습니다.",
                           });
                           return;
                         }
@@ -435,7 +435,7 @@ const OperationTimeTab: React.FC<Props> = ({
                       }
                     }}
                   >
-                    시간추가
+                    시간 추가
                     <Image src="/addArrow.svg" alt="화살표" width={10} height={10} />
                   </CommonButton>
                 </div>

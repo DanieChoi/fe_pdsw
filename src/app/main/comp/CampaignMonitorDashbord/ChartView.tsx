@@ -142,7 +142,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
                 {selectedCall?.totLstCnt || 0}
               </TableCell>
               <TableHeader className="w-[120px]">
-                <Label>순수발신</Label>
+                <Label>순수 발신</Label>
               </TableHeader>
               <TableCell className="text-center text-sm">
                 {selectedCall?.nonTTCT||0}
@@ -154,7 +154,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
                 {(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-(selectedCall?.nogdeleteGL || 0)}
               </TableCell>
               <TableHeader className="w-[120px]">
-                <Label>상담결과 예약</Label>
+                <Label>상담 결과 예약</Label>
               </TableHeader>
               <TableCell className="text-center text-sm">
                 {selectedCall?.recallCnt||0}
@@ -164,7 +164,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
         </Table>
         <div className="h-[370px] border border-[#ebebeb] rounded-b-[3px] p-2 flex justify-center items-center gap-5">
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-center">총 발신 : {selectedCall?.totDialCnt || 0}, 발신대비 성공률 : 
+            <p className="text-sm text-center">총 발신 : {selectedCall?.totDialCnt || 0}, 발신 대비 성공률 : 
               {(selectedCall?.scct || 0) === 0?0:parseFloat(((selectedCall?.scct || 0)/(selectedCall?.totDialCnt || 0)*100).toFixed(1))}
               %</p>
             <div className="relative">
@@ -250,7 +250,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
       
       {activeSection === '발신성공' && (
         <div>
-        <TitleWrap title="발신성공" />
+        <TitleWrap title="발신 성공" />
         <Table className='table-continued'>
           <tbody>
             <TableRow>
@@ -258,16 +258,16 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
                 <Label>대기 상담사 없음</Label>
               </TableHeader>
               <TableHeader className="w-[160px] !text-center border-r border-b">
-                <Label>상담사연결</Label>
+                <Label>상담사 연결</Label>
               </TableHeader>
               <TableHeader className="w-[120px] !text-center border-r border-b">
-                <Label>상담사 연결실패</Label>
+                <Label>상담사 연결 실패</Label>
               </TableHeader>
               <TableHeader className="w-[120px] !text-center border-r border-b">
                 <Label>상담사 무응답</Label>
               </TableHeader>
               <TableHeader className="w-[120px] !text-center border-r border-b">
-                <Label>상담사 통화중</Label>
+                <Label>상담사 통화 중</Label>
               </TableHeader>
             </TableRow>
             <TableRow>
@@ -299,7 +299,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
                 <Label>고객 포기</Label>
               </TableHeader>
               <TableHeader className="w-[120px] !text-center border-r border-b">
-                <Label>고객 최대 대기시간 초과</Label>
+                <Label>고객 최대 대기 시간 초과</Label>
               </TableHeader>
               <TableHeader className="w-[120px] !text-center border-r border-b">
                 <Label>멘트 청취 후 상담사 연결 안함</Label>
@@ -327,12 +327,12 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
 
       {activeSection === '발신실패' && (
         <div>
-          <TitleWrap title="발신실패" />
+          <TitleWrap title="발신 실패" />
           <Table className='table-continued'>
             <tbody>
               <TableRow>
                 <TableHeader className="w-[120px] !text-center border-r border-b">
-                  <Label>통화중</Label>
+                  <Label>통화 중</Label>
                 </TableHeader>
                 <TableHeader className="w-[160px] !text-center border-r border-b">
                   <Label>무응답</Label>
@@ -380,7 +380,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
                   <Label>통화음 없음</Label>
                 </TableHeader>
                 <TableHeader className="w-[120px] !text-center border-r border-b">
-                  <Label>다이얼음 없음</Label>
+                  <Label>다이얼 음 없음</Label>
                 </TableHeader>
                 <TableHeader className="w-[120px] !text-center border-r border-b">
                   <Label>기계음</Label>
@@ -412,15 +412,15 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
 
       {activeSection === '대기리스트' && (
         <div>
-        <TitleWrap title="대기리스트" />
+        <TitleWrap title="대기 리스트" />
         <Table className='table-continued'>
           <tbody>
             <TableRow>
               <TableHeader className="w-[120px] !text-center border-r border-b">
-                <Label>스케줄 대기(발신가능)</Label>
+                <Label>스케줄 대기(발신 가능)</Label>
               </TableHeader>
               <TableHeader className="w-[160px] !text-center border-r border-b">
-                <Label>진행 대기(발신가능)</Label>
+                <Label>진행 대기(발신 가능)</Label>
               </TableHeader>
               
             </TableRow>
@@ -440,7 +440,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
 
       {activeSection === '방지리스트' && (
         <div>
-        <TitleWrap title="방지리스트" />
+        <TitleWrap title="방지 리스트" />
         <Table className='table-continued'>
           <tbody>
             <TableRow>
@@ -509,10 +509,10 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
           <tbody>
             <TableRow>
               <TableHeader className="w-[120px] !text-center border-r border-b">
-                <Label>발신확인 전 상담사 상태 변경</Label>
+                <Label>발신 확인 전 상담사 상태 변경</Label>
               </TableHeader>
               <TableHeader className="w-[160px] !text-center border-r border-b">
-                <Label>발신확인 전 상담사 모드 변경</Label>
+                <Label>발신 확인 전 상담사 모드 변경</Label>
               </TableHeader>
               <TableHeader className="w-[120px] !text-center border-r border-b">
                 <Label>지정 상담사 정보 미입력</Label>

@@ -87,11 +87,11 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
   ]);
 
   const [rows, setRows] = useState<MainRow[]>([
-    { id: '전화번호1', count1: 2, duration1: 0, count2: 1, duration2: 0, count3: 1, duration3: 0, count4: 1, duration4: 0, count5: 1, duration5: 0, count6: 1, duration6: 0, count7: 1, duration7: 0 },
-    { id: '전화번호2', count1: 1, duration1: 0, count2: 1, duration2: 0, count3: 1, duration3: 0, count4: 1, duration4: 0, count5: 1, duration5: 0, count6: 1, duration6: 0, count7: 1, duration7: 0 },
-    { id: '전화번호3', count1: 1, duration1: 0, count2: 1, duration2: 0, count3: 1, duration3: 0, count4: 1, duration4: 0, count5: 1, duration5: 0, count6: 1, duration6: 0, count7: 1, duration7: 0 },
-    { id: '전화번호4', count1: 1, duration1: 0, count2: 1, duration2: 0, count3: 1, duration3: 0, count4: 1, duration4: 0, count5: 1, duration5: 0, count6: 1, duration6: 0, count7: 1, duration7: 0 },
-    { id: '전화번호5', count1: 1, duration1: 0, count2: 1, duration2: 0, count3: 1, duration3: 0, count4: 1, duration4: 0, count5: 1, duration5: 0, count6: 1, duration6: 0, count7: 1, duration7: 0 }
+    { id: '전화번호 1', count1: 2, duration1: 0, count2: 1, duration2: 0, count3: 1, duration3: 0, count4: 1, duration4: 0, count5: 1, duration5: 0, count6: 1, duration6: 0, count7: 1, duration7: 0 },
+    { id: '전화번호 2', count1: 1, duration1: 0, count2: 1, duration2: 0, count3: 1, duration3: 0, count4: 1, duration4: 0, count5: 1, duration5: 0, count6: 1, duration6: 0, count7: 1, duration7: 0 },
+    { id: '전화번호 3', count1: 1, duration1: 0, count2: 1, duration2: 0, count3: 1, duration3: 0, count4: 1, duration4: 0, count5: 1, duration5: 0, count6: 1, duration6: 0, count7: 1, duration7: 0 },
+    { id: '전화번호 4', count1: 1, duration1: 0, count2: 1, duration2: 0, count3: 1, duration3: 0, count4: 1, duration4: 0, count5: 1, duration5: 0, count6: 1, duration6: 0, count7: 1, duration7: 0 },
+    { id: '전화번호 5', count1: 1, duration1: 0, count2: 1, duration2: 0, count3: 1, duration3: 0, count4: 1, duration4: 0, count5: 1, duration5: 0, count6: 1, duration6: 0, count7: 1, duration7: 0 }
   ]);
 
   const maxCallsColumns: Column<MaxCallsRow>[] = [
@@ -112,7 +112,7 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
     },
     { 
       key: 'section1',
-      name: '통화중 실패',
+      name: '통화 중 실패',
       children: [
         { key: 'count1', name: '횟수',  renderCell: EditableCell },
         { key: 'duration1', name: '간격',  renderCell: EditableCell },
@@ -161,7 +161,7 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
     },
     {
       key: 'section7',
-      name: '채널오류',
+      name: '채널 오류',
       children: [
         { key: 'count7', name: '횟수', renderCell: EditableCell },
         { key: 'duration7', name: '간격',  renderCell: EditableCell },
