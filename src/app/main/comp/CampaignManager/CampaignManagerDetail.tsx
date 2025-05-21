@@ -2206,8 +2206,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           </div>
           <div className='flex items-center gap-2 relative'>
             <Label className="w-[74px] min-w-[74px]">스킬</Label>
-            <CustomInput value={tempCampaignInfo.campaign_id === 0 ? '' :inputSkills} className="w-full" readOnly />
-            <button className="absolute right-2 top-[52%] transform -translate-y-1/2">
+            <CustomInput value={tempCampaignInfo.campaign_id === 0 ? '' :inputSkills} readOnly />
+            <button className="absolute right-0 top-[52%] transform -translate-y-1/2 ml-2">
               <Image
                 src="/skill-popup.svg"
                 alt="스킬팝업"
