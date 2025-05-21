@@ -212,7 +212,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
   }, [callCampaignMenu]);
 
   return (
-    <div className="py-5">
+    <div className="py-5 pr-10">
       <div className="flex gap-[60px]">
         <div className="w-[50%] flex flex-col gap-y-2">
           {/* Trunk Access Code */}
