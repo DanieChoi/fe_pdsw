@@ -52,7 +52,7 @@ const AdditionalInfoTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
           />
           <div className="flex flex-col gap-y-2">
             <div className="flex items-center gap-2">
-              <Label className="w-[5rem] min-w-[5rem]">생성 인</Label>
+              <Label className="w-[5rem] min-w-[5rem]">생성인</Label>
               <CustomInput
                 className="w-[14rem]"
                 type="text"
@@ -92,7 +92,7 @@ const AdditionalInfoTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
           />
           <div className="flex flex-col gap-y-2">
             <div className="flex items-center gap-2">
-              <Label className="w-[5rem] min-w-[5rem]">수정 인</Label>
+              <Label className="w-[5rem] min-w-[5rem]">수정인</Label>
               <CustomInput
                 className="w-[14rem]"
                 type="text"
