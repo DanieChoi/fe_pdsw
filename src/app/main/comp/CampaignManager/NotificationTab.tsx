@@ -222,6 +222,7 @@ const NotificationTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onHa
               value={tempNotificationTabParam.supervisor_phone}
               onChange={(e) => handleInput(e)}
               disabled={!isChecked} // 체크박스 상태에 따라 비활성화
+              isPhoneNumber={true}
             />
           </div>
           <div className="flex justify-end text-sm text-gray-500">
