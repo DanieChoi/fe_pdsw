@@ -183,6 +183,16 @@ export interface TabLayoutStore {
 
   openSingleTabAtCurrentSection: (tabId: number, tabInfo: MenuItem) => void;
 
+  // 드래그 오버레이 효과를 위한 상태
+  contentDragOver: {
+    isActive: boolean;
+    rowId: string | null;
+    sectionId: string | null;
+  };
+
+  // 드래그 상태 설정 메서드
+  setContentDragOver: (isActive: boolean, rowId?: string | null, sectionId?: string | null) => void;
+
 };
 
 const generateUniqueId = (prefix: string, existingIds: string[]) => {
@@ -245,6 +255,20 @@ export const useTabStore = create<TabLayoutStore>()(
         deletedCampaignIdAtSidebar: null,
         isResizing: false,
 
+        contentDragOver: {
+          isActive: false,
+          rowId: null,
+          sectionId: null
+        },
+
+        setContentDragOver: (isActive, rowId = null, sectionId = null) =>
+          set({
+            contentDragOver: {
+              isActive,
+              rowId,
+              sectionId
+            }
+          }),
 
         // 삭제된 캠페인 ID 설정 메소드
         setDeletedCampaignId: (campaignId: string | null) =>
@@ -1857,7 +1881,7 @@ export const useTabStore = create<TabLayoutStore>()(
             removeTab,
             rows
           } = get();
-        
+
           // 기본 옵션
           const defaultOptions = {
             exclusiveTabGroups: {
@@ -1866,19 +1890,19 @@ export const useTabStore = create<TabLayoutStore>()(
             },
             showToast: false
           };
-        
+
           // 옵션 병합
           const mergedOptions = { ...defaultOptions, ...options };
           const { exclusiveTabGroups, showToast } = mergedOptions;
-        
+
           // 0. 특정 탭이 열릴 섹션 찾기 (2, 8, 9, 11 처리)
           let targetRowId = null;
           let targetSectionId = null;
-          
+
           // 디폴트 - 첫 번째 섹션 선택 (활성탭과 무관하게 대체 섹션 사용)
           const defaultRowId = rows[0]?.id;
           const defaultSectionId = rows[0]?.sections[0]?.id;
-          
+
           if (tabId === 2) {
             // 2번 탭의 경우: 2번 탭이 있는 섹션 찾기
             outerloop: for (const row of rows) {
@@ -1906,16 +1930,16 @@ export const useTabStore = create<TabLayoutStore>()(
               }
             }
           }
-        
+
           // 섹션을 찾지 못한 경우 첫 번째 섹션 사용 (활성탭 기준 대신 첫 번째 섹션으로 대체)
           if (!targetRowId || !targetSectionId) {
             targetRowId = defaultRowId;
             targetSectionId = defaultSectionId;
           }
-        
+
           // 1. 탭 제거 로직
           let tabsToRemove: number[] = [tabId]; // 기본: 동일 ID만 제거
-        
+
           // 탭 ID가 속한 배타적 그룹 찾기
           for (const [groupName, tabIds] of Object.entries(exclusiveTabGroups)) {
             if (tabIds.includes(tabId)) {
@@ -1924,14 +1948,14 @@ export const useTabStore = create<TabLayoutStore>()(
               break;
             }
           }
-        
+
           // 제거할 모든 탭 제거
           tabsToRemove.forEach(idToRemove => {
             openedTabs
               .filter(tab => tab.id === idToRemove)
               .forEach(tab => removeTab(tab.id, tab.uniqueKey));
           });
-        
+
           // 3. 새 탭 생성
           const newTabKey = `${tabId}-${Date.now()}`;
           const newTab = {
@@ -1940,21 +1964,21 @@ export const useTabStore = create<TabLayoutStore>()(
             content: tabInfo.content || null,
             params: tabInfo.params || {}
           };
-        
+
           // 4. 탭을 직접 대상 섹션에 추가
           set((state) => {
             // 새 탭을 openedTabs에 추가
             const newOpenedTabs = [...state.openedTabs, newTab];
-        
+
             // 해당 섹션에 탭 직접 추가
             const updatedRows = state.rows.map(row => {
               if (row.id !== targetRowId) return row;
-        
+
               return {
                 ...row,
                 sections: row.sections.map(section => {
                   if (section.id !== targetSectionId) return section;
-        
+
                   return {
                     ...section,
                     tabs: [...section.tabs, newTab],
@@ -1963,7 +1987,7 @@ export const useTabStore = create<TabLayoutStore>()(
                 })
               };
             });
-        
+
             // 5. 전역 활성 탭 상태 업데이트
             return {
               ...state,
@@ -1973,7 +1997,7 @@ export const useTabStore = create<TabLayoutStore>()(
               activeTabKey: newTabKey
             };
           });
-        
+
           // 6. 토스트 메시지 출력 (옵션에 따라)
           if (showToast) {
             const tabNames: { [key: number]: string } = {
@@ -1982,20 +2006,20 @@ export const useTabStore = create<TabLayoutStore>()(
               9: '분배 호수',
               11: '예약콜 제한'
             };
-        
+
             // if (tabNames[tabId]) {
             //   toast.info(`${tabNames[tabId]}은(는) 1탭으로 제한합니다.`);
             // }
           }
-        
+
           // 7. 운영 설정 관련 탭이면 운영 스토어도 업데이트
           if ([8, 9, 11].includes(tabId)) {
             useOperationStore.getState().setActiveTab(tabId);
           }
-        
+
           return newTabKey;
         },
-        
+
         setResizing: (isResizing) => set((state) => ({ ...state, isResizing })),
 
         resetTabStore: () =>
