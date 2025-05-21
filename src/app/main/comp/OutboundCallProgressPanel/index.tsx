@@ -191,7 +191,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     { key: 'campaignName', name: '캠페인이름' },
     { key: 'priority', name: '다이얼 순번' },
     { key: 'custKey', name: '고객키' },
-    { key: 'custName', name: '고객이름' },
+    { key: 'custName', name: '고객 이름' },
     { key: 'phoneType', name: '발신번호 구분' },
     { key: 'phone1', name: '전화번호1' },
     { key: 'attempt1', name: '시도횟수' },

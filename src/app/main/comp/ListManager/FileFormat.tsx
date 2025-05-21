@@ -87,11 +87,11 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose, _for
         setAlertState({
           ...errorMessage,
           isOpen: true,
-          message: "고객키[1]은 필수 항목입니다. 다시 확인하시고 설정해 주세요.",
+          message: "고객키[1]은 필수 항목입니다. 다시 확인하시고 설정해주세요.",
           type: '2',
           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
         });
-      }else{
+      } else {
         newRows.splice(index, 1);
         const cnt = newRows.length;
         for( let i=0;i<cnt;i++){
@@ -121,7 +121,7 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose, _for
       _message = '고객키[3] 사이즈는 최대 30byte 입니다.';
       tempLength = 30;
     }else if( newRows[rowIndex].field === 'CSNA' &&  tempLength > 50 ){
-      _message = '고객이름 사이즈는 최대 50byte 입니다.';
+      _message = '고객 이름 사이즈는 최대 50byte 입니다.';
       tempLength = 50;
     }else if( newRows[rowIndex].field === 'TNO1' &&  tempLength > 20 ){
       _message = '고객 전화번호[1] 사이즈는 최대 20byte 입니다.';
@@ -218,7 +218,7 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose, _for
     { id: '1', name: '고객키[1]', field: 'CSKE' },
     { id: '2', name: '고객키[2]', field: 'CSK2' },
     { id: '3', name: '고객키[3]', field: 'CSK3' },
-    { id: '4', name: '고객이름', field: 'CSNA' },
+    { id: '4', name: '고객 이름', field: 'CSNA' },
     { id: '5', name: '고객 전화번호[1]', field: 'TNO1' },
     { id: '6', name: '고객 전화번호[2]', field: 'TNO2' },
     { id: '7', name: '고객 전화번호[3]', field: 'TNO3' },
@@ -269,7 +269,7 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose, _for
     { id: '1', name: '고객키[1]', field: 'CSKE' },
     { id: '2', name: '고객키[2]', field: 'CSK2' },
     { id: '3', name: '고객키[3]', field: 'CSK3' },
-    { id: '4', name: '고객이름', field: 'CSNA' },
+    { id: '4', name: '고객 이름', field: 'CSNA' },
     { id: '5', name: '고객 전화번호[1]', field: 'TNO1' },
     { id: '6', name: '고객 전화번호[2]', field: 'TNO2' },
     { id: '7', name: '고객 전화번호[3]', field: 'TNO3' },
@@ -428,17 +428,8 @@ const FileFormat: React.FC<FileFormatProps> = ({ isOpen,onConfirm, onClose, _for
  
   const modalContent = (
     <div className="w-full">
-      {/* <div className="flex items-center gap-2 mb-1">
-        <CustomCheckbox
-          id="originaldata" checked={originaldataYn} onCheckedChange={(checked) => setOriginaldataYn(checked === true)}
-        />
-        <Label htmlFor="originaldata" className="text-sm">
-          원본 데이터를 서버전송 후 삭제합니다.
-        </Label>
-      </div> */}
-
       <div className="mb-4">
-        <p className="text-sm">* 블랙리스트의 경우 고객키[1], 고객이름 항목만 사용 합니다.</p>
+        <p className="text-sm">* 블랙리스트의 경우 고객키[1], 고객 이름 항목만 사용 합니다.</p>
         <p className="text-sm">* 필드 항목은 키보드 Delete 키로 삭제가 가능합니다.</p>
       </div>
 
