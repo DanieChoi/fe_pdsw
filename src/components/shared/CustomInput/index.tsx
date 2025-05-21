@@ -1,22 +1,40 @@
-// // src/components/shared/CustomInput.tsx
 
+
+// // src/components/shared/CustomInput.tsx
 // "use client";
 
 // import * as React from "react";
 // import { cn } from "@/lib/utils";
 
 // interface CustomInputProps extends React.ComponentProps<"input"> {
+//   /** 전체 너비 적용 여부 */
+//   isFullWidth?: boolean;
+//   /** 퍼센트 입력 여부 (1-100 사이 숫자만 허용) */
 //   isPercent?: boolean;
+//   /** 전화번호 입력 여부 (010, 011 등 형식 검증) */
 //   isPhoneNumber?: boolean;
+//   /** 전화번호 유효성 콜백 */
 //   onValidPhoneNumber?: (isValid: boolean) => void;
+//   /** 외부에서 주입하는 에러 메시지 */
 //   error?: string;
+//   /** 에러 상태 리셋 트리거 키 */
 //   resetKey?: any;
+//   /** 라벨 (옵션) */
+//   label?: React.ReactNode;
+//   /** 인풋 우측에 표시할 요소 */
+//   rightElement?: React.ReactNode;
+//   /** 에러 메시지 표시 여부 */
+//   showError?: boolean;
+//   /** 컨테이너 클래스 이름 */
+//   containerClassName?: string;
 // }
 
 // const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
 //   (
 //     {
 //       className,
+//       containerClassName,
+//       isFullWidth = false,
 //       type = "text",
 //       value,
 //       onChange,
@@ -26,24 +44,28 @@
 //       onValidPhoneNumber,
 //       error,
 //       resetKey,
+//       label,
+//       rightElement,
+//       showError = true,
 //       ...props
 //     },
 //     ref
 //   ) => {
+//     // 내부 상태 관리
 //     const inputRef = React.useRef<HTMLInputElement>(null);
 //     const combinedRef = useCombinedRefs(ref, inputRef);
 //     const [localError, setLocalError] = React.useState<string | undefined>(error);
 //     const [previousPhoneValue, setPreviousPhoneValue] = React.useState<string>("");
 
-//     const stringValue =
-//       typeof value === "number" || typeof value === "string"
-//         ? String(value)
-//         : "";
+//     // 값 문자열 변환
+//     const stringValue = value != null ? String(value) : "";
 
+//     // 리셋 키가 변경되면 에러 상태 초기화
 //     React.useEffect(() => {
 //       setLocalError(undefined);
 //     }, [resetKey]);
 
+//     // 외부 에러 반영
 //     React.useEffect(() => {
 //       if (error !== undefined) {
 //         setLocalError(error);
@@ -53,14 +75,17 @@
 //       }
 //     }, [error]);
 
+//     // 전화번호 유효성 검사 함수
 //     const validatePhoneNumber = (phoneNumber: string): boolean => {
 //       if (!phoneNumber) return true;
 //       return /^01[0|1|6|7|8|9][0-9]{7,8}$/.test(phoneNumber);
 //     };
 
+//     // 입력값 변경 핸들러
 //     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 //       let newValue = e.target.value;
 
+//       // 퍼센트 입력 검증
 //       if (isPercent) {
 //         if (!/^\d*$/.test(newValue)) {
 //           setLocalError("숫자만 입력 가능합니다");
@@ -79,6 +104,7 @@
 //         }
 //       }
 
+//       // 전화번호 입력 검증
 //       if (isPhoneNumber) {
 //         if (!/^\d*$/.test(newValue)) {
 //           setLocalError("숫자만 입력 가능합니다");
@@ -105,9 +131,11 @@
 //         }
 //       }
 
+//       // 변경된 값 전달
 //       onChange?.({ ...e, target: { ...e.target, value: newValue } });
 //     };
 
+//     // 블러 핸들러
 //     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
 //       if (isPhoneNumber) {
 //         const phoneNumber = e.target.value;
@@ -127,6 +155,7 @@
 //       onBlur?.(e);
 //     };
 
+//     // 전화번호 값 변경 감지
 //     React.useEffect(() => {
 //       if (isPhoneNumber && stringValue !== previousPhoneValue) {
 //         setPreviousPhoneValue(stringValue);
@@ -146,24 +175,41 @@
 //     }, [stringValue, isPhoneNumber, localError, onValidPhoneNumber, previousPhoneValue]);
 
 //     return (
-//       <div className="relative">
-//         <div className="flex items-center">
+//       <div className={cn(
+//         "custom-input-root",
+//         isFullWidth && "w-full",
+//         containerClassName
+//       )}>
+//         {label && (
+//           <div className="mb-1">{label}</div>
+//         )}
+        
+//         <div className={cn(
+//           "flex items-center",
+//           isFullWidth && "w-full"
+//         )}>
 //           <input
 //             type={type}
 //             value={stringValue}
 //             onChange={handleChange}
 //             onBlur={handleBlur}
 //             className={cn(
-//               "flex h-[26px] rounded-[3px] border border-input bg-white px-[8px] transition-colors file:border-0 file:bg-white file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:text-[#aaa] disabled:bg-[#F4F4F4] border-[#ebebeb] text-[#333] text-sm w-auto",
+//               "flex h-[26px] rounded-[3px] border border-input bg-white px-[8px] text-sm transition-colors",
+//               "placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+//               "disabled:cursor-not-allowed disabled:text-[#aaa] disabled:bg-[#F4F4F4]",
+//               isFullWidth ? "w-full" : "w-auto",
 //               localError && "border-red-500",
 //               className
 //             )}
 //             ref={combinedRef}
 //             {...props}
 //           />
-//           {isPercent && <span className="ml-2">%</span>}
+          
+//           {isPercent && <span className="ml-2 flex-shrink-0">%</span>}
+//           {rightElement && <div className="ml-2 flex-shrink-0">{rightElement}</div>}
 //         </div>
-//         {localError && (
+        
+//         {showError && localError && (
 //           <div className="text-red-500 text-xs mt-1">{localError}</div>
 //         )}
 //       </div>
@@ -171,6 +217,7 @@
 //   }
 // );
 
+// // 여러 ref를 결합하는 유틸리티 함수
 // function useCombinedRefs<T>(
 //   ...refs: Array<React.Ref<T> | null | undefined>
 // ): React.RefCallback<T> {
@@ -200,7 +247,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 interface CustomInputProps extends React.ComponentProps<"input"> {
-  /** 전체 너비 적용 여부 */
+  /** 전체 너비 적용 여부 (기본값: true) */
   isFullWidth?: boolean;
   /** 퍼센트 입력 여부 (1-100 사이 숫자만 허용) */
   isPercent?: boolean;
@@ -227,7 +274,7 @@ const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
     {
       className,
       containerClassName,
-      isFullWidth = false,
+      isFullWidth = true, // 기본값을 true로 변경
       type = "text",
       value,
       onChange,

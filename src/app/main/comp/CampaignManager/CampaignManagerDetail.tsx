@@ -2156,6 +2156,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
               value={tempCampaignInfo.campaign_id === 0 ? 0 :campaignId}
               onChange={(e) => handleInputData(e.target.value, 'campaign_id')}
               disabled={true}
+              isFullWidth={true}
             />
           </div>
           <div className='flex items-center gap-2'>
