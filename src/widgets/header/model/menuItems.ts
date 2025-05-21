@@ -69,7 +69,7 @@ export const menuItems: MenuItem[] = [
   { 
     id: 23,
     menuId: 8,
-    title: '시스템모니터링', 
+    title: '시스템 모니터링', 
     icon: '/header-menu/시스템모니터링.svg', 
     href: '/settings',
     content: null

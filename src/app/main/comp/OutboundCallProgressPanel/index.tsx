@@ -73,10 +73,10 @@ interface SummaryCallProgressStatusDataType {
   phoneNumber: string[];              //발신 번호
   phoneDialCount: number[];           //발신 번호 별 시도 회수
   dialedPhone: number;                //발신 번호 인덱스
-  reuseCount: number;                 //캠페인 재사용 회수 : 1(최초발신), 2~(재발신)
+  reuseCount: number;                 //캠페인 재사용 회수 : 1(최초 발신), 2~(재발신)
   retryCall: number;                  //재시도 여부 : 0(재시도 없음), 1(재시도 있음)
   waiting: number;                    //대기상담사
-  firstCall: number;                  //최초발신
+  firstCall: number;                  //최초 발신
   _retryCall: number;                 //재시도발신
   distributing: number;               //분배 대기
   result: string;                     //다이얼 결과
@@ -253,7 +253,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
           if( index === -1){
             sumCallProgressStatus.push({...tempList[i],
               waiting: 0,  //대기상담사
-              firstCall: tempList[i].reuseCount === 1 ? 1 : 0, //최초발신
+              firstCall: tempList[i].reuseCount === 1 ? 1 : 0, //최초 발신
               _retryCall: tempList[i].reuseCount === 2 ? 1 : 0, //재시도발신
               distributing: tempList[i].waitingLstCnt, //분배 대기
               result: campaigns.find((campaign) => campaign.campaign_id === tempList[i].campaignId)?.end_flag === 1 ? '진행중' : '완료',
@@ -277,7 +277,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
             [sumCallProgressStatus[i].campaignId]: {
               stats: {
                 waiting: sumCallProgressStatus[i].waiting,    //대기상담사
-                firstCall: sumCallProgressStatus[i].firstCall,//최초발신
+                firstCall: sumCallProgressStatus[i].firstCall,//최초 발신
                 retryCall: sumCallProgressStatus[i].retryCall,//재시도발신
                 distributing: sumCallProgressStatus[i].distributing//분배 대기
               },
@@ -481,7 +481,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
                     대기 상담사
                   </TableHeader>
                   <TableHeader className="!bg-[#FEE9EC] !text-center text-sm font-normal text-[#C95E5E] !h-[30px]">
-                    최초발신
+                    최초 발신
                   </TableHeader>
                   <TableHeader className="!bg-[#E8EFFA] !text-center text-sm font-normal text-[#338BD3] !h-[30px]">
                     재시도 발신

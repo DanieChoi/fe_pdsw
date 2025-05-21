@@ -268,14 +268,14 @@ const StatusCampaign: React.FC = () => {
       setDispatchTypeList(
         Array.from({ length: maxReuse }, (_, i) => ({
           dispatch_id: i,
-          dispatch_name: i === 0 ? "최초발신" : `${i}차재발신`,
+          dispatch_name: i === 0 ? "최초 발신" : `${i}차 재발신`,
         }))
       );
     } else {
       setDispatchTypeList([
         {
           dispatch_id: 0,
-          dispatch_name: "최초발신"
+          dispatch_name: "최초 발신"
         }
       ]);
       setSelectedDispatch('0');
@@ -357,10 +357,10 @@ const StatusCampaign: React.FC = () => {
               <span className="text-sm font-medium text-gray-600">스킬:</span>
               <Select value={selectedSkill} onValueChange={handleSkillChange}>
                 <SelectTrigger className="w-40 h-9">
-                  <SelectValue placeholder="스킬전체보기" />
+                  <SelectValue placeholder="스킬 전체보기" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="total">스킬전체보기</SelectItem>
+                  <SelectItem value="total">스킬 전체보기</SelectItem>
                   {skills.map((skill) => (
                     <SelectItem key={skill.skill_id} value={skill.skill_id.toString()}>
                       {skill.skill_name}
@@ -374,7 +374,7 @@ const StatusCampaign: React.FC = () => {
               <span className="text-sm font-medium text-gray-600">발신:</span>
               <Select value={selectedDispatch} onValueChange={handleDispatchChange}>
                 <SelectTrigger className="w-40 h-9">
-                  <SelectValue placeholder="최초발신" />
+                  <SelectValue placeholder="최초 발신" />
                 </SelectTrigger>
                 <SelectContent>
                   {dispatchTypeList.map((option) => (

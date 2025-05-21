@@ -40,7 +40,7 @@ export interface CampaignProgressInformationResponseDataType {
   customerOnHookCnt: number;          //고객이 바로 끊은 건수
   detectMachinePowerOff: number;      //소리샘-전원꺼짐
   nogautoPopFailMode: number;         //미발신 사유 코드 Autopreview시 Popup 수신후, 상담사 모드 변경
-  reuseCnt: number;                   //캠페인 재사용 회수 : 1(최초발신), 2~(재발신)
+  reuseCnt: number;                   //캠페인 재사용 회수 : 1(최초 발신), 2~(재발신)
   campId: number;                     //캠페인ID
   totLstCnt: number;                  //총 리스트 건수
   totDialCnt: number;                 //총 발신 건수
@@ -187,7 +187,7 @@ export interface CallProgressStatusResponseDataType {
   phoneNumber: string[];              //발신 번호
   phoneDialCount: number[];           //발신 번호 별 시도 회수
   dialedPhone: number;                //발신 번호 인덱스
-  reuseCount: number;                 //캠페인 재사용 회수 : 1(최초발신), 2~(재발신)
+  reuseCount: number;                 //캠페인 재사용 회수 : 1(최초 발신), 2~(재발신)
   retryCall: number;                  //재시도 여부 : 0(재시도 없음), 1(재시도 있음)
 }
 
