@@ -777,7 +777,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId, is_new }: Props) 
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
     }
-    if (!saveErrorCheck && newTenantId === ' ') {
+    if (!saveErrorCheck && (newTenantId === ' ' || newTenantId === 'undefined' || newTenantId === undefined || newTenantId === null)) {
       saveErrorCheck = true;
       setAlertState({
         ...errorMessage,
@@ -906,7 +906,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId, is_new }: Props) 
     }
   });
 
-  //캠페인 정보 수정 api 호출
+  //캠페인 정보 생성 api 호출
   const { mutate: fetchCampaignManagerInsert } = useApiForCampaignManagerInsert({
     onSuccess: (data) => {
       setTempCampaignId(data.result_data.campaign_id);
@@ -920,7 +920,7 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId, is_new }: Props) 
 
     },
     onError: (error) => {
-      ServerErrorCheck('캠페인 정보 수정', error.message);
+      ServerErrorCheck('캠페인 정보 생성', error.message);
     }
   });
 
