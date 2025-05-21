@@ -216,7 +216,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
       <div className="flex gap-[60px]">
         <div className="w-[50%] flex flex-col gap-y-2">
           {/* Trunk Access Code */}
-          <div className="flex items-center gap-2 justify-between">
+          <div className="flex items-center gap-2">
             <Label className="w-[8.3rem] min-w-[8.3rem]">
               Trunk Access Code
             </Label>
@@ -225,6 +225,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
               value={tempOutgoingMethodTab.trunk_access_code}
               onChange={(e) => handleNumericInput(e, 'setTrunkAccessCode')}
               maxLength={10}
+              isFullWidth={true}
             />
           </div>
 
@@ -242,13 +243,14 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
           </div>
 
           {/* 콜 목표량 */}
-          <div className="flex items-center gap-2 justify-between">
+          <div className="flex items-center gap-2 ">
             <Label className="w-[8.3rem] min-w-[8.3rem]">콜 목표량</Label>
             <CustomInput
               type="text"
               value={tempOutgoingMethodTab.alarm_answer_count}
               onChange={(e) => handleNumericInput(e, 'setCallGoal')}
               maxLength={3}
+              isFullWidth={true}
             />
           </div>
 
@@ -294,7 +296,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
           </div>
 
           {/* 자동 다이얼 시 */}
-          <div className="flex items-center gap-2 justify-between">
+          <div className="flex items-center gap-2">
             <Label className="w-[8.3rem] min-w-[8.3rem]">자동 다이얼 시</Label>
             <CustomInput
               type="text"
@@ -305,7 +307,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
           </div>
 
           {/* 다이얼 모드 옵션 */}
-          <div className="flex items-center gap-2 justify-between">
+          <div className="flex items-center gap-2">
             <Label className="w-[8.3rem] min-w-[8.3rem]">다이얼 모드 옵션</Label>
             <Select value={dialModeOption} disabled>
               <SelectTrigger className="w-full">
@@ -374,18 +376,19 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
           </div>
 
           {/* DDD Number */}
-          <div className="flex items-center gap-2 justify-between">
+          <div className="flex items-center gap-2">
             <Label className="w-[8.3rem] min-w-[8.3rem]">DDD Number</Label>
             <CustomInput
               type="text"
               value={tempOutgoingMethodTab.DDD_code}
               onChange={(e) => handleNumericInput(e, 'setDddNumber')}
               maxLength={3}
+              isFullWidth={true}
             />
           </div>
 
           {/* 최대 링 횟수 */}
-          <div className="flex items-center gap-2 justify-between">
+          <div className="flex items-center gap-2">
             <Label className="w-[8.3rem] min-w-[8.3rem]">최대 링 횟수</Label>
             <Select value={maxRings} disabled>
               <SelectTrigger className="w-full">
@@ -398,7 +401,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
           </div>
 
           {/* Token ID */}
-          <div className="flex items-center gap-2 justify-between">
+          <div className="flex items-center gap-2 ">
             <Label className="w-[8.3rem] min-w-[8.3rem]">Token ID</Label>
             <CustomInput
               type="text"
@@ -409,7 +412,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
           </div>
 
           {/* 상담결과 등록 */}
-          <div className="flex items-center gap-2 justify-between">
+          <div className="flex items-center gap-2 ">
             <Label className="w-[8.3rem] min-w-[8.3rem]">상담 결과 등록</Label>
             <Select
               value={tempOutgoingMethodTab.use_counsel_result + ''}
@@ -429,7 +432,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
           </div>
 
           {/* 연결 IVR NO  */}
-          <div className="flex items-center gap-2 justify-between">
+          <div className="flex items-center gap-2 ">
             <Label className="w-[8.3rem] min-w-[8.3rem]">연결 IVR NO</Label>
             <CustomInput
               type="text"
