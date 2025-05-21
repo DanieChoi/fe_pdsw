@@ -91,11 +91,11 @@ const callListInsertData: CallingListInsertRequest = {
   calling_list: [] as CallingListInsertDataType[]
 };
 
-const progressListData: ProgressRow = 
+const progressListData: ProgressRow =
   {
     id: 1,
     datetime: "10:54:28",
-    message: "현재 작업을 진행 하겠습니다. 진행하겠습니다. [ 1 ]",
+    message: "현재 작업을 진행하겠습니다. [ 1 ]",
   }
 ;
 
@@ -168,14 +168,14 @@ const ListManager: React.FC = () => {
           const newProgressListData = { ...progressListData
             , id: progressList.length+1
             , datetime: hours + ':' + minutes + ':' + seconds
-            , message: '서버에 리스트 파일 등록 완료 : 총 ' + (listTotalCount+data.request_count) + '건, 성공 ' + (listSuccessCount+data.result_count) + '건'
+            , message: '서버에 리스트 파일 등록 완료: 총 ' + (listTotalCount+data.request_count) + '건, 성공 ' + (listSuccessCount+data.result_count) + '건'
           };
           setProgressList(prev => [newProgressListData, ...prev]);
         }else{
           const newProgressListData = { ...progressListData
             , id: progressList.length+1
             , datetime: hours + ':' + minutes + ':' + seconds
-            , message: '서버에 리스트 파일 등록 에러 : ' + data.result_msg
+            , message: '서버에 리스트 파일 등록 오류 : ' + data.result_msg
           };
           setProgressList(prev => [newProgressListData, ...prev]);
         }
@@ -189,7 +189,7 @@ const ListManager: React.FC = () => {
         setAlertState({
           ...errorMessage,
           isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야 합니다.',
           type: '2',
           onClose: () => goLogin(),
         });
@@ -201,7 +201,7 @@ const ListManager: React.FC = () => {
         const newProgressListData = { ...progressListData
           , id: progressList.length+1
           , datetime: hours + ':' + minutes + ':' + seconds
-          , message: '파일 전송 도중 에러 : ' + data.message
+          , message: '파일 전송 중 오류 : ' + data.message
         };
         setProgressList(prev => [newProgressListData, ...prev]);
       } 
@@ -229,14 +229,14 @@ const ListManager: React.FC = () => {
           const newProgressListData = { ...progressListData
             , id: progressList.length+1
             , datetime: hours + ':' + minutes + ':' + seconds
-            , message: '서버에 리스트 파일 등록 완료 : 총 ' + (listTotalCount+data.request_count||1) + '건, 성공 ' + (listSuccessCount+data.result_count||1) + '건'
+            , message: '서버에 리스트 파일 등록 완료: 총 ' + (listTotalCount+data.request_count||1) + '건, 성공 ' + (listSuccessCount+data.result_code||1) + '건'
           };
           setProgressList(prev => [newProgressListData, ...prev]);
         }else{
           const newProgressListData = { ...progressListData
             , id: progressList.length+1
             , datetime: hours + ':' + minutes + ':' + seconds
-            , message: '서버에 리스트 파일 등록 에러 : ' + data.result_msg
+            , message: '서버에 리스트 파일 등록 오류 : ' + data.result_msg
           };
           setProgressList(prev => [newProgressListData, ...prev]);
         }
@@ -250,7 +250,7 @@ const ListManager: React.FC = () => {
         setAlertState({
           ...errorMessage,
           isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야 합니다.',
           type: '2',
           onClose: () => goLogin(),
         });
@@ -262,7 +262,7 @@ const ListManager: React.FC = () => {
         const newProgressListData = { ...progressListData
           , id: progressList.length+1
           , datetime: hours + ':' + minutes + ':' + seconds
-          , message: '파일 전송 도중 에러 : ' + data.message
+          , message: '파일 전송 중 오류 : ' + data.message
         };
         setProgressList(prev => [newProgressListData, ...prev]);
       }
@@ -290,7 +290,7 @@ const ListManager: React.FC = () => {
           const newProgressListData = { ...progressListData
             , id: progressList.length+1
             , datetime: hours + ':' + minutes + ':' + seconds
-            , message: '서버에 리스트 파일 등록 에러 : ' + data.result_msg
+            , message: '서버에 리스트 파일 등록 오류 : ' + data.result_msg
           };
           setProgressList(prev => [newProgressListData, ...prev]);
         }
@@ -304,7 +304,7 @@ const ListManager: React.FC = () => {
         setAlertState({
           ...errorMessage,
           isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야 합니다.',
           type: '2',
           onClose: () => goLogin(),
         });
@@ -316,7 +316,7 @@ const ListManager: React.FC = () => {
         const newProgressListData = { ...progressListData
           , id: progressList.length+1
           , datetime: hours + ':' + minutes + ':' + seconds
-          , message: '파일 전송 도중 에러 : ' + data.message
+          , message: '파일 전송 중 오류 : ' + data.message
         };
         setProgressList(prev => [newProgressListData, ...prev]);
       }
@@ -392,7 +392,7 @@ const ListManager: React.FC = () => {
           setAlertState({
             ...errorMessage,
             isOpen: true,
-              message: "파일 또는 포맷 형식이 올바르지 않습니다. 작업대상 지정을 다시 해 주십시오.",
+              message: "파일 또는 포맷 형식이 올바르지 않습니다. 작업 대상 지정을 다시 해 주십시오.",
             type: '2',
             onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
           });
@@ -416,7 +416,7 @@ const ListManager: React.FC = () => {
           const newProgressListData = { ...progressListData
             , id: progressList.length+1
             , datetime: hours + ':' + minutes + ':' + seconds
-            , message: '현재 로드된 파일 갯수 : ' + (uploadedFiles.length+1)
+            , message: '현재 로드된 파일 개수 : ' + (uploadedFiles.length+1)
           };
           setProgressList(prev => [newProgressListData, ...prev]);
           
@@ -559,11 +559,11 @@ const ListManager: React.FC = () => {
                   }else{ 
                     const row = tempdata[i].split(listManagerDelimiter) as unknown[];
                     if( tempdata[i].indexOf(listManagerDelimiter) === -1 ){    
-                      setProcessMessage('파일 전송 도중 에러 : 리스트 파일을 확인 하세요.');
+                      setProcessMessage('파일 전송 중 오류: 리스트 파일을 확인하세요.');
                       setAlertState({
                         ...errorMessage,
                         isOpen: true,
-                        message: "파일 또는 포맷 형식이 올바르지 않습니다. 작업대상 지정을 다시 해 주십시오.",
+                        message: "파일 또는 포맷 형식이 올바르지 않습니다. 작업 대상 지정을 다시 해 주십시오.",
                         type: '2',
                         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
                       });
@@ -571,11 +571,11 @@ const ListManager: React.FC = () => {
                       setUploadedFiles((prev) => prev.slice(0, -1));   
                       break;
                     }else if( tempdata[i].split(listManagerDelimiter).length != sendColumns.length ){
-                      setProcessMessage('파일 전송 도중 에러 : 리스트 파일을 확인 하세요.');
+                      setProcessMessage('파일 전송 중 오류: 리스트 파일을 확인하세요.');
                       setAlertState({
                         ...errorMessage,
                         isOpen: true,
-                        message: "파일 또는 포맷 형식이 올바르지 않습니다. 작업대상 지정을 다시 해 주십시오.",
+                        message: "파일 또는 포맷 형식이 올바르지 않습니다. 작업 대상 지정을 다시 해 주십시오.",
                         type: '2',
                         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
                       });
@@ -694,7 +694,7 @@ const ListManager: React.FC = () => {
       const newProgressListData = { ...progressListData
         , id: progressList.length+1
         , datetime: hours + ':' + minutes + ':' + seconds
-        , message: '현재 로드된 파일 갯수 : ' + (uploadedFiles.length-1)
+        , message: '현재 로드된 파일 개수 : ' + (uploadedFiles.length-1)
       };
       setProgressList(prev => [newProgressListData, ...prev]);
       
@@ -741,7 +741,7 @@ const ListManager: React.FC = () => {
 
   const progressColumns = useMemo<Column<ProgressRow>[]>(() => [
     { key: "datetime", name: "시간" },
-    { key: "message", name: "처리내용" },
+    { key: "message", name: "처리 내용" },
   ], []);
 
   // selectedRows 메모이제이션
@@ -774,7 +774,7 @@ const ListManager: React.FC = () => {
       setAlertState({
         ...errorMessage,
         isOpen: true,
-        message: "발신목록이 없습니다.",
+        message: "발신 목록이 없습니다.",
         type: '2',
         onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
       });
@@ -908,7 +908,7 @@ const ListManager: React.FC = () => {
       const newProgressListData = { ...progressListData
         , id: progressList.length+1
         , datetime: hours + ':' + minutes + ':' + seconds
-        , message: (workFileIndex+1)+' 번 파일 리스트 등록 시작'
+        , message: (workFileIndex+1)+'번 파일 리스트 등록 시작'
       };
       setProgressList(prev => [newProgressListData, ...prev]);
 
@@ -990,11 +990,11 @@ const ListManager: React.FC = () => {
         <div className="w-1/2 flex-1 flex flex-col gap-5">
           <div className="flex flex-col gap-2">
             <TitleWrap
-              title="작업대상목록"
+              title="작업 대상 목록"
               className="border-b border-gray-300 pb-1"
               buttons={[
                 { label: "파일 포맷 설정", onClick: handleFileFormatOpen },
-                { label: "작업시작" , onClick: handleWorkStart},
+                { label: "작업 시작" , onClick: handleWorkStart},
               ]}
             />
             <div className="h-[200px] grid-custom-wrap">
@@ -1020,26 +1020,26 @@ const ListManager: React.FC = () => {
         <div className="w-1/2 flex-1 flex flex-col gap-5">
           <div className="flex flex-col gap-2">
             <TitleWrap
-              title="작업대상 내역"
+              title="작업 대상 내역" // 이 부분은 이미 정상이나, 일관성을 위해 명시
               className="border-b border-gray-300 pb-1"
               buttons={[
                 { label: "새 작업대상", onClick: handleNewTarget},
-                { label: "작업대상 올리기", onClick: triggerFileInput },
-                { label: "작업대상 삭제" ,  onClick: handleDeleteFile, disabled: !selectedFile},
+                { label: "작업 대상 올리기", onClick: triggerFileInput },
+                { label: "작업 대상 삭제" ,  onClick: handleDeleteFile, disabled: !selectedFile},
               ]}
             />
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <Label className="w-[100px] min-w-[100px]">대상캠페인</Label>
+                <Label className="w-[100px] min-w-[100px]">대상 캠페인</Label>
                 <Select value={listManagerCampaignId} 
                 onValueChange={(value) => handleSelectChange(value, 'campaignId')}
                 defaultValue="0" disabled={campaignIdDisabled}
                 >
                   <SelectTrigger className="w-[300px]">
-                    <SelectValue placeholder="대상캠페인" />
+                    <SelectValue placeholder="대상 캠페인" />
                   </SelectTrigger>
                   <SelectContent  style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                    <SelectItem key='0' value='0'>-선택-</SelectItem>
+                    <SelectItem key='0' value='0'>- 선택 -</SelectItem>
                     {campaigns.map(option => (
                       <SelectItem key={option.campaign_id} value={option.campaign_id.toString()}>
                         [{option.campaign_id}]{option.campaign_name}
@@ -1054,7 +1054,7 @@ const ListManager: React.FC = () => {
                 />
               </div>
               <div className="flex items-center gap-1 h-[26px]">
-                <Label className="w-[100px] min-w-[100px]">파일형식</Label>
+                <Label className="w-[100px] min-w-[100px]">파일 형식</Label>
                 <CommonRadio
                   defaultValue="auto"
                   className="flex gap-8"
@@ -1072,7 +1072,7 @@ const ListManager: React.FC = () => {
                 </CommonRadio>
               </div>
               <div className="flex items-center gap-1 h-[26px]">
-                <Label className="w-[100px] min-w-[100px]">작업대상 구분</Label>
+                <Label className="w-[100px] min-w-[100px]">작업 대상 구분</Label>
                 <CommonRadio
                   defaultValue="general"
                   className="flex gap-8 w-[200px] min-w-[200px]"
@@ -1105,12 +1105,12 @@ const ListManager: React.FC = () => {
                   disabled={workTargetDisableYn}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Insert: 기존리스트 삭제 후 등록" />
+                      <SelectValue placeholder="Insert: 기존 리스트 삭제 후 등록" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="I">Insert : 기존리스트 삭제 후 등록</SelectItem>
-                      <SelectItem value="D">Delete : 특정리스트 삭제</SelectItem>
-                      <SelectItem value="A">Append : 발신리스트 추가</SelectItem>
+                      <SelectItem value="I">Insert : 기존 리스트 삭제 후 등록</SelectItem>
+                      <SelectItem value="D">Delete : 특정 리스트 삭제</SelectItem>
+                      <SelectItem value="A">Append : 발신 리스트 추가</SelectItem>
                       <SelectItem value="L">블랙리스트 전체 삭제</SelectItem>
                     </SelectContent>
                   </Select>

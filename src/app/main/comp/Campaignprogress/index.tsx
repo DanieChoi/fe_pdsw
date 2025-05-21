@@ -698,7 +698,7 @@ export default function Campaignprogress() {
                   <SelectValue placeholder="전체 보기" />
                 </SelectTrigger>
                 <SelectContent style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                  <SelectItem value="전체보기">캠페인 전체</SelectItem>
+                  <SelectItem value="전체 보기">캠페인 전체</SelectItem>
                   {campaigns.map((campaign) => (
                     <SelectItem key={campaign.campaign_id} value={campaign.campaign_id + ''}>
                       {campaign.campaign_id}
