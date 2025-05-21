@@ -545,13 +545,13 @@ const SystemPreferences = () => {
     // 장비 저장 핸들러 (신규/수정 공통 검증)
     const validateEquipmentData = () => {
         if (!equipmentNumber || !equipmentName || !refreshCycle) {
-            showAlert('모든 필드를 입력해주세요.');
+            showAlert('모든 필드를 입력해 주세요.');
             return false;
         }
 
         const channelCount = parseInt(refreshCycle);
         if (isNaN(channelCount) || channelCount <= 0) {
-            showAlert('유효한 채널 수를 입력해주세요.');
+            showAlert('유효한 채널 수를 입력해 주세요.');
             return false;
         }
 
@@ -595,17 +595,14 @@ const SystemPreferences = () => {
 
     // 장비 삭제 핸들러
     const handleDeleteEquipment = () => {
-        // 선택된 장비가 없을 경우 경고 알림
         if (!selectedDevice) {
-            showAlert('삭제할 장비를 먼저 선택해주세요.');
+            showAlert('삭제할 장비를 먼저 선택해 주세요.');
             return;
         }
 
-        // 삭제 확인 알림
         showConfirm(
             `장비 [${selectedDevice.device_name}]를 삭제하시겠습니까? \n\n ※주의: 삭제시 데이터베이스에서 완전 삭제됩니다. \n 다시 한번 확인해 주시고 삭제해 주세요.`, 
             () => {
-                // 확인 버튼 클릭 시 실행될 함수
                 deleteDevice({
                     tenant_id: tenants[0].tenant_id,
                     device_id: parseInt(selectedDevice.device_id || "0")
@@ -625,9 +622,8 @@ const SystemPreferences = () => {
                 });
             }
         );
-    }
+    };
 
- 
     // 채널 수정 핸들러
     const handleChannelEdit = () => {
         if (!selectedDevice) return;
@@ -947,9 +943,8 @@ const SystemPreferences = () => {
 
     return (
         <div className="space-y-5">
-            <div className="flex gap-5 space-y-1"> {/* 장비 할당모드 위치 변경으로 인한 space y 추가 */}
+            <div className="flex gap-5 space-y-1">
                 <div className="w-1/2 flex-1 flex flex-col gap-5">
-                    {/* 장비 목록 섹션 */}
                     <div className="flex flex-col gap-2">
                         <TitleWrap title="장비 목록" totalCount={dialingDeviceList?.length || 0} />
                         <div className="grid-custom-wrap h-[300px]">
@@ -971,7 +966,7 @@ const SystemPreferences = () => {
                     {/* 장비 상세내역 섹션 */}
                     <div className="flex flex-col gap-2">
                         <TitleWrap
-                            title="장비 상세내역"
+                            title="장비 상세 내역"
                             buttons={[
                                 { 
                                     label: "신규", 
@@ -1041,7 +1036,7 @@ const SystemPreferences = () => {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <TitleWrap title="채널목록" totalCount={filteredChannels?.length || 0} />
+                        <TitleWrap title="채널 목록" totalCount={filteredChannels?.length || 0} />
                         <div className="grid-custom-wrap h-[300px]">
                         <DataGrid<ChannelRow>
                             columns={channelColumns}

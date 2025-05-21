@@ -35,16 +35,16 @@ interface PreferencesBoardProps {
   onSubmit?: (data: PreferencesData) => void;
 }
 
-// "campaignListAlram": 0,  			알림설정-리스트 잔량부족시 알람 모드(주기적으로 계속) 0: 한번만, 1: 주기적으로 계속
-// "statisticsUpdateCycle": 20,  		통계갱신주기-통계 가져오기 주기
-// "serverConnectionTime": 100,		서버접속시간-서버와의 접속시간을 설정합니다.
-// "showChannelCampaignDayScop": 5,	채널할당시보여주는캠페인-채널 할당 캠페인 범위
-// "personalCampaignAlertOnly": 0,		알림옆라벨-본인 캠페인만 알림 여부 (체크안함) 0:전체, 1:본인
-// "useAlramPopup": 0,					메시지알림창-알람 팝업 사용여부 (알리지않음) 0:알리지 않음, 1:알림
-// "unusedWorkHoursCalc": 1,			캠페인기능업무시간라벨-업무시간 적용여부  (체크) 체크 되어있을때는 캠페인 가능 업무시간 다 Disabled 0:사용, 1:미사용
-// "sendingWorkStartHours": "0000",	발신업무시간시작시간-발신업무시작시간
-// "sendingWorkEndHours": "0000",		발신업무시간종료시간발신업무종료시간
-// "dayOfWeekSetting": "f,f,f,f,f,f,f"	요일설정-발신업무가능 요일 (f는 체크 안됨 t는 체크)
+// "campaignListAlram": 0,  			알림 설정 - 리스트 잔량 부족 시 알람 모드(주기적으로 계속) 0: 한 번만, 1: 주기적으로 계속
+// "statisticsUpdateCycle": 20,  		통계 갱신 주기 - 통계 가져오기 주기
+// "serverConnectionTime": 100,		서버 접속 시간 - 서버와의 접속 시간을 설정합니다.
+// "showChannelCampaignDayScop": 5,	채널 할당 시 보여 주는 캠페인 - 채널 할당 캠페인 범위
+// "personalCampaignAlertOnly": 0,		알림 옆 라벨 - 본인 캠페인만 알림 여부 (체크 안 함) 0:전체, 1:본인
+// "useAlramPopup": 0,					메시지 알림창 - 알람 팝업 사용 여부 (알리지 않음) 0:알리지 않음, 1:알림
+// "unusedWorkHoursCalc": 1,			캠페인 기능 업무 시간 라벨 - 업무 시간 적용 여부 (체크) 체크되어 있을 때는 캠페인 가능 업무 시간 다 Disabled 0:사용, 1:미사용
+// "sendingWorkStartHours": "0000",	발신 업무 시간 시작 시간 - 발신 업무 시작 시간
+// "sendingWorkEndHours": "0000",		발신 업무 시간 종료 시간 - 발신 업무 종료 시간
+// "dayOfWeekSetting": "f,f,f,f,f,f,f"	요일 설정 - 발신 업무 가능 요일 (f는 체크 안 됨, t는 체크)
 
 export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   const router = useRouter();
@@ -204,7 +204,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   const { mutate: fetchOperatingTimeUpdate } = useApiForOperatingTimeUpdate({
     onSuccess: (data) => {
       if(data.result_code !== 0){
-        showAlert('발신업무시간 저장 중 오류가 발생하였습니다.');
+        showAlert('발신 업무 시간 저장 중 오류가 발생하였습니다.');
         return;
       }
       console.log(data);
@@ -299,7 +299,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
         setAlertState({
           ...alertState,
           isOpen: true,
-          message: "시작시간이 종료시간보다 늦을 수 없습니다.",
+          message: "시작 시간이 종료 시간보다 늦을 수 없습니다.",
         });
         return;
       }
@@ -308,7 +308,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
         setAlertState({
           ...alertState,
           isOpen: true,
-          message: "업무시간 제한 사용시 요일 설정이 필요합니다.",
+          message: "업무 시간 제한 사용 시 요일 설정이 필요합니다.",
         });
         return;
       }
@@ -372,7 +372,8 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             <tbody>
               <TableRow>
                 <TableHeader className="w-[12.5rem] !pt-[6px] !pb-[5px]">
-                  <Label className="w-32">채널 할당 시 보여주는 캠페인</Label>
+-                 <Label className="w-32">채널 할당 시 보여주는 캠페인</Label>
++                 <Label className="w-32">채널 할당 시 보여 주는 캠페인</Label>
                 </TableHeader>
                 <TableCell className="w-[17rem]">
                   <div className="flex items-center gap-3">
@@ -397,12 +398,14 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">채널을 캠페인 모드로 할당 시 화면에 보여주는 캠페인의 범위를 선택합니다. 현재 날짜를 기준으로 설정한 값만큼의 범위안에서 캠페인을 보여줍니다.</span>
+-                 <span className="text-sm">채널을 캠페인 모드로 할당 시 화면에 보여주는 캠페인의 범위를 선택합니다. 현재 날짜를 기준으로 설정한 값만큼의 범위안에서 캠페인을 보여줍니다.</span>
++                 <span className="text-sm">채널을 캠페인 모드로 할당 시 화면에 보여 주는 캠페인의 범위를 선택합니다. 현재 날짜를 기준으로 설정한 값만큼의 범위 안에서 캠페인을 보여 줍니다.</span>
                 </TableCell>
               </TableRow>
               <TableRow>
                 <TableHeader className="w-[12.5rem] !py-[6px]">
-                  <Label className="w-32">일람설정</Label>
+-                 <Label className="w-32">일람설정</Label>
++                 <Label className="w-32">일람 설정</Label>
                 </TableHeader>
                 <TableCell className="w-[17rem]">
                   <CommonRadio value={monitoringType} onValueChange={setMonitoringType} className="flex gap-8">
@@ -412,12 +415,14 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                     </div>
                     <div className="flex items-center space-x-2">
                       <CommonRadioItem value="periodic" id="periodic" />
-                      <Label htmlFor="periodic">주기적으로 계속</Label>
+-                     <Label htmlFor="periodic">주기적으로계속</Label>
++                     <Label htmlFor="periodic">주기적으로 계속</Label>
                     </div>
                   </CommonRadio>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">캠페인 리스트 잔량 부족시의 알람모드를 설정합니다.</span>
+-                 <span className="text-sm">캠페인 리스트 잔량 부족시의 알람모드를 설정합니다.</span>
++                 <span className="text-sm">캠페인 리스트 잔량 부족 시의 알람 모드를 설정합니다.</span>
                 </TableCell>
               </TableRow>
             </tbody>
@@ -429,7 +434,8 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             <tbody>
               <TableRow>
                 <TableHeader className="w-[12.5rem] !pt-[6px] !pb-[5px]">
-                  <Label className="w-32">통계 갱신주기</Label>
+-                 <Label className="w-32">통계 갱신주기</Label>
++                 <Label className="w-32">통계 갱신 주기</Label>
                 </TableHeader>
                 <TableCell className="w-[17rem]">
                   <div className="flex items-center gap-3">
@@ -454,12 +460,14 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">캠페인 통계를 서버로부터 가져오는 주기를 설정합니다.(권장 30~60초)</span>
+-                 <span className="text-sm">캠페인 통계를 서버로부터 가져오는 주기를 설정합니다.(권장 30~60초)</span>
++                 <span className="text-sm">캠페인 통계를 서버로부터 가져오는 주기를 설정합니다. (권장 30~60초)</span>
                 </TableCell>
               </TableRow>
               <TableRow>
                 <TableHeader className="w-[12.5rem] !py-[6px]">
-                  <Label className="w-32">서버 접속시간</Label>
+-                 <Label className="w-32">서버 접속시간</Label>
++                 <Label className="w-32">서버 접속 시간</Label>
                 </TableHeader>
                 <TableCell className="w-[17rem]">
                   <div className="flex items-center gap-3">
@@ -484,7 +492,8 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">서버와의 접속시간을 설정합니다.</span>
+-                 <span className="text-sm">서버와의 접속시간을 설정합니다.</span>
++                 <span className="text-sm">서버와의 접속 시간을 설정합니다.</span>
                 </TableCell>
               </TableRow>
             </tbody>
@@ -508,7 +517,8 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             <tbody>
               <TableRow>
                 <TableHeader className="w-[12.5rem] !py-[6px]">
-                  <Label className="w-32">메세지 알림창</Label>
+-                 <Label className="w-32">메세지 알림창</Label>
++                 <Label className="w-32">메시지 알림창</Label>
                 </TableHeader>
                 <TableCell className="w-[17rem]">
                   <div className="flex items-center gap-3">
@@ -541,7 +551,8 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   onCheckedChange={(checked) => setUnusedWorkHoursCalc(checked as boolean)}
                   disabled={tenant_id !== 0}
                 />
-                <Label htmlFor="worktime-enable" className="text-sm">업무시간 제한 미사용</Label>
+-               <Label htmlFor="worktime-enable" className="text-sm">업무시간 제한 미사용</Label>
++               <Label htmlFor="worktime-enable" className="text-sm">업무 시간 제한 미사용</Label>
               </div>
             </div>
           </div>
@@ -549,18 +560,21 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             <tbody>
               <TableRow>
                 <TableHeader className="w-[12.5rem] !pt-[6px] !pb-[5px]">
-                  <Label className="w-32">발신업무시간</Label>
+-                 <Label className="w-32">발신업무시간</Label>
++                 <Label className="w-32">발신 업무 시간</Label>
                 </TableHeader>
                 <TableCell className="w-[17rem]">
                   <div className="flex items-center gap-2">
-                    <Label>시작시각</Label>
+-                   <Label>시작시각</Label>
++                   <Label>시작 시각</Label>
                     <CustomInputForTime
                       value={startTime}
                       onChange={(value) => setStartTime(value)}
                       className="w-16"
                       disabled={tenant_id !== 0 || unusedWorkHoursCalc}
                     />
-                    <Label>종료시각</Label>
+-                   <Label>종료시각</Label>
++                   <Label>종료 시각</Label>
                     <CustomInputForTime
                       value={endTime}
                       onChange={(value) => setEndTime(value)}
@@ -570,7 +584,8 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">해당 업무 시간에만 캠페인을 시작할 수 있습니다.</span>
+-                 <span className="text-sm">해당 업무 시간에만 캠페인을 시작할 수 있습니다.</span>
++                 <span className="text-sm">해당 업무 시간에만 캠페인을 시작할 수 있습니다.</span>
                 </TableCell>
               </TableRow>
               <TableRow>

@@ -99,7 +99,7 @@ const SystemMonitoring: React.FC = () => {
             time: item.time // time은 그대로 사용
           }));
           
-          // #### 요구사항 정렬순서 텍스트 배열
+          // #### 요구 사항 정렬 순서 텍스트 배열
           const customOrder = [
             "EXDdesigner", 
             "EXDdbcontrol", 
@@ -141,10 +141,6 @@ const SystemMonitoring: React.FC = () => {
       return () => clearInterval(interval);
     }
   }, [systemMonitoring,statisticsUpdateCycle]);
-
-  
-
-  
 
   return (
     <div className="w-full limit-width">
