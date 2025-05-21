@@ -375,7 +375,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   <Label className="w-32">채널 할당 시 보여 주는 캠페인</Label>
                 </TableHeader>
                 <TableCell className="w-[20rem]">
-                  <div className="flex items-center gap-2">
+                  <div className="inline-flex items-center gap-1 flex-nowrap">
                     <CustomInput
                       type="number"
                       value={refreshCycle}
@@ -388,12 +388,12 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                         } else if (!isNaN(numericValue)) {
                           setRefreshCycle(Math.min(numericValue, 100).toString());
                         }
-                      }
-                      }
-                      className="!w-20 flex-shrink-0"   // ← !w-20 로 w-full 무시, flex-shrink-0 로 축소 방지
+                      }}
+                      className="!w-20 flex-shrink-0"
                       max={100}
+                      isFullWidth={false}
                     />
-                    <span className="text-sm whitespace-nowrap">일(day)</span>  {/* 줄바꿈 방지 */}
+                    <span className="text-sm whitespace-nowrap">일(day)</span>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -427,7 +427,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
           <TitleWrap title="통신" />
           <Table className='text-[#333]'>
             <tbody>
-              <TableRow>
+              {/* <TableRow>
                 <TableHeader className="w-[12.5rem] !pt-[6px] !pb-[5px]">
                   <Label className="w-32">통계 갱신 주기</Label>
                 </TableHeader>
@@ -456,8 +456,40 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                 <TableCell>
                   <span className="text-sm">캠페인 통계를 서버로부터 가져오는 주기를 설정합니다. (권장 30~60초)</span>
                 </TableCell>
-              </TableRow>
+              </TableRow> */}
+
               <TableRow>
+                <TableHeader className="w-[12.5rem] !pt-[6px] !pb-[5px]">
+                  <Label className="w-32">통계 갱신 주기</Label>
+                </TableHeader>
+                <TableCell className="w-[20rem]">
+                  <div className="inline-flex items-center gap-1 flex-nowrap">
+                    <CustomInput
+                      type="number"
+                      value={retryCount}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const numericValue = Number(value);
+
+                        if (value === '') {
+                          setRetryCount('');
+                        } else if (!isNaN(numericValue)) {
+                          setRetryCount(Math.min(numericValue, 60).toString());
+                        }
+                      }}
+                      className="!w-20 flex-shrink-0"
+                      max={60}
+                      isFullWidth={false}
+                    />
+                    <span className="text-sm whitespace-nowrap">초(sec)</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">캠페인 통계를 서버로부터 가져오는 주기를 설정합니다. (권장 30~60초)</span>
+                </TableCell>
+              </TableRow>
+
+              {/* <TableRow>
                 <TableHeader className="w-[12.5rem] !py-[6px]">
                   <Label className="w-32">서버 접속 시간</Label>
                 </TableHeader>
@@ -486,7 +518,39 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                 <TableCell>
                   <span className="text-sm">서버와의 접속 시간을 설정합니다.</span>
                 </TableCell>
+              </TableRow> */}
+
+              <TableRow>
+                <TableHeader className="w-[12.5rem] !py-[6px]">
+                  <Label className="w-32">서버 접속 시간</Label>
+                </TableHeader>
+                <TableCell className="w-[20rem]">
+                  <div className="inline-flex items-center gap-1 flex-nowrap">
+                    <CustomInput
+                      type="number"
+                      value={timeout}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const numericValue = Number(value);
+
+                        if (value === '') {
+                          setCustomTimeout('');
+                        } else if (!isNaN(numericValue)) {
+                          setCustomTimeout(Math.min(numericValue, 100).toString());
+                        }
+                      }}
+                      className="!w-20 flex-shrink-0"
+                      max={100}
+                      isFullWidth={false}
+                    />
+                    <span className="text-sm whitespace-nowrap">초(sec)</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">서버와의 접속 시간을 설정합니다.</span>
+                </TableCell>
               </TableRow>
+
             </tbody>
           </Table>
         </div>
