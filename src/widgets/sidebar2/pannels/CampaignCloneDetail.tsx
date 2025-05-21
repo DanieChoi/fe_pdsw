@@ -642,7 +642,7 @@ export default function CampaignDetail() {
     }
   }
 
-  //캠페인 발신순서 탭 변경
+  //캠페인 발신 순서 탭 변경
   const handleCampaignOutgoingOrderChange = (value: OutgoingOrderTabParam) => {
     if (value.campaignInfoChangeYn) {
       setCopyCampaignInfo({

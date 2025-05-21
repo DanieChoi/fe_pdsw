@@ -22,7 +22,7 @@ export function CallSettingBulkUpdateFormForCampaingGroup({
   // Main 탭 목록
   const tabs = [
     { key: "registrationTime", label: "등록시간" },
-    { key: "callingOrder", label: "발신순서" },
+    { key: "callingOrder", label: "발신 순서" },
     { key: "callingStrategy", label: "발신전략" },
     { key: "callingMethod", label: "발신방법" },
     { key: "callLineCount", label: "콜라인수" },
@@ -34,7 +34,7 @@ export function CallSettingBulkUpdateFormForCampaingGroup({
   // 선택된 탭 상태 관리 (기본값 "registrationTime")
   const [activeTab, setActiveTab] = useState(tabs[0].key);
 
-  // 전화번호 탭 목록 (발신순서 탭 내부에서 사용)
+  // 전화번호 탭 목록 (발신 순서 탭 내부에서 사용)
   const phoneNumbers = [
     { id: 1, label: "고객 전화번호(1)" },
     { id: 2, label: "고객 전화번호(2)" },
@@ -43,7 +43,7 @@ export function CallSettingBulkUpdateFormForCampaingGroup({
     { id: 5, label: "고객 전화번호(5)" },
   ];
 
-  // 발신순서 탭 외 다른 탭의 기본 내용 (placeholder)
+  // 발신 순서 탭 외 다른 탭의 기본 내용 (placeholder)
   const tabContents: { [key: string]: string } = {
     registrationTime: "등록시간 관련 내용을 여기에 표시합니다.",
     callingStrategy: "발신전략 관련 내용을 여기에 표시합니다.",
@@ -162,9 +162,9 @@ export function CallSettingBulkUpdateFormForCampaingGroup({
                   </div>
                 </div>
 
-                {/* 전화번호별 발신순서 편집 */}
+                {/* 전화번호별 발신 순서 편집 */}
                 <div className="border border-gray-300 p-2 flex-1 flex flex-col">
-                  <div className="text-sm font-medium mb-2">전화번호별 발신순서 편집</div>
+                  <div className="text-sm font-medium mb-2">전화번호별 발신 순서 편집</div>
 
                   <div className="flex flex-1">
                     {/* 왼쪽 전화번호 목록 */}

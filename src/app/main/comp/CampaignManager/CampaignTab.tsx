@@ -54,7 +54,7 @@ const CampaignTab: React.FC<Props> = ({ campaignSchedule
       <div className="tab-custom-wrap">
         <TabsList>
           <TabsTrigger value="tab1">동작시간</TabsTrigger>
-          <TabsTrigger value="tab2">발신순서</TabsTrigger>
+          <TabsTrigger value="tab2">발신 순서</TabsTrigger>
           <TabsTrigger value="tab3">발신전략</TabsTrigger>
           <TabsTrigger value="tab4">발신방법</TabsTrigger>
           <TabsTrigger value="tab5">콜페이싱</TabsTrigger>

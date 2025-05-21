@@ -287,7 +287,7 @@ const OutgoingOrderTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onC
         <div>
           <TitleWrap
             className="border-b border-gray-300 pb-1"
-            title="전화번호별 발신순서 편집"
+            title="전화번호별 발신 순서 편집"
           />
            <div className="">
             <div className="flex gap-5">
