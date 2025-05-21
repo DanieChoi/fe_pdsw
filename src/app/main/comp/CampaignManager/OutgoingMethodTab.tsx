@@ -21,7 +21,7 @@ const useCounselResultList = [
 
 const useMachineHandling = [
   {id:1, name: '컬러링 판별후 사람만 연결'},
-  {id:2, name: '컬러링 판별후 사람/ 기계음 연결'},
+  {id:2, name: '컬러링 판별후 사람 / 기계음 연결'},
   {id:3, name: '기계음 / 사람 무조건연결'},
 ];
 
