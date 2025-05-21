@@ -607,10 +607,10 @@ const TabHeader = ({
                     {sectionCount < 2 ? (
                         <div className="flex h-full">
                             <div className="w-1/2 border-r-2 border-blue-500 border-dashed h-full bg-blue-100 bg-opacity-60 flex items-center justify-center">
-                                <span className="text-blue-500 opacity-80 font-semibold text-sm">현재 영역</span>
+                                {/* <span className="text-blue-500 opacity-80 font-semibold text-sm">현재 영역</span> */}
                             </div>
                             <div className="w-1/2 h-full bg-blue-200 bg-opacity-60 flex items-center justify-center">
-                                <span className="text-blue-500 opacity-80 font-semibold text-sm">새 분할 영역</span>
+                                {/* <span className="text-blue-500 opacity-80 font-semibold text-sm">새 분할 영역</span> */}
                             </div>
                         </div>
                     ) : (
