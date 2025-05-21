@@ -14,6 +14,7 @@ const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
     const inputRef = React.useRef<HTMLInputElement>(null);
     const combinedRef = useCombinedRefs(ref, inputRef);
     const [localError, setLocalError] = React.useState<string | undefined>(error);
+    const [previousPhoneValue, setPreviousPhoneValue] = React.useState<string>("");
 
     const stringValue =
       typeof value === "number" || typeof value === "string"
@@ -35,6 +36,12 @@ const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
         }
       }
     }, [error]);
+
+    // 전화번호 유효성 검사 함수
+    const validatePhoneNumber = (phoneNumber: string): boolean => {
+      if (!phoneNumber) return true; // 빈 값은 유효하다고 처리
+      return /^01[0|1|6|7|8|9][0-9]{7,8}$/.test(phoneNumber);
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       let newValue = e.target.value;
@@ -68,17 +75,34 @@ const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
         }
         newValue = newValue.replace(/\D/g, "");
         
-        // 실시간으로 전화번호 형식 검사 (길이가 11자리 이상일 때)
-        if (newValue.length >= 11) {
-          const isValid = /^01[0|1|6|7|8|9][0-9]{7,8}$/.test(newValue);
-          if (!isValid) {
-            setLocalError("유효하지 않은 전화번호 형식입니다");
+        // 이전 전화번호 값 저장
+        setPreviousPhoneValue(newValue);
+        
+        // 전화번호 유효성 동적 검사 (입력 중일 때도)
+        if (newValue.length > 0) {
+          // 길이가 11자리 미만이면 아직 입력 중이라고 판단하여 에러 메시지 표시하지 않음
+          if (newValue.length < 11) {
+            // 이전에 잘못된 형식 에러가 있었다면 지우기
+            if (localError === "유효하지 않은 전화번호 형식입니다") {
+              setLocalError(undefined);
+            }
           } else {
-            setLocalError(undefined);
+            // 11자리 이상이면 완전한 검사 수행
+            const isValid = validatePhoneNumber(newValue);
+            
+            // 유효성에 따라 에러 메시지 설정/제거
+            if (!isValid) {
+              setLocalError("유효하지 않은 전화번호 형식입니다");
+            } else {
+              setLocalError(undefined);
+            }
+            
+            // 콜백이 제공된 경우 호출
+            onValidPhoneNumber?.(isValid);
           }
-          
-          // 콜백이 제공된 경우 호출
-          onValidPhoneNumber?.(isValid);
+        } else {
+          // 값이 비어있으면 에러 메시지 제거
+          setLocalError(undefined);
         }
       }
 
@@ -87,10 +111,10 @@ const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
       if (isPhoneNumber) {
-        // 전화번호 유효성 검사 - onValidPhoneNumber 존재 여부와 관계없이 검사
+        // 전화번호 유효성 검사 - 블러 이벤트에서는 빈 값도 유효하지 않음으로 처리
         const phoneNumber = e.target.value;
-        if (phoneNumber && phoneNumber !== "") {
-          const isValid = /^01[0|1|6|7|8|9][0-9]{7,8}$/.test(phoneNumber);
+        if (phoneNumber !== "") {
+          const isValid = validatePhoneNumber(phoneNumber);
           
           // 콜백이 제공된 경우 호출
           onValidPhoneNumber?.(isValid);
@@ -111,6 +135,27 @@ const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
 
       props.onBlur?.(e);
     };
+
+    // value가 외부에서 변경될 때 검사 (예: 상위 컴포넌트에서 직접 값 설정)
+    React.useEffect(() => {
+      if (isPhoneNumber && stringValue !== previousPhoneValue) {
+        // 전화번호가 바뀌었을 때 검사
+        setPreviousPhoneValue(stringValue);
+        
+        if (stringValue.length >= 11) {
+          const isValid = validatePhoneNumber(stringValue);
+          if (isValid && localError === "유효하지 않은 전화번호 형식입니다") {
+            setLocalError(undefined);
+            onValidPhoneNumber?.(true);
+          } else if (!isValid && !localError) {
+            setLocalError("유효하지 않은 전화번호 형식입니다");
+            onValidPhoneNumber?.(false);
+          }
+        } else if (stringValue === "" && localError) {
+          setLocalError(undefined);
+        }
+      }
+    }, [stringValue, isPhoneNumber, localError, onValidPhoneNumber, previousPhoneValue]);
 
     return (
       <div className="relative w-full">
