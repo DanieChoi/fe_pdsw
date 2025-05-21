@@ -1075,12 +1075,12 @@ const SystemPreferences = () => {
                                     disabled={!selectedDevice}
                                 >
                                     <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="할당모드 선택" />
+                                        <SelectValue placeholder="할당 모드 선택" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="1">1.캠페인으로할당</SelectItem>
-                                        <SelectItem value="2">2.발신모드로할당</SelectItem>
-                                        <SelectItem value="3">3.채널그룹으로할당</SelectItem>
+                                        <SelectItem value="1">1. 캠페인으로 할당</SelectItem>
+                                        <SelectItem value="2">2. 발신모드로 할당</SelectItem>
+                                        <SelectItem value="3">3. 채널 그룹으로 할당</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div> */}
