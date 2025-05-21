@@ -48,6 +48,7 @@ const NotificationTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onHa
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = e.target.value;
+    setTempCampaignInfoChangeYn(true);
     onHandleNotificationTabChange({...tempNotificationTabParam
       , campaignInfoChangeYn : true
       , supervisor_phone: value
