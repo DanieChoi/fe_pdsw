@@ -442,7 +442,7 @@ function CampaignLayout() {
               onClick={() => setIsModalOpen(true)}
               // disabled={isCampaignFieldDisabled()}
             >
-              캠페인조회
+              캠페인 조회
             </CommonButton>
             <CustomInput 
               type="text" 

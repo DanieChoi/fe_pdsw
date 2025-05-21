@@ -556,7 +556,7 @@ const CampaignSettings = () => {
               size="sm"
               onClick={() => setIsModalOpen(true)}
             >
-              캠페인조회
+              캠페인 조회
             </CommonButton>
           </div>
 

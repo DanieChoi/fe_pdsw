@@ -1577,7 +1577,7 @@ const DistributionLimit = () => {
               }
             }}
           >
-            캠페인조회
+            캠페인 조회
           </CommonButton>
           <CustomInput 
             value={selectedCampaignName !== '' ? selectedCampaignName ?? '' : operationCampaignName ?? ''}
