@@ -51,9 +51,9 @@ export const getStatusIcon = (status?: string) => {
     case "pauseProgress":
       return "/sidebar-menu/tree_pause_progress.png";
     case "timeset":
-      return "/sidebar-menu/tree_timeset.png";  
+      return "/sidebar-menu/tree_timeset.png";
     case "timeattp":
-      return "/sidebar-menu/tree_timeattp.png";  
+      return "/sidebar-menu/tree_timeattp.png";
     default:
       return null;
   }
@@ -112,8 +112,8 @@ export function ContextMenuForCampaignForCampaignTab({
   const [alertState, setAlertState] = useState<CustomAlertRequest>(errorMessage);
   const { availableCampaignTabCampaignContextMenuIds } = useAvailableMenuStore();
 
-  const { tenant_id, role_id, session_key, id : user_id } = useAuthStore();
-  
+  const { tenant_id, role_id, session_key, id: user_id } = useAuthStore();
+
   // 스토어에서 campaigns 데이터 직접 구독하여 항상 최신 상태 사용
   const campaigns = useMainStore(state => state.campaigns);
 
@@ -129,11 +129,11 @@ export function ContextMenuForCampaignForCampaignTab({
     const currentCampaignDialStatus = campaignDialStatus.find((dialStatus) => dialStatus.campaign_id === item.id);
     setCurrentCampaignDialStatus(currentCampaignDialStatus);
   }, [campaignDialStatus, item.id]);
-  
-  
+
+
   // 현재 캠페인 정보를 useMemo로 캐싱
   const currentCampaign = useMemo(() => {
-  return campaigns?.find((c: any) => c.campaign_id === Number(item.id));
+    return campaigns?.find((c: any) => c.campaign_id === Number(item.id));
   }, [campaigns, item.id]);
 
 
@@ -143,7 +143,7 @@ export function ContextMenuForCampaignForCampaignTab({
       switch (currentCampaign.campaign_status) {
         case 1: return "started";
         case 2: return "pending";
-        case 3: return "stopped";   
+        case 3: return "stopped";
 
         default: return item.status;
       }
@@ -185,9 +185,9 @@ export function ContextMenuForCampaignForCampaignTab({
 
   const updateCampaignStatusMutation = useApiForCampaignStatusUpdate({
     onSuccess: (data, variables) => {
-      
+
       // 등록된 발신리스트가 없을 경우
-      if(data.result_code === -1 && data.reason_code === -7771) {
+      if (data.result_code === -1 && data.reason_code === -7771) {
 
         setAlertState({
           ...alertState,
@@ -201,7 +201,7 @@ export function ContextMenuForCampaignForCampaignTab({
           },
         });
         return;
-      } else if( !(data.result_code === 0 || ( data.result_code === -1 && data.reason_code === -13 ))) {
+      } else if (!(data.result_code === 0 || (data.result_code === -1 && data.reason_code === -13))) {
         setAlertState({
           ...alertState,
           isOpen: true,
@@ -211,17 +211,17 @@ export function ContextMenuForCampaignForCampaignTab({
           onClose: () => {
             setAlertState({ ...alertState, isOpen: false });
             preventCloseRef.current = false;
-            
+
           },
         });
         return;
-      } 
-      
+      }
+
       // 멈춤중, 정지중에 해당하면 alert 띄우지 않기
-      const reCheckCampaigns = useCampaignDialStatusStore.getState().campaignDialStatus.some(( dialStatus) => 
-                (dialStatus.campaign_id.toString() === item.id.toString()) && 
-                (dialStatus.status?.toString() === '5' || dialStatus.status?.toString() === '6') );
-      if(!reCheckCampaigns) {
+      const reCheckCampaigns = useCampaignDialStatusStore.getState().campaignDialStatus.some((dialStatus) =>
+        (dialStatus.campaign_id.toString() === item.id.toString()) &&
+        (dialStatus.status?.toString() === '5' || dialStatus.status?.toString() === '6'));
+      if (!reCheckCampaigns) {
         customAlertService.success(
           '캠페인 상태가 성공적으로 변경되었습니다!',
           '캠페인 상태 변경 완료'
@@ -231,13 +231,13 @@ export function ContextMenuForCampaignForCampaignTab({
       // API 성공 후 2가지 방법으로 상태 업데이트:
       // 1. 스토어의 updateCampaignStatus 직접 호출 (즉시 UI 반영)
       useMainStore.getState().updateCampaignStatus(
-        Number(variables.campaign_id), 
+        Number(variables.campaign_id),
         variables.campaign_status
       );
-      
+
       // 2. fetchMain으로 전체 데이터 새로고침 (백엔드와 완전히 동기화)
       fetchMain({ session_key, tenant_id });
-      
+
     },
     onError: (error) => {
       ServerErrorCheck('캠페인 상태 변경', error.message);
@@ -276,8 +276,29 @@ export function ContextMenuForCampaignForCampaignTab({
     }
   };
 
+  // tofix 0521
+  // const handleEditMenuClick = () => {
+  //   simulateHeaderMenuClick(2);
+  //   setCampaignIdForUpdateFromSideMenu(item.id);
+  // };
+
   const handleEditMenuClick = () => {
-    simulateHeaderMenuClick(2);
+    // openSingleTabAtCurrentSection 함수 사용
+    const tabInfo = {
+      id: 2,
+      uniqueKey: `2-${Date.now()}`,
+      title: `캠페인 관리`,
+      content: null,
+      params: { campaignId: item.id, campaignName: item.label, campaignType: item.type },
+      menuId: 2,
+      icon: "",
+      href: ""
+    };
+
+    // 현재 섹션에 단일 탭으로 추가
+    useTabStore.getState().openSingleTabAtCurrentSection(2, tabInfo);
+
+    // 부가 상태 업데이트 (기존과 동일)
     setCampaignIdForUpdateFromSideMenu(item.id);
   };
 
@@ -300,10 +321,10 @@ export function ContextMenuForCampaignForCampaignTab({
 
   const handleRebroadcastClick = (campaignId: any, reBroadCastOption: 'scheduled' | 'realtime') => {
     setCampaignIdForUpdateFromSideMenu(campaignId);
-  
+
     const uniqueKey = `rebroadcast-${campaignId}-${Date.now()}`;
     const titlePrefix = reBroadCastOption === 'scheduled' ? '예약' : '실시간';
-  
+
     useTabStore.getState().addOnlyTab(
       {
         id: 20,
@@ -341,7 +362,7 @@ export function ContextMenuForCampaignForCampaignTab({
     });
   };
 
-  
+
   const handleCampaignListDelete = (campaignId: any) => {
     if (displayStatus !== "stopped") {
       toast.error("캠페인이 중지 상태일 때만 리스트를 삭제할 수 있습니다.");
@@ -352,18 +373,18 @@ export function ContextMenuForCampaignForCampaignTab({
 
   // 캠페인 마스터 정보 수정하기
   const { mutate: fetchCampaignManagerUpdate } = useApiForCampaignManagerUpdate({
-      onSuccess: (data,variables) => {
-          
-      },
-      onError: (data) => {
-          //ServerErrorCheck('캠페인 채널그룹 할당 해제', data.message);
-      }
+    onSuccess: (data, variables) => {
+
+    },
+    onError: (data) => {
+      //ServerErrorCheck('캠페인 채널그룹 할당 해제', data.message);
+    }
   });
 
   // 여기 수정 해야함 표시 #### 
   const handleCampaingProgressUpdate = async (status: CampaignStatus) => {
     // "started" | "pending" | "stopped"
-    
+
 
     if (displayStatus === status || updateCampaignStatusMutation.isPending) {
       return;
@@ -372,64 +393,64 @@ export function ContextMenuForCampaignForCampaignTab({
     const currentDialStatus = useCampaignDialStatusStore.getState().campaignDialStatus;
 
     // 현재 캠페인의 상태가 정지중이거나 멈춤중일때
-    const existDial = currentDialStatus.some(( dialStatus) => 
-                      (dialStatus.campaign_id.toString() === item.id.toString()) && 
-                      (dialStatus.status?.toString() === '5' || dialStatus.status?.toString() === '6') );
+    const existDial = currentDialStatus.some((dialStatus) =>
+      (dialStatus.campaign_id.toString() === item.id.toString()) &&
+      (dialStatus.status?.toString() === '5' || dialStatus.status?.toString() === '6'));
 
     const waitConfirm = async () => {
 
       // 상태변경할 캠페인 정보 가져오기
       const updatedCampaignsInfo = campaigns.filter((campaign) => campaign.campaign_id === parseInt(item.id))[0];
-      
+
       // 캠페인 마스터 변경시 보낼 데이터정보 가져오기
       const currentCampaignInfo = UpdataCampaignInfo(campaigns, parseInt(item.id), updatedCampaignsInfo.start_flag);
 
       // 현재시간 양식 구하기.
       const getCurrentFormattedTime = () => {
-          const now = new Date();
-      
-          const year = now.getFullYear();
-          const month = String(now.getMonth() + 1).padStart(2, '0'); // 0부터 시작하므로 +1
-          const day = String(now.getDate()).padStart(2, '0');
-      
-          const hours = String(now.getHours()).padStart(2, '0');
-          const minutes = String(now.getMinutes()).padStart(2, '0');
-          const seconds = String(now.getSeconds()).padStart(2, '0');
-      
-          return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        const now = new Date();
+
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // 0부터 시작하므로 +1
+        const day = String(now.getDate()).padStart(2, '0');
+
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
       };
 
       const todayTime = getCurrentFormattedTime();
-      
+
       // 현재 캠페인 발신중이며 멈춤 중이거나 정지 중일때 === existDial
-      if(!existDial){
-        
+      if (!existDial) {
+
         // 캠페인 status API 호출
         await updateCampaignStatusMutation.mutateAsync({
           campaign_id: Number(item.id),
           campaign_status: getStatusNumber(status),
         }).then(() => {
-            console.log('#### then 으로 떨어짐 사이드바 캠페인 상태 변경');
+          console.log('#### then 으로 떨어짐 사이드바 캠페인 상태 변경');
         }).catch(error => {
-            console.log('#### 사이드바 캠페인 상태 변경 에러:', error);  
+          console.log('#### 사이드바 캠페인 상태 변경 에러:', error);
         });
       }
       else {
         console.log('#### 마스터 수정 으로 떨어짐 사이드바 캠페인 상태 변경');
         // 캠페인 마스터 API 호출
         fetchCampaignManagerUpdate(
-            {
-                ...currentCampaignInfo
-                , start_flag : status === 'started' ? 1 : status === 'pending' ? 2 : 3
-                , update_user: user_id
-                , update_ip: Cookies.get('userHost')+''
-                , update_time: todayTime
-            }
+          {
+            ...currentCampaignInfo
+            , start_flag: status === 'started' ? 1 : status === 'pending' ? 2 : 3
+            , update_user: user_id
+            , update_ip: Cookies.get('userHost') + ''
+            , update_time: todayTime
+          }
         );
       }
     };
 
-    if(existDial) {
+    if (existDial) {
       // 시점 초기화
       document.body.style.pointerEvents = 'auto';
       setAlertState({
@@ -448,10 +469,10 @@ export function ContextMenuForCampaignForCampaignTab({
         },
       });
       return;
-    }    
-    
+    }
+
     await waitConfirm();
-    
+
     // try {
     //   preventCloseRef.current = true;
     //   // 실제 API 호출
@@ -459,7 +480,7 @@ export function ContextMenuForCampaignForCampaignTab({
     //     campaign_id: Number(item.id),
     //     campaign_status: getStatusNumber(status),
     //   });
-      
+
     //   // API 응답 처리는 onSuccess 콜백에서 처리
     // } catch (error) {
     //   console.error('Error changing campaign status:', {
@@ -601,7 +622,7 @@ export function ContextMenuForCampaignForCampaignTab({
             onFocusID={(focusId) => {
               // context Menu 갇히는거 초기화
               document.body.style.pointerEvents = 'auto';
-              
+
               // onFocusID 삭제 후 이동될 callback 추가, 
               setCampaignIdForUpdateFromSideMenu(focusId.toString());
             }}
@@ -640,10 +661,10 @@ export function ContextMenuForCampaignForCampaignTab({
   const filteredMenuItems = mainMenuItems.filter((menuItem) => {
     if (menuItem.type === "separator") return true;
     if (menuItem.menuId === undefined) return true;
-    
+
     // 캠페인 리스트 삭제 메뉴는 상태에 따라 동적으로 필터링
     if (menuItem.key === "listDelete" && displayStatus !== "stopped") return false;
-    
+
     return availableCampaignTabCampaignContextMenuIds.includes(menuItem.menuId);
   });
 
