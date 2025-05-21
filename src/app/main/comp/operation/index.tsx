@@ -73,7 +73,7 @@ export default function OperationBoard({ uniqueKey }: OperationBoardProps) {
   // 섹션 데이터를 배열로 정의
   const sections = [
     { id: 'section1', title: '캠페인별 발신번호 변경', component: CampaignLayout },
-    { id: 'section2', title: '전화번호별 설명 편집', component: EditDescription },
+    { id: 'section2', title: '전화 번호별 설명 편집', component: EditDescription },
     { id: 'section3', title: '예약 콜 제한 설정', component: CallLimitSetting },
     { id: 'section8', title: '콜백 리스트 초기화 시각 설정', component: SystemCallBackTimeSetting },
     { id: 'section4', title: '분배 호수 제한 설정', component: DistributionLimit },

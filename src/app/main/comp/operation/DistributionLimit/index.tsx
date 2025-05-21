@@ -1594,11 +1594,11 @@ const DistributionLimit = () => {
           { (menu_role_id === 1 && role_id === 0)&& 
             ( 
               <>
-              <CommonButton onClick={openTimeSettingModal}>초기화시각 변경</CommonButton>
-              <CommonButton onClick={() => setIsTimeRemoveOpen(true)}>초기화시각 설정해제</CommonButton>
+              <CommonButton onClick={openTimeSettingModal}>초기화 시각 변경</CommonButton>
+              <CommonButton onClick={() => setIsTimeRemoveOpen(true)}>초기화 시각 설정해제</CommonButton>
               {hasChanges && (
                 <>
-                  <CommonButton variant="outline" onClick={handleCancelChanges}>변경취소</CommonButton>
+                  <CommonButton variant="outline" onClick={handleCancelChanges}>변경 취소</CommonButton>
                   <CommonButton onClick={handleBulkSave}>저장</CommonButton>
                 </>
               )}

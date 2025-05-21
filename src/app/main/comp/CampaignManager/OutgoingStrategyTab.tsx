@@ -351,7 +351,7 @@ const OutgoingStrategyTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, o
         <div>
           <TitleWrap
             className="pb-1"
-            title="전화번호별 최대 링 횟수"
+            title="전화 번호별 최대 링 횟수"
           />
           <div className="grid-custom-wrap w-full">
             <DataGrid

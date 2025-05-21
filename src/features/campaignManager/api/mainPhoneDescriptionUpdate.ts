@@ -1,7 +1,7 @@
 import { axiosInstance } from "@/lib/axios";
 import { PhoneDescriptionListDataResponse, UpdateResponse } from "../types/campaignManagerIndex";
 
-//전화번호별설명 템플릿 수정
+//전화 번호별설명 템플릿 수정
 export const fetchPhoneDescriptionUpdate = async (credentials: PhoneDescriptionListDataResponse): Promise<UpdateResponse> => {
     const PhoneDescriptionUpdateRequestData = {
         request_data: {
