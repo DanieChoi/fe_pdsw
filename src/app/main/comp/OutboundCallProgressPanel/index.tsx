@@ -186,23 +186,23 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 
   // 그리드 컬럼 정의
   const columns: Column[] = [
-    { key: 'skillId', name: '스킬아이디' },
-    { key: 'campaignId', name: '캠페인아이디' },
-    { key: 'campaignName', name: '캠페인이름' },
+    { key: 'skillId', name: '스킬 아이디' },
+    { key: 'campaignId', name: '캠페인 아이디' },
+    { key: 'campaignName', name: '캠페인 이름' },
     { key: 'priority', name: '다이얼 순번' },
     { key: 'custKey', name: '고객키' },
     { key: 'custName', name: '고객 이름' },
-    { key: 'phoneType', name: '발신번호 구분' },
-    { key: 'phone1', name: '전화번호1' },
-    { key: 'attempt1', name: '시도횟수' },
-    { key: 'phone2', name: '전화번호2' },
-    { key: 'attempt2', name: '시도횟수' },
-    { key: 'phone3', name: '전화번호3' },
-    { key: 'attempt3', name: '시도횟수' },
-    { key: 'phone4', name: '전화번호3' },
-    { key: 'attempt4', name: '시도횟수' },
-    { key: 'phone5', name: '전화번호3' },
-    { key: 'attempt5', name: '시도횟수' },
+    { key: 'phoneType', name: '발신 번호 구분' },
+    { key: 'phone1', name: '전화번호 1' },
+    { key: 'attempt1', name: '시도 횟수' },
+    { key: 'phone2', name: '전화번호 2' },
+    { key: 'attempt2', name: '시도 횟수' },
+    { key: 'phone3', name: '전화번호 3' },
+    { key: 'attempt3', name: '시도 횟수' },
+    { key: 'phone4', name: '전화번호 4' },
+    { key: 'attempt4', name: '시도 횟수' },
+    { key: 'phone5', name: '전화번호 5' },
+    { key: 'attempt5', name: '시도 횟수' },
     { key: 'result', name: '다이얼 결과' }
   ];
 
@@ -457,10 +457,10 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
           <Label className="w-20 min-w-20">캠페인</Label>
           <Select onValueChange={handleCampaignChange} value={selectedCampaign}>
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="캠페인전체" />
+              <SelectValue placeholder="캠페인 전체" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">캠페인전체</SelectItem>
+              <SelectItem value="all">캠페인 전체</SelectItem>
               {campaigns.map(option => (
                 <SelectItem key={option.campaign_id} value={option.campaign_id.toString()}>
                   [{option.campaign_id}]{option.campaign_name}
@@ -487,7 +487,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
                     재시도 발신
                   </TableHeader>
                   <TableHeader className="!bg-[#F6F0FA] !text-center text-sm font-normal text-[#9459BF] !h-[30px]">
-                    분배대기
+                    분배 대기
                   </TableHeader>
                 </TableRow>
               </thead>
