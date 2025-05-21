@@ -20,9 +20,9 @@ const useCounselResultList = [
 ];
 
 const useMachineHandling = [
-  {id:1, name: '컬러링 판별후 사람만 연결'},
-  {id:2, name: '컬러링 판별후 사람 / 기계음 연결'},
-  {id:3, name: '기계음 / 사람 무조건연결'},
+  {id:1, name: '컬러링 판별 후 사람만 연결'},
+  {id:2, name: '컬러링 판별 후 사람 / 기계음 연결'},
+  {id:3, name: '기계음 / 사람 무조건 연결'},
 ];
 
 const CampaignOutgoingMethodTab:OutgoingMethodTabParam = {
@@ -242,7 +242,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
           {/* 포기호 처리시간 */}
           <div className="flex items-center gap-2 justify-between">
             <Label className="w-[8.3rem] min-w-[8.3rem]">
-              포기호 처리시간(초)
+              포기호 처리 시간(초)
             </Label>
             <Select value={tempOutgoingMethodTab.overdial_abandon_time+''} onValueChange={handleAbandonmentTime}>
               <SelectTrigger className="w-full">
@@ -262,13 +262,13 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
 
           {/* 기계음 처리 */}
           <div className="flex items-center gap-2 justify-between">
-            <Label className="w-[8.3rem] min-w-[8.3rem]">기계음처리</Label>
+            <Label className="w-[8.3rem] min-w-[8.3rem]">기계음 처리</Label>
             <Select
               value={tempOutgoingMethodTab.detect_mode+''}
               onValueChange={handleMachineHandling}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="컬러링 판별후 사람만연결" />
+                <SelectValue placeholder="컬러링 판별 후 사람만 연결" />
               </SelectTrigger>
               <SelectContent>
                 {useMachineHandling.map((option) => (
@@ -306,7 +306,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
 
           {/* 채널그룹 옵션 */}
           <div className="flex items-center gap-2 justify-between">
-          <Label className="w-[8.3rem] min-w-[8.3rem]">채널그룹 옵션</Label>
+          <Label className="w-[8.3rem] min-w-[8.3rem]">채널 그룹 옵션</Label>
           <Select value={tempOutgoingMethodTab.channel_group_id+''} onValueChange={handleLinkedChannelGroupList}>
             <SelectTrigger className="w-full">
             <SelectValue placeholder={''} />
@@ -473,7 +473,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
                 disabled={!limitRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
               />
               <Label htmlFor="limit-init" className="">
-                분배제한 고정 포함 초기화
+                분배 제한 고정 포함 초기화
               </Label>
             </div>
             <div className="flex items-center gap-2 justify-between">
@@ -496,7 +496,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
                 disabled={!limitRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
               />
               <Label htmlFor="limit-exit-init" className="">
-                분배제한 고정 제외 초기화
+                분배 제한 고정 제외 초기화
               </Label>
             </div>
           </div>

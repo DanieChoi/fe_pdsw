@@ -145,7 +145,7 @@ export default function CampaignManagerHeader({ onSearch,init,setInit }: Props) 
           </Select>
         </div>
         <div className="flex items-center">
-          <Label className="pr-[15px] whitespace-nowrap">캠페인이름</Label>
+          <Label className="pr-[15px] whitespace-nowrap">캠페인 이름</Label>
           <CustomInput
             type="text"
             value={campaignName}

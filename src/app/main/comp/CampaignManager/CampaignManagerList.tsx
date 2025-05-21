@@ -39,19 +39,19 @@ const columns: Column[] = [
   },
   {
     key: "idName",
-    name: "아이디+이름",
+    name: "아이디 + 이름",
     width: 180,
     resizable: true
   },
   {
     key: "startDate",
-    name: "시작일자",
+    name: "시작 일자",
     width: 120,
     resizable: true
   },
   {
     key: "endDate",
-    name: "종료일자",
+    name: "종료 일자",
     width: 120,
     resizable: true
   },
@@ -63,13 +63,13 @@ const columns: Column[] = [
   },
   {
     key: "dialMode",
-    name: "다이얼모드",
+    name: "다이얼 모드",
     width: 150,
     resizable: true
   },
   {
     key: "callingNumber",
-    name: "발신번호",
+    name: "발신 번호",
     width: 150,
     resizable: true
   },

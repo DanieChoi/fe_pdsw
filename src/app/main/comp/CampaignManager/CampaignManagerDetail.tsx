@@ -1207,9 +1207,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       setAlertState({
         ...errorMessage,
         isOpen: true,
-        message: '캠페인 아이디 : ' + tempCampaignManagerInfo.campaign_id
-          + '\n 캠페인 이름 : ' + tempCampaignManagerInfo.campaign_name
-          + '\n 캠페인을 수정하시겠습니까?',
+        message: '캠페인 아이디: ' + tempCampaignManagerInfo.campaign_id
+          + '\n캠페인 이름: ' + tempCampaignManagerInfo.campaign_name
+          + '\n캠페인을 수정하시겠습니까?',
         onClose: () => {
           // 화면 깜빡임 방지를 위한 비동기처리
           setTimeout(() => {
@@ -1382,10 +1382,10 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     setAlertState({
       ...errorMessage,
       isOpen: true,
-      message: '캠페인 아이디 : ' + tempCampaignManagerInfo.campaign_id
-        + '\n 캠페인 이름 : ' + tempCampaignManagerInfo.campaign_name
-        + '\n 삭제된 캠페인은 복구가 불가능합니다.'
-        + '\n 캠페인을 삭제하시겠습니까?',
+      message: '캠페인 아이디: ' + tempCampaignManagerInfo.campaign_id
+        + '\n캠페인 이름: ' + tempCampaignManagerInfo.campaign_name
+        + '\n삭제된 캠페인은 복구가 불가능합니다.'
+        + '\n캠페인을 삭제하시겠습니까?',
       onClose: handleCampaignDeleteExecute,
       onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
     });
@@ -1943,7 +1943,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       campaignId: campaignId + '',
       campaignName: tempCampaignInfo.campaign_name,
       uniqueKey: '7',
-      title: '리스트매니저',
+      title: '리스트 매니저',
       icon: '',
       href: '',
       content: null,
@@ -1958,11 +1958,11 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     setAlertState({
       ...errorMessage,
       isOpen: true,
-      message: '캠페인 아이디 : ' + tempCampaignManagerInfo.campaign_id
-        + '\n 캠페인 이름 : ' + tempCampaignManagerInfo.campaign_name
-        + '\n\n 발신리스트 삭제시 발신리스트와 캠페인 진행정보가 초기화 됩니다.'
-        + '\n 삭제된 발신리스트와 캠페인 진행정보는 복구가 불가능합니다.'
-        + '\n 발신리스트를 삭제하시겠습니까?',
+      message: '캠페인 아이디: ' + tempCampaignManagerInfo.campaign_id
+        + '\n캠페인 이름: ' + tempCampaignManagerInfo.campaign_name
+        + '\n\n 발신 리스트 삭제 시, 발신 리스트와 캠페인 진행 정보가 초기화됩니다.'
+        + '\n삭제된 발신 리스트와 캠페인 진행 정보는 복구가 불가능합니다.'
+        + '\n발신 리스트를 삭제하시겠습니까?',
       onClose: () => fetchCallingListDelete(campaignId),
       onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
     });
@@ -1982,7 +1982,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       campaignId: campaignId + '',
       campaignName: tempCampaignInfo.campaign_name,
       uniqueKey: newTabKey,
-      title: '예약콜 제한 설정',
+      title: '예약콜 제한 건수 설정',
       icon: '/header-menu/예약콜제한설정.svg',
       href: '/reserve',
       content: null,
@@ -2015,7 +2015,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       campaignId: campaignId + '',
       campaignName: tempCampaignInfo.campaign_name,
       uniqueKey: newTabKey,
-      title: '분배호수 제한 설정',
+      title: '분배 호수 제한 설정',
       icon: '/header-menu/분배호수제한설정.svg',
       href: '/distribute',
       content: null,
@@ -2080,7 +2080,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       <div>
         <TitleWrap
           className='border-b border-gray-300 pb-1'
-          title="상세내역"
+          title="상세 내역"
           buttons={
             menu_role_id === 1 ?
               selectedCampaign?.start_flag === 3 ?
@@ -2090,8 +2090,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
                   { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
                   { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
                   { label: "리스트 삭제", onClick: () => handleListManagerDelete(), variant: "customblue" },
-                  { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
-                  { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
+                  { label: "예약콜 제한 건수 설정", onClick: () => handleReservedCall(), variant: "customblue" },
+                  { label: "분배 호수 제한 설정", onClick: () => handleMaxCall(), variant: "customblue" },
                 ]
                 :
                 [
@@ -2099,8 +2099,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
                   { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
                   { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
                   { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
-                  { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
-                  { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
+                  { label: "예약콜 제한 건수 설정", onClick: () => handleReservedCall(), variant: "customblue" },
+                  { label: "분배 호수 제한 설정", onClick: () => handleMaxCall(), variant: "customblue" },
                 ]
               :
               menu_role_id === 2 ?
@@ -2134,8 +2134,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
                       { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
                       { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
                       { label: "리스트 삭제", onClick: () => handleListManagerDelete(), variant: "customblue" },
-                      { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
-                      { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
+                      { label: "예약콜 제한 건수 설정", onClick: () => handleReservedCall(), variant: "customblue" },
+                      { label: "분배 호수 제한 설정", onClick: () => handleMaxCall(), variant: "customblue" },
                     ]
                     :
                     [
@@ -2143,8 +2143,8 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
                       { label: "캠페인 삭제", onClick: () => handleCampaignDelete() },
                       { label: "재발신", onClick: () => handleRebroadcast(), variant: "customblue" },
                       { label: "리스트 적용", onClick: () => handleListManager(), variant: "customblue" },
-                      { label: "예약콜 제한건수설정", onClick: () => handleReservedCall(), variant: "customblue" },
-                      { label: "분배호수 제한설정", onClick: () => handleMaxCall(), variant: "customblue" },
+                      { label: "예약콜 제한 건수 설정", onClick: () => handleReservedCall(), variant: "customblue" },
+                      { label: "분배 호수 제한 설정", onClick: () => handleMaxCall(), variant: "customblue" },
                     ]
           }
         />
@@ -2179,7 +2179,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           </div>
 
           <div className='flex items-center gap-2'>
-            <Label className="w-[74px] min-w-[74px]">캠페인명</Label>
+            <Label className="w-[74px] min-w-[74px]">캠페인 명</Label>
             <CustomInput
               value={tempCampaignInfo.campaign_name || ''}
               onChange={(e) => handleInputData(e.target.value, 'campaign_name')}

@@ -84,19 +84,19 @@ const CallbackTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onHandle
             checked={isChecked}
             onCheckedChange={(checked) => handleChecked(checked === true)}
           />
-          <Label htmlFor="callbackCampaign">Call back Campaign</Label>
+          <Label htmlFor="callbackCampaign">Callback Campaign</Label>
         </div>
 
         {/* Call back 구분 */}
         <div className="flex items-center gap-2">
-          <Label className="w-[8.3rem] min-w-[8.3rem]">Call back 구분</Label>
+          <Label className="w-[8.3rem] min-w-[8.3rem]">Callback 구분</Label>
           <Select disabled={!isChecked} value={campaignInfo?.callback_kind === 0?'1':campaignInfo?.callback_kind+''} onValueChange={(value) => handleSelectChange(value, 'callback_kind')}> {/* 체크 여부로 활성화/비활성화 */}
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select an option" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1">무한 callback</SelectItem>
-              <SelectItem value="2">일반 callback</SelectItem>
+              <SelectItem value="1">무한 Callback</SelectItem>
+              <SelectItem value="2">일반 Callback</SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -225,7 +225,7 @@ const NotificationTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onHa
             />
           </div>
           <div className="flex justify-end text-sm text-gray-500">
-            (외부 회선을 사용할 경우 국선 번호를 포함하여 주십시요.)
+            (외부 회선을 사용할 경우 국선 번호를 포함해 주십시오.)
           </div>
         </div>
 
