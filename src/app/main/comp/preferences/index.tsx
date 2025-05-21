@@ -372,8 +372,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             <tbody>
               <TableRow>
                 <TableHeader className="w-[12.5rem] !pt-[6px] !pb-[5px]">
--                 <Label className="w-32">채널 할당 시 보여주는 캠페인</Label>
-+                 <Label className="w-32">채널 할당 시 보여 주는 캠페인</Label>
+                 <Label className="w-32">채널 할당 시 보여 주는 캠페인</Label>
                 </TableHeader>
                 <TableCell className="w-[17rem]">
                   <div className="flex items-center gap-3">
@@ -398,14 +397,12 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   </div>
                 </TableCell>
                 <TableCell>
--                 <span className="text-sm">채널을 캠페인 모드로 할당 시 화면에 보여주는 캠페인의 범위를 선택합니다. 현재 날짜를 기준으로 설정한 값만큼의 범위안에서 캠페인을 보여줍니다.</span>
-+                 <span className="text-sm">채널을 캠페인 모드로 할당 시 화면에 보여 주는 캠페인의 범위를 선택합니다. 현재 날짜를 기준으로 설정한 값만큼의 범위 안에서 캠페인을 보여 줍니다.</span>
+                 <span className="text-sm">채널을 캠페인 모드로 할당 시 화면에 보여 주는 캠페인의 범위를 선택합니다. 현재 날짜를 기준으로 설정한 값만큼의 범위 안에서 캠페인을 보여 줍니다.</span>
                 </TableCell>
               </TableRow>
               <TableRow>
                 <TableHeader className="w-[12.5rem] !py-[6px]">
--                 <Label className="w-32">일람설정</Label>
-+                 <Label className="w-32">일람 설정</Label>
+                 <Label className="w-32">일람 설정</Label>
                 </TableHeader>
                 <TableCell className="w-[17rem]">
                   <CommonRadio value={monitoringType} onValueChange={setMonitoringType} className="flex gap-8">
@@ -415,14 +412,12 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                     </div>
                     <div className="flex items-center space-x-2">
                       <CommonRadioItem value="periodic" id="periodic" />
--                     <Label htmlFor="periodic">주기적으로계속</Label>
-+                     <Label htmlFor="periodic">주기적으로 계속</Label>
+                     <Label htmlFor="periodic">주기적으로 계속</Label>
                     </div>
                   </CommonRadio>
                 </TableCell>
                 <TableCell>
--                 <span className="text-sm">캠페인 리스트 잔량 부족시의 알람모드를 설정합니다.</span>
-+                 <span className="text-sm">캠페인 리스트 잔량 부족 시의 알람 모드를 설정합니다.</span>
+                 <span className="text-sm">캠페인 리스트 잔량 부족 시의 알람 모드를 설정합니다.</span>
                 </TableCell>
               </TableRow>
             </tbody>
@@ -434,8 +429,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             <tbody>
               <TableRow>
                 <TableHeader className="w-[12.5rem] !pt-[6px] !pb-[5px]">
--                 <Label className="w-32">통계 갱신주기</Label>
-+                 <Label className="w-32">통계 갱신 주기</Label>
+                 <Label className="w-32">통계 갱신 주기</Label>
                 </TableHeader>
                 <TableCell className="w-[17rem]">
                   <div className="flex items-center gap-3">
@@ -460,14 +454,12 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   </div>
                 </TableCell>
                 <TableCell>
--                 <span className="text-sm">캠페인 통계를 서버로부터 가져오는 주기를 설정합니다.(권장 30~60초)</span>
-+                 <span className="text-sm">캠페인 통계를 서버로부터 가져오는 주기를 설정합니다. (권장 30~60초)</span>
+                 <span className="text-sm">캠페인 통계를 서버로부터 가져오는 주기를 설정합니다. (권장 30~60초)</span>
                 </TableCell>
               </TableRow>
               <TableRow>
                 <TableHeader className="w-[12.5rem] !py-[6px]">
--                 <Label className="w-32">서버 접속시간</Label>
-+                 <Label className="w-32">서버 접속 시간</Label>
+                 <Label className="w-32">서버 접속 시간</Label>
                 </TableHeader>
                 <TableCell className="w-[17rem]">
                   <div className="flex items-center gap-3">
@@ -492,8 +484,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   </div>
                 </TableCell>
                 <TableCell>
--                 <span className="text-sm">서버와의 접속시간을 설정합니다.</span>
-+                 <span className="text-sm">서버와의 접속 시간을 설정합니다.</span>
+                 <span className="text-sm">서버와의 접속 시간을 설정합니다.</span>
                 </TableCell>
               </TableRow>
             </tbody>
@@ -517,8 +508,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             <tbody>
               <TableRow>
                 <TableHeader className="w-[12.5rem] !py-[6px]">
--                 <Label className="w-32">메세지 알림창</Label>
-+                 <Label className="w-32">메시지 알림창</Label>
+                 <Label className="w-32">메시지 알림창</Label>
                 </TableHeader>
                 <TableCell className="w-[17rem]">
                   <div className="flex items-center gap-3">
@@ -551,8 +541,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   onCheckedChange={(checked) => setUnusedWorkHoursCalc(checked as boolean)}
                   disabled={tenant_id !== 0}
                 />
--               <Label htmlFor="worktime-enable" className="text-sm">업무시간 제한 미사용</Label>
-+               <Label htmlFor="worktime-enable" className="text-sm">업무 시간 제한 미사용</Label>
+               <Label htmlFor="worktime-enable" className="text-sm">업무 시간 제한 미사용</Label>
               </div>
             </div>
           </div>
@@ -560,21 +549,18 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             <tbody>
               <TableRow>
                 <TableHeader className="w-[12.5rem] !pt-[6px] !pb-[5px]">
--                 <Label className="w-32">발신업무시간</Label>
-+                 <Label className="w-32">발신 업무 시간</Label>
+                 <Label className="w-32">발신 업무 시간</Label>
                 </TableHeader>
                 <TableCell className="w-[17rem]">
                   <div className="flex items-center gap-2">
--                   <Label>시작시각</Label>
-+                   <Label>시작 시각</Label>
+                   <Label>시작 시각</Label>
                     <CustomInputForTime
                       value={startTime}
                       onChange={(value) => setStartTime(value)}
                       className="w-16"
                       disabled={tenant_id !== 0 || unusedWorkHoursCalc}
                     />
--                   <Label>종료시각</Label>
-+                   <Label>종료 시각</Label>
+                  <Label>종료 시각</Label>
                     <CustomInputForTime
                       value={endTime}
                       onChange={(value) => setEndTime(value)}
@@ -584,8 +570,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   </div>
                 </TableCell>
                 <TableCell>
--                 <span className="text-sm">해당 업무 시간에만 캠페인을 시작할 수 있습니다.</span>
-+                 <span className="text-sm">해당 업무 시간에만 캠페인을 시작할 수 있습니다.</span>
+                <span className="text-sm">해당 업무 시간에만 캠페인을 시작할 수 있습니다.</span>
                 </TableCell>
               </TableRow>
               <TableRow>

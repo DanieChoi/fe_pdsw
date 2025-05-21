@@ -255,7 +255,7 @@ const OperationTimeTab: React.FC<Props> = ({
             </div>
 
             <div className="flex items-center gap-[10px] justify-between">
-              <Label className="w-[70px] min-w-[70px]">종료구분</Label>
+              <Label className="w-[70px] min-w-[70px]">종료 구분</Label>
               <CustomInput
                 disabled={true}
                 value={
