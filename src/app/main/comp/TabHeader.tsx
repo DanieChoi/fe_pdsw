@@ -104,15 +104,15 @@
 
 //     // TabStore에서 콘텐츠 드래그 상태 가져오기
 //     const contentDragOver = useTabStore(state => state.contentDragOver);
-    
+
 //     // 콘텐츠 영역에서 같은 섹션으로 드래그 중인지 확인
 //     const isContentBeingDragged = contentDragOver.isActive && 
 //                                  contentDragOver.rowId === rowId && 
 //                                  contentDragOver.sectionId === sectionId;
-    
+
 //     // 드래그 중인 요소가 탭인지 확인 (현재 활성화된 드래그 요소의 데이터 타입 확인)
 //     const isDraggingTab = active?.data?.current?.type === 'tab';
-    
+
 //     // 헤더 내 드래그인 경우 오버레이를 표시하지 않음
 //     // 오직 콘텐츠에서 헤더로 드래그하는 경우에만 오버레이 표시
 //     const showDragOverlay = (isOver && !isDraggingTab) || isContentBeingDragged;
@@ -432,24 +432,24 @@ const TabHeader = ({
 
     // TabStore에서 콘텐츠 드래그 상태 가져오기
     const contentDragOver = useTabStore(state => state.contentDragOver);
-    
+
     // 콘텐츠 영역에서 같은 섹션으로 드래그 중인지 확인
-    const isContentBeingDragged = contentDragOver.isActive && 
-                                 contentDragOver.rowId === rowId && 
-                                 contentDragOver.sectionId === sectionId;
-    
+    const isContentBeingDragged = contentDragOver.isActive &&
+        contentDragOver.rowId === rowId &&
+        contentDragOver.sectionId === sectionId;
+
     // 드래그 중인 요소가 탭인지 확인
     const isDraggingTab = active?.data?.current?.type === 'tab';
-    
+
     // 드래그 중인 탭이 현재 섹션에서 온 것인지 확인
     const draggingTabSectionId = active?.data?.current?.sectionId;
     const draggingTabRowId = active?.data?.current?.rowId;
-    
+
     // 같은 섹션 내에서의 드래그인지 확인 (rowId와 sectionId 모두 일치하는지)
-    const isFromCurrentSection = isDraggingTab && 
-                                draggingTabSectionId === sectionId && 
-                                draggingTabRowId === rowId;
-    
+    const isFromCurrentSection = isDraggingTab &&
+        draggingTabSectionId === sectionId &&
+        draggingTabRowId === rowId;
+
     // 드래그 오버레이 표시 조건 수정:
     // 1. 콘텐츠에서 드래그되는 경우
     // 2. 다른 섹션/행에서 드래그되는 경우
@@ -527,14 +527,12 @@ const TabHeader = ({
     return (
         <div
             ref={setNodeRef}
-            className={`relative flex-none border-b border-gray-200 transition-all duration-200 ${
-                showDragOverlay
-                    ? "bg-blue-100 shadow-lg" 
-                    : "bg-white"
-            }`}
-            data-section-id={sectionId}
-            data-row-id={rowId}
+            className={`relative flex-none transition-all duration-200 border-b border-gray-200 ${showDragOverlay
+                ? "bg-blue-50 shadow-lg border-2 border-dashed border-blue-400"
+                : "bg-white"
+                }`}
         >
+
             {/* 높이를 일관되게 맞춘 컨테이너 */}
             <div className="flex items-stretch">
                 {/* Left scroll - 높이를 동일하게 */}
@@ -647,18 +645,38 @@ const TabHeader = ({
                 <div className="absolute inset-0 pointer-events-none z-10">
                     {sectionCount < 2 ? (
                         <div className="flex h-full">
-                            <div className="w-1/2 border-r-2 border-blue-500 border-dashed h-full bg-blue-100 bg-opacity-60 flex items-center justify-center">
-                                {/* <span className="text-blue-500 opacity-80 font-semibold text-sm">현재 영역</span> */}
+                            <div
+                                className="
+            w-1/2
+            border-r-2 border-blue-500 border-dashed
+            h-full
+            bg-blue-50 bg-opacity-50
+            flex items-center justify-center
+          "
+                            >
+                                {/* 현재 영역 */}
                             </div>
-                            <div className="w-1/2 h-full bg-blue-200 bg-opacity-60 flex items-center justify-center">
-                                {/* <span className="text-blue-500 opacity-80 font-semibold text-sm">새 분할 영역</span> */}
+                            <div
+                                className="
+            w-1/2
+            h-full
+            bg-blue-50 bg-opacity-50
+            flex items-center justify-center
+          "
+                            >
+                                {/* 새 분할 영역 */}
                             </div>
                         </div>
                     ) : (
-                        <div className="border-2 border-dashed border-blue-400 bg-blue-100 bg-opacity-70 h-full" />
+                        <div className="
+                            border-2 border-dashed !border-blue-400
+                            bg-blue-50 bg-opacity-50
+                            h-full
+                        " />
                     )}
                 </div>
             )}
+
         </div>
     );
 };
