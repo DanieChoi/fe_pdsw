@@ -235,24 +235,28 @@ export default function LoginPage() {
     }
   }, []);
 
-  // // 로그인 되어있는 상태로 login 페이지 접근시 replace
-  const isLoggedIn = useAuthStore((state) => state.session_key !== '');
-  const cookiesSessionKey = Cookies.get('session_key');
+  // 쿠키에서 관리되는 session_key
+  const [cookiesSessionKey, setCookiesSessionKey] = useState(Cookies.get('session_key'));
+
+  // store에서 관리되는 세션 타임아웃 체크
   const isSessionTimeCheck = useAuthStore((state) => state.expires_check);
   
-  // AuthStore 의 session_key가 있거나, 쿠키에 session_key가 존재하는지 확인
-  const sessionExists = isLoggedIn || (!!cookiesSessionKey && cookiesSessionKey !== '');
+  // store에 session_key가 존재하는지 확인
+  const isLoggedIn = useAuthStore((state) => state.session_key !== ''); 
+
+  // 쿠키가 session_key가 존재하는지 확인
+  const cookiescheck = cookiesSessionKey !== undefined && cookiesSessionKey !== ''; 
 
   useEffect(() => {
-    
-    if (sessionExists && !isSessionTimeCheck) {
+    // 로그인 되어있는 상태로 login 페이지 접근시 replace
+    if (isLoggedIn && cookiescheck && !isSessionTimeCheck) {
       // store나 쿠키에 session_key가 존재하면서 세션 만료가 아닌 경우 login 페이지 접근시 main 페이지로 이동
       router.replace('/main');
     }
-  }, [isLoggedIn]);
+  }, []);
 
-  // AuthStore 의 session_key가 있거나, 쿠키에 session_key가 존재하면 main 페이지로 이동하기전에 보여지는 빈 페이지
-  if (sessionExists) return (null);
+  // store 의 session_key가 있으면서, 쿠키에 session_key가 존재하면 main 페이지로 이동하기전에 보여지는 빈 페이지
+  if (isLoggedIn && cookiescheck) return (null);
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center">

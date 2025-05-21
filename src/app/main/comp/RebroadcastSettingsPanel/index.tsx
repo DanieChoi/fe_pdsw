@@ -91,7 +91,7 @@ const getOutgoingResultLabel = (key: string) => {
 
 const initOutgoingResult = {
     'outgoing-success-ok': false,
-    'outgoing-success-no': true,
+    'outgoing-success-no': false, // 기본값 false 로 변경 0520
     'fail-busy': true,
     'fail-no-answer': true,
     'fail-fax': false,
@@ -256,7 +256,8 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
             if( returnValue.lastIndexOf('@') === returnValue.length-1 ){
                 returnValue = returnValue.substring(0,returnValue.length-1);
             }
-            setReBroadcastRedialCondition(returnValue);
+            // setReBroadcastRedialCondition(returnValue);
+            // 0520 수정내역 반영을 위한 set이였지만 store 값을 변경하기 때문에 주석처리
         }
     };
 
@@ -858,6 +859,7 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
                                 campaign_id: campaignId
                                 , campaign_status: 1
                             });
+                            setAlertState(prev => ({ ...prev, isOpen: false }));
                         },
                         onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                     });  
@@ -974,14 +976,16 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
                     //4-3. 실시간 재발신 적용 -  발신 성공 상담원 연결성공이 포함될 경우 경고창 호출 후 캠페인 재발신 추출 api 호출 실행하여 재발신 추출한다.
                     setAlertState({
                         isOpen: true,
-                        message: `발신결과 '성공'을 선택하셨습니다. \n기존에 발신되어 고객과 연결된 콜을 다시 발신할 수 있습니다. \n계속하시겠습니까?`,
+                        message: `발신 결과 '성공'을 선택하셨습니다. \n기존에 발신되어 고객과 연결된 콜을 다시 발신할 수 있습니다. \n계속하시겠습니까?`,
+                        // 0521 발신결과 ==> 발신 결과  텍스트 변경
                         title: '발신결과 선택',
                         type: '1',
                         onClose: () => {    
                             fetchCampaignCurrentRedial({
                                 campaign_id: Number(campaignId),
                                 condition: MakeRedialPacket()
-                            });      
+                            });
+                            setAlertState(prev => ({ ...prev, isOpen: false }));      
                         },
                         onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                     });
@@ -996,7 +1000,8 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
                             fetchCampaignCurrentRedial({
                                 campaign_id: Number(campaignId),
                                 condition: MakeRedialPacket()
-                            });      
+                            });
+                            setAlertState(prev => ({ ...prev, isOpen: false }));
                         },
                         onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                     });
@@ -1034,7 +1039,7 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
     //캠페인 상태 변경 api 호출
     const { mutate: fetchCampaignStatusUpdate } = useApiForCampaignStatusUpdate({
         onSuccess: (data) => {
-            if (data.result_code === 0 || data.result_code === -13) {                 
+            if (data.result_code === 0 || ( data.result_code === -1 && data.reason_code === -13 )) {                 
                 // setAlertState({
                 //     isOpen: true,
                 //     message: '재발신 적용 완료했습니다.',
@@ -1043,8 +1048,7 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
                 //     onClose: () => setAlertState(prev => ({ ...prev, isOpen: false })),
                 //     onCancel: () => setAlertState(prev => ({ ...prev, isOpen: false }))
                 // });
-                setAlertState(prev => ({ ...prev, isOpen: false }));
-                setAlertState((prev) => ({ ...prev, isOpen: false }));
+                
             } else {
                 setAlertState({
                     ...errorMessage,
@@ -1176,69 +1180,74 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
     }, [reBroadcastType]);
 
     useEffect(() => {
-        if (reBroadcastRedialCondition == '' ) {
-            setReBroadcastRedialCondition('0035223@35213@26232@26233@26235@262310@26238');
+        // 0521 reBroadcastRedialCondition ==> listRedialQuery 로 변경
+        if (listRedialQuery == '' ) {
+            // setReBroadcastRedialCondition('0035223@35213@26232@26233@26235@262310@26238');
         }else{            
             if( broadcastType === 'realtime'){
-                
+
                 let outgoingSuccessOk = false;  //80954, "발신 성공 상담사 연결 성공"
-                if( reBroadcastRedialCondition.indexOf('35233') > -1 ){   
+                
+                if( listRedialQuery.indexOf('35233') > -1 ){   
                     outgoingSuccessOk = true;
                 }
+                
                 let outgoingSuccessNo = false;  //80955, "발신 성공 상담사 연결 실패"
-                if( reBroadcastRedialCondition.indexOf('35223@35213') > -1 ){   
+                if( listRedialQuery.indexOf('35223@35213') > -1 ){   
                     outgoingSuccessNo = true;
                 }
-                if( reBroadcastRedialCondition.indexOf('35210') > -1 ){   
+
+                if( listRedialQuery.indexOf('35210') > -1 ){   
                     outgoingSuccessOk = true;
                     outgoingSuccessNo = true;
                 }
+                console.log('#### outgoingSuccessOk : ', outgoingSuccessOk, ' #### outgoingSuccessNo : ', outgoingSuccessNo);
                 let failBusy = false;           //80174, "통화중 실패"
-                if( reBroadcastRedialCondition.indexOf('26232') > -1 ){   
+                if( listRedialQuery.indexOf('26232') > -1 ){   
                     // 2018.07.10 Gideon #24364 삼성화재(중국) 장애현상 수정 - 아래 || str == "0026232" 부분 추가
-                    const tempList = reBroadcastRedialCondition.split('@');
+                    const tempList = listRedialQuery.split('@');
                     if( tempList.filter(data => data === '26232' || data === '0026232').length > 0 ){
                         failBusy = true;
                     }
                 }
                 let failNoAnswer = false;       //80175, "무응답 실패"
-                if( reBroadcastRedialCondition.indexOf('26233') > -1 ){   
+                if( listRedialQuery.indexOf('26233') > -1 ){   
                     failNoAnswer = true;
                 }
                 let failFax = false;            //80176, "팩스/모뎀 실패"
-                if( reBroadcastRedialCondition.indexOf('26234') > -1 ){   
+                if( listRedialQuery.indexOf('26234') > -1 ){   
                     failFax = true;
                 }
                 let failMachine = false;        //80177, "기계음 실패"
-                if( reBroadcastRedialCondition.indexOf('26235') > -1 ){   
+                if( listRedialQuery.indexOf('26235') > -1 ){   
                     failMachine = true;
                 }
                 let failEtc = false;            //80178, "기타실패"
-                if( reBroadcastRedialCondition.indexOf('26236') > -1 ){   
+                if( listRedialQuery.indexOf('26236') > -1 ){   
                     failEtc = true;
                 }
                 let failWrongNum = false;       //80179, "전화번호 오류 실패"
-                if( reBroadcastRedialCondition.indexOf('26237') > -1 ){   
+                if( listRedialQuery.indexOf('26237') > -1 ){   
                     failWrongNum = true;
                 }
                 let failLine = false;           //80180, "회선오류 실패"
-                if( reBroadcastRedialCondition.indexOf('26239') > -1 ){   
+                if( listRedialQuery.indexOf('26239') > -1 ){   
                     failLine = true;
                 }
                 let failHangup = false;         //80181, "고객 바로끊음 실패"
-                if( reBroadcastRedialCondition.indexOf('262310') > -1 ){   
+                if( listRedialQuery.indexOf('262310') > -1 ){   
                     failHangup = true;
                 }
                 let failNoTone = false;         //80182, "통화음 없음 실패"
-                if( reBroadcastRedialCondition.indexOf('262311') > -1 ){   
+                if( listRedialQuery.indexOf('262311') > -1 ){   
                     failNoTone = true;
                 }
                 let failNoDial = false;         //80183, "다이얼톤 없음 실패
-                if( reBroadcastRedialCondition.indexOf('262312') > -1 ){   
+                if( listRedialQuery.indexOf('262312') > -1 ){   
                     failNoDial = true;
                 }
                 let outgoingAttempt = false;//80185, "발신 시도 건수"
-                if( reBroadcastRedialCondition.indexOf('26238') > -1 || reBroadcastRedialCondition.indexOf('0026238') > -1 ){   
+                if( listRedialQuery.indexOf('26238') > -1 || listRedialQuery.indexOf('0026238') > -1 ){   
                     outgoingAttempt = true;
                 }
                 //발신결과 체크박스.
@@ -1257,9 +1266,9 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
                     , 'fail-no-dial': failNoDial
                     , 'outgoing-attempt': outgoingAttempt
                 });
-                if (reBroadcastRedialCondition.indexOf("(") > 0 || reBroadcastRedialCondition.indexOf("235959") > 0){
-                    if( reBroadcastRedialCondition.indexOf("(") > 0 ){
-                        const strTimes = reBroadcastRedialCondition.split(/[()]/);
+                if (listRedialQuery.indexOf("(") > 0 || listRedialQuery.indexOf("235959") > 0){
+                    if( listRedialQuery.indexOf("(") > 0 ){
+                        const strTimes = listRedialQuery.split(/[()]/);
                         if (strTimes[1].indexOf("2714") > 0) // 최종발신날짜 
                         {
                             setTimeType("final-call-date");
@@ -1274,18 +1283,18 @@ const RebroadcastSettingsPanel = ({ reBroadCastOption}:PropsType) => {
                     // setOutgoingTimeChecked(true);
                 }
                 //발신되지 않은 예약콜
-                if( reBroadcastRedialCondition.indexOf('402399') > -1 ){   
+                if( listRedialQuery.indexOf('402399') > -1 ){   
                     setCallType("not-sent");
                 }
                 //발신되어진 예약콜
-                if( reBroadcastRedialCondition.indexOf('4023100') > -1 ){   
+                if( listRedialQuery.indexOf('4023100') > -1 ){   
                     setCallType('sent');
                 }
             }else{                
                 // setReBroadcastRedialCondition('0035223@35213@26232@26233@26235@262310@26238');
             }
         }
-    }, [reBroadcastRedialCondition,broadcastType]);    
+    }, [listRedialQuery,broadcastType]);    
 
     useEffect(() => {
         if (reBroadCastOption && reBroadCastOption !== 'campaign' ) {     

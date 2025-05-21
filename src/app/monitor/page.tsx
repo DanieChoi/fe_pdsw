@@ -28,7 +28,6 @@ import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/u
 import CounsellorGroupActions from '@/components/shared/layout/comp/TabActions/CounsellorGroupActions';
 import { useCampaignDialStatusStore } from '@/store/campaignDialStatusStore';
 import { useApiForCampaignManagerUpdate } from '@/features/campaignManager/hooks/useApiForCampaignManagerUpdate';
-import { ca } from 'date-fns/locale';
 
 
 const errorMessage: CustomAlertRequest = {
@@ -284,34 +283,47 @@ const MonitorPage = () => {
   //캠페인 상태 변경 api 호출 ==> 0513 캠페인 마스터 변경으로 수정
   const { mutate: fetchCampaignStatusUpdate } = useApiForCampaignStatusUpdate({
     onSuccess: (data) => {
-      if (!(data.result_code === 0 || data.result_code === -13)) {
-        //
-        // -8000 : '캠페인이 상태 변경 중이므로, 캠페인을 시작할 수 없습니다.'
+      if (data.result_code === 0 || ( data.result_code === -1 && data.reason_code === -13 )) {
+
         setAlertState({
           ...errorMessage,
           isOpen: true,
-          message: CheckCampaignSaveReturnCode(data.reason_code),
+          message: '캠페인 상태 변경이 완료되었습니다.',
           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
           onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
         });
-        setCampaignStatus(currentCampaign.startFlag === 1 ? '시작' : currentCampaign.startFlag === 2 ? '멈춤' : '중지');
+        
+        
       } else {
-        fetchMain({
-          session_key: '',
-          tenant_id: tenant_id,
-        });
-      }
-    }, onError: (data) => {
-      if (data.message.split('||')[0] === '5') {
         setAlertState({
-          ...errorMessage,
           isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+          message: CheckCampaignSaveReturnCode(data.reason_code),
+          title: '알림',
+          type: '1',
+          onClose: () => {
+            setAlertState({ ...alertState, isOpen: false });
+          },
+          onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
+        setCampaignStatus(currentCampaign.startFlag === 1 ? '시작' : currentCampaign.startFlag === 2 ? '멈춤' : currentCampaign.startFlag === 3 ? '중지' : '멈춤');
+        return;
+      }
+
+      setCampaignStatus(currentCampaign.startFlag === 1 ? '시작' : currentCampaign.startFlag === 2 ? '멈춤' : currentCampaign.startFlag === 3 ? '중지' : '멈춤');
+      
+      fetchMain({
+        session_key: '',
+        tenant_id: tenant_id,
+      });
+    }, onError: (error) => {
+      if (error.message.split('||')[0] === '5') {
+        if (window.opener) {
+          window.opener.postMessage({ type: "sessionFailed" }, "*");
+          // 자기 자신 닫기
+          window.close();
+        }  
+      } else if (error.message.split('||')[0] !== '200') {
+        console.log('캠페인 상태 변경 실패 :', error);
       }
     }
   });
@@ -320,28 +332,37 @@ const MonitorPage = () => {
   const { mutate: fetchDialSpeedUpdate } = useApiForDialSpeedUpdate({
     onSuccess: (data, variables) => {
 
-      // 현재 선택된 캠페인의 발신속도를 업데이트해서 최신 상태 반영
-      setCurrentCampaign((prev) => ({
-        ...prev,
-        callPacing: variables.dial_speed,
-      }));
-      // 캠페인 목록 다시 가져오기
-      fetchMain({
-        session_key: '',
-        tenant_id: tenant_id,
-      });
-
-    }, onError: (data) => {
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+      if(data.result_code === 0){
+        // 현재 선택된 캠페인의 발신속도를 업데이트해서 최신 상태 반영
+        setCurrentCampaign((prev) => ({
+          ...prev,
+          callPacing: variables.dial_speed,
+        }));
+        // 캠페인 목록 다시 가져오기
+        fetchMain({
+          session_key: '',
+          tenant_id: tenant_id,
         });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
+      } else {
+        console.log('통합 모니터링 캠페인 발신 속도 수정 실패 :', data);
+
+      }
+      
+
+    }, onError: (error) => {
+      // ### error 수정하자 
+      if (error.message.split('||')[0] === '5') {
+        if (window.opener) {
+          window.opener.postMessage({ type: "sessionFailed" }, "*");
+          // 자기 자신 닫기
+          window.close();
+          
+        }  
+      } else if(error.message.split('||')[0] !== '200') {
+        
+        window.close();
+        window.opener.ServerCheckError('캠페인 발신 속도 수정', error.message);
+
       }
     }
   });
