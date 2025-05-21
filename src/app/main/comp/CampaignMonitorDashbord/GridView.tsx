@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Legend, Tooltip, CartesianGrid } from 'recharts';
 import TitleWrap from "@/components/shared/TitleWrap";
@@ -207,7 +205,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
           </div>
 
           <div>
-            <TitleWrap title="리스트현황" />
+            <TitleWrap title="리스트 현황" />
              <Table>
               <tbody>
                 <TableRow>
@@ -230,7 +228,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                     {selectedCall?.totLstCnt || 0}
                   </TableCell>
                   <TableHeader className="w-[120px] !bg-[#DDF4F2]">
-                    <Label>순수발신</Label>
+                    <Label>순수 발신</Label>
                   </TableHeader>
                   <TableCell className="text-center text-sm">
                     {selectedCall?.nonTTCT||0}
@@ -242,7 +240,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                     {(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-(selectedCall?.nogdeleteGL || 0)}
                   </TableCell>
                   <TableHeader className="w-[120px] !bg-[#DDF4F2]">
-                    <Label>상담결과 예약</Label>
+                    <Label>상담 결과 예약</Label>
                   </TableHeader>
                   <TableCell className="text-center text-sm">
                     {selectedCall?.recallCnt||0}
@@ -253,7 +251,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
           </div>
 
           <div>
-            <TitleWrap title="발신현황" />
+            <TitleWrap title="발신 현황" />
             <Table>
               <tbody>
                 {/* 첫 번째 행 */}
@@ -291,17 +289,17 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
           
           <div className="flex gap-5">
               <div className="w-1/2">
-                <TitleWrap title="총발신 건수" />
+                <TitleWrap title="총 발신 건수" />
                 <div className="flex gap-5">
                   <div className="w-1/2">
                     <Table>
                       <tbody>
                         <TableRow>
-                          <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>발신시도</Label></TableHeader>
+                          <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>발신 시도</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.dialingCall||0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>발신성공</Label></TableHeader>
+                          <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>발신 성공</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.scct||0}</TableCell>
                         </TableRow>
                         <TableRow>
@@ -333,7 +331,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                           <TableCell className="text-center text-sm">{selectedCall?.customerDropCnt||0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[170px]"><Label>고객 최대 대기 시간초과</Label></TableHeader>
+                          <TableHeader className="w-[170px]"><Label>고객 최대 대기 시간 초과</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.nonServiceCnt||0}</TableCell>
                         </TableRow>
                         <TableRow>
@@ -403,7 +401,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                     <Table>
                       <tbody>
                         <TableRow>
-                          <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>대기리스트</Label></TableHeader>
+                          <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>대기 리스트</Label></TableHeader>
                           <TableCell className="text-center text-sm">{(selectedCall?.totLstCnt || 0)-(selectedCall?.nonTTCT || 0)-(selectedCall?.nogblockTime || 0) + (selectedCall?.nogblockTime || 0)}</TableCell>
                           {/* 대기리스트 = 진행대기 + 스케줄대기 */}
                         </TableRow>
@@ -426,7 +424,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                     <Table>
                       <tbody>
                         <TableRow>
-                          <TableHeader className="!bg-[#FEE9EC] w-[200px]"><Label>방지 리스트</Label></TableHeader>
+                          <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>방지 리스트</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.nogdeleteGL || 0}</TableCell>
                         </TableRow>
                         <TableRow>

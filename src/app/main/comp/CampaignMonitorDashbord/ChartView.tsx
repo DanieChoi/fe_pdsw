@@ -332,7 +332,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
             <tbody>
               <TableRow>
                 <TableHeader className="w-[120px] !text-center border-r border-b">
-                  <Label>통화 중</Label>
+                  <Label>통화중</Label>
                 </TableHeader>
                 <TableHeader className="w-[160px] !text-center border-r border-b">
                   <Label>무응답</Label>
@@ -380,7 +380,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
                   <Label>통화음 없음</Label>
                 </TableHeader>
                 <TableHeader className="w-[120px] !text-center border-r border-b">
-                  <Label>다이얼 음 없음</Label>
+                  <Label>다이얼음 없음</Label>
                 </TableHeader>
                 <TableHeader className="w-[120px] !text-center border-r border-b">
                   <Label>기계음</Label>
@@ -509,10 +509,10 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
           <tbody>
             <TableRow>
               <TableHeader className="w-[120px] !text-center border-r border-b">
-                <Label>발신 확인 전 상담사 상태 변경</Label>
+                <Label>발신확인 전 상담사 상태 변경</Label>
               </TableHeader>
               <TableHeader className="w-[160px] !text-center border-r border-b">
-                <Label>발신 확인 전 상담사 모드 변경</Label>
+                <Label>발신확인 전 상담사 모드 변경</Label>
               </TableHeader>
               <TableHeader className="w-[120px] !text-center border-r border-b">
                 <Label>지정 상담사 정보 미입력</Label>
