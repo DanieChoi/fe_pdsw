@@ -2225,7 +2225,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
           </div>
           <div className='flex items-center gap-2'>
             <Label className="w-[74px] min-w-[74px]">발신번호</Label>
-            <CustomInput value={tempCampaignInfo.campaign_id === 0 ? '' :inputCallingNumber} className="w-full" disabled={selectedCampaign !== null} readOnly />
+            <CustomInput value={tempCampaignInfo.campaign_id === 0 ? '' :inputCallingNumber} className="w-full" disabled={selectedCampaign !== null} readOnly 
+              
+            />
             {menu_role_id === 1 ? (
               <CommonButton variant="outline" className="h-[24px]" onClick={() =>
                 setCallingNumberPopupState({

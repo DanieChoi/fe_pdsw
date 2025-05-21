@@ -193,7 +193,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
     if (callCampaignMenu === 'NewCampaignManager' || callCampaignMenu === 'CampaignClone') {
       onCampaignOutgoingMethodChange({
         ...tempOutgoingMethodTab,
-        detect_mode: 1  // 컬러링 판별후 사람만연결
+        detect_mode: 1  // 컬러링 판별후 사람만 연결
       });
     }
   }, [callCampaignMenu]);
@@ -450,6 +450,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
                 value={limitRate}
                 onChange={(e) => handleNumericInput(e, 'setLimitRate')}
                 disabled={!limitRateEnabled} // 체크박스 상태에 따라 활성화/비활성화
+                isPercent={true} // 퍼센트 입력 가능
               />
               %
             </div>
