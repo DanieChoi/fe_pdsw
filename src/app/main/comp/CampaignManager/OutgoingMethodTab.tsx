@@ -224,7 +224,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
               type="text"
               value={tempOutgoingMethodTab.trunk_access_code}
               onChange={(e) => handleNumericInput(e, 'setTrunkAccessCode')}
-              maxLength={10}
+              // maxLength={10}
               isFullWidth={true}
             />
           </div>

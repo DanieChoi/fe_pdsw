@@ -353,7 +353,7 @@ const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
             onBlur={handleBlur}
             className={cn(
               "flex h-[26px] rounded-[3px] border border-input bg-white px-[8px] text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:text-[#aaa] disabled:bg-[#F4F4F4]",
-              isFullWidth ? "w-full" : "w-auto flex-shrink-0",
+              isFullWidth ? "flex-1" : "w-auto flex-shrink-0",
               localError && "border-red-500",
               className
             )}

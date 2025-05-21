@@ -375,7 +375,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
                   <Label className="w-32">채널 할당 시 보여 주는 캠페인</Label>
                 </TableHeader>
                 <TableCell className="w-[20rem]">
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2">
                     <CustomInput
                       type="number"
                       value={refreshCycle}
@@ -596,7 +596,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
             </tbody>
           </Table>
         </div>
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-3">
           <CommonButton
             onClick={handleSubmit}
             disabled={isSaving}
