@@ -647,22 +647,22 @@ const TabHeader = ({
                         <div className="flex h-full">
                             <div
                                 className="
-            w-1/2
-            border-r-2 border-blue-500 border-dashed
-            h-full
-            bg-blue-50 bg-opacity-50
-            flex items-center justify-center
-          "
+                                    w-1/2
+                                    border-r-2 border-blue-500 border-dashed
+                                    h-full
+                                    bg-blue-50 bg-opacity-50
+                                    flex items-center justify-center
+                                "
                             >
                                 {/* 현재 영역 */}
                             </div>
                             <div
                                 className="
-            w-1/2
-            h-full
-            bg-blue-50 bg-opacity-50
-            flex items-center justify-center
-          "
+                                    w-1/2
+                                    h-full
+                                    bg-blue-50 bg-opacity-50
+                                    flex items-center justify-center
+                                "
                             >
                                 {/* 새 분할 영역 */}
                             </div>
