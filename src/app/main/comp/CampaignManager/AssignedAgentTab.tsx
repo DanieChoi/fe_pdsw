@@ -170,7 +170,7 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
   const columns: Column<TreeRow>[] = [
     {
       key: 'groupName',
-      name: '상담그룹',
+      name: '상담 그룹',
       width: 200,
       renderCell: ({ row }) => {
         const indent = row.level * 20;
@@ -178,9 +178,9 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
         let displayName = '';
 
         if (row.level === 0) {
-          displayName = `상담그룹 : ${row.affiliationGroupId}`;
+          displayName = `상담 그룹 : ${row.affiliationGroupId}`;
         } else if (row.level === 1) {
-          displayName = `상담팀 : ${row.affiliationTeamId}`;
+          displayName = `상담 팀 : ${row.affiliationTeamId}`;
         } else {
           displayName = row.id;
         }
