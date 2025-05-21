@@ -397,7 +397,7 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu,campaignInfo, onC
 
           {/* 상담결과 등록 */}
           <div className="flex items-center gap-2 justify-between">
-            <Label className="w-[8.3rem] min-w-[8.3rem]">상담결과 등록</Label>
+            <Label className="w-[8.3rem] min-w-[8.3rem]">상담 결과 등록</Label>
             <Select
               value={tempOutgoingMethodTab.use_counsel_result+''}
               onValueChange={handleUseCounselResult}

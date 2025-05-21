@@ -117,7 +117,9 @@ export function TreeNodeForCampaignTab({
   // 현재 캠페인의 상태 확인
   const currentCampaign = campaigns?.find((c: any) => c.campaign_id === Number(item.id));
   const isTenantFolder = item.type === "folder" && level === 1;
-  const isRootNode = item.label.toLowerCase() === "nexus";
+  const isRootNode = item.label.toLowerCase() === "nexus" && item.type === "folder" && level === 0;
+  // const isRootNode = item.type !== "folder" && item.type !== "campaign";
+
 
   const currentStatus = currentCampaign
     ? (() => {
@@ -358,7 +360,7 @@ export function TreeNodeForCampaignTab({
             <ContextMenu>
               <ContextMenuTrigger>
                 <div ref={nodeRef} className={nodeStyle} onClick={handleClick} style={{ paddingLeft }}>
-                  {nodeContent}
+                  {nodeContent} 
                 </div>
               </ContextMenuTrigger>
               <FolderContextMenu item={updatedItem} />
@@ -381,7 +383,7 @@ export function TreeNodeForCampaignTab({
               onDoubleClick={handleDoubleClick}
               style={{ paddingLeft }}
             >
-              {nodeContent}
+              {nodeContent} 
             </div>
           </ContextMenuForCampaignForCampaignTab>
         );
