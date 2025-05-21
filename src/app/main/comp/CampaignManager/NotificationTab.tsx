@@ -23,7 +23,7 @@ type Props = {
 };
 
 const NotificationTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onHandleNotificationTabChange }) => {
-  const [isChecked, setIsChecked] = useState(false); // 잔량 부족 알림 사용 상태
+  const [isChecked, setIsChecked] = useState(false); // 잔량 부족 알람 사용 상태
   const [alertMessage, setAlertMessage] = useState(false);  // 메시지로 알림
   const [alertSound, setAlertSound] = useState(false);      // 소리로 알림
   const [alertCall, setAlertCall] = useState(false);        // 관리자에게 전화로 알림
@@ -186,7 +186,7 @@ const NotificationTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onHa
             checked={isChecked}
             onCheckedChange={(checked) => setIsChecked(checked === true)} // 체크박스 상태 업데이트
           />
-          <Label htmlFor="lowStockAlert">잔량 부족 알림 사용</Label>
+          <Label htmlFor="lowStockAlert">잔량 부족 알람 사용</Label>
         </div>
 
         {/* 알림 세부 설정 */}
@@ -198,7 +198,7 @@ const NotificationTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onHa
               onChange={(e) => handleNumericInput(e)}
               disabled={!isChecked} // 체크박스 상태에 따라 비활성화
             />
-            <Label className="w-[8.3rem] min-w-[8.3rem]">잔량 부족 알림 개수</Label>
+            <Label className="w-[8.3rem] min-w-[8.3rem]">잔량 부족 알람 개수</Label>
           </div>
           <div className="flex gap-1 items-center">
             <CustomCheckbox id="alertMessage" disabled={!isChecked} checked={alertMessage}

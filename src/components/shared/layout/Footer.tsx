@@ -1085,7 +1085,7 @@ export default function Footer({
           });
         }
       }
-      //잔량 부족 알림 사용
+      //잔량 부족 알람 사용
       else if (announce === 'list-not-enough') {
         _message = '[잔량부족알림] ';
         const _message2 = '[잔량부족알림]';

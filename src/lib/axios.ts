@@ -60,6 +60,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   async (response) => {
     // console.log("here 8888888888888 response", response);
+    
     if (response.data.result_code === 5) {
       sessionCheckYn = false;
       // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
@@ -68,6 +69,7 @@ axiosInstance.interceptors.response.use(
         window.location.href = '/login';
       });
     }
+
     const url = response.config.url || '';
     const userId = getCookie('id');
     if( url !== '/login' && userId != null && userId != '' ) {
