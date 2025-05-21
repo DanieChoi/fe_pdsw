@@ -795,9 +795,9 @@ axiosInstance.interceptors.response.use(
         }
       }
       
-      if( error.status === 400 ){      
-        customAlertService.error(activation + ' 요청이 실패하였습니다. PDS 서버 시스템에 확인하여 주십시오.', 'PDS 서버오류', () => {});
-      }else{
+      // if( error.status === 400 ){      
+      //   customAlertService.error(activation + ' 요청이 실패하였습니다. PDS 서버 시스템에 확인하여 주십시오.', 'PDS 서버오류', () => {});
+      // }else{
         const logData = {
             "tenantId": Number(getCookie('tenant_id')),
             "employeeId": userId,
@@ -819,7 +819,7 @@ axiosInstance.interceptors.response.use(
           `/log/save`,
           logData 
         );
-      }
+      // }
     }
     if (error.response?.status === 401) {
       logoutFunction({ portcheck: false });
