@@ -4,6 +4,7 @@ import { useAuthStore } from "@/store/authStore";
 import CustomAlert from "../shared/layout/CustomAlert";
 import Cookies from 'js-cookie';
 import { useTabStore } from "@/store/tabStore";
+import logoutFunction from "../common/logoutFunction";
 
 const AuthTimeOutCheck = ({ popupRef }: { popupRef: React.MutableRefObject<Window | null> }) => {
 
@@ -49,9 +50,7 @@ const AuthTimeOutCheck = ({ popupRef }: { popupRef: React.MutableRefObject<Windo
           onClose={() => {
             setAlertState((prev) => ({ ...prev, isOpen: false })); // Alert 닫기
             
-            Cookies.remove("session_key"); // 쿠키 제거
-            useAuthStore.getState().clearAuth(); // AuthStore의 상태를 초기화
-            useTabStore.getState().closeAllTabs("row-1", "default"); // tabStore의 초기화, 모든 탭 제거
+            logoutFunction(); // 로그아웃 함수 호출
             router.push("/login"); // 로그인 페이지로 리다이렉트
 
             setExpiresCheck(false); // 상태 초기화

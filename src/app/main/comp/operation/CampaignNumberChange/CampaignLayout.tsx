@@ -16,6 +16,7 @@ import Cookies from 'js-cookie';
 import { useApiForCallingNumberDelete } from '@/features/campaignManager/hooks/useApiForCallingNumberDelete';
 import OnlyNumberInput from '@/components/shared/OnlyNumberInput';
 import { useOperationStore } from '../store/OperationStore';
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 
 type GridRow = MainDataResponse & {
   calling_number: string;
@@ -92,24 +93,12 @@ function CampaignLayout() {
         setCallingNumbers([]);
       }
     },
-    onError: (data) => {
+    onError: (error) => {
       // 에러 발생 시 callingNumbers를 빈 배열로 설정
       setCallingNumbers([]);
-      showAlert('발신번호 조회 중 오류가 발생했습니다: ' + data.message);
+      // showAlert('발신번호 조회 중 오류가 발생했습니다: ' + data.message);
       
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      }
+      ServerErrorCheck('발신번호 조회', error.message);
     }
   });
 
@@ -125,21 +114,7 @@ function CampaignLayout() {
       showAlert('새로운 발신번호가 성공적으로 저장되었습니다.');
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert('발신번호 저장 중 오류가 발생했습니다: ' + error.message);
-      }
+      ServerErrorCheck('발신번호 추가', error.message);
     }
   });
 
@@ -155,21 +130,7 @@ function CampaignLayout() {
       showAlert('발신번호가 성공적으로 수정되었습니다.');
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert('발신번호 수정 중 오류가 발생했습니다: ' + error.message);
-      }
+      ServerErrorCheck('발신번호 수정', error.message);
     }
   });
 
@@ -182,21 +143,7 @@ function CampaignLayout() {
       });
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        Cookies.remove('session_key');
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert('발신번호 수정 중 오류가 발생했습니다: ' + error.message);
-      }
+      ServerErrorCheck('발신번호 삭제', error.message);
     }
   });
 

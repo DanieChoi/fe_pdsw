@@ -40,9 +40,9 @@ export function useApiForCampaignStatusUpdate(
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: CampaignApiError, variables: CampaignStatusDataRequest, context: unknown) => {
-      console.error('API Error:', error);
+      
       // API 오류 시 에러 메시지 표시
-      customAlertService.error(error.message || '상태 변경 중 오류가 발생했습니다.', '상태 변경 오류');
+      // customAlertService.error(error.message || '상태 변경 중 오류가 발생했습니다.', '상태 변경 오류');
       
       // 오류 발생 후에도 캠페인 관리 탭 열기
       // openCampaignManagerTab();

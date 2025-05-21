@@ -8,6 +8,10 @@ import { Label } from "@/components/ui/label";
 import { useApiForAgentStateMonitoringList } from '@/features/monitoring/hooks/useApiForAgentStateMonitoringList';
 import { useMainStore } from '@/store';
 import { useEnvironmentStore } from '@/store/environmentStore';
+import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
+import { logoutChannel } from "@/lib/broadcastChannel";
+import CustomAlert from "@/components/shared/layout/CustomAlert";
+
 
 // 타입 정의
 interface AgentStatus {
@@ -154,6 +158,13 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
     return returnValue;
   };
 
+  const [alertState, setAlertState] = useState({
+    isOpen: false,
+    message: "",
+    title: "",
+    type:"1",
+  });
+
   // 할당 상담사 정보 조회 (campaignId를 props로 받아 사용)
   const { mutate: fetchAgentStateMonitoringList } = useApiForAgentStateMonitoringList({
     onSuccess: (data) => {
@@ -177,6 +188,26 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
         _setAgentData([]);
       }
       
+    },
+    onError: (error) => {
+      if(window.opener){
+        if(error.message.split('||')[0] === '5'){
+          logoutChannel.postMessage({
+            type: 'logout',
+            message: error.message,
+          });
+        }else{
+          setAlertState({
+            ...alertState,
+            isOpen: true,
+            message: "상담사 상태 통계 조회 요청이 실패하였습니다. \nPDS 서버 시스템에 확인하여 주십시오.",
+            title: "알림",
+          });
+          // console.log('통합 모니터링 상담사 통계 조회 실패',error.message);
+        }
+      } else {
+        ServerErrorCheck('상담사 상태 통계 조회',error.message);
+      }
     }
   });
 
@@ -386,6 +417,15 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
           </table>
         </div>
       </div>
+      <CustomAlert
+          message={alertState.message}
+          title={alertState.title}
+          type={alertState.type}
+          isOpen={alertState.isOpen}
+          onClose={() => {
+            setAlertState((prev) => ({ ...prev, isOpen: false })); // Alert 닫기
+          }}
+        />
     </div>
   );
 };
