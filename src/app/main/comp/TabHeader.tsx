@@ -527,9 +527,9 @@ const TabHeader = ({
     return (
         <div
             ref={setNodeRef}
-            className={`relative flex-none transition-all duration-200 border-blue-200 ${showDragOverlay
+            className={`relative flex-none transition-all duration-200 ${showDragOverlay
                 ? "bg-blue-50 shadow-lg border-2 border-dashed border-blue-400"
-                : "bg-white"
+                : "bg-white border-gray-200"
                 }`}
         >
 
@@ -648,7 +648,7 @@ const TabHeader = ({
                             <div
                                 className="
                                     w-1/2
-                                    border-r-2 c-500 border-dashed
+                                    border-r-2 border-blue-500 border-dashed
                                     h-full
                                     bg-blue-50 bg-opacity-50
                                     flex items-center justify-center
