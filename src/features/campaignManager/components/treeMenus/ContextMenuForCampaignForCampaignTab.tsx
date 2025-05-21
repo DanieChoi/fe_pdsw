@@ -29,9 +29,10 @@ import CustomAlert, { CustomAlertRequest } from "@/components/shared/layout/Cust
 import IDialogButtonForCampaingDelete from "./dialog/IDialogButtonForCampaingDelete";
 import { customAlertService } from "@/components/shared/layout/utils/CustomAlertService";
 import { CampaignDialStatus, useCampaignDialStatusStore } from "@/store/campaignDialStatusStore";
-import { UpdataCampaignInfo } from "@/components/common/common";
+import { CheckCampaignSaveReturnCode, UpdataCampaignInfo } from "@/components/common/common";
 import { useApiForCampaignManagerUpdate } from "../../hooks/useApiForCampaignManagerUpdate";
 import Cookies from "js-cookie";
+import { th } from "date-fns/locale";
 
 
 export type CampaignStatus = "started" | "pending" | "stopped";
@@ -199,34 +200,46 @@ export function ContextMenuForCampaignForCampaignTab({
           },
         });
         return;
-      } else if(data.result_code !== 0) {
+      } else if( !(data.result_code === 0 || ( data.result_code === -1 && data.reason_code === -13 ))) {
         setAlertState({
           ...alertState,
           isOpen: true,
-          message: '캠페인 상태 변경 중 오류가 발생했습니다.',
+          message: CheckCampaignSaveReturnCode(data.reason_code),
           title: '알림',
           type: '2',
           onClose: () => {
             setAlertState({ ...alertState, isOpen: false });
             preventCloseRef.current = false;
+            
           },
         });
         return;
       } 
-
-        // API 성공 후 2가지 방법으로 상태 업데이트:
-        // 1. 스토어의 updateCampaignStatus 직접 호출 (즉시 UI 반영)
-        useMainStore.getState().updateCampaignStatus(
-          Number(variables.campaign_id), 
-          variables.campaign_status
+      
+      // 멈춤중, 정지중에 해당하면 alert 띄우지 않기
+      const reCheckCampaigns = useCampaignDialStatusStore.getState().campaignDialStatus.some(( dialStatus) => 
+                (dialStatus.campaign_id.toString() === item.id.toString()) && 
+                (dialStatus.status?.toString() === '5' || dialStatus.status?.toString() === '6') );
+      if(!reCheckCampaigns) {
+        customAlertService.success(
+          '캠페인 상태가 성공적으로 변경되었습니다!',
+          '캠페인 상태 변경 완료'
         );
-        
-        // 2. fetchMain으로 전체 데이터 새로고침 (백엔드와 완전히 동기화)
-        fetchMain({ session_key, tenant_id });
+      }
+
+      // API 성공 후 2가지 방법으로 상태 업데이트:
+      // 1. 스토어의 updateCampaignStatus 직접 호출 (즉시 UI 반영)
+      useMainStore.getState().updateCampaignStatus(
+        Number(variables.campaign_id), 
+        variables.campaign_status
+      );
+      
+      // 2. fetchMain으로 전체 데이터 새로고침 (백엔드와 완전히 동기화)
+      fetchMain({ session_key, tenant_id });
       
     },
     onError: (error) => {
-      toast.error(error.message || "상태 변경 중 오류가 발생했습니다.");
+      
     },
   });
 
@@ -396,17 +409,6 @@ export function ContextMenuForCampaignForCampaignTab({
           campaign_status: getStatusNumber(status),
         }).then(() => {
             console.log('#### then 으로 떨어짐 사이드바 캠페인 상태 변경');
-
-            const reCheckCampaigns = useCampaignDialStatusStore.getState().campaignDialStatus.some(( dialStatus) => 
-                      (dialStatus.campaign_id.toString() === item.id.toString()) && 
-                      (dialStatus.status?.toString() === '5' || item.status?.toString() === '6') );
-            if(!reCheckCampaigns) {
-              customAlertService.success(
-                '캠페인 상태가 성공적으로 변경되었습니다!',
-                '캠페인 상태 변경 완료'
-              );
-            }
-
         }).catch(error => {
             console.log('#### 사이드바 캠페인 상태 변경 에러:', error);  
         });
