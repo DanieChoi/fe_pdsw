@@ -425,18 +425,18 @@ const SystemPreferences = () => {
 
     // 장비 목록 데이터 구성
     const equipmentColumns = [
-        { key: "device_id", name: "장비번호" },
-        { key: "channel_count", name: "채널수" },
-        { key: "device_name", name: "장비이름" },
-        { key: "usage", name: "사용여부" }
+        { key: "device_id", name: "장비 번호" },
+        { key: "channel_count", name: "채널 수" },
+        { key: "device_name", name: "장비 이름" },
+        { key: "usage", name: "사용 여부" }
     ];
 
     
 
     // 채널 목록 데이터 구성
     const channelColumns = [
-        { key: "channelNumber", name: "채널번호" },
-        { key: "channelName", name: "채널이름" },
+        { key: "channelNumber", name: "채널 번호" },
+        { key: "channelName", name: "채널 이름" },
         {
             key: "mode",
             name: "할당 발신모드",
@@ -601,7 +601,7 @@ const SystemPreferences = () => {
         }
 
         showConfirm(
-            `장비 [${selectedDevice.device_name}]를 삭제하시겠습니까? \n\n ※주의: 삭제시 데이터베이스에서 완전 삭제됩니다. \n 다시 한번 확인해 주시고 삭제해 주세요.`, 
+            `장비 [${selectedDevice.device_name}]을 삭제하시겠습니까? \n\n ※주의: 삭제 시 데이터베이스에서 완전 삭제됩니다. \n 다시 한 번 확인해 주시고 삭제해 주세요.`,
             () => {
                 deleteDevice({
                     tenant_id: tenants[0].tenant_id,
@@ -665,7 +665,7 @@ const SystemPreferences = () => {
 
         // 유효성 검사: updatedAssign 배열이 유효한지 확인
         if (!Array.isArray(updatedAssign) || updatedAssign.length !== selectedDevice.channel_count) {
-            showAlert('채널 할당 정보가 올바르지 않습니다. 다시 시도해주세요.');
+            showAlert('채널 할당 정보가 올바르지 않습니다. 다시 시도해 주세요.');
             return;
         }
 
@@ -983,7 +983,7 @@ const SystemPreferences = () => {
                         />
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center gap-1">
-                                <Label className="w-[5.6rem] min-w-[5.6rem]">장비번호</Label>
+                                <Label className="w-[5.6rem] min-w-[5.6rem]">장비 번호</Label>
                                 <CustomInput 
                                     type="text"
                                     value={equipmentNumber}
@@ -993,7 +993,7 @@ const SystemPreferences = () => {
                                 />
                             </div>
                             <div className="flex items-center gap-1">
-                                <Label className="w-[5.6rem] min-w-[5.6rem]">장비이름</Label>
+                                <Label className="w-[5.6rem] min-w-[5.6rem]">장비 이름</Label>
                                 <CustomInput 
                                     type="text"
                                     value={equipmentName}
@@ -1003,7 +1003,7 @@ const SystemPreferences = () => {
                                 />
                             </div>
                             <div className="flex items-center gap-1">
-                                <Label className="w-[5.6rem] min-w-[5.6rem]">채널수</Label>
+                                <Label className="w-[5.6rem] min-w-[5.6rem]">채널 수</Label>
                                 <CustomInput 
                                     type="number" 
                                     value={refreshCycle}
@@ -1020,19 +1020,19 @@ const SystemPreferences = () => {
                     {/* 채널목록 섹션 */}
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-1">
-                            <Label className="w-[5.6rem] min-w-[5.6rem]">장비 할당모드</Label>
+                            <Label className="w-[5.6rem] min-w-[5.6rem]">장비 할당 모드</Label>
                             <Select 
                                 value={allocationMode} 
                                 onValueChange={setAllocationMode}
                                 disabled={!selectedDevice}
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="할당모드 선택" />
+                                    <SelectValue placeholder="할당 모드 선택" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="1">1.캠페인으로할당</SelectItem>
-                                    <SelectItem value="2">2.발신모드로할당</SelectItem>
-                                    <SelectItem value="3">3.채널그룹으로할당</SelectItem>
+                                    <SelectItem value="1">1. 캠페인으로 할당</SelectItem>
+                                    <SelectItem value="2">2. 발신모드로 할당</SelectItem>
+                                    <SelectItem value="3">3. 채널 그룹으로 할당</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
