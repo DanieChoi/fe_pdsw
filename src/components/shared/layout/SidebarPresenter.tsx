@@ -91,7 +91,7 @@ interface SidebarPresenterProps {
   selectedTabId: string;
   selectedNodeId?: string;
   
-  // 리사이징 관련
+  // 크기 조정 관련
   isResizing: boolean;
   onResizeStart: () => void;
   

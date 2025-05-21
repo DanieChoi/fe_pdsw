@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
@@ -251,7 +250,7 @@ export default function Footer({
           window.dispatchEvent(deviceStatusEvent);
           addMessageToFooterList(_time, _type, _message);
         } else if (data['device_status'] === 'down') {
-          _message = 'CIDS 작동중지';
+          _message = 'CIDS 작동 중지';
           // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
           const deviceStatusEvent = new CustomEvent('deviceStatusChange', {
             detail: {
@@ -263,19 +262,19 @@ export default function Footer({
           addMessageToFooterList(_time, _type, _message);
         }
       } else if (command === 'DELETE') {
-        _message = '[장비제거]장비아이디: ' + data['device_id'];
+        _message = '[장비 제거] 장비 ID: ' + data['device_id'];
         addMessageToFooterList(_time, _type, _message);
       }
     }
-    //캠페인수정>콜페이싱 수정
+    // 캠페인 수정 > 콜페이싱 수정
     else if (announce === '/pds/campaign/dial-speed') {
       // _message = '[콜페이싱] ';
       // if (command === 'UPDATE') {
       //   const tempCampaign = campaigns.find((campaign) => campaign.campaign_id === Number(campaign_id));
       //   if (tempCampaign && tempCampaign.dial_mode === 2) {
-      //     _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'] * 2;
+      //     _message += '캠페인 ID ' + campaign_id + ' , 현재 설정 값 ' + data['dial_speed'] * 2;
       //   } else {
-      //     _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'] * 2;
+      //     _message += '캠페인 ID ' + campaign_id + ' , 현재 설정 값 ' + data['dial_speed'] * 2;
       //   }
       //   addMessageToFooterList(_time, _type, _message);
       //   fetchMain({

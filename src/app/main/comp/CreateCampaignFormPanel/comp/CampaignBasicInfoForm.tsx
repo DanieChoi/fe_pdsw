@@ -80,7 +80,7 @@ const CampaignBasicInfoForm = ({
   // 스킬 팝업 열기
   const handleOpenSkillPopup = () => {
     if (!currentTenantId || currentTenantId === '-1') {
-      alert('테넌트를 선택해 주세요.');
+      alert('테넌트를 선택해주세요.');
     } else {
       setSkillPopupState({ ...skillPopupState, isOpen: true });
     }
@@ -90,7 +90,7 @@ const CampaignBasicInfoForm = ({
     <div>
       <div className="grid grid-cols-3 gap-x-[24px] gap-y-2">
         <div className="flex items-center gap-2">
-          <Label className="w-[90px] min-w-[90px]">캠페인 아이디</Label>
+          <Label className="w-[90px] min-w-[90px]">캠페인 ID</Label>
           <CustomInput
             type="number"
             value={tempCampaignInfo.campaign_id}
@@ -137,7 +137,7 @@ const CampaignBasicInfoForm = ({
             value={formattedSkills} 
             className="w-full" 
             readOnly
-            placeholder="스킬을 선택해주세요" 
+            placeholder="스킬을 선택해 주세요" 
           />
           <button
             className="absolute right-2 top-[52%] transform -translate-y-1/2 hover:bg-gray-100 p-1 rounded-full"
