@@ -434,7 +434,8 @@ function CampaignLayout() {
               value={selectedCampaignId}
               readOnly
               disabled={isCampaignFieldDisabled()}
-              className="w-[140px]"
+              // className="w-[140px]"
+              isFullWidth={true}
             />
             <CommonButton 
               variant="outline" 
