@@ -302,7 +302,8 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
               type="text"
               value={tempOutgoingMethodTab.auto_dial_interval}
               onChange={(e) => handleNumericInput(e, 'setAutoDial')}
-              maxLength={5}
+              // maxLength={5}
+              isFullWidth={true}
             />
           </div>
 
@@ -407,7 +408,8 @@ const OutgoingMethodTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, on
               type="text"
               value={tempOutgoingMethodTab.token_id}
               onChange={(e) => handleNumericInput(e, 'setTokenId')}
-              maxLength={1}
+              // maxLength={1}
+              isFullWidth={true}
             />
           </div>
 
