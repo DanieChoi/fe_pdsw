@@ -91,8 +91,7 @@ const SkillListPopup = ({
         <div className="grid-custom-wrap w-full">
           {rows.length === 0 ? (
             <div className="text-center py-4 text-sm text-gray-500">
--             해당 테넌트 에 부여된 스킬이 없습니다
-+             해당 테넌트에 부여된 스킬이 없습니다
+             해당 테넌트에 부여된 스킬이 없습니다
             </div>
           ) : (
             <DataGrid
