@@ -35,7 +35,7 @@ export function useApiForCampaignStatusUpdate(
       // queryClient.invalidateQueries({ queryKey: ['treeMenuDataForSideMenu'] });
       // queryClient.invalidateQueries({ queryKey: ['mainCampaignProgressInformation'] });
       // queryClient.invalidateQueries({ queryKey: ['mainData'] });
-      console.log("캠페인 상태변경 추적 결과 : ", data); 
+      // console.log("캠페인 상태변경 추적 결과 : ", data); 
       // Call the original onSuccess if provided
       options?.onSuccess?.(data, variables, context);
     },

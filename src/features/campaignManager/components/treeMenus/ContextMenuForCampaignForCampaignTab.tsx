@@ -430,13 +430,13 @@ export function ContextMenuForCampaignForCampaignTab({
           campaign_id: Number(item.id),
           campaign_status: getStatusNumber(status),
         }).then(() => {
-          console.log('#### then 으로 떨어짐 사이드바 캠페인 상태 변경');
+          // console.log('#### then 으로 떨어짐 사이드바 캠페인 상태 변경');
         }).catch(error => {
-          console.log('#### 사이드바 캠페인 상태 변경 에러:', error);
+          // console.log('#### 사이드바 캠페인 상태 변경 에러:', error);
         });
       }
       else {
-        console.log('#### 마스터 수정 으로 떨어짐 사이드바 캠페인 상태 변경');
+        // console.log('#### 마스터 수정 으로 떨어짐 사이드바 캠페인 상태 변경');
         // 캠페인 마스터 API 호출
         fetchCampaignManagerUpdate(
           {
