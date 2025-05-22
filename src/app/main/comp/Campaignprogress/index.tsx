@@ -359,12 +359,12 @@ export default function Campaignprogress() {
   };
   // 캠페인 아이디 변경 핸들러
   const handleCampaignChange = (value: string) => {
-    setSelectedCampaign(value);
-    if (campaignSkills.length > 0) {
-      processDataForGrid(campaignSkills, value, selectedSkill, selectedStatus);
-      processDataForList(value, selectedSkill, selectedStatus);
+    // setSelectedCampaign(value);
+    // if (campaignSkills.length > 0) {
+    //   processDataForGrid(campaignSkills, value, selectedSkill, selectedStatus);
+    //   processDataForList(value, selectedSkill, selectedStatus);
       setCampaignTotalProgressInfoCampaignId(value);
-    }
+    // }
   };
   // 상태 별로 보기 변경 핸들러
   const handleStatusChange = (value: string) => {
@@ -578,6 +578,8 @@ export default function Campaignprogress() {
         fetchSkills({
           tenant_id_array: []
         });
+        setSelectedCampaignId(0);
+        setSelectedCampaignIdIndex(0);
       }
     }
   });
@@ -616,6 +618,15 @@ export default function Campaignprogress() {
     }
   }, [columns]);
 
+  // const searchCampaignProgressInformation = (_campaignId:number, _index:number) => {
+  //   if (_campaignId > 0 && tempCampaignList[_index]) {
+  //     fetchCampaignProgressInformation({
+  //       tenantId: tempCampaignList[_index].tenant_id,
+  //       campaignId: _campaignId
+  //     });
+  //   } 
+  // }
+
   useEffect(() => {
     if (selectedCampaignId > 0 && tempCampaignList[selectedCampaignIdIndex]) {
       fetchCampaignProgressInformation({
@@ -651,7 +662,12 @@ export default function Campaignprogress() {
 
   useEffect(() => {
     if (campaignTotalProgressInfoCampaignId != '') {
-      handleCampaignChange(campaignTotalProgressInfoCampaignId);
+      // handleCampaignChange(campaignTotalProgressInfoCampaignId);
+      setSelectedCampaign(campaignTotalProgressInfoCampaignId);
+      if (campaignSkills.length > 0) {
+        processDataForGrid(campaignSkills, campaignTotalProgressInfoCampaignId, selectedSkill, selectedStatus);
+        processDataForList(campaignTotalProgressInfoCampaignId, selectedSkill, selectedStatus);
+      }
     }
   }, [campaignTotalProgressInfoCampaignId]);
 
