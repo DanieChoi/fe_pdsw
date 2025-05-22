@@ -19,13 +19,13 @@ export function TreeMenusForAgentTab() {
   );
 
   const [searchTerm, setSearchTerm] = useState("");
-  const { 
+  const {
     setSelectedCounselor,
     sortOption,
     currentExpansionLevel,
     expandToLevel: storeExpandToLevel
   } = useCounselorFilterStore();
-  
+
   const [allCounselors, setAllCounselors] = useState<Array<{
     counselorId: string;
     counselorName: string;
@@ -49,14 +49,14 @@ export function TreeMenusForAgentTab() {
     if (data?.organizationList) {
       // 기본 확장 상태 적용
       applyDefaultExpansion();
-      
+
       // 필터링 및 정렬 적용한 데이터
       const sorted = applySorting([...data.organizationList]);
-      
+
       // 모든 상담사 정보 추출 (필터링된 데이터에서 추출하기 위해 이 위치로 이동)
       const counselors = getAllCounselorsFromFilteredData(sorted);
       setAllCounselors(counselors);
-      
+
       setSortedData(sorted);
     }
   }, [data, tenant_id]);
@@ -106,25 +106,25 @@ export function TreeMenusForAgentTab() {
   // 정렬 로직 구현 (tenant_id 필터링 적용)
   const applySorting = (dataArray: IOrganization[]) => {
     if (!dataArray || dataArray.length === 0) return [];
-    
+
     const { type, direction, nodeType } = sortOption;
-    
+
     // 깊은 복사를 통해 원본 데이터 보존
     const clonedData: IOrganization[] = JSON.parse(JSON.stringify(dataArray));
-    
+
     // tenant_id가 0이 아닌 경우에만 필터링 적용
     if (tenant_id !== 0 && tenant_id !== 0) {
       // 테넌트 필터링 적용 (tenant_id에 해당하는 것만 표시)
       clonedData.forEach(org => {
         if (org.tenantInfo && org.tenantInfo.length > 0) {
           // tenant_id에 해당하는 테넌트만 필터링
-          org.tenantInfo = org.tenantInfo.filter(tenant => 
+          org.tenantInfo = org.tenantInfo.filter(tenant =>
             tenant.tenantId === tenant_id.toString()
           );
         }
       });
     }
-    
+
     // 조직 레벨 정렬 (최상위 레벨)
     if (nodeType === 'all' || nodeType === 'organization') {
       clonedData.sort((a, b) => {
@@ -133,8 +133,8 @@ export function TreeMenusForAgentTab() {
           const valueB = parseInt(b.centerId) || 0;
           return direction === 'asc' ? valueA - valueB : valueB - valueA;
         } else {
-          return direction === 'asc' 
-            ? a.centerName.localeCompare(b.centerName) 
+          return direction === 'asc'
+            ? a.centerName.localeCompare(b.centerName)
             : b.centerName.localeCompare(a.centerName);
         }
       });
@@ -151,8 +151,8 @@ export function TreeMenusForAgentTab() {
               const valueB = parseInt(b.tenantId) || 0;
               return direction === 'asc' ? valueA - valueB : valueB - valueA;
             } else {
-              return direction === 'asc' 
-                ? a.tenantName.localeCompare(b.tenantName) 
+              return direction === 'asc'
+                ? a.tenantName.localeCompare(b.tenantName)
                 : b.tenantName.localeCompare(a.tenantName);
             }
           });
@@ -169,8 +169,8 @@ export function TreeMenusForAgentTab() {
                   const valueB = parseInt(b.groupId) || 0;
                   return direction === 'asc' ? valueA - valueB : valueB - valueA;
                 } else {
-                  return direction === 'asc' 
-                    ? a.groupName.localeCompare(b.groupName) 
+                  return direction === 'asc'
+                    ? a.groupName.localeCompare(b.groupName)
                     : b.groupName.localeCompare(a.groupName);
                 }
               });
@@ -187,46 +187,68 @@ export function TreeMenusForAgentTab() {
                       const valueB = parseInt(b.teamId) || 0;
                       return direction === 'asc' ? valueA - valueB : valueB - valueA;
                     } else {
-                      return direction === 'asc' 
-                        ? a.teamName.localeCompare(b.teamName) 
+                      return direction === 'asc'
+                        ? a.teamName.localeCompare(b.teamName)
                         : b.teamName.localeCompare(a.teamName);
                     }
                   });
                 }
 
                 // 각 팀 내의 상담사 정렬
+                // group.teamInfo.forEach(team => {
+                //   if (team.counselorInfo && team.counselorInfo.length > 0) {
+                //     // 상담사 레벨 정렬
+                //     if (nodeType === 'all' || nodeType === 'counselor') {
+                //       team.counselorInfo.sort((a, b) => {
+                //         if (type === 'id') {
+                //           const valueA = parseInt(a.counselorId) || 0;
+                //           const valueB = parseInt(b.counselorId) || 0;
+                //           return direction === 'asc' ? valueA - valueB : valueB - valueA;
+                //         } else {
+                //           return direction === 'asc' 
+                //             ? (a.counselorname || '').localeCompare(b.counselorname || '') 
+                //             : (b.counselorname || '').localeCompare(a.counselorname || '');
+                //         }
+                //       });
+                //     }
+                //   }
+                // });
+
                 group.teamInfo.forEach(team => {
                   if (team.counselorInfo && team.counselorInfo.length > 0) {
-                    // 상담사 레벨 정렬
                     if (nodeType === 'all' || nodeType === 'counselor') {
                       team.counselorInfo.sort((a, b) => {
                         if (type === 'id') {
                           const valueA = parseInt(a.counselorId) || 0;
                           const valueB = parseInt(b.counselorId) || 0;
-                          return direction === 'asc' ? valueA - valueB : valueB - valueA;
+                          // 기본은 오름차순, direction이 'desc'일 때만 내림차순
+                          return direction === 'desc' ? valueB - valueA : valueA - valueB;
                         } else {
-                          return direction === 'asc' 
-                            ? (a.counselorname || '').localeCompare(b.counselorname || '') 
-                            : (b.counselorname || '').localeCompare(a.counselorname || '');
+                          // 기본은 오름차순, direction이 'desc'일 때만 내림차순
+                          return direction === 'desc'
+                            ? (b.counselorname || '').localeCompare(a.counselorname || '')
+                            : (a.counselorname || '').localeCompare(b.counselorname || '');
                         }
                       });
                     }
                   }
                 });
+
+
               }
             });
           }
         });
       }
     });
-    
+
     return clonedData;
   };
 
   // 기본 확장 상태를 적용하는 함수
   const applyDefaultExpansion = () => {
     if (!data?.organizationList) return;
-    
+
     const initialExpanded = new Set<string>();
 
     data.organizationList.forEach(org => {
@@ -255,7 +277,7 @@ export function TreeMenusForAgentTab() {
     });
 
     setExpandedNodes(initialExpanded);
-    
+
     // 스토어에도 기본 확장 레벨 적용
     storeExpandToLevel(4); // 팀 레벨까지 기본 확장
   };
@@ -263,34 +285,34 @@ export function TreeMenusForAgentTab() {
   // 특정 레벨까지만 노드 열기 함수
   const expandToLevel = (level: number) => {
     if (!data?.organizationList) return;
-    
+
     const newExpanded = new Set<string>();
-    
+
     // 레벨에 따라 다르게 처리
     data.organizationList.forEach(org => {
       // 레벨 1: 조직
       const orgId = `org-${org.centerId}`;
       if (level >= 1) newExpanded.add(orgId);
-      
+
       if (level >= 2 && org.tenantInfo) {
         // 레벨 2: 테넌트 (tenant_id가 0이거나 tenant_id에 해당하는 것만)
         org.tenantInfo.forEach(tenant => {
           if (tenant_id === 0 || tenant_id === 0 || tenant.tenantId === tenant_id.toString()) {
             const tenantId = `tenant-${tenant.tenantId}`;
             newExpanded.add(tenantId);
-            
+
             if (level >= 3 && tenant.groupInfo) {
               // 레벨 3: 그룹
               tenant.groupInfo.forEach(group => {
                 const groupId = `group-${group.groupId}`;
                 newExpanded.add(groupId);
-                
+
                 if (level >= 4 && group.teamInfo) {
                   // 레벨 4: 팀
                   group.teamInfo.forEach(team => {
                     const teamId = `team-${team.teamId}`;
                     newExpanded.add(teamId);
-                    
+
                     if (level >= 5 && team.counselorInfo) {
                       // 레벨 5: 상담사
                       team.counselorInfo.forEach(counselor => {
@@ -306,14 +328,14 @@ export function TreeMenusForAgentTab() {
         });
       }
     });
-    
+
     setExpandedNodes(newExpanded);
   };
-  
+
   // 전체 열기/닫기 함수
   const toggleAllNodes = (isExpanded: boolean) => {
     if (!data?.organizationList) return;
-    
+
     if (isExpanded) {
       // 모든 레벨 열기 (레벨 5까지)
       expandToLevel(5);
@@ -343,20 +365,20 @@ export function TreeMenusForAgentTab() {
       selectCounselor('', '', '');
       return;
     }
-  
+
     if (!data?.organizationList) return;
-    
+
     // 필터링된 데이터에서 검색
     const filteredData = applySorting([...data.organizationList]);
     const counselorInfo = findCounselorInfoInFilteredData(filteredData, searchTerm);
-    
+
     if (counselorInfo) {
       selectCounselor(counselorInfo.counselorId, counselorInfo.counselorName, counselorInfo.tenantId);
     } else {
       toast.error("상담사를 찾을 수 없습니다.");
     }
   };
-  
+
   // 필터링된 데이터에서 상담사 검색
   const findCounselorInfoInFilteredData = (
     filteredData: IOrganization[],
@@ -402,27 +424,27 @@ export function TreeMenusForAgentTab() {
       applyDefaultExpansion();
       return;
     }
-  
+
     // 상담사 선택 상태 업데이트
     setSelectedNodeId(counselorId);
     setSelectedCounselor(counselorId, counselorName, tenantId);
-    
+
     if (data?.organizationList) {
       // 필터링된 데이터에서 경로 찾기
       const filteredData = applySorting([...data.organizationList]);
       const counselorInfo = findCounselorInfoInFilteredData(filteredData, counselorName);
-      
+
       if (counselorInfo) {
         // 경로상의 모든 노드 확장
         const newExpanded = new Set(expandedNodes);
         counselorInfo.paths.forEach(path => newExpanded.add(path));
         setExpandedNodes(newExpanded);
-  
+
         // DOM 업데이트를 위한 짧은 지연 후 스크롤 실행
         setTimeout(() => {
           const scrollContainer = document.querySelector('.tree-node');
           const targetElement = document.getElementById(`counselor-${counselorId}`);
-  
+
           if (scrollContainer && targetElement) {
             scrollContainer.scrollTop = (
               targetElement.offsetTop -
