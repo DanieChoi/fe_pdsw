@@ -367,9 +367,9 @@ export function GroupSkillAssignmentTab(): JSX.Element {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>ID</TableHead>
-                      <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>이름</TableHead>
-                      <TableHead className="w-16 text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>테넌트 ID</TableHead>
+                      <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>상담사 아이디</TableHead>
+                      <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>상담사 이름</TableHead>
+                      <TableHead className="w-16 text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>테넌트 아이디</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -395,7 +395,7 @@ export function GroupSkillAssignmentTab(): JSX.Element {
 
           {/* 테넌트 ID 정보 */}
           <div className="p-2 bg-gray-50 border rounded text-sm text-[#333] mb-4">
-            <span>테넌트 ID: {tenantId || 'N/A'}</span>
+            <span>테넌트 아이디 : {tenantId || 'N/A'}</span>
           </div>
 
           {/* 스킬 목록 테이블 */}
@@ -404,8 +404,8 @@ export function GroupSkillAssignmentTab(): JSX.Element {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>선택</TableHead>
-                  <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>아이디</TableHead>
-                  <TableHead className="w-16 text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>이름</TableHead>
+                  <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>스킬 아이디</TableHead>
+                  <TableHead className="w-16 text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>스킬 이름</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

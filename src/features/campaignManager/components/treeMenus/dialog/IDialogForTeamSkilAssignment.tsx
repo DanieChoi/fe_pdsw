@@ -265,7 +265,7 @@ export function IDialogForTeamSkilAssignment({
             : `팀의 모든 상담사(${teamMembers.length}명)에게 스킬을 일괄 할당합니다. 할당할 스킬을 선택하세요.`}
         </div>
         <div className="gary-border-box ">
-          <span>테넌트 ID: {tenantId || 'N/A'}</span>
+          <span>테넌트 아이디 : {tenantId || 'N/A'}</span>
         </div>
         <div className="gap-6">
           <div className="">
@@ -292,9 +292,9 @@ export function IDialogForTeamSkilAssignment({
                 <Table>
                   <TableHeader className="sticky top-0 z-10">
                     <TableRow>
-                      <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>ID</TableHead>
-                      <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>이름</TableHead>
-                      <TableHead className="w-16 text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>테넌트 ID</TableHead>
+                      <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>상담사 아이디</TableHead>
+                      <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>상담사 이름</TableHead>
+                      <TableHead className="w-16 text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>테넌트 아이디</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -329,13 +329,13 @@ export function IDialogForTeamSkilAssignment({
                 <TableHeader className="sticky top-0 z-10">
                   <TableRow>
                     <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>선택</TableHead>
-                    <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>아이디</TableHead>
-                    <TableHead className="w-16 text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>이름</TableHead>
+                    <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>스킬 아이디</TableHead>
+                    <TableHead className="w-16 text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>스킬 이름</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {assignableSkills && assignableSkills.length > 0 ? (
-                    assignableSkills.map((skill) => {
+                    assignableSkills.sort((a,b)=> a.skill_id - b.skill_id).map((skill) => {
                       const isAlreadyAssigned = assignedSkillsInfo.includes(skill.skill_id);
                       const isCurrentlySelected = selectedSkills.includes(skill.skill_id);
                       if (isUnassignMode && !isAlreadyAssigned) {
