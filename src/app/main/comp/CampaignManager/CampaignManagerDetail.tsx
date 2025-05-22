@@ -44,6 +44,7 @@ import { CampaignInfoInsertRequest } from '@/features/campaignManager/hooks/useA
 import { useDeleteCampaignHelper } from '@/features/campaignManager/utils/deleteCampaignHelper';
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 import { useCampaignDialStatusStore } from '@/store/campaignDialStatusStore';
+import logoutFunction from '@/components/common/logoutFunction';
 
 
 
@@ -1887,8 +1888,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     }
   });
   const goLogin = () => {
-    Cookies.remove('session_key');
-    useAuthStore.getState().clearAuth();
+    logoutFunction();
     router.push('/login');
   };
 

@@ -30,6 +30,7 @@ import { CampaignInfoUpdateRequest } from '@/features/campaignManager/types/camp
 import { useApiForCampaignManagerUpdate } from '@/features/campaignManager/hooks/useApiForCampaignManagerUpdate';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
+import logoutFunction from "@/components/common/logoutFunction";
 
 interface RebroadcastSettings {
     campaignId: string;
@@ -674,10 +675,9 @@ const RebroadcastSettingsGroupPanel = () => {
         }
     });
     const goLogin = () => {
-      Cookies.remove('session_key');
-      useAuthStore.getState().clearAuth();
-      router.push('/login');
-    }
+    logoutFunction();
+    router.push('/login');
+  };
     
     // 캠페인 재발신 정보 추가
     const { mutate: fetchCampaignAutoRedialInsert } = useApiForCampaignAutoRedialInsert({

@@ -108,6 +108,9 @@ interface MainActions {
   setCampaignGroupsLoaded: (loaded: boolean) => void;
   setCampaignGroupsLoading: (loading: boolean) => void;
 
+  // MainStore 초기화
+  setResetMainStore: () => void;
+
 }
 
 type MainStore = MainState & MainActions;
@@ -260,6 +263,45 @@ export const useMainStore = create<MainStore>()(
         setCampaignGroupsLoading: (loading) => set({
           campaignGroupsLoading: loading
         }, false, 'setCampaignGroupsLoading'),
+
+        // MainStore 초기화
+        setResetMainStore: () => set({
+          campaigns: [],
+          tenants: [],
+          counselers: [],
+          selectedCampaign: null,
+          selectedCampaignRow: null, // Initialize selectedCampaignRow as null
+          totalCount: 0,
+          reBroadcastType: '',
+          sendingStatusCampaignId: '',
+          listManagerFileFormatRows: [],
+          sseInputMessage: '',
+          listManagerDelimiter: '',
+          listManagerCampaignId: '',
+          listManagerFileFormat: '',
+          reBroadcastRedialCondition: '',
+          // 테넌트 상태 초기화
+          tenantsLoaded: false,
+          tenantsLoading: false,
+          // 캠페인 상태 초기화
+          campaignsLoaded: false,
+          campaignsLoading: false,
+          channelMonitorFirstSelect: '',
+          channelMonitorSecondSelect: '',
+          channelMonitorThirdSelect: '',
+          campaignProgressInfoViewType: '',
+          campaignTotalProgressInfoCampaignId: '',
+
+          // 캠페인 스킬 관련
+          campaignSkills: [],
+          campaignSkillsLoaded: false,
+          campaignSkillsLoading: false,
+
+          // 캠페인 그룹 관련
+          campaignGroups: [],
+          campaignGroupsLoaded: false,
+          campaignGroupsLoading: false,
+        }, false, 'setResetMainStore'),
 
       }),
       {

@@ -2066,6 +2066,7 @@ export const useTabStore = create<TabLayoutStore>()(
           activeTabId: state.activeTabId,
           activeTabKey: state.activeTabKey,
           openSectionId: state.openOperationSectionId,
+          campaignIdForUpdateFromSideMenu : state.campaignIdForUpdateFromSideMenu, // 새로고침시 선택한 캠페인 유지
         }), // 저장할 상태만 선택
       }
     )

@@ -131,11 +131,14 @@ export default function Header() {
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data || []);
-      // console.log("Skills data loaded in header, updated store");
+      
+      useMainStore.getState().setCampaignSkillsLoaded(true); // 사이드바 로딩중 해제를 위한 store 값 변경 0522 추가
+      // console.log("Skills data loaded in header, updated store")
     },
     onError: (error) => {
       // 로딩 상태 해제
-      useCampainManagerStore.getState().setSkillsLoading(false);
+
+      useCampainManagerStore.getState().setSkillsLoading(false); // ??
       console.log("Error loading skills data:", error);
     },
     retry: 0,
