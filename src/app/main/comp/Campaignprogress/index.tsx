@@ -123,7 +123,7 @@ const initDispatchStatusData: DispatchStatusDataType = {
 // todo 0428 새로고침 
 export default function Campaignprogress() {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set(['center-1']));
-  const [selectedCampaign, setSelectedCampaign] = useState<string>('전체보기');
+  const [selectedCampaign, setSelectedCampaign] = useState<string>('전체 보기');
   const [selectedSkill, setSelectedSkill] = useState<string>('total');
   const [selectedStatus, setSelectedStatus] = useState<string>('전체');
   const [isSortAscending, setIsSortAscending] = useState<boolean>(true);
@@ -455,7 +455,7 @@ export default function Campaignprogress() {
     } else {
       _tempCampaignList = campaigns;
     }
-    if (currentCampaign !== '전체보기') {
+    if (currentCampaign !== '전체 보기') {
       _tempCampaignList = _tempCampaignList.filter(campaign=>campaign.campaign_id === Number(currentCampaign));
     }
     setTempCampaignList(_tempCampaignList);
@@ -489,7 +489,7 @@ export default function Campaignprogress() {
         tempList = tempList.filter(campaignInfo => campaignInfo.startFlag === currentStatus);
       }
       // 캠페인 아이디 필터링
-      if (currentCampaign !== '전체보기') {
+      if (currentCampaign !== '전체 보기') {
         tempList = tempList.filter(campaignInfo => campaignInfo.campId === Number(currentCampaign));
       }
       return tempList;
