@@ -909,9 +909,9 @@ const TabHeader = ({
     return (
         <div
             ref={setNodeRef}
-            className={`relative flex-none transition-all duration-200 border-b border-blue-200 ${showDragOverlay
-                ? "bg-blue-50 shadow-lg border border-dashed border-blue-400"
-                : "bg-white"
+            className={`relative flex-none transition-all duration-200 ${showDragOverlay
+                ? "bg-blue-50 shadow-lg border border-dashed border-blue-400 border-b border-blue-200"
+                : "bg-white border border-gray-200"
                 }`}
         >
             {/* 높이를 일관되게 맞춘 컨테이너 */}
