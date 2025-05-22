@@ -205,7 +205,7 @@ export function ContextMenuForCampaignForCampaignTab({
         setAlertState({
           ...alertState,
           isOpen: true,
-          message: CheckCampaignSaveReturnCode(data.reason_code),
+          message: CheckCampaignSaveReturnCode(data.reason_code, data.result_msg),
           title: '알림',
           type: '2',
           onClose: () => {

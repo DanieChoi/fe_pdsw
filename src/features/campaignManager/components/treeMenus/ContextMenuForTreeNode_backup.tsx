@@ -110,7 +110,7 @@ export function ContextMenuForTreeNode({
           ...errorMessage,
           isOpen: true,
           type: '2',
-          message: CheckCampaignSaveReturnCode(data.reason_code),
+          message: CheckCampaignSaveReturnCode(data.reason_code, data.result_msg),
           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
           onCancel: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
         });

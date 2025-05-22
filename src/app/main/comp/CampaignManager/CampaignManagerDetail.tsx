@@ -1873,7 +1873,7 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
         setAlertState({
           ...errorMessage,
           isOpen: true,
-          message: CheckCampaignSaveReturnCode(data.reason_code),
+          message: CheckCampaignSaveReturnCode(data.reason_code, data.result_msg),
           type: '2',
           onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
         });
