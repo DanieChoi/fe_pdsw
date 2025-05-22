@@ -34,7 +34,7 @@ const errorMessage = {
 export default function Header() {
   const router = useRouter();
   const _tenantId = Number(Cookies.get('tenant_id'));
-  const { id, tenant_id, session_key: _sessionKey, role_id, menu_role_id } = useAuthStore();
+  const { id:userId, tenant_id, session_key: _sessionKey, role_id, menu_role_id } = useAuthStore();
 
   const [alertState, setAlertState] = useState(errorMessage);
   const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
@@ -438,7 +438,7 @@ export default function Header() {
                 height={14}
                 priority
               />
-              <span>{id}</span>
+              <span>{userId}</span>
             </div>
             <CommonButton
               variant="ghost"

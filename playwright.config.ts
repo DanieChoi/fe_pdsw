@@ -16,12 +16,8 @@ export default defineConfig({
     headless: false // ← 원한다면 항상 브라우저 보이게
   },
 
-  // ✅ 크롬만 남기고 나머지 제거
+  // ✅ 파이어폭스만 남기고 나머지 제거
   projects: [
-    // {
-    //   name: 'chromium',
-    //   use: { ...devices['Desktop Chrome'] },
-    // },
     {
       name: 'firefox', // ✅ 추가
       use: { ...devices['Desktop Firefox'] },
