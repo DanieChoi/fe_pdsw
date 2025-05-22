@@ -92,7 +92,11 @@ export function AddCampaignGroupDialog({
   // 숫자 이외 제거
   const handleGroupIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const onlyDigits = e.target.value.replace(/\D/g, "");
-    setGroupId(onlyDigits);
+    if (onlyDigits.length > 3) {
+      setGroupId('999');
+    }else{
+      setGroupId(onlyDigits);
+    }
     setIsValidated(false);
   };
 
