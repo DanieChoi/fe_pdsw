@@ -58,10 +58,10 @@ export const getAssignableSkillsForCounselor = async (tenantId: number): Promise
     //   skill_id: 0,
     //   tenant_id: 0,
     // },
-    page: {
-      index: 1,
-      items: 10
-    },
+    // page: {
+    //   index: 1,
+    //   items: 10
+    // },
     sort: {
       skill_id: 1,
       tenant_id: 10
