@@ -204,6 +204,7 @@ import { removeNodeByCampaignIdForCampaignTab } from '../utils/treeUtils';
 import { useDeleteCampaignHelper } from '@/features/campaignManager/utils/deleteCampaignHelper';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import logoutFunction from '@/components/common/logoutFunction';
 
 interface Props {
   campaignId?: string | number;
@@ -263,8 +264,7 @@ const IDialogButtonForCampaingDelete: React.FC<Props> = ({
   const router = useRouter();
 
   const goLogin = () => {
-    Cookies.remove('session_key');
-    useAuthStore.getState().clearAuth();
+    logoutFunction();
     router.push('/login');
   };
 

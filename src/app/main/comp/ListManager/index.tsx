@@ -35,6 +35,7 @@ import FileFormat,{FormatRowData, FormatRow, initData} from './FileFormat';
 import LoadingModal from './LoadingModal';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import logoutFunction from "@/components/common/logoutFunction";
 
 
 // 인터페이스
@@ -208,10 +209,9 @@ const ListManager: React.FC = () => {
     }
   });
   const goLogin = () => {
-    Cookies.remove('session_key');
-    useAuthStore.getState().clearAuth();
+    logoutFunction();
     router.push('/login');
-  }
+  };
   
   // 블랙리스트 추가 api 호출
   const { mutate: fetchBlacklistInsert } = useApiForBlacklistInsert({

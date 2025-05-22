@@ -20,6 +20,7 @@ import { useRouter } from 'next/navigation';
 import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/CustomAlert';
 import AddCampaignGroupDialog from "./AddCampaignGroupDialog";
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
+import logoutFunction from '@/components/common/logoutFunction';
 
 const errorMessage = {
   isOpen: false,
@@ -221,8 +222,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   });
 
   const goLogin = () => {
-    Cookies.remove('session_key');
-    useAuthStore.getState().clearAuth();
+    logoutFunction();
     router.push('/login');
   };
 

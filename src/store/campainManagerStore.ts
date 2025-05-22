@@ -77,6 +77,9 @@ interface CampainManagerActions {
   setSkillsLoaded: (loaded: boolean) => void;
   setSkillsLoading: (loading: boolean) => void;
   setChannelGroupList: (channelGroupList: ChannelGroupListDataResponse[]) => void;
+
+  // CampaignManagerStore 초기화
+  setResetCampaignManagerStore: () => void;
 }
 
 type CampainManagerStore = CampainManagerState & CampainManagerActions;
@@ -164,7 +167,38 @@ export const useCampainManagerStore = create<CampainManagerStore>()(
         setSkillsLoaded: (loaded) => set({ skillsLoaded: loaded }),
         setSkillsLoading: (loading) => set({ skillsLoading: loading }),
         setChannelGroupList: (channelGroupList) => set({ channelGroupList }),
-        isAlreadyOpend: false
+        isAlreadyOpend: false,
+
+
+        setResetCampaignManagerStore: () => set({
+          skills: [],
+          callingNumbers: [],
+          schedules: [],
+          campaignSkills: [],
+          phoneDescriptions: [],
+          // selectedCampaign: null, // set 이 없어서 초기화 못시키는중 (사용 안하는듯)
+          totalCount: 0,
+          campaignGroupManagerInit: false,
+          newCampaignManagerInfo: {} as CampaignInfoInsertRequest,
+          newCampaignInfo: {} as MainDataResponse,
+          newTenantId: ' ',
+          newCampaignSchedule: {} as CampaignScheDuleListDataResponse,
+          campaignManagerHeaderTenantId: '',
+          campaignManagerHeaderCampaignName: '',
+          campaignManagerHeaderDailMode: '',
+          campaignManagerHeaderSkill: '',
+          campaignManagerHeaderCallNumber: '',
+          campaignManagerCampaignId: '',
+          copyCampaignManagerInfo: {} as CampaignInfoInsertRequest,
+          copyCampaignInfo: {} as MainDataResponse,
+          copyTenantId: ' ',
+          copyCampaignSchedule: {} as CampaignScheDuleListDataResponse,
+          copyCampaignSkills: {} as CampaignSkillUpdateRequest,
+          // 스킬 상태 초기화
+          skillsLoaded: false,
+          skillsLoading: false,
+          channelGroupList: [],
+        }),
       }),
       {
         name: 'campaign-manager-store', // localStorage에 저장될 키 이름

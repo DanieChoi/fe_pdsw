@@ -4,6 +4,8 @@ import { useAuthStore } from "@/store/authStore"; // Ensure this is the correct 
 import { useOperationStore } from '@/app/main/comp/operation/store/OperationStore';
 import { useSessionCheckStore } from '@/store/sessionCheckStore';
 import { logoutChannel } from '@/lib/broadcastChannel';
+import { useEnvironmentStore } from '@/store/environmentStore';
+import { useCampainManagerStore, useMainStore } from '@/store';
 
 type PortCheck = {
     portcheck?: boolean;
@@ -33,6 +35,17 @@ const logoutFunction = ({ portcheck = true }: PortCheck = {}) => {
     // localStorage.setItem('monitorPopupOpen', 'false');
     
     // --- store 초기화 로직 추가하실거 있으시면 추가하시면 됩니다 ---
+
+    // 임시 주석
+    // 환경 설정 Store 초기화 0522 추가
+    // useEnvironmentStore.getState().clearEnvironment();
+
+    // mainStore 초기화 0522 추가
+    // useMainStore.getState().setResetMainStore();
+
+    // campaignManagerStore 초기화 0522 추가
+    // useCampainManagerStore.getState().setResetCampaignManagerStore();
+
     if(portcheck){
         logoutChannel.postMessage({
             type: "logout",

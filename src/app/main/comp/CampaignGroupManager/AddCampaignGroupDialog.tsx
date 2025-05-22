@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { DataProps } from './CampaignGroupManagerList';
 import { CustomInput } from "@/components/shared/CustomInput";
+import logoutFunction from "@/components/common/logoutFunction";
 
 const errorMessage = {
   isOpen: false,
@@ -97,8 +98,7 @@ export function AddCampaignGroupDialog({
   });
 
   const goLogin = () => {
-    Cookies.remove('session_key');
-    useAuthStore.getState().clearAuth();
+    logoutFunction();
     router.push('/login');
   };
   // 캠페인 그룹 생성 API 호출 훅 사용

@@ -30,6 +30,7 @@ import { useRouter } from 'next/navigation';
 import { CommonButton } from "@/components/shared/CommonButton";
 import { CampaignInfo } from '@/app/main/comp/CreateCampaignFormPanel/variables/variablesForCreateCampaignForm';
 import { useEnvironmentStore } from "@/store/environmentStore";
+import logoutFunction from '@/components/common/logoutFunction';
 
 export interface TabItem {
   id: number;
@@ -1003,8 +1004,7 @@ export default function CampaignDetail() {
     }
   });
   const goLogin = () => {
-    Cookies.remove('session_key');
-    useAuthStore.getState().clearAuth();
+    logoutFunction();
     router.push('/login');
   };
 

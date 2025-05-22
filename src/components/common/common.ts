@@ -162,5 +162,7 @@ export  const CheckCampaignSaveReturnCode = (returnCode: number) => {
       return '무한콜백 캠페인에서만 발생. UserOption Data(limit)가 있다.';
     } else if (returnCode === -10001) {
       return '캠페인 데이터 저장공간이 남아 있지 않습니다. 관리자에게 문의 하세요.';
+    } else {
+      return `${returnCode} 에러 발생. 관리자에게 문의 하세요.`
     }
   }
