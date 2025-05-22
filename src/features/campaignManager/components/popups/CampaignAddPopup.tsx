@@ -657,7 +657,7 @@ const CampaignAddPopup: React.FC<Props> = ({
           </div>
         }
         type="custom"
-        width="max-w-[1100px]"
+        width="max-w-[1300px]"
         showButtons={false}
       />
       {showAlert && (
