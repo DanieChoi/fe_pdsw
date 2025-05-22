@@ -18,6 +18,7 @@ import TitleWrap from "@/components/shared/TitleWrap";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { useCampainManagerStore } from '@/store/campainManagerStore';
+import { useMainStore } from '@/store';
 
 interface SkillWithCampaigns {
   skillId: number;
@@ -59,7 +60,7 @@ const CampaignAddPopup: React.FC<Props> = ({
   const [skillLookup, setSkillLookup] = useState<Record<number, SkillInfo>>({});
   const { refetchTreeDataForCampaignGroupTab } = useSideMenuCampaignGroupTabStore();
 
-  const { setCampaignGroupManagerInit } = useCampainManagerStore();
+  const { campaignSkills } = useMainStore();
 
   // ----------------------------
   //  Hooks
@@ -78,7 +79,9 @@ const CampaignAddPopup: React.FC<Props> = ({
     error: campaignError
   } = useTotalCampaignListForAddCampaignToCampaignGroup(tenantId, isOpen);
 
-  // console.log('캠페인 목록 데이터 for 캠페인 추가 팝업 for 캠페인 그룹:', campaignListData);
+  console.log("campaignListData :: ", campaignListData);
+  console.log("campaignSkills :: ", campaignSkills);
+  
 
   const {
     data: skillListData,
@@ -657,7 +660,7 @@ const CampaignAddPopup: React.FC<Props> = ({
           </div>
         }
         type="custom"
-        width="max-w-[1000px]"
+        width="max-w-[1100px]"
         showButtons={false}
       />
       {showAlert && (
