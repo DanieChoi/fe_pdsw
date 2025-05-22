@@ -209,16 +209,17 @@ export function IDialogForSkilAssignmentForCounselor({
                 <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>
                   선택
                 </TableHead>
-                <TableHead className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>
-                  아이디
+                {/* 0522 QA 요청으로 인한 아이디 -> 스킬 아이디, 이름 -> 스킬 이름 변경 및 w-16 -> w-20  */}
+                <TableHead className="w-20 text-center bg-[#F8F8F8] border-r text-[#333]" style={{ height: '30px' }}>
+                  스킬 아이디
                 </TableHead>
                 <TableHead className="text-center bg-[#F8F8F8] text-[#333]" style={{ height: '30px' }}>
-                  이름
+                  스킬 이름
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {assignableSkills?.result_data.map((skill: CounselorSkill) => {
+              {assignableSkills?.result_data.sort((a,b)=> a.skill_id - b.skill_id).map((skill: CounselorSkill) => {
                 const isInitiallySelected = initialSkills.includes(skill.skill_id);
                 const isCurrentlySelected = selectedSkills.includes(skill.skill_id);
                 const hasChanged = isInitiallySelected !== isCurrentlySelected;

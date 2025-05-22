@@ -51,7 +51,7 @@ export const useCounselorFilterStore = create<CounselorFilterState>()(
       },
       candidateMembersForSkilAssign: [],
       sortOption: { 
-        type: 'name', 
+        type: 'id',  // QA요청 기본 정렬 기준 name --> id 로 변경 0522
         direction: 'asc',
         nodeType: 'all'
       },

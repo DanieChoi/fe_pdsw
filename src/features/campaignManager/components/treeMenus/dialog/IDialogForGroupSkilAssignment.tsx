@@ -688,7 +688,7 @@ export function IDialogForGroupSkilAssignment({
 
         {/* 테넌트 ID 정보 */}
         <div className="gary-border-box">
-          <span>테넌트 ID: {tenantId || "N/A"}</span>
+          <span>테넌트 아이디 : {tenantId || "N/A"}</span>
         </div>
 
         <div className="">
@@ -733,19 +733,19 @@ export function IDialogForGroupSkilAssignment({
                         className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]"
                         style={{ height: "30px" }}
                       >
-                        ID
+                        상담사 아이디
                       </TableHead>
                       <TableHead
                         className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]"
                         style={{ height: "30px" }}
                       >
-                        이름
+                        상담사 이름
                       </TableHead>
                       <TableHead
                         className="w-16 text-center bg-[#F8F8F8] text-[#333]"
                         style={{ height: "30px" }}
                       >
-                        테넌트 ID
+                        테넌트 아이디
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -814,19 +814,19 @@ export function IDialogForGroupSkilAssignment({
                       className="w-16 text-center bg-[#F8F8F8] border-r text-[#333]"
                       style={{ height: "30px" }}
                     >
-                      아이디
+                      스킬 아이디
                     </TableHead>
                     <TableHead
                       className="w-16 text-center bg-[#F8F8F8] text-[#333]"
                       style={{ height: "30px" }}
                     >
-                      이름
+                      스킬 이름
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {assignableSkills && assignableSkills.length > 0 ? (
-                    assignableSkills
+                    assignableSkills.sort((a, b) => a.skill_id - b.skill_id)
                       .map((skill) => {
                         const isAlreadyAssigned =
                           assignedSkillsInfo.includes(skill.skill_id);

@@ -43,7 +43,7 @@ export function CounselorTreeLevelSelector({
             className="text-sm rounded-[3px] px-[6px] py-[4px] justify-start h-[26px]"
           >
             <Image src="/tree-menu/organization.png" alt="조직" width={14} height={12} className="mr-1" />
-            1. 조직
+            1. 센터 {/* 0522 QA요청으로 인한 조직 -> 센터 로 변경 */}
           </Button>
           <Button 
             variant="ghost" 
