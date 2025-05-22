@@ -233,11 +233,13 @@ const RebroadcastSettingsPanelHeader = ({
                 >
                     적용
                 </CommonButton>
+                {/* 
+                0522 QA 요청으로 닫기 삭제
                 <CommonButton
                     onClick={() => removeTab(20, '20')}
                 >
                     닫기
-                </CommonButton>
+                </CommonButton> */}
             </div>
             <CustomAlert
                 message={alertState.message}
