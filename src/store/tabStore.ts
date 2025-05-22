@@ -183,14 +183,11 @@ export interface TabLayoutStore {
 
   openSingleTabAtCurrentSection: (tabId: number, tabInfo: MenuItem) => void;
 
-  // 드래그 오버레이 효과를 위한 상태
   contentDragOver: {
     isActive: boolean;
     rowId: string | null;
     sectionId: string | null;
   };
-
-  // 드래그 상태 설정 메서드
   setContentDragOver: (isActive: boolean, rowId?: string | null, sectionId?: string | null) => void;
 
 };
@@ -265,8 +262,9 @@ export const useTabStore = create<TabLayoutStore>()(
           set({
             contentDragOver: {
               isActive,
-              rowId,
-              sectionId
+              // 드래그가 활성 상태가 아닐 경우 rowId와 sectionId를 null로 설정 보장
+              rowId: isActive ? rowId : null,
+              sectionId: isActive ? sectionId : null,
             }
           }),
 
