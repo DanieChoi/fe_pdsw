@@ -485,7 +485,7 @@ const ITableForSkillListWithCampaign: React.FC<Props> = ({
                   />
                 </th>
                 <th className="text-left px-2 font-medium text-[#333] border-r" style={{ height: '30px' }}>스킬</th>
-                <th className="text-left px-2 font-medium text-[#333] w-1/4 border-r" style={{ height: '30px' }}>캠페인ID</th>
+                <th className="text-left px-2 font-medium text-[#333] w-1/4 border-r" style={{ height: '30px' }}>캠페인 아이디</th>
                 <th className="text-left px-2 font-medium text-[#333] w-1/2" style={{ height: '30px' }}>캠페인 이름</th>
               </tr>
             </thead>

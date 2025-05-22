@@ -367,7 +367,7 @@ const CampaignAddPopup: React.FC<Props> = ({
         <table className="w-full border-collapse text-sm ">
           <thead>
             <tr className="bg-[#F8F8F8] border-b">
-              <th className="border-r border-[#ebebeb] px-2 font-normal text-[#333]" style={{ height: '30px' }}>캠페인 ID</th>
+              <th className="border-r border-[#ebebeb] px-2 font-normal text-[#333]" style={{ height: '30px' }}>캠페인 아이디</th>
               <th className="px-2 font-normal text-[#333]" style={{ height: '30px' }}>캠페인 이름</th>
             </tr>
           </thead>

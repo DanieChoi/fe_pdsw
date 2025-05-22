@@ -214,6 +214,17 @@ export function AddCampaignGroupDialog({
     return false;
   };
 
+  // 숫자 이외 제거
+  const handleGroupIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onlyDigits = e.target.value.replace(/\D/g, "");
+    if (onlyDigits.length > 3) {
+      setGroupId('999');
+    }else{
+      setGroupId(onlyDigits);
+    }
+    setIsValidated(false);
+  };
+
   return (
     <CommonDialogForSideMenu
       isOpen={isOpen}
@@ -245,14 +256,16 @@ export function AddCampaignGroupDialog({
             <CustomInput 
               type="number" 
               value={groupId}
-              onChange={(e) => {
-                setGroupId(e.target.value);
-                setIsValidated(false);
-              }}      
+              // onChange={(e) => {
+              //   setGroupId(e.target.value);
+              //   setIsValidated(false);
+              // }}   
+              onChange={handleGroupIdChange}   
               placeholder="그룹 아이디를 입력해 주세요."     
               className="" 
               min="0" 
               onBlur={handleBlur}
+              maxLength={3}
             />
             <Button
               type="button"
