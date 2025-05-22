@@ -93,9 +93,9 @@ const GroupCampaignList: React.FC<Props> = ({
                   title="전체 선택"
                 />
               </th>
-              <th className="text-left px-2 font-medium text-[#333] border-r" style={{ height: '30px' }}>캠페인ID</th>
+              <th className="text-left px-2 font-medium text-[#333] border-r" style={{ height: '30px' }}>캠페인 아이디</th>
               <th className="text-left px-2 font-medium text-[#333] border-r" style={{ height: '30px' }}>캠페인 이름</th>
-              <th className="text-left px-2 font-medium text-[#333] border-r" style={{ height: '30px' }}>스킬ID</th>
+              <th className="text-left px-2 font-medium text-[#333] border-r" style={{ height: '30px' }}>스킬 아이디</th>
               <th className="text-left px-2 font-medium text-[#333]" style={{ height: '30px' }}>스킬명</th>
             </tr>
           </thead>

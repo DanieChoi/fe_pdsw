@@ -327,7 +327,7 @@ const CampaignAddPopup: React.FC<Props> = ({
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="bg-[#F8F8F8] border-b">
-              <th className="border-r border-[#ebebeb] px-2 font-normal text-[#333]" style={{ height: '30px' }}>캠페인 ID</th>
+              <th className="border-r border-[#ebebeb] px-2 font-normal text-[#333]" style={{ height: '30px' }}>캠페인 아이디</th>
               <th className="border-r border-[#ebebeb] px-2 font-normal text-[#333]" style={{ height: '30px' }}>캠페인 이름</th>
               <th className="px-2 font-normal text-[#333]" style={{ height: '30px' }}>중복</th>
             </tr>
@@ -480,14 +480,14 @@ const CampaignAddPopup: React.FC<Props> = ({
 
   const moveToAll = () => {
     if (selectedRightCampaigns.length === 0) {
-      toast.warn('제거할 캠페인을 선택해주세요.');
+      toast.warn('삭제할 캠페인을 선택해주세요.');
       return;
     }
     const tableContent = createGroupCampaignListTable(selectedRightCampaigns);
     const alertContent = (
       <div>
         <p className="mb-2">
-          {groupName} 에서 아래의 {selectedRightCampaigns.length} 개의 캠페인을 제거하시겠습니까?
+          {groupName} 에서 아래의 {selectedRightCampaigns.length} 개의 캠페인을 삭제하시겠습니까?
         </p>
         {tableContent}
       </div>
@@ -511,9 +511,9 @@ const CampaignAddPopup: React.FC<Props> = ({
       }, {
         onSuccess: (data: { result_code: string | number }) => {
           if (Number(data.result_code) === 0) {
-            toast.success(`${selectedRightCampaigns.length}개의 캠페인이 "${groupName}" 그룹에서 제거되었습니다.`);
+            toast.success(`${selectedRightCampaigns.length}개의 캠페인이 "${groupName}" 그룹에서 삭제되었습니다.`);
           } else {
-            toast.error('캠페인 제거에 실패했습니다.');
+            toast.error('캠페인 삭제제에 실패했습니다.');
           }
           setRemovingCampaigns(false);
           setShowAlert(false);
@@ -523,8 +523,8 @@ const CampaignAddPopup: React.FC<Props> = ({
           setCampaignGroupManagerInit(true);
         },
         onError: (error) => {
-          console.error('캠페인 제거 중 오류 발생:', error);
-          toast.error('캠페인 제거 과정에서 오류가 발생했습니다.');
+          console.error('캠페인 삭제 중 오류 발생:', error);
+          toast.error('캠페인 삭제 과정에서 오류가 발생했습니다.');
           setRemovingCampaigns(false);
           setShowAlert(false);
           setConfirmRemove(false);
@@ -532,8 +532,8 @@ const CampaignAddPopup: React.FC<Props> = ({
         }
       });
     } catch (error) {
-      console.error('캠페인 제거 중 오류 발생:', error);
-      toast.error('캠페인 제거 과정에서 오류가 발생했습니다.');
+      console.error('캠페인 삭제 중 오류 발생:', error);
+      toast.error('캠페인 삭제 과정에서 오류가 발생했습니다.');
       setRemovingCampaigns(false);
       setShowAlert(false);
       setConfirmRemove(false);
@@ -625,7 +625,7 @@ const CampaignAddPopup: React.FC<Props> = ({
                       removingCampaigns ||
                       isRemovingCampaign
                     }
-                    title="선택한 캠페인 제거"
+                    title="선택한 캠페인 삭제"
                   >
                     {removingCampaigns || isRemovingCampaign ? (
                       <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -662,7 +662,7 @@ const CampaignAddPopup: React.FC<Props> = ({
       />
       {showAlert && (
         <CustomAlert
-          title={confirmRemove ? '캠페인 제거 확인' : '캠페인 추가 확인'}
+          title={confirmRemove ? '캠페인 삭제 확인' : '캠페인 추가 확인'}
           isOpen={showAlert}
           onClose={handleAlertConfirm}
           onCancel={() => setShowAlert(false)}
