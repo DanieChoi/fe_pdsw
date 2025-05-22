@@ -274,7 +274,7 @@ const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
     {
       className,
       containerClassName,
-      isFullWidth = true, // 기본값을 true로 변경
+      isFullWidth = true,
       type = "text",
       value,
       onChange,
@@ -437,9 +437,10 @@ const CustomInput = React.forwardRef<HTMLInputElement, CustomInputProps>(
               "flex h-[26px] rounded-[3px] border border-input bg-white px-[8px] text-sm transition-colors",
               "placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
               "disabled:cursor-not-allowed disabled:text-[#aaa] disabled:bg-[#F4F4F4]",
+              // 기본 width 먼저 적용
               isFullWidth ? "w-full" : "w-auto",
               localError && "border-red-500",
-              className
+              className // 사용자 className이 나중에 적용되어 덮어씀
             )}
             ref={combinedRef}
             {...props}

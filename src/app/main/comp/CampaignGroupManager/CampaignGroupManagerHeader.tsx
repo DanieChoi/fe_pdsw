@@ -9,10 +9,10 @@ import { CommonButton } from "@/components/shared/CommonButton";
 import { SkillListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 
 const dialModeList = [
-  {dial_id:1, dial_name: 'Power'},
-  {dial_id:2, dial_name: 'Progressive'},
-  {dial_id:3, dial_name: 'Predictive'},
-  {dial_id:4, dial_name: 'System Preview'},
+  { dial_id: 1, dial_name: 'Power' },
+  { dial_id: 2, dial_name: 'Progressive' },
+  { dial_id: 3, dial_name: 'Predictive' },
+  { dial_id: 4, dial_name: 'System Preview' },
 ];
 
 export interface CampaignGroupHeaderSearch {
@@ -22,10 +22,10 @@ export interface CampaignGroupHeaderSearch {
 
 type Props = {
   groupId: number;
-  onSearch: (param:CampaignGroupHeaderSearch) => void;
+  onSearch: (param: CampaignGroupHeaderSearch) => void;
 }
 
-export default function CampaignGroupManagerHeader({groupId,onSearch}:Props) {
+export default function CampaignGroupManagerHeader({ groupId, onSearch }: Props) {
   const { tenants } = useMainStore();
   const [tenantId, setTenantId] = useState('all'); // 테넌트
   const [campaignGroupName, setCampaignGroupName] = useState(''); // 캠페인이름
@@ -34,8 +34,8 @@ export default function CampaignGroupManagerHeader({groupId,onSearch}:Props) {
   const [isTenantManager, setIsTenantManager] = useState(false);
 
   const onHeaderSearch = () => {
-    const param:CampaignGroupHeaderSearch = {
-      tenantId: tenantId === 'all'?-1:Number(tenantId),
+    const param: CampaignGroupHeaderSearch = {
+      tenantId: tenantId === 'all' ? -1 : Number(tenantId),
       campaignGroupName: campaignGroupName,
     }
     onSearch(param);
@@ -54,34 +54,34 @@ export default function CampaignGroupManagerHeader({groupId,onSearch}:Props) {
     <div className="flex title-background justify-between">
       <div className="flex gap-[40px] items-center">
         <div className="flex items-center gap-1r">
-            <Label className="pr-[15px]">테넌트</Label>
-            <Select defaultValue="all" value={tenant_id !== 0 ? tenant_id.toString() :tenantId} onValueChange={setTenantId} disabled={isTenantManager}>
-                <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="테넌트" />
-                </SelectTrigger>
-                <SelectContent>
-                <SelectItem value='all'>전체</SelectItem>
-                { tenants.map(option => (
-                  <SelectItem key={option.tenant_id} value={option.tenant_id+''}>{option.tenant_name}</SelectItem>
-                )) }
-                </SelectContent>
-            </Select>
+          <Label className="pr-[15px]">테넌트</Label>
+          <Select defaultValue="all" value={tenant_id !== 0 ? tenant_id.toString() : tenantId} onValueChange={setTenantId} disabled={isTenantManager}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="테넌트" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>전체</SelectItem>
+              {tenants.map(option => (
+                <SelectItem key={option.tenant_id} value={option.tenant_id + ''}>{option.tenant_name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex items-center">
-          <Label className="pr-[15px]">캠페인 그룹명</Label>
-          <CustomInput 
-          type="text" 
-          value={campaignGroupName}
-          onChange={(e) => setCampaignGroupName(e.target.value)}
-          className="w-[180px]"
-        />
+          <Label className="pr-[15px] whitespace-nowrap flex-shrink-0">캠페인 그룹명</Label>
+          <CustomInput
+            type="text"
+            value={campaignGroupName}
+            onChange={(e) => setCampaignGroupName(e.target.value)}
+            className="w-[180px]"
+          />
         </div>
       </div>
-        <div className="flex justify-end gap-2">
-          {groupId < 0 &&
+      <div className="flex justify-end gap-2">
+        {groupId < 0 &&
           <CommonButton onClick={onHeaderSearch}>조회</CommonButton>
-          }
-        </div>
+        }
+      </div>
       {/* ... 나머지 필드들 ... */}
     </div>
   );
