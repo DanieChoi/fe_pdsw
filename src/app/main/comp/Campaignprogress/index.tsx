@@ -459,7 +459,12 @@ export default function Campaignprogress() {
       _tempCampaignList = _tempCampaignList.filter(campaign=>campaign.campaign_id === Number(currentCampaign));
     }
     setTempCampaignList(_tempCampaignList);
-
+    if( _tempCampaignList.length > 0){
+      setSelectedCampaignId(_tempCampaignList[0].campaign_id);
+      setSelectedCampaignIdIndex(0);
+      setTempCampaignInfoList([]);
+      setCampaignInfoList([]);
+    }
   };
 
   // 차트 데이터 처리 함수
