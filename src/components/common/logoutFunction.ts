@@ -36,14 +36,15 @@ const logoutFunction = ({ portcheck = true }: PortCheck = {}) => {
     
     // --- store 초기화 로직 추가하실거 있으시면 추가하시면 됩니다 ---
 
+    // 임시 주석
     // 환경 설정 Store 초기화 0522 추가
-    useEnvironmentStore.getState().clearEnvironment();
+    // useEnvironmentStore.getState().clearEnvironment();
 
     // mainStore 초기화 0522 추가
-    useMainStore.getState().setResetMainStore();
+    // useMainStore.getState().setResetMainStore();
 
     // campaignManagerStore 초기화 0522 추가
-    useCampainManagerStore.getState().setResetCampaignManagerStore();
+    // useCampainManagerStore.getState().setResetCampaignManagerStore();
 
     if(portcheck){
         logoutChannel.postMessage({
