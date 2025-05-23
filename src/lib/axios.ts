@@ -14,12 +14,49 @@ export const axiosInstance = axios.create({
 export const axiosRedisInstance = axios.create({
   baseURL: '/api_upds/v1',
   withCredentials: true
+  
 });
+
+let sessionCheckYn = true;
+
+axiosRedisInstance.interceptors.request.use(
+  (config) => {
+    // sessionCheckYn이 false이면 요청을 막음
+    if (!sessionCheckYn) {
+      return Promise.reject({
+        message: '세션 체크가 비활성화되어 API 요청이 차단되었습니다.',
+        config,
+      });
+    }
+    
+    const sessionKey = getCookie('session_key');
+
+    if (sessionKey && config.headers) {
+      // Session-Cookie가 아닌 Session-Key로 변경
+      config.headers['Session-Key'] = sessionKey;
+    }
+    return config;
+  },
+  (error) => {
+
+    // console.log("error ???????????????", error);
+
+    if (error.response.data.result_code === 5) {
+      // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
+      customAlertService.error('API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.', '세션 만료', () => {
+        logoutFunction({ portcheck: false });
+        window.location.href = '/login';
+      });
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export const externalAxiosInstance = axios.create({
   withCredentials: true
 });
-let sessionCheckYn = true;
+// let sessionCheckYn = true;
 
 // 요청 인터셉터 추가
 axiosInstance.interceptors.request.use(

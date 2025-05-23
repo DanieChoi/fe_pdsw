@@ -11,7 +11,7 @@ import CommonSkeletonForSideMenu from "@/components/shared/CommonSkeleton/Common
 
 export function TreeMenusForAgentTab() {
   const { tenant_id, role_id } = useAuthStore(); // 현재 로그인된 사용자 정보 가져오기
-  useApiForSidebarCounselor(tenant_id.toString(), role_id.toString()); // API 호출을 Store에서 관리
+  useApiForSidebarCounselor(tenant_id.toString()); // API 호출을 Store에서 관리
 
   const { treeData, isLoading, error } = useCounselorStoreForSideBar();
   const selectedNodeId = useSideMenuStore((state) => state.selectedNodeId);
