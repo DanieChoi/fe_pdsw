@@ -10,6 +10,7 @@ import TitleWrap from "@/components/shared/TitleWrap";
 import { useApiForSkills } from '@/features/campaignManager/hooks/useApiForSkills';
 import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiForCallingNumber';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 
 const dialModeList = [
   { dial_id: 1, dial_name: 'Power' },
@@ -56,6 +57,9 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
   const { mutate: fetchCallingNumbers } = useApiForCallingNumber({
     onSuccess: (data) => {
       setCallingNumbers(data.result_data||[]);
+    },
+    onError: (error) => {
+      ServerErrorCheck('발신번호 조회', error.message);
     }
   });
 
@@ -63,6 +67,9 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
   const { mutate: fetchSkills } = useApiForSkills({
     onSuccess: (data) => {
       setSkills(data.result_data);
+    },
+    onError: (error) => {
+      ServerErrorCheck('스킬 조회', error.message);
     }
   });
 
@@ -70,6 +77,9 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
       setCampaignSkills(data.result_data);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 스킬 조회', error.message);
     }
   });
 

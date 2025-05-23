@@ -10,8 +10,6 @@ import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiF
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useMainStore, useCampainManagerStore, useTabStore, useAuthStore } from '@/store';
-import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useApiForChannelGroupList } from "@/features/preferences/hooks/useApiForChannelGroup";
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
@@ -37,7 +35,6 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
   const { session_key, tenant_id } = useAuthStore();
   const [masterCampaignId, setMasterCampaignId] = useState<string>('');
   const [alertState, setAlertState] = useState(errorMessage);
-  const router = useRouter();
   const [headerInit, setHeaderInit] = useState<boolean>(false);
 
   const { setSchedules, setSkills, setCallingNumbers, setCampaignSkills, setPhoneDescriptions, setChannelGroupList
@@ -105,6 +102,9 @@ const CampaignManager = ({ campaignId, isOpen, onCampaignPopupClose }: Props) =>
     onSuccess: (data) => {
       setPhoneDescriptions(data.result_data || []);
       fetchChannelGroupList();
+    },
+    onError: (error) => {
+      ServerErrorCheck('전화번호설명 템플릿 조회', error.message);
     }
   });
   // 채널 그룹리스트 조회

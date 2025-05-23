@@ -17,6 +17,10 @@ import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { SkillListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 import { useAgentSkillStatusStore } from '@/store/agenSkillStatusStore';
+import { logoutChannel } from '@/lib/broadcastChannel';
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
+import logoutFunction from '@/components/common/logoutFunction';
+import { log } from 'console';
 
 // 메인 스킬 정보
 interface SkillRow {
@@ -364,20 +368,16 @@ const SkillEdit = () => {
           }
         },
         onError: (error) => {
-          if (error.message.split('||')[0] === '5') {
-            setAlertState({
-              ...errorMessage,
-              isOpen: true,
-              message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-              onConfirm: closeAlert,
-              onCancel: () => {}
-            });
-            Cookies.remove('session_key');
-            setTimeout(() => {
-              router.push('/login');
-            }, 1000);
-          } else {
-              showAlert(`캠페인 스킬 정보 조회 실패: ${error.message}`);
+          if(window.opener){
+            if(error.message.split('||')[0] === '5'){
+              logoutChannel.postMessage({
+                type: 'logout',
+                message: error.message,
+              });
+              window.close();
+            }
+          }else{
+            ServerErrorCheck('캠페인 스킬 데이터 조회', error.message);  
           }
         }
       });
@@ -485,23 +485,20 @@ const SkillEdit = () => {
           
         },
         onError: (error) => {
-          if (error.message.split('||')[0] === '5') {
-            setAlertState({
-              ...errorMessage,
-              isOpen: true,
-              message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-              onConfirm: closeAlert,
-              onCancel: () => {}
-            });
-            Cookies.remove('session_key');
-            setTimeout(() => {
-              router.push('/login');
-            }, 1000);
-          } else if ( error.message.split('||')[0] === '403') {
+          if ( error.message.split('||')[0] === '403') {
             showAlert(`이미 존재하는 스킬 아이디입니다. 다시 입력해주세요.`);
             console.log(`error info : ${error.message}`);
-          } else {
-            showAlert(`저장 실패: ${error.message}`);
+          }
+          else if(window.opener){
+            if(error.message.split('||')[0] === '5'){
+              logoutChannel.postMessage({
+                type: 'logout',
+                message: error.message,
+              });
+              window.close();
+            }
+          }else{
+            ServerErrorCheck('스킬 추가 요청', error.message);  
           }
         }
       });
@@ -511,20 +508,16 @@ const SkillEdit = () => {
           fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
         },
         onError: (error) => {
-          if (error.message.split('||')[0] === '5') {
-            setAlertState({
-              ...errorMessage,
-              isOpen: true,
-              message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-              onConfirm: closeAlert,
-              onCancel: () => {}
-            });
-            Cookies.remove('session_key');
-            setTimeout(() => {
-              router.push('/login');
-            }, 1000);
-          } else {
-            showAlert(`수정 실패: ${error.message}`);
+          if(window.opener){
+            if(error.message.split('||')[0] === '5'){
+              logoutChannel.postMessage({
+                type: 'logout',
+                message: error.message,
+              });
+              window.close();
+            }
+          }else{
+            ServerErrorCheck('스킬 데이터 수정', error.message);  
           }
         }
       });
@@ -583,7 +576,7 @@ const SkillEdit = () => {
                       onConfirm: closeAlert,
                       onCancel: () => {}
                     });
-                    Cookies.remove('session_key');
+                    logoutFunction();
                     setTimeout(() => {
                       router.push('/login');
                     }, 1000);
@@ -668,7 +661,7 @@ const SkillEdit = () => {
                 onConfirm: closeAlert,
                 onCancel: () => {}
               });
-              Cookies.remove('session_key');
+              logoutFunction();
               setTimeout(() => {
                 router.push('/login');
               }, 1000);
@@ -745,14 +738,14 @@ const SkillEdit = () => {
           onConfirm: closeAlert,
           onCancel: () => {}
         });
-        Cookies.remove('session_key');
+        logoutFunction();
         setTimeout(() => {
           router.push('/login');
         }, 1000);
       } else {
         showAlert(`상담사 리스트 조회 실패: ${error.message}`);
       }
-    }
+    },
   });
 
   const { mutate: fetchSkillList, data: skillData } = useApiForSkillList({
@@ -776,7 +769,7 @@ const SkillEdit = () => {
           onConfirm: closeAlert,
           onCancel: () => {}
         });
-        Cookies.remove('session_key');
+        logoutFunction();
         setTimeout(() => {
           router.push('/login');
         }, 1000);
@@ -799,7 +792,7 @@ const SkillEdit = () => {
           onConfirm: closeAlert,
           onCancel: () => {}
         });
-        Cookies.remove('session_key');
+        logoutFunction();
         setTimeout(() => {
           router.push('/login');
         }, 1000);
@@ -821,7 +814,7 @@ const SkillEdit = () => {
           onConfirm: closeAlert,
           onCancel: () => {}
         });
-        Cookies.remove('session_key');
+        logoutFunction();
         setTimeout(() => {
           router.push('/login');
         }, 1000);
@@ -848,7 +841,7 @@ const SkillEdit = () => {
           onConfirm: closeAlert,
           onCancel: () => {}
         });
-        Cookies.remove('session_key');
+        logoutFunction();
         setTimeout(() => {
           router.push('/login');
         }, 1000);
@@ -881,7 +874,7 @@ const SkillEdit = () => {
           onConfirm: closeAlert,
           onCancel: () => {}
         });
-        Cookies.remove('session_key');
+        logoutFunction();
         setTimeout(() => {
           router.push('/login');
         }, 1000);
@@ -936,7 +929,7 @@ const SkillEdit = () => {
           onConfirm: closeAlert,
           onCancel: () => {}
         });
-        Cookies.remove('session_key');
+        logoutFunction();
         setTimeout(() => {
           router.push('/login');
         }, 1000);
@@ -962,7 +955,7 @@ const SkillEdit = () => {
           onConfirm: closeAlert,
           onCancel: () => {}
         });
-        Cookies.remove('session_key');
+        logoutFunction();
         setTimeout(() => {
           router.push('/login');
         }, 1000);
@@ -985,7 +978,7 @@ const SkillEdit = () => {
           onConfirm: closeAlert,
           onCancel: () => {}
         });
-        Cookies.remove('session_key');
+        logoutFunction();
         setTimeout(() => {
           router.push('/login');
         }, 1000);
@@ -1009,7 +1002,7 @@ const SkillEdit = () => {
           onConfirm: closeAlert,
           onCancel: () => {}
         });
-        Cookies.remove('session_key');
+        logoutFunction();
         setTimeout(() => {
           router.push('/login');
         }, 1000);
@@ -1030,7 +1023,7 @@ const SkillEdit = () => {
           onConfirm: closeAlert,
           onCancel: () => {}
         });
-        Cookies.remove('session_key');
+        logoutFunction();
         setTimeout(() => {
           router.push('/login');
         }, 1000);
@@ -1053,7 +1046,7 @@ const SkillEdit = () => {
         onConfirm: closeAlert,
         onCancel: () => {}
       });
-      Cookies.remove('session_key');
+      logoutFunction();
       setTimeout(() => {
         router.push('/login');
       }, 1000);

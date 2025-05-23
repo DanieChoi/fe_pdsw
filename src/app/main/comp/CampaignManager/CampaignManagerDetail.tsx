@@ -1509,6 +1509,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       //   type: '2',
       //   onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false })),
       // });
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 정보 조회', error.message);
     }
   });
 
@@ -1526,6 +1529,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const { mutate: fetchCampaignSkillUpdate } = useApiForCampaignSkillUpdate({
     onSuccess: (data) => {
       setCampaignSkillChangeYn(false);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 스킬 수정', error.message);
     }
   });
 
@@ -1543,6 +1549,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       // const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       // fetchSchedules({ tenant_id_array: tempTenantIdArray });
       setCampaignScheduleChangeYn(false);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 스케줄 등록', error.message);
     }
   });
 
@@ -1553,6 +1562,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
       // const tempTenantIdArray = tenants.map((tenant) => tenant.tenant_id);
       // fetchSchedules({ tenant_id_array: tempTenantIdArray });
       setCampaignScheduleChangeYn(false);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 스케줄 수정', error.message);
     }
   });
 
@@ -1769,6 +1781,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const { mutate: fetchCallingNumberDelete } = useApiForCallingNumberDelete({
     onSuccess: (data) => {      
       // setCallingNumberChangeYn(false);
+    },
+    onError: (error) => {
+      ServerErrorCheck('발신번호 삭제', error.message);
     }
   });
 
@@ -1777,6 +1792,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     onSuccess: (data) => {
       // setCallingNumberChangeYn(false);
       // fetchCallingNumbers({ session_key: '', tenant_id: 0 });
+    },
+    onError: (error) => {
+      ServerErrorCheck('발신번호 추가', error.message);
     }
   });
 
@@ -1785,6 +1803,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
     onSuccess: (data) => {
       // setCallingNumberChangeYn(false);
       // fetchCallingNumbers({ session_key: '', tenant_id: 0 });
+    },
+    onError: (error) => {
+      ServerErrorCheck('발신번호 수정', error.message);
     }
   });
 
@@ -1896,6 +1917,9 @@ export default function CampaignDetail({ campaignId, isOpen, onCampaignPopupClos
   const { mutate: fetchDialSpeedUpdate } = useApiForDialSpeedUpdate({
     onSuccess: (data) => {
       setCampaignDialSpeedChangeYn(false);
+    },
+    onError: (error) => {
+      ServerErrorCheck('발신 속도 수정', error.message);
     }
   });
 

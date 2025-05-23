@@ -17,6 +17,7 @@ import { useApirForEnvironmentList } from '@/features/auth/hooks/useApiForEnviro
 import { useApiForOperatingTime } from '@/features/preferences/hooks/useApiForOperatingTime';
 import { EnvironmentListResponse } from "@/features/auth/types/environmentIndex";
 import Cookies from 'js-cookie';
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 
 interface LoginFormData {
   user_name: string;
@@ -91,7 +92,6 @@ export default function LoginPage() {
       }
     },
     onError: (error) => {
-      
     }
   });
   const convertBinaryString = (input:string) => {
@@ -235,6 +235,8 @@ export default function LoginPage() {
     }
   }, []);
 
+  
+
   // 쿠키에서 관리되는 session_key
   const [cookiesSessionKey, setCookiesSessionKey] = useState(Cookies.get('session_key'));
 
@@ -248,8 +250,11 @@ export default function LoginPage() {
   const cookiescheck = cookiesSessionKey !== undefined && cookiesSessionKey !== ''; 
 
   useEffect(() => {
+    // console.log('쿠키에서 관리되는 session_key:', cookiesSessionKey);
+    // console.log('store에서 관리되는 세션 타임아웃 체크:', isSessionTimeCheck);
+    // console.log('store에 session_key가 존재하는지 확인:', isLoggedIn);
     // 로그인 되어있는 상태로 login 페이지 접근시 replace
-    if (isLoggedIn && cookiescheck && !isSessionTimeCheck) {
+    if (isLoggedIn && cookiescheck && isSessionTimeCheck === false) {
       // store나 쿠키에 session_key가 존재하면서 세션 만료가 아닌 경우 login 페이지 접근시 main 페이지로 이동
       router.replace('/main');
     }

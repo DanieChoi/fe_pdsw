@@ -20,6 +20,7 @@ import { useApiForGetCampaignGroups } from "@/shared/hooks/campaign/useApiForGet
 import GlobalErrorAlert from "@/components/shared/CommonGlobalError/CommonGlobalError";
 import logoutFunction from "@/components/common/logoutFunction";
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
+import { log } from "console";
 
 
 const errorMessage = {
@@ -49,6 +50,22 @@ export default function Header() {
     setLoading,
     setError
   } = useAvailableMenuStore();
+
+  const expires_in = useAuthStore((state) => state.expires_in);
+  const startExpirationWatcher = useAuthStore((state) => state.startExpirationWatcher);
+  const expires_check = useAuthStore((state) => state.expires_check);
+
+  useEffect(() => {
+    const now = Date.now();
+
+    if (expires_in > 0 && !expires_check) {
+      if (now > expires_in) {
+        logoutFunction();
+      } else {
+        startExpirationWatcher(); // 타이머 복구
+      }
+    }
+  }, []);
 
 
   const popupRef = useRef<Window | null>(null);
@@ -137,7 +154,7 @@ export default function Header() {
     },
     onError: (error) => {
       // 로딩 상태 해제
-
+      ServerErrorCheck('스킬 리스트 조회', error.message);
       useCampainManagerStore.getState().setSkillsLoading(false); // ??
       console.log("Error loading skills data:", error);
     },
@@ -252,8 +269,7 @@ export default function Header() {
   });
 
   const goLogin = () => {
-    Cookies.remove('session_key');
-    useAuthStore.getState().clearAuth();
+    logoutFunction();
     router.push('/login');
   }
 
@@ -341,6 +357,7 @@ export default function Header() {
       // 로딩 상태 해제
       useMainStore.getState().setCampaignsLoading(false);
       console.log("Error loading campaign data:", error);
+      ServerErrorCheck('캠페인 리스트 조회', error.message);
     }
   });
 

@@ -24,6 +24,7 @@ import {
   , CampaignDialSpeedUpdateRequest
 } from '@/features/campaignManager/types/campaignManagerIndex';
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
+import logoutFunction from '@/components/common/logoutFunction';
 
 
 const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ tenantId }: IPropsForCreateCampaignForm) => {
@@ -516,6 +517,9 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
       setTempCampaignsInfo(data.result_data.filter((campaign) => campaign.campaign_id === selectedCampaign?.campaign_id)[0]);
       setChangeYn(false);
       removeTab(Number(activeTabId), activeTabKey + '');
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 정보 조회', error.message);
     }
   });
 
@@ -542,7 +546,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
 
 
   const goLogin = () => {
-    Cookies.remove('session_key');
+    logoutFunction();
     router.push('/login');
   }
 
@@ -555,6 +559,7 @@ const CreateCampaignFormsContainer: React.FC<IPropsForCreateCampaignForm> = ({ t
     }
     , onError: (data) => {
       toast.error('캠페인 스케줄 저장에 실패했습니다.', { autoClose: 2000 });
+      ServerErrorCheck('캠페인 스케줄 저장', data.message);
     }
   });
 

@@ -21,6 +21,7 @@ import CustomAlert, { CustomAlertRequest } from '@/components/shared/layout/Cust
 import AddCampaignGroupDialog from "./AddCampaignGroupDialog";
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
 import logoutFunction from '@/components/common/logoutFunction';
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 
 const errorMessage = {
   isOpen: false,
@@ -128,6 +129,9 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
       fetchSkills({
         tenant_id_array: tempTenantIdArray
       });
+    },
+    onError: (error) => {
+      ServerErrorCheck('스케줄 조회', error.message);
     }
   });
   // 스킬 조회
@@ -138,6 +142,9 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
         session_key: session_key,
         tenant_id: tenant_id,
       });
+    },
+    onError: (error) => {
+      ServerErrorCheck('스킬 조회', error.message);
     }
   });
   // 전화번호 조회
@@ -148,7 +155,10 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
         session_key: session_key,
         tenant_id: tenant_id,
       });
-    }
+    },
+    onError: (error) => {
+      ServerErrorCheck('전화번호 조회', error.message);
+    } 
   });
   // 캠페인스킬 조회
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
@@ -158,6 +168,9 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
         session_key: session_key,
         tenant_id: tenant_id,
       });
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인스킬 조회', error.message);
     }
   });
   // 전화번호설명 템플릿 조회
@@ -165,6 +178,9 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
     onSuccess: (data) => {
       setPhoneDescriptions(data.result_data||[]);
       handleInit();
+    },
+    onError: (error) => {
+      ServerErrorCheck('전화번호설명 템플릿 조회', error.message);
     }
   });
   

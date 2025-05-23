@@ -1063,17 +1063,16 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
       ServerErrorCheck('캠페인 정보 수정', error.message);
     }
   });
-  
-  const goLogin = () => {
-    Cookies.remove('session_key');
-    router.push('/login');
-  };
+
 
   //캠페인 스킬 조회 api 호출
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
       setCampaignSkills(data.result_data);
       setCampaignSkillChangeYn(false);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 스킬 조회', error.message);
     }
   });
 
@@ -1084,6 +1083,9 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
         session_key: '',
         tenant_id: 0,
       });
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 스킬 수정', error.message);
     }
   });
 
@@ -1092,6 +1094,9 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
     onSuccess: (data) => {
       setSchedules(data.result_data);
       setCampaignScheduleChangeYn(false);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 스케줄 조회', error.message);
     }
   });
 
@@ -1102,6 +1107,9 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
       fetchSchedules({
         tenant_id_array: tempTenantIdArray
       });
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 스케줄 수정', error.message);
     }
   });
 
@@ -1112,6 +1120,9 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
         session_key: '',
         tenant_id: 0,
       });
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 발신번호 삭제', error.message);
     }
   });
 
@@ -1122,6 +1133,9 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
         session_key: '',
         tenant_id: 0,
       });
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 발신번호 추가', error.message);
     }
   });
 
@@ -1132,6 +1146,9 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
         session_key: '',
         tenant_id: 0,
       });
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 발신번호 수정', error.message);
     }
   });
 
@@ -1139,6 +1156,9 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
   const { mutate: fetchDialSpeedUpdate } = useApiForDialSpeedUpdate({
     onSuccess: (data) => {
       setCampaignDialSpeedChangeYn(false);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 발신 속도 수정', error.message);
     }
   });
 
@@ -1147,7 +1167,11 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
     onSuccess: (data) => {
       setCallingNumbers(data.result_data||[]);
       setCallingNumberChangeYn(false);
+    },
+    onError: (error) => {
+      ServerErrorCheck('전화번호 조회', error.message);
     }
+  
   });
 
   //재발신 버튼 이벤트

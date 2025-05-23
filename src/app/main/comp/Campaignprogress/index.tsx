@@ -19,6 +19,7 @@ import * as XLSX from 'xlsx';
 import ColumnSet, { defaultColumnsData, ColumnSettingItem } from './ColumnSet';
 import { useEnvironmentStore } from '@/store/environmentStore';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 
 interface TreeRow extends DispatchStatusDataType {
   parentId?: string;
@@ -517,6 +518,9 @@ export default function Campaignprogress() {
         session_key: '',
         tenant_id: 0,
       });
+    },
+    onError: (error) => {
+      ServerErrorCheck('스킬 조회', error.message);
     }
   });
 
@@ -526,6 +530,9 @@ export default function Campaignprogress() {
       setCampaignSkills(data.result_data);
       // 여기에 나중에 발신 상태 API 연동
       processDataForGrid(data.result_data, selectedCampaign, selectedSkill, selectedStatus);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 스킬 조회', error.message);
     }
   });
 
@@ -581,6 +588,9 @@ export default function Campaignprogress() {
         setSelectedCampaignId(0);
         setSelectedCampaignIdIndex(0);
       }
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 진행 정보', error.message);
     }
   });
 
