@@ -59,6 +59,11 @@ export interface EnvironmentState {
   isLoading: boolean;
   error: string | null;
   lastUpdated: Date | null;
+
+  // 센터 정보 데이타
+  centerId: string;
+  centerName: string;
+  
 }
 
 interface EnvironmentActions {
@@ -83,6 +88,9 @@ interface EnvironmentActions {
   
   // 환경설정 저장을 위한 데이터 준비
   getEnvironmentSaveRequest: (employeeId: string) => EnvironmentSaveRequest;
+
+  // 센터 데이터 액션
+  setCenterInfo(centerId: string, centerName: string): void;  
 }
 
 type EnvironmentStore = EnvironmentState & EnvironmentActions;
@@ -107,7 +115,11 @@ const initialState: EnvironmentState = {
   // 메타 상태 초기값
   isLoading: false,
   error: null,
-  lastUpdated: null
+  lastUpdated: null,
+
+  // 센터 정보 데이터 초기값
+  centerId: "",
+  centerName: ""
 };
 
 export const useEnvironmentStore = create<EnvironmentStore>()(
@@ -322,7 +334,11 @@ export const useEnvironmentStore = create<EnvironmentStore>()(
             sendingWorkEndHours: state.sendingWorkEndHours,
             dayOfWeekSetting: state.dayOfWeekSetting
           };
-        }
+        },
+
+        setCenterInfo: (centerId, centerName) => {
+          set({ centerId, centerName }, false, "setCenterInfo");
+        } 
       }),
       {
         name: "environment-storage",
@@ -341,7 +357,9 @@ export const useEnvironmentStore = create<EnvironmentStore>()(
           unusedWorkHoursCalc: state.unusedWorkHoursCalc,
           sendingWorkStartHours: state.sendingWorkStartHours,
           sendingWorkEndHours: state.sendingWorkEndHours,
-          dayOfWeekSetting: state.dayOfWeekSetting
+          dayOfWeekSetting: state.dayOfWeekSetting,
+          centerId: state.centerId,
+          centerName: state.centerName
         })
       }
     ),

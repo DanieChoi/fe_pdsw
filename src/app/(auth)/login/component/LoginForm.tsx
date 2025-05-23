@@ -47,7 +47,7 @@ export default function LoginForm({
       <div className="flex mb-8 mb-70">
         <Image
           src="/logo/pds-logo.svg"
-          alt="UPDS"
+          alt="U PDS"
           width={200}
           height={70}
           priority

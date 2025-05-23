@@ -8,6 +8,7 @@ import { MenuItem, menuItems } from "@/widgets/header/model/menuItems";
 import { simulateMenuClick } from "@/widgets/header/utils";
 import { contextMenuItems } from "@/widgets/header/model/contextMenuItems";
 import { useOperationStore } from "@/app/main/comp/operation/store/OperationStore";
+import { useSystemDeviceStore } from "./systemDeviceStore";
 
 // MenuItem 인터페이스에 params 속성 추가
 declare module "@/widgets/header/model/menuItems" {
@@ -736,6 +737,10 @@ export const useTabStore = create<TabLayoutStore>()(
             // tabIdr가 운영설정인 경우 clearOperationCampaign 호출
             if (tabId === 8 || tabId === 9 || tabId === 11) { // 
               useOperationStore.getState().clearOperationCampaign();
+            }
+
+            if(tabId === 10){
+              useSystemDeviceStore.getState().setSaveSelectDevice('');
             }
 
             // 2. 탭 제거 후 남아있는 탭 목록 생성

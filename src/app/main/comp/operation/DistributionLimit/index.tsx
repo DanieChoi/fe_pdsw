@@ -18,6 +18,9 @@ import ContextMenu from './context_menu';
 import OnlyNumberInput from '@/components/shared/OnlyNumberInput';
 import { useOperationStore } from '../store/OperationStore';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
+import { useApiForCampaignAssignmentAgent } from '@/features/campaignManager/hooks/useApiForCampaignAssignmentAgent';
+import { useEnvironmentStore } from '@/store/environmentStore';
+import { se } from 'date-fns/locale';
 
 interface Row {
   id: string;
@@ -554,10 +557,45 @@ const DistributionLimit = () => {
     }
   };
 
+  const centerName = useEnvironmentStore.getState().centerName;
+
+  const { mutate : fetchCounselorList } = useApiForCampaignAssignmentAgent({
+    onSuccess: (data) => {
+      console.log("#### fetchCounselorList : ",data);      
+      if(data.assignedCounselorList && selectedCampaignId){
+        const counselorRows: Row[] = [];
+        
+        data.assignedCounselorList.forEach(counselor => {
+            counselorRows.push({
+              id: `agent-${counselor.counselorId}`,
+              center: centerName,
+              group: counselor.affiliationGroupId,
+              part: counselor.affiliationTeamId,
+              agent_id: counselor.counselorId,
+              agent_name: counselor.counselorname,
+              max_dist: '0',
+              current_resp: '0',
+              fix_flag: 'N',
+              level: 3
+            });
+        });
+        
+        setRawAgentData(counselorRows);
+      } else {
+        setRawAgentData([]);
+      }
+    },
+    onError: (error) => {
+      ServerErrorCheck('상담사 리스트 정보 조회', error.message);
+      setRawAgentData([]);
+    }
+  });
+
+
   // 캠페인별 상담사 목록 조회
   const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
     onSuccess: (response) => {
-      // console.log("response : ",response);
+      console.log("#### response : ",response);
       if (response?.result_data && response.result_data.length > 0) {
         // 캠페인에 소속된 상담사 ID 목록 저장
         const agentIds = response.result_data[0].agent_id;
@@ -572,48 +610,48 @@ const DistributionLimit = () => {
   });
 
   // 백엔드에서 가져온 상담사 리스트 정보 처리
-  const { mutate: fetchCounselorList } = useApiForCounselorList({
-    onSuccess: (response) => {
-      if (response?.organizationList && selectedCampaignId) {
-        const counselorRows: Row[] = [];
+  // const { mutate: fetchCounselorList } = useApiForCounselorList({
+  //   onSuccess: (response) => {
+  //     if (response?.organizationList && selectedCampaignId) {
+  //       const counselorRows: Row[] = [];
         
-        response.organizationList.forEach(org => {
-          const centerName = org.centerName;
+  //       response.organizationList.forEach(org => {
+  //         const centerName = org.centerName;
           
-          org.tenantInfo.forEach(tenant => {
-            tenant.groupInfo.forEach(group => {
-              group.teamInfo.forEach(team => {
-                team.counselorInfo.forEach(counselor => {
-                  // 캠페인에 소속된 상담사만 추가
-                  if (campaignAgents.includes(counselor.counselorId)) {
-                    counselorRows.push({
-                      id: `agent-${counselor.counselorId}`,
-                      center: centerName,
-                      group: group.groupId,
-                      part: team.teamId,
-                      agent_id: counselor.counselorId,
-                      agent_name: counselor.counselorname,
-                      max_dist: '0',
-                      current_resp: '0',
-                      fix_flag: 'N',
-                      level: 3
-                    });
-                  }
-                });
-              });
-            });
-          });
-        });
+  //         org.tenantInfo.forEach(tenant => {
+  //           tenant.groupInfo.forEach(group => {
+  //             group.teamInfo.forEach(team => {
+  //               team.counselorInfo.forEach(counselor => {
+  //                 // 캠페인에 소속된 상담사만 추가
+  //                 if (campaignAgents.includes(counselor.counselorId)) {
+  //                   counselorRows.push({
+  //                     id: `agent-${counselor.counselorId}`,
+  //                     center: centerName,
+  //                     group: group.groupId,
+  //                     part: team.teamId,
+  //                     agent_id: counselor.counselorId,
+  //                     agent_name: counselor.counselorname,
+  //                     max_dist: '0',
+  //                     current_resp: '0',
+  //                     fix_flag: 'N',
+  //                     level: 3
+  //                   });
+  //                 }
+  //               });
+  //             });
+  //           });
+  //         });
+  //       });
         
-        setRawAgentData(counselorRows);
-      } else {
-        setRawAgentData([]);
-      }
-    },
-    onError: (error) => {
-      ServerErrorCheck('상담사 리스트 정보 조회', error.message);
-    }
-  });
+  //       setRawAgentData(counselorRows);
+  //     } else {
+  //       setRawAgentData([]);
+  //     }
+  //   },
+  //   onError: (error) => {
+  //     ServerErrorCheck('상담사 리스트 정보 조회', error.message);
+  //   }
+  // });
 
   // 운영설정 분배호수 제한 설정 리스트 API 호출
   const { mutate: fetchMaxCallList } = useApiForMaxCallList({
@@ -703,11 +741,16 @@ const DistributionLimit = () => {
   
   // campaignAgents가 업데이트되면 상담사 목록 조회
   useEffect(() => {
+
     if (selectedCampaignId && campaignAgents.length > 0) {
       fetchCounselorList({
-        tenantId: tenant_id,
-        roleId: role_id
+        campaignId: selectedCampaignId.toString(),
+        tenantId: campaigns.filter(c => c.campaign_id.toString() === selectedCampaignId)[0].tenant_id.toString(),
       });
+      // fetchCounselorList({
+      //   tenantId: tenant_id,
+      //   roleId: role_id
+      // });
     }
   }, [tenant_id, role_id, selectedCampaignId, campaignAgents, fetchCounselorList]);
 

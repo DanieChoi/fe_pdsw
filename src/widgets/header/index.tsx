@@ -436,7 +436,7 @@ export default function Header() {
           <div className="flex items-center">
             <Image
               src="/header-menu/header-logo.svg"
-              alt="UPDS"
+              alt="U PDS"
               width={54}
               height={18}
               priority

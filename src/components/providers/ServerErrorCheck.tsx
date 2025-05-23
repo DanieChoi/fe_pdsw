@@ -13,10 +13,8 @@ const ServerErrorCheck = (requestContent: string, dataMessage: string, routerChe
   let errorMessage = requestContent + ' 요청이 실패하였습니다. \nPDS 서버 시스템에 확인하여 주십시오.';
   const errorTitle = '알림';
   
-  if(dataMessage.split('||')[0] === 'undefined' ){
-
-    errorMessage = 'PDS 서버 시스템과 연결할 수 없습니다. \n서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.'
-    routerCheck = true;
+  if(dataMessage.split('||')[0] === 'undefined'){
+    routerCheck = false;
   }
   else if (dataMessage.split('||')[0] === '5') {
     
@@ -26,6 +24,9 @@ const ServerErrorCheck = (requestContent: string, dataMessage: string, routerChe
   }else if (dataMessage.split('||')[0] === '200') {
 
     return null;
+  }else{
+    errorMessage = 'PDS 서버 시스템과 연결할 수 없습니다. \n서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.'
+
   }
 
   // routerCheck ==> 로그인 페이지 보낼지 여부 변수 (나중에 필요할 경우 let 으로 변경)

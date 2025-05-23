@@ -1,7 +1,7 @@
 // C:\nproject2\fe_pdsw_for_playwright\src\app\(auth)\login\page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ExpandIcon, Eye, EyeOff } from 'lucide-react';
@@ -18,6 +18,7 @@ import { useApiForOperatingTime } from '@/features/preferences/hooks/useApiForOp
 import { EnvironmentListResponse } from "@/features/auth/types/environmentIndex";
 import Cookies from 'js-cookie';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
+import { useApiForCenterInfo } from '@/features/auth/hooks/useApiForCenterInfo';
 
 interface LoginFormData {
   user_name: string;
@@ -61,10 +62,14 @@ export default function LoginPage() {
   // 캠페인 운용 가능 시간 조회 API 호출
   const { mutate: fetchOperatingTime } = useApiForOperatingTime({
     onSuccess: (data) => {
-      console.log(data);
+
       const startTime = data.result_data.start_time;
       const endTime = data.result_data.end_time;
       const work = data.result_data.days_of_week;
+
+      
+
+      console.log('##### after tempEnvironment : ', tempEnvironment);
       if( startTime === '0000' && endTime === '0000' && work === '0000000' ){
         // setStartTime("0000");
         // setEndTime("0000");          
@@ -100,16 +105,33 @@ export default function LoginPage() {
       .map(char => char === '1' ? 't' : 'f') // 각각 '1'이면 't', 아니면 'f'로
       .join(',');              // 쉼표로 연결
   };
+
+  const { mutate: centerInfo} = useApiForCenterInfo({
+    onSuccess: (data) => {
+      // console.log('센터 정보:', data.centerInfoList.map((item) => item.centerName)[0]);
+
+      useEnvironmentStore.getState().setCenterInfo(data.centerInfoList[0].centerId,data.centerInfoList[0].centerName);
+    },
+    onError: (error) => {
+      console.error('센터 정보 로드 실패:', error);
+      setAlertState({
+        isOpen: true,
+        message: '센터 정보를 불러오는데 실패했습니다.',
+        title: '로그인',
+        type: '2',
+      });
+    }
+  });
   
   const { mutate: environment } = useApirForEnvironmentList({
     onSuccess: (data) => {
       console.log('환경설정 데이터:', data);
-
-      fetchOperatingTime();
-
+      centerInfo();
+      setTempEnvironment(data);
+      console.log('##### before tempEnvironment : ', tempEnvironment);
       // 환경설정 데이터를 별도 스토어에 저장
       // setEnvironment(data);
-      setTempEnvironment(data);
+      
     },
     onError: (error) => {
       console.error('환경설정 데이터 로드 실패:', error);
@@ -121,6 +143,12 @@ export default function LoginPage() {
       });
     }
   });
+
+  useEffect(() => {
+    if (tempEnvironment && tempEnvironment.code !== "") {
+      fetchOperatingTime();
+    }
+  }, [tempEnvironment]);
 
   const { mutate: login } = useApiForLogin({
     onSuccess: (data) => {
@@ -270,7 +298,7 @@ export default function LoginPage() {
         <div className="flex mb-8 mb-70">
           <Image
             src="/logo/pds-logo.svg"
-            alt="UPDS"
+            alt="U PDS"
             width={200}
             height={70}
             priority

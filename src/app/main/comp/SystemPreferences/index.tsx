@@ -16,6 +16,7 @@ import { useEnvironmentStore } from '@/store/environmentStore';
 import { useApiForSchedules } from '@/features/campaignManager/hooks/useApiForSchedules';
 import { useApiForChannelGroupList } from '@/features/preferences/hooks/useApiForChannelGroup';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
+import { useSystemDeviceStore } from '@/store/systemDeviceStore';
 
 interface EquipmentRow {
     device_id: string;
@@ -69,6 +70,7 @@ const SystemPreferences = () => {
     // 채널 할당 발신모드 일괄적용을 위한 상태 추가
     const [updatedChannelAssign, setUpdatedChannelAssign] = useState<updateChannel[]>([]);
 
+    const {saveSelectDevice, setSaveSelectDevice } = useSystemDeviceStore();
 
     const { tenant_id, role_id } = useAuthStore();
 
@@ -175,15 +177,34 @@ const SystemPreferences = () => {
             
             setDialingDeviceList(data.result_data);
             
-            // 만약 조회된 장비목록이 있다면, 첫번째 장비를 선택 상태로 설정하기
+            // 만약 조회된 장비목록이 있다면, 스토어에 저장된 이미 선택된 장비나, 첫번째 장비를 선택 상태로 설정하기
             if(data.result_data.length > 0) {
-                const firstRow = {
-                    device_id : data.result_data[0].device_id.toString(),
-                    channel_count : data.result_data[0].channel_count,
-                    device_name : data.result_data[0].device_name,  
-                    usage : getDeviceUsage(data.result_data[0].device_id)
+
+                if(saveSelectDevice){
+                    const savedDevice = data.result_data.find(device => 
+                        device && device.device_id && device.device_id.toString() === saveSelectDevice
+                    );
+                    
+                    if (savedDevice) {
+                        const deviceRow = {
+                            device_id: savedDevice.device_id.toString(),
+                            channel_count: savedDevice.channel_count,
+                            device_name: savedDevice.device_name,
+                            usage: getDeviceUsage(savedDevice.device_id)
+                        };
+                        setSelectedDevice(deviceRow);
+                        setIsEditable(true);
+                    }
+                }else{
+
+                    const firstRow = {
+                        device_id : data.result_data[0].device_id.toString(),
+                        channel_count : data.result_data[0].channel_count,
+                        device_name : data.result_data[0].device_name,  
+                        usage : getDeviceUsage(data.result_data[0].device_id)
+                    }
+                    setSelectedDevice(firstRow);
                 }
-                setSelectedDevice(firstRow);
 
             } // end of if 
             
@@ -503,6 +524,7 @@ const SystemPreferences = () => {
     const handleEquipmentCellClick = ({ row }: CellClickArgs<EquipmentRow>) => {
         if (row) {
             setSelectedDevice(row);
+            setSaveSelectDevice(row.device_id);
         }
     };
 
