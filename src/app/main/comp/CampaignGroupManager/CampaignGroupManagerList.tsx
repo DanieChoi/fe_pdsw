@@ -60,12 +60,13 @@ type Props = {
   campaignGroupHeaderSearchParam?: CampaignGroupHeaderSearch;
   campaignGroupList?: DataProps[];
   groupCampaignListData?: downDataProps[];
+  selectedGroupId?: string;
   onGroupSelect: (id: string) => void;
   onCampaignSelect: (id: string) => void;
   onSelectCampaignList: (data: Set<number>) => void;
 }
 
-export default function CampaignGroupManagerList({campaignId,campaignGroupHeaderSearchParam,campaignGroupList,groupCampaignListData
+export default function CampaignGroupManagerList({campaignId,campaignGroupHeaderSearchParam,campaignGroupList,groupCampaignListData,selectedGroupId
     ,onGroupSelect,onCampaignSelect,onSelectCampaignList}: Props) {
   const { campaigns, selectedCampaign , setSelectedCampaign } = useMainStore();
   const [selectedCampaignGroups, setSelectedCampaignGroups] = useState<Set<number>>(new Set([]));
@@ -106,6 +107,14 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
   }, [selectedCampaign]);
 
   useEffect(() => {
+    if( selectedGroupId && selectedGroupId !== '-1' && (campaignGroupList?.length ?? 0) > 0 ){      
+      const foundRow = (campaignGroupList ?? []).find(group => group.campaignGroupId === Number(selectedGroupId));
+      setSelectedGroupRow(foundRow ?? null);
+      onGroupSelect(selectedGroupId);
+    }
+  }, [selectedGroupId,campaignGroupList]);
+
+  useEffect(() => {
     if( typeof campaignGroupHeaderSearchParam != 'undefined' ){
       let _tempCampaignGroupList:DataProps[] = campaignGroupList || [];
       if( campaignGroupHeaderSearchParam.tenantId > -1 ){
@@ -133,7 +142,7 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
         });
       }
       setTempCampaigns(_tempCampaignGroupList as unknown as DataProps[]);
-      if( _tempCampaignGroupList.length > 0 ){
+      if( _tempCampaignGroupList.length > 0 && selectedGroupRow == null ){
         setSelectedGroupRow(_tempCampaignGroupList[0]);
         onGroupSelect(_tempCampaignGroupList[0].campaignGroupId.toString());
       }else{
@@ -144,7 +153,7 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
       setTempCampaigns(campaignGroupList as unknown as DataProps[]);
       if( (campaignGroupList ?? []).length > 0 ){
         if( selectedGroupRow != null){
-          onGroupSelect(selectedGroupRow.campaignGroupId.toString());
+          // onGroupSelect(selectedGroupRow.campaignGroupId.toString());
         }else{
           setSelectedGroupRow((campaignGroupList ?? [])[0]);
         }
