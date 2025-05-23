@@ -450,7 +450,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
   }, [selectedCampaign, campaignSkills, callingNumbers, schedules, campaignId]);
 
   useEffect(() => {
-    if (campaignId > 0) {
+    if (campaignId > 0 && campaigns.length > 0) {
       setSelectedCampaign(campaigns.filter((campaign) => campaign.campaign_id === campaignId)[0]);
     } else {
       setSelectedCampaign(null);
@@ -459,7 +459,7 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
       setInputCallingNumber('');
       setTempCampaignSchedule({ ...CampaignScheduleInfo });
     }
-  }, [campaignId]);
+  }, [campaignId,campaigns]);
 
   //input data change
   const handleInputData = (value: any, col: string) => {
