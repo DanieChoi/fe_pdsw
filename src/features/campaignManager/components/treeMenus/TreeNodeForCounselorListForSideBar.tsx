@@ -397,6 +397,7 @@ import { IContextMenuForTennantForCounselorTreeMenu } from "./ContextMenus/ICont
 import { IContextMenuForGroupAndTeamAndCounselor } from "./ContextMenus/IContextMenuForGroupAndTeamAndCounselorProps";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
 import Image from "next/image";
+import IContextMenuForSkill from './ContextMenus/IContextMenuForSkill';
 
 interface ExpandConfig {
   organization?: boolean;
@@ -625,7 +626,7 @@ export function TreeNodeForCounselorListForSideBar({
     }
 
     if (type === 'skill') {
-      console.log(`스킬 선택: ${data.skillName}`);
+      console.log(`스킬 선택: ${data.skillName}, 상담사: ${currentCounselorId}, 테넌트: ${currentTenantId}`);
     }
 
     console.log(`${type} ${label} 클릭 - TenantID: ${currentTenantId}`);
@@ -659,8 +660,6 @@ export function TreeNodeForCounselorListForSideBar({
           default:
             return <UserCircle2 className="h-4 w-4 text-gray-600" />;
         }
-      case 'skill':
-        return <span className="text-blue-500">🔧</span>; // 스킬 아이콘
       default:
         return null;
     }
@@ -704,7 +703,7 @@ export function TreeNodeForCounselorListForSideBar({
       );
     }
   
-    // group, team, counselor 타입 (skill은 컨텍스트 메뉴 제외)
+    // group, team, counselor 타입
     if (['group', 'team', 'counselor'].includes(type)) {
       const counselors = getCounselorsForNode();
       
@@ -733,7 +732,24 @@ export function TreeNodeForCounselorListForSideBar({
       );
     }
   
-    // skill 타입이나 그 외에는 컨텍스트 메뉴 없음
+    // skill 타입 - 상담원 정보 포함 ✅
+    if (type === 'skill') {
+      const contextMenuItem = {
+        id: data.skillId,
+        name: data.skillName,
+      };
+      
+      return (
+        <IContextMenuForSkill 
+          item={contextMenuItem}
+          counselorIds={currentCounselorId ? [currentCounselorId] : []} // 현재 상담원 ID
+          tenantId={currentTenantId || ''} // 현재 테넌트 ID
+        >
+          {content}
+        </IContextMenuForSkill>
+      );
+    }
+
     return content;
   };
   
