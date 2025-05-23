@@ -8,12 +8,12 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 
 import { baseTabs, TabId } from "@/features/campaignManager/components/data/baseTabs";
-import { TreeMenusForCampaigns } from "@/features/campaignManager/components/treeMenus/TreeMenusForCampaigns";
+import { TreeMenusForCampaigns } from "@/widgets/sidebar2/tree-menu/TreeMenusForCampaigns";
 import { TreeMenusForAgentTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentTab";
-import { TreeMenusForCampaignGroupTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForCampaignGroupTab";
+import { TreeMenusForCampaignGroupTab } from "@/widgets/sidebar2/tree-menu/TreeMenusForCampaignGroupTab";
 import { useSidebarWidthStore } from "@/store/useSidebarWidthStore";
 import { TabActions } from "@/components/shared/layout/comp/TabActions";
-import { BottomTabsForSideMenu } from "@/components/shared/layout/BottomTabsForSideMenu";
+import { BottomTabsForSideMenu } from "@/widgets/sidebar2/footer/BottomTabsForSideMenu";
 
 const MemoTabActions = memo(TabActions);
 MemoTabActions.displayName = "MemoTabActions";

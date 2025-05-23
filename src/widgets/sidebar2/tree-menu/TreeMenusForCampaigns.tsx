@@ -4,14 +4,14 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { create } from "zustand";
 import { TreeItem } from "@/features/campaignManager/types/typeForSidebar2";
-import { TreeNodeForCampaignTab } from "./TreeNodeForCampaignTab";
+import { TreeNodeForCampaignTab } from "../../../features/campaignManager/components/treeMenus/TreeNodeForCampaignTab";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { getStatusIcon } from "@/components/shared/layout/utils/utils";
 import { useSidebarWidthStore } from "@/store/useSidebarWidthStore";
 import { useAuthStore, useMainStore } from "@/store";
 import { useTreeMenuStore, ViewMode } from "@/store/storeForSsideMenuCampaignTab";
 import { useShallow } from "zustand/react/shallow";
-import { getStatusFromFlags } from "../../api/apiForGetTreeMenuDataForSideMenu";
+import { getStatusFromFlags } from "../../../features/campaignManager/api/apiForGetTreeMenuDataForSideMenu";
 
 
 // 트리 노드 선택/확장 상태 관리
