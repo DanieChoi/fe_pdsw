@@ -891,6 +891,9 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId, is_new }: Props) 
         type: '2',
         onClose: handleClose,
       });
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 정보 조회', error.message);
     }
   });
 
@@ -903,6 +906,9 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId, is_new }: Props) 
   const { mutate: fetchCallingNumberInsert } = useApiForCallingNumberInsert({
     onSuccess: (data) => {
       setCallingNumberChangeYn(false);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 발신번호 추가', error.message);
     }
   });
 
@@ -928,6 +934,9 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId, is_new }: Props) 
   const { mutate: fetchCampaignSkillUpdate } = useApiForCampaignSkillUpdate({
     onSuccess: (data) => {
       setCampaignSkillChangeYn(false);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 스킬 수정', error.message);
     }
   });
 
@@ -950,6 +959,9 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId, is_new }: Props) 
         fetchCallingNumberInsert(_tempCallingNumberInfo);
       }
       setCampaignInfoChangeYn(false);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 스케줄 등록', error.message);
     }
   });
 
@@ -957,6 +969,9 @@ const NewCampaignManagerDetail: React.FC<Props> = ({ tenantId, is_new }: Props) 
   const { mutate: fetchDialSpeedUpdate } = useApiForDialSpeedUpdate({
     onSuccess: (data) => {
       setCampaignDialSpeedChangeYn(false);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 발신 속도 수정', error.message);
     }
   });
 

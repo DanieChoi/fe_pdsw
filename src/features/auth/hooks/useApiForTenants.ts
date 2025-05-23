@@ -35,7 +35,6 @@ export function useApiForTenants(
 
       if (error.response?.data?.result_code === 5) {
         console.log('세션 만료, 로그인으로 이동');
-        window.location.href = '/login';
       } else {
         console.log('다른 에러:', error.response?.data?.result_code);
       }

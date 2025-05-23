@@ -8,6 +8,7 @@ import { CommonButton } from "@/components/shared/CommonButton";
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import { AdditionalInfoTabParam } from './CampaignManagerDetail';
 import { useApiForCampaignAssignmentAgent } from '@/features/campaignManager/hooks/useApiForCampaignAssignmentAgent';
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 
 interface ConsultingData {
   id: string;
@@ -88,6 +89,9 @@ const AssignedAgentTab: React.FC<Props> = ({callCampaignMenu,campaignInfo,onHand
     onSuccess: (data) => {
       const transformedData = transformToTreeData(data.assignedCounselorList);
       setInitialData(transformedData.sort((a, b) => a.id.localeCompare(b.id)));
+    },
+    onError: (error) => {
+      ServerErrorCheck('할당상담사 정보 조회', error.message);
     }
   });
   

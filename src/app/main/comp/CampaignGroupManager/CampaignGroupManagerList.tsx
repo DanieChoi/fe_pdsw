@@ -5,6 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { useApiForCampaignAgent } from '@/features/campaignManager/hooks/useApiForCampaignAgent';
 import DataGrid, { CellClickArgs, SelectColumn } from "react-data-grid";
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 
 type Column = {
   key: string;
@@ -84,6 +85,9 @@ export default function CampaignGroupManagerList({campaignId,campaignGroupHeader
       // fetchSkills({
       //   tenant_id_array: tempTenantIdArray
       // });   
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 소속 상담사 리스트 요청', error.message);
     }
   });
   

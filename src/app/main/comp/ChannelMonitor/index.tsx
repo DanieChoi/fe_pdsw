@@ -6,6 +6,8 @@ import 'react-data-grid/lib/styles.css';
 import { useApiForChannelStateMonitoringList } from '@/features/monitoring/hooks/useApiForChannelStateMonitoringList';
 import { useMainStore } from '@/store';
 import { useApiForDialingDevice } from '@/features/preferences/hooks/useApiForDialingDevice';
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
+import { logoutChannel } from '@/lib/broadcastChannel';
 
 type ChannelStatus = 'IDLE' | 'BUSY' | 'NONE';
 
@@ -217,6 +219,19 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
         setSecondModeCampaignGroup(tempData.sort((a,b) => parseInt(a.key) - parseInt(b.key)));
       }
       
+    },
+    onError: (error) => {
+      if(window.opener){
+        if(error.message.split('||')[0] === '5'){
+          logoutChannel.postMessage({
+            type: 'logout',
+            message: error.message,
+          });
+          window.close();
+        }
+      }else{
+        ServerErrorCheck('장비 목록 조회', error.message);  
+      }
     }
   });
 
@@ -232,17 +247,21 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
         }
         fetchChannelStateMonitoringList({deviceId:0});
       },
-      onError: (data) => {
+      onError: (error) => {
         // onError 추가한 이유 : 통합모니터링 창이 켜있다가 가장 먼저 통신하는 api이므로
-        // 세션이 만료되었을때 팝업창을 닫는 로직처리를 위한 것입니다.     
-        if (data.message.split('||')[0] === '5') {
-          if (window.opener) {
-            window.opener.postMessage({ type: "sessionFailed" }, "*");
-            // 자기 자신 닫기
+        if(window.opener){
+          if(error.message.split('||')[0] === '5'){
+            logoutChannel.postMessage({
+              type: 'logout',
+              message: error.message,
+            });
             window.close();
-          }  
-        }
-      }
+          }
+        }else{
+          ServerErrorCheck('장비 목록 조회', error.message);  
+        } 
+      },
+      
   });  
 
   useEffect(() => {  

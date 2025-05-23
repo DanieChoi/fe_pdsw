@@ -75,7 +75,7 @@ export const loginApi = {
 
       // ###### 로그인 시간 기준으로 세션키 만료시간 설정 ######
       const currentDate = new Date();
-      const expiredDate = new Date(currentDate.getTime() + data.expires_in); // 밀리세컨드 더하기
+      const expiredDate = new Date(currentDate.getTime() + data.expires_in * 1000); // 초 더하기
       
       data.expires_in = expiredDate.getTime(); // 만료일시를 밀리세컨드로 변환하여 저장
 
