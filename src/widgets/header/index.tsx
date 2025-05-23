@@ -55,12 +55,21 @@ export default function Header() {
   const startExpirationWatcher = useAuthStore((state) => state.startExpirationWatcher);
   const expires_check = useAuthStore((state) => state.expires_check);
 
+  // 새로고침에도 만료시간 체크 유지를 위한 헤더 감시로직
   useEffect(() => {
     const now = Date.now();
-
     if (expires_in > 0 && !expires_check) {
       if (now > expires_in) {
-        logoutFunction();
+        setAlertState({
+          ...errorMessage,
+          isOpen: true,
+          message: '로그인 세션이 만료되었습니다. 다시 로그인해주세요.',
+          type: '2',
+          onClose: () => {
+            logoutFunction();
+            router.push('/login');
+          },
+        });
       } else {
         startExpirationWatcher(); // 타이머 복구
       }
