@@ -5,6 +5,7 @@ import { CounselorAssignListCredentials, CounselorAssignListResponse } from '@/f
 interface Props {
   credentials: CounselorAssignListCredentials;
   enabled?: boolean;
+  sessionKey?: string;
 }
 
 const useApiForFetchCounselorAssignList = ({ credentials, enabled }: Props) => {
