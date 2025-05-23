@@ -651,36 +651,44 @@ const ListManager: React.FC = () => {
   // 엑셀다운로드 핸들러
   const handleExcelDownload = () => {
     const data = [
-      { 고객키: "1", 이름: "홍길동", 전화번호: "01012345678" },
-      { 고객키: "2", 이름: "김철수", 전화번호: "01011112222" },
+      { 고객키: "1", 이름: "홍길동", 전화번호: "01031141714", 토큰: "1" },
+      { 고객키: "2", 이름: "김철수", 전화번호: "0234584260", 토큰: "2" },
     ];
 
     // 헤더 정의
-    const headers = ["고객키[1]", "고객 이름", "고객 전화번호[1]"];
+    const headers = ["고객키(CSKE)", "고객이름(CSNA)", "고객전화번호(TNO1)", "토큰데이타(TKDA)"];
 
     // 데이터 객체 배열을 2차원 배열로 변환 (헤더 아래에 값들)
-    const rows = data.map(item => [item.고객키, item.이름, item.전화번호]);
+    const rows = data.map(item => [item.고객키, item.이름, item.전화번호, item.토큰]);
 
     // 시트 생성 (헤더 + 데이터)
     const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+
+    // 컬럼 너비 설정 (단위: 문자 수)
+    worksheet['!cols'] = [
+      { wch: 20 },  // 고객키
+      { wch: 20 },  // 고객이름
+      { wch: 20 },  // 전화번호
+      { wch: 20 },  // 토큰
+    ];
 
     // 워크북 생성 및 시트 추가
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
     // 엑셀 파일 다운로드
-    XLSX.writeFile(workbook, 'ListManager.xlsx');
+    XLSX.writeFile(workbook, 'ListManager_OBListTemplate.xlsx');
   };
   // txt다운로드 핸들러
   const handleTxtDownload = () => {
     const data = [
-      { 고객키: "1", 이름: "홍길동", 전화번호: "01012345678" },
-      { 고객키: "2", 이름: "김철수", 전화번호: "01011112222" },
+      { 고객키: "1", 이름: "홍길동", 전화번호: "01031141714", 토큰: "1" },
+      { 고객키: "2", 이름: "김철수", 전화번호: "0234584260", 토큰: "2" },
     ];
 
     // 헤더와 데이터 구성 (쉼표 구분자 사용)
-    const headers = ["고객키[1]", "고객 이름", "고객 전화번호[1]"];
-    const rows = data.map(item => [item.고객키, item.이름, item.전화번호].join(","));
+    const headers = ["고객키(CSKE)", "고객이름(CSNA)", "고객전화번호(TNO1)", "토큰데이타(TKDA)"];
+    const rows = data.map(item => [item.고객키, item.이름, item.전화번호, item.토큰].join(","));
 
     // const textContent = [headers.join(","), ...rows].join("\n");
     const textContent = [...rows].join("\n");
@@ -691,7 +699,7 @@ const ListManager: React.FC = () => {
     // 다운로드 링크 생성 및 실행
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "ListManager.txt";
+    link.download = "ListManager_OBListTemplate.txt";
     document.body.appendChild(link);
     link.click();
 
@@ -1075,7 +1083,7 @@ const ListManager: React.FC = () => {
               title="작업 대상 내역" // 이 부분은 이미 정상이나, 일관성을 위해 명시
               className="border-b border-gray-300 pb-1"
               buttons={[
-                { label: "엑셀 파일 다운로드", onClick: handleExcelDownload },
+                { label: "xls 다운로드", onClick: handleExcelDownload },
                 { label: "txt 다운로드", onClick: handleTxtDownload },
                 { label: "새 작업대상", onClick: handleNewTarget},
                 { label: "작업 대상 올리기", onClick: triggerFileInput },
