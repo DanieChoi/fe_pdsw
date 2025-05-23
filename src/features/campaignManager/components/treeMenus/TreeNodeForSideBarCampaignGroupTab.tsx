@@ -434,12 +434,33 @@ export function TreeNodeForSideBarCampaignGroupTab({
     setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
   }, [node, setSelectedNodeId]);
 
+  // 캠페인 그룹 노드 더블 클릭 시 캠페인 그룹 일괄 수정 동작
+  const handleDoubleClickGroup = useCallback(() => {
+    if (node.type !== "group") return;
+    const { addTabCurrentOnly } = useTabStore.getState();
+    addTabCurrentOnly({
+      id: 1,
+      title: `캠페인 그룹 관리: ${node.name}`,
+      uniqueKey: `groupBulkUpdate_${node.group_id}_${Date.now()}`,
+      params: {
+        groupId: node.group_id,
+        groupName: node.name,
+      },
+    });
+  }, [node]);
+
   const renderNodeUI = useCallback(() => (
     <div
       ref={nodeRef}
       className={getNodeStyle()}
       onClick={handleClick}
-      onDoubleClick={node.type === "campaign" ? handleDoubleClickCampaign : undefined}
+      onDoubleClick={
+        node.type === "campaign"
+          ? handleDoubleClickCampaign
+          : node.type === "group"
+            ? handleDoubleClickGroup
+            : undefined
+      }
       onContextMenu={node.type === "campaign" ? undefined : handleContextMenuEvent}
       style={{ paddingLeft: `${level * 16 + 8}px` }}
     >
@@ -455,9 +476,6 @@ export function TreeNodeForSideBarCampaignGroupTab({
         )}
         {renderIcon()}
         <span className={`flex text-sm ${isSelected ? "font-medium text-555" : "text-555"}`}>
-
-          {/* // 캠페인 노드일 경우 상태 아이콘 표시 */}
-          {/* 일시적인 멈춤중 중지중 시작중에 대해 currentCampaignDialStatus 사용 null 일 경우 현재처럼 node.start_flag 참조 삼항 연산자 분기 처리 필요*/}
           {node.type === "campaign" && typeof currentCampaignDialStatus?.status === "number" ? (
             getStatusIconWithStartFlag(currentCampaignDialStatus.status) ? (
               <Image
@@ -486,7 +504,20 @@ export function TreeNodeForSideBarCampaignGroupTab({
         </span>
       </div>
     </div>
-  ), [getNodeStyle, handleClick, handleDoubleClickCampaign, handleContextMenuEvent, hasChildren, isExpanded, isSelected, level, node, renderIcon]);
+  ), [
+    getNodeStyle,
+    handleClick,
+    handleDoubleClickCampaign,
+    handleDoubleClickGroup,
+    handleContextMenuEvent,
+    hasChildren,
+    isExpanded,
+    isSelected,
+    level,
+    node,
+    renderIcon,
+    currentCampaignDialStatus,
+  ]);
 
   const handleEditCampaign = useCallback(() => {
     const { simulateHeaderMenuClick, setCampaignIdForUpdateFromSideMenu } = useTabStore.getState();
