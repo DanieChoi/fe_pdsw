@@ -1214,7 +1214,7 @@ export function TreeMenusForAgentTab() {
       </div>
       
       {/* 🌟 개발용 디버그 정보 */}
-      {process.env.NODE_ENV === 'development' && (
+      {/* {process.env.NODE_ENV === 'development' && (
         <div className="text-xs text-gray-500 p-2 border-t">
           데이터 버전: {dataVersionRef.current} | 
           확장된 노드: {expandedNodes.size}개 | 
@@ -1222,7 +1222,7 @@ export function TreeMenusForAgentTab() {
           Window 상태: {WindowStateUtils.getCurrentState() ? 'OK' : 'None'} |
           스킬 정보: {sortedData[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0}개
         </div>
-      )}
+      )} */}
     </div>
   );
 }
