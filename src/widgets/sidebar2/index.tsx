@@ -9,11 +9,11 @@ import { useShallow } from "zustand/react/shallow";
 
 import { baseTabs, TabId } from "@/features/campaignManager/components/data/baseTabs";
 import { TreeMenusForCampaigns } from "@/widgets/sidebar2/tree-menu/TreeMenusForCampaigns";
-import { TreeMenusForAgentTab } from "@/features/campaignManager/components/treeMenus/TreeMenusForAgentTab";
+import { TreeMenusForAgentTab } from "@/widgets/sidebar2/tree-menu/TreeMenusForAgentTab";
 import { TreeMenusForCampaignGroupTab } from "@/widgets/sidebar2/tree-menu/TreeMenusForCampaignGroupTab";
 import { useSidebarWidthStore } from "@/store/useSidebarWidthStore";
-import { TabActions } from "@/components/shared/layout/comp/TabActions";
 import { BottomTabsForSideMenu } from "@/widgets/sidebar2/footer/BottomTabsForSideMenu";
+import { TabActions } from "./TabActions";
 
 const MemoTabActions = memo(TabActions);
 MemoTabActions.displayName = "MemoTabActions";
