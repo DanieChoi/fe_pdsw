@@ -338,6 +338,7 @@ export interface CounselorAssignListCredentials {
 }
 
 export interface CounselorAssignListResponse {
+  result_data: any;
   code: string;
   message: string;
   skillAssignedCounselorList: SkillAssignedCounselorListItem[];
