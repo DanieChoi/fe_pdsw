@@ -167,7 +167,28 @@ export function TreeNodeForSideBarCampaignGroupTab({
     }
     if (node.type === "campaign") {
       setCampaignIdForUpdateFromSideMenu(node.campaign_id?.toString() || "");
+      handleDoubleClickCampaign();
     }
+
+    if (node.type === "group") {
+      const { addTabCurrentOnly } = useTabStore.getState();
+      addTabCurrentOnly({
+        id: 1,
+        title: `캠페인 그룹 관리: ${node.name}`,
+        uniqueKey: `groupBulkUpdate_${node.group_id}_${Date.now()}`,
+        params: {
+          groupId: node.group_id,
+          groupName: node.name,
+        },
+      });
+    }
+
+    // node.type === "campaign"
+    //   ? handleDoubleClickCampaign
+    //   : node.type === "group"
+    //     ? handleDoubleClickGroup
+    //     : undefined
+
   }, [onNodeToggle, node, onNodeSelect, hasChildren, setCampaignIdForUpdateFromSideMenu]);
 
 
@@ -454,13 +475,13 @@ export function TreeNodeForSideBarCampaignGroupTab({
       ref={nodeRef}
       className={getNodeStyle()}
       onClick={handleClick}
-      onDoubleClick={
-        node.type === "campaign"
-          ? handleDoubleClickCampaign
-          : node.type === "group"
-            ? handleDoubleClickGroup
-            : undefined
-      }
+      // onClick={
+      //   node.type === "campaign"
+      //     ? handleDoubleClickCampaign
+      //     : node.type === "group"
+      //       ? handleDoubleClickGroup
+      //       : undefined
+      // }
       onContextMenu={node.type === "campaign" ? undefined : handleContextMenuEvent}
       style={{ paddingLeft: `${level * 16 + 8}px` }}
     >
