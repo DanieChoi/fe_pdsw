@@ -17,6 +17,9 @@ export function TreeMenusForAgentTab() {
   const selectedNodeId = useSideMenuStore((state) => state.selectedNodeId);
   const setSelectedNodeId = useSideMenuStore((state) => state.setSelectedNodeId);
 
+  console.log("treeData in TreeMenusForAgentTab !!!!!!!!!!!!! ", treeData);
+  
+
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [initialized, setInitialized] = useState(false);
 

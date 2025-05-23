@@ -11,14 +11,19 @@ import {
   TeamNode,
   TenantNode
 } from "../types/typeForSideBarCounselorTab";
+import { getCookie } from "@/lib/cookies";
 
 // campaignId는 항상 "0"으로 고정되므로 별도 인자로 받지 않음
 export async function apiToFetchCounselorListForSideBar(tenantId: string) {
+    const sessionKey = getCookie('session_key');
+
+
   const response = await axiosRedisInstance.post(
     "/counselor/list",
     {
       tenantId,
       campaignId: "0",
+      sessionKey
     },
     {
       headers: {

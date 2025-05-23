@@ -31,6 +31,7 @@ export interface ITeam {
 }
 
 export interface ICounselor {
+  assignedSkills: any;
   counselorId: string;
   counselorname: string;
   blendKind: string;
