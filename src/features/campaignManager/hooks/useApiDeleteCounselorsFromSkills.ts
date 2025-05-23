@@ -527,11 +527,6 @@
 //   }
 // };
 
-import { useMutation } from '@tanstack/react-query';
-import { apiForDeleteCounselorsForSpecificSkill } from '../api/apiForCounselorSkil';
-import { useAgentSkillStatusStore } from '@/store/agenSkillStatusStore';
-
-// Window 객체에 저장할 타입 정의
 declare global {
   interface Window {
     __COUNSELOR_TREE_STATE__?: {
@@ -545,6 +540,12 @@ declare global {
     };
   }
 }
+
+import { useMutation } from '@tanstack/react-query';
+import { apiForDeleteCounselorsForSpecificSkill } from '../api/apiForCounselorSkil';
+import { useAgentSkillStatusStore } from '@/store/agenSkillStatusStore';
+
+// Window 객체에 저장할 타입 정의
 
 interface DeleteCounselorsFromSkillsParams {
   skillIds: number[];
