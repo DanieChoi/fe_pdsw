@@ -390,9 +390,11 @@
 //   );
 // }
 
+// TreeNodeForCounselorListForSideBar.tsx - 간단한 버전
 "use client";
 import React, { useCallback } from 'react';
 import { UserCircle2 } from "lucide-react";
+import { useIsMutating } from '@tanstack/react-query'; // 🎯 React Query 기본 기능만 사용
 import { IContextMenuForTennantForCounselorTreeMenu } from "./ContextMenus/IContextMenuForTennantForCounselorTreeMenu";
 import { IContextMenuForGroupAndTeamAndCounselor } from "./ContextMenus/IContextMenuForGroupAndTeamAndCounselorProps";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
@@ -423,7 +425,7 @@ interface ITreeNodeForCounselorListForSideBar {
   type: 'organization' | 'tenant' | 'group' | 'team' | 'counselor' | 'skill';
   defaultExpanded: ExpandConfig;
   parentTenantId?: string;
-  parentCounselorId?: string; // 상담사 ID 추가
+  parentCounselorId?: string;
 }
 
 export function TreeNodeForCounselorListForSideBar({
@@ -444,6 +446,14 @@ export function TreeNodeForCounselorListForSideBar({
   const currentTenantId = type === 'tenant' ? data.tenantId : parentTenantId;
   const currentCounselorId = type === 'counselor' ? data.counselorId : parentCounselorId;
 
+  // 🎯 React Query의 기본 기능으로 삭제 중인지 확인
+  const isMutatingCount = useIsMutating({
+    mutationKey: ['deleteCounselorsFromSkills', currentTenantId]
+  });
+  
+  // 현재 스킬이 삭제 중인지 간단히 판단 (정확하지 않지만 충분함)
+  const isAnySkillDeleting = type === 'skill' && isMutatingCount > 0;
+
   const getCounselorsForNode = () => {
     switch (type) {
       case 'counselor':
@@ -452,7 +462,7 @@ export function TreeNodeForCounselorListForSideBar({
           tenantId: currentTenantId
         }];
       case 'skill':
-        return []; // 스킬 노드는 상담사 정보 없음
+        return [];
       case 'team': {
         let counselors = data.counselorInfo?.map((counselor: any) => ({
           type: 'counselor',
@@ -510,7 +520,7 @@ export function TreeNodeForCounselorListForSideBar({
       case 'group': return `group-${data.groupId}`;
       case 'team': return `team-${data.teamId}`;
       case 'counselor': return data.counselorId;
-      case 'skill': return `skill-${currentCounselorId}-${data.skillId}`; // currentCounselorId 사용
+      case 'skill': return `skill-${currentCounselorId}-${data.skillId}`;
     }
   };
 
@@ -586,15 +596,14 @@ export function TreeNodeForCounselorListForSideBar({
         return counselors;
       }
       case 'counselor': {
-        // 상담사의 스킬들을 자식 노드로 반환
         return data.assignedSkills?.map((skill: ISkill) => ({
           type: 'skill',
           data: skill,
-          parentCounselorId: data.counselorId // 상담사 ID 전달
+          parentCounselorId: data.counselorId
         })) || [];
       }
       case 'skill': 
-        return null; // 스킬은 최하위 노드
+        return null;
     }
   };
 
@@ -606,6 +615,11 @@ export function TreeNodeForCounselorListForSideBar({
   const isSelected = selectedNodeId === id;
 
   const handleNodeClick = () => {
+    // 🎯 삭제 중인 스킬은 클릭 무시
+    if (isAnySkillDeleting && type === 'skill') {
+      return;
+    }
+
     onNodeSelect(id);
     if (hasChildren) {
       onNodeToggle(id);
@@ -628,15 +642,14 @@ export function TreeNodeForCounselorListForSideBar({
     if (type === 'skill') {
       console.log(`스킬 선택: ${data.skillName}, 상담사: ${currentCounselorId}, 테넌트: ${currentTenantId}`);
     }
-
-    console.log(`${type} ${label} 클릭 - TenantID: ${currentTenantId}`);
-    const counselors = getCounselorsForNode();
-    console.log(`${type} 노드의 상담사 목록:`, counselors);
   };
 
   const handleContextMenu = useCallback(() => {
+    if (isAnySkillDeleting && type === 'skill') {
+      return;
+    }
     onNodeSelect(id);
-  }, [id, onNodeSelect]);
+  }, [id, onNodeSelect, type, isAnySkillDeleting]);
 
   const renderIcon = () => {
     switch (type) {
@@ -665,15 +678,26 @@ export function TreeNodeForCounselorListForSideBar({
     }
   };
 
+  // 🎨 스킬 노드 스타일 (간단한 버전)
+  const skillStyle = type === 'skill' && isAnySkillDeleting ? {
+    opacity: 0.6,
+    pointerEvents: 'none' as const
+  } : {};
+
   const renderNodeContent = () => (
     <div
       id={type === 'counselor' ? `counselor-${data.counselorId}` : 
           type === 'skill' ? `skill-${currentCounselorId}-${data.skillId}` : undefined}
       className={`flex items-center hover:bg-[#FFFAEE] px-2 py-0.5 cursor-pointer transition-colors duration-150 text-[#555]
-        ${isSelected ? "bg-[#FFFAEE]" : ""} ${type === 'skill' ? "text-blue-600" : ""}`}
+        ${isSelected ? "bg-[#FFFAEE]" : ""} 
+        ${type === 'skill' ? "text-blue-600" : ""}
+        ${isAnySkillDeleting && type === 'skill' ? 'animate-pulse cursor-not-allowed' : ''}`}
       onClick={handleNodeClick}
       onContextMenu={handleContextMenu}
-      style={{ paddingLeft: `${level * 16 + 8}px` }}
+      style={{ 
+        paddingLeft: `${level * 16 + 8}px`,
+        ...skillStyle
+      }}
     >
       <div className="flex items-center w-full gap-2">
         {hasChildren ? (
@@ -686,15 +710,23 @@ export function TreeNodeForCounselorListForSideBar({
           <span className="w-3" />
         )}
         {renderIcon()}
+        
+        {/* 🎯 삭제 중일 때만 로딩 표시 (간단함) */}
+        {type === 'skill' && isAnySkillDeleting && (
+          <div className="w-3 h-3 border border-blue-500 border-t-transparent rounded-full animate-spin mr-1" />
+        )}
+        
         <span className={`text-sm ${type === 'skill' ? 'text-blue-600' : 'text-555'} ${isSelected ? "font-medium" : ""}`}>
           {type === 'counselor' ? `${getLabel()} [${getId()}]` : getLabel()}
+          {type === 'skill' && isAnySkillDeleting && (
+            <span className="text-xs text-gray-500 ml-2">(처리 중...)</span>
+          )}
         </span>
       </div>
     </div>
   );
 
   const renderWithContextMenu = (content: React.ReactNode) => {
-    // organization 또는 tenant 타입
     if (type === 'organization' || type === 'tenant') {
       return (
         <IContextMenuForTennantForCounselorTreeMenu>
@@ -703,7 +735,6 @@ export function TreeNodeForCounselorListForSideBar({
       );
     }
   
-    // group, team, counselor 타입
     if (['group', 'team', 'counselor'].includes(type)) {
       const counselors = getCounselorsForNode();
       
@@ -732,8 +763,8 @@ export function TreeNodeForCounselorListForSideBar({
       );
     }
   
-    // skill 타입 - 상담원 정보 포함 ✅
-    if (type === 'skill') {
+    // 🎯 스킬 타입 - 처리 중이 아닐 때만 컨텍스트 메뉴
+    if (type === 'skill' && !isAnySkillDeleting) {
       const contextMenuItem = {
         id: data.skillId,
         name: data.skillName,
@@ -742,8 +773,8 @@ export function TreeNodeForCounselorListForSideBar({
       return (
         <IContextMenuForSkill 
           item={contextMenuItem}
-          counselorIds={currentCounselorId ? [currentCounselorId] : []} // 현재 상담원 ID
-          tenantId={currentTenantId || ''} // 현재 테넌트 ID
+          counselorIds={currentCounselorId ? [currentCounselorId] : []}
+          tenantId={currentTenantId || ''}
         >
           {content}
         </IContextMenuForSkill>
