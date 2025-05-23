@@ -381,10 +381,10 @@ export default function Header() {
   const { data: counselorListData } = useApiForFetchCounselorList({
     credentials: {
       // 필요한 credentials 정보
-      session_key: _sessionKey,
-      tenant_id: tenant_id,
-      roleId: menu_role_id
+      tenantId: tenant_id,
+      skillId: 0, // Default skill ID or use an appropriate value
     },
+    sessionKey: _sessionKey,
     // enabled: shouldFetchCounselors,  // fetchMain 완료 후에만 실행
   });
 
@@ -392,7 +392,8 @@ export default function Header() {
 
   useEffect(() => {
     if (counselorListData) {
-      setCounselers(counselorListData.result_data);
+      // Access the correct property structure based on the CounselorAssignListResponse type
+      setCounselers(counselorListData.result_data || []);
     }
   }, [counselorListData]);
 
