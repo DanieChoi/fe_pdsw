@@ -26,9 +26,9 @@ export const fetchCampaigns = async (credentials: MainCredentials): Promise<Main
 
 export const fetchCounselorList = async (credentials: MainCredentials): Promise<any> => {
   try {
-    const { data } = await axiosRedisInstance.get<any>(
+    const { data } = await axiosRedisInstance.post<any>(
       // `/api/v1/counselor/list?tenantId=${credentials.tenant_id}&roleId=${credentials.roleId}`
-      `/counselor/list?tenantId=${credentials.tenant_id}&roleId=${credentials.roleId}`
+      `/counselor/list`
     );
     return data;
   } catch (error: any) {
