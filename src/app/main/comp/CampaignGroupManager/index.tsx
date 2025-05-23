@@ -191,7 +191,8 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
       if( data.result_data.length > 0 ){
         for (let i = 0; i < tenants.length; i++) {
           for (let j = 0; j < data.result_data.length; j++) {
-            if (tenants[i].tenant_id === data.result_data[j].tenant_id && parseInt(groupId || '-1') < 0) {
+            // if (tenants[i].tenant_id === data.result_data[j].tenant_id && parseInt(groupId || '-1') < 0) {
+            if (tenants[i].tenant_id === data.result_data[j].tenant_id ) {
               tempRows.push({
                 no: tempRows.length + 1,
                 tenantId: tenants[i].tenant_id,
@@ -199,21 +200,21 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
                 campaignGroupId: data.result_data[j].group_id,
                 campaignGroupName: data.result_data[j].group_name,
               });
-              if (j === 0) {
-                _setGroupId(data.result_data[j].group_id);
-                setGroupInfo(tempRows[0]);
-              }
-            }else if( tenants[i].tenant_id === data.result_data[j].tenant_id && _groupId > -1 && _groupId === data.result_data[j].group_id ){
-              const tempRowData = {
-                no: tempRows.length + 1,
-                tenantId: tenants[i].tenant_id,
-                tenantName: tenants[i].tenant_name,
-                campaignGroupId: data.result_data[j].group_id,
-                campaignGroupName: data.result_data[j].group_name,
-              };
-              tempRows.push(tempRowData);
-              _setGroupId(tempRowData.campaignGroupId);
-              setGroupInfo(tempRowData);
+              // if (j === 0) {
+              //   _setGroupId(data.result_data[j].group_id);
+              //   setGroupInfo(tempRows[0]);
+              // }
+            // }else if( tenants[i].tenant_id === data.result_data[j].tenant_id && _groupId > -1 && _groupId === data.result_data[j].group_id ){
+            //   const tempRowData = {
+            //     no: tempRows.length + 1,
+            //     tenantId: tenants[i].tenant_id,
+            //     tenantName: tenants[i].tenant_name,
+            //     campaignGroupId: data.result_data[j].group_id,
+            //     campaignGroupName: data.result_data[j].group_name,
+            //   };
+            //   tempRows.push(tempRowData);
+            //   _setGroupId(tempRowData.campaignGroupId);
+            //   setGroupInfo(tempRowData);
             }
           }
         }
@@ -284,9 +285,9 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
 
   // 캠페인 그룹 소속 캠페인 데이터 로드 시 
   useEffect(() => {
-    if (_campaignGroupList && _groupId > 0) {
+    if (_campaignGroupList && _campaignGroupList.length > 0 && _groupId > 0) {
       const tempCampaignListRows: downDataProps[] = [];
-      if (campaignGroupCampaignListData && campaignGroupCampaignListData) {
+      if (campaignGroupCampaignListData && campaignGroupCampaignListData.length > 0 ) {
         for (let i = 0; i < _campaignGroupList.length; i++) {
           for (let j = 0; j < campaignGroupCampaignListData.length; j++) {
             if (_groupId === _campaignGroupList[i].campaignGroupId && _groupId === campaignGroupCampaignListData[j].group_id) {
@@ -327,6 +328,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   useEffect(() => {
     if (groupId) {
       _setGroupId(parseInt(groupId));
+      fetchCampaignGroupSearch(null);
     }
   }, [groupId]);
 
@@ -349,6 +351,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
             campaignGroupHeaderSearchParam={campaignGroupHeaderSearchParam}
             campaignGroupList={_campaignGroupList}
             groupCampaignListData={tempCampaignListData}
+            selectedGroupId={_groupId+''}
             onGroupSelect={handleGroupSelect}
             onCampaignSelect={handleCampaignSelect}
             onSelectCampaignList={handleSelectCampaignList}
