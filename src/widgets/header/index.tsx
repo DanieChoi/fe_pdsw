@@ -378,24 +378,24 @@ export default function Header() {
     });
   // console.log("dataForMenusInfoForRoleId : ", dataForMenusInfoForRoleId);
 
-  const { data: counselorListData } = useApiForFetchCounselorList({
-    credentials: {
-      // 필요한 credentials 정보
-      tenantId: tenant_id,
-      skillId: 0, // Default skill ID or use an appropriate value
-    },
-    sessionKey: _sessionKey,
-    // enabled: shouldFetchCounselors,  // fetchMain 완료 후에만 실행
-  });
+  // const { data: counselorListData } = useApiForFetchCounselorList({
+  //   credentials: {
+  //     // 필요한 credentials 정보
+  //     tenantId: tenant_id,
+  //     skillId: 0, // Default skill ID or use an appropriate value
+  //   },
+  //   sessionKey: _sessionKey,
+  //   // enabled: shouldFetchCounselors,  // fetchMain 완료 후에만 실행
+  // });
 
-  // console.log('counselorListData at header :', counselorListData);
+  // // console.log('counselorListData at header :', counselorListData);
 
-  useEffect(() => {
-    if (counselorListData) {
-      // Access the correct property structure based on the CounselorAssignListResponse type
-      setCounselers(counselorListData.result_data || []);
-    }
-  }, [counselorListData]);
+  // useEffect(() => {
+  //   if (counselorListData) {
+  //     // Access the correct property structure based on the CounselorAssignListResponse type
+  //     setCounselers(counselorListData.result_data || []);
+  //   }
+  // }, [counselorListData]);
 
   useEffect(() => {
     if (tenants.length > 0 && _sessionKey !== "") {
