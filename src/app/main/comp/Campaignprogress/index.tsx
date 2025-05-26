@@ -21,7 +21,7 @@ import { useEnvironmentStore } from '@/store/environmentStore';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 
-interface TreeRow extends DispatchStatusDataType {
+export interface TreeRow extends DispatchStatusDataType {
   parentId?: string;
   isExpanded?: boolean;
   level: number;
@@ -31,7 +31,7 @@ interface TreeRow extends DispatchStatusDataType {
 }
 
 // 실제 API 연동 시 사용할 데이터 타입
-interface DispatchStatusDataType extends CampaignProgressInformationResponseDataType {
+export interface DispatchStatusDataType extends CampaignProgressInformationResponseDataType {
   strFlag: string;
   senderId: number;
   startFlag: string;
@@ -135,10 +135,10 @@ export default function Campaignprogress() {
   const [campaignInfoList, setCampaignInfoList] = useState<DispatchStatusDataType[]>([]);
   const [tempCampaignInfoList, setTempCampaignInfoList] = useState<DispatchStatusDataType[]>([]);
   const [skills, setSkills] = useState<any[]>([]);
-  const { campaignSkills, setCampaignSkills } = useCampainManagerStore();
+  const { campaignSkills, setCampaignSkills, campaignTotalProgressInfoColumn, setcampaignTotalProgressInfoColumn } = useCampainManagerStore();
   const [isColumnSetOpen, setIsColumnSetOpen] = useState(false);
   const [initData, setInitData] = useState<TreeRow[]>([]);
-  const [columns, setColumns] = useState<Column<TreeRow>[]>(defaultColumnsData);
+  // const [columns, setColumns] = useState<Column<TreeRow>[]>(defaultColumnsData);
 
   const { statisticsUpdateCycle } = useEnvironmentStore();
   const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null);
@@ -222,7 +222,7 @@ export default function Campaignprogress() {
         } else if (row.level === 1) {
           displayName = `테넌트: ${row.id.split('-')[1]}`;
         } else if (row.level === 2) {
-          displayName = `캠페인 ID: ${row.id.split('-')[1]}`;
+          displayName = `캠페인 아이디: ${row.id.split('-')[1]}`;
         } else {
           displayName = row.campaignName;
         }
@@ -420,7 +420,7 @@ export default function Campaignprogress() {
 
     // Add the headers
     // const headers = _columns.map(col => col.name);
-    const headers = ['센터', '테넌트', '캠페인 ID', ..._columns.map(col => col.name)];
+    const headers = ['센터', '테넌트', '캠페인 아이디', ..._columns.map(col => col.name)];
 
     // Create the worksheet
     const ws = XLSX.utils.aoa_to_sheet([headers, ...tempList]);
@@ -434,7 +434,8 @@ export default function Campaignprogress() {
   };
   //컬럼 설정 확인 이벤트.
   const handleColumnSetConfirm = (data: ColumnSettingItem[]) => {
-    setColumns(data);
+    // setColumns(data);    
+    setcampaignTotalProgressInfoColumn(data);
     setIsColumnSetOpen(false)
   };
   const handleColumnSetClose = () => setIsColumnSetOpen(false);
@@ -622,11 +623,11 @@ export default function Campaignprogress() {
     return getSortedData(filteredData);
   }, [selectedCampaign, selectedSkill, selectedStatus, isSortAscending, initData]);
 
-  useEffect(() => {
-    if (columns.length > 0) {
-      _setColumns([...headercolumns, ...columns]);
-    }
-  }, [columns]);
+  // useEffect(() => {
+  //   if (columns.length > 0) {
+  //     _setColumns([...headercolumns, ...columns]);
+  //   }
+  // }, [columns]);
 
   // const searchCampaignProgressInformation = (_campaignId:number, _index:number) => {
   //   if (_campaignId > 0 && tempCampaignList[_index]) {
@@ -682,6 +683,21 @@ export default function Campaignprogress() {
   }, [campaignTotalProgressInfoCampaignId]);
 
   useEffect(() => {
+    if (campaignTotalProgressInfoColumn.length === 0) {
+      setcampaignTotalProgressInfoColumn(defaultColumnsData);
+    } else {
+      _setColumns([
+        ...headercolumns,
+        ...campaignTotalProgressInfoColumn.map((col) => ({
+          ...col,
+          renderCell: ({ row }: { row: TreeRow }) =>
+            row.level === 3 ? row[col.key] : ''
+        }))
+      ]);
+    }
+  }, [campaignTotalProgressInfoColumn]);  
+
+  useEffect(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
@@ -716,13 +732,23 @@ export default function Campaignprogress() {
       <TitleWrap
         className="border-b border-gray-300 pb-3"
         title="상담사 상태"
+        buttons={[
+          { label: "새로고침", onClick: () => {
+            setSelectedCampaignId(tempCampaignList[0].campaign_id);
+            setSelectedCampaignIdIndex(0);
+            setTempCampaignInfoList([]);
+            setCampaignInfoList([]);
+          } },
+          { label: "엑셀로 저장", onClick: () => handleExcelDownload() },
+          { label: "컬럼 설정", onClick: () => setIsColumnSetOpen(true) },
+        ]}
       />
 
 
       <div className="flex items-center justify-between pb-3">
         <div className="flex gap-5">
           <div className='flex items-center gap-2'>
-            <Label className="pr-2">캠페인</Label>
+            <Label className="pr-2">캠페인 아이디</Label>
             <div className="w-[120px]">
               <Select value={selectedCampaign} onValueChange={handleCampaignChange}>
                 <SelectTrigger className="w-full">
@@ -795,7 +821,7 @@ export default function Campaignprogress() {
           </div>
 
           {/* 새로고침 버튼 */}
-          <CommonButton variant="secondary" onClick={() => {
+          {/* <CommonButton variant="secondary" onClick={() => {
             setSelectedCampaignId(tempCampaignList[0].campaign_id);
             setSelectedCampaignIdIndex(0);
             setTempCampaignInfoList([]);
@@ -807,7 +833,7 @@ export default function Campaignprogress() {
           <CommonButton variant="secondary" onClick={handleExcelDownload}>엑셀로 저장</CommonButton>
           <CommonButton variant="secondary" onClick={() => setIsColumnSetOpen(true)}>
             컬럼 설정
-          </CommonButton>
+          </CommonButton> */}
 
         </div>
       </div>
@@ -833,7 +859,7 @@ export default function Campaignprogress() {
         isOpen={isColumnSetOpen}
         onClose={handleColumnSetClose}
         onConfirm={handleColumnSetConfirm}
-        columns={columns}
+        columns={campaignTotalProgressInfoColumn}
       />
     </div>
   );

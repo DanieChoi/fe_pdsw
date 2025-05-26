@@ -14,6 +14,7 @@ import { CampaignInfo, CampaignManagerInfo } from '@/app/main/comp/CreateCampaig
 import { CampaignScheduleInfo } from '@/app/main/comp/CreateCampaignFormPanel/variables/interfacesForCreateCampaign';
 import { ChannelGroupListDataResponse } from "@/features/preferences/hooks/useApiForChannelGroup";
 import { devtools, persist } from 'zustand/middleware';
+import { ColumnSettingItem } from '@/app/main/comp/Campaignprogress/ColumnSet';
 
 // Import default values for reset function
 
@@ -46,6 +47,7 @@ interface CampainManagerState {
   copyTenantId: string;
   copyCampaignSchedule: CampaignScheDuleListDataResponse;
   copyCampaignSkills: CampaignSkillUpdateRequest;
+  campaignTotalProgressInfoColumn: ColumnSettingItem[];
 }
 
 interface CampainManagerActions {
@@ -73,6 +75,7 @@ interface CampainManagerActions {
   setCopyTenantId: (copyTenantId: string) => void;
   setCopyCampaignSchedule: (copyCampaignSchedule: CampaignScheDuleListDataResponse) => void;
   setCopyCampaignSkills: (copyCampaignSkills:CampaignSkillUpdateRequest) => void;
+  setcampaignTotalProgressInfoColumn: (campaignTotalProgressInfoColumn: ColumnSettingItem[]) => void;
   // 스킬 액션 추가
   setSkillsLoaded: (loaded: boolean) => void;
   setSkillsLoading: (loading: boolean) => void;
@@ -111,6 +114,7 @@ export const useCampainManagerStore = create<CampainManagerStore>()(
         copyTenantId: ' ',
         copyCampaignSchedule: {} as CampaignScheDuleListDataResponse,
         copyCampaignSkills: {} as CampaignSkillUpdateRequest,
+        campaignTotalProgressInfoColumn: [],
         // 스킬 상태 초기화
         skillsLoaded: false,
         skillsLoading: false,
@@ -163,6 +167,7 @@ export const useCampainManagerStore = create<CampainManagerStore>()(
         setCopyTenantId: (copyTenantId) => set({ copyTenantId }),
         setCopyCampaignSchedule: (copyCampaignSchedule) => set({ copyCampaignSchedule }),
         setCopyCampaignSkills: (copyCampaignSkills) => set({ copyCampaignSkills }),
+        setcampaignTotalProgressInfoColumn: (campaignTotalProgressInfoColumn) => set({ campaignTotalProgressInfoColumn }),
         // 스킬 액션 구현
         setSkillsLoaded: (loaded) => set({ skillsLoaded: loaded }),
         setSkillsLoading: (loading) => set({ skillsLoading: loading }),
@@ -198,6 +203,7 @@ export const useCampainManagerStore = create<CampainManagerStore>()(
           skillsLoaded: false,
           skillsLoading: false,
           channelGroupList: [],
+          campaignTotalProgressInfoColumn: [],
         }),
       }),
       {

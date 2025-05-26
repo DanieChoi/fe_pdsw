@@ -21,6 +21,7 @@ import { logoutChannel } from '@/lib/broadcastChannel';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 import logoutFunction from '@/components/common/logoutFunction';
 import { log } from 'console';
+import { useEnvironmentStore } from '@/store/environmentStore';
 
 // 메인 스킬 정보
 interface SkillRow {
@@ -72,6 +73,8 @@ const SkillEdit = () => {
   const [allCampaigns, setAllCampaigns] = useState<CampaignRow[]>([]);
   // 다중 선택 스킬 관리를 위한 상태 추가 (체크박스로 선택된 항목들)
   const [selectedSkillRows, setSelectedSkillRows] = useState<Set<string>>(new Set());
+
+  const { centerId, centerName} = useEnvironmentStore();
 
   const { setSkills } = useCampainManagerStore();
 
@@ -184,7 +187,8 @@ const SkillEdit = () => {
       if(skillId !== idx + 1){
         return skillId;
       }
-    });
+    }); 
+    // console.log('minSkillId', minSkillId);
     
     // 비어있는(존재하지않는 스킬아이디) 최소값 반환
     return String(minSkillId ? minSkillId - 1 : 1);
@@ -195,7 +199,7 @@ const SkillEdit = () => {
     if(agentSkillStatus === true){
       // console.log('######### 상담사 상태 변경 수신');
       
-      fetchCounselorList({ tenantId: tenant_id, roleId: role_id });
+      // fetchCounselorList({ tenantId: tenant_id, roleId: role_id });
       fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
       fetchSkillCampaignList();
       fetchSkillAgentList();
@@ -728,25 +732,25 @@ const SkillEdit = () => {
   
 
   // API Hooks
-  const { mutate: fetchCounselorList, data: counselorData } = useApiForCounselorList({
-    onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        logoutFunction();
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert(`상담사 리스트 조회 실패: ${error.message}`);
-      }
-    },
-  });
+  // const { mutate: fetchCounselorList, data: counselorData } = useApiForCounselorList({
+  //   onError: (error) => {
+  //     if (error.message.split('||')[0] === '5') {
+  //       setAlertState({
+  //         ...errorMessage,
+  //         isOpen: true,
+  //         message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
+  //         onConfirm: closeAlert,
+  //         onCancel: () => {}
+  //       });
+  //       logoutFunction();
+  //       setTimeout(() => {
+  //         router.push('/login');
+  //       }, 1000);
+  //     } else {
+  //       showAlert(`상담사 리스트 조회 실패: ${error.message}`);
+  //     }
+  //   },
+  // });
 
   const { mutate: fetchSkillList, data: skillData } = useApiForSkillList({
 
@@ -1054,18 +1058,21 @@ const SkillEdit = () => {
       showAlert(`캠페인 스킬 할당 실패: ${error.message}`);
     }
   }
-  })
+  });
 
   // 테넌트 선택시 관련 센터 정보 가져오기
   const getSelectedTenantCenterName = () => {
-    if (!counselorData?.organizationList || !selectedSkill) return '';
+    // if (!counselorData?.organizationList || !selectedSkill) return '';
 
-    // 선택된 테넌트 ID에 해당하는 센터 이름 찾기
-    for (const org of counselorData.organizationList) {
-      const tenant = org.tenantInfo.find(t => t.tenantId === String(editableFields.tenantId));
-      if (tenant || editableFields.tenantId === 0) {
-        return org.centerName;
-      }
+    // // 선택된 테넌트 ID에 해당하는 센터 이름 찾기
+    // for (const org of counselorData.organizationList) {
+    //   const tenant = org.tenantInfo.find(t => t.tenantId === String(editableFields.tenantId));
+    //   if (tenant || editableFields.tenantId === 0) {
+    //     return org.centerName;
+    //   }
+    // }
+    if(centerId !== "" && centerName !== ""){
+      return centerName;
     }
     return '';
   };
@@ -1127,7 +1134,7 @@ const SkillEdit = () => {
 
 
   useEffect(() => {
-    fetchCounselorList({ tenantId: tenant_id, roleId: role_id });
+    // fetchCounselorList({ tenantId: tenant_id, roleId: role_id });
     fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
     fetchSkillCampaignList();
     fetchSkillAgentList();
@@ -1136,27 +1143,21 @@ const SkillEdit = () => {
       session_key: '',
       tenant_id: tenant_id
     });
-  }, [tenant_id, role_id, tenants, fetchCounselorList, fetchSkillList, fetchSkillCampaignList, fetchSkillAgentList, fetchCampaignList, campaignSkillList]);
+  }, [tenant_id, role_id, tenants, fetchSkillList, fetchSkillCampaignList, fetchSkillAgentList, fetchCampaignList, campaignSkillList]);
 
   useEffect(() => {
     if (
-      counselorData?.organizationList &&
       skillData?.result_data
     ) {
+
       const tenantMap: { [tenantId: string]: { centerName: string; tenantName: string } } = {};
-      counselorData.organizationList.forEach(org => {
-        const centerName = org.centerName;
-        org.tenantInfo.forEach(tenant => {
-          tenantMap[tenant.tenantId] = {
-            centerName,
-            tenantName: tenant.tenantName
-          };
-        });
-        if (!tenantMap["0"]) {
-          tenantMap["0"] = {
-            centerName,
-            tenantName: tenants.find((tenant) => tenant.tenant_id === 0)?.tenant_name ?? 'NONE'
-          }
+      
+      skillData.result_data.forEach((skill: SkillListDataResponse) => {
+        const tenantId = String(skill.tenant_id);
+        const tenant = tenants.find((tenant) => tenant.tenant_id === Number(tenantId));
+        tenantMap[tenantId] = {
+          centerName: getSelectedTenantCenterName() || '',
+          tenantName: tenant ? tenant.tenant_name : ''
         };
       });
 
@@ -1183,7 +1184,7 @@ const SkillEdit = () => {
       });
       setRows(skillRows);
     }
-  }, [counselorData, skillData, campaignData, agentData]);
+  }, [skillData, campaignData, agentData]);
 
   // 키보드 이벤트 핸들러 추가
   useEffect(() => {
