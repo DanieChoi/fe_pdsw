@@ -838,16 +838,16 @@ export default function CampaignGroupManagerDetail({ groupInfo, campaignId, onIn
       });
     }
     // }
-    if (!saveErrorCheck && tempCampaignManagerInfo.campaign_name === '') {
-      saveErrorCheck = true;
-      setAlertState({
-        ...errorMessage,
-        isOpen: true,
-        message: "캠페인명을 입력해 주세요.",
-        type: '2',
-        onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
-      });
-    }
+    // if (!saveErrorCheck && tempCampaignManagerInfo.campaign_name === '') {
+    //   saveErrorCheck = true;
+    //   setAlertState({
+    //     ...errorMessage,
+    //     isOpen: true,
+    //     message: "캠페인명을 입력해 주세요.",
+    //     type: '2',
+    //     onClose: () => setAlertState((prev) => ({ ...prev, isOpen: false }))
+    //   });
+    // }
     if (!saveErrorCheck && tempCampaignSchedule.start_time.length === 0) {
       saveErrorCheck = true;
       setAlertState({
