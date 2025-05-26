@@ -66,7 +66,9 @@ export interface CampaignAssignmentAgentListResponse {
 // 캠페인 할당상담사 데이터 타입
 export interface CampaignAssignmentAgentListDataResponse {
   affiliationGroupId: string;
+  affiliationGroupName: string;
   affiliationTeamId: string;
+  affiliationTeamName: string;
   counselorEmplNum: string;
   counselorId: string;
   counselorname: string;

@@ -152,7 +152,7 @@ export default function LoginPage() {
     onSuccess: (data) => {
 
       // login.ts에서 throw error를 하기때문에 다른 오류 응답은 올수 없음
-      setIsPending(false);
+      
 
       // console.log('data (로그인 응답)', data);
 
@@ -178,6 +178,7 @@ export default function LoginPage() {
         tenantId: data.tenant_id,    // 로그인 응답에서 받은 tenant_id
         employeeId: formData.user_name  // 로그인 시 입력한 user_name
       });
+      setIsPending(false);
 
       // 로그인시 통합모니터링창 초기화
       localStorage.setItem('monitorPopupOpen', 'false');

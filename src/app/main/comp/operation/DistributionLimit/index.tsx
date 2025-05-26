@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import CampaignModal from '../CampaignModal';
 import { useAuthStore, useMainStore, useTabStore } from '@/store';
-import { useApiForCounselorList } from '@/features/preferences/hooks/useApiForCounselorList';
 import { useApiForCreateMaxCall, useApiForDeleteMaxCall, useApiForMaxCallInitTimeList, useApiForMaxCallInitTimeUpdate, useApiForMaxCallList, useApiForUpdateMaxCall } from '@/features/preferences/hooks/useApiForMaxCall';
 import { useApiForCampaignAgentList } from '@/features/preferences/hooks/useApiForCampaignAgent';
 import Cookies from 'js-cookie';
@@ -39,6 +38,8 @@ interface Row {
   hasChildren?: boolean;
   isEditing?: boolean;
   hasChanges?: boolean;
+  groupName?: string; // 그룹 이름 추가
+  partName?: string; // 파트 이름 추가
 }
 
 interface EditData {
@@ -287,8 +288,8 @@ const DistributionLimit = () => {
         id: `agent-${agent.agent_id}`,
         parentId: part.id,
         center: agent.center,
-        group: agent.group,
-        part: agent.part,
+        group: `[${agent.group}]${agent.groupName}`, 
+        part: `[${agent.part}]${agent.partName}`,
         agent_id: agent.agent_id,
         agent_name: agent.agent_name,
         max_dist: agent.max_dist,
@@ -559,6 +560,7 @@ const DistributionLimit = () => {
 
   const centerName = useEnvironmentStore.getState().centerName;
 
+  // 백엔드에서 가져온 상담사 리스트 정보 처리
   const { mutate : fetchCounselorList } = useApiForCampaignAssignmentAgent({
     onSuccess: (data) => {
       // console.log("#### fetchCounselorList : ",data);      
@@ -570,7 +572,9 @@ const DistributionLimit = () => {
               id: `agent-${counselor.counselorId}`,
               center: centerName,
               group: counselor.affiliationGroupId,
+              groupName : counselor.affiliationGroupName,
               part: counselor.affiliationTeamId,
+              partName: counselor.affiliationTeamName,
               agent_id: counselor.counselorId,
               agent_name: counselor.counselorname,
               max_dist: '0',
@@ -608,50 +612,6 @@ const DistributionLimit = () => {
       ServerErrorCheck('캠페인별 상담사 목록 조회', error.message);
     }
   });
-
-  // 백엔드에서 가져온 상담사 리스트 정보 처리
-  // const { mutate: fetchCounselorList } = useApiForCounselorList({
-  //   onSuccess: (response) => {
-  //     if (response?.organizationList && selectedCampaignId) {
-  //       const counselorRows: Row[] = [];
-        
-  //       response.organizationList.forEach(org => {
-  //         const centerName = org.centerName;
-          
-  //         org.tenantInfo.forEach(tenant => {
-  //           tenant.groupInfo.forEach(group => {
-  //             group.teamInfo.forEach(team => {
-  //               team.counselorInfo.forEach(counselor => {
-  //                 // 캠페인에 소속된 상담사만 추가
-  //                 if (campaignAgents.includes(counselor.counselorId)) {
-  //                   counselorRows.push({
-  //                     id: `agent-${counselor.counselorId}`,
-  //                     center: centerName,
-  //                     group: group.groupId,
-  //                     part: team.teamId,
-  //                     agent_id: counselor.counselorId,
-  //                     agent_name: counselor.counselorname,
-  //                     max_dist: '0',
-  //                     current_resp: '0',
-  //                     fix_flag: 'N',
-  //                     level: 3
-  //                   });
-  //                 }
-  //               });
-  //             });
-  //           });
-  //         });
-  //       });
-        
-  //       setRawAgentData(counselorRows);
-  //     } else {
-  //       setRawAgentData([]);
-  //     }
-  //   },
-  //   onError: (error) => {
-  //     ServerErrorCheck('상담사 리스트 정보 조회', error.message);
-  //   }
-  // });
 
   // 운영설정 분배호수 제한 설정 리스트 API 호출
   const { mutate: fetchMaxCallList } = useApiForMaxCallList({
@@ -747,10 +707,7 @@ const DistributionLimit = () => {
         campaignId: selectedCampaignId.toString(),
         tenantId: campaigns.filter(c => c.campaign_id.toString() === selectedCampaignId)[0].tenant_id.toString(),
       });
-      // fetchCounselorList({
-      //   tenantId: tenant_id,
-      //   roleId: role_id
-      // });
+
     }
   }, [tenant_id, role_id, selectedCampaignId, campaignAgents, fetchCounselorList]);
 
@@ -1448,7 +1405,7 @@ const DistributionLimit = () => {
     },
     { 
       key: 'part', 
-      name: '상담 파트',
+      name: '상담 팀',
       renderCell: ({ row }: { row: Row }) => {
         // 상담사 행에만 데이터 표시
         return row.level === 3 ? row.part : '';
@@ -1599,6 +1556,15 @@ const DistributionLimit = () => {
               </SelectContent>
             </Select>
           </div>
+
+          <CustomInput 
+            value={selectedCampaignName !== '' ? selectedCampaignName ?? '' : operationCampaignName ?? ''}
+            readOnly 
+            className="w-[140px]"
+            disabled={true}
+          />
+
+
           <CommonButton 
             variant="outline" 
             size="sm"
@@ -1622,14 +1588,9 @@ const DistributionLimit = () => {
           >
             캠페인 조회
           </CommonButton>
-          <CustomInput 
-            value={selectedCampaignName !== '' ? selectedCampaignName ?? '' : operationCampaignName ?? ''}
-            readOnly 
-            className="w-[140px]"
-            disabled={true}
-          />
+          
           <div className="text-sm w-full ml-5">
-            응답호수 초기화 시각 : {initTime === "9999" ? "없음" : `${initTime.slice(0, 2)}:${initTime.slice(2)}`}
+            응답호수 초기화 시각 : {initTime === "9999" || initTime.slice(0, 2) === '-1' ? "없음" : `${initTime.slice(0, 2)}:${initTime.slice(2)}`}
           </div>
         </div>
         <div className="flex gap-2">
@@ -1666,8 +1627,8 @@ const DistributionLimit = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value='all'>해당 상담사 전체</SelectItem>
-                <SelectItem value='remaining'>잔여 호수가 남은 상담사</SelectItem>
-                <SelectItem value='no-remaining'>잔여 호수가 없는 상담사</SelectItem>
+                <SelectItem value='remaining'>잔여 분배호수가 남은 상담사</SelectItem>
+                <SelectItem value='no-remaining'>잔여 분배호수가 없는 상담사</SelectItem>
                 <SelectItem value='no-limit'>최대 분배호수가 설정되지 않은 상담사</SelectItem>
                 <SelectItem value='has-limit'>최대 분배호수가 설정된 상담사</SelectItem>
               </SelectContent>
@@ -1728,9 +1689,9 @@ const DistributionLimit = () => {
         message={
           <div className="flex flex-col gap-4">
             <div className="text-center">
-              {initTime === "9999" 
+              {initTime === "9999" || initTime.slice(0, 2) === '-1'
                 ? "현재 설정 값이 없습니다. 시간을 입력하세요" 
-                : `현재설정값 : ${initTime.slice(0, 2)}시 ${initTime.slice(2)}분`
+                : `현재 설정값 : ${initTime.slice(0, 2)}시 ${initTime.slice(2)}분`
               }
             </div>
             <div className="flex justify-center pt-2">

@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import TitleWrap from "@/components/shared/TitleWrap";
 import 'react-data-grid/lib/styles.css';
-import { useApiForCounselorAssignList, useApiForCounselorList } from '@/features/preferences/hooks/useApiForCounselorList';
+import { useApiForCounselorAssignList } from '@/features/preferences/hooks/useApiForCounselorList';
 import { useApiForCampaignList, useApiForCreateSkill, useApiForDeleteAgentSkill, useApiForDeleteSkill, useApiForSkillAgentList, useApiForSkillCampaignList, useApiForSkillList, useApiForUpdateSkill } from '@/features/preferences/hooks/useApiForSkill';
 import { useAuthStore, useCampainManagerStore, useMainStore } from '@/store';
 import { CounselorAssignListResponse } from '@/features/preferences/types/SystemPreferences';
@@ -732,26 +732,6 @@ const SkillEdit = () => {
   
 
   // API Hooks
-  // const { mutate: fetchCounselorList, data: counselorData } = useApiForCounselorList({
-  //   onError: (error) => {
-  //     if (error.message.split('||')[0] === '5') {
-  //       setAlertState({
-  //         ...errorMessage,
-  //         isOpen: true,
-  //         message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-  //         onConfirm: closeAlert,
-  //         onCancel: () => {}
-  //       });
-  //       logoutFunction();
-  //       setTimeout(() => {
-  //         router.push('/login');
-  //       }, 1000);
-  //     } else {
-  //       showAlert(`상담사 리스트 조회 실패: ${error.message}`);
-  //     }
-  //   },
-  // });
-
   const { mutate: fetchSkillList, data: skillData } = useApiForSkillList({
 
     onSuccess: (data) => {      

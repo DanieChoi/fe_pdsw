@@ -6,6 +6,7 @@ import { useSessionCheckStore } from '@/store/sessionCheckStore';
 import { logoutChannel } from '@/lib/broadcastChannel';
 import { useEnvironmentStore } from '@/store/environmentStore';
 import { useCampainManagerStore, useMainStore } from '@/store';
+import { useSystemDeviceStore } from '@/store/systemDeviceStore';
 
 type PortCheck = {
     portcheck?: boolean;
@@ -44,6 +45,8 @@ const logoutFunction = ({ portcheck = true }: PortCheck = {}) => {
 
     // campaignManagerStore 초기화 0522 추가
     useCampainManagerStore.getState().setResetCampaignManagerStore();
+
+    useSystemDeviceStore.getState().setSaveSelectDevice('');
 
     if(portcheck){
         logoutChannel.postMessage({

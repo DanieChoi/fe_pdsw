@@ -8,7 +8,6 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useAuthStore, useMainStore, useCampainManagerStore } from '@/store';
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
 import { useApiForTenants } from '@/features/auth/hooks/useApiForTenants';
-import useApiForFetchCounselorList from '@/features/campaignManager/hooks/useApiForFetchCounselorList';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
 import { useApiForGetAuthorizedMenusInfoForMenuRoleId } from "./hooks/useApiForGetAuthorizedMenusInfoForMenuRoleId";
 import { useAvailableMenuStore } from "@/store/useAvailableMenuStore";
@@ -20,7 +19,6 @@ import { useApiForGetCampaignGroups } from "@/shared/hooks/campaign/useApiForGet
 import GlobalErrorAlert from "@/components/shared/CommonGlobalError/CommonGlobalError";
 import logoutFunction from "@/components/common/logoutFunction";
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
-import { log } from "console";
 
 
 const errorMessage = {

@@ -119,7 +119,18 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
       key: 'skills', 
       name: '스킬',
       width: 200,
+    },
+    { 
+      key: 'dial_mode', 
+      name: '다이얼 모드',
+      
+    },
+    { 
+      key: 'calling_number', 
+      name: '발신번호',
+      width: 150,
     }
+
   ], []);
 
 
@@ -170,11 +181,19 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
         .map((skill) => skill.skill_name)
         .join(", ");
 
+      const dialMode = dialModeList
+        .find(d => d.dial_id === campaign.dial_mode)?.dial_name || '';
+
+      const campaignCallingNumber = callingNumbers
+        .find(c => c.campaign_id === campaign.campaign_id);   
+
       return {
         campaign_id: campaign.campaign_id,
         campaign_name: campaign.campaign_name,
         tenant_name: tenant?.tenant_name || "",
         skills: skillNames,
+        dial_mode: dialMode,
+        calling_number: campaignCallingNumber?.calling_number || '',
       };
     });
 
@@ -272,12 +291,21 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
           .filter(skill => campaignSkill?.skill_id?.includes(skill.skill_id))
           .map(skill => skill.skill_name)
           .join(', ');
+        
+        const dialMode = dialModeList
+          .find(d => d.dial_id === campaign.dial_mode)?.dial_name || '';
+
+        const campaignCallingNumber = callingNumbers
+          .find(c => c.campaign_id === campaign.campaign_id); 
+        
 
         return {
           campaign_id: campaign.campaign_id,
           campaign_name: campaign.campaign_name,
           tenant_name: tenant?.tenant_name || '',
           skills: skillNames,
+          dial_mode: dialMode,
+          calling_number: campaignCallingNumber?.calling_number || '',
         };
       })
     );
