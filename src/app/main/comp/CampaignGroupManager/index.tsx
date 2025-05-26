@@ -225,16 +225,9 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
         setGroupInfo(initData);
       }
       fetchCampaignGroupCampaignList(null);
-    },onError: (data) => {      
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          type: '2',
-          onClose: () => goLogin(),
-        });
-      }
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 그룹 조회', error.message);
     }
   });
 
@@ -253,32 +246,18 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
   const { mutate: fetchCampaignGroupDelete } = useApiForCampaignGroupDelete({
     onSuccess: (data) => {
       handleInit();
-    },onError: (data) => {      
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          type: '2',
-          onClose: () => goLogin(),
-        });
-      }
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 그룹 삭제', error.message);
     }
   });
   // 캠페인 그룹 소속 캠페인 삭제
   const { mutate: fetchCampaignGroupCampaignListDelete } = useApiForCampaignGroupCampaignListDelete({
     onSuccess: (data) => {
       
-    },onError: (data) => {      
-      if (data.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          type: '2',
-          onClose: () => goLogin(),
-        });
-      }
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인 그룹 소속 캠페인 삭제', error.message);
     }
   });
   
@@ -308,6 +287,11 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
       setTempCampaignListData(tempCampaignListRows);
       if (tempCampaignListRows.length == 0) {
         setCampaignId(0);
+      }else {
+        const firstCampaign = tempCampaignListData[0];
+        if (firstCampaign) {
+          setCampaignId(firstCampaign.campaignId);
+        }
       }
     }
   }, [_groupId, _campaignGroupList, campaignGroupCampaignListData]);
