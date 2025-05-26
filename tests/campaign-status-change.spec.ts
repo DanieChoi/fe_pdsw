@@ -1,37 +1,61 @@
 import { test, expect } from '@playwright/test';
+import { loginAsAdmin } from './helpers/login.helper';
 
-test('캠페인 상태가 멈춤이면 중지로, 중지면 멈춤으로 1회만 전환', async ({ page }) => {
-  await page.goto('http://localhost:3000/login');
-  await page.getByPlaceholder('아이디를 입력하세요').fill('NEX21004');
-  await page.getByPlaceholder('비밀번호를 입력하세요').fill('Nexus62402580@');
-  await page.getByRole('button', { name: '로그인' }).click();
-  await page.waitForURL('**/main');
-  await expect(page.getByText('캠페인 관리')).toBeVisible();
-  await page.waitForTimeout(1500);
+test('상태 변경 가능한 캠페인 중에서 무작위 선택하여 상태 전환', async ({ page }) => {
+  await loginAsAdmin(page);
 
-  const campaignNode = page.locator('div.tree-item:has-text("[12]12")').first();
-  await expect(campaignNode).toBeVisible();
+  // 멈춤 또는 중지 상태인 캠페인들만 찾기
+  const pausedCampaigns = page.locator('div.campaign-node img[src*="tree_pause"]').locator('..');
+  const stoppedCampaigns = page.locator('div.campaign-node img[src*="tree_stop"]').locator('..');
+  
+  const pausedCount = await pausedCampaigns.count();
+  const stoppedCount = await stoppedCampaigns.count();
+  const totalCount = pausedCount + stoppedCount;
 
-  // 현재 상태 아이콘의 src 파악
-  const statusImg = campaignNode.locator('img[alt="status"]');
-  const statusSrc = await statusImg.getAttribute('src');
-
-  // 컨텍스트 메뉴 열기
-  await campaignNode.click({ button: 'right' });
-  await page.getByText('시작구분:').hover();
-
-  // 상태에 따라 한 번만 전환
-  if (statusSrc?.includes('tree_pause')) {
-    console.log('🟡 현재 상태: 멈춤 → 중지로 전환');
-    await page.getByText('중지').click();
-  } else if (statusSrc?.includes('tree_stop')) {
-    console.log('🟠 현재 상태: 중지 → 멈춤으로 전환');
-    await page.getByText('멈춤').click();
-  } else {
-    console.log('⚠️ 현재 상태가 멈춤이나 중지가 아님. 테스트 중단');
+  if (totalCount === 0) {
+    console.log('⚠️ 상태 변경 가능한 캠페인이 없습니다. 테스트 중단');
     return;
   }
 
-  await expect(page.getByText('캠페인 상태가 성공적으로 변경되었습니다!')).toBeVisible();
+  console.log(`📋 상태 변경 가능한 캠페인: 멈춤 ${pausedCount}개, 중지 ${stoppedCount}개`);
+
+  // 무작위로 선택
+  const randomNum = Math.random() * totalCount;
+  let selectedCampaign;
+  let currentState;
+
+  if (randomNum < pausedCount) {
+    // 멈춤 상태 캠페인 선택
+    const randomPausedIndex = Math.floor(Math.random() * pausedCount);
+    selectedCampaign = pausedCampaigns.nth(randomPausedIndex);
+    currentState = 'pause';
+  } else {
+    // 중지 상태 캠페인 선택
+    const randomStoppedIndex = Math.floor(Math.random() * stoppedCount);
+    selectedCampaign = stoppedCampaigns.nth(randomStoppedIndex);
+    currentState = 'stop';
+  }
+
+  // 선택된 캠페인 정보 출력
+  const campaignText = await selectedCampaign.textContent();
+  console.log(`🎯 선택된 캠페인: ${campaignText?.trim()} (현재: ${currentState})`);
+
+  // 컨텍스트 메뉴 열기
+  await selectedCampaign.click({ button: 'right' });
+  await page.waitForTimeout(500);
+  await page.getByText('시작구분:').first().hover();
+
+  // 상태 전환
+  if (currentState === 'pause') {
+    console.log('🟡 멈춤 → 중지로 전환');
+    await page.getByText('중지').click();
+  } else {
+    console.log('🟠 중지 → 멈춤으로 전환');
+    await page.getByText('멈춤').click();
+  }
+
+  // 성공 확인
+  await expect(page.getByText('캠페인 상태가 성공적으로 변경되었습니다!')).toBeVisible({ timeout: 5000 });
   await page.getByRole('button', { name: '확인' }).click();
+  console.log('✅ 캠페인 상태 변경 성공');
 });
