@@ -23,8 +23,8 @@ export const metadata: Metadata = {
   title: "UPDS",
   description: "UPDS project",
   icons: {
-    icon: 'nexpds.ico',           // /public/favicon.ico
-    shortcut: 'nexpds.ico',
+    icon: '/nexpds.ico',           // /public/favicon.ico
+    shortcut: '/nexpds.ico',
   }
 };
 
