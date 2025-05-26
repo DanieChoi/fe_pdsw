@@ -232,6 +232,18 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
       // if (environmentData.dayOfWeekSetting) {
       //   setDayOfWeek(environmentData.dayOfWeekSetting.split(','));
       // }
+    }else{
+      setRefreshCycle("5");
+      setMonitoringType("periodic");
+      setRetryCount("30");
+      setCustomTimeout("100");
+      setPersonalCampaignAlertOnly(false);
+      setMessageType("알림과 없음");
+      setUnusedWorkHoursCalc(false);
+      setStartTime("0000");
+      setEndTime("0000");
+      setDayOfWeek(['f', 'f', 'f', 'f', 'f', 'f', 'f']);
+      setUnusedWorkHoursCalc(true);
     }
   }, [environmentData]);
 
