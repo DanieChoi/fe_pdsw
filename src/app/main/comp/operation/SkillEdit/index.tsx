@@ -188,7 +188,7 @@ const SkillEdit = () => {
         return skillId;
       }
     }); 
-    console.log('minSkillId', minSkillId);
+    // console.log('minSkillId', minSkillId);
     
     // 비어있는(존재하지않는 스킬아이디) 최소값 반환
     return String(minSkillId ? minSkillId - 1 : 1);

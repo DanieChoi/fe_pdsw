@@ -561,7 +561,7 @@ const DistributionLimit = () => {
 
   const { mutate : fetchCounselorList } = useApiForCampaignAssignmentAgent({
     onSuccess: (data) => {
-      console.log("#### fetchCounselorList : ",data);      
+      // console.log("#### fetchCounselorList : ",data);      
       if(data.assignedCounselorList && selectedCampaignId){
         const counselorRows: Row[] = [];
         
@@ -595,7 +595,7 @@ const DistributionLimit = () => {
   // 캠페인별 상담사 목록 조회
   const { mutate: fetchCampaignAgentList } = useApiForCampaignAgentList({
     onSuccess: (response) => {
-      console.log("#### response : ",response);
+      // console.log("#### response : ",response);
       if (response?.result_data && response.result_data.length > 0) {
         // 캠페인에 소속된 상담사 ID 목록 저장
         const agentIds = response.result_data[0].agent_id;

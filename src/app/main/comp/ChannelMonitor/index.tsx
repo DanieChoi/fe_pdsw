@@ -8,6 +8,10 @@ import { useMainStore } from '@/store';
 import { useApiForDialingDevice } from '@/features/preferences/hooks/useApiForDialingDevice';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 import { logoutChannel } from '@/lib/broadcastChannel';
+import { ChannelGroupListDataResponse, useApiForChannelGroupList } from '@/features/preferences/hooks/useApiForChannelGroup';
+import { set } from 'lodash';
+import CommonButton from '@/components/shared/CommonButton';
+import { useEnvironmentStore } from '@/store/environmentStore';
 
 type ChannelStatus = 'IDLE' | 'BUSY' | 'NONE';
 
@@ -147,8 +151,8 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
 
   // 그리드 컬럼 정의
   const columns = [
-    { key: 'CIDSNO', name: 'CIDSNO' },
-    { key: 'CHNO', name: 'CHNO' },
+    { key: 'CIDSNO', name: 'CIDS NO.' },
+    { key: 'CHNO', name: 'CH NO.' },
     { 
       key: 'status', 
       name: '상태',
@@ -203,22 +207,38 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
 
       const dataCampaignList = data.dialerChannelStatusList.filter(item => item.assign_kind === '1' && !(item.dial_mode == '0' || item.dial_mode == '2147483647') );
       if( dataCampaignList.length > 0){
-        const tempData: ItemType[] = dataCampaignList.map(item => ({
-          key: `${item.dial_mode}`,
-          name: campaigns.filter(data => data.campaign_id === Number(item.dial_mode ))[0].campaign_name
-        }));
-        setSecondModeCampaign(tempData.sort((a,b) => parseInt(a.key) - parseInt(b.key)));
+        const groupedMap = new Map<string, ItemType>();
+
+        dataCampaignList.forEach(item => {
+          const dialModeKey = `${item.dial_mode}`;
+          const matchedCampaign = campaigns.find(data => data.campaign_id === Number(item.dial_mode));
+          // 중복되지않게 key와 name을 설정 (한 캠페인에 여러개 표시되도록)
+          groupedMap.set(dialModeKey, {
+            key: dialModeKey,
+            name: matchedCampaign?.campaign_name || ''
+          }); 
+        });
+
+        const tempData: ItemType[] = Array.from(groupedMap.values()).sort((a, b) => parseInt(a.key) - parseInt(b.key));
+        setSecondModeCampaign(tempData);
       }
       
       const dataGroupList = data.dialerChannelStatusList.filter(item => item.assign_kind === '3' && !(item.dial_mode == '0' || item.dial_mode == '2147483647') );
       if( dataGroupList.length > 0){
-        const tempData: ItemType[] = dataGroupList.map(item => ({
-          key: `${item.dial_mode}`,
-          name: campaigns.filter(data => data.campaign_id === Number(item.dial_mode ))[0].campaign_name
-        }));
-        setSecondModeCampaignGroup(tempData.sort((a,b) => parseInt(a.key) - parseInt(b.key)));
+        if(allChannelGroup && allChannelGroup.length > 0){
+          // 채널그룹 모드 데이터로 변경
+          const tempData: ItemType[] = dataGroupList.map(item => ({
+            key: `${item.dial_mode}`,
+            name: allChannelGroup.filter(data => data.group_id === Number(item.dial_mode ))[0].group_name
+          }));
+          setSecondModeCampaignGroup(tempData.sort((a,b) => parseInt(a.key) - parseInt(b.key)));
+        }
       }
-      
+      setIsLoading(false);
+      setIsRefreshing(false);
+
+      const endTime = new Date();
+      setLastRefreshTime(endTime);
     },
     onError: (error) => {
       if(window.opener){
@@ -230,10 +250,28 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
           window.close();
         }
       }else{
+        console.log('ChannelMonitor: fetchChannelStateMonitoringList error', error);
         ServerErrorCheck('장비 목록 조회', error.message);  
       }
     }
   });
+
+  // 전체 채널 그룹 변수
+  const [allChannelGroup, setAllChannelGroup] = useState<ChannelGroupListDataResponse[]>();
+
+  // 전체 채널 그룹 조회
+  const { mutate : fetchChannelGroupList } = useApiForChannelGroupList({
+    onSuccess: (data) => {
+      if( data.result_code === 0 ){
+        setAllChannelGroup(data.result_data);
+      }
+    },
+    onError: (error) => {
+      
+      ServerErrorCheck('채널 그룹 목록 조회', error.message);  
+    }
+  })
+
 
   // 장비 목록 조회
   const { mutate: fetchDialingDeviceList } = useApiForDialingDevice({
@@ -266,6 +304,7 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
 
   useEffect(() => {  
     if( sseInputMessage != '' && sseInputMessage.indexOf('channel') > -1){
+      fetchChannelGroupList();
       fetchDialingDeviceList({
           tenant_id_array: tenants.map(tenant => tenant.tenant_id)
       }); 
@@ -275,6 +314,7 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
 
   useEffect(() => {   
     if( init ){
+      fetchChannelGroupList();
       fetchDialingDeviceList({
           tenant_id_array: tenants.map(tenant => tenant.tenant_id)
       }); 
@@ -294,11 +334,44 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
     }
   }, [channelMonitorFirstSelect, channelMonitorSecondSelect, channelMonitorThirdSelect]);
 
-  useEffect(() => {   
+  useEffect(() => { 
+    fetchChannelGroupList();  
     fetchDialingDeviceList({
         tenant_id_array: tenants.map(tenant => tenant.tenant_id)
     });    
   }, []);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null);
+  const { statisticsUpdateCycle } = useEnvironmentStore();
+
+  const formattedLastRefreshTime = lastRefreshTime ?
+    `${lastRefreshTime.toLocaleTimeString()}` :
+    '아직 갱신되지 않음';
+
+    
+  // 새로고침해서 fetch 하는 함수
+  const refreshData = () => {
+    setIsRefreshing(true);
+    setIsLoading(true);
+
+    fetchChannelGroupList();  
+    fetchDialingDeviceList({
+        tenant_id_array: tenants.map(tenant => tenant.tenant_id)
+    });
+  };
+
+  // 갱신주기마다 refreshData 실행 useEffect
+  useEffect(() => {
+    if (statisticsUpdateCycle > 0) {
+      const interval = setInterval(() => {
+        refreshData();
+      }, statisticsUpdateCycle * 1000);
+      return () => clearInterval(interval);
+    }
+  }, [statisticsUpdateCycle, refreshData]);
 
   return (
     <div className="h-full limit-700">
@@ -345,6 +418,41 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
 
         {/* 데이터 그리드 */}
         <div className="w-full lg:w-1/2 flex flex-col gap-5">
+
+          {/* 새로고침 버튼 표시*/}
+          <div className="flex justify-end gap-2 text-xs text-gray-500 min-w-[260px]">
+            <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md">
+              <span className="w-2 h-2 rounded-full bg-green-500" />
+              <span>
+                갱신 주기: <span className="font-medium text-blue-600">{statisticsUpdateCycle}초</span>
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md max-w[150px] min-w-[150px]">
+              <span>마지막 갱신:</span>
+              <span className="font-medium text-blue-600">{formattedLastRefreshTime}</span>
+            </div>
+            <CommonButton
+              variant="outline"
+              size="sm"
+              onClick={refreshData}
+              disabled={isLoading || isRefreshing}
+              className="flex items-center whitespace-nowrap mr-2"
+            >
+              <svg
+                className={`h-3 w-3 ${isRefreshing ? "animate-spin" : ""}`}
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {/* {isRefreshing ? "갱신중" : "새로고침"} */}
+              새로고침
+            </CommonButton>
+          </div>
+
           <div className="flex gap-2">
             <Select onValueChange={handleFirstSelectChange}>
               <SelectTrigger className="w-40">

@@ -125,7 +125,7 @@ export default function LoginPage() {
   
   const { mutate: environment } = useApirForEnvironmentList({
     onSuccess: (data) => {
-      console.log('환경설정 데이터:', data);
+      // console.log('환경설정 데이터:', data);
       centerInfo();
       setTempEnvironment(data);
       console.log('##### before tempEnvironment : ', tempEnvironment);
