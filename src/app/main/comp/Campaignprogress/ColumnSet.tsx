@@ -6,7 +6,7 @@ export interface ColumnSetProps {
   isOpen: boolean;
   onConfirm: (data: ColumnSettingItem[]) => void;
   onClose: () => void;
-  columns: any[];
+  columns: ColumnSettingItem[];
 }
 
 export interface ColumnSettingItem {
@@ -61,7 +61,7 @@ const HeaderColumn : ColumnSettingItem[] = [
   { key: 'nogautoPopNoReady', name: '팝업후 상담사 상태 변경',renderCell: ({ row }: { row: { level?: number,nogautoPopNoReady?: number } }) => (row.level === 3 ? row.nogautoPopNoReady : '')},
   { key: 'nogautoPopFailMode', name: '팝업후 상담사 모드 변경',renderCell: ({ row }: { row: { level?: number,nogautoPopFailMode?: number } }) => (row.level === 3 ? row.nogautoPopFailMode : '')},
   { key: 'nogautoDialNoReady', name: '발신 확인전 상담사 상태 변경',renderCell: ({ row }: { row: { level?: number,nogautoDialNoReady?: number } }) => (row.level === 3 ? row.nogautoDialNoReady : '')},
-  { key: 'nogautoPopFailMode', name: '발신 확인전 상담사 모드 변경',renderCell: ({ row }: { row: { level?: number,nogautoPopFailMode?: number } }) => (row.level === 3 ? row.nogautoPopFailMode : '')},
+  { key: 'nogautoDialFailMode', name: '발신 확인전 상담사 모드 변경',renderCell: ({ row }: { row: { level?: number,nogautoDialFailMode?: number } }) => (row.level === 3 ? row.nogautoDialFailMode : '')},
   { key: 'nogautoNoEmployeeId', name: '지정 상담사 정보 미입력',renderCell: ({ row }: { row: { level?: number,nogautoNoEmployeeId?: number } }) => (row.level === 3 ? row.nogautoNoEmployeeId : '')}
 ];
 
