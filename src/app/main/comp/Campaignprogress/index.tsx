@@ -629,13 +629,6 @@ export default function Campaignprogress() {
   //   }
   // }, [columns]);
 
-  useEffect(() => {
-    if (campaignTotalProgressInfoColumn.length > 0) {
-      // _setColumns([...headercolumns, ...columns]);
-      _setColumns([...headercolumns, ...campaignTotalProgressInfoColumn]);
-    }
-  }, [campaignTotalProgressInfoColumn]);
-
   // const searchCampaignProgressInformation = (_campaignId:number, _index:number) => {
   //   if (_campaignId > 0 && tempCampaignList[_index]) {
   //     fetchCampaignProgressInformation({
@@ -691,7 +684,16 @@ export default function Campaignprogress() {
 
   useEffect(() => {
     if (campaignTotalProgressInfoColumn.length === 0) {
-      setcampaignTotalProgressInfoColumn(defaultColumnsData);      
+      setcampaignTotalProgressInfoColumn(defaultColumnsData);
+    } else {
+      _setColumns([
+        ...headercolumns,
+        ...campaignTotalProgressInfoColumn.map((col) => ({
+          ...col,
+          renderCell: ({ row }: { row: TreeRow }) =>
+            row.level === 3 ? row[col.key] : ''
+        }))
+      ]);
     }
   }, [campaignTotalProgressInfoColumn]);  
 
