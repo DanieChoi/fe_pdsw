@@ -69,7 +69,6 @@ export default function LoginPage() {
 
       
 
-      console.log('##### after tempEnvironment : ', tempEnvironment);
       if( startTime === '0000' && endTime === '0000' && work === '0000000' ){
         // setStartTime("0000");
         // setEndTime("0000");          
@@ -128,7 +127,6 @@ export default function LoginPage() {
       // console.log('환경설정 데이터:', data);
       centerInfo();
       setTempEnvironment(data);
-      console.log('##### before tempEnvironment : ', tempEnvironment);
       // 환경설정 데이터를 별도 스토어에 저장
       // setEnvironment(data);
       
