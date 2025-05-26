@@ -661,7 +661,7 @@ const CampaignSettings = () => {
           <div className="mt-[20px] text-sm">
             <ul className='space-y-1'>
               <li>• 필요 이상의 예약콜 / 콜백에 대한 제한이 필요한 경우</li>
-              <li>• 입력 받을 콜 수를 제한 할 수 있습니다.</li>
+              <li>&nbsp;&nbsp;&nbsp;입력 받을 콜 수를 제한 할 수 있습니다.</li>
               <li>• 리스트 마감 시각은 콜백 리스트 초기화 시각 전으로 설정하여야 합니다.</li>
             </ul>
           </div>
