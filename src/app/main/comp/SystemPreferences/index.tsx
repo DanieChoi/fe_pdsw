@@ -860,7 +860,7 @@ const SystemPreferences = () => {
                     const channels: ChannelRow[] = selectedDeviceChannels.channel_assign
                         .map((assignValue, index) => ({
                             channelNumber: index,
-                            channelName: `Channel No ${index}`,
+                            channelName: `Channel No.${index}`,
                             mode : assignValue.toString(),
                             // mode: getChannelMode(assignValue, selectedDeviceChannels.assign_kind),
                             assignValue: assignValue
@@ -931,7 +931,7 @@ const SystemPreferences = () => {
 
             const channels: ChannelRow[] = deviceChannels.channel_assign.map((assignValue, index) => ({
                 channelNumber: index,
-                channelName: `Channel No ${index}`,
+                channelName: `Channel No.${index}`,
                 mode: getChannelMode(assignValue, currentAssignKind),
                 assignValue: assignValue,
             }));
@@ -946,7 +946,7 @@ const SystemPreferences = () => {
             // 장비의 할당모드와 같은걸 선택했다면 기존 장비의 assignValue 사용
             const channels: ChannelRow[] = deviceChannels.channel_assign.map((assignValue, index) => ({
                 channelNumber: index,
-                channelName: `Channel No ${index}`,
+                channelName: `Channel No.${index}`,
                 mode: assignValue.toString(),
                 assignValue: assignValue,
             }));
@@ -1015,22 +1015,22 @@ const SystemPreferences = () => {
                                 />
                             </div>
                             <div className="flex items-center gap-1">
-                                <Label className="w-[5.6rem] min-w-[5.6rem]">장비 이름</Label>
-                                <CustomInput 
-                                    type="text"
-                                    value={equipmentName}
-                                    onChange={(e) => setEquipmentName(e.target.value)}
-                                    disabled={!isEditable}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div className="flex items-center gap-1">
                                 <Label className="w-[5.6rem] min-w-[5.6rem]">채널 수</Label>
                                 <CustomInput 
                                     type="number" 
                                     value={refreshCycle}
                                     onChange={(e) => setRefreshCycle(e.target.value)}
                                     disabled={!isEditable || selectedDevice !== null}
+                                    className="w-full"
+                                />
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <Label className="w-[5.6rem] min-w-[5.6rem]">장비 이름</Label>
+                                <CustomInput 
+                                    type="text"
+                                    value={equipmentName}
+                                    onChange={(e) => setEquipmentName(e.target.value)}
+                                    disabled={!isEditable}
                                     className="w-full"
                                 />
                             </div>
