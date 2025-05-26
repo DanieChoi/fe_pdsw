@@ -12,6 +12,7 @@ import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiF
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useEnvironmentStore } from '@/store/environmentStore';
 import CommonButton from '@/components/shared/CommonButton';
+import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 
 // 타입 정의
 interface Stats {
@@ -215,7 +216,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       setSelectedCampaign(value);
     }
 
-    
+
     // const existingTabs = openedTabs.filter(tab => tab.id === 5);
     // existingTabs.forEach(tab => {
     //   removeTab(tab.id, tab.uniqueKey);
@@ -342,13 +343,23 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
 
       const endTime = new Date();
       setLastRefreshTime(endTime);
-    } 
+    },
+    onError: (error) => {
+      
+      setIsLoading(false);
+      setIsRefreshing(false);
+      
+      ServerErrorCheck('발신진행상태 조회', error.message);
+    }
   });
   
   // 전화번호설명 템플릿 조회
   const { mutate: fetchPhoneDescriptions } = useApiForPhoneDescription({
     onSuccess: (data) => {
       setPhoneDescriptions(data.result_data||[]);
+    },
+    onError: (error) => {
+      ServerErrorCheck('전화번호설명 템플릿 조회', error.message);
     }
   });
 
@@ -356,6 +367,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
   const { mutate: fetchCampaignSkills } = useApiForCampaignSkill({
     onSuccess: (data) => {
       setCampaignSkills(data.result_data);
+    },
+    onError: (error) => {
+      ServerErrorCheck('캠페인스킬 조회', error.message);
     }
   });
 

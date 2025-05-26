@@ -420,7 +420,8 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
         <div className="w-full lg:w-1/2 flex flex-col gap-5">
 
           {/* 새로고침 버튼 표시*/}
-          <div className="flex justify-end gap-2 text-xs text-gray-500 min-w-[260px]">
+          { init === undefined && 
+          (<div className="flex justify-end gap-2 text-xs text-gray-500 min-w-[260px]">
             <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md">
               <span className="w-2 h-2 rounded-full bg-green-500" />
               <span>
@@ -452,6 +453,7 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
               새로고침
             </CommonButton>
           </div>
+        )}  
 
           <div className="flex gap-2">
             <Select onValueChange={handleFirstSelectChange}>
