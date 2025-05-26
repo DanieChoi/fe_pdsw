@@ -11,6 +11,7 @@ import { useMainStore, useCampainManagerStore, useAuthStore, useTabStore } from 
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useApiForPhoneDescription';
 import { useEnvironmentStore } from '@/store/environmentStore';
+import CommonButton from '@/components/shared/CommonButton';
 
 // 타입 정의
 interface Stats {
@@ -120,8 +121,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       distributing: 0
     },
     barData: [
-      { name: '최초 발신용', value: 0 },
-      { name: '재시도 발신용', value: 0 },
+      { name: '최초 발신중', value: 0 },
+      { name: '재시도 발신중', value: 0 },
       { name: '분배 대기', value: 0 }
     ],
     gridData: []
@@ -141,15 +142,15 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     // 모든 캠페인의 바 차트 데이터 합계 계산
     const totalBarData = [
       {
-        name: '최초 발신용',
+        name: '최초 발신중',
         value: Object.values(_campaignData).reduce((sum, campaign) =>
-          sum + (campaign.barData.find(item => item.name === '최초 발신용')?.value ?? 0), 0
+          sum + (campaign.barData.find(item => item.name === '최초 발신중')?.value ?? 0), 0
         )
       },
       {
-        name: '재시도 발신용',
+        name: '재시도 발신중',
         value: Object.values(_campaignData).reduce((sum, campaign) =>
-          sum + (campaign.barData.find(item => item.name === '재시도 발신용')?.value ?? 0), 0
+          sum + (campaign.barData.find(item => item.name === '재시도 발신중')?.value ?? 0), 0
         )
       },
       {
@@ -257,11 +258,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
               _retryCall: tempList[i].reuseCount === 2 ? 1 : 0, //재시도발신
               distributing: tempList[i].waitingLstCnt, //분배 대기
               result: campaigns.find((campaign) => campaign.campaign_id === tempList[i].campaignId)?.end_flag === 1 ? '진행중' : '완료',
-              phoneType: (() => {
-                const campaign = campaigns.find((campaign) => campaign.campaign_id === tempList[i].campaignId);
-                const phoneDescription = phoneDescriptions.find((phoneDescription) => phoneDescription.description_id === campaign?.dial_phone_id);
-                return phoneDescription ? (phoneDescription as any)[`phone${tempList[i].dialedPhone}`] || '' : '';
-              })()
+              phoneType: tempList[i].reuseCount.toString(),
             });
           }else{
             // sumCallProgressStatus[index].waiting += tempList[i].waiting;
@@ -282,8 +279,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
                 distributing: sumCallProgressStatus[i].distributing//분배 대기
               },
               barData: [
-                { name: '최초 발신용', value: sumCallProgressStatus[i].firstCall },  //최초 발신용
-                { name: '재시도 발신용', value: sumCallProgressStatus[i].retryCall },  //재시도 발신용
+                { name: '최초 발신중', value: sumCallProgressStatus[i].firstCall },  //최초 발신용 --> 최초 발신중 변경 0526
+                { name: '재시도 발신중', value: sumCallProgressStatus[i].retryCall },  //재시도 발신용 --> 최초 발신중 변경 0526
                 // { name: '분배 대기', value: sumCallProgressStatus[i].waiting - (sumCallProgressStatus[i].firstCall+sumCallProgressStatus[i].retryCall) }   //분배 대기
                 { name: '분배 대기', value: sumCallProgressStatus[i].distributing }   //분배 대기
               ],
@@ -339,6 +336,12 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
       // setDataList(tempList);
       // setSelectedCall(tempList[0]);
       // console.log("API 응답 데이터:", tempList); 
+
+      setIsLoading(false);
+      setIsRefreshing(false);
+
+      const endTime = new Date();
+      setLastRefreshTime(endTime);
     } 
   });
   
@@ -361,6 +364,9 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
+    setIsRefreshing(true);
+    setIsLoading(true);
+
     if( selectedCampaign != 'all' && campaigns && campaigns.length > 0 ){
       const campaignInfo = campaigns.find(data => data.campaign_id === Number(selectedCampaign));
       const tenantId = campaignInfo?.tenant_id+'' || '1';
@@ -450,11 +456,55 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     }
   }, []);
 
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null);
+
+  const formattedLastRefreshTime = lastRefreshTime ?
+    `${lastRefreshTime.toLocaleTimeString()}` :
+    '아직 갱신되지 않음';
+
+    
+  // 새로고침해서 fetch 하는 함수
+  const refreshData = () => {
+    setIsRefreshing(true);
+    setIsLoading(true);
+
+    const campaignInfo = campaigns.find(data => data.campaign_id === Number(selectedCampaign));
+    const tenantId = campaignInfo?.tenant_id+'' || '1';
+    const campaignId = campaignInfo?.campaign_id+'' || '0';
+    fetchCallProgressStatus({ tenantId, campaignId });
+
+    fetchCampaignSkills({
+      session_key: session_key,
+      tenant_id: tenant_id,
+    });
+
+    fetchPhoneDescriptions({
+      session_key: session_key,
+      tenant_id: tenant_id,
+    });  
+
+  };
+
+  // 갱신주기마다 refreshData 실행 useEffect
+  useEffect(() => {
+    if (statisticsUpdateCycle > 0) {
+      const interval = setInterval(() => {
+        refreshData();
+      }, statisticsUpdateCycle * 1000);
+      return () => clearInterval(interval);
+    }
+  }, [statisticsUpdateCycle, refreshData]);
+
   return (
     <div className="flex flex-col gap-5 h-full out-wrap limit-700">
       {shouldRenderSelect && (
-        <div className="flex items-center gap-2">
-          <Label className="w-20 min-w-20">캠페인</Label>
+        <div className="flex justify-between items-center gap-2">
+          <div className='flex items-center gap-2'>
+            <Label className="w-20 min-w-20">캠페인</Label>
           <Select onValueChange={handleCampaignChange} value={selectedCampaign}>
             <SelectTrigger className="w-48">
               <SelectValue placeholder="캠페인 전체" />
@@ -468,6 +518,42 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
               ))}
             </SelectContent>
           </Select>
+
+          </div>
+          
+          {/* 새로고침 버튼 표시*/}
+          <div className="flex justify-end gap-2 text-xs text-gray-500 min-w-[260px]">
+            <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md">
+              <span className="w-2 h-2 rounded-full bg-green-500" />
+              <span>
+                갱신 주기: <span className="font-medium text-blue-600">{statisticsUpdateCycle}초</span>
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md max-w[150px] min-w-[150px]">
+              <span>마지막 갱신:</span>
+              <span className="font-medium text-blue-600">{formattedLastRefreshTime}</span>
+            </div>
+            <CommonButton
+              variant="outline"
+              size="sm"
+              onClick={refreshData}
+              disabled={isLoading || isRefreshing}
+              className="flex items-center whitespace-nowrap mr-2"
+            >
+              <svg
+                className={`h-3 w-3 ${isRefreshing ? "animate-spin" : ""}`}
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {/* {isRefreshing ? "갱신중" : "새로고침"} */}
+              새로고침
+            </CommonButton>
+          </div>
         </div>
       )}
 
