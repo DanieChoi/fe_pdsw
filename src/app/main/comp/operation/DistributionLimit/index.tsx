@@ -1169,6 +1169,9 @@ const DistributionLimit = () => {
     
     // 영향을 받는 상담사 ID 찾기 - 정확한 필터링으로 수정
     let targetAgents: Row[] = [];
+
+    console.log('bulkLimitModal.targetGroup' , bulkLimitModal.targetGroup);
+    console.log('agent.group' , rawAgentData.map(agent => agent.group));
     
     if (bulkLimitModal.targetLevel === 1) {
       // 상담 그룹에 속한 모든 상담사만 정확히 필터링
