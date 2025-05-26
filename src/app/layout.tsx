@@ -33,14 +33,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
+
   return (
     <html lang="en">
 
-      <head>
-      <Script src="/env.js" strategy="afterInteractive" />
+      {/* <head>
+        <Script src="/env.js" strategy="afterInteractive" />
 
+      </head> */}
+
+      <head>
+        <Script src="/env.js" strategy="afterInteractive" />
+        <link rel="icon" href="/nexpds.ico" type="image/x-icon" />
       </head>
+
 
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased body-top`}
