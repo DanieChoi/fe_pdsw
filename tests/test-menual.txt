@@ -1,0 +1,179 @@
+# 🚀 Playwright 테스트 실행 명령어 완전 정리
+
+## 📌 기본 실행 명령어
+```bash
+# 모든 테스트 실행
+npx playwright test
+
+# 특정 파일만 실행
+npx playwright test campaign-status-change
+npx playwright test campaign-management-navigation
+
+# 특정 테스트만 실행 (test 이름으로)
+npx playwright test -g "캠페인 상태가 멈춤이면"
+npx playwright test -g "캠페인 관리 탭이"
+```
+
+## 🐛 디버깅 명령어
+```bash
+# UI 모드로 실행 (시각적 디버깅) ⭐ 가장 많이 사용
+npx playwright test --ui
+
+# 디버그 모드로 실행 (브라우저 개발자 도구와 함께)
+npx playwright test --debug
+
+# 특정 테스트를 디버그 모드로
+npx playwright test --debug campaign-status-change
+npx playwright test --debug -g "캠페인"
+```
+
+## 🖥️ 헤드리스/헤드풀 모드
+```bash
+# 헤드리스 모드 (브라우저 창 안 보임, 빠름)
+npx playwright test --headed=false
+
+# 헤드풀 모드 (브라우저 창 보임, 느림)
+npx playwright test --headed
+
+# CI 환경에서 헤드리스로 실행
+CI=true npx playwright test
+```
+
+## 📊 보고서 관련
+```bash
+# 테스트 실행 (보고서 자동 열림)
+npx playwright test
+
+# 보고서만 다시 열기
+npx playwright show-report
+
+# 보고서 생성 위치 확인
+ls playwright-report/
+```
+
+## 🔧 실행 옵션
+```bash
+# 병렬 실행 (workers 오버라이드)
+npx playwright test --workers=2
+npx playwright test --workers=4
+
+# 재시도 없이 실행
+npx playwright test --retries=0
+
+# 실패한 테스트만 다시 실행
+npx playwright test --last-failed
+
+# 특정 디렉토리의 테스트만 실행
+npx playwright test tests/
+npx playwright test tests/campaign*
+```
+
+## 🔍 정보 확인 명령어
+```bash
+# 테스트 목록만 보기
+npx playwright test --list
+
+# 프로젝트 목록 확인
+npx playwright test --list-projects
+
+# 설정 확인 (실제 실행 없이)
+npx playwright test --dry-run
+
+# Playwright 버전 확인
+npx playwright --version
+```
+
+## 🎯 개발 중 자주 사용하는 명령어
+
+### 개발/디버깅할 때:
+```bash
+npx playwright test --ui                    # UI 모드 (가장 추천)
+npx playwright test --debug campaign       # 특정 테스트 디버깅
+```
+
+### 완성된 테스트 실행할 때:
+```bash
+npx playwright test                         # 전체 실행
+npx playwright test campaign               # 캠페인 관련만 실행
+```
+
+### CI/CD에서 사용할 때:
+```bash
+npx playwright test --headed=false --workers=1
+```
+
+## 📦 package.json 스크립트 (선택사항)
+```json
+{
+  "scripts": {
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui",
+    "test:debug": "npx playwright test --debug",
+    "test:report": "npx playwright show-report",
+    "test:campaign": "npx playwright test campaign",
+    "test:headless": "npx playwright test --headed=false"
+  }
+}
+```
+
+스크립트 추가 후 사용:
+```bash
+npm run test              # 전체 테스트
+npm run test:ui           # UI 모드
+npm run test:debug        # 디버그 모드
+npm run test:campaign     # 캠페인 테스트만
+```
+
+## 🎪 고급 명령어
+```bash
+# 특정 브라우저로만 실행
+npx playwright test --project=firefox
+npx playwright test --project=chromium
+
+# 환경변수와 함께 실행
+NODE_ENV=test npx playwright test
+
+# 타임아웃 설정
+npx playwright test --timeout=120000
+
+# 특정 태그가 있는 테스트만 실행
+npx playwright test --grep "@smoke"
+npx playwright test --grep-invert "@slow"
+```
+
+## 🚨 트러블슈팅 명령어
+```bash
+# Playwright 재설치
+npm uninstall @playwright/test
+npm install @playwright/test
+npx playwright install
+
+# 브라우저 재설치
+npx playwright install firefox
+
+# 캐시 클리어
+rm -rf playwright-report/
+rm -rf test-results/
+```
+
+## ⭐ 자주 사용하는 TOP 5
+1. `npx playwright test --ui` (개발 중)
+2. `npx playwright test` (전체 실행)
+3. `npx playwright test campaign` (특정 테스트)
+4. `npx playwright test --debug` (디버깅)
+5. `npx playwright show-report` (보고서 보기)
+
+## 🔥 현재 프로젝트 설정 기준 명령어
+```bash
+# 순차 실행 (workers: 1)
+npx playwright test
+
+# Firefox만 사용
+npx playwright test --project=firefox
+
+# 헤드풀 모드 (headless: false)
+npx playwright test --headed
+
+# HTML 보고서 자동 열림 (open: 'always')
+# 테스트 완료 후 자동으로 브라우저에 보고서 열림
+```
