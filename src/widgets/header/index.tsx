@@ -396,13 +396,6 @@ export default function Header() {
       store.setSkillsLoading(true);
       console.log("Starting skills data fetch from header");
 
-      // 테넌트 ID 준비
-      // const tenant_id_array = tenant_id === 0 
-      //   ? tenants.map(tenant => tenant.tenant_id)
-      //   : [tenant_id];
-
-      // // 스킬 데이터 로드
-      // fetchSkills({ tenant_id_array });
     }
   }, [tenants, _sessionKey]);
 
@@ -435,7 +428,6 @@ export default function Header() {
                 )}
               </div>
 
-
               <Image
                 src="/header-menu/top_pic.svg"
                 alt="사용자"
@@ -467,45 +459,6 @@ export default function Header() {
         {/* useAlramPopup: {useAlramPopup} */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between header-padding">
-            {/* <nav className="flex overflow-x-auto gap-3">
-              {menuItems
-                // availableHeaderMenuIds에 있는 메뉴만 필터링
-                .filter(item => availableHeaderMenuIds?.includes(item.menuId))
-                .map((item) => {
-                  const count = getTabCountById(item.id);
-                  const isActive = isActiveTab(item.id);
-                  const isOpened = isTabOpened(item.id);
-
-                  return (
-                    <div key={`menu-${item.id}`} className="menu-item">
-                      <CommonButton
-                        variant={isActive ? 'menuActive' : (isOpened ? 'menuOpened' : 'menu')}
-                        size="default"
-                        onClick={(e) => handleMenuClick(item, e)}
-                        className="relative py-1.5 px-2"
-                      >
-                        <div className="flex items-center justify-center">
-                          <Image
-                            src={item.icon}
-                            alt={item.title}
-                            width={32}
-                            height={32}
-                            className="object-contain"
-                          />
-                        </div>
-                        <div className="flex items-center">
-                          <span className={`text-xs whitespace-nowrap ${isActive ? 'text-white' : 'text-[#333]'}`}>{item.title}</span>
-                          {count > 1 && (
-                            <span className="ml-1 px-1.5 py-0.5 text-[10px] leading-none bg-[#E5F3F3] text-[#5BC2C1] rounded-full min-w-[16px] text-center">
-                              {count}
-                            </span>
-                          )}
-                        </div>
-                      </CommonButton>
-                    </div>
-                  );
-                })}
-            </nav> */}
 
             <nav className="flex overflow-x-auto gap-3">
               {menuItems
