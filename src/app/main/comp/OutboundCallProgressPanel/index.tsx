@@ -259,7 +259,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
               _retryCall: tempList[i].reuseCount === 2 ? 1 : 0, //재시도발신
               distributing: tempList[i].waitingLstCnt, //분배 대기
               result: campaigns.find((campaign) => campaign.campaign_id === tempList[i].campaignId)?.end_flag === 1 ? '진행중' : '완료',
-              phoneType: tempList[i].reuseCount.toString(),
+              phoneType: tempList[i].dialedPhone + '', // 발신번호 구분으로 예측되는 dialedPhone 컬럼으로 변경 (05/27)
             });
           }else{
             // sumCallProgressStatus[index].waiting += tempList[i].waiting;
@@ -487,8 +487,8 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     setIsLoading(true);
 
     const campaignInfo = campaigns.find(data => data.campaign_id === Number(selectedCampaign));
-    const tenantId = campaignInfo?.tenant_id+'' || '1';
-    const campaignId = campaignInfo?.campaign_id+'' || '0';
+    const tenantId = campaignInfo?.tenant_id+'' !== 'undefined' ? campaignInfo?.tenant_id+'' : '1';
+    const campaignId = campaignInfo?.campaign_id+'' !== 'undefined' ? campaignInfo?.campaign_id+'' : '0';
     fetchCallProgressStatus({ tenantId, campaignId });
 
     fetchCampaignSkills({
