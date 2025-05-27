@@ -5,13 +5,12 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { create } from "zustand";
 import { TreeItem } from "@/features/campaignManager/types/typeForSidebar2";
 import { TreeNodeForCampaignTab } from "../../../features/campaignManager/components/treeMenus/TreeNodeForCampaignTab";
-import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { getStatusIcon } from "@/components/shared/layout/utils/utils";
 import { useSidebarWidthStore } from "@/widgets/sidebar2/store/useSidebarWidthStore";
 import { useAuthStore, useMainStore } from "@/store";
 import { useTreeMenuStore, ViewMode } from "@/store/storeForSsideMenuCampaignTab";
 import { useShallow } from "zustand/react/shallow";
-import { getStatusFromFlags } from "../../../features/campaignManager/api/apiForGetTreeMenuDataForSideMenu";
+import { getStatusFromFlags } from "../api/apiForGetTreeMenuDataForSideMenu";
 
 
 // 트리 노드 선택/확장 상태 관리
@@ -185,19 +184,6 @@ export function TreeMenusForCampaigns() {
   );
 
 
-
-  // console.log("노드 출력을 위한 데이터:", originalItems);
-
-
-  // expandNodes 함수와 원본 아이템을 전역으로 사용할 수 있도록 저장
-  // useEffect(() => {
-  //   window.treeExpandNodes = expandNodes;
-  //   window.originalTreeItems = originalItems;
-  //   window.treeSavePreviousState = savePreviousState;
-  //   window.treeRestorePreviousState = restorePreviousState;
-  // }, [expandNodes, originalItems, savePreviousState, restorePreviousState]);
-
-
   // 통합 스토어에서 정렬 및 필터링 상태 가져오기
   const {
     campaignSort,
@@ -360,18 +346,6 @@ export function TreeMenusForCampaigns() {
       return item;
     });
   }
-
-  // 정렬 상태가 변경될 때마다 UI 업데이트 강제
-  // useEffect(() => {
-  //   console.log("정렬/필터 상태 변경 감지");
-
-  //   // 디바운스 처리로 연속 업데이트 방지
-  //   const debounceTimer = setTimeout(() => {
-  //     setForceUpdate(prev => prev + 1);
-  //   }, 100); // 100ms 디바운스
-
-  //   return () => clearTimeout(debounceTimer);
-  // }, [campaignSort.type, campaignSort.direction, selectedNodeType]);
 
   const filteredItems = useMemo(() => filterTreeItems(originalItems), [originalItems, filterMode, selectedSkillIds]);
   const sortedItems = useMemo(() => sortTreeItems(filteredItems), [filteredItems, campaignSort, selectedNodeType]);

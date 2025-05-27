@@ -1,13 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import useApiForGetSkillsWithCampaigns from '@/widgets/sidebar/hooks/useApiForGetSkillsWithCampaigns';
-import { useTotalCampaignListForAddCampaignToCampaignGroup } from '@/widgets/sidebar/hooks/useTotalCampaignListForAddCampaignToCampaignGroup';
-import { useTotalSkillListForAddCampaignToCampaignGroup } from '@/widgets/sidebar/hooks/useTotalSkillListForAddCampaignToCampaignGroup';
-import useApiForGetCampaignListForCampaignGroup from '@/widgets/sidebar/hooks/useApiForGetCampaignListForCampaignGroup';
+import useApiForGetSkillsWithCampaigns from '@/shared/hooks/skill/useApiForGetSkillsWithCampaigns';
 import { CampaignInfo, SkillInfo } from '@/widgets/sidebar2/api/type/typeForAddCampaignForCampaignGroup';
 import GroupCampaignList from './GroupCampaignList';
 import ITableForSkillListWithCampaign from './ITableForSkillListWithCampaign';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { toast } from 'react-toastify';
 import useApiForAddCampaignToSpecificCampaignGroup from '../../hooks/useApiForAddCampaignToSpecificCampaignGroup';
@@ -18,6 +14,9 @@ import TitleWrap from "@/components/shared/TitleWrap";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { CustomInput } from "@/components/shared/CustomInput";
 import { useCampainManagerStore } from '@/store/campainManagerStore';
+import useApiForGetCampaignListForCampaignGroup from '@/shared/hooks/campaign/useApiForGetCampaignListForCampaignGroup';
+import { useTotalSkillListForAddCampaignToCampaignGroup } from '@/widgets/sidebar2/hooks/useTotalSkillListForAddCampaignToCampaignGroup';
+import { useTotalCampaignListForAddCampaignToCampaignGroup } from '@/shared/hooks/campaign/useTotalCampaignListForAddCampaignToCampaignGroup';
 
 interface SkillWithCampaigns {
   skillId: number;
@@ -140,28 +139,7 @@ const CampaignAddPopup: React.FC<Props> = ({
     }
   }, [skillListData]);
 
-  // useEffect(() => {
-  //   if (data?.result_data) {
-  //     const skillMap: Record<number, SkillWithCampaigns> = {};
-  //     data.result_data.forEach(campaign => {
-  //       if (Array.isArray(campaign.skill_id)) {
-  //         campaign.skill_id.forEach(skillId => {
-  //           if (!skillMap[skillId]) {
-  //             skillMap[skillId] = { skillId, campaigns: [] };
-  //           }
-  //           if (!skillMap[skillId].campaigns.some(c => c.campaignId === campaign.campaign_id)) {
-  //             skillMap[skillId].campaigns.push({
-  //               campaignId: campaign.campaign_id,
-  //               tenantId: campaign.tenant_id
-  //             });
-  //           }
-  //         });
-  //       }
-  //     });
-  //     const skillArray = Object.values(skillMap).sort((a, b) => a.skillId - b.skillId);
-  //     setSkillsWithCampaigns(skillArray);
-  //   }
-  // }, [data]);
+
 
   useEffect(() => {
     // 데이터 로그 추가

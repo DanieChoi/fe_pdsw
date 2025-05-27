@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react';
 import CustomAlert from '@/components/shared/layout/CustomAlert';
+import React from 'react';
 
 export interface IDialogButtonForDeleteCampaignGroupProps {
   isOpen: boolean;

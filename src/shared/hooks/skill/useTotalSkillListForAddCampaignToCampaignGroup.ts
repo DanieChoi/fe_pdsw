@@ -2,7 +2,7 @@ import { useQuery, UseMutationOptions, UseQueryOptions } from '@tanstack/react-q
 import {
   SkillListResponse,
 } from '@/widgets/sidebar2/api/type/typeForAddCampaignForCampaignGroup';
-import { getTotalSkillList } from '../../sidebar2/api/apiForAddCampaginForCampaignGroup';
+import { getTotalSkillList } from '@/widgets/sidebar2/api/apiForAddCampaginForCampaignGroup';
 
 /**
  * 스킬 목록을 가져오는 React Query 훅

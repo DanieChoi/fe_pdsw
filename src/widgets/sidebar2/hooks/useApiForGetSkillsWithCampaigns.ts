@@ -3,7 +3,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { 
   CampaignSkillsResponse 
-} from '@/widgets/sidebar/api/type/typeForAddCampaignForCampaignGroup';
+} from '@/types/typeForAddCampaignForCampaignGroup';
 import { getSkilsWithCampaigns } from '@/widgets/sidebar2/api/apiForAddCampaginForCampaignGroup';
 
 /**

@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { CampaignGroupSkillsResponse } from '@/widgets/sidebar/api/type/typeForAddCampaignForCampaignGroup';
+import { CampaignGroupSkillsResponse } from '@/types/typeForAddCampaignForCampaignGroup';
 import { getCampaignListForCampaignGroup } from '@/widgets/sidebar2/api/apiForAddCampaginForCampaignGroup';
 
 /**

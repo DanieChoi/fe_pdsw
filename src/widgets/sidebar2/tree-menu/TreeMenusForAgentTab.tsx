@@ -7,11 +7,10 @@ import { useApiForSidebarCounselor } from "@/features/campaignManager/hooks/useA
 import { WindowStateUtils } from "@/features/campaignManager/hooks/useApiDeleteCounselorsFromSkills";
 import { TreeNodeForCounselorListForSideBar } from "../../../features/campaignManager/components/treeMenus/TreeNodeForCounselorListForSideBar";
 import { SearchBarForSideMenuForCounselorTab } from "../../../features/campaignManager/components/treeMenus/searchbar/SearchBarForSideMenuForCounselorTab";
-import { findCounselorInfo, getAllCounselors } from "../../../features/campaignManager/components/treeMenus/searchbar/utilsForSideMenuForCounselorTab";
 import { useCounselorFilterStore, NodeType } from "@/store/storeForSideMenuCounselorTab";
 import { toast } from "react-toastify";
 import { CounselorTreeLevelSelector } from "../../../features/campaignManager/components/treeMenus/option/CounselorTreeLevelSelector";
-import { IOrganization, ITenant, IGroup, ITeam, ICounselor } from "@/features/campaignManager/types/typeForSideBarCounselorTab2";
+import { IOrganization } from "@/features/campaignManager/types/typeForSideBarCounselorTab2";
 
 interface ISkill {
   skillId: string;

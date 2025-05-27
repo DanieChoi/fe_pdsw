@@ -1,4 +1,3 @@
-// src/widgets/sidebar/hooks/useApiForAddCampaignToSpecificCampaignGroup.ts
 import { useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-query';
 import { UseMutationOptions } from '@tanstack/react-query';
 import { SuccessResponse } from '@/features/campaignManager/types/typeForCampaignGroupForSideBar';

@@ -8,7 +8,7 @@ import {
   CampaignSkillsResponse,
   CampaignGroupSkillsResponse,
   CampaignGroupSkillsRequest
-} from "@/widgets/sidebar/api/type/typeForAddCampaignForCampaignGroup";
+} from "@/types/typeForAddCampaignForCampaignGroup";
 
 /**
  * 모든 스킬 정보를 가져오는 API 함수

@@ -1,7 +1,7 @@
 import { useQuery, UseMutationOptions, UseQueryOptions } from '@tanstack/react-query';
 import {
   SkillListResponse,
-} from '@/widgets/sidebar/api/type/typeForAddCampaignForCampaignGroup';
+} from '@/types/typeForAddCampaignForCampaignGroup';
 import { getTotalSkillList } from '../api/apiForAddCampaginForCampaignGroup';
 
 /**

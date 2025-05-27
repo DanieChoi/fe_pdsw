@@ -3,11 +3,9 @@
 
 import { useEffect, useState } from "react";
 import { Settings } from "lucide-react";
-import { NotificationSetup } from "@/app/_components/NotificationSetup";
-import { NotificationListener } from "@/app/_components/NotificationListener";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ToastContainer } from "react-toastify";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import "react-toastify/dist/ReactToastify.css";
 
 const queryClient = new QueryClient({
@@ -59,7 +57,6 @@ export default function ClientProvider({ children }: { children: React.ReactNode
   if (!isEnvLoaded) {
     // ⚙️ 톱니바퀴(Settings) 아이콘 로더 적용!
     return <SettingsLoader />;
-    
   }
 
   return (

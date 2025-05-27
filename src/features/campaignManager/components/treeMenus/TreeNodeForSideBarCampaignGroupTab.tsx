@@ -18,7 +18,7 @@ import { IContextMenuForCampaignForCampaignGroup, CampaignStatus } from "./Conte
 import IContextMenuForCampaignGroupAtCampaignGroup from "./ContextMenus/IContextMenuForCampaignGroupAtCampaignGroup";
 import IContextMenuForTenantAtCampaignGroup from "./ContextMenus/IContextMenuForTenantAtCampaignGroup";
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
-import IDialogButtonForDeleteCampaignGroup from "@/widgets/sidebar/dialogs/IDialogButtonForDeleteCampaignGroup";
+import IDialogButtonForDeleteCampaignGroup from "@/widgets/sidebar2/dialog/IDialogButtonForDeleteCampaignGroup";
 import { useApiForMultiUpdateCampaignProgressStatus } from "../treeMenus/hook/useApiForMultiUpdateCampaignProgressStatus";
 import {
   Dialog,

@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { CampaignListResponse } from '../api/type/typeForAddCampaignForCampaignGroup';
-import { getTotalCampaignList } from '../api/apiForAddCampaginForCampaignGroup';
+import { CampaignListResponse } from '@/types/typeForAddCampaignForCampaignGroup';
+import { getTotalCampaignList } from '@/widgets/sidebar2/api/apiForAddCampaginForCampaignGroup';
 
 /**
  * 캠페인 목록을 가져오는 React Query 훅
