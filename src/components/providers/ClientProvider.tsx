@@ -96,7 +96,7 @@ const queryClient = new QueryClient({
 const SettingsLoader = () => (
   <div className="flex items-center justify-center py-10">
     <Settings className="w-5 h-5 text-indigo-500 animate-spin mr-3" />
-    <span className="text-sm text-gray-600">환경 설정 로딩 중...</span>
+    <span className="text-sm text-gray-600">환경 설정 로딩중...</span>
   </div>
 );
 
@@ -106,7 +106,7 @@ const GradientBarLoader = () => (
     <div className="w-48 h-1.5 bg-gray-200 rounded-full overflow-hidden">
       <div className="w-full h-full bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500 rounded-full animate-pulse transform scale-x-75 origin-left"></div>
     </div>
-    <span className="text-sm text-gray-600">환경 설정 로딩 중...</span>
+    <span className="text-sm text-gray-600">환경 설정 로딩중...</span>
   </div>
 );
 
@@ -119,7 +119,7 @@ const WaveDotsLoader = () => (
       <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full animate-bounce" style={{ animationDelay: '400ms', animationDuration: '1400ms' }}></div>
       <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-red-500 rounded-full animate-bounce" style={{ animationDelay: '600ms', animationDuration: '1400ms' }}></div>
     </div>
-    <span className="text-sm text-gray-600">환경 설정 로딩 중...</span>
+    <span className="text-sm text-gray-600">환경 설정 로딩중...</span>
   </div>
 );
 
@@ -157,9 +157,6 @@ export default function ClientProvider({ children }: { children: React.ReactNode
     // ⚙️ 톱니바퀴(Settings) 아이콘 로더 적용!
     return <SettingsLoader />;
     
-    // 다른 옵션들:
-    // return <GradientBarLoader />;     // 그라데이션 바 (막대 그래프 스타일)
-    // return <WaveDotsLoader />;        // 웨이브 도트 (장난스럽고 귀여움)
   }
 
   return (
