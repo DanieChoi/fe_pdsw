@@ -739,7 +739,7 @@ export const useTabStore = create<TabLayoutStore>()(
               useOperationStore.getState().clearOperationCampaign();
             }
 
-            if(tabId === 10){
+            if (tabId === 10) {
               useSystemDeviceStore.getState().setSaveSelectDevice('');
             }
 
@@ -1055,6 +1055,8 @@ export const useTabStore = create<TabLayoutStore>()(
         //   }),
 
         // Updated moveTabToSection function to preserve section widths
+        // Store의 moveTabToSection 함수를 이것으로 교체하세요
+
         moveTabToSection: (
           tabId: number,
           targetRowId: string,
@@ -1067,81 +1069,118 @@ export const useTabStore = create<TabLayoutStore>()(
             );
             if (!movedTab) return state;
 
-            // First, find the source section that contains the tab
+            // 소스 섹션 정보 찾기
             let sourceRowId = "";
             let sourceSectionId = "";
+            let sourceSection = null;
+            let sourceRow = null;
 
-            // Find which row and section the tab is currently in
-            state.rows.forEach((row) => {
-              row.sections.forEach((sec) => {
-                const hasTab = sec.tabs.some(
-                  (t) => t.id === tabId && t.uniqueKey === draggedTabKey
-                );
-                if (hasTab) {
+            for (const row of state.rows) {
+              for (const section of row.sections) {
+                if (section.tabs.some(t => t.id === tabId && t.uniqueKey === draggedTabKey)) {
                   sourceRowId = row.id;
-                  sourceSectionId = sec.id;
+                  sourceSectionId = section.id;
+                  sourceSection = section;
+                  sourceRow = row;
+                  break;
                 }
-              });
-            });
-
-            // Store the current section widths before making any changes
-            const sourceTargetRow = state.rows.find((r) => r.id === targetRowId);
-            const originalWidths = sourceTargetRow ? [...sourceTargetRow.sections.map(s => s.width)] : [];
-
-            const updatedRows = state.rows.map((row) => ({
-              ...row,
-              sections: row.sections.map((sec) => ({
-                ...sec,
-                tabs: sec.tabs.filter(
-                  (t) => !(t.id === tabId && t.uniqueKey === draggedTabKey)
-                ),
-                activeTabKey:
-                  sec.activeTabKey === draggedTabKey
-                    ? sec.tabs.length > 1
-                      ? sec.tabs[sec.tabs.length - 2].uniqueKey
-                      : null
-                    : sec.activeTabKey,
-              })),
-            }));
-
-            const targetRowIndex = updatedRows.findIndex((r) => r.id === targetRowId);
-            if (targetRowIndex === -1) return state;
-
-            const targetRow = updatedRows[targetRowIndex];
-            const targetSectionIndex = targetRow.sections.findIndex(
-              (s) => s.id === targetSectionId
-            );
-            if (targetSectionIndex === -1) return state;
-
-            const targetSec = targetRow.sections[targetSectionIndex];
-            const newTabs = [...targetSec.tabs, movedTab];
-
-            const updatedTargetSec = {
-              ...targetSec,
-              tabs: newTabs,
-              activeTabKey: movedTab.uniqueKey,
-            };
-
-            const replacedSections = [...targetRow.sections];
-            replacedSections[targetSectionIndex] = updatedTargetSec;
-
-            // If we're in the same row and just moving between sections, preserve the widths
-            if (sourceRowId === targetRowId && originalWidths.length > 0) {
-              updatedRows[targetRowIndex] = {
-                ...targetRow,
-                sections: replacedSections.map((section, index) => ({
-                  ...section,
-                  width: originalWidths[index] || section.width
-                }))
-              };
-            } else {
-              // For moving to a different row or other cases, use adjustSectionWidths
-              updatedRows[targetRowIndex] = {
-                ...targetRow,
-                sections: adjustSectionWidths(replacedSections),
-              };
+              }
+              if (sourceSection) break;
             }
 
+            // 같은 위치로 이동하는 경우 변경하지 않음
+            if (sourceRowId === targetRowId && sourceSectionId === targetSectionId) {
+              return state;
+            }
+
+            // 타겟 행과 섹션 찾기
+            const targetRow = state.rows.find(r => r.id === targetRowId);
+            if (!targetRow) return state;
+
+            const targetSection = targetRow.sections.find(s => s.id === targetSectionId);
+            if (!targetSection) return state;
+
+            // 원본 너비 보존 (같은 행 내 이동시에만)
+            const preserveWidths = sourceRowId === targetRowId;
+            const originalWidths = preserveWidths ? targetRow.sections.map(s => s.width) : [];
+
+            // 모든 상태 변경을 한번에 처리
+            const updatedRows = state.rows.map((row) => {
+              if (row.id === sourceRowId && row.id === targetRowId) {
+                // 같은 행 내에서 이동하는 경우
+                return {
+                  ...row,
+                  sections: row.sections.map((section) => {
+                    if (section.id === sourceSectionId) {
+                      // 소스 섹션에서 탭 제거
+                      const remainingTabs = section.tabs.filter(
+                        (t) => !(t.id === tabId && t.uniqueKey === draggedTabKey)
+                      );
+                      return {
+                        ...section,
+                        tabs: remainingTabs,
+                        activeTabKey: section.activeTabKey === draggedTabKey
+                          ? (remainingTabs.length > 0 ? remainingTabs[remainingTabs.length - 1].uniqueKey : null)
+                          : section.activeTabKey,
+                        width: preserveWidths ? originalWidths[row.sections.findIndex(s => s.id === sourceSectionId)] : section.width
+                      };
+                    } else if (section.id === targetSectionId) {
+                      // 타겟 섹션에 탭 추가
+                      return {
+                        ...section,
+                        tabs: [...section.tabs, movedTab],
+                        activeTabKey: movedTab.uniqueKey,
+                        width: preserveWidths ? originalWidths[row.sections.findIndex(s => s.id === targetSectionId)] : section.width
+                      };
+                    }
+                    return {
+                      ...section,
+                      width: preserveWidths ? originalWidths[row.sections.findIndex(s => s.id === section.id)] : section.width
+                    };
+                  })
+                };
+              } else if (row.id === sourceRowId) {
+                // 소스 행에서 탭 제거
+                return {
+                  ...row,
+                  sections: row.sections.map((section) => {
+                    if (section.id === sourceSectionId) {
+                      const remainingTabs = section.tabs.filter(
+                        (t) => !(t.id === tabId && t.uniqueKey === draggedTabKey)
+                      );
+                      return {
+                        ...section,
+                        tabs: remainingTabs,
+                        activeTabKey: section.activeTabKey === draggedTabKey
+                          ? (remainingTabs.length > 0 ? remainingTabs[remainingTabs.length - 1].uniqueKey : null)
+                          : section.activeTabKey,
+                      };
+                    }
+                    return section;
+                  })
+                };
+              } else if (row.id === targetRowId) {
+                // 타겟 행에 탭 추가
+                const updatedSections = row.sections.map((section) => {
+                  if (section.id === targetSectionId) {
+                    return {
+                      ...section,
+                      tabs: [...section.tabs, movedTab],
+                      activeTabKey: movedTab.uniqueKey,
+                    };
+                  }
+                  return section;
+                });
+
+                return {
+                  ...row,
+                  sections: preserveWidths ? updatedSections : adjustSectionWidths(updatedSections),
+                };
+              }
+              return row;
+            });
+
+            // 탭 그룹에서도 제거
             const updatedGroups = state.tabGroups
               .map((g) => ({
                 ...g,
@@ -1151,6 +1190,7 @@ export const useTabStore = create<TabLayoutStore>()(
               }))
               .filter((g) => g.tabs.length > 0);
 
+            // 단일 상태 업데이트로 모든 변경사항 적용
             return {
               ...state,
               rows: updatedRows,
@@ -2069,7 +2109,7 @@ export const useTabStore = create<TabLayoutStore>()(
           activeTabId: state.activeTabId,
           activeTabKey: state.activeTabKey,
           openSectionId: state.openOperationSectionId,
-          campaignIdForUpdateFromSideMenu : state.campaignIdForUpdateFromSideMenu, // 새로고침시 선택한 캠페인 유지
+          campaignIdForUpdateFromSideMenu: state.campaignIdForUpdateFromSideMenu, // 새로고침시 선택한 캠페인 유지
         }), // 저장할 상태만 선택
       }
     )
