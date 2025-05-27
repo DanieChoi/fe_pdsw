@@ -9,6 +9,7 @@ import logoutFunction from "../common/logoutFunction";
 const AuthTimeOutCheck = ({ popupRef }: { popupRef: React.MutableRefObject<Window | null> }) => {
 
   const expiresCheck = useAuthStore((state) => state.expires_check);
+  const session_key = useAuthStore((state) => state.session_key);
   const setExpiresCheck = useAuthStore((state) => state.setExpiresCheck);
 
   const [alertState, setAlertState] = useState({
@@ -22,7 +23,7 @@ const AuthTimeOutCheck = ({ popupRef }: { popupRef: React.MutableRefObject<Windo
 
   useEffect(() => {
     // console.log("AuthTimeOutCheck: expiresCheck 상태:", expiresCheck);
-    if (expiresCheck) {
+    if (session_key !== "" && expiresCheck) {
 
       // 수동으로 popupRef를 props로 전달받은 이유 ==> onClose 이벤트에 로그아웃 함수를 호출하면 닫기버튼을 누르기전까지 popupRef가 닫히지 않음
       if (popupRef.current && !popupRef.current.closed) {
