@@ -13,6 +13,8 @@ import { useApiForPhoneDescription } from '@/features/campaignManager/hooks/useA
 import { useEnvironmentStore } from '@/store/environmentStore';
 import CommonButton from '@/components/shared/CommonButton';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
+import { FancyGraphLoader } from '@/shared/ui/loading/FancyGraphLoader';
+import { PulseBarsLoader } from '@/shared/ui/loading/PulseBarsLoader';
 
 // 타입 정의
 interface Stats {
@@ -513,29 +515,168 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
     }
   }, [statisticsUpdateCycle, refreshData]);
 
-  return (
+
+  
+  // return (
+  //   <div className="flex flex-col gap-5 h-full out-wrap limit-700">
+  //     {shouldRenderSelect && (
+  //       <div className="flex justify-between items-center gap-2">
+  //         <div className='flex items-center gap-2'>
+  //           <Label className="w-20 min-w-20">캠페인</Label>
+  //         <Select onValueChange={handleCampaignChange} value={selectedCampaign}>
+  //           <SelectTrigger className="w-48">
+  //             <SelectValue placeholder="캠페인 전체" />
+  //           </SelectTrigger>
+  //           <SelectContent>
+  //             <SelectItem value="all">캠페인 전체</SelectItem>
+  //             {campaigns.map(option => (
+  //               <SelectItem key={option.campaign_id} value={option.campaign_id.toString()}>
+  //                 [{option.campaign_id}]{option.campaign_name}
+  //               </SelectItem>
+  //             ))}
+  //           </SelectContent>
+  //         </Select>
+
+  //         </div>
+          
+  //         {/* 새로고침 버튼 표시*/}
+  //         <div className="flex justify-end gap-2 text-xs text-gray-500 min-w-[260px]">
+  //           <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md">
+  //             <span className="w-2 h-2 rounded-full bg-green-500" />
+  //             <span>
+  //               갱신 주기: <span className="font-medium text-blue-600">{statisticsUpdateCycle}초</span>
+  //             </span>
+  //           </div>
+
+  //           <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md max-w[150px] min-w-[150px]">
+  //             <span>마지막 갱신:</span>
+  //             <span className="font-medium text-blue-600">{formattedLastRefreshTime}</span>
+  //           </div>
+  //           <CommonButton
+  //             variant="outline"
+  //             size="sm"
+  //             onClick={refreshData}
+  //             disabled={isLoading || isRefreshing}
+  //             className="flex items-center whitespace-nowrap mr-2"
+  //           >
+  //             <svg
+  //               className={`h-3 w-3 ${isRefreshing ? "animate-spin" : ""}`}
+  //               xmlns="http://www.w3.org/2000/svg"
+  //               fill="none"
+  //               viewBox="0 0 24 24"
+  //               stroke="currentColor"
+  //             >
+  //               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+  //             </svg>
+  //             {/* {isRefreshing ? "갱신중" : "새로고침"} */}
+  //             새로고침
+  //           </CommonButton>
+  //         </div>
+  //       </div>
+  //     )}
+
+  //     <div className="flex gap-5 h-[calc(100%-61px)] out-call-responsive-container">
+  //       <div className="flex-1 out-call-responsive-left gap-5">
+  //         <div className="">
+  //           <Table>
+  //             <thead>
+  //               <TableRow>
+  //                 <TableHeader className="!bg-[#DDF4F2] !text-center text-sm font-normal text-[#3A9D6C] !h-[30px]">
+  //                   대기 상담사
+  //                 </TableHeader>
+  //                 <TableHeader className="!bg-[#FEE9EC] !text-center text-sm font-normal text-[#C95E5E] !h-[30px]">
+  //                   최초 발신
+  //                 </TableHeader>
+  //                 <TableHeader className="!bg-[#E8EFFA] !text-center text-sm font-normal text-[#338BD3] !h-[30px]">
+  //                   재시도 발신
+  //                 </TableHeader>
+  //                 <TableHeader className="!bg-[#F6F0FA] !text-center text-sm font-normal text-[#9459BF] !h-[30px]">
+  //                   분배 대기
+  //                 </TableHeader>
+  //               </TableRow>
+  //             </thead>
+  //             <tbody>
+  //               <TableRow>
+  //                 <TableCell className="!text-center text-sm !h-[30px]">{waitingCounselorCnt}</TableCell>
+  //                 <TableCell className="!text-center text-sm !h-[30px]">{currentData.stats.firstCall}</TableCell>
+  //                 <TableCell className="!text-center text-sm !h-[30px]">{currentData.stats.retryCall}</TableCell>
+  //                 <TableCell className="!text-center text-sm !h-[30px]">{currentData.stats.distributing}</TableCell>
+  //               </TableRow>
+  //             </tbody>
+  //           </Table>
+  //         </div>
+
+  //         <div className="w-full h-[calc(100%-57px)]">
+  //           <ResponsiveContainer width="100%" height="100%" className="m-auto">
+  //             <BarChart
+  //               data={currentData.barData}
+  //               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+  //               layout="vertical"
+  //             >
+  //               <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={true} />
+  //               <XAxis
+  //                 type="number"
+  //                 tick={{ fontSize: 13 }}
+  //                 axisLine={{ stroke: '#999' }}
+  //               />
+  //               <YAxis
+  //                 type="category"
+  //                 dataKey="name"
+  //                 width={100}
+  //                 tick={{ fontSize: 13 }}
+  //                 axisLine={{ stroke: '#999' }}
+  //               />
+  //               <Tooltip />
+  //               <Bar
+  //                 dataKey="value"
+  //                 fill="#4FD1C5"
+  //                 barSize={20}
+  //               />
+  //             </BarChart>
+  //           </ResponsiveContainer>
+  //         </div>
+  //       </div>
+
+  //       <div className="grid-custom-wrap flex-1 out-call-responsive-right">
+  //         <DataGrid
+  //           columns={columns}
+  //           rows={currentData.gridData}
+  //           className="grid-custom"
+  //           rowHeight={30}
+  //           headerRowHeight={30}
+  //         />
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
+
+return (
+  isLoading ? (
+    <div className="flex items-center justify-center h-full">
+      <PulseBarsLoader message="데이터 로딩 중입니다..." showMessage />
+    </div>
+  ) : (
     <div className="flex flex-col gap-5 h-full out-wrap limit-700">
       {shouldRenderSelect && (
         <div className="flex justify-between items-center gap-2">
-          <div className='flex items-center gap-2'>
+          <div className="flex items-center gap-2">
             <Label className="w-20 min-w-20">캠페인</Label>
-          <Select onValueChange={handleCampaignChange} value={selectedCampaign}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="캠페인 전체" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">캠페인 전체</SelectItem>
-              {campaigns.map(option => (
-                <SelectItem key={option.campaign_id} value={option.campaign_id.toString()}>
-                  [{option.campaign_id}]{option.campaign_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
+            <Select onValueChange={handleCampaignChange} value={selectedCampaign}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="캠페인 전체" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">캠페인 전체</SelectItem>
+                {campaigns.map(option => (
+                  <SelectItem key={option.campaign_id} value={option.campaign_id.toString()}>
+                    [{option.campaign_id}]{option.campaign_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          
-          {/* 새로고침 버튼 표시*/}
+
+          {/* 새로고침 버튼 표시 */}
           <div className="flex justify-end gap-2 text-xs text-gray-500 min-w-[260px]">
             <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md">
               <span className="w-2 h-2 rounded-full bg-green-500" />
@@ -543,8 +684,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
                 갱신 주기: <span className="font-medium text-blue-600">{statisticsUpdateCycle}초</span>
               </span>
             </div>
-
-            <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md max-w[150px] min-w-[150px]">
+            <div className="flex items-center gap-1 bg-slate-50 px-2 py-1.5 rounded-md max-w-[150px] min-w-[150px]">
               <span>마지막 갱신:</span>
               <span className="font-medium text-blue-600">{formattedLastRefreshTime}</span>
             </div>
@@ -562,9 +702,13 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
               </svg>
-              {/* {isRefreshing ? "갱신중" : "새로고침"} */}
               새로고침
             </CommonButton>
           </div>
@@ -610,11 +754,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
                 layout="vertical"
               >
                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={true} />
-                <XAxis
-                  type="number"
-                  tick={{ fontSize: 13 }}
-                  axisLine={{ stroke: '#999' }}
-                />
+                <XAxis type="number" tick={{ fontSize: 13 }} axisLine={{ stroke: '#999' }} />
                 <YAxis
                   type="category"
                   dataKey="name"
@@ -623,11 +763,7 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
                   axisLine={{ stroke: '#999' }}
                 />
                 <Tooltip />
-                <Bar
-                  dataKey="value"
-                  fill="#4FD1C5"
-                  barSize={20}
-                />
+                <Bar dataKey="value" fill="#4FD1C5" barSize={20} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -644,7 +780,10 @@ const OutboundCallProgressPanel: React.FC<OutboundCallProgressPanelProps> = ({
         </div>
       </div>
     </div>
-  );
+  )
+);
+
+
 };
 
 export default OutboundCallProgressPanel;

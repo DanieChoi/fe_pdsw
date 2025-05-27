@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin } from './helpers/login.helper';
 
-test('상태 변경 가능한 캠페인 중에서 무작위 선택하여 상태 전환', async ({ page }) => {
+test('캠페인 중에서 무작위 선택하여 상태 전환', async ({ page }) => {
   await loginAsAdmin(page);
 
   // 멈춤 또는 중지 상태인 캠페인들만 찾기
