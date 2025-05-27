@@ -1,22 +1,26 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import useApiForGetSkillsWithCampaigns from '@/shared/hooks/skill/useApiForGetSkillsWithCampaigns';
-import { CampaignInfo, SkillInfo } from '@/widgets/sidebar2/api/type/typeForAddCampaignForCampaignGroup';
-import GroupCampaignList from './GroupCampaignList';
-import ITableForSkillListWithCampaign from './ITableForSkillListWithCampaign';
-import { useAuthStore } from '@/store/authStore';
 import { toast } from 'react-toastify';
-import useApiForAddCampaignToSpecificCampaignGroup from '../../hooks/useApiForAddCampaignToSpecificCampaignGroup';
-import useApiForRemoveCampaignFromCampaignGroup from '../../hooks/useApiForRemoveCampaignFromCampaignGroup';
-import CustomAlert from '@/components/shared/layout/CustomAlert';
-import { useSideMenuCampaignGroupTabStore } from '@/store/storeForSideMenuCampaignGroupTab';
+
+import { useQueryClient } from '@tanstack/react-query';
+import { CampaignInfo, SkillInfo } from '@/widgets/sidebar2/api/type/typeForAddCampaignForCampaignGroup';
+
+import ITableForSkillListWithCampaign from './ITableForSkillListWithCampaign';
+import GroupCampaignList from './GroupCampaignList';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { CommonButton } from "@/components/shared/CommonButton";
 import { CustomInput } from "@/components/shared/CustomInput";
-import { useCampainManagerStore } from '@/store/campainManagerStore';
+import CustomAlert from '@/components/shared/layout/CustomAlert';
+
 import useApiForGetCampaignListForCampaignGroup from '@/shared/hooks/campaign/useApiForGetCampaignListForCampaignGroup';
-import { useTotalSkillListForAddCampaignToCampaignGroup } from '@/widgets/sidebar2/hooks/useTotalSkillListForAddCampaignToCampaignGroup';
+import useApiForAddCampaignToSpecificCampaignGroup from '../../hooks/useApiForAddCampaignToSpecificCampaignGroup';
+import useApiForRemoveCampaignFromCampaignGroup from '../../hooks/useApiForRemoveCampaignFromCampaignGroup';
+import useApiForGetSkillsWithCampaigns from '@/shared/hooks/skill/useApiForGetSkillsWithCampaigns';
 import { useTotalCampaignListForAddCampaignToCampaignGroup } from '@/shared/hooks/campaign/useTotalCampaignListForAddCampaignToCampaignGroup';
+import { useTotalSkillListForAddCampaignToCampaignGroup } from '@/widgets/sidebar2/hooks/useTotalSkillListForAddCampaignToCampaignGroup';
+import { useSideMenuCampaignGroupTabStore } from '@/store/storeForSideMenuCampaignGroupTab';
+
+import { useCampainManagerStore } from '@/store/campainManagerStore';
+import { useAuthStore } from '@/store/authStore';
 
 interface SkillWithCampaigns {
   skillId: number;
