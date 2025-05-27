@@ -7,7 +7,6 @@ import 'react-data-grid/lib/styles.css';
 import TitleWrap from "@/components/shared/TitleWrap";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/CustomSelect";
 import { Label } from "@/components/ui/label";
-import { CommonButton } from "@/components/shared/CommonButton";
 import Image from "next/image";
 import { useMainStore, useCampainManagerStore } from '@/store';
 import { useApiForCampaignProgressInformation } from '@/features/monitoring/hooks/useApiForCampaignProgressInformation';
@@ -20,6 +19,7 @@ import ColumnSet, { defaultColumnsData, ColumnSettingItem } from './ColumnSet';
 import { useEnvironmentStore } from '@/store/environmentStore';
 import { MainDataResponse } from '@/features/auth/types/mainIndex';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
+import { PulseBarsLoader } from '@/shared/ui/loading/PulseBarsLoader';
 
 export interface TreeRow extends DispatchStatusDataType {
   parentId?: string;
@@ -145,6 +145,7 @@ export default function Campaignprogress() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [tempCampaignList, setTempCampaignList] = useState<MainDataResponse[]>([]);
   const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   //campaigns: MainDataResponse[];
 
@@ -466,6 +467,7 @@ export default function Campaignprogress() {
       setSelectedCampaignIdIndex(0);
       setTempCampaignInfoList([]);
       setCampaignInfoList([]);
+      setIsLoading(true);
     }
   };
 
@@ -588,6 +590,7 @@ export default function Campaignprogress() {
         });
         setSelectedCampaignId(0);
         setSelectedCampaignIdIndex(0);
+        setIsLoading(false);
       }
     },
     onError: (error) => {
@@ -668,6 +671,7 @@ export default function Campaignprogress() {
       setSelectedCampaignIdIndex(0);
       setTempCampaignInfoList([]);
       setCampaignInfoList([]);
+      setIsLoading(true);
     }
   }, [campaigns,tempCampaignList]);
 
@@ -711,6 +715,7 @@ export default function Campaignprogress() {
         setSelectedCampaignIdIndex(0);
         setTempCampaignInfoList([]);
         setCampaignInfoList([]);
+        setIsLoading(true);
       }, 50);
 
       setLastRefreshTime(new Date());
@@ -727,6 +732,11 @@ export default function Campaignprogress() {
 
 
   return (
+    isLoading ? (
+      <div className="flex items-center justify-center h-full">
+        <PulseBarsLoader message="데이터 로딩 중입니다..." showMessage />
+      </div>
+    ) : (
     <div className="limit-width">
 
       <TitleWrap
@@ -738,6 +748,7 @@ export default function Campaignprogress() {
             setSelectedCampaignIdIndex(0);
             setTempCampaignInfoList([]);
             setCampaignInfoList([]);
+            setIsLoading(true);
           } },
           { label: "엑셀로 저장", onClick: () => handleExcelDownload() },
           { label: "컬럼 설정", onClick: () => setIsColumnSetOpen(true) },
@@ -862,6 +873,7 @@ export default function Campaignprogress() {
         columns={campaignTotalProgressInfoColumn}
       />
     </div>
+    )
   );
 }
 
