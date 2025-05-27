@@ -1,16 +1,19 @@
-
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useAuthStore } from "@/store/authStore";
-import { useApiForSidebarCounselor } from "@/features/campaignManager/hooks/useApiForGetDataForSidebarCounselorTab";
-import { WindowStateUtils } from "@/features/campaignManager/hooks/useApiDeleteCounselorsFromSkills";
+import { toast } from "react-toastify";
+
 import { TreeNodeForCounselorListForSideBar } from "../../../features/campaignManager/components/treeMenus/TreeNodeForCounselorListForSideBar";
 import { SearchBarForSideMenuForCounselorTab } from "../../../features/campaignManager/components/treeMenus/searchbar/SearchBarForSideMenuForCounselorTab";
-import { useCounselorFilterStore, NodeType } from "@/store/storeForSideMenuCounselorTab";
-import { toast } from "react-toastify";
 import { CounselorTreeLevelSelector } from "../../../features/campaignManager/components/treeMenus/option/CounselorTreeLevelSelector";
 import { IOrganization } from "@/features/campaignManager/types/typeForSideBarCounselorTab2";
+
+import { useApiForSidebarCounselor } from "@/features/campaignManager/hooks/useApiForGetDataForSidebarCounselorTab";
+import { WindowStateUtils } from "@/features/campaignManager/hooks/useApiDeleteCounselorsFromSkills";
+
+import { useAuthStore } from "@/store/authStore";
+import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
+
 
 interface ISkill {
   skillId: string;
