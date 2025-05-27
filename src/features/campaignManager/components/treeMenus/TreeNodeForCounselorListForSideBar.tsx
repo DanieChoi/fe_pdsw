@@ -527,7 +527,7 @@ export function TreeNodeForCounselorListForSideBar({
   const getLabel = () => {
     switch (type) {
       case 'organization': return `[1]${data.centerName}`;
-      case 'tenant': return data.tenantName;
+      case 'tenant': return `[${data.tenantId}]${data.tenantName}`;
       case 'group': return '[' + data.groupId + ']' + data.groupName;
       case 'team': return '[' + data.teamId + ']' + data.teamName;
       case 'counselor': return data.counselorname;
