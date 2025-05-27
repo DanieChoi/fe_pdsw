@@ -5,10 +5,8 @@ import { SortOption } from '@/store/storeForSideBarCampaignSort';
 
 interface CampaignActionsProps {
   onFilter: (type: FilterType) => void;
-  // Update to use SortOption instead of just SortType
   onSort: (option: SortOption) => void;
   selectedFilter: FilterType;
-  // Update to use SortOption instead of just SortType
   selectedSort: SortOption;
 }
 

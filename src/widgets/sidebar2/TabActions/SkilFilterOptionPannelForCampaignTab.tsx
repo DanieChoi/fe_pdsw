@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import CommonButton from "@/components/shared/CommonButton";
-import { useAuthStore } from "@/store/authStore";
 import { CustomCheckbox } from "@/components/shared/CustomCheckbox";
 import { useAssignableSkills } from "@/features/preferences/hooks/useAssignableSkills";
-import { Popover } from "@/components/ui/popover";
 import { PopoverClose } from "@radix-ui/react-popover";
 import { useTreeMenuStore } from "@/store/storeForSsideMenuCampaignTab";
 
@@ -27,15 +25,10 @@ const SkilFilterOptionPannelForCampaignTab = ({
     selectedSkills: externalSelectedSkills,
     onSelectedSkillsChange,
 }: SkilFilterOptionPannelForCampaignTabProps) => {
-    const { tenant_id } = useAuthStore();
-
-    // 할당 가능한 스킬 목록 가져오기
     const { data: skills = [] as Skill[], isLoading, isError } = useAssignableSkills();
 
-    // 로컬 상태로 체크 박스 선택 상태 관리
     const [internalSelectedSkills, setInternalSelectedSkills] = useState<number[]>([]);
     
-    // 실제로 사용할 선택된 스킬 배열 (외부 또는 내부)
     const selectedSkills = externalSelectedSkills !== undefined ? externalSelectedSkills : internalSelectedSkills;
     const setSelectedSkills = (skills: number[]) => {
         if (onSelectedSkillsChange) {
