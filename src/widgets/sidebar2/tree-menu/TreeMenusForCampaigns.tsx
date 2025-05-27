@@ -7,7 +7,7 @@ import { TreeItem } from "@/features/campaignManager/types/typeForSidebar2";
 import { TreeNodeForCampaignTab } from "../../../features/campaignManager/components/treeMenus/TreeNodeForCampaignTab";
 import { useApiForGetTreeMenuDataForSideMenu } from "@/features/auth/hooks/useApiForGetTreeMenuDataForSideMenu";
 import { getStatusIcon } from "@/components/shared/layout/utils/utils";
-import { useSidebarWidthStore } from "@/store/useSidebarWidthStore";
+import { useSidebarWidthStore } from "@/widgets/sidebar2/store/useSidebarWidthStore";
 import { useAuthStore, useMainStore } from "@/store";
 import { useTreeMenuStore, ViewMode } from "@/store/storeForSsideMenuCampaignTab";
 import { useShallow } from "zustand/react/shallow";

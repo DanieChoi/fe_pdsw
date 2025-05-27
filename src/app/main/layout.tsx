@@ -7,7 +7,7 @@ import { useState, useRef } from 'react';
 import Footer from '@/components/shared/layout/Footer';
 import '@/app/globals.css';
 import Header from '@/widgets/header';
-import { useSidebarWidthStore } from '@/store/useSidebarWidthStore';
+import { useSidebarWidthStore } from '@/widgets/sidebar2/store/useSidebarWidthStore';
 import { PortalProvider } from '@/features/campaignManager/components/treeMenus/provider/usePortal';
 import Sidebar2 from '@/widgets/sidebar2';
 

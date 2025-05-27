@@ -1,7 +1,8 @@
 "use client";
 
-import { TabId } from "@/features/campaignManager/components/data/baseTabs";
+import { TabId } from "@/widgets/sidebar2/data/baseTabs";
 import Image from 'next/image'
+
 interface BottomTabsForSideMenuProps {
   selectedTabId: TabId;
   onTabChange: (tabId: TabId) => void;
