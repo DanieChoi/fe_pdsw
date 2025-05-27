@@ -66,9 +66,7 @@ export default function LoginPage() {
       const startTime = data.result_data.start_time;
       const endTime = data.result_data.end_time;
       const work = data.result_data.days_of_week;
-
       
-
       if( startTime === '0000' && endTime === '0000' && work === '0000000' ){
         // setStartTime("0000");
         // setEndTime("0000");          
@@ -94,6 +92,10 @@ export default function LoginPage() {
           dayOfWeekSetting: convertBinaryString(work),
         });
       }
+
+      // 로그인시 통합모니터링창 초기화
+      localStorage.setItem('monitorPopupOpen', 'false');
+      router.push('/main');
     },
     onError: (error) => {
     }
@@ -124,11 +126,10 @@ export default function LoginPage() {
   
   const { mutate: environment } = useApirForEnvironmentList({
     onSuccess: (data) => {
-      // console.log('환경설정 데이터:', data);
-      centerInfo();
-      setTempEnvironment(data);
-      // 환경설정 데이터를 별도 스토어에 저장
-      // setEnvironment(data);
+      
+      centerInfo(); // 센터정보 저장하는 api 호출
+
+      setTempEnvironment(data); // 환경설정 데이터를 state로 저장 (이후 useEffect로 store에 저장)
       
     },
     onError: (error) => {
@@ -142,6 +143,7 @@ export default function LoginPage() {
     }
   });
 
+  // tempEnvironment가 업데이트 완료되었을때
   useEffect(() => {
     if (tempEnvironment && tempEnvironment.code !== "") {
       fetchOperatingTime();
@@ -180,9 +182,9 @@ export default function LoginPage() {
       });
       setIsPending(false);
 
-      // 로그인시 통합모니터링창 초기화
-      localStorage.setItem('monitorPopupOpen', 'false');
-      router.push('/main');
+      
+
+      
     },
     onError: (e) => {
       if (e.message === 'User does not exist.') {

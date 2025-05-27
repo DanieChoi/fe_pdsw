@@ -41,7 +41,7 @@ export default function Header() {
   const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
   const { setSkills } = useCampainManagerStore();
 
-  const { environmentData, setEnvironment} = useEnvironmentStore();
+  const { environmentData, setEnvironment, centerId, centerName} = useEnvironmentStore();
 
   const {
     availableHeaderMenuIds,
@@ -115,7 +115,10 @@ export default function Header() {
         sendingWorkEndHours: "0000",
         dayOfWeekSetting: 'f,f,f,f,f,f,f',
       };
-      centerInfo();
+      if(centerId === '' || centerName === '') {
+        centerInfo();
+      }
+      
       setEnvironment(initialEnvironmentData);        
     }
   
