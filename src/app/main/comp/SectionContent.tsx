@@ -575,4 +575,6 @@ const SectionContent = ({
   );
 };
 
+SectionContent.displayName = 'SectionContent';
+
 export default React.memo(SectionContent);
