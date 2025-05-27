@@ -286,13 +286,13 @@ const AgentStatusMonitoring: React.FC<AgentStatusMonitoringProps> = ({ campaignI
       <div>
         {campaignId && campaignId > 0?
         <TitleWrap
-        title={`상담사 상태 통계${campaignId ? ` (캠페인 ID: ${campaignId})` : ''}`}
+        title={`상담사 상태 통계${campaignId ? ` (캠페인 아이디: ${campaignId})` : ''}`}
         className="border-b border-gray-300 pb-1"
         />
         :
         tenantId && Number(tenantId) > 0?
         <TitleWrap
-        title={`상담사 상태 통계${tenantId ? ` (테넌트 ID: ${tenantId})` : ''}`}
+        title={`상담사 상태 통계${tenantId ? ` (테넌트 아이디: ${tenantId})` : ''}`}
         className="border-b border-gray-300 pb-1"
         />
         :

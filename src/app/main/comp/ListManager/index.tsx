@@ -378,7 +378,7 @@ const ListManager: React.FC = () => {
     const files = e.target.files;
     if (files && files.length > 0) {
       try{
-        setIsLoading(true);
+        // setIsLoading(true);
         const file = files[0];
         if( listManagerFileFormat === 'excel' && file.name.indexOf('.xls') === -1 ){              
           setAlertState({
@@ -785,7 +785,7 @@ const ListManager: React.FC = () => {
   // 데이터그리드 컬럼 정의
   const columns = useMemo<Column<FileRow>[]>(() => [
     { key: "fileName", name: "파일 이름" },
-    { key: "campaignId", name: "캠페인 ID" },
+    { key: "campaignId", name: "캠페인 아이디" },
     { key: "fileSize", name: "파일 크기" },
     {
       key: "deletable",
