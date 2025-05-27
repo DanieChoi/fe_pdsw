@@ -345,7 +345,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                     <Table>
                       <tbody>
                         <TableRow>
-                          <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>발신실패</Label></TableHeader>
+                          <TableHeader className="!bg-[#FEE9EC] w-[170px]"><Label>발신 실패</Label></TableHeader>
                           <TableCell className="text-center text-sm">{failCnt}</TableCell>
                         </TableRow>
                         <TableRow>

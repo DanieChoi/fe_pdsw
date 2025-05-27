@@ -221,7 +221,7 @@ export default function Campaignprogress() {
         if (row.level === 0) {
           displayName = '센터: NEXUS(1센터)';
         } else if (row.level === 1) {
-          displayName = `테넌트: ${row.id.split('-')[1]}`;
+          displayName = `테넌트 아이디: ${row.id.split('-')[1]}`;
         } else if (row.level === 2) {
           displayName = `캠페인 아이디: ${row.id.split('-')[1]}`;
         } else {
@@ -387,7 +387,7 @@ export default function Campaignprogress() {
             tempData.push('');
           }
         } else if (list[i].id.indexOf('tenant') > -1) {
-          tempData = ['', '테넌트: ' + list[i].id.split('-')[1], ''];
+          tempData = ['', '테넌트 아이디: ' + list[i].id.split('-')[1], ''];
           for (let j = 0; j < _columns.length; j++) {
             tempData.push('');
           }
@@ -421,7 +421,7 @@ export default function Campaignprogress() {
 
     // Add the headers
     // const headers = _columns.map(col => col.name);
-    const headers = ['센터', '테넌트', '캠페인 아이디', ..._columns.map(col => col.name)];
+    const headers = ['센터', '테넌트 아이디', '캠페인 아이디', ..._columns.map(col => col.name)];
 
     // Create the worksheet
     const ws = XLSX.utils.aoa_to_sheet([headers, ...tempList]);

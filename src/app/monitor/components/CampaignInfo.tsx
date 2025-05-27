@@ -101,7 +101,7 @@ const CampaignInfo = ({
         <div className='flex justify-between items-center'>
           <div className='flex gap-2 items-center'>
             <div className='text-sm whitespace-nowrap'>
-              콜페이싱
+              콜페이싱(%)
             </div>
             <CustomInput
               type="number"
