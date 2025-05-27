@@ -37,16 +37,10 @@ export default function Header() {
 
   const [alertState, setAlertState] = useState(errorMessage);
   const [shouldFetchCounselors, setShouldFetchCounselors] = useState(false);
-  const [isSplitDialogOpen, setIsSplitDialogOpen] = useState(false);
   const { setSkills } = useCampainManagerStore();
 
   const {
-    availableMenus,
-    availableHeaderMenus,
     availableHeaderMenuIds,
-    setAvailableMenus,
-    setLoading,
-    setError
   } = useAvailableMenuStore();
 
   const expires_in = useAuthStore((state) => state.expires_in);
@@ -126,9 +120,6 @@ export default function Header() {
     tenants,
     setCampaigns,
     setTenants,
-    setCounselers,
-    setCampaignsLoading,
-    setTenantsLoading,
   } = useMainStore();
 
   const {
@@ -142,11 +133,6 @@ export default function Header() {
     rows,
     tabGroups,
     setActiveTab,
-    openCampaignManagerForUpdate,
-    setCampaignIdForUpdateFromSideMenu,
-    closeAllTabs,
-    moveTabToSection,
-
   } = useTabStore();
 
   const { data: campaignSkillsData } = useApiForGetCampaignSkills();
@@ -156,7 +142,7 @@ export default function Header() {
     onSuccess: (data) => {
       setSkills(data.result_data || []);
       
-      useMainStore.getState().setCampaignSkillsLoaded(true); // 사이드바 로딩중 해제를 위한 store 값 변경 0522 추가
+      useMainStore.getState().setCampaignSkillsLoaded(true); 
       // console.log("Skills data loaded in header, updated store")
     },
     onError: (error) => {
@@ -354,26 +340,6 @@ export default function Header() {
       roleId: menu_role_id || 1, // menu_role_id가 없을 경우 기본값 1
       enabled: !!menu_role_id // menu_role_id가 있을 때만 활성화
     });
-  // console.log("dataForMenusInfoForRoleId : ", dataForMenusInfoForRoleId);
-
-  // const { data: counselorListData } = useApiForFetchCounselorList({
-  //   credentials: {
-  //     // 필요한 credentials 정보
-  //     tenantId: tenant_id,
-  //     skillId: 0, // Default skill ID or use an appropriate value
-  //   },
-  //   sessionKey: _sessionKey,
-  //   // enabled: shouldFetchCounselors,  // fetchMain 완료 후에만 실행
-  // });
-
-  // // console.log('counselorListData at header :', counselorListData);
-
-  // useEffect(() => {
-  //   if (counselorListData) {
-  //     // Access the correct property structure based on the CounselorAssignListResponse type
-  //     setCounselers(counselorListData.result_data || []);
-  //   }
-  // }, [counselorListData]);
 
   useEffect(() => {
     if (tenants.length > 0 && _sessionKey !== "") {
