@@ -13,6 +13,7 @@ import { WindowStateUtils } from "@/features/campaignManager/hooks/useApiDeleteC
 
 import { useAuthStore } from "@/store/authStore";
 import { useCounselorFilterStore } from "@/store/storeForSideMenuCounselorTab";
+import { SkeletonForTreeMenuForCounselor } from "../Skeleton/SkeletonForTreeMenuForCounselor";
 
 
 interface ISkill {
@@ -67,7 +68,7 @@ export function TreeMenusForAgentTab() {
 
     // 깊은 복사를 통해 원본 데이터 보존 (스킬 정보 포함)
     const clonedData: IOrganization[] = JSON.parse(JSON.stringify(dataArray));
-    
+
     console.log('🔍 정렬 전 데이터 확인:', {
       orgCount: clonedData.length,
       firstOrgHasSkills: clonedData[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
@@ -204,15 +205,15 @@ export function TreeMenusForAgentTab() {
         orgCount: updatedData.organizationList.length,
         firstOrgHasSkills: updatedData.organizationList[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
       });
-      
+
       // 정렬 적용 후 상태 업데이트 (스킬 정보 보존)
       const sorted = applySorting([...updatedData.organizationList]);
       setSortedData(sorted);
-      
+
       // 상담사 목록 업데이트
       const counselors = getAllCounselorsFromFilteredData(sorted);
       setAllCounselors(counselors);
-      
+
       dataVersionRef.current += 1;
       console.log(`✅ UI 업데이트 완료 (버전: ${dataVersionRef.current})`);
     } else {
@@ -238,21 +239,21 @@ export function TreeMenusForAgentTab() {
         orgCount: data.organizationList.length,
         firstOrgHasSkills: data.organizationList[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
       });
-      
+
       // Window 상태 초기화
       WindowStateUtils.initTreeState(tenant_id.toString(), data);
-      
+
       // 콜백 함수들 등록
       WindowStateUtils.registerCallbacks({
         updateSidebarCallback,
         setExpandedNodesCallback,
         setSelectedNodeCallback
       });
-      
+
       isInitializedRef.current = true;
       console.log('✅ Window 상태 초기화 완료');
     }
-    
+
     return () => {
       // 컴포넌트 언마운트 시 정리
       if (isInitializedRef.current) {
@@ -271,14 +272,14 @@ export function TreeMenusForAgentTab() {
         orgCount: data.organizationList.length,
         firstOrgHasSkills: data.organizationList[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
       });
-      
+
       // Window 상태 업데이트
       const currentState = WindowStateUtils.getCurrentState();
       if (currentState) {
         currentState.sidebarData = data;
         console.log('🔄 Window 사이드바 데이터 업데이트');
       }
-      
+
       // 기본 확장 상태 적용
       applyDefaultExpansion();
 
@@ -291,7 +292,7 @@ export function TreeMenusForAgentTab() {
 
       setSortedData(sorted);
       dataVersionRef.current += 1;
-      
+
       console.log(`✅ 초기화 작업 완료 (버전: ${dataVersionRef.current})`);
     }
   }, [data, tenant_id, applySorting]);
@@ -329,7 +330,7 @@ export function TreeMenusForAgentTab() {
       console.log('🔄 정렬 옵션 변경, 데이터 재정렬');
       const sorted = applySorting([...data.organizationList]);
       setSortedData(sorted);
-      
+
       // Window 상태도 업데이트 (스킬 정보 보존)
       const currentState = WindowStateUtils.getCurrentState();
       if (currentState) {
@@ -470,7 +471,7 @@ export function TreeMenusForAgentTab() {
       } else {
         next.add(nodeId);
       }
-      
+
       // Window 상태도 업데이트
       WindowStateUtils.updateExpandedNodes(next);
       return next;
@@ -488,10 +489,10 @@ export function TreeMenusForAgentTab() {
 
     // 필터링된 데이터에서 검색
     const filteredData = applySorting([...data.organizationList]);
-    
+
     // 이름 또는 ID로 검색
     let counselorInfo = findCounselorInfoInFilteredData(filteredData, searchTerm);
-    
+
     // 스킬로도 검색
     if (!counselorInfo) {
       counselorInfo = findCounselorBySkill(filteredData, searchTerm);
@@ -545,10 +546,10 @@ export function TreeMenusForAgentTab() {
         for (const group of (tenant.groupInfo || [])) {
           for (const team of (group.teamInfo || [])) {
             for (const counselor of (team.counselorInfo || [])) {
-              const hasSkill = counselor.assignedSkills?.some((skill: ISkill) => 
+              const hasSkill = counselor.assignedSkills?.some((skill: ISkill) =>
                 skill.skillName.toLowerCase().includes(searchTerm.toLowerCase())
               );
-              
+
               if (hasSkill) {
                 return {
                   counselorId: counselor.counselorId,
@@ -557,7 +558,7 @@ export function TreeMenusForAgentTab() {
                   paths: [
                     `org-${org.centerId}`,
                     `tenant-${tenant.tenantId}`,
-                    `group-${group.groupId}`, 
+                    `group-${group.groupId}`,
                     `team-${team.teamId}`
                   ]
                 };
@@ -617,8 +618,14 @@ export function TreeMenusForAgentTab() {
     }
   };
 
+  // 🌟 로딩 상태일 때 스켈레톤 표시
   if (isLoading) {
-    return <div className="h-full p-4">Loading...</div>;
+    return <SkeletonForTreeMenuForCounselor type="full" />;
+  }
+
+  // 🌟 데이터가 없거나 빈 경우에도 스켈레톤 표시
+  if (!data?.organizationList || data.organizationList.length === 0) {
+    return <SkeletonForTreeMenuForCounselor type="partial" />;
   }
 
   return (
@@ -666,7 +673,7 @@ export function TreeMenusForAgentTab() {
           ))}
         </div>
       </div>
-      
+
       {/* 🌟 개발용 디버그 정보 */}
       {/* {process.env.NODE_ENV === 'development' && (
         <div className="text-xs text-gray-500 p-2 border-t">
