@@ -243,7 +243,6 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
       setStartTime("0000");
       setEndTime("0000");
       setDayOfWeek(['f', 'f', 'f', 'f', 'f', 'f', 'f']);
-      setUnusedWorkHoursCalc(true);
     }
   }, [environmentData]);
 
