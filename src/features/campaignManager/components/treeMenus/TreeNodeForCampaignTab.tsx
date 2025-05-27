@@ -265,6 +265,7 @@ export function TreeNodeForCampaignTab({
       )}
       {getNodeIcon()}
       <span className={textStyle}>
+        {(item.type === "folder" && !isTenantFolder) && `[1]`} 
         {(isTenantFolder || item.type === "campaign") && ` [${item.id}]`}
         {item.label} 
       </span>

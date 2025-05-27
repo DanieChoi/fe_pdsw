@@ -673,10 +673,10 @@ export default function CampaignModal({ isOpen, onClose, onSelect }: CampaignMod
             onClick: resetFilters,
             variant: "outline"
           },
-          { 
-            label: "적용", 
-            onClick: () => {}, // useMemo로 자동 적용되므로 빈 함수
-          },
+          // { 
+          //   label: "적용", 
+          //   onClick: () => {}, // useMemo로 자동 적용되므로 빈 함수
+          // },
         ]}
       />
       
