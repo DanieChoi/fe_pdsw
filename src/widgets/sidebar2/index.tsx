@@ -7,12 +7,15 @@ import { Resizable } from "re-resizable";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 
+import { baseTabs, TabId } from "@/widgets/sidebar2/data/baseTabs";
+
+import { TabActions } from "./TabActions";
+
 import { TreeMenusForCampaigns } from "@/widgets/sidebar2/tree-menu/TreeMenusForCampaigns";
 import { TreeMenusForAgentTab } from "@/widgets/sidebar2/tree-menu/TreeMenusForAgentTab";
 import { TreeMenusForCampaignGroupTab } from "@/widgets/sidebar2/tree-menu/TreeMenusForCampaignGroupTab";
+
 import { BottomTabsForSideMenu } from "@/widgets/sidebar2/footer/BottomTabsForSideMenu";
-import { TabActions } from "./TabActions";
-import { baseTabs, TabId } from "@/widgets/sidebar2/data/baseTabs";
 
 import { useSidebarWidthStore } from "./store/useSidebarWidthStore";
 

@@ -26,29 +26,6 @@ const SettingsLoader = () => (
   </div>
 );
 
-// 대안 1: 그라데이션 바 로더 (GitHub/Linear 스타일)
-const GradientBarLoader = () => (
-  <div className="flex flex-col items-center justify-center py-10 space-y-3">
-    <div className="w-48 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-      <div className="w-full h-full bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500 rounded-full animate-pulse transform scale-x-75 origin-left"></div>
-    </div>
-    <span className="text-sm text-gray-600">환경 설정 로딩중...</span>
-  </div>
-);
-
-// 대안 2: 웨이브 도트 애니메이션 (Discord 스타일)
-const WaveDotsLoader = () => (
-  <div className="flex items-center justify-center py-10">
-    <div className="flex space-x-1 mr-4">
-      <div className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms', animationDuration: '1400ms' }}></div>
-      <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full animate-bounce" style={{ animationDelay: '200ms', animationDuration: '1400ms' }}></div>
-      <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full animate-bounce" style={{ animationDelay: '400ms', animationDuration: '1400ms' }}></div>
-      <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-red-500 rounded-full animate-bounce" style={{ animationDelay: '600ms', animationDuration: '1400ms' }}></div>
-    </div>
-    <span className="text-sm text-gray-600">환경 설정 로딩중...</span>
-  </div>
-);
-
 export default function ClientProvider({ children }: { children: React.ReactNode }) {
   const [isEnvLoaded, setIsEnvLoaded] = useState(false);
 
