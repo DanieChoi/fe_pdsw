@@ -392,7 +392,7 @@ const EditDescription = () => {
 
       <div className="w-[513px]">
         <div className="grid grid-cols-[5.5rem_1fr] gap-x-4 gap-y-2">
-          <Label className="whitespace-nowrap self-center">전화 템플릿 아이디</Label>
+          <Label className="whitespace-nowrap self-center">전화번호별<br/>템플릿 아이디</Label>
           <CustomInput
             type="text"
             value={inputId}
