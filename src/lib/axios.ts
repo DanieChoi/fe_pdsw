@@ -44,6 +44,7 @@ axiosRedisInstance.interceptors.request.use(
     if (error.response.data.result_code === 5) {
       // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
       customAlertService.error('API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.', '세션 만료', () => {
+        console.log("### axiosRedisInstance REQUEST error throw", error.response);
         logoutFunction({ portcheck: false });
         window.location.href = '/login';
       });
@@ -84,6 +85,7 @@ axiosInstance.interceptors.request.use(
     if (error.response.data.result_code === 5) {
       // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
       customAlertService.error('API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.', '세션 만료', () => {
+        console.log("### axiosInstance REQUEST error response", error.response);
         logoutFunction({ portcheck: false });
         window.location.href = '/login';
       });
@@ -102,6 +104,7 @@ axiosInstance.interceptors.response.use(
       sessionCheckYn = false;
       // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
       customAlertService.error('API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.', '세션 만료', () => {
+        console.log("### axiosInstanc RESPONSE data error : ", response);
         logoutFunction({ portcheck: false });
         window.location.href = '/login';
       });
@@ -485,6 +488,7 @@ axiosInstance.interceptors.response.use(
     if (error.response.data.result_code === 5) {
       // 세션 만료 시 알럿 표시 후 로그인 페이지로 리다이렉트
       customAlertService.error('API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.', '세션 만료', () => {
+        console.log("### axiosInstanc RESPONSE throw error : ", error.response);
         logoutFunction({ portcheck: false });
         window.location.href = '/login';
       });
