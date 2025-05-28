@@ -120,11 +120,11 @@ const SkillEdit = () => {
     SelectColumn,
     { key: 'center', name: '센터' },
     { key: 'tenant', name: '테넌트' },
-    { key: 'skillId', name: '스킬아이디' },
-    { key: 'skillName', name: '스킬이름' },
+    { key: 'skillId', name: '스킬 아이디' },
+    { key: 'skillName', name: '스킬 이름' },
     { key: 'description', name: '설명' },
-    { key: 'campaignCount', name: '소속캠페인 수' },
-    { key: 'agentCount', name: '소속상담사 수' }
+    { key: 'campaignCount', name: '소속 캠페인 수' },
+    { key: 'agentCount', name: '소속 상담사 수' }
   ], []);
 
   // 캠페인 그리드 컬럼
@@ -138,10 +138,10 @@ const SkillEdit = () => {
   // 상담사 그리드 컬럼
   const agentColumns = useMemo(() => [
     SelectColumn,
-    { key: 'teamId', name: '팀아이디' },
-    { key: 'teamName', name: '팀이름' },
-    { key: 'loginId', name: '로그인아이디' },
-    { key: 'agentId', name: '상담사아이디' },
+    { key: 'teamId', name: '팀 아이디' },
+    { key: 'teamName', name: '팀 이름' },
+    { key: 'loginId', name: '로그인 아이디' },
+    { key: 'agentId', name: '상담사 아이디' },
     { key: 'agentName', name: '상담사 이름' },
     { key: 'consultMode', name: '상담모드' }
   ], []);
@@ -181,14 +181,12 @@ const SkillEdit = () => {
       .filter(id => /^\d+$/.test(id))  // 순수 숫자 형식만 필터링
       .map(id => parseInt(id, 10));
     
-
     // 최소값 찾아내기
     const minSkillId = numericSkillIds.find((skillId, idx) => {
-      if(skillId !== idx + 1){
+      if(skillId === idx + 1){
         return skillId;
       }
     }); 
-    // console.log('minSkillId', minSkillId);
     
     // 비어있는(존재하지않는 스킬아이디) 최소값 반환
     return String(minSkillId ? minSkillId - 1 : 1);
@@ -208,6 +206,19 @@ const SkillEdit = () => {
         session_key: '',
         tenant_id: tenant_id
       });
+      
+      if( selectedSkill !== null && rows.length > 0){ 
+        
+        const skillId = rows.find((row) => row.skillId === selectedSkill.skillId)?.skillId;
+        const tenantId = rows.find((row) => row.skillId === selectedSkill.skillId)?.tenantId;
+
+        fetchCounselorAssignList({
+          tenantId: Number(tenantId),
+          skillId: Number(skillId)
+        });
+
+      }
+      
 
       useAgentSkillStatusStore.getState().setAgentSkillStatus(false);
     }
@@ -521,7 +532,12 @@ const SkillEdit = () => {
               window.close();
             }
           }else{
-            ServerErrorCheck('스킬 데이터 수정', error.message);  
+            if ( error.message.split('||')[0] === '403') {
+              console.log(`스킬 데이터 error info : ${error.message}`);
+            } else{
+              ServerErrorCheck('스킬 데이터 수정', error.message);  
+            }
+            
           }
         }
       });
@@ -835,6 +851,7 @@ const SkillEdit = () => {
 
   const { mutate: fetchCounselorAssignList } = useApiForCounselorAssignList({
     onSuccess: (data: CounselorAssignListResponse) => {
+      console.log("fetchCounselorAssignList data: ", data);
       if (data.skillAssignedCounselorList) {
         const mappedAgents: AgentRow[] = data.skillAssignedCounselorList.map(counselor => ({
           skillId: selectedSkill?.skillId || '',
@@ -931,21 +948,13 @@ const SkillEdit = () => {
       showAlert('스킬이 성공적으로 수정되었습니다.');
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        logoutFunction();
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert(`스킬 수정 실패: ${error.message}`);
+      if (error.message.split('||')[0] === '403'){
+        showAlert(`올바른 스킬 데이터가 아닙니다. 다시 확인해주세요.`);
+        return;
+      } else{
+        ServerErrorCheck('스킬 수정 요청', error.message);
       }
+      
     }
   });
 
@@ -954,21 +963,7 @@ const SkillEdit = () => {
       // showAlert('스킬이 성공적으로 삭제되었습니다.');
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        logoutFunction();
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert(`스킬 삭제 실패: ${error.message}`);
-      }
+      ServerErrorCheck('스킬 삭제 요청', error.message);
     }
   })
 
@@ -978,42 +973,14 @@ const SkillEdit = () => {
       showAlert('상담사 스킬이 성공적으로 해제되었습니다.');
     },
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        logoutFunction();
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert(`상담사 스킬 해제 실패: ${error.message}`);
-      }
+      ServerErrorCheck('상담사 스킬 해제 요청', error.message);
     }
   });
 
   // 캠페인스킬 조회
   const { mutate: campaignSkillList } = useApiForCampaignSkill({
     onError: (error) => {
-      if (error.message.split('||')[0] === '5') {
-        setAlertState({
-          ...errorMessage,
-          isOpen: true,
-          message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-          onConfirm: closeAlert,
-          onCancel: () => {}
-        });
-        logoutFunction();
-        setTimeout(() => {
-          router.push('/login');
-        }, 1000);
-      } else {
-        showAlert(`캠페인 스킬 조회 실패: ${error.message}`);
-      }
+      ServerErrorCheck('캠페인 스킬 조회 요청', error.message);
     }
   })
 
@@ -1022,21 +989,7 @@ const SkillEdit = () => {
     showAlert('캠페인 스킬 할당이 성공적으로 완료되었습니다.');
   },
   onError: (error) => {
-    if (error.message.split('||')[0] === '5') {
-      setAlertState({
-        ...errorMessage,
-        isOpen: true,
-        message: 'API 연결 세션이 만료되었습니다. 로그인을 다시 하셔야합니다.',
-        onConfirm: closeAlert,
-        onCancel: () => {}
-      });
-      logoutFunction();
-      setTimeout(() => {
-        router.push('/login');
-      }, 1000);
-    } else {
-      showAlert(`캠페인 스킬 할당 실패: ${error.message}`);
-    }
+    ServerErrorCheck('캠페인 스킬 할당 요청', error.message);
   }
   });
 
@@ -1321,7 +1274,7 @@ const SkillEdit = () => {
         <div className="w-[513px]">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <Label className="w-[8rem] min-w-[8rem]">상담센터</Label>
+              <Label className="w-[8rem] min-w-[8rem]">센터</Label>
               <CustomInput 
                 value={isNewMode ? getSelectedTenantCenterName() : selectedSkill?.center || ''}
                 className="w-full"
@@ -1355,7 +1308,7 @@ const SkillEdit = () => {
               )}
             </div>
             <div className="flex items-center gap-2">
-              <Label className="w-[8rem] min-w-[8rem]">스킬아이디</Label>
+              <Label className="w-[8rem] min-w-[8rem]">스킬 아이디</Label>
               <CustomInput
                 type="number"
                 value={editableFields.skillId || ''}
@@ -1380,7 +1333,7 @@ const SkillEdit = () => {
               />
             </div>
             <div className="flex items-center gap-2">
-              <Label className="w-[8rem] min-w-[8rem]">스킬이름</Label>
+              <Label className="w-[8rem] min-w-[8rem]">스킬 이름</Label>
               <CustomInput 
                 value={editableFields.skillName}
                 onChange={(e) => handleInputChange('skillName', e.target.value)}
