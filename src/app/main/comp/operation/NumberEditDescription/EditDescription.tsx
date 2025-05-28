@@ -452,6 +452,15 @@ const EditDescription = () => {
           />
         </div>
 
+        <div className="mt-[20px] text-sm">
+          <ul className='space-y-1'>
+            <li>• 설정된 항목은 캠페인 - 발신순서에서 사용됩니다 .</li>
+          </ul>
+        </div>
+
+
+        {/* 설정된 항목은 캠페인 - 발신순서에서 사용됩니다 . */}
+
         <div className="flex justify-end gap-2 pt-4">
           <CommonButton onClick={handleNew}>신규</CommonButton>
           <CommonButton onClick={handleSave}>저장</CommonButton>
