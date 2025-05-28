@@ -962,9 +962,14 @@ const ListManager: React.FC = () => {
     if (workFileIndex > -1) {
       
       const now = new Date();
+      const year = now.getFullYear();
+      const month = (now.getMonth() + 1).toString().padStart(2, '0'); // 0~11이므로 +1
+      const date = now.getDate().toString().padStart(2, '0');
       const hours = now.getHours().toString().padStart(2, '0');
       const minutes = now.getMinutes().toString().padStart(2, '0');
       const seconds = now.getSeconds().toString().padStart(2, '0');
+      const formatted = `${year}-${month}-${date} ${hours}:${minutes}:${seconds}`;
+
       const newProgressListData = { ...progressListData
         , id: progressList.length+1
         , datetime: hours + ':' + minutes + ':' + seconds
@@ -977,7 +982,7 @@ const ListManager: React.FC = () => {
       for( let j=0;j<sendList.length;j++){
         if( uploadedFiles[workFileIndex].id === sendList[j].fileId ){
           dataList.push({
-            customer_key: sendList[j].CSNA+''
+            customer_key: sendList[j].CSKE+''
             , sequence_number: sequenceIndex++,
             customer_name: sendList[j].CSNA+'',
             phone_number1: sendList[j].TNO1+'',
@@ -985,8 +990,8 @@ const ListManager: React.FC = () => {
             phone_number3: sendList[j].TNO3+'',
             phone_number4: sendList[j].TNO4+'',
             phone_number5: sendList[j].TNO5+'',
-            reserved_time: sendList[j].TKDA+'',
-            token_data: sendList[j].CSC1+''
+            reserved_time: formatted,
+            token_data: sendList[j].TKDA+''
           });
         }
       }
