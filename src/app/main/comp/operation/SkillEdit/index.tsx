@@ -13,14 +13,12 @@ import { CounselorAssignListResponse } from '@/features/preferences/types/System
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useApiForCampaignSkillUpdate } from '@/features/campaignManager/hooks/useApiForCampaignSkillUpdate';
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
-import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { SkillListDataResponse } from '@/features/campaignManager/types/campaignManagerIndex';
 import { useAgentSkillStatusStore } from '@/store/agenSkillStatusStore';
 import { logoutChannel } from '@/lib/broadcastChannel';
 import ServerErrorCheck from '@/components/providers/ServerErrorCheck';
 import logoutFunction from '@/components/common/logoutFunction';
-import { log } from 'console';
 import { useEnvironmentStore } from '@/store/environmentStore';
 
 // 메인 스킬 정보
@@ -194,8 +192,9 @@ const SkillEdit = () => {
 
   // 사이드바에서 상담사 스킬 할당 변경 감지용 store
   useEffect(() => {
+
     if(agentSkillStatus === true){
-      // console.log('######### 상담사 상태 변경 수신');
+      console.log('######### 상담사 상태 변경 수신');
       
       // fetchCounselorList({ tenantId: tenant_id, roleId: role_id });
       fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
@@ -548,7 +547,7 @@ const SkillEdit = () => {
   const handleDelete = () => {
 
     if (!selectedSkill || rows.find((row) => row.skillId === selectedSkill?.skillId) === undefined) {
-      showAlert('생성되지 않은 스킬아이디는 삭제 할 수 없습니다.');
+      showAlert('생성되지 않거나 선택되지 않은 스킬아이디는 삭제 할 수 없습니다.');
       return;
     }
 
@@ -851,7 +850,6 @@ const SkillEdit = () => {
 
   const { mutate: fetchCounselorAssignList } = useApiForCounselorAssignList({
     onSuccess: (data: CounselorAssignListResponse) => {
-      console.log("fetchCounselorAssignList data: ", data);
       if (data.skillAssignedCounselorList) {
         const mappedAgents: AgentRow[] = data.skillAssignedCounselorList.map(counselor => ({
           skillId: selectedSkill?.skillId || '',
