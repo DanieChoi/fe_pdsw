@@ -179,7 +179,7 @@ export default function PreferencesBoard({ onSubmit }: PreferencesBoardProps) {
   // 캠페인 운용 가능 시간 조회 API 호출
   const { mutate: fetchOperatingTime } = useApiForOperatingTime({
     onSuccess: (data) => {
-      console.log(data);
+      
       const startTime = data.result_data.start_time;
       const endTime = data.result_data.end_time;
       const work = data.result_data.days_of_week;

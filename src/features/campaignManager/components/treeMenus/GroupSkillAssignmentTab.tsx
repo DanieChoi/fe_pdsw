@@ -76,7 +76,7 @@ const useAssignableSkills = (tenantId?: number) => {
         const response = await getAssignableSkillsForCounselor(tenantId);
 
         if (response.result_code === 0 && response.result_msg === "Success") {
-          console.log("✅ 불러온 스킬 목록:", response.result_data);
+          // console.log("✅ 불러온 스킬 목록:", response.result_data);
 
           return response.result_data.map((skill) => ({
             skill_id: skill.skill_id,

@@ -27,7 +27,7 @@ export function TreeMenusForAgentTab() {
     tenant_id.toString(),
   );
 
-  console.log("🌟 treeData in TreeMenusForAgentTab (Window 버전 - 스킬 포함) !!!!!!!!!!!!! ", data);
+  // console.log("🌟 treeData in TreeMenusForAgentTab (Window 버전 - 스킬 포함) !!!!!!!!!!!!! ", data);
 
   const [searchTerm, setSearchTerm] = useState("");
   const {
@@ -69,10 +69,12 @@ export function TreeMenusForAgentTab() {
     // 깊은 복사를 통해 원본 데이터 보존 (스킬 정보 포함)
     const clonedData: IOrganization[] = JSON.parse(JSON.stringify(dataArray));
 
+    /*
     console.log('🔍 정렬 전 데이터 확인:', {
       orgCount: clonedData.length,
       firstOrgHasSkills: clonedData[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
     });
+    */
 
     // tenant_id가 0이 아닌 경우에만 필터링 적용
     if (tenant_id !== 0) {
@@ -188,11 +190,12 @@ export function TreeMenusForAgentTab() {
         });
       }
     });
-
+    /*
     console.log('🔍 정렬 후 데이터 확인:', {
       orgCount: clonedData.length,
       firstOrgHasSkills: clonedData[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
     });
+    */
 
     return clonedData;
   }, [sortOption, tenant_id]);
@@ -234,11 +237,12 @@ export function TreeMenusForAgentTab() {
   // 🌟 컴포넌트 마운트 시 Window 상태 초기화
   useEffect(() => {
     if (data?.organizationList && !isInitializedRef.current) {
-      console.log('🌟 Window 상태 초기화 시작');
-      console.log('🔍 초기 데이터의 스킬 정보 확인:', {
+      // console.log('🌟 Window 상태 초기화 시작');
+      /* console.log('🔍 초기 데이터의 스킬 정보 확인:', {
         orgCount: data.organizationList.length,
         firstOrgHasSkills: data.organizationList[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
       });
+      */
 
       // Window 상태 초기화
       WindowStateUtils.initTreeState(tenant_id.toString(), data);
@@ -251,13 +255,13 @@ export function TreeMenusForAgentTab() {
       });
 
       isInitializedRef.current = true;
-      console.log('✅ Window 상태 초기화 완료');
+      // console.log('✅ Window 상태 초기화 완료');
     }
 
     return () => {
       // 컴포넌트 언마운트 시 정리
       if (isInitializedRef.current) {
-        console.log('🧹 Window 상태 정리');
+        // console.log('🧹 Window 상태 정리');
         WindowStateUtils.cleanup();
         isInitializedRef.current = false;
       }
@@ -267,17 +271,18 @@ export function TreeMenusForAgentTab() {
   // 🌟 데이터 로드 시 초기화 작업 + Window 상태 업데이트
   useEffect(() => {
     if (data?.organizationList) {
-      console.log('📊 데이터 로드됨, 초기화 작업 시작');
-      console.log('🔍 로드된 데이터의 스킬 정보 확인:', {
+      // console.log('📊 데이터 로드됨, 초기화 작업 시작');
+      /* console.log('🔍 로드된 데이터의 스킬 정보 확인:', {
         orgCount: data.organizationList.length,
         firstOrgHasSkills: data.organizationList[0]?.tenantInfo?.[0]?.groupInfo?.[0]?.teamInfo?.[0]?.counselorInfo?.[0]?.assignedSkills?.length || 0
       });
+      */
 
       // Window 상태 업데이트
       const currentState = WindowStateUtils.getCurrentState();
       if (currentState) {
         currentState.sidebarData = data;
-        console.log('🔄 Window 사이드바 데이터 업데이트');
+        // console.log('🔄 Window 사이드바 데이터 업데이트');
       }
 
       // 기본 확장 상태 적용
@@ -293,7 +298,7 @@ export function TreeMenusForAgentTab() {
       setSortedData(sorted);
       dataVersionRef.current += 1;
 
-      console.log(`✅ 초기화 작업 완료 (버전: ${dataVersionRef.current})`);
+      // console.log(`✅ 초기화 작업 완료 (버전: ${dataVersionRef.current})`);
     }
   }, [data, tenant_id, applySorting]);
 
@@ -327,7 +332,7 @@ export function TreeMenusForAgentTab() {
   // 🌟 정렬 옵션 변경 시 데이터 재정렬 + Window 상태 업데이트
   useEffect(() => {
     if (data?.organizationList) {
-      console.log('🔄 정렬 옵션 변경, 데이터 재정렬');
+      // console.log('🔄 정렬 옵션 변경, 데이터 재정렬');
       const sorted = applySorting([...data.organizationList]);
       setSortedData(sorted);
 
@@ -335,7 +340,7 @@ export function TreeMenusForAgentTab() {
       const currentState = WindowStateUtils.getCurrentState();
       if (currentState) {
         currentState.sidebarData = { ...data, organizationList: sorted };
-        console.log('🔄 Window 상태 업데이트 (정렬 반영)');
+        // console.log('🔄 Window 상태 업데이트 (정렬 반영)');
       }
     }
   }, [sortOption, data, tenant_id, applySorting]);

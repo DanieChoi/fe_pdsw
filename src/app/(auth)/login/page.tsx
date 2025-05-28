@@ -302,6 +302,7 @@ export default function LoginPage() {
             alt="U PDS"
             width={200}
             height={70}
+            style={{ width: '200px', height: '70px' }}
             priority
           />
         </div>
@@ -337,6 +338,7 @@ export default function LoginPage() {
                     alt="password"
                     width={14}
                     height={19}
+                    style={{ width: '14px', height: '19px' }}
                     priority
                   />
                 </div>

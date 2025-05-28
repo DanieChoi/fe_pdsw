@@ -671,7 +671,7 @@ export const WindowStateUtils = {
       expandedNodes: new Set(),
       selectedNodeId: undefined
     };
-    console.log('🌟 Window 상태 초기화 완료');
+    // console.log('🌟 Window 상태 초기화 완료');
   },
 
   registerCallbacks: (callbacks: {
@@ -681,7 +681,7 @@ export const WindowStateUtils = {
   }) => {
     if (window.__COUNSELOR_TREE_STATE__) {
       Object.assign(window.__COUNSELOR_TREE_STATE__, callbacks);
-      console.log('🔗 콜백 등록 완료');
+      // console.log('🔗 콜백 등록 완료');
     }
   },
 
@@ -701,6 +701,6 @@ export const WindowStateUtils = {
 
   cleanup: () => {
     delete window.__COUNSELOR_TREE_STATE__;
-    console.log('🧹 Window 상태 정리 완료');
+    // console.log('🧹 Window 상태 정리 완료');
   }
 };

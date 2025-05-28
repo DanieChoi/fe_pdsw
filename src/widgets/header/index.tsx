@@ -513,6 +513,7 @@ export default function Header() {
                             alt={item.title}
                             width={32}
                             height={32}
+                            style={{ width: '32px', height: '32px' }}
                             className="object-contain"
                           />
                         </div>

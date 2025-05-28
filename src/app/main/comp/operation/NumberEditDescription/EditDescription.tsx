@@ -111,7 +111,7 @@ const EditDescription = () => {
 
   // 전화번호설명 템플릿 조회
   useEffect(() => {
-    console.log("campaigns", campaigns)
+    // console.log("campaigns", campaigns)
     fetchPhoneDescriptions({
       session_key: '',
       tenant_id: tenant_id,
@@ -236,7 +236,7 @@ const EditDescription = () => {
   // ], []);
 
   const columns = useMemo(() => [
-    { key: 'id', name: '전화 템플릿 아이디' },
+    { key: 'id', name: '전화번호별 템플릿 아이디' },
     { key: 'phone1', name: '고객 전화번호(1)' },
     { key: 'phone2', name: '고객 전화번호(2)' },
     { key: 'phone3', name: '고객 전화번호(3)' },
