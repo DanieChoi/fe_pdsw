@@ -106,7 +106,7 @@ const ChannelGroupSetting = () => {
     const channelColumns = [
         {
         key: "group_id",
-        name: "ID",
+        name: "그룹 아이디",
         editable: false,
         },
         {
@@ -128,7 +128,7 @@ const ChannelGroupSetting = () => {
         },
         {
         key: "campaign_count",
-        name: "캠페인 수",
+        name: "할당된 캠페인 수",
         editable: false,
         },
     ];
@@ -608,8 +608,8 @@ const ChannelGroupSetting = () => {
                         </div>
                         <div className="pt-4">
                             <ul className='space-y-1 notice-li'>
-                                <li>• 채널 그룹아이디 추가 / 수정 / 삭제를 할 수 있습니다.</li>
-                                <li>• 아이디를 추가하시려면 그리드에서 키보드 ↓를 누르시던지 [신규] 버튼을 클릭해 주세요.</li>
+                                <li>• 채널그룹 아이디 추가 / 수정 / 삭제를 할 수 있습니다.</li>
+                                <li>• 채널그룹 아이디를 추가하시려면 그리드에서 키보드 ↓를 누르시던지 [신규] 버튼을 클릭해 주세요.</li>
                             </ul>
                         </div>
                         
