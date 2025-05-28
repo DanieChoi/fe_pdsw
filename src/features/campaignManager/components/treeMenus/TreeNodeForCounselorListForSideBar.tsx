@@ -628,7 +628,7 @@ export function TreeNodeForCounselorListForSideBar({
     if (type === 'counselor') {
       const tenantId = data.tenantId || currentTenantId;
       if (tenantId) {
-        console.log(`상담사 선택: ${data.counselorname}, TenantID: ${tenantId}`);
+        // console.log(`상담사 선택: ${data.counselorname}, TenantID: ${tenantId}`);
         setSelectedCounselor(
           data.counselorId,
           data.counselorname,

@@ -32,7 +32,7 @@ export async function apiToFetchCounselorListForSideBar(tenantId: string) {
     }
   );
 
-  console.log("response.data at 상담사 api 함수 (POST, 고정 campaignId) : ", response.data);
+  // console.log("response.data at 상담사 api 함수 (POST, 고정 campaignId) : ", response.data);
 
   return response.data;
 }

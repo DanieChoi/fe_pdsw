@@ -111,7 +111,7 @@ const EditDescription = () => {
 
   // 전화번호설명 템플릿 조회
   useEffect(() => {
-    console.log("campaigns", campaigns)
+    // console.log("campaigns", campaigns)
     fetchPhoneDescriptions({
       session_key: '',
       tenant_id: tenant_id,

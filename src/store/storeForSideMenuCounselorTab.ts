@@ -160,7 +160,7 @@ export const useCounselorFilterStore = create<CounselorFilterState>()(
           false,
           'counselorFilter/expandToLevel'
         );
-        console.log(`Expansion level set to: ${level}`);
+        // console.log(`Expansion level set to: ${level}`);
       },
 
       expandAll: () => {
