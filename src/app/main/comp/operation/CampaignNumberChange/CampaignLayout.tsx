@@ -428,7 +428,7 @@ function CampaignLayout() {
       <div className="w-[513px]">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <Label className="w-[5rem] min-w-[5rem]">대상캠페인</Label>
+            <Label className="w-[5rem] min-w-[5rem]">대상 캠페인</Label>
             <CustomInput 
               type="text" 
               value={selectedCampaignId}
@@ -457,13 +457,18 @@ function CampaignLayout() {
           {/* 발신번호 영역 */}
           <div className="flex items-center gap-2">
             <Label className="w-[5rem] min-w-[5rem]">발신번호</Label>
-            <OnlyNumberInput
-              type="text" 
-              value={selectedCallingNumber}
-              onChange={(e) => setSelectedCallingNumber(e.target.value)}
-              disabled={isCallingNumberDisabled()}
-              className=""
-            />
+
+            <CustomInput
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={selectedCallingNumber}
+                  onChange={(e) => {
+                      setSelectedCallingNumber(e.target.value); // 숫자만 허용
+                  }}
+                  maxLength={11}
+              />
+
           </div>
 
           {/* 버튼 영역 */}
@@ -485,7 +490,7 @@ function CampaignLayout() {
               <li>• 캠페인 별로 발신번호를 설정할 수 있습니다.</li>
               <li>• 발신번호를 설정하시려면 신규 버튼을 클릭해 주세요.</li>
             </ul>
-            <p className='mt-[20px]'>※ 변경된 정보는 캠페인의 발신 작업이 재시작 시 반영됩니다.</p>
+            <p className='mt-[20px]'>※ 변경된 정보는 캠페인 재 시작 시 반영됩니다 .</p>
           </div>
         </div>
       </div>
