@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { loginAsAdmin } from './helpers/login.helper';
+import { loginAndGoToCampaignManagement } from './helpers/login.helper';
 
 test('캠페인 중에서 무작위 선택하여 상태 전환', async ({ page }) => {
-  await loginAsAdmin(page);
+  // 로그인 및 캠페인 관리 페이지로 이동
+  await loginAndGoToCampaignManagement(page);
 
   // 멈춤 또는 중지 상태인 캠페인들만 찾기
   const pausedCampaigns = page.locator('div.campaign-node img[src*="tree_pause"]').locator('..');
