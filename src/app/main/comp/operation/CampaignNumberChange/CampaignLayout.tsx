@@ -137,10 +137,12 @@ function CampaignLayout() {
   // 발신번호 삭제
   const { mutate: fetchCallingNumberDelete } = useApiForCallingNumberDelete({
     onSuccess: (data) => {
-      fetchCallingNumbers({
-        session_key: '',
-        tenant_id: tenant_id,
-      });
+      if (data.result_code == 0 ) {
+        fetchCallingNumbers({
+          session_key: '',
+          tenant_id: tenant_id,
+        });
+      }
     },
     onError: (error) => {
       ServerErrorCheck('발신번호 삭제', error.message);
@@ -367,15 +369,19 @@ function CampaignLayout() {
           }, 
           {
             onSuccess: (data) => {
-              showAlert('발신번호가 성공적으로 삭제되었습니다.');
+              if (data.result_code !== 0 ) {
+                showAlert('에러사항에 대해서 관리자에게 문의 하세요.');
+              }else {
+                showAlert('발신번호가 성공적으로 삭제되었습니다.');
+                // 삭제 후 데이터 초기화
+                setSelectedRow(null);
+                setSelectedCampaign(null);
+                setSelectedCampaignId('');
+                setSelectedCampaignName('');
+                setSelectedCallingNumber('');
+                setIsNewMode(true); // 삭제 후 신규 모드로 변경
+              }
               
-              // 삭제 후 데이터 초기화
-              setSelectedRow(null);
-              setSelectedCampaign(null);
-              setSelectedCampaignId('');
-              setSelectedCampaignName('');
-              setSelectedCallingNumber('');
-              setIsNewMode(true); // 삭제 후 신규 모드로 변경
             }
           }
         );
