@@ -1,7 +1,7 @@
 // src/features/campaignManager/types/typeForCounselorSkill.ts
 export interface CounselorSkillRequestData {
   filter: {
-    skill_id: {
+    skill_id?: {
       start: number;
       end: number;
     };
