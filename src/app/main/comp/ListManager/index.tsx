@@ -990,7 +990,7 @@ const ListManager: React.FC = () => {
             phone_number3: sendList[j].TNO3+'',
             phone_number4: sendList[j].TNO4+'',
             phone_number5: sendList[j].TNO5+'',
-            reserved_time: formatted,
+            reserved_time: '',
             token_data: sendList[j].TKDA+''
           });
         }
