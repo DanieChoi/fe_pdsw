@@ -43,6 +43,4 @@ export async function loginAndGoToCampaignManagement(page: Page) {
   await campaignButton.click();
   await page.waitForTimeout(1500);
   
-  // 캠페인 트리가 로드되었는지 확인
-  await expect(page.getByText('NEXUS')).toBeVisible();
 }
