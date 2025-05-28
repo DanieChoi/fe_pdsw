@@ -21,6 +21,7 @@ import { useApiForCallingNumber } from '@/features/campaignManager/hooks/useApiF
 import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiForCampaignSkill';
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
 import CustomAlert from "./CustomAlert";
+import { useAgentSkillStatusStore } from "@/store/agenSkillStatusStore";
 
 const errorMessage = {
   isOpen: false,
@@ -389,6 +390,8 @@ export default function Footer({
         });
         window.dispatchEvent(agentSkillUpdateStatus);
 
+        // 스킬편집에 전달을 위한 store 업데이트
+        useAgentSkillStatusStore.getState().setAgentSkillStatus(true);
         // 캠페인 관리(상세) 전달을 위한 호출
         fetchMain({
           session_key: '',
