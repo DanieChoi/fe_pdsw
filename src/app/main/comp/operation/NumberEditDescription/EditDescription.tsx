@@ -237,11 +237,11 @@ const EditDescription = () => {
 
   const columns = useMemo(() => [
     { key: 'id', name: '전화 템플릿 아이디' },
-    { key: 'phone1', name: '고객 전화번호 (1)' },
-    { key: 'phone2', name: '고객 전화번호 (2)' },
-    { key: 'phone3', name: '고객 전화번호 (3)' },
-    { key: 'phone4', name: '고객 전화번호 (4)' },
-    { key: 'phone5', name: '고객 전화번호 (5)' },
+    { key: 'phone1', name: '고객 전화번호(1)' },
+    { key: 'phone2', name: '고객 전화번호(2)' },
+    { key: 'phone3', name: '고객 전화번호(3)' },
+    { key: 'phone4', name: '고객 전화번호(4)' },
+    { key: 'phone5', name: '고객 전화번호(5)' },
   ], []);
 
   // 전화번호 설명 데이터 그리드 행 정의
@@ -323,7 +323,7 @@ const EditDescription = () => {
             </div>
 
             <div className="flex items-center gap-2">
-            <Label className=" whitespace-nowrap">고객 전화번호 (1)</Label>
+            <Label className=" whitespace-nowrap">고객 전화번호(1)</Label>
             <CustomInput
                 type="text"
                 value={inputPhone1}
@@ -335,7 +335,7 @@ const EditDescription = () => {
             </div>
             
             <div className="flex items-center gap-2">
-            <Label className=" whitespace-nowrap">고객 전화번호 (2)</Label>
+            <Label className=" whitespace-nowrap">고객 전화번호(2)</Label>
             <CustomInput
                 type="text"
                 value={inputPhone2}
@@ -347,7 +347,7 @@ const EditDescription = () => {
             </div>
             
             <div className="flex items-center gap-2">
-            <Label className=" whitespace-nowrap">고객 전화번호 (3)</Label>
+            <Label className=" whitespace-nowrap">고객 전화번호(3)</Label>
             <CustomInput
                 type="text"
                 value={inputPhone3}
@@ -359,7 +359,7 @@ const EditDescription = () => {
             </div>
 
             <div className="flex items-center gap-2">
-            <Label className=" whitespace-nowrap">고객 전화번호 (4)</Label>
+            <Label className=" whitespace-nowrap">고객 전화번호(4)</Label>
             <CustomInput
                 type="text"
                 value={inputPhone4}
@@ -371,7 +371,7 @@ const EditDescription = () => {
             </div>
 
             <div className="flex items-center gap-2">
-            <Label className=" whitespace-nowrap">고객 전화번호 (5)</Label>
+            <Label className=" whitespace-nowrap">고객 전화번호(5)</Label>
             <CustomInput
                 type="text"
                 value={inputPhone5}
@@ -401,7 +401,7 @@ const EditDescription = () => {
             disabled
           />
 
-          <Label className="whitespace-nowrap self-center">고객 전화번호 (1)</Label>
+          <Label className="whitespace-nowrap self-center">고객 전화번호(1)</Label>
           <CustomInput
             type="text"
             value={inputPhone1}
@@ -411,7 +411,7 @@ const EditDescription = () => {
             maxLength={20}
           />
 
-          <Label className="whitespace-nowrap self-center">고객 전화번호 (2)</Label>
+          <Label className="whitespace-nowrap self-center">고객 전화번호(2)</Label>
           <CustomInput
             type="text"
             value={inputPhone2}
@@ -421,7 +421,7 @@ const EditDescription = () => {
             maxLength={20}
           />
 
-          <Label className="whitespace-nowrap self-center">고객 전화번호 (3)</Label>
+          <Label className="whitespace-nowrap self-center">고객 전화번호(3)</Label>
           <CustomInput
             type="text"
             value={inputPhone3}
@@ -431,7 +431,7 @@ const EditDescription = () => {
             maxLength={20}
           />
 
-          <Label className="whitespace-nowrap self-center">고객 전화번호 (4)</Label>
+          <Label className="whitespace-nowrap self-center">고객 전화번호(4)</Label>
           <CustomInput
             type="text"
             value={inputPhone4}
@@ -441,7 +441,7 @@ const EditDescription = () => {
             maxLength={20}
           />
 
-          <Label className="whitespace-nowrap self-center">고객 전화번호 (5)</Label>
+          <Label className="whitespace-nowrap self-center">고객 전화번호(5)</Label>
           <CustomInput
             type="text"
             value={inputPhone5}

@@ -296,7 +296,7 @@ const ITableForUpdateCamapignProgressToStart = ({
                         <TooltipContent>
                           {hasNumbers ? (
                             <div>
-                              <p className="font-medium mb-1">등록된 발신번호 ({callingNumbers.length}개)</p>
+                              <p className="font-medium mb-1">등록된 발신번호({callingNumbers.length}개)</p>
                               <ul className="text-xs space-y-1">
                                 {callingNumbers.slice(0, 5).map((number: string, idx) => (
                                   <li key={idx}>• {number}</li>
