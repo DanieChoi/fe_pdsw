@@ -252,7 +252,7 @@ const OutgoingOrderTab: React.FC<Props> = ({ callCampaignMenu, campaignInfo, onC
       <div className="flex flex-col gap-5">
         <div className="flex gap-5 justify-between items-start">
           <div className="flex items-center gap-2 justify-between w-[25%]">
-            <Label className="w-[5rem] min-w-[5rem]">전화번호별 템플릿 아이디</Label>
+            <Label className="w-[5rem] min-w-[5rem]">전화번호별<br/>템플릿 아이디</Label>
             <Select 
               onValueChange={(value) => handleSelectChange(value, 'dialMode')}
               value={tempCampaignOutgoingOrderTab.dial_phone_id > 0 ?tempCampaignOutgoingOrderTab.dial_phone_id+'': phoneDescriptions.length > 0? phoneDescriptions[0].description_id+'':''}

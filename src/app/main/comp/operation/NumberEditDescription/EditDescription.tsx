@@ -236,7 +236,7 @@ const EditDescription = () => {
   // ], []);
 
   const columns = useMemo(() => [
-    { key: 'id', name: '전화 템플릿 아이디' },
+    { key: 'id', name: '전화번호별 템플릿 아이디' },
     { key: 'phone1', name: '고객 전화번호 (1)' },
     { key: 'phone2', name: '고객 전화번호 (2)' },
     { key: 'phone3', name: '고객 전화번호 (3)' },
@@ -392,7 +392,7 @@ const EditDescription = () => {
 
       <div className="w-[513px]">
         <div className="grid grid-cols-[5.5rem_1fr] gap-x-4 gap-y-2">
-          <Label className="whitespace-nowrap self-center">전화 템플릿 아이디</Label>
+          <Label className="whitespace-nowrap self-center">전화번호별<br/>템플릿 아이디</Label>
           <CustomInput
             type="text"
             value={inputId}
