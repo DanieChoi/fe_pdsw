@@ -9,7 +9,7 @@ const ServerErrorCheck = (requestContent: string, dataMessage: string, routerChe
   // 함수라서 컴포넌트 렌더링이 불가능하므로 공용 에러 store 사용
   const openAlert = useErrorAlertStore.getState().openAlert;
 
-  console.log('###### ServerErrorCheck - dataMessage: ', dataMessage);
+  console.log('###### ServerErrorCheck - dataMessage: ', dataMessage, 'requestContent: ', requestContent);
   let errorMessage = requestContent + ' 요청이 실패하였습니다. \nPDS 서버 시스템에 확인하여 주십시오.';
   const errorTitle = '알림';
   
