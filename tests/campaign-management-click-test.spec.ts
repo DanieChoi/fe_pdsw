@@ -1,3 +1,5 @@
+// fe_pdsw_for_playwright\tests\campaign-management-click-test.spec.ts
+
 import { test, expect } from '@playwright/test';
 import { loginAsAdmin } from './helpers/login.helper';
 
