@@ -45,18 +45,18 @@ const secondModeAll = [
 
 const secondModeCampaignGroup = [
   {key:' ', name: '전체 채널그룹'},
-  {key:'회선사용안함', name: '회선사용안함'},
+  {key:'회선 사용 안함', name: '회선 사용 안함'},
   {key:'모든그룹아이디사용', name: '모든 그룹아이디 사용'},
 ];
 
 const secondModeSender = [
-  {key:' ', name: '전체발신모드'},
-  {key:'0', name: '회선사용안함'},
-  {key:'발신방법모두사용', name: '발신방법모두사용'},
-  {key:'1', name: 'power mode'},
-  {key:'2', name: 'progressive mode'},
-  {key:'3', name: 'predictive mode'},
-  {key:'5', name: 'system preview'}
+  {key:' ', name: '전체 발신 모드'},
+  {key:'0', name: '회선 사용 안함'},
+  {key:'발신방법 모두 사용', name: '발신방법 모두 사용'},
+  {key:'1', name: 'Power Mode'},
+  {key:'2', name: 'Progressive Mode'},
+  {key:'3', name: 'Predictive Mode'},
+  {key:'5', name: 'System Preview'}
 ];
 
 interface ChannelMonitorProps {
@@ -199,9 +199,9 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
         CHNO: `CH${item.id}`,
         status: item.state === '0' ? 'NONE' : item.state === '1' ? 'IDLE' : 'BUSY' as ChannelStatus,
         ChannelMode: item.assign_kind,
-        campaignMode: item.assign_kind === '1' ? item.dial_mode === '2147483647' ? '모든캠페인사용' : item.dial_mode === '0' ?'회선사용안함':item.dial_mode : '', 
-        callMode: item.assign_kind === '2' ?item.dial_mode === '2147483647' ? '발신방법모두사용':item.dial_mode:'',
-        channelGroupMode: item.assign_kind === '3' ? item.dial_mode === '2147483647' ? '모든그룹아이디사용' : item.dial_mode === '0' ?'회선사용안함':item.dial_mode : '',
+        campaignMode: item.assign_kind === '1' ? item.dial_mode === '2147483647' ? '모든 캠페인 사용' : item.dial_mode === '0' ?'회선 사용 안함':item.dial_mode : '', 
+        callMode: item.assign_kind === '2' ?item.dial_mode === '2147483647' ? '발신방법 모두 사용':item.dial_mode:'',
+        channelGroupMode: item.assign_kind === '3' ? item.dial_mode === '2147483647' ? '모든그룹아이디사용' : item.dial_mode === '0' ?'회선 사용 안함':item.dial_mode : '',
       }));
       setChannelData(dataList);  
 
@@ -481,15 +481,15 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
                 }
                 {firstSelect === '캠페인 모드' &&
                 <>
-                  <SelectItem key={' '} value={' '}>{'전체캠페인'}</SelectItem> 
-                  <SelectItem key={'회선사용안함'} value={'회선사용안함'}>{'회선사용안함'}</SelectItem> 
-                  <SelectItem key={'모든캠페인사용'} value={'모든캠페인사용'}>{'모든캠페인사용'}</SelectItem> 
+                  <SelectItem key={' '} value={' '}>{'전체 캠페인'}</SelectItem> 
+                  <SelectItem key={'회선 사용 안함'} value={'회선 사용 안함'}>{'회선 사용 안함'}</SelectItem> 
+                  <SelectItem key={'모든 캠페인 사용'} value={'모든 캠페인 사용'}>{'모든 캠페인 사용'}</SelectItem> 
                 </>
                 }
                 {firstSelect === '채널 그룹 모드' &&
                 <>
                   <SelectItem key={' '} value={' '}>{'전체 채널그룹'}</SelectItem> 
-                  <SelectItem key={'회선사용안함'} value={'회선사용안함'}>{'회선사용안함'}</SelectItem> 
+                  <SelectItem key={'회선 사용 안함'} value={'회선 사용 안함'}>{'회선 사용 안함'}</SelectItem> 
                   <SelectItem key={'모든그룹아이디사용'} value={'모든그룹아이디사용'}>{'모든 그룹아이디 사용'}</SelectItem> 
                 </>
                 }

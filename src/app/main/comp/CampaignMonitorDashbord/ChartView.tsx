@@ -445,7 +445,7 @@ const ChartView: React.FC<Props> = ({ selectedCall }) => {
           <tbody>
             <TableRow>
               <TableHeader className="w-[120px] !text-center border-r border-b">
-                <Label>블랙리스트</Label>
+                <Label>블랙 리스트</Label>
               </TableHeader>
               <TableHeader className="w-[160px] !text-center border-r border-b">
                 <Label>실시간 리스트 삭제</Label>
