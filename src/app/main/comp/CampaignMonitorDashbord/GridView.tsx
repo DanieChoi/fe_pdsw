@@ -98,7 +98,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
           
           <div className="flex gap-5">
               <div className="w-1/2">
-                <TitleWrap title="발신 실패 사유" />
+                <TitleWrap title="발신 실패 사유 현황" />
                 <div className="border rounded h-[170px] flex items-center justify-center">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -428,7 +428,7 @@ const GridView: React.FC<Props> = ({ selectedCall }) => {
                           <TableCell className="text-center text-sm">{selectedCall?.nogdeleteGL || 0}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableHeader className="w-[200px]"><Label>블랙리스트</Label></TableHeader>
+                          <TableHeader className="w-[200px]"><Label>블랙 리스트</Label></TableHeader>
                           <TableCell className="text-center text-sm">{selectedCall?.blackList || 0}</TableCell>
                         </TableRow>
                         <TableRow>

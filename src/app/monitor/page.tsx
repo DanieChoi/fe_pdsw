@@ -159,7 +159,7 @@ const MonitorPage = () => {
   const [sections, setSections] = useState<Section[]>([
     {
       id: 'campaign-info',
-      title: '캠페인정보',
+      title: '캠페인 정보',
       position: 'top-left',
       width: `${sizes.topRow.left}%`
     },
@@ -177,7 +177,7 @@ const MonitorPage = () => {
     },
     {
       id: 'channel-monitor',
-      title: '채널모니터',
+      title: '채널 모니터',
       position: 'bottom-left',
       width: `${sizes.bottomRow.left}%`
     },
