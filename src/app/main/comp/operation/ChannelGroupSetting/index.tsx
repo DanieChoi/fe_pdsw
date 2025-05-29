@@ -1,7 +1,7 @@
 import CommonButton from "@/components/shared/CommonButton";
 import DataGrid, { SelectColumn } from "react-data-grid";
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Cookies from 'js-cookie';
 import { useAuthStore, useCampainManagerStore, useMainStore } from "@/store";
 import CustomAlert from "@/components/shared/layout/CustomAlert";
@@ -27,13 +27,6 @@ interface ChannelCampaignRow {
     campaign_name : string;
 }
 
-
-const errorMessage = {
-    isOpen: false,
-    message: '',
-    title: '로그인',
-    type: '2',
-};
 
 
 const ChannelGroupSetting = () => {
@@ -97,6 +90,9 @@ const ChannelGroupSetting = () => {
     const [changedRows, setChangedRows] = useState<Set<number>>(new Set());
     // 채널 그룹리스트 선택 행 상태관리
     const [selectedChannelRow, setSelectedChannelRow] = useState<number | null>(null);
+
+    // 추가될 채널 그룹리스트 행 상태관리
+    const [newChannelGroupRow, setNewChannelGroupRow] = useState<ChannelGroupRow | null>(null);
 
     // 캠페인 관리를 위한 store
     const { setChannelGroupList } = useCampainManagerStore();
@@ -196,12 +192,21 @@ const ChannelGroupSetting = () => {
                     setCampaignCount(filteredCampaigns.length);
                 }
 
+                // 신규로 추가된 행이 있는 경우
+                if (newChannelGroupRow) {
+                    const newRowIndex = updatedRows.findIndex(row => row.group_id === newChannelGroupRow.group_id);
+                    if (newRowIndex !== -1) {
+                        setSelectedChannelRow(newRowIndex); // 신규 행을 선택 상태로 설정
+                    }
+                }
 
+                setNewChannelGroupRow(null); // 신규 행 상태 초기화
             }
             
             
         }, 
         onError: (data) => {
+            console.log('채널 그룹 조회 실패:', data);
         
             ServerErrorCheck('채널 그룹 조회', data.message);
         }
@@ -234,6 +239,7 @@ const ChannelGroupSetting = () => {
             if(data.result_code === 0) {
                 showAlert('채널 그룹이 삭제되었습니다.');
             }
+            setSelectedChannelRow(null); // 삭제 후 선택된 행 초기화
             fetchChannelGroupList();
         }, 
         onError: (data) => {
@@ -334,6 +340,7 @@ const ChannelGroupSetting = () => {
 
     // 채널 그룹 신규 추가
     const handleNew = () => {
+        console.log('신규 채널 그룹 추가', newRows);
 
         const newGroupId = parseInt(generateChannelGroupId());
         
@@ -347,6 +354,8 @@ const ChannelGroupSetting = () => {
         setChannelGroupRow((prev) => [...prev, newGroup]);
         setNewRows((prev) => new Set(prev).add(newGroup.group_id)); // 신규 행 추적
         setSelectedChannelRow(channelGroupRow.length); // 새로 추가된 행을 선택 상태로 설정
+        setCampaignCount(0); // 캠페인 수 초기화
+        setChannelCampaignRow([]); // 캠페인 목록 초기화
     };
 
 
@@ -435,6 +444,9 @@ const ChannelGroupSetting = () => {
         }
 
         showAlert('채널 그룹이 저장되었습니다.');
+        
+        setNewChannelGroupRow(newRowsToSave[0]);
+        
     }
 
     // 현재시간 양식 구하기.
@@ -514,7 +526,6 @@ const ChannelGroupSetting = () => {
 
     useEffect( ()=> {
         fetchChannelGroupList();
-        console.log('after campaigns :: ', campaigns);
     }, [campaigns]);
 
 
@@ -653,7 +664,7 @@ const ChannelGroupSetting = () => {
                         <ul className='space-y-1 notice-li'>
                             <li>• 그룹해제 = 선택 박스 체크 후 [선택 캠페인 채널그룹 해제] 버튼을 클릭하시던지 
                                 그리드 선택 후 키보드 Delete를 눌러주세요.</li>
-                            <li>• 등록된 채널 그룹 캠페인관리 {'>'} 발신방법 {'>'} 채널 그룹 옵션에서 사용 가능 합니다. </li>
+                            <li>• 등록된 채널 그룹은 캠페인관리 {'>'} 발신방법 {'>'} 채널 그룹 옵션에서 사용 가능 합니다. </li>
                         </ul>
                     </div>
                 </div>    

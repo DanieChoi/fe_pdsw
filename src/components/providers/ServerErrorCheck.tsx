@@ -22,6 +22,11 @@ const ServerErrorCheck = (requestContent: string, dataMessage: string, routerChe
   }
   else if (dataMessage.split('||')[0] === '200') {
     routerCheck = false;
+  }
+  else if (dataMessage.includes("Cannot read properties of undefined") ||
+           dataMessage.includes("Cannot read properties of null") ) {
+    console.log('###### ServerErrorCheck data Error : ', dataMessage);
+    errorMessage = '잘못된 요청입니다. \nPDS 서버 시스템에 확인하여 주십시오.';
   }else{
     console.log('###### ServerErrorCheck Else - dataMessage: ', dataMessage);
     errorMessage = 'PDS 서버 시스템과 연결할 수 없습니다. \n서버 동작 상태를 확인하여 주십시오. 프로그램을 종료합니다.'
