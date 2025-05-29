@@ -19,13 +19,11 @@ export interface FormatRow {
   field: string;
 }
 
-export const initData: FormatRow[] = [{
-  id: '1',
-  name: '고객키[1]',
-  start: 1,
-  length: 1,
-  field: 'CSKE'
-}]
+export const initData: FormatRow[] = [{  id: '1',  name: '고객키[1]',  start: 1,  length: 1,  field: 'CSKE'}
+  ,{  id: '4',  name: '고객 이름',  start: 1,  length: 1,  field: 'CSNA'}
+  ,{  id: '5',  name: '고객 전화번호[1]', start: 1, length: 1, field: 'TNO1'}
+  ,{  id: '17', name: '토큰데이터', start: 1, length: 1, field: 'TKDA'}
+];
 
 const delimiterList: { id: string; name: string; }[] = [
   {id:',',name:','}
