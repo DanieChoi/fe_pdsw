@@ -229,7 +229,7 @@ const ChannelMonitor: React.FC<ChannelMonitorProps> = ({ init,onInit }) => {
           // 채널그룹 모드 데이터로 변경
           const tempData: ItemType[] = dataGroupList.map(item => ({
             key: `${item.dial_mode}`,
-            name: allChannelGroup.filter(data => data.group_id === Number(item.dial_mode ))[0].group_name
+            name: allChannelGroup.find(data => data.group_id === Number(item.dial_mode ))?.group_name || ''
           }));
           setSecondModeCampaignGroup(tempData.sort((a,b) => parseInt(a.key) - parseInt(b.key)));
         }
