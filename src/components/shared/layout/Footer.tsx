@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { ChevronUp, ChevronDown, Bell, BellOff, Trash } from "lucide-react";
-import { debounce, isEqual } from 'lodash';
+import { debounce, isEqual, throttle } from 'lodash';
 import { useAuthStore, useMainStore, useCampainManagerStore } from '@/store';
 import { Resizable } from "re-resizable";
 import { useApiForMain } from '@/features/auth/hooks/useApiForMain';
@@ -65,6 +65,15 @@ export default function Footer({
   const { useAlramPopup } = useEnvironmentStore();
   const [isResizing, setIsResizing] = useState(false);
   const [isHeightToggled, setIsHeightToggled] = useState(false);
+
+  const throttledResizeUpdate = useMemo(
+    () => throttle((height: number) => {
+      if (onResizeHeight) {
+        onResizeHeight(height);
+      }
+    }, 16), // 16ms throttle for smooth ~60fps
+    [onResizeHeight]
+  );
 
   const { invalidateTreeMenuData } = useApiForGetTreeMenuDataForSideMenu();
   const { invalidateCampaignGroupTreeData } = useApiForGetTreeDataForCampaignGroupTab();
@@ -812,7 +821,7 @@ export default function Footer({
   //             tempEventData["kind"],
   //             tempEventData["campaign_id"],
   //             tempEventData["skill_id"] || "", // skill_id 추가 (없을 경우 빈 문자열)
-  //             tempEventData // tempEventData는 7번째 매개변수로
+  //             tempEventData // tempEventData는 7번째 매개변수
   //           );
   //         }
   //       }
@@ -1009,19 +1018,26 @@ export default function Footer({
     onResizeStart?.();
   };
 
-  const handleResizing = (e: any, direction: any, ref: any, d: any) => {
+  const handleResizing = useCallback((e: any, direction: any, ref: any) => {
     const newHeight = ref.offsetHeight;
+    
+    // DOM 직접 조작으로 실시간 업데이트 (React 상태 업데이트보다 빠름)
+    if (footerRef.current && footerRef.current.parentElement) {
+      footerRef.current.parentElement.style.height = `${newHeight}px`;
+    }
+    
+    // 상태 업데이트는 여전히 필요 (리사이징 완료 후 React 상태와 동기화)
     setCurrentHeight(newHeight);
-    onResizeHeight?.(newHeight);
-  };
+    throttledResizeUpdate(newHeight);
+  }, [throttledResizeUpdate]);
 
-  const handleResizeStop = (e: any, direction: any, ref: any, d: any) => {
+  const handleResizeStop = useCallback((e: any, direction: any, ref: any) => {
+    const newHeight = ref.offsetHeight;
     setIsResizing(false);
-    const newHeight = ref.offsetHeight; // ✅ 여기서도 offsetHeight 기준으로!
     setCurrentHeight(newHeight);
     onResizeHeight?.(newHeight);
     onResizeEnd?.(newHeight);
-  };
+  }, [onResizeHeight, onResizeEnd]);
 
   const handleToggleHeight = () => {
     // toast.info("드래그하여 높이를 조절하세요.");
@@ -1116,7 +1132,7 @@ export default function Footer({
           if (tempCampaign && (tempCampaign.use_list_alarm === 1 || tempCampaign.use_list_alarm === 4 || tempCampaign.use_list_alarm === 5 || tempCampaign.use_list_alarm === 7)) {
             _message += data['campaign_id'] + ' 캠페인 잔량알림 : ' + tempCampaign.list_alarm_count;
             // } else if (tempCampaign && tempCampaign.dial_mode === 3) {
-            //   _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정값 ' + data['dial_speed'];
+            //   _message += '캠페인 아이디 ' + campaign_id + ' , 현재 설정 값 ' + data['dial_speed'];
             // addMessageToFooterList(_time, _type, _message);
             // 토스트 알림 표시
             if (useAlramPopup === 1) {
@@ -1183,105 +1199,124 @@ export default function Footer({
     }
   }, [sseData]);
 
+  const footerRef = useRef<HTMLDivElement>(null);
+
   return (
-    <Resizable
-      size={{
-        width: '100%',
-        height: isDrawerOpen ? currentHeight : 32
-      }}
-      minHeight={100}
-      maxHeight={500}
-      enable={{
-        top: isDrawerOpen,
-        right: false,
-        bottom: false,
-        left: false,
-        topRight: false,
-        bottomRight: false,
-        bottomLeft: false,
-        topLeft: false
-      }}
-      className={cn(
-        "border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col group relative h-[1px]",
-        isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative",
-        !isResizing && "duration-300 ease-in-out",
-      )}
-      onResizeStart={handleResizeStartInternal}
-      onResizeStop={handleResizeStop}
-      onResize={handleResizing} // ✅ 추가
-    >
-      {/* 상단 바 영역 */}
-      <div className="flex-none pt-[5px] pb-[4px] px-[20px] border-b bg-white flex justify-between items-center">
-        <div className="flex items-center gap-1">
-          <span className="text-[13px] text-[#333]">현재 진행 상태 </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {useAlramPopup === 1 ? (
-            <>
-              <span title="알림 활성화">
-                <Bell className="w-4 h-4 text-blue-500" />
-              </span>
-              <button onClick={handleClearNotifications} title="알림 모두 비우기">
-                <Trash className="w-4 h-4 text-gray-500" />
-              </button>
-            </>
-          ) : (
-            <span title="알림 비활성화">
-              <BellOff className="w-4 h-4 text-gray-400" />
-            </span>
-          )}
-
-          {/* 열기/닫기 버튼 */}
-          <button
-            onClick={toggleDrawer}
-            className=""
-            title={isDrawerOpen ? "닫기" : "열기"}
-          >
-            {isDrawerOpen ? (
-              <ChevronDown className="w-4 h-4" />
-            ) : (
-              <ChevronUp className="w-4 h-4" />
-            )}
-          </button>
-        </div>
-      </div>
-      <CustomAlert
-        message={alertState.message}
-        title={alertState.title}
-        type={alertState.type}
-        isOpen={alertState.isOpen}
-        onClose={() => {
-          alertState.onClose()
+    <div ref={footerRef}>
+      <Resizable
+        size={{
+          width: '100%',
+          height: isDrawerOpen ? currentHeight : 32
         }}
-        onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
-
-      {/* 푸터 내부 콘텐츠: isDrawerOpen이 true일 때만 렌더링 */}
-      {isDrawerOpen && (
-        <div className="flex-1 flex overflow-hidden">
-          {/* D(1단) -> w-full, W(2단) -> w-1/2 + 오른쪽 테이블 */}
-          <div
-            className={`
-              ${isExpanded ? "w-1/2" : "w-full"}
-              overflow-auto py-[7px] px-[20px]
-              ${isExpanded ? "border-r" : ""}
-            `}
-          >
-            <table className="w-full text-sm">
-              <tbody>
-                {footerDataList.map((log, index) => (
-                  <tr key={index}>
-                    <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
-                    <td className="whitespace-nowrap text-[13px] px-1">[{log.type}]</td>
-                    <td className="text-[13px]">{log.message}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        minHeight={100}
+        maxHeight={500}
+        enable={{
+          top: isDrawerOpen,
+          right: false,
+          bottom: false,
+          left: false,
+          topRight: false,
+          bottomRight: false,
+          bottomLeft: false,
+          topLeft: false
+        }}
+        className={cn(
+          "border-t text-sm text-gray-600 bg-[#FBFBFB] flex flex-col group relative",
+          isExpanded ? "fixed left-0 right-0 bottom-0 z-50" : "relative",
+          // 리사이징 중에는 애니메이션 비활성화
+          !isResizing && "transition-all duration-300 ease-in-out",
+        )}
+        onResizeStart={handleResizeStartInternal}
+        onResizeStop={handleResizeStop}
+        onResize={handleResizing}
+        handleComponent={{
+          top: (
+            <div
+              className="w-full h-2 cursor-row-resize bg-transparent hover:bg-gray-200 hover:bg-opacity-50"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                zIndex: 30,
+              }}
+            />
+          ),
+        }}
+      >
+        {/* 상단 바 영역 */}
+        <div className="flex-none pt-[5px] pb-[4px] px-[20px] border-b bg-white flex justify-between items-center">
+          <div className="flex items-center gap-1">
+            <span className="text-[13px] text-[#333]">현재 진행 상태 </span>
           </div>
 
+          <div className="flex items-center gap-2">
+            {useAlramPopup === 1 ? (
+              <>
+                <span title="알림 활성화">
+                  <Bell className="w-4 h-4 text-blue-500" />
+                </span>
+                <button onClick={handleClearNotifications} title="알림 모두 비우기">
+                  <Trash className="w-4 h-4 text-gray-500" />
+                </button>
+              </>
+            ) : (
+              <span title="알림 비활성화">
+                <BellOff className="w-4 h-4 text-gray-400" />
+              </span>
+            )}
+
+            {/* 열기/닫기 버튼 */}
+            <button
+              onClick={toggleDrawer}
+              className=""
+              title={isDrawerOpen ? "닫기" : "열기"}
+            >
+              {isDrawerOpen ? (
+                <ChevronDown className="w-4 h-4" />
+              ) : (
+                <ChevronUp className="w-4 h-4" />
+              )}
+            </button>
+          </div>
         </div>
-      )}
-    </Resizable>
+        <CustomAlert
+          message={alertState.message}
+          title={alertState.title}
+          type={alertState.type}
+          isOpen={alertState.isOpen}
+          onClose={() => {
+            alertState.onClose()
+          }}
+          onCancel={() => setAlertState((prev) => ({ ...prev, isOpen: false }))} />
+
+        {/* 푸터 내부 콘텐츠: isDrawerOpen이 true일 때만 렌더링 */}
+        {isDrawerOpen && (
+          <div className="flex-1 flex overflow-hidden">
+            {/* D(1단) -> w-full, W(2단) -> w-1/2 + 오른쪽 테이블 */}
+            <div
+              className={`
+                ${isExpanded ? "w-1/2" : "w-full"}
+                overflow-auto py-[7px] px-[20px]
+                ${isExpanded ? "border-r" : ""}
+              `}
+            >
+              <table className="w-full text-sm">
+                <tbody>
+                  {footerDataList.map((log, index) => (
+                    <tr key={index}>
+                      <td className="whitespace-nowrap text-[13px]">[{log.time}]</td>
+                      <td className="whitespace-nowrap text-[13px] px-1">[{log.type}]</td>
+                      <td className="text-[13px]">{log.message}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        )}
+      </Resizable>
+    </div>
   );
 }
+
