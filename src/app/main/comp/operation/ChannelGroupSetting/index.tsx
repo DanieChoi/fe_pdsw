@@ -1,14 +1,13 @@
 import CommonButton from "@/components/shared/CommonButton";
 import DataGrid, { SelectColumn } from "react-data-grid";
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Cookies from 'js-cookie';
 import { useAuthStore, useCampainManagerStore, useMainStore } from "@/store";
 import CustomAlert from "@/components/shared/layout/CustomAlert";
 import TitleWrap from "@/components/shared/TitleWrap";
 import { useApiForChannelGroupCreate, useApiForChannelGroupDelete, useApiForChannelGroupList, useApiForChannelGroupUpdate } from "@/features/preferences/hooks/useApiForChannelGroup";
 import { useApiForCampaignManagerUpdate } from "@/features/campaignManager/hooks/useApiForCampaignManagerUpdate";
-import { campaignChannel } from "@/lib/broadcastChannel";
 import { UpdataCampaignInfo } from "@/components/common/common";
 import ServerErrorCheck from "@/components/providers/ServerErrorCheck";
 
@@ -340,7 +339,6 @@ const ChannelGroupSetting = () => {
 
     // 채널 그룹 신규 추가
     const handleNew = () => {
-        console.log('신규 채널 그룹 추가', newRows);
 
         const newGroupId = parseInt(generateChannelGroupId());
         
