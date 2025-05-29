@@ -1019,10 +1019,11 @@ const ListManager: React.FC = () => {
   }, [listManagerFileFormat]);
    
   useEffect(() => {
-    if ( listManagerFileFormatRows.length === 0 || listManagerFileFormatRows.length === 1  ) {
+    if ( listManagerFileFormatRows.length === 0 ) {
       setListManagerFileFormatRows(initData);
+      setListManagerDelimiter(',');
       setSendColumns([]);
-    }else if ( listManagerFileFormatRows.length > 1 ) {
+    }else if ( listManagerFileFormatRows.length > 0 ) {
       setHeaderColumnData(listManagerFileFormatRows);
       const tempList: Column<SendRow>[] = listManagerFileFormatRows.map((tempData) => ({
         key: tempData.field,
@@ -1030,7 +1031,7 @@ const ListManager: React.FC = () => {
       }));  
       setSendColumns(tempList);
     }
-  }, [listManagerFileFormatRows]);
+  }, [listManagerFileFormatRows]); 
    
   useEffect(() => {
     if( processMessage !== ''){
