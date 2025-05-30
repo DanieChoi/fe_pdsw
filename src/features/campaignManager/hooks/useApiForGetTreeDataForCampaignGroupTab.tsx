@@ -48,11 +48,7 @@ export const useApiForGetTreeDataForCampaignGroupTab = (initialTenantId?: number
       const combinedData = await apiForCombinedTenantAndCampaignGroup(tenant_id);
       return {
         combinedData,
-        transformedData: transformToTreeData(combinedData).map(node => ({
-          ...node,
-          id: centerId || node.id.toString(), // store에 저장된 로그인시 받아온 센터아이디
-          name: centerId && centerName ? `[${centerId}]${centerName}` : node.name.toString() , // 이름이 없을 경우 기본값 설정
-        }))
+        transformedData: transformToTreeData(combinedData)
       };
     },
     enabled: tenant_id !== undefined && tenant_id !== null,
