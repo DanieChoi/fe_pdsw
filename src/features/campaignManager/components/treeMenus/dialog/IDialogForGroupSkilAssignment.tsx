@@ -602,7 +602,7 @@ export function IDialogForGroupSkilAssignment({
         const removeResult = await deleteSkillsMutation.mutateAsync({
           skillIds: skillsToRemove,
           counselorIds: counselorIds,
-          tenantId,
+          // tenantId,
         });
         if (removeResult.success) {
           toast.success(
