@@ -21,5 +21,6 @@ export function useApiForSidebarCounselor(tenant_id: string) {
     queryKey: ['counselorList', tenant_id],
     queryFn: () => apiToFetchCounselorListForSideBar(tenant_id),
     staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 }

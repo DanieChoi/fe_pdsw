@@ -541,7 +541,7 @@ declare global {
   }
 }
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiForDeleteCounselorsForSpecificSkill } from '../api/apiForCounselorSkil';
 import { useAgentSkillStatusStore } from '@/store/agenSkillStatusStore';
 
@@ -564,100 +564,123 @@ interface BatchDeleteResult {
  * 🌟 간단한 Window 기반 스킬 삭제 훅
  * 복잡한 캐시 무효화 없이 Window 데이터만 직접 업데이트
  */
+// export function useApiDeleteCounselorsFromSkills(tenantId: string) {
+//   const { setAgentSkillStatus } = useAgentSkillStatusStore();
+
+//   // 실제 API 호출 함수
+//   const deleteSkills = async ({ skillIds, counselorIds }: Omit<DeleteCounselorsFromSkillsParams, 'tenantId'>) => {
+//     console.log('🚀 API 호출 시작:', { skillIds, counselorIds, tenantId });
+    
+//     const results = await Promise.allSettled(
+//       skillIds.map(skillId => 
+//         apiForDeleteCounselorsForSpecificSkill(skillId, counselorIds)
+//           .then(response => {
+//             console.log(`✅ 스킬 ${skillId} 삭제 성공`);
+//             return { skillId, success: true, response };
+//           })
+//           .catch(error => {
+//             console.error(`❌ 스킬 ${skillId} 삭제 실패:`, error);
+//             return { skillId, success: false, error };
+//           })
+//       )
+//     );
+
+//     const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
+//     const failedSkills = results
+//       .filter(r => r.status === 'fulfilled' && !r.value.success)
+//       .map(r => (r as any).value.skillId);
+
+//     console.log('🏁 API 호출 완료:', { successCount, failedSkills });
+
+//     return {
+//       success: successCount > 0,
+//       successCount,
+//       failedSkills,
+//       error: failedSkills.length > 0 ? new Error(`${failedSkills.length}개 스킬 삭제 실패`) : undefined
+//     };
+//   };
+
+//   // Window 데이터에서 스킬 제거
+//   const removeSkillsFromWindow = (skillIds: number[], counselorIds: string[]) => {
+//     const windowState = window.__COUNSELOR_TREE_STATE__;
+    
+//     if (!windowState?.sidebarData?.organizationList) {
+//       console.warn('⚠️ Window에 사이드바 데이터가 없습니다');
+//       return;
+//     }
+
+//     console.log('🔄 Window에서 스킬 제거:', { skillIds, counselorIds });
+    
+//     // 데이터에서 해당 스킬들 제거
+//     windowState.sidebarData.organizationList.forEach((org: any) => {
+//       org.tenantInfo?.forEach((tenant: any) => {
+//         tenant.groupInfo?.forEach((group: any) => {
+//           group.teamInfo?.forEach((team: any) => {
+//             team.counselorInfo?.forEach((counselor: any) => {
+//               if (counselorIds.includes(counselor.counselorId) && counselor.assignedSkills) {
+//                 const before = counselor.assignedSkills.length;
+//                 counselor.assignedSkills = counselor.assignedSkills.filter(
+//                   (skill: any) => !skillIds.includes(Number(skill.skillId))
+//                 );
+//                 const after = counselor.assignedSkills.length;
+//                 if (before > after) {
+//                   console.log(`🔄 상담사 ${counselor.counselorId}: ${before - after}개 스킬 제거`);
+//                 }
+//               }
+//             });
+//           });
+//         });
+//       });
+//     });
+
+//     // UI 업데이트 콜백 호출
+//     if (windowState.updateSidebarCallback) {
+//       windowState.updateSidebarCallback(windowState.sidebarData);
+//       console.log('✅ UI 업데이트 완료');
+//     }
+//   };
+
+//   return useMutation<BatchDeleteResult, Error, DeleteCounselorsFromSkillsParams>({
+//     mutationKey: ['deleteCounselorsFromSkills', tenantId],
+//     mutationFn: deleteSkills,
+    
+//     onSuccess: (result, variables) => {
+//       if (result.success) {
+//         // Window에서 스킬 제거
+//         removeSkillsFromWindow(variables.skillIds, variables.counselorIds);
+        
+//         // 다른 컴포넌트에 알리기
+//         setAgentSkillStatus(true);
+        
+//         console.log('🎉 스킬 삭제 및 UI 업데이트 완료');
+//       }
+//     },
+    
+//     onError: (error) => {
+//       console.error('💥 스킬 삭제 실패:', error);
+//     }
+//   });
+// }
+
+// 🎯 깔끔한 스킬 삭제 훅
 export function useApiDeleteCounselorsFromSkills(tenantId: string) {
+  const queryClient = useQueryClient();
   const { setAgentSkillStatus } = useAgentSkillStatusStore();
 
-  // 실제 API 호출 함수
-  const deleteSkills = async ({ skillIds, counselorIds }: Omit<DeleteCounselorsFromSkillsParams, 'tenantId'>) => {
-    console.log('🚀 API 호출 시작:', { skillIds, counselorIds, tenantId });
+  return useMutation({
+    mutationFn: ({ skillIds, counselorIds }: Omit<DeleteCounselorsFromSkillsParams, 'tenantId'>) =>
+      Promise.allSettled(
+        skillIds.map(skillId => 
+          apiForDeleteCounselorsForSpecificSkill(skillId, counselorIds)
+        )
+      ),
     
-    const results = await Promise.allSettled(
-      skillIds.map(skillId => 
-        apiForDeleteCounselorsForSpecificSkill(skillId, counselorIds)
-          .then(response => {
-            console.log(`✅ 스킬 ${skillId} 삭제 성공`);
-            return { skillId, success: true, response };
-          })
-          .catch(error => {
-            console.error(`❌ 스킬 ${skillId} 삭제 실패:`, error);
-            return { skillId, success: false, error };
-          })
-      )
-    );
-
-    const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
-    const failedSkills = results
-      .filter(r => r.status === 'fulfilled' && !r.value.success)
-      .map(r => (r as any).value.skillId);
-
-    console.log('🏁 API 호출 완료:', { successCount, failedSkills });
-
-    return {
-      success: successCount > 0,
-      successCount,
-      failedSkills,
-      error: failedSkills.length > 0 ? new Error(`${failedSkills.length}개 스킬 삭제 실패`) : undefined
-    };
-  };
-
-  // Window 데이터에서 스킬 제거
-  const removeSkillsFromWindow = (skillIds: number[], counselorIds: string[]) => {
-    const windowState = window.__COUNSELOR_TREE_STATE__;
-    
-    if (!windowState?.sidebarData?.organizationList) {
-      console.warn('⚠️ Window에 사이드바 데이터가 없습니다');
-      return;
-    }
-
-    console.log('🔄 Window에서 스킬 제거:', { skillIds, counselorIds });
-    
-    // 데이터에서 해당 스킬들 제거
-    windowState.sidebarData.organizationList.forEach((org: any) => {
-      org.tenantInfo?.forEach((tenant: any) => {
-        tenant.groupInfo?.forEach((group: any) => {
-          group.teamInfo?.forEach((team: any) => {
-            team.counselorInfo?.forEach((counselor: any) => {
-              if (counselorIds.includes(counselor.counselorId) && counselor.assignedSkills) {
-                const before = counselor.assignedSkills.length;
-                counselor.assignedSkills = counselor.assignedSkills.filter(
-                  (skill: any) => !skillIds.includes(Number(skill.skillId))
-                );
-                const after = counselor.assignedSkills.length;
-                if (before > after) {
-                  console.log(`🔄 상담사 ${counselor.counselorId}: ${before - after}개 스킬 제거`);
-                }
-              }
-            });
-          });
-        });
+    onSuccess: () => {
+      // 🎯 이것만 하면 끝!
+      queryClient.invalidateQueries({ 
+        queryKey: ['counselorList'] 
       });
-    });
-
-    // UI 업데이트 콜백 호출
-    if (windowState.updateSidebarCallback) {
-      windowState.updateSidebarCallback(windowState.sidebarData);
-      console.log('✅ UI 업데이트 완료');
-    }
-  };
-
-  return useMutation<BatchDeleteResult, Error, DeleteCounselorsFromSkillsParams>({
-    mutationKey: ['deleteCounselorsFromSkills', tenantId],
-    mutationFn: deleteSkills,
-    
-    onSuccess: (result, variables) => {
-      if (result.success) {
-        // Window에서 스킬 제거
-        removeSkillsFromWindow(variables.skillIds, variables.counselorIds);
-        
-        // 다른 컴포넌트에 알리기
-        setAgentSkillStatus(true);
-        
-        console.log('🎉 스킬 삭제 및 UI 업데이트 완료');
-      }
-    },
-    
-    onError: (error) => {
-      console.error('💥 스킬 삭제 실패:', error);
+      setAgentSkillStatus(true);
     }
   });
 }

@@ -94,11 +94,15 @@ export function useApiBatchSkillAssignment(tenantId: string) {
       queryClient.invalidateQueries({
         queryKey: ['counselorSkills', tenantId]
       });
-      
-      // 상담사 관련 쿼리 캐시 무효화
+
       queryClient.invalidateQueries({
-        queryKey: ['counselorList', tenantId]
+        queryKey: ['counselorList']
       });
+      
+      // // 상담사 관련 쿼리 캐시 무효화
+      // queryClient.invalidateQueries({
+      //   queryKey: ['counselorList', tenantId]
+      // });
 
       // 다른 컴포넌트에 알리기위한 상담사 스킬 변경 상태
       setAgentSkillStatus(true);

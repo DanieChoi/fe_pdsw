@@ -22,6 +22,7 @@ import { useApiForCampaignSkill } from '@/features/campaignManager/hooks/useApiF
 import { useSideMenuCampaignGroupTabStore } from "@/store/storeForSideMenuCampaignGroupTab";
 import CustomAlert from "./CustomAlert";
 import { useAgentSkillStatusStore } from "@/store/agenSkillStatusStore";
+import { useQueryClient } from "@tanstack/react-query";
 
 const errorMessage = {
   isOpen: false,
@@ -60,6 +61,7 @@ export default function Footer({
   const [footerDataList, setFooterDataList] = useState<FooterDataType[]>([]);
   const [currentHeight, setCurrentHeight] = useState(footerHeight);
   const { id, tenant_id, role_id } = useAuthStore();
+  const queryClient = useQueryClient();
   const { tenants, campaigns, setCampaigns, setSseInputMessage } = useMainStore();
   const { channelGroupList, setChannelGroupList, schedules, setSchedules, setCallingNumbers, setCampaignSkills } = useCampainManagerStore();
   const { useAlramPopup } = useEnvironmentStore();
@@ -387,9 +389,12 @@ export default function Footer({
         } else if (command === 'DELETE') {
           actionType = '해제';
         }
-
         const _message = '[상담사 스킬' + actionType + '] 스킬아이디: ' + skill_id;
         addMessageToFooterList(_time, _type, _message);
+
+        queryClient.invalidateQueries({
+          queryKey: ['counselorList']
+        });
 
         // 분배제한 호수 전달을 위한 event 발송
         const agentSkillUpdateStatus = new CustomEvent('agentSkillUpdateStatus', {
@@ -431,7 +436,7 @@ export default function Footer({
     else if (announce === '/pds/campaign/skill') {
       if (command === 'UPDATE') {
         _message = '[캠페인 요구스킬 수정] 캠페인 아이디 : ' + campaign_id;
-        addMessageToFooterList(_time, _type, _message);   
+        addMessageToFooterList(_time, _type, _message);
         fetchCampaignSkills({ session_key: '', tenant_id: 0 });
         // 커스텀 이벤트 발생 - 장비 상태 변경을 다른 컴포넌트에 알림
         const campaignSkillUpdateStatus = new CustomEvent('campaignSkillUpdateStatus', {
@@ -926,27 +931,27 @@ export default function Footer({
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       const { type, message } = event.data;
-     
-      if( type === 'sseMessage' ){
-          console.log( 'sseMessageChannel :: ' + message);
-          
-          const tempEventData = JSON.parse(message);
-          const announce = tempEventData["announce"];
-          const command = tempEventData["command"];
-          const data = tempEventData["data"];
-          const kind = tempEventData["kind"];
-          const campaign_id = tempEventData["campaign_id"];
-          const skill_id = tempEventData["skill_id"];
-          footerDataSet(
-            announce,
-            command,
-            data,
-            kind,
-            campaign_id,
-            tempEventData["skill_id"] || "",
-            tempEventData
-          );
-          setSseData(message);
+
+      if (type === 'sseMessage') {
+        console.log('sseMessageChannel :: ' + message);
+
+        const tempEventData = JSON.parse(message);
+        const announce = tempEventData["announce"];
+        const command = tempEventData["command"];
+        const data = tempEventData["data"];
+        const kind = tempEventData["kind"];
+        const campaign_id = tempEventData["campaign_id"];
+        const skill_id = tempEventData["skill_id"];
+        footerDataSet(
+          announce,
+          command,
+          data,
+          kind,
+          campaign_id,
+          tempEventData["skill_id"] || "",
+          tempEventData
+        );
+        setSseData(message);
       }
     };
 
@@ -1020,12 +1025,12 @@ export default function Footer({
 
   const handleResizing = useCallback((e: any, direction: any, ref: any) => {
     const newHeight = ref.offsetHeight;
-    
+
     // DOM 직접 조작으로 실시간 업데이트 (React 상태 업데이트보다 빠름)
     if (footerRef.current && footerRef.current.parentElement) {
       footerRef.current.parentElement.style.height = `${newHeight}px`;
     }
-    
+
     // 상태 업데이트는 여전히 필요 (리사이징 완료 후 React 상태와 동기화)
     setCurrentHeight(newHeight);
     throttledResizeUpdate(newHeight);
@@ -1192,8 +1197,8 @@ export default function Footer({
         } else if (command === 'UPDATE') {
           _message += '[' + campaign_id + '], 사용자 발신번호 설정 변경 성공';
         }
-        addMessageToFooterList(_time, _type, _message); 
-        fetchCallingNumbers({ session_key: '', tenant_id: 0 }); 
+        addMessageToFooterList(_time, _type, _message);
+        fetchCallingNumbers({ session_key: '', tenant_id: 0 });
       }
 
     }
