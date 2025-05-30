@@ -296,12 +296,12 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
     }
   }, [_groupId, _campaignGroupList, campaignGroupCampaignListData]);
   
-  // useEffect(() => {
-  //   if (campaignGroupManagerInit) {
-  //     setCampaignGroupManagerInit(false);
-  //     fetchCampaignGroupSearch(null);
-  //   }
-  // }, [campaignGroupManagerInit]);
+  useEffect(() => {
+    if (campaignGroupManagerInit) {
+      setCampaignGroupManagerInit(false);
+      fetchCampaignGroupSearch(null);
+    }
+  }, [campaignGroupManagerInit]);
 
   useEffect(() => {
     if (campaigns) {
@@ -313,11 +313,8 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
     if (groupId) {
       _setGroupId(parseInt(groupId));
       fetchCampaignGroupSearch(null);
-    }else if(campaignGroupManagerInit) {
-      setCampaignGroupManagerInit(false);
-      fetchCampaignGroupSearch(null);
     }
-  }, [groupId,campaignGroupManagerInit]);
+  }, [groupId]);
 
   useEffect(() => {
     if (tenants) {
