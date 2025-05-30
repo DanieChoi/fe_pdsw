@@ -142,20 +142,19 @@ const IContextMenuForSkill: React.FC<IContextMenuForSkillProps> = ({
     }
 
     deleteSkill({
-      skillIds: [Number(item.id)],
+      skillIds: [Number(item.id)], // 숫자로 변환
       counselorIds: counselorIds,
+      tenantId: tenantId,
     }, {
-      onSuccess: (results) => {
-        // results: PromiseSettledResult<CounselorSkillAssignmentResponse>[]
-        const fulfilled = results.filter(r => r.status === "fulfilled");
-        const rejected = results.filter(r => r.status === "rejected");
-
-        if (fulfilled.length && rejected.length === 0) {
-          toast.success(`"${item.name}" 스킬이 해제되었습니다.`, { autoClose: 2000 });
-        } else if (fulfilled.length && rejected.length) {
-          toast.warn(`일부 상담사에서 "${item.name}" 스킬 해제에 실패했습니다.`, { autoClose: 3000 });
+      onSuccess: (result) => {
+        if (result.success) {
+          toast.success(`"${item.name}" 스킬이 해제되었습니다.`, {
+            autoClose: 2000
+          });
         } else {
-          toast.error(`"${item.name}" 스킬 해제에 실패했습니다.`, { autoClose: 3000 });
+          toast.error(`"${item.name}" 스킬 해제에 실패했습니다.`, {
+            autoClose: 3000
+          });
         }
       },
       onError: (error) => {
