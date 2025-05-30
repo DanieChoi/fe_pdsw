@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect } from 'react';
 import { useSideMenuCampaignGroupTabStore } from '@/store/storeForSideMenuCampaignGroupTab';
 import { apiForCombinedTenantAndCampaignGroup, transformToTreeData } from '@/features/preferences/api/apiForCampaignGroup';
-import { useEnvironmentStore } from '@/store/environmentStore';
+
 
 /**
  * 캠페인 그룹 트리 데이터를 가져오는 커스텀 훅 (TanStack Query 사용)
@@ -23,7 +23,6 @@ export const useApiForGetTreeDataForCampaignGroupTab = (initialTenantId?: number
     tenant_id: storeTenantId
   } = useSideMenuCampaignGroupTabStore();
 
-  const { centerId, centerName } = useEnvironmentStore();
   
   // tenant_id 결정 (props로 받은 값이 우선, 없으면 스토어 값 사용)
   // const tenant_id = initialTenantId !== undefined ? initialTenantId : storeTenantId;

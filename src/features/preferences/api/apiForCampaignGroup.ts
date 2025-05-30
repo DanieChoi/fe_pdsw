@@ -14,6 +14,7 @@ import { TenantListResponse } from "@/features/campaignManager/types/typeForTena
 import { apiForGetTenantList } from "@/features/campaignManager/api/apiForTennants";
 import { ApiRequest, CampaignGroupResponse } from "@/features/campaignManager/types/typeForCampaignGroup";
 import { customAlertService } from "@/components/shared/layout/utils/CustomAlertService";
+import { useEnvironmentStore } from "@/store/environmentStore";
 
 interface CombinedData {
     tenantData: TenantListResponse;
@@ -159,6 +160,9 @@ export const apiForCampaignListForCampaignGroup = async (
 export const transformToTreeData = (combinedData: ExtendedCombinedData): TreeNode[] => {
     const { tenantData, campaignGroupData, campaignData } = combinedData;
 
+    const centerId = useEnvironmentStore.getState().centerId;
+    const centerName = useEnvironmentStore.getState().centerName;
+
     if (!tenantData?.result_data) {
         return [];
     }
@@ -213,8 +217,8 @@ export const transformToTreeData = (combinedData: ExtendedCombinedData): TreeNod
 
     // 최상위 NEXUS 노드에 테넌트 노드를 자식으로 추가
     return [{
-        id: "nexus-root",
-        name: "[1]NEXUS",
+        id: centerId ? `${centerId}` :"nexus-root",
+        name: centerId && centerName ? `[${centerId}]${centerName}` :"[1]NEXUS",
         type: "root" as const,
         children: tenantNodes
     }];
@@ -278,7 +282,7 @@ export const apiForCreateCampaignGroup = async (
         },
     };
 
-    console.log("Create campaign group request data:", request_data);
+    // console.log("Create campaign group request data:", request_data);
 
 
     try {
