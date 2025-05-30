@@ -277,7 +277,7 @@ export const TreeMenusForCampaignGroupTab = memo(function TreeMenusForCampaignGr
   const expandTenantAndGroup = useSideMenuCampaignGroupTabStore(selectExpandTenantAndGroup);
   const removeCampaignFromGroup = useSideMenuCampaignGroupTabStore(selectRemoveCampaignFromGroup);
 
-  console.log("캠페인 그룹탭 트리 데이터", treeData);
+  // console.log("캠페인 그룹탭 트리 데이터", treeData);
 
   // Log only once with useEffect instead of on every render
   useEffect(() => {

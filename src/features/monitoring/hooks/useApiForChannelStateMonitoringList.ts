@@ -11,11 +11,11 @@ export function useApiForChannelStateMonitoringList(
     mutationKey: ['mainChannelStateMonitoringList'],
     mutationFn: fetchChannelStateMonitoringList,
     onSuccess: (data, variables, context) => {
-      console.log('API Response:', {
-        code: data.code,
-        message: data.message,
-        data: data.dialerChannelStatusList
-      });
+      // console.log('API Response:', {
+      //   code: data.code,
+      //   message: data.message,
+      //   data: data.dialerChannelStatusList
+      // });
       options?.onSuccess?.(data, variables, context);
     },
     onError: (error: MonitoringApiError, variables: ChannelStatusMonitoringRequest, context: unknown) => {

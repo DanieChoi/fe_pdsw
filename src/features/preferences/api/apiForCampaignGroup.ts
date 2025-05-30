@@ -30,7 +30,7 @@ export const apiForCombinedTenantAndCampaignGroup = async (
     tenant_id: number
 ): Promise<ExtendedCombinedData> => {
 
-    console.log("tenant_id ??????????????????????????????????????????????????????????? ", tenant_id);
+    // console.log("tenant_id ??????????????????????????????????????????????????????????? ", tenant_id);
 
 
     try {
@@ -46,9 +46,9 @@ export const apiForCombinedTenantAndCampaignGroup = async (
             })
         ]);
 
-        console.log("Combined API for tenant data:", tenantData);
-        console.log("Combined API for campaign group data:", campaignGroupData);
-        console.log("Combined API for campaign data:", campaignData);
+        // console.log("Combined API for tenant data:", tenantData);
+        // console.log("Combined API for campaign group data:", campaignGroupData);
+        // console.log("Combined API for campaign data:", campaignData);
 
         // 데이터 유효성 검사 및 기본값 설정
         const safeData = {
@@ -112,7 +112,7 @@ export const apiForCampaignListForCampaignGroup = async (
             request
         );
 
-        console.log("Campaign list for campaign group response:", data);
+        // console.log("Campaign list for campaign group response:", data);
 
         // Check if data exists and has the expected structure
         // if (!data || typeof data !== 'object') {

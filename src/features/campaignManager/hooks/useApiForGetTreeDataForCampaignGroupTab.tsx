@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect } from 'react';
 import { useSideMenuCampaignGroupTabStore } from '@/store/storeForSideMenuCampaignGroupTab';
 import { apiForCombinedTenantAndCampaignGroup, transformToTreeData } from '@/features/preferences/api/apiForCampaignGroup';
+import { useEnvironmentStore } from '@/store/environmentStore';
 
 /**
  * 캠페인 그룹 트리 데이터를 가져오는 커스텀 훅 (TanStack Query 사용)
@@ -21,6 +22,8 @@ export const useApiForGetTreeDataForCampaignGroupTab = (initialTenantId?: number
     setSelectedNodeId,
     tenant_id: storeTenantId
   } = useSideMenuCampaignGroupTabStore();
+
+  const { centerId, centerName } = useEnvironmentStore();
   
   // tenant_id 결정 (props로 받은 값이 우선, 없으면 스토어 값 사용)
   // const tenant_id = initialTenantId !== undefined ? initialTenantId : storeTenantId;
@@ -39,14 +42,17 @@ export const useApiForGetTreeDataForCampaignGroupTab = (initialTenantId?: number
       if (tenant_id === undefined || tenant_id === null) {
         throw new Error('테넌트 ID가 없습니다');
       }
-      
-      console.log("tenant_id :::::::::::::::::::::::::: ", tenant_id);
+      // console.log("tenant_id :::::::::::::::::::::::::: ", tenant_id);
       
 
       const combinedData = await apiForCombinedTenantAndCampaignGroup(tenant_id);
       return {
         combinedData,
-        transformedData: transformToTreeData(combinedData)
+        transformedData: transformToTreeData(combinedData).map(node => ({
+          ...node,
+          id: centerId || node.id.toString(), // store에 저장된 로그인시 받아온 센터아이디
+          name: centerId && centerName ? `[${centerId}]${centerName}` : node.name.toString() , // 이름이 없을 경우 기본값 설정
+        }))
       };
     },
     enabled: tenant_id !== undefined && tenant_id !== null,

@@ -11,6 +11,7 @@ import { useAuthStore, useMainStore } from "@/store";
 import { useTreeMenuStore, ViewMode } from "@/store/storeForSsideMenuCampaignTab";
 import { useShallow } from "zustand/react/shallow";
 import { getStatusFromFlags } from "../api/apiForGetTreeMenuDataForSideMenu";
+import { useEnvironmentStore } from "@/store/environmentStore";
 
 
 // 트리 노드 선택/확장 상태 관리
@@ -67,6 +68,8 @@ export function TreeMenusForCampaigns() {
     campaignSkills,
     campaignSkillsLoaded
   } = useMainStore();
+
+  const { centerId, centerName } = useEnvironmentStore();
 
   // 로딩 상태 확인
   const isLoading = !tenantsLoaded || !campaignsLoaded || !campaignSkillsLoaded ||
@@ -144,8 +147,8 @@ export function TreeMenusForCampaigns() {
         id: 'campaign',
         label: '캠페인',
         items: [{
-          id: 'nexus',
-          label: 'NEXUS',
+          id: centerId || 'nexus',
+          label: centerName || 'Nexus',
           type: 'folder',
           children: items
         }]
@@ -245,7 +248,7 @@ export function TreeMenusForCampaigns() {
 
     return items.map(item => {
       // NEXUS 루트 노드 처리
-      if (item.id === "nexus" && item.children) {
+      if ((item.id === centerId || item.id === "nexus") && item.children) {
         // 테넌트 폴더와 기타 아이템 분리
         const tenantFolders = item.children.filter(child => child.type === "folder");
         const otherItems = item.children.filter(child => child.type !== "folder");
@@ -490,7 +493,7 @@ export function TreeMenusForCampaigns() {
         const newExpanded = new Set<string>();
 
         // 루트 노드(NEXUS)만 확장
-        const rootNode = items.find(item => item.id.toLowerCase() === "nexus");
+        const rootNode = items.find(item => item.id.toLowerCase() === centerId?.toLowerCase() || item.id.toLowerCase() === "nexus");
         if (rootNode) {
           newExpanded.add(rootNode.id);
 
