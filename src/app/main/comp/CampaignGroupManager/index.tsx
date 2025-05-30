@@ -314,7 +314,7 @@ const CampaignGroupManager = ({ groupId, groupName }: Props) => {
       _setGroupId(parseInt(groupId));
       fetchCampaignGroupSearch(null);
     }
-  }, [groupId,campaignGroupManagerInit]);
+  }, [groupId]);
 
   useEffect(() => {
     if (tenants) {
