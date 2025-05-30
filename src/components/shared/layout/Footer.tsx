@@ -531,24 +531,11 @@ export default function Footer({
           );
 
         }
-        else if ((data['campaign_status'] === 2 || data['campaign_status'] === 3) && data['campaign_end_flag'] === 1) {
+        else if ( data['campaign_status'] === 2 || data['campaign_status'] === 3 ) {
           // 캠페인 상태가 멈춤이나 정지이며, 완료 되었을때 ==> 차후에 campaign_end_flag 맞춰서 변경해야함!!!
+          // 0530 footer 수신이벤트가 end_flag 2로 오는경우가 추가되어서 기존 end_flag 1 조건 삭제
           removeCampaignDialStatus({ campaign_id: campaign_id });
         }
-
-        /* 캠페인 동작시간에 벗어났을때 캠페인 시작을 누르면
-          전화를 받아서 발신이 종료된경우
-          [11:01:48]	[EVENT]	[캠페인 동작상태 변경] 캠페인 아이디 : 38890, 동작상태: 중지, 완료구분: 완료
-
-          스케줄에 해당하는 시간이 되었을경우
-          [10:59:59]	[EVENT]	[캠페인 동작상태 변경] 캠페인 아이디 : 38890, 동작상태: 시작, 완료구분: 진행중
-
-          스케줄에 해당하지않는 시간에 시작을 누를경우
-          [10:54:39]	[EVENT]	[캠페인 동작상태 변경] 캠페인 아이디 : 38890, 동작상태: 스케줄 PAUSE, 완료구분: 진행중
-          [10:54:39]	[EVENT]	[캠페인 동작상태 변경] 캠페인 아이디 : 38890, 동작상태: 캠페인 멈춤 중, 완료구분: 진행중
-          [10:54:39]	[EVENT]	[캠페인 동작상태 변경] 캠페인 아이디 : 38890, 동작상태: 시작, 완료구분: 진행중
-        */
-
 
         // 스케줄 PAUSE와 스케줄 시작 구분???
         if ((data['campaign_status'] === 4 || data['campaign_status'] === 9) && data['campaign_end_flag'] === 1) {
@@ -566,7 +553,6 @@ export default function Footer({
           // 캠페인 상태가 스케줄 PAUSE와 스케줄 시작일때,
           addCampaignDialStatus({ campaign_id: campaign_id, status: data['campaign_status'] });
         }
-
 
 
         // 푸터 로그 메시지

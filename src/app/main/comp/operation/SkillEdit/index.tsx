@@ -194,7 +194,6 @@ const SkillEdit = () => {
   useEffect(() => {
 
     if(agentSkillStatus === true){
-      console.log('######### 상담사 상태 변경 수신');
       
       // fetchCounselorList({ tenantId: tenant_id, roleId: role_id });
       fetchSkillList({ tenant_id_array: tenants.map(tenant => tenant.tenant_id) });
